@@ -1,5 +1,5 @@
-import 'package:tim_ui_kit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tim_ui_kit/tim_ui_kit.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 enum GroupReceptAllowType { work, public, meeting }
 
@@ -90,6 +90,9 @@ class TIMUIKitChatConfig {
   /// The notification sound in Android devices.
   final String notificationAndroidSound;
 
+  ///Used to set the line height of text messages
+  final double textHight;
+
   /// The body content shows in push notification.
   /// Returning `null` means using default body in this case.
   final String? Function(
@@ -132,37 +135,46 @@ class TIMUIKitChatConfig {
   /// The default action is opening the link with the default browser of system.
   final void Function(String url)? onTapLink;
 
-  const TIMUIKitChatConfig({
-    this.onTapLink,
-    this.timeDividerConfig,
-    this.faceURIPrefix,
-    this.faceURISuffix,
-    this.isAtWhenReply = true,
-    this.notificationAndroidSound = "",
-    this.isSupportMarkdownForTextMessage = false,
-    this.notificationExt,
-    this.isUseMessageReaction = true,
-    this.isShowSelfNameInGroup = false,
-    @Deprecated("Please use [isShowGroupReadingStatus] instead")
-        this.isShowGroupMessageReadReceipt = true,
-    this.upperRecallTime = 120,
-    this.isShowOthersNameInGroup = true,
-    this.urlPreviewType = UrlPreviewType.onlyHyperlink,
-    this.notificationBody,
-    this.notificationOPPOChannelID = "",
-    this.notificationTitle = "",
-    this.notificationIOSSound = "",
-    this.isAllowSoundMessage = true,
-    @Deprecated("Please use [groupReadReceiptPermissionList] instead")
-        this.groupReadReceiptPermisionList,
-    this.groupReadReceiptPermissionList,
-    this.isAllowEmojiPanel = true,
-    this.isAllowShowMorePanel = true,
-    this.isShowReadingStatus = true,
-    this.isAllowLongPressMessage = true,
-    this.isAllowClickAvatar = true,
-    this.isShowGroupReadingStatus = true,
-    this.isReportGroupReadingStatus = true,
-    this.showC2cMessageEditStaus = true,
-  });
+  /// Whether to use the default emoji
+  final bool isUseDefaultEmoji;
+
+  /// Is show avatar on history message list.
+  /// [Default]: true.
+  final bool isShowAvatar;
+
+  const TIMUIKitChatConfig(
+      {this.onTapLink,
+      this.timeDividerConfig,
+      this.faceURIPrefix,
+      this.faceURISuffix,
+      this.textHight = 1.0,
+      this.isAtWhenReply = true,
+      this.notificationAndroidSound = "",
+      this.isSupportMarkdownForTextMessage = false,
+      this.notificationExt,
+      this.isUseMessageReaction = true,
+      this.isShowAvatar = true,
+      this.isShowSelfNameInGroup = false,
+      @Deprecated("Please use [isShowGroupReadingStatus] instead")
+          this.isShowGroupMessageReadReceipt = true,
+      this.upperRecallTime = 120,
+      this.isShowOthersNameInGroup = true,
+      this.urlPreviewType = UrlPreviewType.onlyHyperlink,
+      this.notificationBody,
+      this.notificationOPPOChannelID = "",
+      this.notificationTitle = "",
+      this.notificationIOSSound = "",
+      this.isAllowSoundMessage = true,
+      @Deprecated("Please use [groupReadReceiptPermissionList] instead")
+          this.groupReadReceiptPermisionList,
+      this.groupReadReceiptPermissionList,
+      this.isAllowEmojiPanel = true,
+      this.isAllowShowMorePanel = true,
+      this.isShowReadingStatus = true,
+      this.isAllowLongPressMessage = true,
+      this.isAllowClickAvatar = true,
+      this.isShowGroupReadingStatus = true,
+      this.isReportGroupReadingStatus = true,
+      this.showC2cMessageEditStaus = true,
+      this.isUseDefaultEmoji = false});
 }

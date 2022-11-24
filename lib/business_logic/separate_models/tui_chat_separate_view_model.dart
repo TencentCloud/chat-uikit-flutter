@@ -8,16 +8,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/business_logic/life_cycle/chat_life_cycle.dart';
-import 'package:tim_ui_kit/business_logic/separate_models/tui_chat_model_tools.dart';
-import 'package:tim_ui_kit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tim_ui_kit/data_services/friendShip/friendship_services.dart';
-import 'package:tim_ui_kit/data_services/group/group_services.dart';
-import 'package:tim_ui_kit/data_services/message/message_services.dart';
-import 'package:tim_ui_kit/data_services/services_locatar.dart';
-import 'package:tim_ui_kit/ui/constants/history_message_constant.dart';
-import 'package:tim_ui_kit/ui/utils/platform.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/tim_uikit_chat_config.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/chat_life_cycle.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_model_tools.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/friendShip/friendship_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_chat_config.dart';
 import 'package:uuid/uuid.dart';
 
 class TUIChatSeparateViewModel extends ChangeNotifier {
@@ -191,10 +191,10 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     globalModel.lifeCycle = lifeCycle;
     globalModel.setCurrentConversation(
         CurrentConversation(conversationID, conversationType ?? ConvType.c2c));
-    globalModel.setTempMessageList(conversationID, []);
     globalModel.setMessageListPosition(
         conversationID, HistoryMessagePosition.bottom);
     globalModel.setChatConfig(chatConfig);
+    globalModel.clearRecivedNewMessageCount();
     _isInit = true;
   }
 
@@ -205,23 +205,30 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     required int count,
     String? lastMsgID,
   }) async {
+    print(lastMsgID);
     haveMoreData = false;
     final currentHistoryMsgList = globalModel.messageListMap[conversationID];
-    final response = await _messageService.getHistoryMessageList(
+    final response = await _messageService.getHistoryMessageListWithComplete(
         count: count,
         getType: getType,
         userID: conversationType == ConvType.c2c ? conversationID : null,
         groupID: conversationType == ConvType.group ? conversationID : null,
         lastMsgID: lastMsgID,
         lastMsgSeq: lastMsgSeq);
+    if (response == null) {
+      return false;
+    }
     if (lastMsgID != null && currentHistoryMsgList != null) {
-      final newList = [...currentHistoryMsgList, ...response];
+      final messageList = response.messageList;
+      final newList = [...currentHistoryMsgList, ...messageList];
       final List<V2TimMessage> msgList =
           await lifeCycle?.didGetHistoricalMessageList(newList) ?? newList;
-      globalModel.setMessageList(conversationID, msgList, needDuration: false);
+      globalModel.setMessageList(conversationID, msgList,
+          needResetNewMessageCount: false);
     } else {
       List<V2TimMessage> messageList =
-          await lifeCycle?.didGetHistoricalMessageList(response) ?? response;
+          await lifeCycle?.didGetHistoricalMessageList(response.messageList) ??
+              response.messageList;
       if (globalModel.loadingMessage[conversationID] != null) {
         if (globalModel.loadingMessage[conversationID]!.isNotEmpty) {
           messageList = [
@@ -233,26 +240,28 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
         }
       }
       globalModel.setMessageList(conversationID, messageList,
-          needDuration: false);
+          needResetNewMessageCount: false);
       // The messages in first screen
     }
-    if (response.isEmpty ||
-        (!PlatformUtils().isWeb && response.length < count) ||
-        (PlatformUtils().isWeb && response.length < min(count, 20))) {
-      haveMoreData = false;
-    } else {
-      haveMoreData = true;
-    }
+    haveMoreData = !response.isFinished;
+
+    // if (response.isEmpty ||
+    //     (!PlatformUtils().isWeb && response.length < count) ||
+    //     (PlatformUtils().isWeb && response.length < min(count, 20))) {
+    //   haveMoreData = false;
+    // } else {
+    //   haveMoreData = true;
+    // }
     // notifyListeners();
     if (chatConfig.isShowGroupReadingStatus &&
         conversationType == ConvType.group &&
-        response.isNotEmpty) {
-      _getMsgReadReceipt(response);
+        response.messageList.isNotEmpty) {
+      _getMsgReadReceipt(response.messageList);
     }
     if (chatConfig.isReportGroupReadingStatus &&
         conversationType == ConvType.group &&
-        response.isNotEmpty) {
-      _setMsgReadReceipt(response);
+        response.messageList.isNotEmpty) {
+      _setMsgReadReceipt(response.messageList);
     }
     return haveMoreData;
   }
@@ -455,8 +464,8 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     return globalModel.messageListMap[conversationID] ?? [];
   }
 
-  List<V2TimMessage> getTempMessageList() {
-    return globalModel.tempMessageListMap[conversationID] ?? [];
+  int getConversationUnreadCount() {
+    return globalModel.unreadCountForConversation;
   }
 
   Future<V2TimValueCallback<V2TimMessage>?> sendTextAtMessage(
@@ -1246,16 +1255,16 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
   }
 
   showLatestUnread() {
-    List<V2TimMessage> currentMsgList = getOriginMessageList();
-    currentMsgList = [
-      ...?globalModel.tempMessageListMap[conversationID],
-      ...currentMsgList
-    ];
+    // List<V2TimMessage> currentMsgList = getOriginMessageList();
+    // currentMsgList = [
+    //   ...?globalModel.tempMessageListMap[conversationID],
+    //   ...currentMsgList
+    // ];
     markMessageAsRead();
     globalModel.setMessageListPosition(
         conversationID, HistoryMessagePosition.bottom);
-    globalModel.setTempMessageList(conversationID, []);
-    globalModel.setMessageList(conversationID, currentMsgList);
+    // globalModel.setTempMessageList(conversationID, []);
+    // globalModel.setMessageList(conversationID, currentMsgList);
   }
 
   @override

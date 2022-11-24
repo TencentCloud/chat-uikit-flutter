@@ -1,8 +1,8 @@
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tim_ui_kit/data_services/core/core_services_implements.dart';
-import 'package:tim_ui_kit/data_services/message/message_services.dart';
-import 'package:tim_ui_kit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 
 class TUIChatModelTools {
   final TUIChatGlobalModel globalModel = serviceLocator<TUIChatGlobalModel>();

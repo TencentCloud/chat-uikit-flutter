@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tim_ui_kit/data_services/core/core_services_implements.dart';
-import 'package:tim_ui_kit/data_services/services_locatar.dart';
-import 'package:tim_ui_kit/ui/utils/color.dart';
-import 'package:tim_ui_kit/ui/utils/tui_theme.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/color.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
 class Avatar extends TIMUIKitStatelessWidget {
   final String faceUrl;
@@ -30,10 +30,10 @@ class Avatar extends TIMUIKitStatelessWidget {
     Widget defaultAvatar() {
       if (type == 1) {
         return Image.asset('images/default_c2c_head.png',
-            package: 'tim_ui_kit');
+            package: 'tencent_cloud_chat_uikit');
       } else {
         return Image.asset('images/default_group_head.png',
-            package: 'tim_ui_kit');
+            package: 'tencent_cloud_chat_uikit');
       }
     }
 

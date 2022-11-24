@@ -10,32 +10,32 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:super_tooltip/super_tooltip.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tim_ui_kit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tim_ui_kit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tim_ui_kit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tim_ui_kit/business_logic/view_models/tui_theme_view_model.dart';
-import 'package:tim_ui_kit/data_services/message/message_services.dart';
-import 'package:tim_ui_kit/data_services/services_locatar.dart';
-import 'package:tim_ui_kit/tim_ui_kit.dart';
-import 'package:tim_ui_kit/ui/constants/history_message_constant.dart';
-import 'package:tim_ui_kit/ui/utils/message.dart';
-import 'package:tim_ui_kit/ui/utils/platform.dart';
-import 'package:tim_ui_kit/ui/utils/time_ago.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_message_tooltip.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_message_read_receipt.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_utils.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/main.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_custom_elem.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_face_elem.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_group_trtc_tips_elem.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/tim_uikit_cloud_custom_data.dart';
-import 'package:tim_ui_kit/ui/widgets/avatar.dart';
-import 'package:tim_ui_kit/ui/widgets/loading.dart';
-import 'package:tim_ui_kit/ui/widgets/radio_button.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_theme_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/time_ago.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_message_tooltip.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_message_read_receipt.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_utils.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/main.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_custom_elem.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_face_elem.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_group_trtc_tips_elem.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_cloud_custom_data.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/loading.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/radio_button.dart';
 
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
 import '../TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_select_emoji.dart';
 
@@ -228,6 +228,11 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
   // open MessageReaction
   final bool? isUseMessageReaction;
 
+  /// Whether to use the default emoji
+  final bool isUseDefaultEmoji;
+
+  final customEmojiStickerList;
+
   const TIMUIKitHistoryMessageListItem(
       {Key? key,
       required this.message,
@@ -253,7 +258,9 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
       this.textPadding,
       this.topRowBuilder,
       this.isUseMessageReaction,
-      this.bottomRowBuilder})
+      this.bottomRowBuilder,
+      this.isUseDefaultEmoji = false,
+      this.customEmojiStickerList = const []})
       : super(key: key);
 
   @override
@@ -425,6 +432,8 @@ class _TIMUIKItHistoryMessageListItemState
           backgroundColor: widget.themeData?.messageBackgroundColor,
           textPadding: widget.textPadding,
           isShowMessageReaction: widget.isUseMessageReaction,
+          isUseDefaultEmoji: widget.isUseDefaultEmoji,
+          customEmojiStickerList: widget.customEmojiStickerList,
         );
       case MessageElemType.V2TIM_ELEM_TYPE_FACE:
         if (messageItemBuilder?.faceMessageItemBuilder != null) {
@@ -765,7 +774,8 @@ class _TIMUIKItHistoryMessageListItemState
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final TUIChatSeparateViewModel model =
         Provider.of<TUIChatSeparateViewModel>(context);
-    final TUIChatGlobalModel globalModel = serviceLocator<TUIChatGlobalModel>();
+    final isDownloadWaiting = context.select<TUIChatGlobalModel, bool>(
+        (value) => value.isWaiting(widget.message.msgID ?? ""));
     final TUITheme theme = value.theme;
     final message = widget.message;
     final msgType = message.elemType;
@@ -776,8 +786,7 @@ class _TIMUIKItHistoryMessageListItemState
     final isRevokedMsg = msgStatus == 6;
     final isTimeDivider = msgType == 11;
     final isPeerRead = message.isPeerRead ?? false;
-    final isGroupMessage =
-        widget.message.groupID != null && widget.message.groupID!.isNotEmpty;
+    final isGroupMessage = model.conversationType == ConvType.group;
     final bool isRevokeEditable =
         widget.message.elemType == MessageElemType.V2TIM_ELEM_TYPE_TEXT;
     final isShowNickNameForSelf =
@@ -885,7 +894,7 @@ class _TIMUIKItHistoryMessageListItemState
                       isSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
                   children: [
                     if (!isSelf && widget.showAvatar)
-                      InkWell(
+                      GestureDetector(
                         onTap: () {
                           if (widget.onTapForOthersPortrait != null &&
                               widget.allowAvatarTap) {
@@ -987,8 +996,8 @@ class _TIMUIKItHistoryMessageListItemState
                                   message.status ==
                                       MessageStatus.V2TIM_MSG_STATUS_SENDING)
                                 Container(
-                                  padding: const EdgeInsets.only(bottom: 10),
-                                  margin: const EdgeInsets.only(right: 4),
+                                  padding: const EdgeInsets.only(bottom: 3),
+                                  margin: const EdgeInsets.only(right: 6),
                                   child: const Loading(),
                                 ),
                               if (isSelf &&
@@ -1059,8 +1068,7 @@ class _TIMUIKItHistoryMessageListItemState
                         ],
                       ),
                     ),
-                    if (widget.message.elemType == 6 &&
-                        globalModel.isWaiting(widget.message.msgID ?? ""))
+                    if (widget.message.elemType == 6 && isDownloadWaiting)
                       Container(
                         margin: const EdgeInsets.only(top: 24, left: 6),
                         child: LoadingAnimationWidget.threeArchedCircle(

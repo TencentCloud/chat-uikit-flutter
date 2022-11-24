@@ -7,12 +7,12 @@ import 'package:chewie/src/helpers/utils.dart';
 import 'package:chewie/src/animated_play_pause.dart';
 import 'package:chewie/src/material/material_progress_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tim_ui_kit/ui/utils/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
 import 'package:video_player/video_player.dart';
 import 'center_play_button.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
 class VideoCustomControls extends StatefulWidget {
   const VideoCustomControls({required this.downloadFn, Key? key})
@@ -131,7 +131,7 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
             IconButton(
               icon: Image.asset(
                 'images/close.png',
-                package: 'tim_ui_kit',
+                package: 'tencent_cloud_chat_uikit',
               ),
               iconSize: 30,
               onPressed: () {
@@ -145,7 +145,7 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
             IconButton(
               icon: Image.asset(
                 'images/download.png',
-                package: 'tim_ui_kit',
+                package: 'tencent_cloud_chat_uikit',
               ),
               iconSize: 30,
               onPressed: widget.downloadFn,

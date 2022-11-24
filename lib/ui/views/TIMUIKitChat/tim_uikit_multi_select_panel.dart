@@ -1,15 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tim_ui_kit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tim_ui_kit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tim_ui_kit/ui/utils/color.dart';
-import 'package:tim_ui_kit/ui/utils/tui_theme.dart';
-import 'package:tim_ui_kit/ui/widgets/forward_message_screen.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/color.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/forward_message_screen.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
 class MultiSelectPanel extends TIMUIKitStatelessWidget {
   final ConvType conversationType;
@@ -50,7 +50,7 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
             children: [
               IconButton(
                 icon: Image.asset('images/forward.png',
-                    package: 'tim_ui_kit', color: Colors.white),
+                    package: 'tencent_cloud_chat_uikit', color: Colors.white),
                 iconSize: 40,
                 onPressed: () {
                   _handleForwardMessage(context, false, model);
@@ -64,7 +64,7 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
             children: [
               IconButton(
                 icon: Image.asset('images/merge_forward.png',
-                    package: 'tim_ui_kit', color: Colors.white),
+                    package: 'tencent_cloud_chat_uikit', color: Colors.white),
                 iconSize: 40,
                 onPressed: () {
                   _handleForwardMessage(context, true, model);
@@ -80,7 +80,7 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
             children: [
               IconButton(
                 icon: Image.asset('images/delete.png',
-                    package: 'tim_ui_kit', color: Colors.white),
+                    package: 'tencent_cloud_chat_uikit', color: Colors.white),
                 iconSize: 40,
                 onPressed: () {
                   showCupertinoModalPopup<String>(

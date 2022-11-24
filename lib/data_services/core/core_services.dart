@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/data_services/core/tim_uikit_config.dart';
-import 'package:tim_ui_kit/ui/utils/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_config.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
 
 enum AppStatus { foreground, background }
 

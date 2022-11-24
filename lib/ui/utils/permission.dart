@@ -8,10 +8,10 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tim_ui_kit/ui/utils/platform.dart';
-import 'package:tim_ui_kit/ui/utils/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
 
 class PermissionRequestInfo extends StatefulWidget {
   final Function removeOverLay;
@@ -92,7 +92,7 @@ class _PermissionRequestInfo extends TIMUIKitState<PermissionRequestInfo>
                       width: 50,
                       child: Image.asset(
                         permission?["icon"] ?? "",
-                        package: "tim_ui_kit",
+                        package: "tencent_cloud_chat_uikit",
                       ),
                     ),
                     const SizedBox(

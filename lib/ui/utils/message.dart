@@ -4,67 +4,10 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/ui/constants/history_message_constant.dart';
-import 'package:tim_ui_kit/ui/constants/time.dart';
-import 'package:tim_ui_kit/ui/utils/tui_theme.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_custom_elem.dart';
-
-class CallingMessage {
-  /// 发起邀请方
-  String? inviter;
-
-  /// 被邀请方
-  List<String>? inviteeList;
-
-  /// videoCall: 语音 audioCall: 视频
-  int? callType;
-
-  // 1: 邀请方发起邀请
-  // 2: 邀请方取消邀请
-  // 3: 被邀请方接受邀请
-  // 4: 被邀请方拒绝邀请
-  // 5: 邀请超时
-  int? actionType;
-
-  /// 邀请ID
-  String? inviteID;
-
-  /// 通话时间
-  int? timeout;
-
-  /// 通话房间
-  int? roomID;
-
-  // 通话时间：秒，大于0代表通话时间
-  int? callEnd;
-  // 是否是群组通话
-  bool? isGroup;
-
-  CallingMessage(
-      {this.inviter,
-      this.actionType,
-      this.inviteID,
-      this.inviteeList,
-      this.timeout,
-      this.roomID,
-      this.callType,
-      this.callEnd,
-      this.isGroup});
-
-  CallingMessage.fromJSON(json) {
-    actionType = json["actionType"];
-    timeout = json["timeout"];
-    inviter = json["inviter"];
-    inviteeList = List<String>.from(json["inviteeList"]);
-    inviteID = json["inviteID"];
-    callType = jsonDecode(json["data"])["cmd"] != null
-        ? (jsonDecode(json["data"])["cmd"] == "audioCall" ? 1 : 2)
-        : jsonDecode(json["data"])["call_type"];
-    roomID = jsonDecode(json["data"])["room_id"];
-    callEnd = jsonDecode(json["data"])["call_end"];
-    isGroup = jsonDecode(json["data"])["is_group"];
-  }
-}
+import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
+import 'package:tencent_cloud_chat_uikit/ui/constants/time.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_custom_elem.dart';
 
 class MessageUtils {
   // 判断CallingData的方式和Trtc的方法一致
@@ -271,17 +214,17 @@ class MessageUtils {
 
   static String handleCustomMessageString(V2TimMessage message) {
     final customElem = message.customElem;
-    final callingMessage = TIMUIKitCustomElem.getCallMessage(customElem);
+    final callingMessage = CallingMessage.getCallMessage(customElem);
     if (callingMessage != null) {
       // 如果是结束消息
-      final isCallEnd = TIMUIKitCustomElem.isCallEndExist(callingMessage);
+      final isCallEnd = CallingMessage.isCallEndExist(callingMessage);
       String? option2 = "";
       if (isCallEnd) {
-        option2 = TIMUIKitCustomElem.getShowTime(callingMessage.callEnd!);
+        option2 = CallingMessage.getShowTime(callingMessage.callEnd!);
       }
       return isCallEnd
           ? (TIM_t_para("通话时间：{{option2}}", "通话时间：$option2")(option2: option2))
-          : (TIMUIKitCustomElem.getActionType(callingMessage.actionType!));
+          : (CallingMessage.getActionType(callingMessage.actionType!));
     } else {
       return TIM_t("自定义消息");
     }
@@ -290,16 +233,16 @@ class MessageUtils {
   static handleCustomMessage(V2TimMessage message, context) {
     // 这个函数应该返回String，目前已经切走用不上了，但是不敢删QAQ，就这么留着吧。
     final customElem = message.customElem;
-    final callingMessage = TIMUIKitCustomElem.getCallMessage(customElem);
+    final callingMessage = CallingMessage.getCallMessage(customElem);
     if (callingMessage != null) {
       // 如果是结束消息
-      final isCallEnd = TIMUIKitCustomElem.isCallEndExist(callingMessage);
+      final isCallEnd = CallingMessage.isCallEndExist(callingMessage);
 
       final isVoiceCall = callingMessage.callType == 1;
 
       String? option2 = "";
       if (isCallEnd) {
-        option2 = TIMUIKitCustomElem.getShowTime(callingMessage.callEnd!);
+        option2 = CallingMessage.getShowTime(callingMessage.callEnd!);
       }
 
       return Row(
@@ -309,7 +252,7 @@ class MessageUtils {
             padding: const EdgeInsets.only(right: 4),
             child: Image.asset(
               isVoiceCall ? "images/voice_call.png" : "images/video_call.png",
-              package: 'tim_ui_kit',
+              package: 'tencent_cloud_chat_uikit',
               height: 16,
               width: 16,
             ),
@@ -318,7 +261,7 @@ class MessageUtils {
               ? Text(TIM_t_para("通话时间：{{option2}}", "通话时间：$option2")(
                   option2: option2))
               : Text(
-                  TIMUIKitCustomElem.getActionType(callingMessage.actionType!)),
+              CallingMessage.getActionType(callingMessage.actionType!)),
           // if (isFromSelf)
           //   Padding(
           //     padding: const EdgeInsets.only(left: 4),
@@ -326,7 +269,7 @@ class MessageUtils {
           //       isVoiceCall
           //           ? "images/voice_call.png"
           //           : "images/video_call_self.png",
-          //       package: 'tim_ui_kit',
+          //       package: 'tencent_cloud_chat_uikit',
           //       height: 16,
           //       width: 16,
           //     ),

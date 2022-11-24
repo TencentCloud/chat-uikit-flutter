@@ -1,14 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:tencent_extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tim_ui_kit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tim_ui_kit/tim_ui_kit.dart';
-import 'package:tim_ui_kit/ui/widgets/link_preview/link_preview_entry.dart';
-import 'package:tim_ui_kit/ui/widgets/link_preview/widgets/link_preview.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/link_preview_entry.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/widgets/link_preview.dart';
 import 'TIMUIKitMessageReaction/tim_uikit_message_reaction_show_panel.dart';
 
 class TIMUIKitTextElem extends StatefulWidget {
@@ -22,6 +24,8 @@ class TIMUIKitTextElem extends StatefulWidget {
   final EdgeInsetsGeometry? textPadding;
   final TUIChatSeparateViewModel chatModel;
   final bool? isShowMessageReaction;
+  final bool isUseDefaultEmoji;
+  final List customEmojiStickerList;
 
   const TIMUIKitTextElem(
       {Key? key,
@@ -34,7 +38,9 @@ class TIMUIKitTextElem extends StatefulWidget {
       this.isShowMessageReaction,
       this.backgroundColor,
       this.textPadding,
-      required this.chatModel})
+      required this.chatModel,
+      this.isUseDefaultEmoji = false,
+      this.customEmojiStickerList = const []})
       : super(key: key);
 
   @override
@@ -155,9 +161,12 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final theme = value.theme;
     final textWithLink = LinkPreviewEntry.getHyperlinksText(
-        widget.message,
-        widget.chatModel.chatConfig.isSupportMarkdownForTextMessage,
-        widget.chatModel.chatConfig.onTapLink);
+      widget.message,
+      widget.chatModel.chatConfig.isSupportMarkdownForTextMessage,
+      widget.chatModel.chatConfig.onTapLink,
+      widget.isUseDefaultEmoji,
+      widget.customEmojiStickerList,
+    );
     final borderRadius = widget.isFromSelf
         ? const BorderRadius.only(
             topLeft: Radius.circular(10),
@@ -195,7 +204,7 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
         borderRadius: widget.borderRadius ?? borderRadius,
       ),
       constraints:
-          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
+          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -203,10 +212,22 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
           // You can render the widget from extension directly, with a [TextStyle] optionally.
           widget.chatModel.chatConfig.urlPreviewType != UrlPreviewType.none
               ? textWithLink!(
-                  style: widget.fontStyle ?? const TextStyle(fontSize: 16))
-              : Text(widget.message.textElem?.text ?? "",
+                  style: widget.fontStyle ??
+                      TextStyle(
+                          fontSize: 16,
+                          textBaseline: TextBaseline.ideographic,
+                          height: widget.chatModel.chatConfig.textHight))
+              : ExtendedText(widget.message.textElem?.text ?? "",
                   softWrap: true,
-                  style: widget.fontStyle ?? const TextStyle(fontSize: 16)),
+                  style: widget.fontStyle ??
+                      TextStyle(
+                          fontSize: 16,
+                          height: widget.chatModel.chatConfig.textHight),
+                  specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
+                    isUseDefaultEmoji: widget.isUseDefaultEmoji,
+                    customEmojiStickerList: widget.customEmojiStickerList,
+                    showAtBackground: true,
+                  )),
           // If the link preview info is available, render the preview card.
           if (_renderPreviewWidget() != null &&
               widget.chatModel.chatConfig.urlPreviewType ==

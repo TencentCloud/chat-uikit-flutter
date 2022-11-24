@@ -1,4 +1,4 @@
-[English](https://github.com/TencentCloud/TIMSDK/blob/master/Flutter/IMSDK/tim_ui_kit/README.md) | 简体中文
+[English](https://github.com/TencentCloud/tc-chat-uikit-flutter) | 简体中文
 
 # Flutter TUIKit
 
@@ -54,7 +54,7 @@ TUIKit 是基于 IM SDK 实现的一套 UI 组件，其包含会话、聊天、�
 基础用法如下，先初始化IM，再登录用户：
 
 ```dart
-import 'package:tim_ui_kit/tim_ui_kit.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 final CoreServicesImpl _coreInstance = TIMUIKitCore.getInstance();
 final V2TIMManager _sdkInstance = TIMUIKitCore.getSDKInstance();
@@ -82,7 +82,7 @@ _coreInstance.login(
 
 通过`TIMCallbackType`确定类型。
 
-> 这部分的处理逻辑[可参考我们的 DEMO](https://github.com/TencentCloud/TIMSDK/blob/master/Flutter/Demo/im-flutter-uikit/lib/src/pages/app.dart)，并根据您的需要，自行修改。
+> 这部分的处理逻辑[可参考我们的 DEMO](https://github.com/TencentCloud/tc-chat-demo-flutter/lib/src/pages/app.dart)，并根据您的需要，自行修改。
 
 #### SDK API 错误（`TIMCallbackType.API_ERROR`）
 
@@ -170,19 +170,19 @@ _coreInstance.login(
 
 #### 方法
 
-- **loadData(int count)**:  
+- **loadData(int count)**:
   加载会话列表, count 为单次加载数量
-- **reloadData(int count)**:  
+- **reloadData(int count)**:
   重新加载会话列表, count 为单次加载数量
 - **pinConversation({required String conversationID, required bool isPinned})**:
   会话置顶
-- **clearHistoryMessage({required V2TimConversation conversation})**:  
+- **clearHistoryMessage({required V2TimConversation conversation})**:
   清除指定会话消息
-- **deleteConversation({required String conversationID})**:  
+- **deleteConversation({required String conversationID})**:
   删除指定会话
-- **setConversationListener({V2TimConversationListener? listener})**:  
+- **setConversationListener({V2TimConversationListener? listener})**:
   添加会话监听器
-- **dipose()**:  
+- **dipose()**:
   销毁
 
 ---
@@ -226,19 +226,19 @@ _coreInstance.login(
 
 ### TIMUIKitProfileController
 
-- **pinedConversation(bool isPined, String convID)**:  
+- **pinedConversation(bool isPined, String convID)**:
   会话置顶, `isPined` 为是否置顶，`convID` 为需要置顶的会话 ID.
-- **addUserToBlackList(bool shouldAdd, String userID)**:  
+- **addUserToBlackList(bool shouldAdd, String userID)**:
   添加用户至黑名单, `shouldAdd`为是否需要添加至黑名单, `userID`为需要被添加到黑名单的用户.
-- **changeFriendVerificationMethod(int allowType)**:  
+- **changeFriendVerificationMethod(int allowType)**:
   更改好友验证方式, `0`为"同意任何用户添加好友"、`1`为"需要验证"、`2`为"拒绝任何人加好友".
-- **updateRemarks(String userID, String remark)**:  
+- **updateRemarks(String userID, String remark)**:
   更新好友备注, `userID`为被更新的用户 ID, `remark`为备注.
-- **loadData**:  
+- **loadData**:
   加载数据
-- **dispose()**:  
+- **dispose()**:
   销毁
-- **addFriend(String userID)**:  
+- **addFriend(String userID)**:
   添加好友，`userID`为被添加好友的用户 ID.
 
 ---
@@ -285,7 +285,7 @@ _coreInstance.login(
 [详细用法可参考此文档](https://cloud.tencent.com/document/product/269/79121)
 
 ```dart
-import 'package:tim_ui_kit/tim_ui_kit.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 // 全局搜索
 TIMUIKitSearch(
@@ -394,10 +394,10 @@ TIMUIKitSearchMsgDetail(
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:tim_ui_kit/tim_ui_kit.dart';
-import 'package:tim_ui_kit/ui/controller/tim_uikit_chat_controller.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_history_message_list.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_text_field.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/controller/tim_uikit_chat_controller.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_history_message_list.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_text_field.dart';
 
 class Chat extends StatefulWidget {
   final V2TimConversation selectedConversation;

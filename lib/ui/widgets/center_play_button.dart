@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
 class CenterPlayButton extends TIMUIKitStatelessWidget {
   CenterPlayButton({
@@ -27,7 +27,7 @@ class CenterPlayButton extends TIMUIKitStatelessWidget {
             child: GestureDetector(
               child: IconButton(
                 iconSize: 86,
-                icon: Image.asset('images/play.png', package: 'tim_ui_kit'),
+                icon: Image.asset('images/play.png', package: 'tencent_cloud_chat_uikit'),
                 onPressed: onPressed,
               ),
             ),

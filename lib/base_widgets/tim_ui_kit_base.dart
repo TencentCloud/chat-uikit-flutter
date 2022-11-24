@@ -1,4 +1,4 @@
-import 'package:tim_ui_kit/ui/utils/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
 
 class TUIKitBuildValue {
   // 这里预留以后可以扩展全局通用能力

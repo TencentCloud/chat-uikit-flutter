@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_class.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_class.dart';
 
 typedef MessageFunction = Future<V2TimMessage?> Function(V2TimMessage message);
 

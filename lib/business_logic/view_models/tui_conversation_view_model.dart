@@ -2,13 +2,13 @@
 
 import 'package:flutter/material.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/business_logic/life_cycle/conversation_life_cycle.dart';
-import 'package:tim_ui_kit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tim_ui_kit/data_services/conversation/conversation_services.dart';
-import 'package:tim_ui_kit/data_services/message/message_services.dart';
-import 'package:tim_ui_kit/data_services/services_locatar.dart';
-import 'package:tim_ui_kit/data_services/friendShip/friendship_services.dart';
-import 'package:tim_ui_kit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/conversation_life_cycle.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/conversation/conversation_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/friendShip/friendship_services.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 
 List<T> removeDuplicates<T>(
     List<T> list, bool Function(T first, T second) isEqual) {
@@ -118,9 +118,7 @@ class TUIConversationViewModel extends ChangeNotifier {
 
   initConversation() async {
     clearData();
-    if (PlatformUtils().isWeb) {
-      loadInitConversation();
-    }
+    loadInitConversation();
   }
 
   Future<void> loadData({required int count}) async {

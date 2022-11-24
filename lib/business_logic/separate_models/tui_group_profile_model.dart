@@ -2,13 +2,13 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/business_logic/life_cycle/group_profile_life_cycle.dart';
-import 'package:tim_ui_kit/data_services/conversation/conversation_services.dart';
-import 'package:tim_ui_kit/data_services/core/core_services_implements.dart';
-import 'package:tim_ui_kit/data_services/friendShip/friendship_services.dart';
-import 'package:tim_ui_kit/data_services/group/group_services.dart';
-import 'package:tim_ui_kit/data_services/message/message_services.dart';
-import 'package:tim_ui_kit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/group_profile_life_cycle.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/conversation/conversation_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/friendShip/friendship_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 
 class TUIGroupProfileModel extends ChangeNotifier {
   final CoreServicesImpl _coreServices = serviceLocator<CoreServicesImpl>();

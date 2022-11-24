@@ -1,7 +1,35 @@
 import 'package:tencent_im_base/tencent_im_base.dart';
 
+class MessageListResponse {
+  final bool haveMoreData;
+  final List<V2TimMessage> data;
+  MessageListResponse({required this.haveMoreData, required this.data});
+}
+
 abstract class MessageService {
   Future<List<V2TimMessage>> getHistoryMessageList({
+    HistoryMsgGetTypeEnum getType =
+        HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
+    String? userID,
+    String? groupID,
+    int lastMsgSeq,
+    required int count,
+    String? lastMsgID,
+    List<int>? messageTypeList,
+  });
+
+  Future<V2TimMessageListResult?> getHistoryMessageListWithComplete({
+    HistoryMsgGetTypeEnum getType =
+        HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
+    String? userID,
+    String? groupID,
+    int lastMsgSeq,
+    required int count,
+    String? lastMsgID,
+    List<int>? messageTypeList,
+  });
+
+  Future<MessageListResponse> getHistoryMessageListV2({
     HistoryMsgGetTypeEnum getType =
         HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
     String? userID,
@@ -164,5 +192,16 @@ abstract class MessageService {
 
   Future<V2TimCallback> sendMessageReadReceipts({
     required List<String> messageIDList,
+  });
+
+  Future<V2TimValueCallback<V2TimMessageOnlineUrl>> getMessageOnlineUrl({
+    required String msgID,
+  });
+
+  Future<V2TimCallback> downloadMessage({
+    required String msgID,
+    required int messageType,
+    required int imageType, // 图片类型，仅messageType为图片消息是有效
+    required bool isSnapshot, // 是否是视频封面，仅messageType为视频消息是有效
   });
 }

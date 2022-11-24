@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tim_ui_kit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tim_ui_kit/ui/utils/color.dart';
-import 'package:tim_ui_kit/ui/utils/tui_theme.dart';
-import 'package:tim_ui_kit/ui/widgets/merger_message_screen.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/color.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/merger_message_screen.dart';
 
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
 import 'TIMUIKitMessageReaction/tim_uikit_message_reaction_show_panel.dart';
@@ -68,16 +68,12 @@ class TIMUIKitMergerElemState extends TIMUIKitState<TIMUIKitMergerElem> {
   _handleTap(BuildContext context, TUIChatSeparateViewModel model) async {
     try {
       if (widget.messageID != "") {
-        final mergerMessageList =
-            await model.downloadMergerMessage(widget.messageID);
-        if (mergerMessageList != null) {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MergerMessageScreen(
-                    model: model, messageList: mergerMessageList),
-              ));
-        }
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MergerMessageScreen(
+                  model: model, msgID: widget.messageID),
+            ));
       }
     } catch (e) {
       onTIMCallback(TIMCallback(

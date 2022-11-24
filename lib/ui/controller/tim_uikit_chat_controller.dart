@@ -1,10 +1,10 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/cupertino.dart';
-import 'package:tim_ui_kit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tim_ui_kit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tim_ui_kit/data_services/services_locatar.dart';
-import 'package:tim_ui_kit/tim_ui_kit.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 class TIMUIKitChatController {
   late TUIChatSeparateViewModel? model;
@@ -37,7 +37,7 @@ class TIMUIKitChatController {
 
   /// clear the current conversation;
   /// 销毁
-  @Deprecated("No need to dispose after tim_ui_kit 0.1.4")
+  @Deprecated("No need to dispose after tencent_cloud_chat_uikit 0.1.4")
   dispose() {}
 
   /// clear the history of current conversation;

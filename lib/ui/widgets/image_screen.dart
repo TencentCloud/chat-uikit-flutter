@@ -3,11 +3,11 @@ import 'dart:math';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tim_ui_kit/ui/widgets/center_loading.dart';
-import 'package:tim_ui_kit/ui/widgets/gestured_image.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tim_ui_kit/ui/widgets/image_hero.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/center_loading.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/gestured_image.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/image_hero.dart';
 
 typedef DoubleClickAnimationListener = void Function();
 
@@ -245,7 +245,7 @@ class _ImageScreenState extends TIMUIKitState<ImageScreen>
                   child: IconButton(
                     icon: Image.asset(
                       'images/close.png',
-                      package: 'tim_ui_kit',
+                      package: 'tencent_cloud_chat_uikit',
                     ),
                     iconSize: 30,
                     onPressed: close,
@@ -256,7 +256,7 @@ class _ImageScreenState extends TIMUIKitState<ImageScreen>
                 child: IconButton(
                   icon: Image.asset(
                     'images/download.png',
-                    package: 'tim_ui_kit',
+                    package: 'tencent_cloud_chat_uikit',
                   ),
                   iconSize: 30,
                   onPressed: widget.downloadFn,

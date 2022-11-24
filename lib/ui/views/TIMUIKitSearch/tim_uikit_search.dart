@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tim_ui_kit/data_services/services_locatar.dart';
-import 'package:tim_ui_kit/business_logic/view_models/tui_search_view_model.dart';
-import 'package:tim_ui_kit/ui/utils/color.dart';
-import 'package:tim_ui_kit/ui/utils/platform.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitSearch/tim_uikit_search_friend.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitSearch/pureUI/tim_uikit_search_input.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitSearch/tim_uikit_search_group.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitSearch/tim_uikit_search_msg.dart';
-import 'package:tim_ui_kit/tim_ui_kit.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitSearch/tim_uikit_search_not_support.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_search_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/color.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/tim_uikit_search_friend.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/pureUI/tim_uikit_search_input.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/tim_uikit_search_group.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/tim_uikit_search_msg.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/tim_uikit_search_not_support.dart';
 
 class TIMUIKitSearch extends StatefulWidget {
   /// the callback after clicking the conversation item
@@ -30,6 +30,8 @@ class TIMUIKitSearch extends StatefulWidget {
   final Function(V2TimConversation conversation, String initKeyword)?
       onEnterSearchInConversation;
 
+  final bool? isAutoFocus;
+
   const TIMUIKitSearch(
       {required this.onTapConversation,
       Key? key,
@@ -37,6 +39,7 @@ class TIMUIKitSearch extends StatefulWidget {
           this.conversation,
       @Deprecated("You are supposed to use [onEnterSearchInConversation], though the effects are the same.")
           this.onEnterConversation,
+      this.isAutoFocus = true,
       this.onEnterSearchInConversation})
       : super(key: key);
 
@@ -88,6 +91,7 @@ class TIMUIKitSearchState extends TIMUIKitState<TIMUIKitSearch> {
               children: [
                 TIMUIKitSearchInput(
                   key: inputTextField,
+                  isAutoFocus: widget.isAutoFocus,
                   onChange: (String value) {
                     model.searchByKey(value);
                   },

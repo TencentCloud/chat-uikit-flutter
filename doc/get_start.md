@@ -147,11 +147,11 @@ TUIKit 是基于腾讯云 IM SDK 的一款 UI 组件库，它提供了一些通�
 
 #### 安装IM TUIkit
 
-我们的TUIkit已经内含IM SDK，因此仅需安装`tim_ui_kit`，不需要再安装基础im sdk。
+我们的TUIkit已经内含IM SDK，因此仅需安装`tencent_cloud_chat_uikit`，不需要再安装基础im sdk。
 
 ```shell
 #在命令行执行：
-flutter pub add tim_ui_kit
+flutter pub add tencent_cloud_chat_uikit
 ```
 
 #### 初始化
@@ -162,7 +162,7 @@ flutter pub add tim_ui_kit
 
 ```dart
 /// main.dart
-import 'package:tim_ui_kit/tim_ui_kit.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 final CoreServicesImpl _coreInstance = TIMUIKitCore.getInstance();
   @override
@@ -183,7 +183,7 @@ final CoreServicesImpl _coreInstance = TIMUIKitCore.getInstance();
 调用`_coreInstance.login`方法，登录一个测试账户。
 
 ```dart
-import 'package:tim_ui_kit/tim_ui_kit.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 final CoreServicesImpl _coreInstance = TIMUIKitCore.getInstance();
 _coreInstance.login(userID: userID, userSig: userSig);
@@ -203,7 +203,7 @@ _coreInstance.login(userID: userID, userSig: userSig);
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:tim_ui_kit/tim_ui_kit.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 class Conversation extends StatelessWidget {
 const Conversation({Key? key}) : super(key: key);
@@ -244,7 +244,7 @@ return Scaffold(
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:tim_ui_kit/tim_ui_kit.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 class Chat extends StatelessWidget {
 final V2TimConversation selectedConversation;
@@ -283,7 +283,7 @@ return TIMUIKitChat(
 
 ```dart
 import 'package:flutter/material.dart';
-import 'package:tim_ui_kit/tim_ui_kit.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 class UserProfile extends StatelessWidget {
     final String userID;
@@ -322,9 +322,9 @@ class UserProfile extends StatelessWidget {
 
 [TIMUIKitNewContact](https://intl.cloud.tencent.com/document/product/1047/46297#timuikitnewcontact): 联系人（好友）申请列表。如需在外部显示小红点，可使用 `TIMUIKitUnreadCount` 小红点组件，其会自动挂载监听。
 
-[TIMUIKitSearch](https://pub.dev/documentation/tim_ui_kit/latest/ui_views_TIMUIKitSearch_tim_uikit_search/TIMUIKitSearch-class.html): 搜索组件，支持全局搜索联系人/群组/聊天记录，也支持在特定会话中搜索聊天记录。两种模式取决于是否传入 `conversation`。
+[TIMUIKitSearch](https://pub.dev/documentation/tencent_cloud_chat_uikit/latest/ui_views_TIMUIKitSearch_tim_uikit_search/TIMUIKitSearch-class.html): 搜索组件，支持全局搜索联系人/群组/聊天记录，也支持在特定会话中搜索聊天记录。两种模式取决于是否传入 `conversation`。
 
-详细UI插件指南[可参考本文档](https://cloud.tencent.com/document/product/269/70747#timuikitcontact)或[插件README](https://pub.dev/packages/tim_ui_kit)。
+详细UI插件指南[可参考本文档](https://cloud.tencent.com/document/product/269/70747#timuikitcontact)或[插件README](https://pub.dev/packages/tencent_cloud_chat_uikit)。
 
 [](id:part5)
 

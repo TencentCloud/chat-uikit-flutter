@@ -1,13 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tim_ui_kit/business_logic/separate_models/tui_group_profile_model.dart';
-import 'package:tim_ui_kit/ui/utils/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_group_profile_model.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/ui/widgets/avatar.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
 class GroupProfileDetailCard extends TIMUIKitStatelessWidget {
   final V2TimGroupInfo groupInfo;
@@ -143,6 +143,9 @@ class GroupProfileDetailCard extends TIMUIKitStatelessWidget {
         color: Colors.white,
         padding: const EdgeInsets.only(top: 12, bottom: 12, left: 16),
         child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(
               width: 48,
@@ -156,33 +159,27 @@ class GroupProfileDetailCard extends TIMUIKitStatelessWidget {
             Expanded(
               child: Container(
                 margin: const EdgeInsets.only(left: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          showName,
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(
-                          height: 8,
-                        ),
-                        Text("ID: $groupID",
-                            style: TextStyle(
-                                fontSize: 13, color: theme.weakTextColor))
-                      ],
+                    Text(
+                      showName,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.w600),
                     ),
-                    Icon(
-                      Icons.keyboard_arrow_right,
-                      color: theme.weakTextColor,
-                    )
+                    const SizedBox(
+                      height: 8,
+                    ),
+                    Text("ID: $groupID",
+                        style: TextStyle(
+                            fontSize: 13, color: theme.weakTextColor))
                   ],
                 ),
               ),
+            ),
+            Icon(
+              Icons.keyboard_arrow_right,
+              color: theme.weakTextColor,
             )
           ],
         ),

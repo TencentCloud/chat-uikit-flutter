@@ -3,8 +3,8 @@
 import 'package:example/TIMUIKitGroupProfileExample.dart';
 import 'package:example/TIMUIKitProfileExample.dart';
 import 'package:flutter/material.dart';
-import 'package:tim_ui_kit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tim_ui_kit/tim_ui_kit.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 class TIMUIKitChatExample extends StatelessWidget {
   final V2TimConversation? selectedConversation;
@@ -79,7 +79,7 @@ class TIMUIKitChatExample extends StatelessWidget {
               },
               icon: Image.asset(
                 'images/more.png',
-                package: 'tim_ui_kit',
+                package: 'tencent_cloud_chat_uikit',
                   height: 34,
                   width: 34,
                 ))

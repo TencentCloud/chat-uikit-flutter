@@ -27,10 +27,10 @@ Flutter TIMUIKit 是基于Flutter IM SDK 实现的一套UI组件，其中包含�
 参考Flutter[文档](https://flutter.cn/docs/get-started/test-drive?tab=terminal)快速创建一个flutter应用。
 
 ### 步骤2: 安装依赖
-在`pubspec.yaml`文件中的`dependencies`下添加`tim_ui_kit`。或者执行如下命令:
+在`pubspec.yaml`文件中的`dependencies`下添加`tencent_cloud_chat_uikit`。或者执行如下命令:
 ```
 // step 1:
-flutter pub add tim_ui_kit
+flutter pub add tencent_cloud_chat_uikit
 
 // step 2:
 flutter pub get
@@ -42,7 +42,7 @@ flutter pub get
 ```dart
 /// main.dart
 import 'package:flutter/material.dart';
-import 'package:tim_ui_kit/tim_ui_kit.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 void main() {
   runApp(MyApp());
@@ -161,7 +161,7 @@ class _MyHomePageState extends State<MyHomePage> {
 ```dart
 /// message.dart
 import 'package:flutter/material.dart';
-import 'package:tim_ui_kit/tim_ui_kit.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 class Conversation extends StatelessWidget {
   const Conversation({Key? key}) : super(key: key);

@@ -1,8 +1,10 @@
+import 'package:tencent_extended_text/extended_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:tencent_im_base/base_widgets/tim_stateless_widget.dart';
-import 'package:tim_ui_kit/ui/widgets/link_preview/common/utils.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/common/utils.dart';
 
 class LinkTextMarkdown extends TIMStatelessWidget {
   /// Callback for when link is tapped
@@ -53,12 +55,22 @@ class LinkText extends TIMStatelessWidget {
   /// text style for default words
   final TextStyle? style;
 
+  final bool isUseDefaultEmoji;
+
+  final customEmojiStickerList;
+
   const LinkText(
-      {Key? key, required this.messageText, this.onLinkTap, this.style})
+      {Key? key,
+      required this.messageText,
+      this.onLinkTap,
+      this.style,
+      this.isUseDefaultEmoji = false,
+      this.customEmojiStickerList = const []})
       : super(key: key);
 
-  List<InlineSpan> _getContentSpan(String text, BuildContext context) {
+  String _getContentSpan(String text, BuildContext context) {
     List<InlineSpan> _contentList = [];
+    String contentData = '';
 
     Iterable<RegExpMatch> matches = LinkUtils.urlReg.allMatches(text);
 
@@ -69,14 +81,16 @@ class LinkText extends TIMStatelessWidget {
         index = match.end;
       }
       if (index < match.start) {
-        String a = text.substring(index + 1, match.start);
+        String a = text.substring(index, match.start);
         index = match.end;
+        contentData += a;
         _contentList.add(
           TextSpan(text: a),
         );
       }
 
       if (LinkUtils.urlReg.hasMatch(c)) {
+        contentData += '\$' + c + '\$';
         _contentList.add(TextSpan(
             text: c,
             style: TextStyle(color: LinkUtils.hexToColor("015fff")),
@@ -90,6 +104,7 @@ class LinkText extends TIMStatelessWidget {
                 }
               }));
       } else {
+        contentData += c;
         _contentList.add(
           TextSpan(text: c, style: style ?? const TextStyle(fontSize: 16.0)),
         );
@@ -97,19 +112,38 @@ class LinkText extends TIMStatelessWidget {
     }
     if (index < text.length) {
       String a = text.substring(index, text.length);
+      contentData += a;
       _contentList.add(
         TextSpan(text: a, style: style ?? const TextStyle(fontSize: 16.0)),
       );
     }
 
-    return _contentList;
+    return contentData;
   }
 
   @override
   Widget timBuild(BuildContext context) {
-    return Text.rich(
-      TextSpan(children: [..._getContentSpan(messageText, context)]),
-      style: style ?? const TextStyle(fontSize: 16.0),
-    );
+    return
+        // Text.rich(
+        //   TextSpan(children: [..._getContentSpan(messageText, context)]),
+        //   style: style ?? const TextStyle(fontSize: 16.0),
+        // );
+        ExtendedText(_getContentSpan(messageText, context), softWrap: true,
+            onSpecialTextTap: (dynamic parameter) {
+      if (parameter.toString().startsWith('\$')) {
+        if (onLinkTap != null) {
+          onLinkTap!((parameter.toString()).replaceAll('\$', ''));
+        } else {
+          LinkUtils.launchURL(
+              context, (parameter.toString()).replaceAll('\$', ''));
+        }
+      }
+    },
+            style: style ?? const TextStyle(fontSize: 16.0),
+            specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
+              isUseDefaultEmoji: isUseDefaultEmoji,
+              customEmojiStickerList: customEmojiStickerList,
+              showAtBackground: true,
+            ));
   }
 }

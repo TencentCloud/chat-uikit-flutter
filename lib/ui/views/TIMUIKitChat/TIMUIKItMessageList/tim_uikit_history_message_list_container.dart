@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tim_ui_kit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tim_ui_kit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tim_ui_kit/ui/constants/history_message_constant.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKItMessageList/TIMUIKitTongue/tim_uikit_chat_history_message_list_tongue.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_config.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_item.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/tim_uikit_chat_config.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/TIMUIKitTongue/tim_uikit_chat_history_message_list_tongue.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_config.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_item.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_chat_config.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
 enum LoadingPlace {
   none,
@@ -56,25 +56,36 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
   /// tool tips panel configuration, long press message will show tool tips panel
   final ToolTipsConfig? toolTipsConfig;
 
-  const TIMUIKitHistoryMessageListContainer(
-      {Key? key,
-      this.itemBuilder,
-      this.scrollController,
-      required this.conversationID,
-      required this.conversationType,
-      this.userAvatarBuilder,
-      this.onLongPressForOthersHeadPortrait,
-      this.groupAtInfoList,
-      this.messageItemBuilder,
-      this.tongueItemBuilder,
-      this.extraTipsActionItemBuilder,
-      this.onTapAvatar,
-      @Deprecated("Nickname will not show in one-to-one chat, if you tend to control it in group chat, please use `isShowSelfNameInGroup` and `isShowOthersNameInGroup` from `config: TIMUIKitChatConfig` instead")
-          this.showNickName = true,
-      this.initFindingMsg,
-      this.mainHistoryListConfig,
-      this.toolTipsConfig})
-      : super(key: key);
+  /// Whether to use the default emoji
+  final bool isUseDefaultEmoji;
+
+  final customEmojiStickerList;
+
+  final bool isAllowScroll;
+
+  const TIMUIKitHistoryMessageListContainer({
+    Key? key,
+    this.itemBuilder,
+    this.scrollController,
+    required this.conversationID,
+    required this.conversationType,
+    this.userAvatarBuilder,
+    this.onLongPressForOthersHeadPortrait,
+    this.groupAtInfoList,
+    this.messageItemBuilder,
+    this.tongueItemBuilder,
+    this.extraTipsActionItemBuilder,
+    this.isAllowScroll = true,
+    this.onTapAvatar,
+    @Deprecated("Nickname will not show in one-to-one chat, if you tend to control it in group chat, please use `isShowSelfNameInGroup` and `isShowOthersNameInGroup` from `config: TIMUIKitChatConfig` instead")
+        this.showNickName = true,
+    this.initFindingMsg,
+    this.mainHistoryListConfig,
+    this.toolTipsConfig,
+    this.isUseDefaultEmoji = false,
+    this.customEmojiStickerList = const [],
+  }) : super(key: key);
+
   @override
   State<StatefulWidget> createState() =>
       _TIMUIKitHistoryMessageListContainerState();
@@ -124,12 +135,15 @@ class _TIMUIKitHistoryMessageListContainerState
       builder: (context, messageList, child) {
         return TIMUIKitHistoryMessageList(
           model: model,
+          isAllowScroll: widget.isAllowScroll,
           controller: _historyMessageListController,
           groupAtInfoList: widget.groupAtInfoList,
           mainHistoryListConfig: widget.mainHistoryListConfig,
           itemBuilder: (context, message) {
             return TIMUIKitHistoryMessageListItem(
                 userAvatarBuilder: widget.userAvatarBuilder,
+                customEmojiStickerList: widget.customEmojiStickerList,
+                isUseDefaultEmoji: widget.isUseDefaultEmoji,
                 topRowBuilder: _getTopRowBuilder(model),
                 onScrollToIndex: _historyMessageListController.scrollToIndex,
                 onScrollToIndexBegin:
@@ -139,6 +153,7 @@ class _TIMUIKitHistoryMessageListContainerState
                         additionalItemBuilder:
                             widget.extraTipsActionItemBuilder),
                 message: message!,
+                showAvatar: chatConfig.isShowAvatar,
                 onTapForOthersPortrait: widget.onTapAvatar,
                 messageItemBuilder: widget.messageItemBuilder,
                 onLongPressForOthersHeadPortrait:

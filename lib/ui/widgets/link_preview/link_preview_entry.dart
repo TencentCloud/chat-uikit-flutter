@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/ui/widgets/link_preview/common/utils.dart';
-import 'package:tim_ui_kit/ui/widgets/link_preview/widgets/link_preview.dart';
-import 'package:tim_ui_kit/ui/widgets/link_preview/widgets/link_text.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/common/utils.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/widgets/link_preview.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/widgets/link_text.dart';
 
 import 'models/link_preview_content.dart';
 
@@ -10,7 +10,9 @@ class LinkPreviewEntry {
   /// get the text message with hyperlinks
   static LinkPreviewText? getHyperlinksText(
       V2TimMessage message, bool isMarkdown,
-      [Function(String)? onLinkTap]) {
+      [Function(String)? onLinkTap,
+      bool isUseDefaultEmoji = false,
+      List customEmojiStickerList = const []]) {
     final String? messageText = message.textElem!.text;
 
     if (messageText == null) {
@@ -22,7 +24,11 @@ class LinkPreviewEntry {
           ? LinkTextMarkdown(
               messageText: messageText, style: style, onLinkTap: onLinkTap)
           : LinkText(
-              messageText: messageText, style: style, onLinkTap: onLinkTap);
+              messageText: messageText,
+              style: style,
+              onLinkTap: onLinkTap,
+              isUseDefaultEmoji: isUseDefaultEmoji,
+              customEmojiStickerList: customEmojiStickerList);
     };
   }
 

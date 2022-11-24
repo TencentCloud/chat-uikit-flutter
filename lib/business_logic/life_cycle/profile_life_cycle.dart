@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:tim_ui_kit/business_logic/life_cycle/base_life_cycle.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/base_life_cycle.dart';
 
 class ProfileLifeCycle {
   /// Before adding a contact to block list,

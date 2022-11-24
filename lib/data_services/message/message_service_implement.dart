@@ -1,13 +1,79 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/data_services/core/core_services_implements.dart';
-import 'package:tim_ui_kit/data_services/message/message_services.dart';
-import 'package:tim_ui_kit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 
 class MessageServiceImpl extends MessageService {
   final CoreServicesImpl _coreService = serviceLocator<CoreServicesImpl>();
+  final Map<String, List<V2TimMessage>> messgaeListMap = {};
+  final Map<String, List<V2TimMessage>> sendingMessage = {};
+
+  @override
+  Future<MessageListResponse> getHistoryMessageListV2({
+    HistoryMsgGetTypeEnum getType =
+        HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
+    String? userID,
+    String? groupID,
+    int lastMsgSeq = -1,
+    required int count,
+    String? lastMsgID,
+    List<int>? messageTypeList,
+  }) async {
+    bool haveMoreData = true;
+    final res = await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .getHistoryMessageList(
+            count: count,
+            getType: getType,
+            userID: userID,
+            groupID: groupID,
+            lastMsgID: lastMsgID,
+            lastMsgSeq: lastMsgSeq,
+            messageTypeList: messageTypeList);
+    final List<V2TimMessage> reponseMessageList = res.data ?? [];
+    final conversationID = userID ?? groupID;
+    final cachedMessageList = messgaeListMap[conversationID];
+    List<V2TimMessage> commbinedMessageList = [];
+    // 加载更多
+    if (lastMsgID != null && cachedMessageList != null) {
+      commbinedMessageList = [...cachedMessageList, ...reponseMessageList];
+      // 首次加载
+    } else {
+      final bool existSendingMessage = sendingMessage[conversationID] != null &&
+          sendingMessage[conversationID]!.isNotEmpty;
+      // 存在未发送完成的消息
+      if (existSendingMessage) {
+        commbinedMessageList = [
+          ...sendingMessage[conversationID]!,
+          ...reponseMessageList
+        ];
+      } else {
+        sendingMessage.remove(conversationID);
+        commbinedMessageList = reponseMessageList;
+      }
+    }
+    if (res.code != 0) {
+      _coreService.callOnCallback(TIMCallback(
+          type: TIMCallbackType.API_ERROR,
+          errorMsg: res.desc,
+          errorCode: res.code));
+    }
+    if (reponseMessageList.isEmpty ||
+        (!PlatformUtils().isWeb && reponseMessageList.length < count) ||
+        (PlatformUtils().isWeb && reponseMessageList.length < min(count, 20))) {
+      haveMoreData = false;
+    } else {
+      haveMoreData = true;
+    }
+    return MessageListResponse(
+        haveMoreData: haveMoreData, data: commbinedMessageList);
+  }
 
   @override
   Future<List<V2TimMessage>> getHistoryMessageList({
@@ -30,14 +96,45 @@ class MessageServiceImpl extends MessageService {
             lastMsgID: lastMsgID,
             lastMsgSeq: lastMsgSeq,
             messageTypeList: messageTypeList);
-    final List<V2TimMessage> messageList = res.data ?? [];
+    final reponseMessageList = res.data ?? [];
     if (res.code != 0) {
       _coreService.callOnCallback(TIMCallback(
           type: TIMCallbackType.API_ERROR,
           errorMsg: res.desc,
           errorCode: res.code));
     }
-    return messageList;
+    return reponseMessageList;
+  }
+
+  @override
+  Future<V2TimMessageListResult?> getHistoryMessageListWithComplete({
+    HistoryMsgGetTypeEnum getType =
+        HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
+    String? userID,
+    String? groupID,
+    int lastMsgSeq = -1,
+    required int count,
+    String? lastMsgID,
+    List<int>? messageTypeList,
+  }) async {
+    final res = await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .getHistoryMessageListV2(
+            count: count,
+            getType: getType,
+            userID: userID,
+            groupID: groupID,
+            lastMsgID: lastMsgID,
+            lastMsgSeq: lastMsgSeq,
+            messageTypeList: messageTypeList);
+    final reponseMessageList = res.data;
+    if (res.code != 0) {
+      _coreService.callOnCallback(TIMCallback(
+          type: TIMCallbackType.API_ERROR,
+          errorMsg: res.desc,
+          errorCode: res.code));
+    }
+    return reponseMessageList;
   }
 
   @override
@@ -655,6 +752,44 @@ class MessageServiceImpl extends MessageService {
     final result = await TencentImSDKPlugin.v2TIMManager
         .getMessageManager()
         .setLocalCustomData(msgID: msgID, localCustomData: localCustomData);
+    if (result.code != 0) {
+      _coreService.callOnCallback(TIMCallback(
+          type: TIMCallbackType.API_ERROR,
+          errorMsg: result.desc,
+          errorCode: result.code));
+    }
+    return result;
+  }
+
+  @override
+  Future<V2TimValueCallback<V2TimMessageOnlineUrl>> getMessageOnlineUrl(
+      {required String msgID}) async {
+    final result = await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .getMessageOnlineUrl(msgID: msgID);
+
+    if (result.code != 0) {
+      _coreService.callOnCallback(TIMCallback(
+          type: TIMCallbackType.API_ERROR,
+          errorMsg: result.desc,
+          errorCode: result.code));
+    }
+    return result;
+  }
+
+  @override
+  Future<V2TimCallback> downloadMessage(
+      {required String msgID,
+      required int messageType,
+      required int imageType,
+      required bool isSnapshot}) async {
+    final result = await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .downloadMessage(
+            msgID: msgID,
+            messageType: messageType,
+            imageType: imageType,
+            isSnapshot: isSnapshot);
     if (result.code != 0) {
       _coreService.callOnCallback(TIMCallback(
           type: TIMCallbackType.API_ERROR,

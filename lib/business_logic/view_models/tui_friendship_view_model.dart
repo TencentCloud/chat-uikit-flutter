@@ -2,13 +2,13 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/business_logic/life_cycle/block_list_life_cycle.dart';
-import 'package:tim_ui_kit/business_logic/life_cycle/friend_list_life_cycle.dart';
-import 'package:tim_ui_kit/business_logic/life_cycle/new_contact_life_cycle.dart';
-import 'package:tim_ui_kit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tim_ui_kit/data_services/friendShip/friendship_services.dart';
-import 'package:tim_ui_kit/data_services/group/group_services.dart';
-import 'package:tim_ui_kit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/block_list_life_cycle.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/friend_list_life_cycle.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/new_contact_life_cycle.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/friendShip/friendship_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 
 class TUIFriendShipViewModel extends ChangeNotifier {
   final FriendshipServices _friendshipServices =

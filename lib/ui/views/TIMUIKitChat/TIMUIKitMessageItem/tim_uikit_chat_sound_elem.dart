@@ -3,15 +3,17 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_plugin_record_plus/const/play_state.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tim_ui_kit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tim_ui_kit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tim_ui_kit/data_services/services_locatar.dart';
-import 'package:tim_ui_kit/ui/constants/history_message_constant.dart';
-import 'package:tim_ui_kit/ui/utils/color.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/color.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/ui/utils/sound_record.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/sound_record.dart';
 
 import 'TIMUIKitMessageReaction/tim_uikit_message_reaction_show_panel.dart';
 
@@ -58,6 +60,8 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
   bool isShowJumpState = false;
   bool isShining = false;
   final TUIChatGlobalModel globalModel = serviceLocator<TUIChatGlobalModel>();
+  final MessageService _messageService = serviceLocator<MessageService>();
+  late V2TimSoundElem stateElement = widget.message.soundElem!;
 
   _playSound() async {
     if (!SoundPlayer.isInited) {
@@ -79,13 +83,37 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
       SoundPlayer.stop();
       widget.chatModel.currentSelectedMsgId = "";
     } else {
-      SoundPlayer.play(url: widget.soundElem.url!);
+      SoundPlayer.play(url: stateElement.url!);
       widget.chatModel.currentSelectedMsgId = widget.msgID;
       // SoundPlayer.setSoundInterruptListener(() {
       //   // setState(() {
       //   isPlaying = false;
       //   // });
       // });
+    }
+  }
+
+  downloadMessageDetailAndSave() async {
+    if (widget.message.msgID != null && widget.message.msgID != '') {
+      if (widget.message.soundElem!.url == null ||
+          widget.message.soundElem!.url == '') {
+        final response = await _messageService.getMessageOnlineUrl(
+            msgID: widget.message.msgID!);
+        widget.message.soundElem = response.data!.soundElem;
+        Future.delayed(const Duration(microseconds: 10), () {
+          setState(() => stateElement = response.data!.soundElem!);
+        });
+      }
+      if (!PlatformUtils().isWeb) {
+        if (widget.message.soundElem!.localUrl == null ||
+            widget.message.soundElem!.localUrl == '') {
+          _messageService.downloadMessage(
+              msgID: widget.message.msgID!,
+              messageType: 4,
+              imageType: 0,
+              isSnapshot: false);
+        }
+      }
     }
   }
 
@@ -107,6 +135,7 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
         // SoundPlayer.removeSoundInterruptListener();
       }
     });
+    downloadMessageDetailAndSave();
   }
 
   @override
@@ -121,8 +150,8 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
 
   double _getSoundLen() {
     double soundLen = 32;
-    if (widget.soundElem.duration != null) {
-      final realSoundLen = widget.soundElem.duration!;
+    if (stateElement.duration != null) {
+      final realSoundLen = stateElement.duration!;
       int sdLen = 32;
       if (realSoundLen > 10) {
         sdLen = 12 * charLen + ((realSoundLen - 10) * charLen / 0.5).floor();
@@ -209,19 +238,19 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
                   ? [
                       Container(width: _getSoundLen()),
                       Text(
-                        "''${widget.soundElem.duration} ",
+                        "''${stateElement.duration} ",
                         style: widget.fontStyle,
                       ),
                       isPlaying
                           ? Image.asset(
                               'images/play_voice_send.gif',
-                              package: 'tim_ui_kit',
+                              package: 'tencent_cloud_chat_uikit',
                               width: 16,
                               height: 16,
                             )
                           : Image.asset(
                               'images/voice_send.png',
-                              package: 'tim_ui_kit',
+                              package: 'tencent_cloud_chat_uikit',
                               width: 16,
                               height: 16,
                             ),
@@ -230,7 +259,7 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
                       isPlaying
                           ? Image.asset(
                               'images/play_voice_receive.gif',
-                              package: 'tim_ui_kit',
+                              package: 'tencent_cloud_chat_uikit',
                               width: 16,
                               height: 16,
                             )
@@ -238,10 +267,10 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
                               'images/voice_receive.png',
                               width: 16,
                               height: 16,
-                              package: 'tim_ui_kit',
+                              package: 'tencent_cloud_chat_uikit',
                             ),
                       Text(
-                        " ${widget.soundElem.duration}''",
+                        " ${stateElement.duration}''",
                         style: widget.fontStyle,
                       ),
                       Container(width: _getSoundLen()),

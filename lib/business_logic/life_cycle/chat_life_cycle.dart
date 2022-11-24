@@ -1,4 +1,4 @@
-import 'package:tim_ui_kit/business_logic/life_cycle/base_life_cycle.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/base_life_cycle.dart';
 
 class ChatLifeCycle {
   /// Before a new message will be added to historical message list from long connection.

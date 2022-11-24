@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tim_ui_kit/ui/utils/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
 
 Color hexToColor(String hexString) {
   return Color(int.parse(hexString, radix: 16)).withAlpha(255);

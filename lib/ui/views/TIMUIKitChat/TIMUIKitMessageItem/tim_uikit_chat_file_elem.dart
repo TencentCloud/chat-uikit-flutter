@@ -7,25 +7,25 @@ import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:open_file/open_file.dart';
+import 'package:tencent_open_file/tencent_open_file.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tim_ui_kit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tim_ui_kit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tim_ui_kit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 
-import 'package:tim_ui_kit/ui/utils/color.dart';
-import 'package:tim_ui_kit/ui/utils/permission.dart';
-import 'package:tim_ui_kit/ui/utils/platform.dart';
-import 'package:tim_ui_kit/ui/utils/tui_theme.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_wrapper.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_file_icon.dart';
-import 'package:tim_ui_kit/ui/widgets/textSize.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/color.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_wrapper.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_file_icon.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/textSize.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class TIMUIKitFileElem extends StatefulWidget {
@@ -82,7 +82,11 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
               onPressed: () {
                 //关闭对话框并返回true
                 Navigator.of(context).pop();
-                OpenFile.open(path);
+                try {
+                  OpenFile.open(path);
+                } catch (e) {
+                  print(e);
+                }
               },
             ),
           ],
@@ -95,16 +99,24 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
   void initState() {
     super.initState();
     if (!PlatformUtils().isWeb) {
-      hasFile();
+      Future.delayed(const Duration(microseconds: 10), () {
+        hasFile();
+      });
     }
   }
 
   Future<String> getSavePath() async {
     var appDocDir = await getTemporaryDirectory();
-    String savePathWithAppPath = appDocDir.path +
-        '/' +
-        (widget.message.msgID ?? "") +
-        widget.fileElem!.fileName!;
+    // String savePathWithAppPath = appDocDir.path +
+    //     '/' +
+    //     (widget.message.msgID ?? "") +
+    //     widget.fileElem!.fileName!;
+    // return savePathWithAppPath;
+
+    String savePathWithAppPath =
+        '/storage/emulated/0/Android/data/com.tencent.flutter.tuikit/cache/' +
+            (widget.message.msgID ?? "") +
+            widget.fileElem!.fileName!;
     return savePathWithAppPath;
   }
 
@@ -112,11 +124,25 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
     if (PlatformUtils().isWeb) {
       return true;
     }
-    String savePath = await getSavePath();
+
+    if (model.getMessageProgress(widget.messageID) == 100) {
+      String savePath = widget.message.fileElem!.localUrl ??
+          model.getFileMessageLocation(widget.messageID);
+      File f = File(savePath);
+      if (f.existsSync() && widget.messageID != null) {
+        filePath = savePath;
+        // model.setFileMessageLocation(widget.messageID!, filePath);
+        return true;
+      }
+      return false;
+    }
+    // String savePath = await getSavePath();
+    String savePath = widget.message.fileElem!.localUrl ?? '';
     File f = File(savePath);
     if (f.existsSync() && widget.messageID != null) {
       filePath = savePath;
       model.setMessageProgress(widget.messageID!, 100);
+      // model.setFileMessageLocation(widget.messageID!, filePath);
       return true;
     }
     return false;
@@ -135,16 +161,8 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
   }
 
   addUrlToWaitingPath() async {
-    try {
-      if (widget.fileElem!.url!.isNotEmpty) {
-        String savePath = await getSavePath();
-        model.addWaitingList(
-            widget.messageID!, widget.fileElem!.url!, savePath);
-        print("add path success");
-      }
-    } catch (err) {
-      // err
-    }
+    model.addWaitingList(widget.messageID!);
+    print("add path success");
   }
 
   checkIsWaiting() {
@@ -167,13 +185,6 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
   }
 
   tryOpenFile(context, theme) async {
-    if (PlatformUtils().isWeb) {
-      launchUrl(
-        Uri.parse(widget.fileElem?.path ?? ""),
-        mode: LaunchMode.externalApplication,
-      );
-      return;
-    }
     if (!await Permissions.checkPermission(context, Permission.storage.value)) {
       return;
     }
@@ -217,6 +228,13 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
               }
               return GestureDetector(
                   onTap: () async {
+                    if (PlatformUtils().isWeb) {
+                      launchUrl(
+                        Uri.parse(widget.fileElem?.path ?? ""),
+                        mode: LaunchMode.externalApplication,
+                      );
+                      return;
+                    }
                     if (await hasFile()) {
                       if (received == 100) {
                         tryOpenFile(context, theme);
@@ -230,7 +248,6 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
                           ),
                         );
                       }
-
                       return;
                     }
 
@@ -286,7 +303,7 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
                                       child: LayoutBuilder(
                                         builder:
                                             (buildContext, boxConstraints) {
-                                          return ExtendText(
+                                          return CustomText(
                                             fileName,
                                             width: boxConstraints.maxWidth,
                                             style: TextStyle(

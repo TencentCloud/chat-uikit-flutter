@@ -6,16 +6,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 
-import 'package:tim_ui_kit/ui/utils/message.dart';
-import 'package:tim_ui_kit/ui/utils/platform.dart';
-import 'package:tim_ui_kit/ui/utils/tui_theme.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_wrapper.dart';
-import 'package:tim_ui_kit/ui/widgets/video_screen.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_wrapper.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/video_screen.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 class TIMUIKitVideoElem extends StatefulWidget {
@@ -40,6 +43,9 @@ class TIMUIKitVideoElem extends StatefulWidget {
 }
 
 class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
+  final TUIChatGlobalModel globalModel = serviceLocator<TUIChatGlobalModel>();
+  final MessageService _messageService = serviceLocator<MessageService>();
+  late V2TimVideoElem stateElement = widget.message.videoElem!;
   Widget errorDisplay(TUITheme? theme) {
     return Container(
       decoration: BoxDecoration(
@@ -67,9 +73,27 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
     );
   }
 
-  Widget generateSnapshot(TUITheme theme) {
-    if (widget.message.videoElem!.snapshotUrl == null &&
-        widget.message.videoElem!.snapshotUrl == null) {
+  Widget generateSnapshot(TUITheme theme, int height) {
+    if (!PlatformUtils().isWeb) {
+      final current = (DateTime.now().millisecondsSinceEpoch / 1000).ceil();
+      final timeStamp = widget.message.timestamp ?? current;
+      if (current - timeStamp < 300) {
+        if (stateElement!.snapshotPath != null &&
+            stateElement!.snapshotPath != '') {
+          File imgF = File(stateElement!.snapshotPath!);
+          bool isExist = imgF.existsSync();
+          if (isExist) {
+            return Image.file(File(stateElement!.snapshotPath!),
+                fit: BoxFit.fitWidth);
+          }
+        }
+      }
+    }
+
+    if ((stateElement!.snapshotUrl == null ||
+            stateElement!.snapshotUrl == '') &&
+        (stateElement!.snapshotPath == null ||
+            stateElement!.snapshotPath == '')) {
       return Container(
         decoration: BoxDecoration(
             borderRadius: const BorderRadius.all(Radius.circular(5)),
@@ -77,7 +101,7 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
               width: 1,
               color: Colors.black12,
             )),
-        height: 100,
+        height: double.parse(height.toString()),
         child: Center(
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -91,23 +115,57 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
         ),
       );
     }
-    return (!kIsWeb && widget.message.videoElem!.snapshotUrl == null ||
+    return (!kIsWeb && stateElement!.snapshotUrl == null ||
             widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING)
-        ? Image.file(File(widget.message.videoElem!.snapshotPath!),
-            fit: BoxFit.fitWidth)
+        ? (stateElement!.snapshotPath!.isNotEmpty
+            ? Image.file(File(stateElement!.snapshotPath!),
+                fit: BoxFit.fitWidth)
+            : Image.file(File(stateElement!.localSnapshotUrl!),
+                fit: BoxFit.fitWidth))
         : (kIsWeb ||
-                widget.message.videoElem?.localSnapshotUrl == null ||
-                widget.message.videoElem?.localSnapshotUrl == "")
-            ? CachedNetworkImage(
-                placeholder: (context, url) =>
-                    Image(image: MemoryImage(kTransparentImage)),
-                cacheKey: widget.message.videoElem!.UUID,
-                fit: BoxFit.fitWidth,
-                imageUrl: widget.message.videoElem!.snapshotUrl!,
-                errorWidget: (context, url, error) => errorDisplay(theme),
-              )
-            : Image.file(File(widget.message.videoElem!.localSnapshotUrl!),
+                stateElement?.localSnapshotUrl == null ||
+                stateElement?.localSnapshotUrl == "")
+            ? Image.network(stateElement!.snapshotUrl!, fit: BoxFit.fitWidth)
+            : Image.file(File(stateElement!.localSnapshotUrl!),
                 fit: BoxFit.fitWidth);
+  }
+
+  downloadMessageDetailAndSave() async {
+    if (widget.message.msgID != null && widget.message.msgID != '') {
+      if (widget.message.videoElem!.videoUrl == null ||
+          widget.message.videoElem!.videoUrl == '') {
+        final response = await _messageService.getMessageOnlineUrl(
+            msgID: widget.message.msgID!);
+        widget.message.videoElem = response.data!.videoElem;
+        Future.delayed(const Duration(microseconds: 10), () {
+          setState(() => stateElement = response.data!.videoElem!);
+        });
+      }
+      if (!PlatformUtils().isWeb) {
+        if (widget.message.videoElem!.localVideoUrl == null ||
+            widget.message.videoElem!.localVideoUrl == '') {
+          _messageService.downloadMessage(
+              msgID: widget.message.msgID!,
+              messageType: 5,
+              imageType: 0,
+              isSnapshot: false);
+        }
+        if (widget.message.videoElem!.localSnapshotUrl == null ||
+            widget.message.videoElem!.localSnapshotUrl == '') {
+          _messageService.downloadMessage(
+              msgID: widget.message.msgID!,
+              messageType: 5,
+              imageType: 0,
+              isSnapshot: true);
+        }
+      }
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    downloadMessageDetailAndSave();
   }
 
   @override
@@ -124,6 +182,7 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
             pageBuilder: (_, __, ___) => VideoScreen(
               message: widget.message,
               heroTag: heroTag,
+              videoElement: stateElement,
             ),
           ),
         );
@@ -143,14 +202,13 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
                     borderRadius: const BorderRadius.all(Radius.circular(5)),
                     child: LayoutBuilder(builder:
                         (BuildContext context, BoxConstraints constraints) {
-                      double positionRadio = 1.0;
-                      if (widget.message.videoElem?.snapshotWidth != null &&
-                          widget.message.videoElem?.snapshotHeight != null &&
-                          widget.message.videoElem?.snapshotWidth != 0 &&
-                          widget.message.videoElem?.snapshotHeight != 0) {
-                        positionRadio =
-                            (widget.message.videoElem!.snapshotWidth! /
-                                widget.message.videoElem!.snapshotHeight!);
+                      double positionRadio = 0.56;
+                      if (stateElement?.snapshotWidth != null &&
+                          stateElement?.snapshotHeight != null &&
+                          stateElement?.snapshotWidth != 0 &&
+                          stateElement?.snapshotHeight != 0) {
+                        positionRadio = (stateElement!.snapshotWidth! /
+                            stateElement!.snapshotHeight!);
                       }
 
                       return ConstrainedBox(
@@ -165,10 +223,8 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
                             aspectRatio: positionRadio,
                             child: Stack(
                               children: <Widget>[
-                                if (widget.message.videoElem!.snapshotUrl !=
-                                        null ||
-                                    widget.message.videoElem!.snapshotUrl !=
-                                        null)
+                                if (stateElement!.snapshotUrl != null ||
+                                    stateElement!.snapshotUrl != null)
                                   AspectRatio(
                                     aspectRatio: positionRadio,
                                     child: Container(
@@ -178,20 +234,27 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
                                   ),
                                 Row(
                                   children: [
-                                    Expanded(child: generateSnapshot(theme))
+                                    Expanded(
+                                        child: generateSnapshot(
+                                            theme,
+                                            stateElement!.snapshotHeight ??
+                                                100))
                                   ],
                                 ),
                                 if (widget.message.status !=
                                             MessageStatus
                                                 .V2TIM_MSG_STATUS_SENDING &&
-                                        widget.message.videoElem!.videoPath !=
-                                            null ||
-                                    widget.message.videoElem!.videoUrl != null)
+                                        (stateElement!.snapshotUrl != null ||
+                                            stateElement!.snapshotPath !=
+                                                null) &&
+                                        stateElement!.videoPath != null ||
+                                    stateElement!.videoUrl != null)
                                   Positioned.fill(
                                     // alignment: Alignment.center,
                                     child: Center(
                                         child: Image.asset('images/play.png',
-                                            package: 'tim_ui_kit', height: 64)),
+                                            package: 'tencent_cloud_chat_uikit',
+                                            height: 64)),
                                   ),
                                 Positioned(
                                     right: 10,

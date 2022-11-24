@@ -8,16 +8,18 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_class.dart';
 
-import 'package:tim_ui_kit/business_logic/life_cycle/chat_life_cycle.dart';
-import 'package:tim_ui_kit/business_logic/separate_models/tui_chat_model_tools.dart';
-import 'package:tim_ui_kit/data_services/group/group_services.dart';
-import 'package:tim_ui_kit/data_services/message/message_services.dart';
-import 'package:tim_ui_kit/data_services/services_locatar.dart';
-import 'package:tim_ui_kit/tim_ui_kit.dart';
-import 'package:tim_ui_kit/ui/constants/history_message_constant.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/chat_life_cycle.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_model_tools.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 
-import 'package:tim_ui_kit/ui/utils/message.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
+import 'package:tencent_im_base/base_widgets/tim_callback.dart';
 
 enum ConvType { none, c2c, group }
 
@@ -30,13 +32,13 @@ class CurrentConversation {
   CurrentConversation(this.conversationID, this.conversationType);
 }
 
-class TUIChatGlobalModel extends ChangeNotifier {
+class TUIChatGlobalModel extends ChangeNotifier with TIMUIKitClass {
   final MessageService _messageService = serviceLocator<MessageService>();
   final GroupServices _groupServices = serviceLocator<GroupServices>();
   final Map<String, List<V2TimMessage>?> _messageListMap = {};
   final Map<String, V2TimMessageReceipt> _messageReadReceiptMap = {};
-  final Map<String, List<V2TimMessage>?> _tempMessageListMap = {};
   final Map<String, int> _messageListProgressMap = {};
+  final Map<String, String> _fileListLocationMap = {};
   final Map<String, dynamic> _preloadImageMap = {};
   final Map<String, HistoryMessagePosition> _historyMessagePositionMap = {};
   final List<CurrentConversation> _currentConversationList = [];
@@ -52,7 +54,8 @@ class TUIChatGlobalModel extends ChangeNotifier {
 
   late V2TimAdvancedMsgListener advancedMsgListener;
   int _unreadCountForConversation = 0;
-  int testCount = 0;
+  // use for generate a new sliver list to show recived messag list
+  int _recivedNewMessageCount = 0;
   TIMUIKitChatConfig chatConfig = const TIMUIKitChatConfig();
   List<V2TimGroupApplication>? _groupApplicationList;
   String Function(V2TimMessage message)? _abstractMessageBuilder;
@@ -66,27 +69,37 @@ class TUIChatGlobalModel extends ChangeNotifier {
 
   TUIChatGlobalModel() {
     advancedMsgListener = V2TimAdvancedMsgListener(
-        onRecvC2CReadReceipt: (List<V2TimMessageReceipt> receiptList) {
-      _onReceiveC2CReadReceipt(receiptList);
-    }, onRecvMessageRevoked: (String msgID) {
-      onMessageRevoked(msgID);
-    }, onRecvNewMessage: (V2TimMessage newMsg) {
-      _onReceiveNewMsg(newMsg);
-    }, onSendMessageProgress: (V2TimMessage messagae, int progress) {
-      _onSendMessageProgress(messagae, progress);
-    }, onRecvMessageReadReceipts: (List<V2TimMessageReceipt> receiptList) {
-      _onReceiveMessageReadReceipts(receiptList);
-    }, onRecvMessageModified: (V2TimMessage newMsg) {
-      onMessageModified(newMsg);
-    });
+      onRecvC2CReadReceipt: (List<V2TimMessageReceipt> receiptList) {
+        _onReceiveC2CReadReceipt(receiptList);
+      },
+      onRecvMessageRevoked: (String msgID) {
+        onMessageRevoked(msgID);
+      },
+      onRecvNewMessage: (V2TimMessage newMsg) {
+        _onReceiveNewMsg(newMsg);
+      },
+      onSendMessageProgress: (V2TimMessage messagae, int progress) {
+        _onSendMessageProgress(messagae, progress);
+      },
+      onRecvMessageReadReceipts: (List<V2TimMessageReceipt> receiptList) {
+        _onReceiveMessageReadReceipts(receiptList);
+      },
+      onRecvMessageModified: (V2TimMessage newMsg) {
+        onMessageModified(newMsg);
+      },
+      onMessageDownloadProgressCallback:
+          (V2TimMessageDownloadProgress messageProgress) {
+        onMessageDownloadProgressCallback(messageProgress);
+      },
+    );
     // Future.delayed(const Duration(milliseconds: 200)).then((value) => initMessageMapFromLocal());
   }
 
   bool get isDownloading => _isDownloading;
   bool get hasWaiting => _waitingDownloadList.isNotEmpty;
   Map<String, String> get currentDownLoad => _waitingDownloadList.first;
-  void addWaitingList(String msgID, String url, String savePath) {
-    print("add $url to waiting list success");
+  void addWaitingList(String msgID) {
+    print("add to waiting list success");
     bool contains = false;
     for (Map<String, String> element in _waitingDownloadList) {
       String msgIDItem = element["msgID"] ?? "";
@@ -100,8 +113,6 @@ class TUIChatGlobalModel extends ChangeNotifier {
     if (!contains) {
       _waitingDownloadList.add(Map.from({
         "msgID": msgID,
-        "url": url,
-        "savePath": savePath,
       }));
       // setMessageProgress(msgID, 1); // 有一点进度条，表示等待中
     }
@@ -119,28 +130,29 @@ class TUIChatGlobalModel extends ChangeNotifier {
 
     Map<String, String> nextDownLoad = _waitingDownloadList.first;
     String downLoadMsgID = nextDownLoad["msgID"] ?? "";
-    String downLoadMsgUrl = nextDownLoad["url"] ?? "";
-    String downLoadMsgSavePath = nextDownLoad["savePath"] ?? "";
-    if (downLoadMsgID.isEmpty ||
-        downLoadMsgUrl.isEmpty ||
-        downLoadMsgSavePath.isEmpty) {
+    if (downLoadMsgID.isEmpty) {
       return;
     }
-    print("new download $downLoadMsgSavePath");
-    await Dio().download(downLoadMsgUrl, downLoadMsgSavePath,
-        onReceiveProgress: (recv, total) {
-      if (total != -1) {
-        // print((received / total * 100).toStringAsFixed(0) + "%");
-        int progrss = (recv / total * 100).ceil();
-        if (progrss > 1) {
-          setMessageProgress(downLoadMsgID, progrss);
-        }
-        //you can build progressbar feature too
-      }
-    });
+    if (_messageListProgressMap[downLoadMsgID] == 100) {
+      return;
+    }
+    // await Dio().download(downLoadMsgUrl, downLoadMsgSavePath,
+    //     onReceiveProgress: (recv, total) {
+    //   if (total != -1) {
+    //     // print((received / total * 100).toStringAsFixed(0) + "%");
+    //     int progrss = (recv / total * 100).ceil();
+    //     if (progrss > 1) {
+    //       setMessageProgress(downLoadMsgID, progrss);
+    //     }
+    //     //you can build progressbar feature too
+    //   }
+    // });
+    await _messageService.downloadMessage(
+        msgID: downLoadMsgID, messageType: 6, imageType: 0, isSnapshot: false);
+    _isDownloading = true;
     // startDownloadProcess(context, theme, received);
     print("start another download");
-    downloadFile();
+    // downloadFile();
   }
 
   int getRecevied(msgID) {
@@ -171,6 +183,10 @@ class TUIChatGlobalModel extends ChangeNotifier {
     return _totalUnreadCount;
   }
 
+  int get recivedMessageListCount {
+    return _recivedNewMessageCount;
+  }
+
   int get unreadCountForConversation => _unreadCountForConversation;
 
   List<V2TimGroupApplication> get groupApplicationList =>
@@ -178,9 +194,6 @@ class TUIChatGlobalModel extends ChangeNotifier {
 
   String Function(V2TimMessage message)? get abstractMessageBuilder =>
       _abstractMessageBuilder;
-
-  Map<String, List<V2TimMessage>?> get tempMessageListMap =>
-      _tempMessageListMap;
 
   Map<String, V2TimMessageReceipt> get messageReadReceiptMap =>
       _messageReadReceiptMap;
@@ -296,7 +309,6 @@ class TUIChatGlobalModel extends ChangeNotifier {
         count: 10,
         getType: HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
         userID: conversationType == ConvType.c2c ? conversationID : null,
-        messageTypeList: [1],
         groupID: conversationType == ConvType.group ? conversationID : null);
     if (_messageListMap[conversationID] == null ||
         _messageListMap[conversationID]!.isEmpty) {
@@ -368,10 +380,14 @@ class TUIChatGlobalModel extends ChangeNotifier {
     _totalUnreadCount = 0;
     _groupApplicationList?.clear();
     _totalUnreadCount = 0;
+    _recivedNewMessageCount = 0;
     _messageReadReceiptMap.clear();
-    _tempMessageListMap.clear();
     _messageListProgressMap.clear();
     notifyListeners();
+  }
+
+  clearRecivedNewMessageCount() {
+    _recivedNewMessageCount = 0;
   }
 
   _preLoadImage(List<V2TimMessage> msgList) {
@@ -411,6 +427,10 @@ class TUIChatGlobalModel extends ChangeNotifier {
     return _messageListProgressMap[msgID] ?? 0;
   }
 
+  String getFileMessageLocation(String? msgID) {
+    return _fileListLocationMap[msgID] ?? '';
+  }
+
   setMessageProgress(String msgID, int progress) {
     _messageListProgressMap[msgID] = progress;
     if (progress > 0 && progress < 100) {
@@ -428,7 +448,11 @@ class TUIChatGlobalModel extends ChangeNotifier {
         return false;
       });
     }
+    notifyListeners();
+  }
 
+  setFileMessageLocation(String msgID, String location) {
+    _fileListLocationMap[msgID] = location;
     notifyListeners();
   }
 
@@ -584,6 +608,7 @@ class TUIChatGlobalModel extends ChangeNotifier {
           convID: convID,
           convType: currentSelectedConvType!,
         );
+        _recivedNewMessageCount = 0;
         final currentMsg = _messageListMap[convID] ?? [];
         _messageListMap[convID] = [newMsg, ...currentMsg];
         notifyListeners();
@@ -599,8 +624,9 @@ class TUIChatGlobalModel extends ChangeNotifier {
       } else {
         if (convID == currentSelectedConv) {
           unreadCountForConversation++;
-          final currentTempMsg = _tempMessageListMap[convID] ?? [];
-          _tempMessageListMap[convID] = [newMsg, ...currentTempMsg];
+          _recivedNewMessageCount++;
+          final currentMsg = _messageListMap[convID] ?? [];
+          _messageListMap[convID] = [newMsg, ...currentMsg];
           notifyListeners();
         }
       }
@@ -692,6 +718,35 @@ class TUIChatGlobalModel extends ChangeNotifier {
     print("message progress: $progress");
   }
 
+  onMessageDownloadProgressCallback(
+      V2TimMessageDownloadProgress messageProgress) {
+    if (messageProgress.isFinish) {
+      setMessageProgress(messageProgress.msgID, 100);
+      setFileMessageLocation(messageProgress.msgID, messageProgress.path);
+      downloadFile();
+      return;
+    }
+    if (messageProgress.isError) {
+      TIMUIKitClass.onTIMCallback(
+        TIMCallback(
+            type: TIMCallbackType.INFO,
+            infoRecommendText:
+                TIM_t("视频保存失败") + ": ${messageProgress.errorCode.toString()}",
+            infoCode: 6660403),
+      );
+      return;
+    }
+
+    if (messageProgress.totalSize != -1) {
+      int progrss =
+          (messageProgress.currentSize / messageProgress.totalSize * 100)
+              .ceil();
+      if (progrss > 1) {
+        setMessageProgress(messageProgress.msgID, progrss);
+      }
+    }
+  }
+
   void addAdvancedMsgListener() {
     _messageService.addAdvancedMsgListener(listener: advancedMsgListener);
   }
@@ -755,10 +810,12 @@ class TUIChatGlobalModel extends ChangeNotifier {
       messageList = messageList.map((item) {
         if (item.msgID == msgID) {
           item.localCustomData = localCustomData;
+          // item.id = DateTime.now().millisecondsSinceEpoch.toString();
         }
         return item;
       }).toList();
-      setMessageList(conversationID, messageList);
+      setMessageList(conversationID, messageList,
+          needResetNewMessageCount: false);
       return true;
     }
     return false;
@@ -773,10 +830,12 @@ class TUIChatGlobalModel extends ChangeNotifier {
       messageList = messageList.map((item) {
         if (item.msgID == msgID) {
           item.localCustomInt = HistoryMessageDartConstant.read;
+          // item.id = DateTime.now().millisecondsSinceEpoch.toString();
         }
         return item;
       }).toList();
-      setMessageList(conversationID, messageList);
+      setMessageList(conversationID, messageList,
+          needResetNewMessageCount: false);
       return true;
     }
     return false;
@@ -824,20 +883,11 @@ class TUIChatGlobalModel extends ChangeNotifier {
   }
 
   void setMessageList(String conversationID, List<V2TimMessage> messageList,
-      {bool needDuration = false}) {
+      {bool needResetNewMessageCount = true}) {
     _messageListMap[conversationID] = messageList;
-    if (needDuration) {
-      Future.delayed(const Duration(milliseconds: 800), () {
-        notifyListeners();
-      });
-    } else {
-      notifyListeners();
+    if (needResetNewMessageCount) {
+      _recivedNewMessageCount = 0;
     }
-  }
-
-  void setTempMessageList(
-      String conversationID, List<V2TimMessage> messageList) {
-    _tempMessageListMap[conversationID] = messageList;
     notifyListeners();
   }
 
@@ -887,6 +937,25 @@ class TUIChatGlobalModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateAsyncMessage(
+    V2TimMessage message,
+    String convID,
+  ) {
+    message.id = DateTime.now().millisecondsSinceEpoch.toString();
+    final activeMessageList = _messageListMap[convID];
+    if (activeMessageList == null || activeMessageList.isEmpty) {
+      return;
+    }
+    final msgID = message.msgID;
+    _messageListMap[currentSelectedConv] = activeMessageList.map((item) {
+      if (item.msgID == msgID) {
+        return message;
+      }
+      return item;
+    }).toList();
+    notifyListeners();
+  }
+
   List<V2TimMessage>? getMessageList(String conversationID) {
     final list = messageListMap[conversationID]?.reversed.toList() ?? [];
     final List<V2TimMessage> listWithTimestamp = [];
@@ -911,16 +980,15 @@ class TUIChatGlobalModel extends ChangeNotifier {
         listWithTimestamp.add(V2TimMessage.fromJson(item.toJson()));
       }
     }
-
     final returnValue = listWithTimestamp.reversed.toList();
     return returnValue;
   }
 
-  HistoryMessagePosition getMessageListPosition(String conversationID) {
+  HistoryMessagePosition getMessageListPosition(String? conversationID) {
     final HistoryMessagePosition? position =
         _historyMessagePositionMap[conversationID];
     if (position == null) {
-      _historyMessagePositionMap[conversationID] =
+      _historyMessagePositionMap[conversationID ?? currentSelectedConv] =
           HistoryMessagePosition.bottom;
       return HistoryMessagePosition.bottom;
     } else {

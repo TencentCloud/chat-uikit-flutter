@@ -1,27 +1,34 @@
 import 'dart:async';
 
+import 'package:tencent_extended_text_field/extended_text_field.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tim_ui_kit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tim_ui_kit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tim_ui_kit/business_logic/view_models/tui_conversation_view_model.dart';
-import 'package:tim_ui_kit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tim_ui_kit/data_services/services_locatar.dart';
-import 'package:tim_ui_kit/tim_ui_kit.dart';
-import 'package:tim_ui_kit/ui/utils/color.dart';
-import 'package:tim_ui_kit/ui/utils/message.dart';
-import 'package:tim_ui_kit/ui/utils/platform.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_at_text.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_emoji_panel.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_send_sound_message.dart';
+import 'package:tencent_extended_text_field/extended_text_field.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_conversation_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/color.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_at_text.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_emoji_panel.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_send_sound_message.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 
-import 'package:tim_ui_kit/ui/utils/permission.dart';
+import '../../../utils/constant_data.dart';
+import '../../../utils/custom_emoji_face_data_class.dart';
+import '../../../utils/custom_sticker.dart';
+import 'special_text/DefaultSpecialTextSpanBuilder.dart';
+import 'special_text/emoji_text.dart';
 
 enum MuteStatus { none, me, all }
 
@@ -64,12 +71,20 @@ class TIMUIKitInputTextField extends StatefulWidget {
 
   final TUIChatSeparateViewModel model;
 
+  /// Whether to use the default emoji
+  final bool isUseDefaultEmoji;
+
+  final List customEmojiStickerList;
+
   /// sticker panel customiziation
   final Widget Function(
-      {void Function() sendTextMessage,
-      void Function(int index, String data) sendFaceMessage,
-      void Function() deleteText,
-      void Function(int unicode) addText})? customStickerPanel;
+          {void Function() sendTextMessage,
+          void Function(int index, String data) sendFaceMessage,
+          void Function() deleteText,
+          void Function(int unicode) addText,
+          void Function(String singleEmojiName) addCustomEmojiText,
+          List<CustomEmojiFaceData> defaultCustomEmojiStickerList})?
+      customStickerPanel;
 
   const TIMUIKitInputTextField(
       {Key? key,
@@ -86,6 +101,8 @@ class TIMUIKitInputTextField extends StatefulWidget {
       this.backgroundColor,
       this.controller,
       this.onChanged,
+      this.isUseDefaultEmoji = false,
+      this.customEmojiStickerList = const [],
       required this.model})
       : super(key: key);
 
@@ -147,7 +164,17 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                 textEditingController.text = "$oldText$newText";
                 // handleSetDraftText();
               },
-            )
+              addCustomEmojiText: ((String singleEmojiName) {
+                RegExp exp = RegExp(r"([\u4e00-\u9fa5]+|[a-zA-Z]+)");
+                var emojiPngNameMatch = exp.firstMatch(singleEmojiName);
+                String? emojiName = emojiPngNameMatch![0];
+                final oldText = textEditingController.text;
+                final newText = '[$emojiName]';
+                textEditingController.text = "$oldText$newText";
+                setSendButton();
+              }),
+              defaultCustomEmojiStickerList:
+                  widget.isUseDefaultEmoji ? ConstData.emojiList : [])
           : EmojiPanel(onTapEmoji: (unicode) {
               final oldText = textEditingController.text;
               final newText = String.fromCharCode(unicode);
@@ -248,10 +275,11 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
       final text =
           "${MessageUtils.getDisplayName(widget.model.repliedMessage!)}:${widget.model.abstractMessageBuilder != null ? widget.model.abstractMessageBuilder!(widget.model.repliedMessage!) : MessageUtils.getAbstractMessage(widget.model.repliedMessage!)}";
       return Container(
-        color: hexToColor("EBF0F6"),
+        color: widget.backgroundColor ?? hexToColor("f5f5f6"),
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
@@ -260,21 +288,20 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                 softWrap: true,
                 maxLines: 3,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: hexToColor("8F96A0"), fontSize: 14),
+                style: TextStyle(color: hexToColor("8f959e"), fontSize: 14),
               ),
+            ),
+            const SizedBox(
+              width: 16,
             ),
             InkWell(
               onTap: () {
                 widget.model.repliedMessage = null;
               },
-              child: SizedBox(
-                height: 18,
-                width: 18,
-                child: Image.asset(
-                  'images/clear.png',
-                  package: 'tim_ui_kit',
-                ),
-              ),
+              child: Icon(
+                  Icons.clear,
+                  color: hexToColor("8f959e"),
+                  size: 18),
             )
           ],
         ),
@@ -340,6 +367,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     setSendButton();
   }
 
+// index为emoji的index,data为baseurl+name
   onCustomEmojiFaceSubmitted(int index, String data) {
     final convType = widget.conversationType;
     if (widget.model.repliedMessage != null) {
@@ -716,7 +744,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
             children: [
               _buildRepliedMessage(value),
               Container(
-                color: widget.backgroundColor ?? hexToColor("f7f6f6"),
+                color: widget.backgroundColor ?? hexToColor("f5f5f6"),
                 child: SafeArea(
                   child: Column(
                     children: [
@@ -766,7 +794,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                                   showSendSoundText
                                       ? 'images/keyboard.svg'
                                       : 'images/voice.svg',
-                                  package: 'tim_ui_kit',
+                                  package: 'tencent_cloud_chat_uikit',
                                   color: const Color.fromRGBO(68, 68, 68, 1),
                                   height: 28,
                                   width: 28,
@@ -784,12 +812,13 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                                         conversationID: widget.conversationID,
                                         conversationType:
                                             widget.conversationType)
-                                    : TextField(
-                                        onChanged: debounceFunc,
+                                    : ExtendedTextField(
+                                        // selectionControls:
+                                        //     _defaultTextSelectionControls,
                                         maxLines: 4,
                                         minLines: 1,
-                                        controller: textEditingController,
                                         focusNode: focusNode,
+                                        onChanged: debounceFunc,
                                         onTap: () {
                                           goDownBottom();
                                           setState(() {
@@ -816,7 +845,15 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                                             filled: true,
                                             isDense: true,
                                             hintText: widget.hintText ?? ''),
-                                      ),
+                                        controller: textEditingController,
+                                        specialTextSpanBuilder:
+                                            DefaultSpecialTextSpanBuilder(
+                                          isUseDefaultEmoji:
+                                              widget.isUseDefaultEmoji,
+                                          customEmojiStickerList:
+                                              widget.customEmojiStickerList,
+                                          showAtBackground: true,
+                                        )),
                               ),
                             if (forbiddenText == null)
                               const SizedBox(
@@ -839,7 +876,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                                         showEmojiPanel
                                             ? 'images/keyboard.svg'
                                             : 'images/face.svg',
-                                        package: 'tim_ui_kit',
+                                        package: 'tencent_cloud_chat_uikit',
                                         color:
                                             const Color.fromRGBO(68, 68, 68, 1),
                                         height: 28,
@@ -864,7 +901,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                                         color: hexToColor("5c6168"), size: 32)
                                     : SvgPicture.asset(
                                         'images/add.svg',
-                                        package: 'tim_ui_kit',
+                                        package: 'tencent_cloud_chat_uikit',
                                         color:
                                             const Color.fromRGBO(68, 68, 68, 1),
                                         height: 28,

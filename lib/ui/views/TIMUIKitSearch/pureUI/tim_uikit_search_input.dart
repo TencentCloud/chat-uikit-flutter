@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 
-import 'package:tim_ui_kit/ui/utils/color.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/color.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tim_ui_kit/ui/utils/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
 
 class TIMUIKitSearchInput extends StatefulWidget {
   final ValueChanged<String> onChange;
@@ -13,6 +13,7 @@ class TIMUIKitSearchInput extends StatefulWidget {
   final TextEditingController? controller;
   final Widget? prefixIcon;
   final Widget? prefixText;
+  final bool? isAutoFocus;
 
   const TIMUIKitSearchInput({
     required this.onChange,
@@ -20,6 +21,7 @@ class TIMUIKitSearchInput extends StatefulWidget {
     this.controller,
     Key? key,
     this.prefixIcon,
+    this.isAutoFocus = true,
     this.prefixText,
   }) : super(key: key);
 
@@ -64,7 +66,7 @@ class TIMUIKitSearchInputState extends TIMUIKitState<TIMUIKitSearchInput> {
               child: SizedBox(
             height: 36,
             child: TextField(
-              autofocus: true,
+              autofocus: widget.isAutoFocus ?? true,
               onChanged: (value) async {
                 final trimValue = value.trim();
                 final isEmpty = trimValue.isEmpty;

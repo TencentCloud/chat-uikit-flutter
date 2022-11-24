@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:link_preview_generator/link_preview_generator.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/ui/widgets/link_preview/common/extensions.dart';
-import 'package:tim_ui_kit/ui/widgets/link_preview/link_preview_entry.dart';
-import 'package:tim_ui_kit/ui/widgets/link_preview/models/link_preview_content.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/common/extensions.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/link_preview_entry.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/models/link_preview_content.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LinkUtils {
@@ -27,6 +27,7 @@ class LinkUtils {
 
   /// Launch URL
   static Future<void> launchURL(BuildContext context, String url) async {
+    print(url);
     try {
       await launchUrl(
         Uri.parse(url).withScheme,

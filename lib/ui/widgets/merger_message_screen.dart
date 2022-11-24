@@ -1,27 +1,53 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_statelesswidget.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tim_ui_kit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tim_ui_kit/business_logic/view_models/tui_theme_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_theme_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 
-import 'package:tim_ui_kit/ui/utils/color.dart';
-import 'package:tim_ui_kit/ui/utils/tui_theme.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/main.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_face_elem.dart';
-import 'package:tim_ui_kit/ui/views/TIMUIKitChat/tim_uikit_cloud_custom_data.dart';
-import 'package:tim_ui_kit/ui/widgets/avatar.dart';
-import 'package:tim_ui_kit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/color.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/main.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_face_elem.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_cloud_custom_data.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
-class MergerMessageScreen extends TIMUIKitStatelessWidget {
-  final List<V2TimMessage> messageList;
+class MergerMessageScreen extends StatefulWidget {
   final TUIChatSeparateViewModel model;
+  final String msgID;
 
   MergerMessageScreen(
-      {Key? key, required this.model, required this.messageList})
+      {Key? key, required this.model, required this.msgID})
       : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => MergerMessageScreenState();
+}
+
+class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
+  final MessageService _messageService = serviceLocator<MessageService>();
+
+  List<V2TimMessage> messageList = [];
+
+  @override
+  initState() {
+    super.initState();
+    initMessageList();
+  }
+
+  void initMessageList() async {
+    final mergerMessageList = await _messageService.downloadMergerMessage(msgID: widget.msgID);
+    setState(() {
+      messageList = mergerMessageList ?? [];
+    });
+  }
 
   bool isReplyMessage(V2TimMessage message) {
     final hasCustomData =
@@ -29,7 +55,7 @@ class MergerMessageScreen extends TIMUIKitStatelessWidget {
     if (hasCustomData) {
       try {
         final CloudCustomData messageCloudCustomData =
-            CloudCustomData.fromJson(json.decode(message.cloudCustomData!));
+        CloudCustomData.fromJson(json.decode(message.cloudCustomData!));
         if (messageCloudCustomData.messageReply != null) {
           MessageRepliedData.fromJson(messageCloudCustomData.messageReply!);
           return true;
@@ -51,7 +77,7 @@ class MergerMessageScreen extends TIMUIKitStatelessWidget {
         return Text(TIM_t("[自定义]"));
       case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
         return TIMUIKitSoundElem(
-            chatModel: model,
+            chatModel: widget.model,
             isShowMessageReaction: false,
             message: message,
             soundElem: message.soundElem!,
@@ -62,7 +88,7 @@ class MergerMessageScreen extends TIMUIKitStatelessWidget {
         if (isReplyMessage(message)) {
           return TIMUIKitReplyElem(
               isShowMessageReaction: false,
-              chatModel: model,
+              chatModel: widget.model,
               message: message,
               scrollToIndex: () {},
               clearJump: () {});
@@ -73,17 +99,17 @@ class MergerMessageScreen extends TIMUIKitStatelessWidget {
           softWrap: true,
           style: const TextStyle(fontSize: 16),
         );
-      // return Text(message.textElem!.text!);
+    // return Text(message.textElem!.text!);
       case MessageElemType.V2TIM_ELEM_TYPE_FACE:
         return TIMUIKitFaceElem(
-            model: model,
+            model: widget.model,
             isShowJump: false,
             isShowMessageReaction: false,
             path: message.faceElem?.data ?? "",
             message: message);
       case MessageElemType.V2TIM_ELEM_TYPE_FILE:
         return TIMUIKitFileElem(
-            chatModel: model,
+            chatModel: widget.model,
             isShowMessageReaction: false,
             message: message,
             messageID: message.msgID,
@@ -92,7 +118,7 @@ class MergerMessageScreen extends TIMUIKitStatelessWidget {
             isShowJump: false);
       case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
         return TIMUIKitImageElem(
-          chatModel: model,
+          chatModel: widget.model,
           isShowMessageReaction: false,
           message: message,
           isFrom: "merger",
@@ -100,12 +126,13 @@ class MergerMessageScreen extends TIMUIKitStatelessWidget {
         );
       case MessageElemType.V2TIM_ELEM_TYPE_VIDEO:
         return TIMUIKitVideoElem(message,
-            chatModel: model, isFrom: "merger", isShowMessageReaction: false);
+            chatModel: widget.model,
+            isFrom: "merger", isShowMessageReaction: false);
       case MessageElemType.V2TIM_ELEM_TYPE_LOCATION:
         return Text(TIM_t("[位置]"));
       case MessageElemType.V2TIM_ELEM_TYPE_MERGER:
         return TIMUIKitMergerElem(
-            model: model,
+            model: widget.model,
             isShowJump: false,
             isShowMessageReaction: false,
             message: message,
@@ -181,7 +208,21 @@ class MergerMessageScreen extends TIMUIKitStatelessWidget {
           iconTheme: const IconThemeData(
             color: Colors.white,
           )),
-      body: Padding(
+      body: messageList.isEmpty ? Row(children: [
+        Expanded(child: Column(
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            LoadingAnimationWidget.staggeredDotsWave(
+              color: theme.weakTextColor ?? Colors.grey,
+              size: 48,
+            ),
+            const SizedBox(height: 20),
+            Text(TIM_t("消息列表加载中"))
+          ],
+        ))
+      ],) : Padding(
         padding: const EdgeInsets.all(16),
         child: ListView.builder(
           shrinkWrap: true,

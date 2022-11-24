@@ -15,8 +15,8 @@ class TextSize {
   }
 }
 
-class ExtendText extends StatefulWidget {
-  const ExtendText(
+class CustomText extends StatefulWidget {
+  const CustomText(
     this.text, {
     Key? key,
     required this.width,
@@ -53,10 +53,10 @@ class ExtendText extends StatefulWidget {
   final TextHeightBehavior? textHeightBehavior;
 
   @override
-  State<ExtendText> createState() => _ExtendTextState();
+  State<CustomText> createState() => _ExtendTextState();
 }
 
-class _ExtendTextState extends State<ExtendText> {
+class _ExtendTextState extends State<CustomText> {
   String? text;
   countTextSize() {
     TextStyle style = widget.style ?? const TextStyle(fontSize: 14);

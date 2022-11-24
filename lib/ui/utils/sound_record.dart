@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_plugin_record_plus/const/play_state.dart';
 import 'package:flutter_plugin_record_plus/const/response.dart';
 import 'package:flutter_plugin_record_plus/index.dart';
-import 'package:tim_ui_kit/import_proxy/import_proxy.dart';
+import 'package:tencent_cloud_chat_uikit/import_proxy/import_proxy.dart';
 
 typedef PlayStateListener = void Function(PlayState playState);
 typedef SoundInterruptListener = void Function();

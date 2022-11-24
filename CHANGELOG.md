@@ -1,8 +1,22 @@
+## 1.0.0
+
+* Add: Support adding Flutter module to Native APP, for details, please refer to [this documentation](https://www.tencentcloud.com/document/product/1047/51456) to implement.
+* Add: Customize sticker and Emoji for text messages. For details, please refer to [this documentation](https://cloud.tencent.com/document/product/269/80882) to modify.
+* Optimize: The loading duration for history message list, especially with lots of media and file messages.
+* Optimize: More panel area supports scroll.
+* Optimize: Load latest messages when scrolling back to bottom with more fluency.
+* Modify: It is required to provide the call record widget to `messageItemBuilder` => `customMessageItemBuilder` of `TIMUIKitChat`. You can choose to use the default widget, `CallMessageItem`, from our call plugin `tim_ui_kit_calling_plugin` directly. Refer to the [Demo](https://github.com/TencentCloud/chat-demo-flutter/tree/main/lib/utils/custom_message/custom_message_element.dart).
+* Fix: The amount of photos from the album on Android.
+* Fix: The out of bounds for long text in the group profile info card.
+* Fix: Some bugs.
+
+> **Please pay more attention to the second line and sixth line**, that some modifications are required, otherwise the module of sticker / emoji / call records will not work.
+
 ## 0.1.8
 
 * Optimize: File batch downloading queue, allow click multiple file messages once.
 * Optimize: Group list widgets can be updated automatically.
-* Optimize: Camera capture supports relatively lower performance devices, adjust resolution automatically. 
+* Optimize: Camera capture supports relatively lower performance devices, adjusting resolution automatically.
 * Optimize: Supports customize the color and text style of the app bar, especially on TIMUIKitChat widget.
 * Fix: Friend remark or nickname can not show on group tips.
 * Fix: Crash on video playing.
@@ -10,7 +24,7 @@
 
 ## 0.1.7
 
-* Add: Big and RAW images supports, especially for those captured from latest version of iOS and iPhone 14 Pro series, compress and format before sending automatically.
+* Add: Big and RAW images supported, especially for those captured from the latest version of iOS and iPhone 14 Pro series, compress and format before sending automatically.
 * Optimize: Performance and stability, especially for history message list and launching.
 * Optimize: Makes initializing the `TIMUIKitChat` an idempotent operation.
 * Optimize: Load latest messages when scrolling back to bottom.
@@ -23,12 +37,12 @@
 * Add: Web supports. Now, you could implement TUIKit on iOS/Android/Web platforms.
 * Add: Disk storage checking after log in, and controls in `config` of `init`.
 * Add: `timeDividerConfig`, `notificationAndroidSound`, `isSupportMarkdownForTextMessage` and `onTapLink` to `TIMUIKitChatConfig`.
-* Remove: The default Emoji list, due to the copyright issues. You can provided your own sticker list to panel by [tim_ui_kit_sticker_plugin](https://pub.dev/packages/tim_ui_kit_sticker_plugin).
+* Remove: The default Emoji list, due to the copyright issues. You can provide your own sticker list to the panel by [tim_ui_kit_sticker_plugin](https://pub.dev/packages/tim_ui_kit_sticker_plugin).
 * Optimize: You could now choose to disable Markdown parsing for text messages.
 * Optimize: You could now choose to disable the shows for @ message in conversation list.
 * Optimize: You could now return `null` for `notificationExt`/`notificationBody` in `TIMUIKitChatConfig` and `messageRowBuilder` in `MessageItemBuilder`, to use default value up to your needs in the specific case, means you can control whether or not using customized setting based on the provided situation, without the necessary to re-define the same logic as the TUIKit in your code.
 * Optimize: Supports multiple lines for text messages.
-* Optimize: Rebuild and improve the experience of `TIMUIKitChat`. While, `TIMUIKitChatController` needs to be specified to `controller` here, like how we shows in [Demo](https://github.com/TencentCloud/TIMSDK/blob/master/Flutter/Demo/im-flutter-uikit/lib/src/chat.dart).
+* Optimize: Rebuild and improve the experience of `TIMUIKitChat`. While, `TIMUIKitChatController` needs to be specified to `controller` here, like how we shows in [Demo](https://github.com/TencentCloud/tc-chat-demo-flutter/lib/src/chat.dart).
 * Fix: Several bugs.
 
 ## 0.1.3
