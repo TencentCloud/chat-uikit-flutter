@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -19,7 +18,6 @@ import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_wrapper.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/video_screen.dart';
-import 'package:transparent_image/transparent_image.dart';
 
 class TIMUIKitVideoElem extends StatefulWidget {
   final V2TimMessage message;
@@ -78,22 +76,22 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
       final current = (DateTime.now().millisecondsSinceEpoch / 1000).ceil();
       final timeStamp = widget.message.timestamp ?? current;
       if (current - timeStamp < 300) {
-        if (stateElement!.snapshotPath != null &&
-            stateElement!.snapshotPath != '') {
-          File imgF = File(stateElement!.snapshotPath!);
+        if (stateElement.snapshotPath != null &&
+            stateElement.snapshotPath != '') {
+          File imgF = File(stateElement.snapshotPath!);
           bool isExist = imgF.existsSync();
           if (isExist) {
-            return Image.file(File(stateElement!.snapshotPath!),
+            return Image.file(File(stateElement.snapshotPath!),
                 fit: BoxFit.fitWidth);
           }
         }
       }
     }
 
-    if ((stateElement!.snapshotUrl == null ||
-            stateElement!.snapshotUrl == '') &&
-        (stateElement!.snapshotPath == null ||
-            stateElement!.snapshotPath == '')) {
+    if ((stateElement.snapshotUrl == null ||
+            stateElement.snapshotUrl == '') &&
+        (stateElement.snapshotPath == null ||
+            stateElement.snapshotPath == '')) {
       return Container(
         decoration: BoxDecoration(
             borderRadius: const BorderRadius.all(Radius.circular(5)),
@@ -115,18 +113,18 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
         ),
       );
     }
-    return (!kIsWeb && stateElement!.snapshotUrl == null ||
+    return (!kIsWeb && stateElement.snapshotUrl == null ||
             widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING)
-        ? (stateElement!.snapshotPath!.isNotEmpty
-            ? Image.file(File(stateElement!.snapshotPath!),
+        ? (stateElement.snapshotPath!.isNotEmpty
+            ? Image.file(File(stateElement.snapshotPath!),
                 fit: BoxFit.fitWidth)
-            : Image.file(File(stateElement!.localSnapshotUrl!),
+            : Image.file(File(stateElement.localSnapshotUrl!),
                 fit: BoxFit.fitWidth))
         : (kIsWeb ||
-                stateElement?.localSnapshotUrl == null ||
-                stateElement?.localSnapshotUrl == "")
-            ? Image.network(stateElement!.snapshotUrl!, fit: BoxFit.fitWidth)
-            : Image.file(File(stateElement!.localSnapshotUrl!),
+                stateElement.localSnapshotUrl == null ||
+                stateElement.localSnapshotUrl == "")
+            ? Image.network(stateElement.snapshotUrl!, fit: BoxFit.fitWidth)
+            : Image.file(File(stateElement.localSnapshotUrl!),
                 fit: BoxFit.fitWidth);
   }
 
@@ -203,12 +201,12 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
                     child: LayoutBuilder(builder:
                         (BuildContext context, BoxConstraints constraints) {
                       double positionRadio = 0.56;
-                      if (stateElement?.snapshotWidth != null &&
-                          stateElement?.snapshotHeight != null &&
-                          stateElement?.snapshotWidth != 0 &&
-                          stateElement?.snapshotHeight != 0) {
-                        positionRadio = (stateElement!.snapshotWidth! /
-                            stateElement!.snapshotHeight!);
+                      if (stateElement.snapshotWidth != null &&
+                          stateElement.snapshotHeight != null &&
+                          stateElement.snapshotWidth != 0 &&
+                          stateElement.snapshotHeight != 0) {
+                        positionRadio = (stateElement.snapshotWidth! /
+                            stateElement.snapshotHeight!);
                       }
 
                       return ConstrainedBox(
@@ -223,8 +221,8 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
                             aspectRatio: positionRadio,
                             child: Stack(
                               children: <Widget>[
-                                if (stateElement!.snapshotUrl != null ||
-                                    stateElement!.snapshotUrl != null)
+                                if (stateElement.snapshotUrl != null ||
+                                    stateElement.snapshotUrl != null)
                                   AspectRatio(
                                     aspectRatio: positionRadio,
                                     child: Container(
@@ -237,18 +235,18 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
                                     Expanded(
                                         child: generateSnapshot(
                                             theme,
-                                            stateElement!.snapshotHeight ??
+                                            stateElement.snapshotHeight ??
                                                 100))
                                   ],
                                 ),
                                 if (widget.message.status !=
                                             MessageStatus
                                                 .V2TIM_MSG_STATUS_SENDING &&
-                                        (stateElement!.snapshotUrl != null ||
-                                            stateElement!.snapshotPath !=
+                                        (stateElement.snapshotUrl != null ||
+                                            stateElement.snapshotPath !=
                                                 null) &&
-                                        stateElement!.videoPath != null ||
-                                    stateElement!.videoUrl != null)
+                                        stateElement.videoPath != null ||
+                                    stateElement.videoUrl != null)
                                   Positioned.fill(
                                     // alignment: Alignment.center,
                                     child: Center(

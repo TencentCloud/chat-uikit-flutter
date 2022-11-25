@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
+// ignore: unnecessary_import
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
@@ -205,7 +205,6 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     required int count,
     String? lastMsgID,
   }) async {
-    print(lastMsgID);
     haveMoreData = false;
     final currentHistoryMsgList = globalModel.messageListMap[conversationID];
     final response = await _messageService.getHistoryMessageListWithComplete(
@@ -755,6 +754,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
           image = result?.path;
         }
       } catch (e) {
+        // ignore: avoid_print
         print(e);
       }
     }

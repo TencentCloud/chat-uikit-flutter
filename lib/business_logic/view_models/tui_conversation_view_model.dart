@@ -59,6 +59,7 @@ class TUIConversationViewModel extends ChangeNotifier {
         _conversationList.removeWhere((element) => element?.isPinned == true);
         _conversationList = [...pinnedConversation, ..._conversationList];
       } catch (e) {
+        // ignore: avoid_print
         print(e);
       }
     } else {

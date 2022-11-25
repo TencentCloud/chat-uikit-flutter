@@ -57,7 +57,7 @@ class LinkText extends TIMStatelessWidget {
 
   final bool isUseDefaultEmoji;
 
-  final customEmojiStickerList;
+  final List customEmojiStickerList;
 
   const LinkText(
       {Key? key,

@@ -16,11 +16,10 @@ import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/controller/tim_uikit_chat_controller.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/color.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/custom_emoji_face_data_class.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/frame.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/optimize_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_multi_select_panel.dart';
-import '../../utils/custom_emoji_face_data_class.dart';
-import '../../utils/custom_sticker.dart';
 import 'TIMUIKItMessageList/TIMUIKitTongue/tim_uikit_chat_history_message_list_tongue.dart';
 import 'TIMUIKItMessageList/tim_uikit_chat_history_message_list_config.dart';
 import 'TIMUIKItMessageList/tim_uikit_history_message_list_container.dart';
@@ -313,9 +312,6 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
           final listContainerBox =
               listContainerKey.currentContext?.findRenderObject() as RenderBox?;
           final listContainerBoxHeight = listContainerBox?.size.height ?? 0;
-
-          print(
-              'hjkadshjghajklsdhfjklsahgjkl: alignBox${alignHeight},listContainerBox${listContainerBoxHeight}, isAllow:${(!(listContainerBoxHeight < alignHeight))}');
 
           return GestureDetector(
             onTap: () {

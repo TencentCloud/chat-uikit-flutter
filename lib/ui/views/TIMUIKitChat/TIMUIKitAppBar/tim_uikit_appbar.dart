@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
@@ -75,6 +77,7 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
                 "";
           }
         } catch (e) {
+          // ignore: avoid_print
           print(e);
         }
       },
@@ -98,6 +101,7 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
             }
           }
         } catch (e) {
+          // ignore: avoid_print
           print(e);
         }
       },
@@ -156,6 +160,7 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
         });
       }
     } catch (e) {
+      // ignore: avoid_print
       print(e);
     }
   }

@@ -3,17 +3,14 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
-import 'package:dio/dio.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:chewie/chewie.dart';
@@ -46,7 +43,6 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
   late ChewieController chewieController;
   GlobalKey<ExtendedImageSlidePageState> slidePagekey =
       GlobalKey<ExtendedImageSlidePageState>();
-  final MessageService _messageService = serviceLocator<MessageService>();
   final TUIChatGlobalModel model = serviceLocator<TUIChatGlobalModel>();
   bool isInit = false;
   @override
@@ -180,34 +176,34 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
 
   void _saveVideo() {
     if (PlatformUtils().isWeb) {
-      _saveNetworkVideo(context, widget.videoElement!.videoPath!,
+      _saveNetworkVideo(context, widget.videoElement.videoPath!,
           isAsset: true);
       return;
     }
-    if (widget.videoElement!.videoPath != '' &&
-        widget.videoElement!.videoPath != null) {
-      File f = File(widget.videoElement!.videoPath!);
+    if (widget.videoElement.videoPath != '' &&
+        widget.videoElement.videoPath != null) {
+      File f = File(widget.videoElement.videoPath!);
       if (f.existsSync()) {
-        _saveNetworkVideo(context, widget.videoElement!.videoPath!,
+        _saveNetworkVideo(context, widget.videoElement.videoPath!,
             isAsset: true);
         return;
       }
     }
-    if (widget.videoElement!.localVideoUrl != '' &&
-        widget.videoElement!.localVideoUrl != null) {
-      File f = File(widget.videoElement!.localVideoUrl!);
+    if (widget.videoElement.localVideoUrl != '' &&
+        widget.videoElement.localVideoUrl != null) {
+      File f = File(widget.videoElement.localVideoUrl!);
       if (f.existsSync()) {
-        _saveNetworkVideo(context, widget.videoElement!.localVideoUrl!,
+        _saveNetworkVideo(context, widget.videoElement.localVideoUrl!,
             isAsset: true);
         return;
       }
     }
-    _saveNetworkVideo(context, widget.videoElement!.videoUrl!, isAsset: false);
+    _saveNetworkVideo(context, widget.videoElement.videoUrl!, isAsset: false);
   }
 
   double getVideoHeight() {
-    double height = widget.videoElement!.snapshotHeight!.toDouble();
-    double width = widget.videoElement!.snapshotWidth!.toDouble();
+    double height = widget.videoElement.snapshotHeight!.toDouble();
+    double width = widget.videoElement.snapshotWidth!.toDouble();
     // 横图
     if (width > height) {
       return height * 1.3;
@@ -216,8 +212,8 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
   }
 
   double getVideoWidth() {
-    double height = widget.videoElement!.snapshotHeight!.toDouble();
-    double width = widget.videoElement!.snapshotWidth!.toDouble();
+    double height = widget.videoElement.snapshotHeight!.toDouble();
+    double width = widget.videoElement.snapshotWidth!.toDouble();
     // 横图
     if (width > height) {
       return width * 1.3;
@@ -252,7 +248,7 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
           }
           File f = File(savePath);
           if (f.existsSync()) {
-            widget.videoElement!.localVideoUrl =
+            widget.videoElement.localVideoUrl =
                 model.getFileMessageLocation(widget.message.msgID);
           }
         }
@@ -260,31 +256,31 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
     }
 
     VideoPlayerController player = PlatformUtils().isWeb
-        ? ((widget.videoElement!.videoPath != null &&
-                    widget.videoElement!.videoPath!.isNotEmpty) ||
+        ? ((widget.videoElement.videoPath != null &&
+                    widget.videoElement.videoPath!.isNotEmpty) ||
                 widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING
             ? VideoPlayerController.network(
-                widget.videoElement!.videoPath!,
+                widget.videoElement.videoPath!,
               )
-            : (widget.videoElement?.localVideoUrl == null ||
-                    widget.videoElement?.localVideoUrl == "")
+            : (widget.videoElement.localVideoUrl == null ||
+                    widget.videoElement.localVideoUrl == "")
                 ? VideoPlayerController.network(
-                    widget.videoElement!.videoUrl!,
+                    widget.videoElement.videoUrl!,
                   )
                 : VideoPlayerController.network(
-                    widget.videoElement!.localVideoUrl!,
+                    widget.videoElement.localVideoUrl!,
                   ))
-        : (widget.videoElement!.videoPath != null &&
-                    widget.videoElement!.videoPath!.isNotEmpty) ||
+        : (widget.videoElement.videoPath != null &&
+                    widget.videoElement.videoPath!.isNotEmpty) ||
                 widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING
-            ? VideoPlayerController.file(File(widget.videoElement!.videoPath!))
-            : (widget.videoElement?.localVideoUrl == null ||
-                    widget.videoElement?.localVideoUrl == "")
+            ? VideoPlayerController.file(File(widget.videoElement.videoPath!))
+            : (widget.videoElement.localVideoUrl == null ||
+                    widget.videoElement.localVideoUrl == "")
                 ? VideoPlayerController.network(
-                    widget.videoElement!.videoUrl!,
+                    widget.videoElement.videoUrl!,
                   )
                 : VideoPlayerController.file(File(
-                    widget.videoElement!.localVideoUrl!,
+                    widget.videoElement.localVideoUrl!,
                   ));
     await player.initialize();
     WidgetsBinding.instance?.addPostFrameCallback((_) {
@@ -308,8 +304,8 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
 
   @override
   didUpdateWidget(oldWidget) {
-    if (oldWidget.videoElement!.videoUrl != widget.videoElement!.videoUrl ||
-        oldWidget.videoElement!.videoPath != widget.videoElement!.videoPath) {
+    if (oldWidget.videoElement.videoUrl != widget.videoElement.videoUrl ||
+        oldWidget.videoElement.videoPath != widget.videoElement.videoPath) {
       setVideoMessage();
     }
     super.didUpdateWidget(oldWidget);

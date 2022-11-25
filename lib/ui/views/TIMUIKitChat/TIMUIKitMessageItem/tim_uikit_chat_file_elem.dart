@@ -3,13 +3,10 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:dio/dio.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tencent_open_file/tencent_open_file.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
@@ -106,13 +103,6 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
   }
 
   Future<String> getSavePath() async {
-    var appDocDir = await getTemporaryDirectory();
-    // String savePathWithAppPath = appDocDir.path +
-    //     '/' +
-    //     (widget.message.msgID ?? "") +
-    //     widget.fileElem!.fileName!;
-    // return savePathWithAppPath;
-
     String savePathWithAppPath =
         '/storage/emulated/0/Android/data/com.tencent.flutter.tuikit/cache/' +
             (widget.message.msgID ?? "") +

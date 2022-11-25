@@ -13,7 +13,7 @@ class EmojiText extends SpecialText {
   static const String flag = '[';
   final int? start;
   final bool isUseDefaultEmoji;
-  final customEmojiStickerList;
+  final List customEmojiStickerList;
   @override
   InlineSpan finishText() {
     final String key = toString();

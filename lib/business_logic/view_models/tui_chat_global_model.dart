@@ -4,12 +4,9 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_class.dart';
-
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/chat_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_model_tools.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
@@ -17,9 +14,7 @@ import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
-
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
-import 'package:tencent_im_base/base_widgets/tim_callback.dart';
 
 enum ConvType { none, c2c, group }
 
@@ -394,7 +389,7 @@ class TUIChatGlobalModel extends ChangeNotifier with TIMUIKitClass {
     List<V2TimMessage> needPreViewList =
         msgList.sublist(0, max(0, min(5, msgList.length - 1)));
     for (var msgItem in needPreViewList) {
-      V2TimImage? getImageFromList(V2_TIM_IMAGE_TYPES_ENUM imgType) {
+      V2TimImage? getImageFromList(V2TimImageTypesEnum imgType) {
         V2TimImage? img = MessageUtils.getImageFromImgList(
             msgItem.imageElem?.imageList,
             HistoryMessageDartConstant.imgPriorMap[imgType] ??
@@ -402,7 +397,7 @@ class TUIChatGlobalModel extends ChangeNotifier with TIMUIKitClass {
         return img;
       }
 
-      V2TimImage? originalImg = getImageFromList(V2_TIM_IMAGE_TYPES_ENUM.small);
+      V2TimImage? originalImg = getImageFromList(V2TimImageTypesEnum.small);
       if (originalImg?.localUrl != null && originalImg!.localUrl != "") {
         try {
           ImageConfiguration configuration = const ImageConfiguration();

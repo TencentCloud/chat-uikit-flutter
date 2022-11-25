@@ -113,7 +113,6 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
 
   //保存网络图片到本地
   _saveImageToLocal(context, String imageUrl, {bool isAsset = true}) async {
-    var response;
     if (PlatformUtils().isWeb) {
       download(imageUrl) async {
         final http.Response r = await http.get(Uri.parse(imageUrl));
@@ -268,7 +267,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     }
   }
 
-  V2TimImage? getImageFromList(V2_TIM_IMAGE_TYPES_ENUM imgType) {
+  V2TimImage? getImageFromList(V2TimImageTypesEnum imgType) {
     V2TimImage? img = MessageUtils.getImageFromImgList(
         widget.message.imageElem!.imageList,
         HistoryMessageDartConstant.imgPriorMap[imgType] ??
@@ -386,9 +385,9 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
 
   void setOnlineImageRatio() {
     if (networkImagePositionRadio == null) {
-      V2TimImage? smallImg = getImageFromList(V2_TIM_IMAGE_TYPES_ENUM.small);
+      V2TimImage? smallImg = getImageFromList(V2TimImageTypesEnum.small);
       V2TimImage? originalImg =
-          getImageFromList(V2_TIM_IMAGE_TYPES_ENUM.original);
+          getImageFromList(V2TimImageTypesEnum.original);
       Image image = Image.network(smallImg?.url ?? originalImg?.url ?? "");
 
       image.image
@@ -506,6 +505,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
             networkImagePositionRadio ?? positionRadio, theme);
       }
     } catch (e) {
+      // ignore: avoid_print
       print(e);
     }
 
@@ -517,6 +517,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
             networkImagePositionRadio ?? positionRadio, theme);
       }
     } catch (e) {
+      // ignore: avoid_print
       print(e);
     }
 
@@ -539,8 +540,8 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
         "${widget.message.msgID ?? widget.message.id ?? widget.message.timestamp ?? DateTime.now().millisecondsSinceEpoch}${widget.isFrom}";
 
     V2TimImage? originalImg =
-        getImageFromList(V2_TIM_IMAGE_TYPES_ENUM.original);
-    V2TimImage? smallImg = getImageFromList(V2_TIM_IMAGE_TYPES_ENUM.small);
+        getImageFromList(V2TimImageTypesEnum.original);
+    V2TimImage? smallImg = getImageFromList(V2TimImageTypesEnum.small);
     return TIMUIKitMessageReactionWrapper(
         chatModel: widget.chatModel,
         isShowJump: widget.isShowJump,

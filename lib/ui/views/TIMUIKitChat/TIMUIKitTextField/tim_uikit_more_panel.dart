@@ -1,7 +1,6 @@
 // ignore_for_file: unused_field, avoid_print, unused_import
 
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +28,8 @@ import 'package:tencent_cloud_chat_uikit/ui/widgets/toast.dart';
 import 'package:video_thumbnail/video_thumbnail.dart' as video_thumbnail;
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+// ignore: unnecessary_import
+import 'dart:typed_data';
 
 import 'package:tencent_cloud_chat_uikit/ui/utils/shared_theme.dart';
 import 'package:universal_html/html.dart' as html;

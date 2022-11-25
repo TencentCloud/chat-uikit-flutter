@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:tencent_cloud_chat_uikit/ui/utils/constant_data.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/custom_emoji_face_data_class.dart';
 import 'package:tencent_extended_text_field/extended_text_field.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
-import 'package:tencent_extended_text_field/extended_text_field.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
@@ -23,12 +24,7 @@ import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_send_sound_message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
-
-import '../../../utils/constant_data.dart';
-import '../../../utils/custom_emoji_face_data_class.dart';
-import '../../../utils/custom_sticker.dart';
 import 'special_text/DefaultSpecialTextSpanBuilder.dart';
-import 'special_text/emoji_text.dart';
 
 enum MuteStatus { none, me, all }
 
@@ -446,6 +442,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
           );
         }
       } catch (e) {
+        // ignore: avoid_print
         print(e);
       }
     });

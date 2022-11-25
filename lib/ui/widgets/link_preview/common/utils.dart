@@ -27,7 +27,6 @@ class LinkUtils {
 
   /// Launch URL
   static Future<void> launchURL(BuildContext context, String url) async {
-    print(url);
     try {
       await launchUrl(
         Uri.parse(url).withScheme,

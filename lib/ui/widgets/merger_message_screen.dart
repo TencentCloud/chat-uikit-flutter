@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_theme_view_model.dart';
@@ -23,7 +22,7 @@ class MergerMessageScreen extends StatefulWidget {
   final TUIChatSeparateViewModel model;
   final String msgID;
 
-  MergerMessageScreen(
+  const MergerMessageScreen(
       {Key? key, required this.model, required this.msgID})
       : super(key: key);
 

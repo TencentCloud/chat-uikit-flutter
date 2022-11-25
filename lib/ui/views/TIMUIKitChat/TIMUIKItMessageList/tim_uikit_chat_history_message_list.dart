@@ -314,7 +314,7 @@ class _TIMUIKitHistoryMessageListState
     final endPoint = haveTimeStampMessage
         ? recivedMessageListCount + 1
         : recivedMessageListCount;
-    return widget.messageList.sublist(0, endPoint).toList();
+    return widget.messageList.sublist(0, endPoint).reversed.toList();
   }
 
   @override
@@ -329,9 +329,8 @@ class _TIMUIKitHistoryMessageListState
 
     final messageList = widget.messageList;
     final globalModel = context.read<TUIChatGlobalModel>();
-    final unreadCount = globalModel.unreadCountForConversation;
     final recivedNewMessageList = globalModel.recivedMessageListCount;
-    final shouldShowUnreadMessage = unreadCount > 0;
+    final shouldShowUnreadMessage = recivedNewMessageList > 0;
     final unreadMessageList = _getRecivedMessageList(recivedNewMessageList);
     final readedMessageList = messageList
         .sublist(unreadMessageList.length, messageList.length)

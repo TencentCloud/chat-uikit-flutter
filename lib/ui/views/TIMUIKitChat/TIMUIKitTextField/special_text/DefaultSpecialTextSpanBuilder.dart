@@ -1,6 +1,8 @@
+
+// ignore_for_file: file_names
+
 import 'package:tencent_extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/custom_emoji_face_data_class.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/http_text.dart';
 
 import 'emoji_text.dart';

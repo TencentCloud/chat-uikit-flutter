@@ -1,4 +1,4 @@
-// ignore_for_file: unnecessary_getters_setters
+// ignore_for_file: unnecessary_getters_setters, avoid_print
 
 import 'package:flutter/cupertino.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';

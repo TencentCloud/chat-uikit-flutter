@@ -59,7 +59,7 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
   /// Whether to use the default emoji
   final bool isUseDefaultEmoji;
 
-  final customEmojiStickerList;
+  final List customEmojiStickerList;
 
   final bool isAllowScroll;
 

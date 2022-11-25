@@ -1,4 +1,4 @@
-enum V2_TIM_IMAGE_TYPES_ENUM {
+enum V2TimImageTypesEnum {
   original,
   big,
   small,
@@ -14,10 +14,10 @@ class HistoryMessageDartConstant {
     'SMALL': 2,
   };
 
-  static Map<V2_TIM_IMAGE_TYPES_ENUM, List<String>> imgPriorMap = {
-    V2_TIM_IMAGE_TYPES_ENUM.original: oriImgPrior,
-    V2_TIM_IMAGE_TYPES_ENUM.big: bigImgPrior,
-    V2_TIM_IMAGE_TYPES_ENUM.small: smallImgPrior,
+  static Map<V2TimImageTypesEnum, List<String>> imgPriorMap = {
+    V2TimImageTypesEnum.original: oriImgPrior,
+    V2TimImageTypesEnum.big: bigImgPrior,
+    V2TimImageTypesEnum.small: smallImgPrior,
   };
 
   // 缩略图优先，大图次之，最后是原图

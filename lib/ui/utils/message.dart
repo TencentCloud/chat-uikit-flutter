@@ -7,7 +7,6 @@ import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/time.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_custom_elem.dart';
 
 class MessageUtils {
   // 判断CallingData的方式和Trtc的方法一致

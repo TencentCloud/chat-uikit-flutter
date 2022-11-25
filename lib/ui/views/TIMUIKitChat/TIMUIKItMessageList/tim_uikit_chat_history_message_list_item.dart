@@ -3,13 +3,11 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:super_tooltip/super_tooltip.dart';
+import 'package:tencent_super_tooltip/tencent_super_tooltip.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
@@ -231,7 +229,7 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
   /// Whether to use the default emoji
   final bool isUseDefaultEmoji;
 
-  final customEmojiStickerList;
+  final List customEmojiStickerList;
 
   const TIMUIKitHistoryMessageListItem(
       {Key? key,
@@ -604,7 +602,8 @@ class _TIMUIKItHistoryMessageListItemState
   bool isRevokable(int timestamp) =>
       (DateTime.now().millisecondsSinceEpoch / 1000).ceil() - timestamp < 120;
 
-  _onLongPress(c, V2TimMessage message, TUIChatSeparateViewModel model) {
+  _onLongPress(c, V2TimMessage message, TUIChatSeparateViewModel model,
+      TapDownDetails? details) {
     if (tooltip != null && tooltip!.isOpen) {
       tooltip!.close();
       return;
@@ -612,8 +611,9 @@ class _TIMUIKItHistoryMessageListItemState
     tooltip = null;
 
     final screenHeight = MediaQuery.of(context).size.height;
-    if (context.size!.height + 180 > screenHeight) {
-      initTools(context: c, isLongMessage: true, model: model);
+    if (context.size!.height + 180 > screenHeight && !PlatformUtils().isWeb) {
+      initTools(
+          context: c, isLongMessage: true, model: model, details: details);
       if (widget.onScrollToIndexBegin != null) {
         widget.onScrollToIndexBegin!(message);
       }
@@ -621,8 +621,8 @@ class _TIMUIKItHistoryMessageListItemState
         tooltip!.show(c);
       });
     } else {
-      initTools(context: c, model: model);
-      tooltip!.show(c);
+      initTools(context: c, model: model, details: details);
+      tooltip!.show(c, targetCenter: details?.globalPosition);
     }
   }
 
@@ -642,13 +642,16 @@ class _TIMUIKItHistoryMessageListItemState
     });
   }
 
-  initTools({
-    BuildContext? context,
-    bool isLongMessage = false,
-    required TUIChatSeparateViewModel model,
-  }) {
+  initTools(
+      {BuildContext? context,
+      bool isLongMessage = false,
+      required TUIChatSeparateViewModel model,
+      TapDownDetails? details}) {
     final isSelf = widget.message.isSelf ?? false;
     double arrowTipDistance = 30;
+    double arrowBaseWidth = 10;
+    double arrowLength = 10;
+    bool hasArrow = true;
     TooltipDirection popupDirection = TooltipDirection.up;
     double? left;
     double? right;
@@ -656,34 +659,48 @@ class _TIMUIKItHistoryMessageListItemState
         SelectEmojiPanelPosition.down;
     if (context != null) {
       RenderBox? box = _key.currentContext?.findRenderObject() as RenderBox?;
-      if (box != null) {
+      if (details != null && box != null) {
         double screenWidth = MediaQuery.of(context).size.width;
-        Offset offset = box.localToGlobal(Offset.zero);
-        double boxWidth = box.size.width;
+        final mousePosition = details.globalPosition;
+        hasArrow = false;
+        arrowTipDistance = 0;
+        arrowBaseWidth = 0;
+        arrowLength = 0;
+        popupDirection = TooltipDirection.down;
         if (isSelf) {
-          right = screenWidth - offset.dx - boxWidth;
+          right = screenWidth - mousePosition.dx;
         } else {
-          left = offset.dx;
+          left = mousePosition.dx;
         }
-        if (offset.dy < 300 && !isLongMessage) {
-          selectEmojiPanelPosition = SelectEmojiPanelPosition.up;
-          popupDirection = TooltipDirection.down;
+      } else {
+        if (box != null) {
+          double screenWidth = MediaQuery.of(context).size.width;
+          Offset offset = box.localToGlobal(Offset.zero);
+          double boxWidth = box.size.width;
+          if (isSelf) {
+            right = screenWidth - offset.dx - boxWidth;
+          } else {
+            left = offset.dx;
+          }
+          if (offset.dy < 300 && !isLongMessage) {
+            selectEmojiPanelPosition = SelectEmojiPanelPosition.up;
+            popupDirection = TooltipDirection.down;
+          }
         }
+        arrowTipDistance = (context.size!.height / 2).roundToDouble() +
+            (isLongMessage ? -120 : 10);
       }
-      arrowTipDistance = (context.size!.height / 2).roundToDouble() +
-          (isLongMessage ? -120 : 10);
     }
 
     tooltip = SuperTooltip(
       popupDirection: popupDirection,
       minimumOutSidePadding: 0,
       arrowTipDistance: arrowTipDistance,
-      arrowBaseWidth: 10.0,
-      arrowLength: 10.0,
-      // right: kIsWeb ? right : (widget.message.isSelf! ? 60 : null),
-      // left: kIsWeb ? left : (widget.message.isSelf! ? null : 60),
+      arrowBaseWidth: arrowBaseWidth,
+      arrowLength: arrowLength,
       right: right,
       left: left,
+      hasArrow: hasArrow,
       borderColor: Colors.white,
       backgroundColor: Colors.white,
       shadowColor: Colors.black26,
@@ -1029,10 +1046,11 @@ class _TIMUIKItHistoryMessageListItemState
                                         ignoring: model.isMultiSelect,
                                         child: _getMessageItemBuilder(
                                             message, message.status, model)),
-                                    onSecondaryTap: () {
+                                    onSecondaryTapDown: (details) {
                                       if (PlatformUtils().isWeb) {
                                         if (widget.allowLongPress) {
-                                          _onLongPress(context, message, model);
+                                          _onLongPress(
+                                              context, message, model, details);
                                         }
                                         if (widget.onLongPress != null) {
                                           widget.onLongPress!(context, message);
@@ -1041,7 +1059,8 @@ class _TIMUIKItHistoryMessageListItemState
                                     },
                                     onLongPress: () {
                                       if (widget.allowLongPress) {
-                                        _onLongPress(context, message, model);
+                                        _onLongPress(
+                                            context, message, model, null);
                                       }
                                       if (widget.onLongPress != null) {
                                         widget.onLongPress!(context, message);
