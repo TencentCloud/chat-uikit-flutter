@@ -1,3 +1,8 @@
+## 1.0.1
+
+* Modify: Remove `groupTRTCTipsItemBuilder` from `MessageItemBuilder`, please use `customMessageItemBuilder` instead.
+* Modify: Remove default rendering for calling messages, you can choose to use the default widgets, `CallMessageItem` and `GroupCallMessageItem`, from our call plugin `tim_ui_kit_calling_plugin` directly. Refer to the [Demo](https://github.com/TencentCloud/chat-demo-flutter/tree/main/lib/utils/custom_message/custom_message_element.dart).
+
 ## 1.0.0
 
 * Add: Support adding Flutter module to Native APP, for details, please refer to [this documentation](https://www.tencentcloud.com/document/product/1047/51456) to implement.

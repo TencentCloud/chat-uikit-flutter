@@ -6,7 +6,7 @@ import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendsh
 import 'package:tencent_cloud_chat_uikit/data_services/conversation/conversation_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
+
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitAddGroup/tim_uikit_send_application.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';

@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/color.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/message_reaction_emoji.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_emoji_panel.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/emoji.dart';

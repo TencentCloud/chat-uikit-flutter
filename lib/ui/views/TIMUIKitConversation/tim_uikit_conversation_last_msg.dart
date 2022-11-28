@@ -4,10 +4,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_theme_view_model.dart';
+
 
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
+
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
@@ -34,47 +34,11 @@ class TIMUIKitLastMsg extends TIMUIKitStatelessWidget {
     return _getLastMsgShowText(lastMsg, context);
   }
 
-  static String handleCustomMessage(V2TimMessage message) {
-    final customElem = message.customElem;
-    final callingMessage = CallingMessage.getCallMessage(customElem);
-    String customLastMsgShow = TIM_t("[自定义]");
-    if (customElem?.data == "group_create") {
-      customLastMsgShow = TIM_t("群聊创建成功！");
-    }
-    if (callingMessage != null) {
-      // 如果是结束消息
-      final isCallEnd = CallingMessage.isCallEndExist(callingMessage);
-
-      final isVoiceCall = callingMessage.callType == 1;
-
-      String? callTime = "";
-
-      if (isCallEnd) {
-        callTime = CallingMessage.getShowTime(callingMessage.callEnd!);
-      }
-
-      final option3 = callTime;
-      customLastMsgShow = isCallEnd
-          ? TIM_t_para("通话时间：{{option3}}", "通话时间：$option3")(option3: option3)
-          : CallingMessage.getActionType(callingMessage.actionType!);
-
-      final option1 = customLastMsgShow;
-      final option2 = customLastMsgShow;
-      customLastMsgShow = isVoiceCall
-          ? TIM_t_para("[语音通话]：{{option1}}", "[语音通话]：$option1")(
-              option1: option1)
-          : TIM_t_para("[视频通话]：{{option2}}", "[视频通话]：$option2")(
-              option2: option2);
-    }
-    return customLastMsgShow;
-  }
-
   String _getLastMsgShowText(V2TimMessage? message, BuildContext context) {
     final msgType = message!.elemType;
     switch (msgType) {
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
-        return handleCustomMessage(message);
-      // TIM_t("[自定义]");
+        return TIM_t("[自定义]");
       case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
         return TIM_t("[语音]");
       case MessageElemType.V2TIM_ELEM_TYPE_TEXT:

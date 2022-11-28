@@ -1012,7 +1012,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "1.0.0+1"
+    version: "1.0.1"
   tencent_extended_text:
     dependency: transitive
     description:
@@ -1040,7 +1040,7 @@ packages:
       name: tencent_im_base
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.3"
+    version: "1.0.7"
   tencent_im_sdk_plugin_platform_interface:
     dependency: transitive
     description:

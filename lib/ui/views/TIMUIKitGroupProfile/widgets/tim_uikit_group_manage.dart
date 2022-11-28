@@ -6,10 +6,10 @@ import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_group_profile_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_theme_view_model.dart';
+
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/color.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
+
+
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/radio_button.dart';
 

@@ -4,7 +4,6 @@ import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_conversation_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendship_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_theme_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/conversation/conversation_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/conversation/conversation_services_implements.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
@@ -16,6 +15,7 @@ import 'package:tencent_cloud_chat_uikit/data_services/message/message_service_i
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_search_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
+import 'package:tencent_im_base/theme/tui_theme_view_model.dart';
 
 final serviceLocator = GetIt.instance;
 bool boolIsInitailized = false;

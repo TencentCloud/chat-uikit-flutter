@@ -5,7 +5,7 @@ import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_group_profile_model.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/controller/tim_uikit_chat_controller.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/color.dart';
+
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 
 class GroupProfileButtonArea extends TIMUIKitStatelessWidget {

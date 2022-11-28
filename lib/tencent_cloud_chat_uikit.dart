@@ -5,9 +5,8 @@ import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'data_services/core/core_services_implements.dart';
 export 'data_services/core/core_services_implements.dart';
-
-// Global
-export 'ui/utils/tui_theme.dart';
+export 'package:tencent_im_base/theme/tui_theme.dart';
+export 'package:tencent_im_base/theme/color.dart';
 
 // Widgets
 export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitConversation/tim_uikit_conversation.dart';

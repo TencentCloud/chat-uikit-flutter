@@ -8,13 +8,13 @@ import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_glo
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_conversation_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendship_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_theme_view_model.dart';
+
 import 'package:tencent_cloud_chat_uikit/data_services/core/core_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_config.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/color.dart';
+
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
+
 import 'package:disk_space/disk_space.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/web_support/uikit_web_support.dart'
     if (dart.library.html) 'package:tencent_cloud_chat_uikit/data_services/core/web_support/uikit_web_support_implement.dart';

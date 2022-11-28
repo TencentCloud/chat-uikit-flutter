@@ -13,7 +13,7 @@ import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_theme_view_model.dart';
+
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
@@ -27,7 +27,6 @@ import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageIt
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/main.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_custom_elem.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_face_elem.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_group_trtc_tips_elem.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_cloud_custom_data.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/loading.dart';
@@ -101,9 +100,6 @@ class MessageItemBuilder {
   /// merger message builder
   final MessageItemContent? mergerMessageItemBuilder;
 
-  /// group calling message builder, show without avatar and nickname
-  final MessageItemContent? groupTRTCTipsItemBuilder;
-
   /// The builder for the whole message line, expect for those message type without avatar and nickname.
   /// [Update] You can only re-define the message types you need, returns null means using default row layout.
   final MessageRowBuilder? messageRowBuilder;
@@ -124,7 +120,6 @@ class MessageItemBuilder {
     this.groupTipsMessageItemBuilder,
     this.mergerMessageItemBuilder,
     this.messageRowBuilder,
-    this.groupTRTCTipsItemBuilder,
     this.messageNickNameBuilder,
   });
 }
@@ -546,14 +541,6 @@ class _TIMUIKItHistoryMessageListItemState
             TIMUIKitGroupTipsElem(groupTipsElem: messageItem.groupTipsElem!));
   }
 
-  Widget _groupTRTCTipsMessageBuilder() {
-    final messageItem = widget.message;
-    return TIMUIKitGroupTrtcTipsElem(
-      key: ValueKey(messageItem.msgID),
-      customMessage: messageItem,
-    );
-  }
-
   Widget _selfRevokeEditMessageBuilder(theme, model) {
     return Container(
         margin: const EdgeInsets.symmetric(vertical: 20),
@@ -830,19 +817,6 @@ class _TIMUIKItHistoryMessageListItemState
         return groupTipsMessage ?? _groupTipsMessageBuilder();
       }
       return _groupTipsMessageBuilder();
-    }
-
-    if (MessageUtils.isGroupCallingMessage(message)) {
-      if (widget.messageItemBuilder?.groupTRTCTipsItemBuilder != null) {
-        final groupTrtcTipsMessage =
-            widget.messageItemBuilder!.groupTRTCTipsItemBuilder!(
-          message,
-          (model.jumpMsgID == message.msgID),
-          clearJump,
-        );
-        return groupTrtcTipsMessage ?? _groupTRTCTipsMessageBuilder();
-      }
-      return _groupTRTCTipsMessageBuilder();
     }
 
     if (isRevokedMsg) {

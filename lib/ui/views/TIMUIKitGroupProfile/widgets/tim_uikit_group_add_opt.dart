@@ -4,8 +4,8 @@ import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_group_profile_model.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/color.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
+
+
 
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 

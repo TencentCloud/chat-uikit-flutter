@@ -3,16 +3,16 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/color.dart';
+
 import 'package:tencent_cloud_chat_uikit/ui/utils/time_ago.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
+
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitConversation/tim_uikit_conversation_draft_text.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitConversation/tim_uikit_conversation_last_msg.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/unread_message.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
-typedef LastMessageBuilder = Widget Function(
+typedef LastMessageBuilder = Widget? Function(
     V2TimMessage? lastMsg, List<V2TimGroupAtInfo?> groupAtInfoList);
 
 class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
@@ -58,8 +58,9 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
         draftText: draftText ?? "",
       );
     } else if (lastMsg != null) {
-      if (lastMessageBuilder != null) {
-        return lastMessageBuilder!(lastMsg, groupAtInfoList);
+      if (lastMessageBuilder != null &&
+          lastMessageBuilder!(lastMsg, groupAtInfoList) != null) {
+        return lastMessageBuilder!(lastMsg, groupAtInfoList)!;
       }
       return TIMUIKitLastMsg(
         groupAtInfoList: groupAtInfoList,

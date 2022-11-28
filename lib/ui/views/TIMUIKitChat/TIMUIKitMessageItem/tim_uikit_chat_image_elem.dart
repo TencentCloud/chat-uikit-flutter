@@ -22,7 +22,7 @@ import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_theme_view_model.dart';
+
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
@@ -35,7 +35,7 @@ import 'package:tencent_cloud_chat_uikit/ui/widgets/toast.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 
-import 'package:tencent_cloud_chat_uikit/ui/utils/shared_theme.dart';
+
 
 class TIMUIKitImageElem extends StatefulWidget {
   final V2TimMessage message;

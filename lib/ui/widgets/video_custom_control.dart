@@ -9,10 +9,11 @@ import 'package:chewie/src/material/material_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/tui_theme.dart';
+
 import 'package:video_player/video_player.dart';
 import 'center_play_button.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 class VideoCustomControls extends StatefulWidget {
   const VideoCustomControls({required this.downloadFn, Key? key})
