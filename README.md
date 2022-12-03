@@ -1,41 +1,4 @@
-<style>
-.button-9 {
-  appearance: button;
-  backface-visibility: hidden;
-  background-color: #1d52d9;
-  border-radius: 6px;
-  border-width: 0;
-  box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset,rgba(50, 50, 93, .1) 0 2px 5px 0,rgba(0, 0, 0, .07) 0 1px 1px 0;
-  box-sizing: border-box;
-  color: #fff;
-  cursor: pointer;
-  font-family: -apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif;
-  font-size: 100%;
-  height: 44px;
-  line-height: 1.15;
-  margin: 12px 0 0;
-  outline: none;
-  overflow: hidden;
-  padding: 0 20px;
-  position: relative;
-  text-align: center;
-  text-transform: none;
-  transform: translateZ(0);
-  transition: all .2s,box-shadow .08s ease-in;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-}
 
-.button-9:disabled {
-  cursor: default;
-}
-
-.button-9:focus {
-  box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset, rgba(50, 50, 93, .2) 0 6px 15px 0, rgba(0, 0, 0, .1) 0 2px 2px 0, rgba(50, 151, 211, .3) 0 0 0 4px;
-}
-
-</style>
 
 <br>
 
@@ -98,7 +61,7 @@ You can experience our Chat and Voice/Video Call modules via the following demos
 
 You can use these UI components to build your APP with the In-APP chat module quickly and easily.
 
-![img](https://qcloudimg.tencent-cloud.cn/raw/f140dd76be01a65abfb7e6ba2bf50ed5.png)
+![img](https://dscache.tencent-cloud.cn/upload/uploader/WeChatWorkScreenshot_88d88306-ba1f-49dd-81fe-0eff11e2009e-4d41bacc5116ab6bd2c0033fc40351be527d12f9.png)
 
 Currently, Flutter [TUIKit](https://www.tencentcloud.com/document/product/1047/50059?from=pub) contains the following main components:
 
