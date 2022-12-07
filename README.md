@@ -34,8 +34,6 @@ More languages:
 
 <a target="_blank" href="https://comm.qq.com/im/doc/flutter/en/TUIKit/readme.html"><button type="button" class="button-9" role="button">Official Documentation</button></a>
 
-<br>
-
 ## Experience DEMO
 
 You can experience our Chat and Voice/Video Call modules via the following demos.
@@ -79,13 +77,29 @@ Currently, Flutter [TUIKit](https://www.tencentcloud.com/document/product/1047/5
 
 Also, there are some other useful components and widgets, that can help to build your APP, and meet your business needs, including group entry application list and group member list, etc.
 
-For the source code of the project in the figure above, see [im-flutter-uikit](https://github.com/TencentCloud/tc-chat-demo-flutter). The project is open source and can be used directly.
+For the source code of the project in the figure above, see [chat-demo-flutter](https://github.com/TencentCloud/chat-demo-flutter). The project is open source and can be used directly.
 
-## Supported Platforms
+### Supported Platforms
 
 - Android
 - iOS
-- Web(After version of 0.1.4)
+- Web(Since version of 0.1.4)
+
+### What's more
+
+In addition to Flutter SDK & TUIKit, we have numerous SDKs that covering all platforms. The following platforms can communicate with each other and provide services across devices and platforms.
+
+[**chat-uikit-android**](https://github.com/TencentCloud/chat-uikit-android)
+
+[**chat-uikit-ios**](https://github.com/TencentCloud/chat-uikit-ios)
+
+[**chat-uikit-vue**](https://github.com/TencentCloud/chat-uikit-vue)
+
+[**chat-uikit-react**](https://github.com/TencentCloud/chat-uikit-react)
+
+[**chat-uikit-uniapp**](https://github.com/TencentCloud/chat-uikit-uniapp)
+
+[**chat-uikit-wechat**](https://github.com/TencentCloud/chat-uikit-wechat)
 
 ## Get Started
 
@@ -825,21 +839,6 @@ TIMUIKitSearchMsgDetail(
               keyword: initKeyword ?? "",
             );
 ```
-
-## What's more
-
-In addition to Flutter SDK, we have numerous SDKs that covering all platforms. The following platforms can communicate with each other and provide services across devices and platforms.
-
-| Platform  | Introduction | Demo | Download | UI Components library |
-| --- | --- | --- | --- | --- |
-| Android | Compatible with JDK 1.6 and Android SDK version 14 and later | [Get](https://www.tencentcloud.com/document/product/1047/34279) | [Get](https://github.com/TencentCloud/TIMSDK/tree/master/Android/IMSDK) | [Get](https://www.tencentcloud.com/document/product/1047/50062) |
-| iOS | Compatible with iOS 8.0 and later | [Get](https://www.tencentcloud.com/document/product/1047/34279) | [Get](https://github.com/TencentCloud/TIMSDK/tree/master/iOS/IMSDK) | [Get](https://www.tencentcloud.com/document/product/1047/50062)  |
-| Mac | Compatible with OS X 10.10 and later | - | [Get](https://github.com/TencentCloud/TIMSDK/tree/master/Mac/IMSDK) | -   |
-| Windows | C and C++ are included. Compatible with Windows 7, Windows 8 and 8.1, and Windows 10. Both 32-bit and 64-bit programs can be connected | - | [Get](https://github.com/TencentCloud/TIMSDK/tree/master/Windows/IMSDK) | -   |
-| Web | Supports Internet Explorer 11+, Chrome 7+, Firefox 3.6+, Opera 12+ and Safari 6+ | [Get](https://www.tencentcloud.com/document/product/1047/34279) | [Get](https://www.npmjs.com/package/tim-js-sdk) | [Get](https://www.tencentcloud.com/document/product/1047/50061)  |
-| Unity | Supports 2020.2.7f1c1 or later | -  | [Get](https://www.tencentcloud.com/document/product/1047/46263) | -   |
-| Flutter | Supports Flutter 2 & dart 2.12 and later, deploying to Android, iOS, Web, macOS and Windows. | [Get](https://www.tencentcloud.com/document/product/1047/34279) | Here | [Get](https://pub.dev/packages/tencent_cloud_chat_uikit) |
-| Electron | Electron SDK | - | [Get](https://github.com/tencentyun/im_electron_demo) | -   |
 
 ## Contact Us
 
