@@ -59,7 +59,7 @@ You can experience our Chat and Voice/Video Call modules via the following demos
 
 You can use these UI components to build your APP with the In-APP chat module quickly and easily.
 
-![img](https://dscache.tencent-cloud.cn/upload/uploader/WeChatWorkScreenshot_88d88306-ba1f-49dd-81fe-0eff11e2009e-4d41bacc5116ab6bd2c0033fc40351be527d12f9.png)
+<img width="1447" alt="TUIKit screenshots" src="https://user-images.githubusercontent.com/24520036/206137134-98fb5b4f-cfe2-4d38-bcb3-761d416c1a8b.png">
 
 Currently, Flutter [TUIKit](https://www.tencentcloud.com/document/product/1047/50059?from=pub) contains the following main components:
 
