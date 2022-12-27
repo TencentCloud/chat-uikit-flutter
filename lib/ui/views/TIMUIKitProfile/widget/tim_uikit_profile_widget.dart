@@ -146,7 +146,7 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
       child: TIMUIKitOperationItem(
         showArrowRightIcon: false,
         operationName: TIM_t("账号"),
-        operationRightWidget: Text(userNum),
+        operationRightWidget: SelectableText(userNum),
       ),
     );
   }
@@ -165,7 +165,7 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
   /// gender
   static Widget genderBar(int gender) {
     Map genderMap = {
-      0: TIM_t("未知"),
+      0: TIM_t("未填写"),
       1: TIM_t("男"),
       2: TIM_t("女"),
     };
@@ -181,7 +181,7 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
   /// gender
   static Widget genderBarWithArrow(int gender) {
     Map genderMap = {
-      0: TIM_t("未知"),
+      0: TIM_t("未填写"),
       1: TIM_t("男"),
       2: TIM_t("女"),
     };
@@ -212,7 +212,7 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
         child: TIMUIKitOperationItem(
           showArrowRightIcon: false,
           operationName: TIM_t("生日"),
-          operationRightWidget: Text(TIM_t("未知")),
+          operationRightWidget: Text(TIM_t("未填写")),
         ),
       );
     }

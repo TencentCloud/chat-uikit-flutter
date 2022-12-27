@@ -532,7 +532,6 @@ class TUIChatGlobalModel extends ChangeNotifier with TIMUIKitClass {
       return;
     }
     if (!(_c2cMessageFromUserActiveMap[toUser] ?? false)) {
-      print("to user is not online");
       return;
     }
     V2TimMsgCreateInfoResult? res = await _messageService.createCustomMessage(

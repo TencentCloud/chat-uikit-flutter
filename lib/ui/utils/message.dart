@@ -212,72 +212,7 @@ class MessageUtils {
   }
 
   static String handleCustomMessageString(V2TimMessage message) {
-    final customElem = message.customElem;
-    final callingMessage = CallingMessage.getCallMessage(customElem);
-    if (callingMessage != null) {
-      // 如果是结束消息
-      final isCallEnd = CallingMessage.isCallEndExist(callingMessage);
-      String? option2 = "";
-      if (isCallEnd) {
-        option2 = CallingMessage.getShowTime(callingMessage.callEnd!);
-      }
-      return isCallEnd
-          ? (TIM_t_para("通话时间：{{option2}}", "通话时间：$option2")(option2: option2))
-          : (CallingMessage.getActionType(callingMessage.actionType!));
-    } else {
-      return TIM_t("自定义消息");
-    }
-  }
-
-  static handleCustomMessage(V2TimMessage message, context) {
-    // 这个函数应该返回String，目前已经切走用不上了，但是不敢删QAQ，就这么留着吧。
-    final customElem = message.customElem;
-    final callingMessage = CallingMessage.getCallMessage(customElem);
-    if (callingMessage != null) {
-      // 如果是结束消息
-      final isCallEnd = CallingMessage.isCallEndExist(callingMessage);
-
-      final isVoiceCall = callingMessage.callType == 1;
-
-      String? option2 = "";
-      if (isCallEnd) {
-        option2 = CallingMessage.getShowTime(callingMessage.callEnd!);
-      }
-
-      return Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(right: 4),
-            child: Image.asset(
-              isVoiceCall ? "images/voice_call.png" : "images/video_call.png",
-              package: 'tencent_cloud_chat_uikit',
-              height: 16,
-              width: 16,
-            ),
-          ),
-          isCallEnd
-              ? Text(TIM_t_para("通话时间：{{option2}}", "通话时间：$option2")(
-                  option2: option2))
-              : Text(
-              CallingMessage.getActionType(callingMessage.actionType!)),
-          // if (isFromSelf)
-          //   Padding(
-          //     padding: const EdgeInsets.only(left: 4),
-          //     child: Image.asset(
-          //       isVoiceCall
-          //           ? "images/voice_call.png"
-          //           : "images/video_call_self.png",
-          //       package: 'tencent_cloud_chat_uikit',
-          //       height: 16,
-          //       width: 16,
-          //     ),
-          //   ),
-        ],
-      );
-    } else {
-      return const Text("[自定义]");
-    }
+    return TIM_t("消息");
   }
 
   static Widget wrapMessageTips(Widget child, TUITheme? theme) {

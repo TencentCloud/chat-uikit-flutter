@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/center_loading.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/gestured_image.dart';
@@ -15,15 +16,15 @@ class ImageScreen extends StatefulWidget {
   const ImageScreen(
       {required this.imageProvider,
       required this.heroTag,
-      required this.downloadFn,
-      required this.messageID,
+      this.downloadFn,
+      this.messageID,
       Key? key})
       : super(key: key);
 
   final ImageProvider imageProvider;
   final String heroTag;
   final String? messageID;
-  final void Function() downloadFn;
+  final Future<void> Function()? downloadFn;
 
   @override
   State<StatefulWidget> createState() {
@@ -40,9 +41,10 @@ class _ImageScreenState extends TIMUIKitState<ImageScreen>
   double currentScale = 1.0;
   double fittedScale = 1.0;
   double initialScale = 1.0;
+  bool isLoading = false;
+
   GlobalKey<ExtendedImageSlidePageState> slidePagekey =
       GlobalKey<ExtendedImageSlidePageState>();
-
   GlobalKey<ExtendedImageGestureState> extendedImageGestureKey =
       GlobalKey<ExtendedImageGestureState>();
 
@@ -84,7 +86,9 @@ class _ImageScreenState extends TIMUIKitState<ImageScreen>
             constraints: BoxConstraints.expand(
               height: MediaQuery.of(context).size.height,
             ),
-            child: Stack(children: [
+            child: Stack(
+              alignment: Alignment.center,
+                children: [
               Positioned(
                 top: 0,
                 left: 0,
@@ -250,19 +254,42 @@ class _ImageScreenState extends TIMUIKitState<ImageScreen>
                     iconSize: 30,
                     onPressed: close,
                   )),
-              Positioned(
-                right: 10,
-                bottom: 50,
-                child: IconButton(
-                  icon: Image.asset(
-                    'images/download.png',
-                    package: 'tencent_cloud_chat_uikit',
+              if (widget.downloadFn != null)
+                Positioned(
+                  right: 10,
+                  bottom: 50,
+                  child: IconButton(
+                    icon: Image.asset(
+                      'images/download.png',
+                      package: 'tencent_cloud_chat_uikit',
+                    ),
+                    iconSize: 30,
+                    onPressed: () async {
+                      setState(() {
+                        isLoading = true;
+                      });
+                      await widget.downloadFn!();
+                      Future.delayed(const Duration(milliseconds: 200),(){
+                        setState(() {
+                          isLoading = false;
+                        });
+                      });
+                    },
                   ),
-                  iconSize: 30,
-                  onPressed: widget.downloadFn,
                 ),
-              ),
               CenterLoading(messageID: widget.messageID),
+              if (isLoading)
+                Container(
+                  child: LoadingAnimationWidget.staggeredDotsWave(
+                    size: 35,
+                    color: Colors.white,
+                  ),
+                  padding: const EdgeInsets.all(30),
+                  decoration: const BoxDecoration(
+                    color: Color(0xB22b2b2b),
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
+                ),
             ])),
       );
     }));

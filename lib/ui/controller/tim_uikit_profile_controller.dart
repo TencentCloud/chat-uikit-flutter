@@ -52,9 +52,10 @@ class TIMUIKitProfileController {
     String title,
     String tips,
     void Function(String) onSubmitted,
+      TUITheme theme
   ) {
     TextInputBottomSheet.showTextInputBottomSheet(
-        context, title, tips, onSubmitted);
+        context, title, tips, onSubmitted, theme);
   }
 
   /// Load the profile data

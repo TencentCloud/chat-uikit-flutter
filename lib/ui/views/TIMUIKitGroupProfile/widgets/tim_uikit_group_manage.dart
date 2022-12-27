@@ -16,8 +16,7 @@ import 'package:tencent_cloud_chat_uikit/ui/widgets/radio_button.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
 class GroupProfileGroupManage extends TIMUIKitStatelessWidget {
-  final TUIGroupProfileModel model;
-  GroupProfileGroupManage(this.model, {Key? key}) : super(key: key);
+  GroupProfileGroupManage({Key? key}) : super(key: key);
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
@@ -600,24 +599,17 @@ class _GroupProfileAddAdminState extends TIMUIKitState<GroupProfileAddAdmin> {
                       onTap: () {
                         final isChecked = selectedMemberList.contains(e);
                         if (isChecked) {
-                          selectedMemberList.add(e);
-                        } else {
                           selectedMemberList.remove(e);
+                        } else {
+                          selectedMemberList.add(e);
                         }
                         setState(() {});
                       },
                       child: Row(
                         children: [
                           CheckBoxButton(
+                            onlyShow: true,
                             isChecked: selectedMemberList.contains(e),
-                            onChanged: (value) {
-                              if (value) {
-                                selectedMemberList.add(e);
-                              } else {
-                                selectedMemberList.remove(e);
-                              }
-                              setState(() {});
-                            },
                           ),
                           const SizedBox(
                             width: 10,

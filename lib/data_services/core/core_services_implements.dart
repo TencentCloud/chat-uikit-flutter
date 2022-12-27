@@ -2,6 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_setting_model.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/listener_model/tui_group_listener_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
@@ -65,7 +66,9 @@ class CoreServicesImpl with CoreServices {
   setGlobalConfig(TIMUIKitConfig? config) {
     final TUISelfInfoViewModel selfInfoViewModel =
         serviceLocator<TUISelfInfoViewModel>();
+    final TUISettingModel settingModel = serviceLocator<TUISettingModel>();
     selfInfoViewModel.globalConfig = config;
+    settingModel.init();
   }
 
   addIdentifier() {
@@ -83,12 +86,17 @@ class CoreServicesImpl with CoreServices {
       required LogLevelEnum loglevel,
       required V2TimSDKListener listener,
       LanguageEnum? language,
+        String? extraLanguage,
       TIMUIKitConfig? config,
       VoidCallback? onWebLoginSuccess}) async {
     addIdentifier();
-    if (language != null) {
+    if(extraLanguage != null){
       Future.delayed(const Duration(milliseconds: 1), () {
-        I18nUtils(null, language);
+        I18nUtils(null, extraLanguage);
+      });
+    }else if (language != null) {
+      Future.delayed(const Duration(milliseconds: 1), () {
+        I18nUtils(null, languageEnumToString[language]);
       });
     }
     if (onTUIKitCallbackListener != null) {
@@ -132,12 +140,17 @@ class CoreServicesImpl with CoreServices {
     ValueChanged<TIMCallback>? onTUIKitCallbackListener,
     LanguageEnum? language,
     TIMUIKitConfig? config,
+    String? extraLanguage,
     required String userId,
   }) async {
     _userID = userId;
-    if (language != null) {
+    if(extraLanguage != null){
       Future.delayed(const Duration(milliseconds: 1), () {
-        I18nUtils(null, language);
+        I18nUtils(null, extraLanguage);
+      });
+    }else if (language != null) {
+      Future.delayed(const Duration(milliseconds: 1), () {
+        I18nUtils(null, languageEnumToString[language]);
       });
     }
     if (onTUIKitCallbackListener != null) {
@@ -340,7 +353,6 @@ class CoreServicesImpl with CoreServices {
 
   @override
   Future<V2TimCallback> setOfflinePushConfig({
-    // ignore: todo
     required String token,
     bool isTPNSToken = false,
     int? businessID,

@@ -37,38 +37,45 @@ class TIMUIKitOperationItem extends TIMUIKitStatelessWidget {
     final TUITheme theme = value.theme;
 
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       margin: const EdgeInsets.only(bottom: 1),
       color: Colors.white,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-            child: Container(
-              margin: const EdgeInsets.only(right: 22),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(operationName),
-                  if (operationDescription != null)
-                    Text(
-                      operationDescription!,
-                      style:
-                          TextStyle(color: theme.weakTextColor, fontSize: 12),
-                    )
-                ],
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(operationName),
+                if (operationDescription != null)
+                  Text(
+                    operationDescription!,
+                    style:
+                        TextStyle(color: theme.weakTextColor, fontSize: 12),
+                  )
+              ],
             ),
           ),
           type == "switch"
-              ? CupertinoSwitch(
-                  value: operationValue ?? false,
-                  onChanged: onSwitchChange,
-                  activeColor: theme.primaryColor,
+              ? Transform.scale(
+                  scale: 0.8,
+                  child: CupertinoSwitch(
+                    value: operationValue ?? false,
+                    onChanged: onSwitchChange,
+                    activeColor: theme.primaryColor,
+                  ),
                 )
               : Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    Transform.scale(
+                      scale: 0,
+                      child: CupertinoSwitch(
+                        value: false,
+                        onChanged: onSwitchChange,
+                      ),
+                    ),
                     ConstrainedBox(
                       constraints: BoxConstraints(
                         maxWidth: MediaQuery.of(context).size.width / 1.6,

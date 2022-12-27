@@ -12,7 +12,6 @@ import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 
-
 class PermissionRequestInfo extends StatefulWidget {
   final Function removeOverLay;
   final int permissionType;
@@ -54,6 +53,8 @@ class _PermissionRequestInfo extends TIMUIKitState<PermissionRequestInfo>
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
+    final theme = value.theme;
+
     final permission = {
       1: {
         "name": TIM_t("相机"),
@@ -79,7 +80,7 @@ class _PermissionRequestInfo extends TIMUIKitState<PermissionRequestInfo>
             child: Opacity(
               opacity: 0.7,
               child: Container(
-                color: Colors.black,
+                color: theme.black,
                 padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -103,15 +104,14 @@ class _PermissionRequestInfo extends TIMUIKitState<PermissionRequestInfo>
                           TIM_t_para(" 申请获取{{option2}}", " 申请获取$option2")(
                               option2: option2) +
                           TIM_t("权限"),
-                      style: const TextStyle(color: Colors.white, fontSize: 18),
+                      style: TextStyle(color: theme.white, fontSize: 18),
                     ),
                     const SizedBox(
                       height: 20,
                     ),
                     Text(
                       permission?["text"] ?? "",
-                      style:
-                          const TextStyle(color: Colors.white70, fontSize: 16),
+                      style: TextStyle(color: theme.white, fontSize: 16),
                     )
                   ],
                 ),
@@ -204,14 +204,22 @@ class Permissions {
     return _prefix + appName + _postfixList[value];
   }
 
-  static Future<bool> checkPermission(BuildContext context, int value,
-      [bool isShowPermissionPage = true]) async {
+  static Future<bool> checkPermission(
+    BuildContext context,
+    int value, [
+    TUITheme? theme,
+    bool isShowPermissionPage = true,
+  ]) async {
     final status = await Permission.byValue(value).status;
     if (status.isGranted || status.isLimited) {
       return true;
     }
-    final bool? shouldRequestPermission =
-        await showPermissionConfirmDialog(context, value, isShowPermissionPage);
+    final bool? shouldRequestPermission = await showPermissionConfirmDialog(
+      context,
+      value,
+      theme,
+      isShowPermissionPage,
+    );
     if (shouldRequestPermission != null && shouldRequestPermission) {
       return await Permission.byValue(value).request().isGranted;
     }
@@ -247,12 +255,8 @@ class Permissions {
   }
 
   static Future<bool?> showPermissionConfirmDialog(BuildContext context, value,
-      [bool isShowPermissionPage = true]) async {
-    final platformUtils = PlatformUtils();
-    // 第一次直接走系统文案
-    if (!await checkPermissionSetBefore(value)) {
+      [TUITheme? theme, bool isShowPermissionPage = true]) async {
       await setLocalPermission(value);
-      if (platformUtils.isAndroid && isShowPermissionPage) {
         showPermissionRequestInfoDialog(context, value);
       }
       return true;
@@ -303,7 +307,9 @@ class Permissions {
                         Expanded(
                           child: TextButton(
                             child: Text(TIM_t("以后再说"),
-                                style: const TextStyle(color: Colors.black)),
+                                style: TextStyle(
+                                  color: theme?.black ?? Colors.black,
+                                )),
                             onPressed: closeDialog, // 关闭对话框
                           ),
                         ),
@@ -311,7 +317,9 @@ class Permissions {
                         Expanded(
                           child: TextButton(
                             child: Text(TIM_t("去开启"),
-                                style: const TextStyle(color: Colors.black)),
+                                style: TextStyle(
+                                  color: theme?.black ?? Colors.black,
+                                )),
                             onPressed: getPermission,
                           ),
                         )

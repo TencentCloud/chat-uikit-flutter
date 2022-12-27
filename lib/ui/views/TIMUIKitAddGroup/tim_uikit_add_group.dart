@@ -88,8 +88,7 @@ class _TIMUIKitAddGroupState extends TIMUIKitState<TIMUIKitAddGroup> {
                     )));
       },
       child: Container(
-        color: Colors.white,
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           // crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -106,9 +105,6 @@ class _TIMUIKitAddGroupState extends TIMUIKitState<TIMUIKitAddGroup> {
                   showName,
                   style: const TextStyle(fontSize: 18),
                 ),
-                // const SizedBox(
-                //   height: 4,
-                // ),
                 Text(
                   "ID: $groupID",
                   style: TextStyle(fontSize: 12, color: theme.weakTextColor),
@@ -130,8 +126,12 @@ class _TIMUIKitAddGroupState extends TIMUIKitState<TIMUIKitAddGroup> {
     final noResult = searchResult != null && searchResult.isEmpty;
     if (noResult) {
       return [
-        Center(
-          child: Text(TIM_t("该群聊不存在")),
+        Container(
+          margin: const EdgeInsets.only(top: 20),
+          child: Center(
+            child: Text(TIM_t("该群聊不存在"),
+                style: TextStyle(color: theme.weakTextColor, fontSize: 14)),
+          ),
         )
       ];
     }
@@ -221,11 +221,12 @@ class _TIMUIKitAddGroupState extends TIMUIKitState<TIMUIKitAddGroup> {
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
           child: Row(
             children: [
               Expanded(
                   child: TextField(
+                autofocus: true,
                 focusNode: _focusNode,
                 controller: _controller,
                 onChanged: (value) {
@@ -258,39 +259,24 @@ class _TIMUIKitAddGroupState extends TIMUIKitState<TIMUIKitAddGroup> {
                       ),
                     ),
                     contentPadding: EdgeInsets.zero,
-                    hintStyle: const TextStyle(
-                      color: Color(0xffAEA4A3),
+                    hintStyle: TextStyle(
+                      color: theme.weakTextColor,
                     ),
-                    fillColor: Colors.white,
+                    fillColor: theme.inputFillColor,
                     filled: true,
                     hintText: TIM_t("搜索群ID")),
               )),
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                width: isFocused ? 50 : 0,
-                child: TextButton(
-                    onPressed: () {
-                      final searchParams = _controller.text;
-                      if (searchParams.trim().isNotEmpty) {
-                        searchGroup(searchParams);
-                        showResult = true;
-                        setState(() {});
-                      }
-                    },
-                    child: Text(
-                      TIM_t("搜索"),
-                      softWrap: false,
-                      style: const TextStyle(color: Colors.black),
-                    )),
-              )
             ],
           ),
         ),
         if (showResult)
           Expanded(
-            child: SingleChildScrollView(
-              child: Column(
-                children: _searchResultBuilder(groupResult, theme),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: _searchResultBuilder(groupResult, theme),
+                ),
               ),
             ),
           )

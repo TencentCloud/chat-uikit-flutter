@@ -30,12 +30,18 @@ class UnreadMessage extends TIMUIKitStatelessWidget {
       alignment: Alignment.center,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: theme.cautionColor ?? CommonColor.cautionColor,
+        color: theme.conversationItemUnreadCountBgColor ??
+            CommonColor.cautionColor,
       ),
       child: unreadText != "0"
           ? Center(
-              child: Text(unreadText,
-                  style: TextStyle(color: Colors.white, fontSize: fontSize)),
+              child: Text(
+                unreadText,
+                style: TextStyle(
+                  color: theme.conversationItemUnreadCountTextColor,
+                  fontSize: fontSize,
+                ),
+              ),
             )
           : null,
     );

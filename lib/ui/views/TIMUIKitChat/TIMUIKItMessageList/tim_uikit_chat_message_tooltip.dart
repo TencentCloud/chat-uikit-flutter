@@ -5,6 +5,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
@@ -93,6 +94,10 @@ class TIMUIKitMessageTooltipState
     final shouldShowRevokeAction = isCanRevoke &&
         (widget.message.isSelf ?? false) &&
         widget.message.status != MessageStatus.V2TIM_MSG_STATUS_SEND_FAIL;
+    final shouldShowReplyAction = !(widget.message.customElem?.data != null &&
+        MessageUtils.isCallingData(widget.message.customElem!.data!));
+    final shouldShowForwardAction = !(widget.message.customElem?.data != null &&
+        MessageUtils.isCallingData(widget.message.customElem!.data!));
     final tooltipsConfig = widget.toolTipsConfig;
     final defaultTipsList = [
       {
@@ -100,6 +105,7 @@ class TIMUIKitMessageTooltipState
         "id": "copyMessage",
         "icon": "images/copy_message.png"
       },
+      if(shouldShowForwardAction)
       {
         "label": TIM_t("转发"),
         "id": "forwardMessage",
@@ -110,6 +116,7 @@ class TIMUIKitMessageTooltipState
         "id": "multiSelect",
         "icon": "images/multi_message.png"
       },
+      if (shouldShowReplyAction)
       {
         "label": TIM_t("引用"),
         "id": "replyMessage",

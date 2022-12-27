@@ -32,8 +32,8 @@ class TIMUIKitGroupProfileWidget {
     return GroupProfileNotification();
   }
 
-  static Widget groupManage(TUIGroupProfileModel model) {
-    return GroupProfileGroupManage(model);
+  static Widget groupManage() {
+    return GroupProfileGroupManage();
   }
 
   static Widget searchMessage(Function(V2TimConversation?) onJumpToSearch) {

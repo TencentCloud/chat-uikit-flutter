@@ -45,6 +45,7 @@ class TIMUIKitProfileUserInfoCard extends TIMUIKitStatelessWidget {
             height: 48,
             child: Avatar(
               faceUrl: faceUrl,
+              isShowBigWhenClick: true,
               showName: showName ?? "",
               type: 1,
             ),
@@ -66,9 +67,17 @@ class TIMUIKitProfileUserInfoCard extends TIMUIKitStatelessWidget {
                 ),
                 Container(
                   margin: const EdgeInsets.symmetric(vertical: 4),
-                  child: Text(
-                    "ID:  ${userInfo?.userID ?? ""}",
-                    style: TextStyle(fontSize: 13, color: theme.weakTextColor),
+                  child: Row(
+                    children: [
+                      Text(
+                        "ID:  ",
+                        style: TextStyle(fontSize: 13, color: theme.weakTextColor),
+                      ),
+                      SelectableText(
+                        userInfo?.userID ?? "",
+                        style: TextStyle(fontSize: 13, color: theme.weakTextColor),
+                      ),
+                    ],
                   ),
                 ),
                 Text(signatureText,

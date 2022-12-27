@@ -3,7 +3,8 @@ import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/message_reaction_emoji.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_emoji_panel.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_emoji_panel.dart'
+    as emoji;
 import 'package:tencent_cloud_chat_uikit/ui/widgets/emoji.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/extended_wrap/extended_wrap.dart';
 
@@ -64,7 +65,7 @@ class TIMUIKitMessageReactionEmojiSelectPanelState
                   onTap: () {
                     widget.onSelect(item.unicode);
                   },
-                  child: EmojiItem(
+                  child: emoji.EmojiItem(
                     name: item.name,
                     unicode: item.unicode,
                   ),

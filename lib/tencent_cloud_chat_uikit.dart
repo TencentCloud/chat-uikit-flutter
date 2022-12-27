@@ -8,6 +8,9 @@ export 'data_services/core/core_services_implements.dart';
 export 'package:tencent_im_base/theme/tui_theme.dart';
 export 'package:tencent_im_base/theme/color.dart';
 
+// Sticker
+export 'package:tim_ui_kit_sticker_plugin/tim_ui_kit_sticker_plugin.dart';
+
 // Widgets
 export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitConversation/tim_uikit_conversation.dart';
 export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_chat.dart';
@@ -46,6 +49,9 @@ export 'package:tencent_cloud_chat_uikit/ui/controller/tim_uikit_profile_control
 // Config
 export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_chat_config.dart';
 export 'package:permission_handler/permission_handler.dart';
+
+// Utils
+export 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
 
 class TIMUIKitCore {
   static CoreServicesImpl getInstance() {

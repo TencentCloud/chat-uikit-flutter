@@ -1,7 +1,6 @@
-
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/constant_data.dart';
 import 'package:tencent_extended_text/extended_text.dart';
+import 'package:tim_ui_kit_sticker_plugin/constant/emoji.dart';
 
 ///emoji/image text
 class EmojiText extends SpecialText {
@@ -18,7 +17,7 @@ class EmojiText extends SpecialText {
   InlineSpan finishText() {
     final String key = toString();
 
-    if (EmojiUitl(
+    if (EmojiUtil(
             isUseDefaultEmoji: isUseDefaultEmoji,
             customEmojiStickerList: customEmojiStickerList)
         .instance
@@ -34,7 +33,7 @@ class EmojiText extends SpecialText {
       if (isUseDefaultEmoji == true) {
         return ImageSpan(
             AssetImage(
-                EmojiUitl(
+                EmojiUtil(
                         isUseDefaultEmoji: isUseDefaultEmoji,
                         customEmojiStickerList: customEmojiStickerList)
                     .instance
@@ -48,7 +47,7 @@ class EmojiText extends SpecialText {
             margin: const EdgeInsets.all(0));
       } else {
         return ImageSpan(
-            AssetImage(EmojiUitl(
+            AssetImage(EmojiUtil(
                     isUseDefaultEmoji: isUseDefaultEmoji,
                     customEmojiStickerList: customEmojiStickerList)
                 .instance
@@ -66,29 +65,27 @@ class EmojiText extends SpecialText {
   }
 }
 
-class EmojiUitl {
-  EmojiUitl(
+class EmojiUtil {
+  EmojiUtil(
       {this.isUseDefaultEmoji = false, this.customEmojiStickerList = const []});
-  EmojiUitl._(this.isUseDefaultEmoji, this.customEmojiStickerList) {
-    RegExp exp = RegExp(r"([\u4e00-\u9fa5]+|[a-zA-Z]+)");
+  EmojiUtil._(this.isUseDefaultEmoji, this.customEmojiStickerList) {
     if (isUseDefaultEmoji == true) {
       for (int i = 0; i < ConstData.emojiList.length; i++) {
         for (int j = 0; j < ConstData.emojiList[i].list.length; j++) {
-          var emojiPngNameMatch =
-              exp.firstMatch(ConstData.emojiList[i].list[j]);
-          String? emojiName = emojiPngNameMatch![0];
+          String? emojiName = ConstData.emojiList[i].list[j].split('.png')[0];
           _emojiMap['[$emojiName]'] =
-              '$_emojiFilePath/${ConstData.emojiList[i].name}/[$emojiName]@2x.png';
+              '$_emojiFilePath/${ConstData.emojiList[i].name}/$emojiName.png';
+          _emojiMap['[${ConstData.emojiMapList[emojiName]}]'] =
+              '$_emojiFilePath/${ConstData.emojiList[i].name}/$emojiName.png';
         }
       }
     } else {
       for (int i = 0; i < customEmojiStickerList.length; i++) {
         for (int j = 0; j < customEmojiStickerList[i].list.length; j++) {
-          var emojiPngNameMatch =
-              exp.firstMatch(customEmojiStickerList[i].list[j]);
-          String? emojiName = emojiPngNameMatch![0];
+          String? emojiName =
+              customEmojiStickerList[i].list[j].split('.png')[0];
           _emojiMap['[$emojiName]'] =
-              '$_emojiFilePath/${customEmojiStickerList[i].name}/[$emojiName]@2x.png';
+              '$_emojiFilePath/${customEmojiStickerList[i].name}/$emojiName.png';
         }
       }
     }
@@ -101,7 +98,7 @@ class EmojiUitl {
 
   final String _emojiFilePath = 'assets/custom_face_resource';
   // EmojiUitl? _instance;
-  static EmojiUitl? _instance;
-  EmojiUitl get instance =>
-      _instance ??= EmojiUitl._(isUseDefaultEmoji, customEmojiStickerList);
+  static EmojiUtil? _instance;
+  EmojiUtil get instance =>
+      _instance ??= EmojiUtil._(isUseDefaultEmoji, customEmojiStickerList);
 }

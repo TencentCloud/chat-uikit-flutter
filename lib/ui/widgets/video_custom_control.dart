@@ -7,6 +7,7 @@ import 'package:chewie/src/helpers/utils.dart';
 import 'package:chewie/src/animated_play_pause.dart';
 import 'package:chewie/src/material/material_progress_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 
@@ -18,7 +19,7 @@ import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 class VideoCustomControls extends StatefulWidget {
   const VideoCustomControls({required this.downloadFn, Key? key})
       : super(key: key);
-  final void Function() downloadFn;
+  final Future<void> Function() downloadFn;
 
   @override
   State<StatefulWidget> createState() {
@@ -35,6 +36,7 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
   Timer? _showAfterExpandCollapseTimer;
   bool _dragging = false;
   bool _displayTapped = false;
+  bool isLoading = false;
 
   final barHeight = 48.0;
   final marginSize = 5.0;
@@ -72,7 +74,7 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
         child: AbsorbPointer(
           absorbing: _hideStuff,
           child: Stack(
-            fit: StackFit.expand,
+            alignment: Alignment.center,
             children: <Widget>[
               if (_latestValue.isBuffering)
                 const Center(
@@ -86,7 +88,19 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
                   _buildVideoControlBar(context),
                   _buildBottomBar()
                 ]),
-              )
+              ),
+              if (isLoading)
+                Container(
+                  child: LoadingAnimationWidget.staggeredDotsWave(
+                    size: 35,
+                    color: Colors.white,
+                  ),
+                  padding: const EdgeInsets.all(30),
+                  decoration: const BoxDecoration(
+                    color: Color(0xB22b2b2b),
+                    borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
+                ),
             ],
           ),
         ),
@@ -149,7 +163,17 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
                 package: 'tencent_cloud_chat_uikit',
               ),
               iconSize: 30,
-              onPressed: widget.downloadFn,
+              onPressed: () async {
+                setState(() {
+                  isLoading = true;
+                });
+                await widget.downloadFn();
+                Future.delayed(const Duration(milliseconds: 200),(){
+                  setState(() {
+                    isLoading = false;
+                  });
+                });
+              },
             )
           ],
         ),

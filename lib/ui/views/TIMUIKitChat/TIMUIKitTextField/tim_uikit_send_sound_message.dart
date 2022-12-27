@@ -291,7 +291,10 @@ class _SendSoundMessageState extends TIMUIKitState<SendSoundMessage> {
       onTapDown: (detail) async {
         if (!isInit) {
           bool hasMicrophonePermission = await Permissions.checkPermission(
-              context, Permission.microphone.value);
+            context,
+            Permission.microphone.value,
+            theme,
+          );
           if (!hasMicrophonePermission) {
             return;
           }

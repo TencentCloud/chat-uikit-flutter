@@ -1,3 +1,18 @@
+## 1.1.0
+
+* Add: Supports two new languages, Japanese and Korean.
+* Add: Supports adding new other languages, apart from our default ones, including English, Chinese(Simplified and Traditional), Japanese and Korean, or modifying the translations, refers to [this documentation](https://www.tencentcloud.com/document/product/1047/52154).
+* Add: Sticker plug-in has been embedded in TUIKit by default. Now we support three types of stickers, Unicode Emoji, small image emoji and big image stickers, the usage has been optimized, refers to [this documentation](https://www.tencentcloud.com/document/product/1047/52227).
+* Optimize: Themes, more customization.
+* Optimize: The animation of the input area, keyboard, sticker panel and the more panel.
+* Optimize: Emoji, both Unicode and small images, can be inserted to any position in text messages.
+* Optimize: Avatar in profile can be previewed with a large image.
+* Optimize: UserID in profile can be copied.
+* Optimize: Several UI details, including `TIMUIKitAddFriend`, `TIMUIKitAddGroup`, `TIMUIKitGroupProfile` and `TIMUIKitProfile`.
+* Optimize: `TIMUIKitGroupProfile` and `TIMUIKitProfile` can update automatically after `ID` changed.
+* Optimize: New loading animation when downloading the image/video on `TIMUIKitGroupChat`. 
+* Fix: Some bugs.
+
 ## 1.0.1
 
 * Modify: Remove `groupTRTCTipsItemBuilder` from `MessageItemBuilder`, please use `customMessageItemBuilder` instead.

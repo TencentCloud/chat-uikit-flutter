@@ -5,6 +5,31 @@ import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_config.dar
 
 enum AppStatus { foreground, background }
 
+enum LanguageEnum {
+  /// Chinese, Traditional
+  zhHant,
+
+  /// Chinese, Simplified
+  zhHans,
+
+  /// English
+  en,
+
+  /// Korean
+  ko,
+
+  /// Japanese
+  ja,
+}
+
+const languageEnumToString = {
+  LanguageEnum.zhHant: "zh-Hant",
+  LanguageEnum.zhHans: "zh-Hans",
+  LanguageEnum.en: "en",
+  LanguageEnum.ja: "ja",
+  LanguageEnum.ko: "ko",
+};
+
 abstract class CoreServices {
   Future<bool?> init({
     required int sdkAppID,

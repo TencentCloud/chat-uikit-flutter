@@ -16,7 +16,6 @@ import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 
-
 import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 
@@ -167,15 +166,17 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
     return res;
   }
 
-  downloadFile() async {
-    if (!await Permissions.checkPermission(context, Permission.storage.value)) {
+  downloadFile(TUITheme theme) async {
+    if (!await Permissions.checkPermission(
+        context, Permission.storage.value, theme)) {
       return;
     }
     await model.downloadFile();
   }
 
   tryOpenFile(context, theme) async {
-    if (!await Permissions.checkPermission(context, Permission.storage.value)) {
+    if (!await Permissions.checkPermission(
+        context, Permission.storage.value, theme)) {
       return;
     }
     showOpenFileConfirmDialog(context, filePath, theme);
@@ -252,7 +253,7 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
                     } else {
                       await addUrlToWaitingPath();
                     }
-                    await downloadFile();
+                    await downloadFile(theme);
                   },
                   child: Container(
                     width: 237,

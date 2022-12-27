@@ -7,10 +7,14 @@ class CheckBoxButton extends TIMUIKitStatelessWidget {
   final bool isChecked;
   final Function(bool isChecked)? onChanged;
   final bool disabled;
+  final bool onlyShow;
+  final double? size;
 
   CheckBoxButton(
       {this.disabled = false,
       Key? key,
+      this.size,
+      this.onlyShow = false,
       required this.isChecked,
       this.onChanged})
       : super(key: key);
@@ -31,22 +35,33 @@ class CheckBoxButton extends TIMUIKitStatelessWidget {
           const BoxDecoration(shape: BoxShape.circle, color: Colors.grey);
     }
     return Center(
-        child: InkWell(
-      onTap: () {
-        if (onChanged != null && !disabled) {
-          onChanged!(!isChecked);
-        }
-      },
-      child: Container(
-        height: 22,
-        width: 22,
-        decoration: boxDecoration,
-        child: const Icon(
-          Icons.check,
-          size: 11.0,
-          color: Colors.white,
-        ),
-      ),
-    ));
+        child: onlyShow
+            ? Container(
+                height: size ?? 22,
+                width: size ?? 22,
+                decoration: boxDecoration,
+                child: Icon(
+                  Icons.check,
+                  size: size != null ? (size! / 2) : 11,
+                  color: Colors.white,
+                ),
+              )
+            : InkWell(
+                onTap: () {
+                  if (onChanged != null && !disabled) {
+                    onChanged!(!isChecked);
+                  }
+                },
+                child: Container(
+                  height: size ?? 22,
+                  width: size ?? 22,
+                  decoration: boxDecoration,
+                  child: Icon(
+                    Icons.check,
+                    size: size != null ? (size! / 2) : 11,
+                    color: Colors.white,
+                  ),
+                ),
+              ));
   }
 }

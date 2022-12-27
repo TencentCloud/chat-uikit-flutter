@@ -173,7 +173,7 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
     final TUIChatSeparateViewModel chatVM =
         Provider.of<TUIChatSeparateViewModel>(context);
     return AppBar(
-      backgroundColor: setAppbar?.backgroundColor,
+      backgroundColor: setAppbar?.backgroundColor ?? theme.chatHeaderBgColor,
       actionsIconTheme: setAppbar?.actionsIconTheme,
       foregroundColor: setAppbar?.foregroundColor,
       elevation: setAppbar?.elevation,
@@ -189,15 +189,18 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
       toolbarTextStyle: setAppbar?.toolbarTextStyle,
       textTheme: setAppbar?.textTheme,
       flexibleSpace: setAppbar?.backgroundColor == null
-          ? setAppbar?.flexibleSpace ??
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [
-                    theme.lightPrimaryColor ?? CommonColor.lightPrimaryColor,
-                    theme.primaryColor ?? CommonColor.primaryColor
-                  ]),
-                ),
-              )
+          ? theme.chatHeaderBgColor != null
+              ? setAppbar?.flexibleSpace ??
+                  Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: [
+                        theme.lightPrimaryColor ??
+                            CommonColor.lightPrimaryColor,
+                        theme.primaryColor ?? CommonColor.primaryColor
+                      ]),
+                    ),
+                  )
+              : null
           : null,
       iconTheme: setAppbar?.iconTheme ??
           const IconThemeData(

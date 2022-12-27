@@ -22,6 +22,16 @@ class IntlCameraPickerTextDelegate extends CameraPickerTextDelegate {
   @override
   String get loadFailed => TIM_t('加载失败');
 
+  /// Default loading string for the dialog.
+  /// 加载中弹窗的默认文字
+  @override
+  String get loading => TIM_t('加载中…');
+
+  /// Saving string for the dialog.
+  /// 保存中弹窗的默认文字
+  @override
+  String get saving => TIM_t('保存中…');
+
   /// Semantics fields.
   ///
   /// Fields below are only for semantics usage. For customizable these fields,

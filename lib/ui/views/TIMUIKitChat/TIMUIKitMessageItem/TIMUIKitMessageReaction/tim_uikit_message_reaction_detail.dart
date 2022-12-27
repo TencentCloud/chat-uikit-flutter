@@ -5,7 +5,6 @@ import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 
-
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 
 class TIMUIKitMessageReactionDetail extends StatefulWidget {
@@ -99,7 +98,7 @@ class TIMUIKitMessageReactionDetailState
               padding: const EdgeInsets.only(top: 20, bottom: 20, right: 28),
               child: Text(
                 showName,
-                style: const TextStyle(color: Colors.black, fontSize: 18),
+                style: TextStyle(color: theme.black, fontSize: 18),
               ),
             )),
           ],

@@ -16,7 +16,6 @@ import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/controller/tim_uikit_chat_controller.dart';
 
-import 'package:tencent_cloud_chat_uikit/ui/utils/custom_emoji_face_data_class.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/frame.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/optimize_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_multi_select_panel.dart';
@@ -318,6 +317,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
               textFieldController.hideAllPanel();
             },
             child: Scaffold(
+                resizeToAvoidBottomInset: false,
                 appBar: TIMUIKitAppBar(
                   showTotalUnReadCount: widget.showTotalUnReadCount,
                   config: widget.appBarConfig,
@@ -395,7 +395,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                                     conversationType: widget.conversationType,
                                     initText: widget.draftText,
                                     hintText: widget.textFieldHintText,
-                                    showMorePannel:
+                                    showMorePanel:
                                         widget.config?.isAllowShowMorePanel ??
                                             true,
                                     showSendAudio:

@@ -6,7 +6,6 @@ import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implem
 import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 
-
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
@@ -79,9 +78,9 @@ class _SendJoinGroupApplicationState
       appBar: AppBar(
         title: Text(
           TIM_t("进群申请"),
-          style: const TextStyle(color: Colors.white, fontSize: 17),
+          style: TextStyle(color: theme.white, fontSize: 17),
         ),
-        shadowColor: Colors.white,
+        shadowColor: theme.white,
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(colors: [
@@ -90,8 +89,8 @@ class _SendJoinGroupApplicationState
             ]),
           ),
         ),
-        iconTheme: const IconThemeData(
-          color: Colors.white,
+        iconTheme: IconThemeData(
+          color: theme.white,
         ),
       ),
       body: SingleChildScrollView(
@@ -99,7 +98,7 @@ class _SendJoinGroupApplicationState
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              color: Colors.white,
+              color: theme.white,
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               margin: const EdgeInsets.only(bottom: 12),
               child: Row(
@@ -151,20 +150,20 @@ class _SendJoinGroupApplicationState
             Container(
               margin: const EdgeInsets.only(top: 6, bottom: 12),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              color: Colors.white,
+              color: theme.white,
               child: TextField(
                   maxLines: 4,
                   controller: _verficationController,
                   keyboardType: TextInputType.multiline,
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                       border: InputBorder.none,
                       hintStyle: TextStyle(
-                        color: Color(0xFFAEA4A3),
+                        color: theme.textgrey,
                       ),
                       hintText: '')),
             ),
             Container(
-              color: Colors.white,
+              color: theme.white,
               width: double.infinity,
               margin: const EdgeInsets.only(top: 10),
               child: TextButton(

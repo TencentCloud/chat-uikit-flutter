@@ -84,8 +84,7 @@ class _TIMUIKitAddFriendState extends TIMUIKitState<TIMUIKitAddFriend> {
                     model: _selfInfoViewModel)));
       },
       child: Container(
-        color: Colors.white,
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.symmetric(vertical: 12),
         child: Row(
           // crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -122,8 +121,12 @@ class _TIMUIKitAddFriendState extends TIMUIKitState<TIMUIKitAddFriend> {
     final noResult = searchResult == null || searchResult.isEmpty;
     if (noResult) {
       return [
-        Center(
-          child: Text(TIM_t("用户不存在")),
+        Container(
+          margin: const EdgeInsets.only(top: 20),
+          child: Center(
+            child: Text(TIM_t("该用户不存在"),
+                style: TextStyle(color: theme.weakTextColor, fontSize: 14)),
+          ),
         )
       ];
     }
@@ -161,23 +164,20 @@ class _TIMUIKitAddFriendState extends TIMUIKitState<TIMUIKitAddFriend> {
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final TUITheme theme = value.theme;
-
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: _selfInfoViewModel),
       ],
       builder: (BuildContext context, Widget? w) {
-        final selfInfoModel = Provider.of<TUISelfInfoViewModel>(context);
-        final userID = selfInfoModel.loginInfo?.userID ?? "";
-        String option2 = userID;
         return Column(
           children: [
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
               child: Row(
                 children: [
                   Expanded(
                       child: TextField(
+                    autofocus: true,
                     focusNode: _focusNode,
                     controller: _controller,
                     onChanged: (value) {
@@ -210,45 +210,24 @@ class _TIMUIKitAddFriendState extends TIMUIKitState<TIMUIKitAddFriend> {
                           ),
                         ),
                         contentPadding: EdgeInsets.zero,
-                        hintStyle: const TextStyle(
-                          color: Color(0xffAEA4A3),
+                        hintStyle: TextStyle(
+                          color: theme.weakTextColor,
                         ),
-                        fillColor: Colors.white,
+                        fillColor: theme.inputFillColor,
                         filled: true,
                         hintText: TIM_t("搜索用户 ID")),
                   )),
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    width: isFocused ? 50 : 0,
-                    child: TextButton(
-                        onPressed: () {
-                          final searchParams = _controller.text;
-                          if (searchParams.trim().isNotEmpty) {
-                            searchFriend(searchParams);
-                            showResult = true;
-                            setState(() {});
-                          }
-                        },
-                        child: Text(
-                          TIM_t("搜索"),
-                          softWrap: false,
-                          style: const TextStyle(color: Colors.black),
-                        )),
-                  )
                 ],
               ),
             ),
-            if (!isFocused)
-              Center(
-                child: Text(
-                    TIM_t_para("我的用户ID: {{option2}}", "我的用户ID: $option2")(
-                        option2: option2)),
-              ),
             if (showResult)
               Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: _searchResultBuilder(searchResult, theme),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 20),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: _searchResultBuilder(searchResult, theme),
+                    ),
                   ),
                 ),
               )

@@ -59,7 +59,11 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
   }
 
   //保存网络视频到本地
-  _saveNetworkVideo(context, String videoUrl, {bool isAsset = true}) async {
+  Future<void> _saveNetworkVideo(
+    context,
+    String videoUrl, {
+    bool isAsset = true,
+  }) async {
     if (PlatformUtils().isWeb) {
       RegExp exp = RegExp(r"((\.){1}[^?]{2,4})");
       String? suffix = exp.allMatches(videoUrl).last.group(0);
@@ -83,12 +87,16 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
     }
     if (PlatformUtils().isIOS) {
       if (!await Permissions.checkPermission(
-          context, Permission.photosAddOnly.value)) {
+        context,
+        Permission.photosAddOnly.value,
+      )) {
         return;
       }
     } else {
       if (!await Permissions.checkPermission(
-          context, Permission.storage.value)) {
+        context,
+        Permission.storage.value,
+      )) {
         return;
       }
     }
@@ -172,33 +180,44 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
             infoCode: 6660403));
       }
     }
+    return;
   }
 
-  void _saveVideo() {
+  Future<void> _saveVideo() async {
     if (PlatformUtils().isWeb) {
-      _saveNetworkVideo(context, widget.videoElement.videoPath!,
-          isAsset: true);
-      return;
+      return await _saveNetworkVideo(
+        context,
+        widget.videoElement.videoPath!,
+        isAsset: true,
+      );
     }
     if (widget.videoElement.videoPath != '' &&
         widget.videoElement.videoPath != null) {
       File f = File(widget.videoElement.videoPath!);
       if (f.existsSync()) {
-        _saveNetworkVideo(context, widget.videoElement.videoPath!,
-            isAsset: true);
-        return;
+        return await _saveNetworkVideo(
+          context,
+          widget.videoElement.videoPath!,
+          isAsset: true,
+        );
       }
     }
     if (widget.videoElement.localVideoUrl != '' &&
         widget.videoElement.localVideoUrl != null) {
       File f = File(widget.videoElement.localVideoUrl!);
       if (f.existsSync()) {
-        _saveNetworkVideo(context, widget.videoElement.localVideoUrl!,
-            isAsset: true);
-        return;
+        return await _saveNetworkVideo(
+          context,
+          widget.videoElement.localVideoUrl!,
+          isAsset: true,
+        );
       }
     }
-    _saveNetworkVideo(context, widget.videoElement.videoUrl!, isAsset: false);
+    return await _saveNetworkVideo(
+      context,
+      widget.videoElement.videoUrl!,
+      isAsset: false,
+    );
   }
 
   double getVideoHeight() {
@@ -293,7 +312,9 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
           showControlsOnInitialize: false,
           allowPlaybackSpeedChanging: false,
           aspectRatio: w == 0 || h == 0 ? null : w / h,
-          customControls: VideoCustomControls(downloadFn: _saveVideo));
+          customControls: VideoCustomControls(downloadFn: () async{
+            return await _saveVideo();
+          }));
       setState(() {
         videoPlayerController = player;
         chewieController = controller;

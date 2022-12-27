@@ -58,7 +58,7 @@ class _TIMUIKitBlackListState extends TIMUIKitState<TIMUIKitBlackList> {
                   .deleteFromBlockList([friendInfo.userID]);
             },
             backgroundColor: theme.cautionColor ?? CommonColor.cautionColor,
-            foregroundColor: Colors.white,
+            foregroundColor: theme.white,
             label: TIM_t("删除"),
             autoClose: true,
           )
@@ -93,7 +93,7 @@ class _TIMUIKitBlackListState extends TIMUIKitState<TIMUIKitBlackList> {
                                   CommonColor.weakDividerColor))),
                   child: Text(
                     showName,
-                    style: const TextStyle(color: Colors.black, fontSize: 18),
+                    style: TextStyle(color: theme.black, fontSize: 18),
                   ),
                 ))
               ],

@@ -253,13 +253,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.2.4"
-  dio:
-    dependency: "direct main"
-    description:
-      name: dio
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "4.0.6"
   disk_space:
     dependency: "direct main"
     description:
@@ -506,13 +499,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.0.2"
-  i18n:
-    dependency: "direct main"
-    description:
-      name: i18n
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "3.4.1"
   image_gallery_saver:
     dependency: "direct main"
     description:
@@ -898,13 +884,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.1"
-  quick_log:
-    dependency: transitive
-    description:
-      name: quick_log
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "5.2.1"
   quiver:
     dependency: transitive
     description:
@@ -1003,6 +982,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.3"
+  shell:
+    dependency: transitive
+    description:
+      name: shell
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -1077,7 +1063,7 @@ packages:
       name: tencent_cloud_chat_sdk
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.0.4"
+    version: "5.0.6"
   tencent_extended_text:
     dependency: "direct main"
     description:
@@ -1105,14 +1091,21 @@ packages:
       name: tencent_im_base
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.7"
+    version: "1.0.14"
   tencent_im_sdk_plugin_platform_interface:
     dependency: transitive
     description:
       name: tencent_im_sdk_plugin_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.9"
+    version: "0.3.10"
+  tencent_keyboard_visibility:
+    dependency: "direct main"
+    description:
+      name: tencent_keyboard_visibility
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.0.1"
   tencent_open_file:
     dependency: "direct main"
     description:
@@ -1133,7 +1126,7 @@ packages:
       name: tencent_wechat_camera_picker
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.6.2+5"
+    version: "3.6.5"
   term_glyph:
     dependency: transitive
     description:
@@ -1141,6 +1134,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.1"
+  tim_ui_kit_sticker_plugin:
+    dependency: "direct main"
+    description:
+      name: tim_ui_kit_sticker_plugin
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.1"
   timing:
     dependency: transitive
     description:

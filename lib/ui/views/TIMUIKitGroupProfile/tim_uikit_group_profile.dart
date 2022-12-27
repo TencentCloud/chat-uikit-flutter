@@ -93,6 +93,14 @@ class _TIMUIKitGroupProfileState extends TIMUIKitState<TIMUIKitGroupProfile> {
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(covariant TIMUIKitGroupProfile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if(oldWidget.groupID != widget.groupID){
+      model.loadData(widget.groupID);
+    }
+  }
+
   final List<GroupProfileWidgetEnum> _defaultWidgetOrder = [
     GroupProfileWidgetEnum.detailCard,
     GroupProfileWidgetEnum.operationDivider,
@@ -213,7 +221,7 @@ class _TIMUIKitGroupProfileState extends TIMUIKitState<TIMUIKitGroupProfile> {
                   if (isAdmin || isGroupOwner) {
                     return (customBuilder?.groupManage != null
                         ? customBuilder?.groupManage!(toDefaultManagePage)
-                        : TIMUIKitGroupProfileWidget.groupManage(model))!;
+                        : TIMUIKitGroupProfileWidget.groupManage())!;
                   } else {
                     return Container();
                   }

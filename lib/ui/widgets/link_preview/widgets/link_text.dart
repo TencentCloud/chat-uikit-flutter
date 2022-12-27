@@ -1,3 +1,4 @@
+import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_extended_text/extended_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -70,7 +71,7 @@ class LinkText extends TIMStatelessWidget {
 
   String _getContentSpan(String text, BuildContext context) {
     List<InlineSpan> _contentList = [];
-    String contentData = '';
+    String contentData = PlatformUtils().isWeb ? '\u200B' : "";
 
     Iterable<RegExpMatch> matches = LinkUtils.urlReg.allMatches(text);
 

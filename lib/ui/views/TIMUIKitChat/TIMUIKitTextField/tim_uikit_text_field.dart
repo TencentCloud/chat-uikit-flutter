@@ -1,7 +1,8 @@
 import 'dart:async';
+import 'dart:math';
 
-import 'package:tencent_cloud_chat_uikit/ui/utils/constant_data.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/custom_emoji_face_data_class.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_setting_model.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/optimize_utils.dart';
 import 'package:tencent_extended_text_field/extended_text_field.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,6 @@ import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_conversa
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_at_text.dart';
@@ -24,6 +24,7 @@ import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_send_sound_message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
+import 'package:tencent_keyboard_visibility/tencent_keyboard_visibility.dart';
 import 'special_text/DefaultSpecialTextSpanBuilder.dart';
 
 enum MuteStatus { none, me, all }
@@ -53,13 +54,13 @@ class TIMUIKitInputTextField extends StatefulWidget {
   /// show send emoji icon
   final bool showSendEmoji;
 
-  /// show more pannel
-  final bool showMorePannel;
+  /// show more panel
+  final bool showMorePanel;
 
   /// background color
   final Color? backgroundColor;
 
-  /// controll input field behavior
+  /// control input field behavior
   final TIMUIKitInputTextFieldController? controller;
 
   /// on text changed
@@ -72,7 +73,7 @@ class TIMUIKitInputTextField extends StatefulWidget {
 
   final List customEmojiStickerList;
 
-  /// sticker panel customiziation
+  /// sticker panel customization
   final Widget Function(
           {void Function() sendTextMessage,
           void Function(int index, String data) sendFaceMessage,
@@ -93,7 +94,7 @@ class TIMUIKitInputTextField extends StatefulWidget {
       this.customStickerPanel,
       this.showSendAudio = true,
       this.showSendEmoji = true,
-      this.showMorePannel = true,
+      this.showMorePanel = true,
       this.backgroundColor,
       this.controller,
       this.onChanged,
@@ -108,6 +109,7 @@ class TIMUIKitInputTextField extends StatefulWidget {
 
 class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
   final TUIChatGlobalModel globalModel = serviceLocator<TUIChatGlobalModel>();
+  final TUISettingModel settingModel = serviceLocator<TUISettingModel>();
   bool showMore = false;
   bool showMoreButton = true;
   bool showSendSoundText = false;
@@ -116,7 +118,10 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
   late FocusNode focusNode;
   String zeroWidthSpace = '\ufeff';
   String lastText = "";
-  double lastkeyboardHeight = 0;
+  String languageType = "";
+  double? bottomPadding;
+  Function? setKeyboardHeight;
+  int? currentCursor;
 
   Map<String, V2TimGroupMemberFullInfo> memberInfoMap = {};
 
@@ -127,21 +132,6 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
   MuteStatus muteStatus = MuteStatus.none;
 
   int latestSendEditStatusTime = DateTime.now().millisecondsSinceEpoch;
-
-  listenKeyBoardStatus() {
-    final currentKeyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-    // 键盘弹出
-    if (currentKeyboardHeight - lastkeyboardHeight > 0) {
-      // 保证弹出时showKeyboard为true
-      setState(() {
-        showKeyboard = true;
-      });
-
-      /// 键盘收回
-    } else if (currentKeyboardHeight - lastkeyboardHeight < 0) {}
-
-    lastkeyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-  }
 
   Widget _getBottomContainer() {
     if (showEmojiPanel) {
@@ -155,26 +145,27 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                 backSpaceText();
               },
               addText: (int unicode) {
-                final oldText = textEditingController.text;
                 final newText = String.fromCharCode(unicode);
-                textEditingController.text = "$oldText$newText";
+                addStickerToText(newText);
                 // handleSetDraftText();
               },
               addCustomEmojiText: ((String singleEmojiName) {
-                RegExp exp = RegExp(r"([\u4e00-\u9fa5]+|[a-zA-Z]+)");
-                var emojiPngNameMatch = exp.firstMatch(singleEmojiName);
-                String? emojiName = emojiPngNameMatch![0];
-                final oldText = textEditingController.text;
+                String? emojiName = singleEmojiName.split('.png')[0];
+                if (widget.isUseDefaultEmoji &&
+                    languageType == 'zh' &&
+                    ConstData.emojiMapList[emojiName] != null &&
+                    ConstData.emojiMapList[emojiName] != '') {
+                  emojiName = ConstData.emojiMapList[emojiName];
+                }
                 final newText = '[$emojiName]';
-                textEditingController.text = "$oldText$newText";
+                addStickerToText(newText);
                 setSendButton();
               }),
               defaultCustomEmojiStickerList:
                   widget.isUseDefaultEmoji ? ConstData.emojiList : [])
           : EmojiPanel(onTapEmoji: (unicode) {
-              final oldText = textEditingController.text;
               final newText = String.fromCharCode(unicode);
-              textEditingController.text = "$oldText$newText";
+              addStickerToText(newText);
               setSendButton();
               // handleSetDraftText();
             }, onSubmitted: () {
@@ -191,29 +182,49 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
           conversationType: widget.conversationType);
     }
 
-    return Container();
+    return const SizedBox(height: 0);
+  }
+
+  void addStickerToText(String sticker){
+    final oldText = textEditingController.text;
+    if(currentCursor != null && currentCursor! > -1){
+      final firstString = oldText.substring(0, currentCursor);
+      final secondString = oldText.substring(currentCursor!);
+      currentCursor = currentCursor! + sticker.length;
+      textEditingController.text = "$firstString$sticker$secondString";
+    }else{
+      textEditingController.text = "$oldText$sticker";
+    }
   }
 
   double _getBottomHeight() {
-    listenKeyBoardStatus();
-    // if (showKeyboard) {
-    //   // return MediaQuery.of(context).viewInsets.bottom;
-    //   return 0;
-    // } else
-    if (showMore || showEmojiPanel) {
-      return 248.0;
-    }
-    // 在文本框多行拓展时增加保护区高度
-    else if (textEditingController.text.length >= 46 && showKeyboard == false) {
-      return 25;
+    if (showKeyboard) {
+      final currentKeyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+      double originHeight = settingModel.keyboardHeight;
+      if (currentKeyboardHeight != 0) {
+        if (currentKeyboardHeight >= originHeight) {
+          originHeight = currentKeyboardHeight;
+        }
+        if (setKeyboardHeight != null) {
+          setKeyboardHeight!(currentKeyboardHeight);
+        }
+      }
+      final height = originHeight != 0 ? originHeight : currentKeyboardHeight;
+      return height;
+    } else if (showMore || showEmojiPanel) {
+      return 248.0 + (bottomPadding ?? 0.0);
+    } else if (textEditingController.text.length >= 46 &&
+        showKeyboard == false) {
+      return 25 + (bottomPadding ?? 0.0);
     } else {
-      return 0;
+      return bottomPadding ?? 0;
     }
   }
 
   _openMore() {
     if (!showMore) {
       focusNode.unfocus();
+      currentCursor = null;
     }
     setState(() {
       showKeyboard = false;
@@ -224,6 +235,8 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
   }
 
   _openEmojiPanel() {
+    _onCursorChange();
+    showKeyboard = showEmojiPanel;
     if (showEmojiPanel) {
       focusNode.requestFocus();
     } else {
@@ -231,7 +244,6 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     }
 
     setState(() {
-      showKeyboard = showEmojiPanel;
       showMore = false;
       showSendSoundText = false;
       showEmojiPanel = !showEmojiPanel;
@@ -294,10 +306,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
               onTap: () {
                 widget.model.repliedMessage = null;
               },
-              child: Icon(
-                  Icons.clear,
-                  color: hexToColor("8f959e"),
-                  size: 18),
+              child: Icon(Icons.clear, color: hexToColor("8f959e"), size: 18),
             )
           ],
         ),
@@ -334,11 +343,6 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
       // handleSetDraftText();
     }
     setSendButton();
-
-    // if (originalText.isNotEmpty) {
-    //   text = originalText.characters.skipLast(1);
-    //   textEditingController.text = "$text";
-    // }
   }
 
 // 和onSubmitted一样，只是保持焦点的不同
@@ -416,6 +420,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
             context);
       }
       textEditingController.clear();
+      currentCursor = null;
       if (showKeyboard) {
         focusNode.requestFocus();
       }
@@ -450,6 +455,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
 
   _hideAllPanel() {
     focusNode.unfocus();
+    currentCursor == null;
     if (showKeyboard != false || showMore != false || showEmojiPanel != false) {
       setState(() {
         showKeyboard = false;
@@ -461,17 +467,13 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
 
   void onModelChanged() {
     if (widget.model.repliedMessage != null) {
+      showKeyboard = true;
       focusNode.requestFocus();
       _addDeleteTag();
-      setState(() {
-        showKeyboard = true;
-      });
     } else {}
     if (widget.model.editRevokedMsg != "") {
+      showKeyboard = true;
       focusNode.requestFocus();
-      setState(() {
-        showKeyboard = true;
-      });
       textEditingController.clear();
       textEditingController.text = widget.model.editRevokedMsg;
       textEditingController.selection = TextSelection.fromPosition(TextPosition(
@@ -486,6 +488,11 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     textEditingController.text = zeroWidthSpace + originalText;
     textEditingController.selection = TextSelection.fromPosition(
         TextPosition(offset: textEditingController.text.length));
+  }
+
+  _onCursorChange() {
+    final selection = textEditingController.selection;
+    currentCursor = selection.baseOffset;
   }
 
   _handleSoftKeyBoardDelete() {
@@ -622,6 +629,11 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     if (widget.initText != null) {
       textEditingController.text = widget.initText!;
     }
+    final AppLocale appLocale = I18nUtils.findDeviceLocale();
+    languageType =
+        (appLocale == AppLocale.zhHans || appLocale == AppLocale.zhHant)
+            ? 'zh'
+            : 'en';
   }
 
   @override
@@ -697,7 +709,13 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     final theme = value.theme;
     final TUIChatSeparateViewModel model =
         Provider.of<TUIChatSeparateViewModel>(context);
+
+    setKeyboardHeight ??= OptimizeUtils.debounce((height) {
+      settingModel.keyboardHeight = height;
+    }, const Duration(seconds: 1));
+
     _getMuteType(model);
+
     final debounceFunc = _debounce((value) {
       if (isWebDevice() || isAndroidDevice()) {
         if (value.isEmpty && showMoreButton != true) {
@@ -721,6 +739,12 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
       }
     }, const Duration(milliseconds: 80));
 
+    final MediaQueryData data = MediaQuery.of(context);
+    EdgeInsets padding = data.padding;
+    if (bottomPadding == null || padding.bottom > bottomPadding!) {
+      bottomPadding = padding.bottom;
+    }
+
     return Selector<TUIChatSeparateViewModel, V2TimMessage?>(
         builder: ((context, value, child) {
           String? getForbiddenText() {
@@ -742,188 +766,201 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
               _buildRepliedMessage(value),
               Container(
                 color: widget.backgroundColor ?? hexToColor("f5f5f6"),
-                child: SafeArea(
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 16),
-                        constraints: const BoxConstraints(minHeight: 50),
-                        child: Row(
-                          children: [
-                            if (forbiddenText != null)
-                              Expanded(
-                                  child: Container(
-                                height: 35,
-                                color: theme.weakBackgroundColor,
-                                alignment: Alignment.center,
-                                child: Text(
-                                  TIM_t(forbiddenText),
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: theme.weakTextColor,
-                                  ),
-                                ),
-                              )),
-                            if (!PlatformUtils().isWeb &&
-                                widget.showSendAudio &&
-                                forbiddenText == null)
-                              InkWell(
-                                onTap: () async {
-                                  if (showSendSoundText) {
-                                    focusNode.requestFocus();
-                                    setState(() {
-                                      showKeyboard = true;
-                                    });
-                                  }
-                                  if (await Permissions.checkPermission(
-                                      context, Permission.microphone.value)) {
-                                    setState(() {
-                                      showEmojiPanel = false;
-                                      showMore = false;
-                                      showSendSoundText = !showSendSoundText;
-                                    });
-                                  }
-                                },
-                                child: SvgPicture.asset(
-                                  showSendSoundText
-                                      ? 'images/keyboard.svg'
-                                      : 'images/voice.svg',
-                                  package: 'tencent_cloud_chat_uikit',
-                                  color: const Color.fromRGBO(68, 68, 68, 1),
-                                  height: 28,
-                                  width: 28,
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 16),
+                      constraints: const BoxConstraints(minHeight: 50),
+                      child: Row(
+                        children: [
+                          if (forbiddenText != null)
+                            Expanded(
+                                child: Container(
+                              height: 35,
+                              color: theme.weakBackgroundColor,
+                              alignment: Alignment.center,
+                              child: Text(
+                                TIM_t(forbiddenText),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  color: theme.weakTextColor,
                                 ),
                               ),
-                            if (forbiddenText == null)
-                              const SizedBox(
-                                width: 10,
+                            )),
+                          if (!PlatformUtils().isWeb &&
+                              widget.showSendAudio &&
+                              forbiddenText == null)
+                            InkWell(
+                              onTap: () async {
+                                if (showSendSoundText) {
+                                  showKeyboard = true;
+                                  focusNode.requestFocus();
+                                }
+                                if (await Permissions.checkPermission(
+                                  context,
+                                  Permission.microphone.value,
+                                  theme,
+                                )) {
+                                  setState(() {
+                                    showEmojiPanel = false;
+                                    showKeyboard = false;
+                                    showMore = false;
+                                    showSendSoundText = !showSendSoundText;
+                                  });
+                                }
+                              },
+                              child: SvgPicture.asset(
+                                showSendSoundText
+                                    ? 'images/keyboard.svg'
+                                    : 'images/voice.svg',
+                                package: 'tencent_cloud_chat_uikit',
+                                color: const Color.fromRGBO(68, 68, 68, 1),
+                                height: 28,
+                                width: 28,
                               ),
-                            if (forbiddenText == null)
-                              Expanded(
-                                child: showSendSoundText
-                                    ? SendSoundMessage(
-                                        onDownBottom: goDownBottom,
-                                        conversationID: widget.conversationID,
-                                        conversationType:
-                                            widget.conversationType)
-                                    : ExtendedTextField(
-                                        // selectionControls:
-                                        //     _defaultTextSelectionControls,
-                                        maxLines: 4,
-                                        minLines: 1,
-                                        focusNode: focusNode,
-                                        onChanged: debounceFunc,
-                                        onTap: () {
-                                          goDownBottom();
-                                          setState(() {
+                            ),
+                          if (forbiddenText == null)
+                            const SizedBox(
+                              width: 10,
+                            ),
+                          if (forbiddenText == null)
+                            Expanded(
+                              child: showSendSoundText
+                                  ? SendSoundMessage(
+                                      onDownBottom: goDownBottom,
+                                      conversationID: widget.conversationID,
+                                      conversationType: widget.conversationType)
+                                  : KeyboardVisibility(
+                                      child: ExtendedTextField(
+                                          maxLines: 4,
+                                          minLines: 1,
+                                          focusNode: focusNode,
+                                          onChanged: debounceFunc,
+                                          onTap: () {
                                             showKeyboard = true;
-                                            showEmojiPanel = false;
-                                            showMore = false;
+                                            goDownBottom();
+                                            setState(() {
+                                              showEmojiPanel = false;
+                                              showMore = false;
+                                            });
+                                          },
+                                          keyboardType: TextInputType.multiline,
+                                          textInputAction:
+                                              PlatformUtils().isAndroid
+                                                  ? TextInputAction.newline
+                                                  : TextInputAction.send,
+                                          onEditingComplete: onSubmitted,
+                                          textAlignVertical:
+                                              TextAlignVertical.top,
+                                          decoration: InputDecoration(
+                                              border: InputBorder.none,
+                                              hintStyle: const TextStyle(
+                                                // fontSize: 10,
+                                                color: Color(0xffAEA4A3),
+                                              ),
+                                              fillColor: Colors.white,
+                                              filled: true,
+                                              isDense: true,
+                                              hintText: widget.hintText ?? ''),
+                                          controller: textEditingController,
+                                          specialTextSpanBuilder: PlatformUtils().isWeb
+                                              ? null
+                                              : DefaultSpecialTextSpanBuilder(
+                                                  isUseDefaultEmoji:
+                                                      widget.isUseDefaultEmoji,
+                                                  customEmojiStickerList: widget
+                                                      .customEmojiStickerList,
+                                                  showAtBackground: true,
+                                                )
+                                      ),
+                                      onChanged: (bool visibility) {
+                                        if (showKeyboard != visibility &&
+                                            visibility == false) {
+                                          setState(() {
+                                            showKeyboard = visibility;
                                           });
-                                        },
-                                        keyboardType: TextInputType.multiline,
-                                        textInputAction:
-                                            PlatformUtils().isAndroid
-                                                ? TextInputAction.newline
-                                                : TextInputAction.send,
-                                        onEditingComplete: onSubmitted,
-                                        textAlignVertical:
-                                            TextAlignVertical.center,
-                                        decoration: InputDecoration(
-                                            border: InputBorder.none,
-                                            hintStyle: const TextStyle(
-                                              // fontSize: 10,
-                                              color: Color(0xffAEA4A3),
-                                            ),
-                                            fillColor: Colors.white,
-                                            filled: true,
-                                            isDense: true,
-                                            hintText: widget.hintText ?? ''),
-                                        controller: textEditingController,
-                                        specialTextSpanBuilder:
-                                            DefaultSpecialTextSpanBuilder(
-                                          isUseDefaultEmoji:
-                                              widget.isUseDefaultEmoji,
-                                          customEmojiStickerList:
-                                              widget.customEmojiStickerList,
-                                          showAtBackground: true,
-                                        )),
+                                        }
+                                      }),
+                            ),
+                          if (forbiddenText == null)
+                            const SizedBox(
+                              width: 10,
+                            ),
+                          if (widget.showSendEmoji && forbiddenText == null)
+                            InkWell(
+                              onTap: () {
+                                _openEmojiPanel();
+                                goDownBottom();
+                              },
+                              child: PlatformUtils().isWeb
+                                  ? Icon(
+                                      showEmojiPanel
+                                          ? Icons.keyboard_alt_outlined
+                                          : Icons.mood_outlined,
+                                      color: hexToColor("5c6168"),
+                                      size: 32)
+                                  : SvgPicture.asset(
+                                      showEmojiPanel
+                                          ? 'images/keyboard.svg'
+                                          : 'images/face.svg',
+                                      package: 'tencent_cloud_chat_uikit',
+                                      color:
+                                          const Color.fromRGBO(68, 68, 68, 1),
+                                      height: 28,
+                                      width: 28,
+                                    ),
+                            ),
+                          if (forbiddenText == null)
+                            const SizedBox(
+                              width: 10,
+                            ),
+                          if (widget.showMorePanel &&
+                              forbiddenText == null &&
+                              showMoreButton)
+                            InkWell(
+                              onTap: () {
+                                // model.sendCustomMessage(data: "a", convID: model.currentSelectedConv, convType: model.currentSelectedConvType == 1 ? ConvType.c2c : ConvType.group);
+                                _openMore();
+                                goDownBottom();
+                              },
+                              child: PlatformUtils().isWeb
+                                  ? Icon(Icons.add_circle_outline_outlined,
+                                      color: hexToColor("5c6168"), size: 32)
+                                  : SvgPicture.asset(
+                                      'images/add.svg',
+                                      package: 'tencent_cloud_chat_uikit',
+                                      color:
+                                          const Color.fromRGBO(68, 68, 68, 1),
+                                      height: 28,
+                                      width: 28,
+                                    ),
+                            ),
+                          if ((isAndroidDevice() || isWebDevice()) &&
+                              !showMoreButton)
+                            SizedBox(
+                              height: 32.0,
+                              child: ElevatedButton(
+                                onPressed: onSubmitted,
+                                child: Text(TIM_t("发送")),
                               ),
-                            if (forbiddenText == null)
-                              const SizedBox(
-                                width: 10,
-                              ),
-                            if (widget.showSendEmoji && forbiddenText == null)
-                              InkWell(
-                                onTap: () {
-                                  _openEmojiPanel();
-                                  goDownBottom();
-                                },
-                                child: kIsWeb
-                                    ? Icon(
-                                        showEmojiPanel
-                                            ? Icons.keyboard_alt_outlined
-                                            : Icons.mood_outlined,
-                                        color: hexToColor("5c6168"),
-                                        size: 32)
-                                    : SvgPicture.asset(
-                                        showEmojiPanel
-                                            ? 'images/keyboard.svg'
-                                            : 'images/face.svg',
-                                        package: 'tencent_cloud_chat_uikit',
-                                        color:
-                                            const Color.fromRGBO(68, 68, 68, 1),
-                                        height: 28,
-                                        width: 28,
-                                      ),
-                              ),
-                            if (forbiddenText == null)
-                              const SizedBox(
-                                width: 10,
-                              ),
-                            if (widget.showMorePannel &&
-                                forbiddenText == null &&
-                                showMoreButton)
-                              InkWell(
-                                onTap: () {
-                                  // model.sendCustomMessage(data: "a", convID: model.currentSelectedConv, convType: model.currentSelectedConvType == 1 ? ConvType.c2c : ConvType.group);
-                                  _openMore();
-                                  goDownBottom();
-                                },
-                                child: kIsWeb
-                                    ? Icon(Icons.add_circle_outline_outlined,
-                                        color: hexToColor("5c6168"), size: 32)
-                                    : SvgPicture.asset(
-                                        'images/add.svg',
-                                        package: 'tencent_cloud_chat_uikit',
-                                        color:
-                                            const Color.fromRGBO(68, 68, 68, 1),
-                                        height: 28,
-                                        width: 28,
-                                      ),
-                              ),
-                            if ((isAndroidDevice() || isWebDevice()) &&
-                                !showMoreButton)
-                              SizedBox(
-                                height: 32.0,
-                                child: ElevatedButton(
-                                  onPressed: onSubmitted,
-                                  child: Text(TIM_t("发送")),
-                                ),
-                              ),
-                          ],
-                        ),
+                            ),
+                        ],
                       ),
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 150),
-                        height: _getBottomHeight(),
-                        child: _getBottomContainer(),
-                      )
-                    ],
-                  ),
+                    ),
+                    AnimatedContainer(
+                      duration: Duration(
+                          milliseconds:
+                              (showKeyboard && PlatformUtils().isAndroid)
+                                  ? 200
+                                  : 340),
+                      curve: Curves.fastOutSlowIn,
+                      height: max(_getBottomHeight(), 0.0),
+                      child: _getBottomContainer(),
+                    ),
+                  ],
                 ),
               )
             ],

@@ -5,6 +5,7 @@ import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_search_view_model.dart';
 
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/pureUI/tim_uikit_search_indicator.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/tim_uikit_search_friend.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/pureUI/tim_uikit_search_input.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/tim_uikit_search_group.dart';
@@ -51,6 +52,11 @@ class TIMUIKitSearchState extends TIMUIKitState<TIMUIKitSearch> {
   late TextEditingController textEditingController = TextEditingController();
   final model = serviceLocator<TUISearchViewModel>();
   GlobalKey<dynamic> inputTextField = GlobalKey();
+  List<SearchType> searchTypes = [
+    SearchType.group,
+    SearchType.contact,
+    SearchType.history
+  ];
 
   @override
   void initState() {
@@ -70,12 +76,12 @@ class TIMUIKitSearchState extends TIMUIKitState<TIMUIKitSearch> {
             value: serviceLocator<TUISearchViewModel>())
       ],
       builder: (context, w) {
-        List<V2TimFriendInfoResult>? friendResultList =
-            Provider.of<TUISearchViewModel>(context).friendList;
-        List<V2TimMessageSearchResultItem>? msgList =
-            Provider.of<TUISearchViewModel>(context).msgList;
-        List<V2TimGroupInfo>? groupList =
-            Provider.of<TUISearchViewModel>(context).groupList;
+        List<V2TimFriendInfoResult> friendResultList =
+            Provider.of<TUISearchViewModel>(context).friendList ?? [];
+        List<V2TimMessageSearchResultItem> msgList =
+            Provider.of<TUISearchViewModel>(context).msgList ?? [];
+        List<V2TimGroupInfo> groupList =
+            Provider.of<TUISearchViewModel>(context).groupList ?? [];
         int totalMsgCount =
             Provider.of<TUISearchViewModel>(context).totalMsgCount;
         return GestureDetector(
@@ -105,27 +111,45 @@ class TIMUIKitSearchState extends TIMUIKitState<TIMUIKitSearch> {
                     child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      TIMUIKitSearchFriend(
+                      if (friendResultList.isEmpty ||
+                          !(searchTypes.contains(SearchType.contact)) &&
+                              (groupList.isEmpty ||
+                                  !(searchTypes.contains(SearchType.group))) &&
+                              (totalMsgCount == 0 ||
+                                  !(searchTypes.contains(SearchType.history))))
+                        TIMUIKitSearchIndicator(
+                          typeList: searchTypes,
+                          onChange: (list) {
+                            setState(() {
+                              searchTypes = list;
+                            });
+                          },
+                        ),
+                      if (searchTypes.contains(SearchType.contact))
+                        TIMUIKitSearchFriend(
+                            onTapConversation: widget.onTapConversation,
+                            friendResultList: friendResultList),
+                      if (searchTypes.contains(SearchType.group))
+                        TIMUIKitSearchGroup(
+                            groupList: groupList,
+                            onTapConversation: widget.onTapConversation),
+                      if (searchTypes.contains(SearchType.history))
+                        TIMUIKitSearchMsg(
                           onTapConversation: widget.onTapConversation,
-                          friendResultList: friendResultList ?? []),
-                      TIMUIKitSearchGroup(
-                          groupList: groupList ?? [],
-                          onTapConversation: widget.onTapConversation),
-                      TIMUIKitSearchMsg(
-                        onTapConversation: widget.onTapConversation,
-                        keyword: textEditingController.text,
-                        totalMsgCount: totalMsgCount,
-                        msgList: msgList ?? [],
-                        onEnterConversation:
-                            (V2TimConversation conversation, String keyword) {
-                          if (widget.onEnterSearchInConversation != null) {
-                            widget.onEnterSearchInConversation!(
-                                conversation, keyword);
-                          } else if (widget.onEnterConversation != null) {
-                            widget.onEnterConversation!(conversation, keyword);
-                          }
-                        },
-                      )
+                          keyword: textEditingController.text,
+                          totalMsgCount: totalMsgCount,
+                          msgList: msgList,
+                          onEnterConversation:
+                              (V2TimConversation conversation, String keyword) {
+                            if (widget.onEnterSearchInConversation != null) {
+                              widget.onEnterSearchInConversation!(
+                                  conversation, keyword);
+                            } else if (widget.onEnterConversation != null) {
+                              widget.onEnterConversation!(
+                                  conversation, keyword);
+                            }
+                          },
+                        )
                     ],
                   ),
                 ))

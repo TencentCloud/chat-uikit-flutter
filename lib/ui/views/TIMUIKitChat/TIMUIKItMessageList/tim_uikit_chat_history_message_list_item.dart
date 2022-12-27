@@ -581,7 +581,10 @@ class _TIMUIKItHistoryMessageListItemState
             ? (model.chatConfig.timeDividerConfig?.timestampParser!(timeStamp))!
             : TimeAgo().getTimeForMessage(timeStamp),
         style: widget.themeData?.timelineTextStyle ??
-            TextStyle(fontSize: 12, color: theme.weakTextColor),
+            TextStyle(
+              fontSize: 12,
+              color: theme.chatTimeDividerTextColor,
+            ),
       ),
     );
   }
@@ -589,8 +592,13 @@ class _TIMUIKItHistoryMessageListItemState
   bool isRevokable(int timestamp) =>
       (DateTime.now().millisecondsSinceEpoch / 1000).ceil() - timestamp < 120;
 
-  _onLongPress(c, V2TimMessage message, TUIChatSeparateViewModel model,
-      TapDownDetails? details) {
+  _onLongPress(
+    c,
+    V2TimMessage message,
+    TUIChatSeparateViewModel model,
+    TUITheme theme,
+    TapDownDetails? details,
+  ) {
     if (tooltip != null && tooltip!.isOpen) {
       tooltip!.close();
       return;
@@ -600,7 +608,12 @@ class _TIMUIKItHistoryMessageListItemState
     final screenHeight = MediaQuery.of(context).size.height;
     if (context.size!.height + 180 > screenHeight && !PlatformUtils().isWeb) {
       initTools(
-          context: c, isLongMessage: true, model: model, details: details);
+        context: c,
+        isLongMessage: true,
+        model: model,
+        details: details,
+        theme: theme,
+      );
       if (widget.onScrollToIndexBegin != null) {
         widget.onScrollToIndexBegin!(message);
       }
@@ -608,7 +621,12 @@ class _TIMUIKItHistoryMessageListItemState
         tooltip!.show(c);
       });
     } else {
-      initTools(context: c, model: model, details: details);
+      initTools(
+        context: c,
+        model: model,
+        details: details,
+        theme: theme,
+      );
       tooltip!.show(c, targetCenter: details?.globalPosition);
     }
   }
@@ -633,6 +651,7 @@ class _TIMUIKItHistoryMessageListItemState
       {BuildContext? context,
       bool isLongMessage = false,
       required TUIChatSeparateViewModel model,
+      TUITheme? theme,
       TapDownDetails? details}) {
     final isSelf = widget.message.isSelf ?? false;
     double arrowTipDistance = 30;
@@ -688,8 +707,8 @@ class _TIMUIKItHistoryMessageListItemState
       right: right,
       left: left,
       hasArrow: hasArrow,
-      borderColor: Colors.white,
-      backgroundColor: Colors.white,
+      borderColor: theme?.white ?? Colors.white,
+      backgroundColor: theme?.white ?? Colors.white,
       shadowColor: Colors.black26,
       hasShadow: true,
       borderWidth: 1.0,
@@ -967,7 +986,8 @@ class _TIMUIKItHistoryMessageListItemState
                                   child: Text(
                                     isPeerRead ? TIM_t("已读") : TIM_t("未读"),
                                     style: TextStyle(
-                                        color: theme.weakTextColor,
+                                        color: theme
+                                            .chatMessageItemUnreadStatusTextColor,
                                         fontSize: 12),
                                   ),
                                 ),
@@ -1024,7 +1044,12 @@ class _TIMUIKItHistoryMessageListItemState
                                       if (PlatformUtils().isWeb) {
                                         if (widget.allowLongPress) {
                                           _onLongPress(
-                                              context, message, model, details);
+                                            context,
+                                            message,
+                                            model,
+                                            theme,
+                                            details,
+                                          );
                                         }
                                         if (widget.onLongPress != null) {
                                           widget.onLongPress!(context, message);
@@ -1034,7 +1059,12 @@ class _TIMUIKItHistoryMessageListItemState
                                     onLongPress: () {
                                       if (widget.allowLongPress) {
                                         _onLongPress(
-                                            context, message, model, null);
+                                          context,
+                                          message,
+                                          model,
+                                          theme,
+                                          null,
+                                        );
                                       }
                                       if (widget.onLongPress != null) {
                                         widget.onLongPress!(context, message);

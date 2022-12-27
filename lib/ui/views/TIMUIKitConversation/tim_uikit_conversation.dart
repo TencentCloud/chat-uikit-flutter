@@ -187,8 +187,9 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
           onPressed: (context) {
             _clearHistory(conversationItem);
           },
-          backgroundColor: theme.primaryColor ?? CommonColor.primaryColor,
-          foregroundColor: Colors.white,
+          backgroundColor: theme.conversationItemSliderClearBgColor ??
+              CommonColor.primaryColor,
+          foregroundColor: theme.conversationItemSliderTextColor,
           label: TIM_t("清除聊天"),
           spacing: 0,
           autoClose: true,
@@ -197,16 +198,18 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
         onPressed: (context) {
           _pinConversation(conversationItem);
         },
-        backgroundColor: theme.infoColor ?? CommonColor.infoColor,
-        foregroundColor: Colors.white,
+        backgroundColor:
+            theme.conversationItemSliderPinBgColor ?? CommonColor.infoColor,
+        foregroundColor: theme.conversationItemSliderTextColor,
         label: conversationItem.isPinned! ? TIM_t("取消置顶") : TIM_t("置顶"),
       ),
       ConversationItemSlidablePanel(
         onPressed: (context) {
           _deleteConversation(conversationItem);
         },
-        backgroundColor: Colors.red,
-        foregroundColor: Colors.white,
+        backgroundColor:
+            theme.conversationItemSliderDeleteBgColor ?? Colors.red,
+        foregroundColor: theme.conversationItemSliderTextColor,
         label: TIM_t("删除"),
       )
     ];

@@ -7,7 +7,6 @@ import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_prof
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitProfile/profile_widget.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitProfile/widget/tim_uikit_profile_widget.dart';
@@ -123,6 +122,14 @@ class _TIMUIKitProfileState extends TIMUIKitState<TIMUIKitProfile> {
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(covariant TIMUIKitProfile oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if(oldWidget.userID != widget.userID){
+      _model.loadData(userID: widget.userID, isNeedConversation: !widget.isSelf);
+    }
+  }
+
   final List<ProfileWidgetEnum> _defaultWidgetOrder = [
     ProfileWidgetEnum.userInfoCard,
     ProfileWidgetEnum.operationDivider,
@@ -189,14 +196,14 @@ class _TIMUIKitProfileState extends TIMUIKitState<TIMUIKitProfile> {
 
           void handleTapRemarkBar() {
             _controller.showTextInputBottomSheet(
-                context, TIM_t("修改备注名"), TIM_t("仅限中字、字母、数字和下划线"),
+                context, TIM_t("修改备注名"), TIM_t("仅限汉字、英文、数字和下划线"),
                 (String remark) async {
               final res =
                   await _controller.updateRemarks(widget.userID, remark);
               if (res.code == 0) {
                 widget.lifeCycle?.didRemarkUpdated(remark);
               }
-            });
+            }, theme);
           }
 
           void handleAddFriend() async {

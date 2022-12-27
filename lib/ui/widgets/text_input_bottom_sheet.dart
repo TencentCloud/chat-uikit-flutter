@@ -3,7 +3,7 @@ import 'package:tencent_im_base/tencent_im_base.dart';
 
 class TextInputBottomSheet {
   static showTextInputBottomSheet(BuildContext context, String title,
-      String tips, Function(String text) onSubmitted) {
+      String tips, Function(String text) onSubmitted, TUITheme theme) {
     TextEditingController _selectionController = TextEditingController();
 
     showModalBottomSheet(
@@ -13,17 +13,21 @@ class TextInputBottomSheet {
           return SingleChildScrollView(
               child: Container(
             padding: EdgeInsets.only(
-              top: 12,
+              top: 16,
               left: 16,
               right: 16,
-              bottom: MediaQuery.of(context).viewInsets.bottom,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 30,
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text(title,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.w500, fontSize: 15)),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  child: Text(title,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w500, fontSize: 16)),
+                ),
+                Divider(height: 2, color: theme.weakDividerColor),
                 TextField(
                   controller: _selectionController,
                 ),
@@ -35,7 +39,8 @@ class TextInputBottomSheet {
                       height: 40,
                       child: Text(
                         tips,
-                        style: const TextStyle(color: Colors.grey),
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 12),
                       ),
                     )
                   ],
@@ -61,9 +66,6 @@ class TextInputBottomSheet {
                       },
                       child: Text(TIM_t("确定"))),
                 ),
-                const SizedBox(
-                  height: 40,
-                )
               ],
             ),
           ));

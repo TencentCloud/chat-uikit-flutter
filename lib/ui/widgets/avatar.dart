@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/image_screen.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
@@ -9,22 +10,25 @@ import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 class Avatar extends TIMUIKitStatelessWidget {
   final String faceUrl;
   final String showName;
-  final bool isFromLocal;
+  final bool isFromLocalAsset;
   final CoreServicesImpl coreService = serviceLocator<CoreServicesImpl>();
   final BorderRadius? borderRadius;
   final V2TimUserStatus? onlineStatus;
   final int? type; // 1 c2c 2 group
+  final bool isShowBigWhenClick;
+
   Avatar(
       {Key? key,
       required this.faceUrl,
       this.onlineStatus,
       required this.showName,
-      this.isFromLocal = false,
+      this.isShowBigWhenClick = false,
+      this.isFromLocalAsset = false,
       this.borderRadius,
       this.type = 1})
       : super(key: key);
 
-  Widget _getFaceUrlImageWidget(BuildContext context, TUITheme theme) {
+  Widget getImageWidget(BuildContext context, TUITheme theme) {
     Widget defaultAvatar() {
       if (type == 1) {
         return Image.asset('images/default_c2c_head.png',
@@ -37,7 +41,7 @@ class Avatar extends TIMUIKitStatelessWidget {
 
     // final emptyAvatarBuilder = coreService.emptyAvatarBuilder;
     if (faceUrl != "") {
-      if (isFromLocal) {
+      if (isFromLocalAsset) {
         return Image.asset(faceUrl);
       }
       return CachedNetworkImage(
@@ -45,33 +49,35 @@ class Avatar extends TIMUIKitStatelessWidget {
         fadeInDuration: const Duration(milliseconds: 0),
         errorWidget: (BuildContext context, String c, dynamic s) {
           return defaultAvatar();
-          // if (emptyAvatarBuilder != null) {
-          //   return emptyAvatarBuilder(context);
-          // }
-          // return Container(
-          //   alignment: Alignment.center,
-          //   decoration: BoxDecoration(
-          //     color: theme.primaryColor,
-          //   ),
-          //   child: Text(
-          //     showName.length <= 2 ? showName : showName.substring(0, 2),
-          //     style: const TextStyle(color: Colors.white, fontSize: 14),
-          //   ),
-          // );
         },
       );
     } else {
       return defaultAvatar();
-      // return Container(
-      //   alignment: Alignment.center,
-      //   decoration: BoxDecoration(
-      //     color: theme.primaryColor,
-      //   ),
-      //   child: Text(
-      //     showName.length <= 2 ? showName : showName.substring(0, 2),
-      //     style: const TextStyle(color: Colors.white, fontSize: 14),
-      //   ),
-      // );
+    }
+  }
+
+  ImageProvider getImageProvider() {
+    ImageProvider defaultAvatar() {
+      if (type == 1) {
+        return Image.asset('images/default_c2c_head.png',
+                package: 'tencent_cloud_chat_uikit')
+            .image;
+      } else {
+        return Image.asset('images/default_group_head.png',
+                package: 'tencent_cloud_chat_uikit')
+            .image;
+      }
+    }
+
+    if (faceUrl != "") {
+      if (isFromLocalAsset) {
+        return Image.asset(faceUrl).image;
+      }
+      return CachedNetworkImageProvider(
+        faceUrl,
+      );
+    } else {
+      return defaultAvatar();
     }
   }
 
@@ -83,10 +89,30 @@ class Avatar extends TIMUIKitStatelessWidget {
       fit: StackFit.expand,
       clipBehavior: Clip.none,
       children: [
-        ClipRRect(
-          borderRadius: borderRadius ?? BorderRadius.circular(4.8),
-          child: _getFaceUrlImageWidget(context, theme),
-        ),
+        if (isShowBigWhenClick)
+          GestureDetector(
+            onTap: () {
+              Navigator.of(context).push(
+                PageRouteBuilder(
+                  opaque: false, // set to false
+                  pageBuilder: (_, __, ___) => ImageScreen(
+                      imageProvider: getImageProvider(), heroTag: faceUrl),
+                ),
+              );
+            },
+            child: Hero(
+              tag: faceUrl,
+              child: ClipRRect(
+                borderRadius: borderRadius ?? BorderRadius.circular(4.8),
+                child: getImageWidget(context, theme),
+              ),
+            ),
+          ),
+        if (!isShowBigWhenClick)
+          ClipRRect(
+            borderRadius: borderRadius ?? BorderRadius.circular(4.8),
+            child: getImageWidget(context, theme),
+          ),
         if (onlineStatus?.statusType != null && onlineStatus?.statusType != 0)
           Positioned(
             bottom: -4,
@@ -102,8 +128,8 @@ class Avatar extends TIMUIKitStatelessWidget {
                   width: 2.0,
                 ),
                 color: onlineStatus?.statusType == 1
-                    ? hexToColor("43db2b")
-                    : hexToColor("b3b8ba"),
+                    ? theme.conversationItemOnlineStatusBgColor
+                    : theme.conversationItemOfflineStatusBgColor,
               ),
               child: null,
             ),

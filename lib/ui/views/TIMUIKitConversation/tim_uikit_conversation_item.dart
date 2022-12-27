@@ -85,13 +85,13 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
         return Text(TimeAgo().getTimeStringForChat(draftTimestamp as int),
             style: TextStyle(
               fontSize: 12,
-              color: theme.weakTextColor,
+              color: theme.conversationItemTitmeTextColor,
             ));
       } else if (lastMsg != null) {
         return Text(TimeAgo().getTimeStringForChat(lastMsg!.timestamp as int),
             style: TextStyle(
               fontSize: 12,
-              color: theme.weakTextColor,
+              color: theme.conversationItemTitmeTextColor,
             ));
       }
     } catch (err) {}
@@ -105,11 +105,17 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
     return Container(
       padding: const EdgeInsets.only(top: 6, bottom: 6, left: 16, right: 16),
       decoration: BoxDecoration(
-          color: isPined ? theme.weakBackgroundColor : Colors.white,
-          border: Border(
-              bottom: BorderSide(
-                  color: theme.weakDividerColor ?? CommonColor.weakDividerColor,
-                  width: 1))),
+        color: isPined
+            ? theme.conversationItemPinedBgColor
+            : theme.conversationItemBgColor,
+        border: Border(
+          bottom: BorderSide(
+            color: theme.conversationItemBorderColor ??
+                CommonColor.weakDividerColor,
+            width: 1,
+          ),
+        ),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -160,11 +166,12 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
                       textAlign: TextAlign.left,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 1,
-                      style: const TextStyle(
-                          height: 1,
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400),
+                      style: TextStyle(
+                        height: 1,
+                        color: theme.conversationItemTitleTextColor,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                      ),
                     )),
                     _getTimeStringForChatWidget(context, theme),
                   ],
@@ -182,7 +189,7 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
                         height: 18,
                         child: Icon(
                           Icons.notifications_off,
-                          color: theme.weakTextColor,
+                          color: theme.conversationItemNoNotificationIconColor,
                           size: 16.0,
                         ),
                       )

@@ -192,7 +192,7 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
     }
     final defaultStyle = widget.isFromSelf
         ? theme.lightPrimaryMaterialColor.shade50
-        : theme.weakBackgroundColor;
+        : theme.chatMessageItemFromOthersBgColor;
     final backgroundColor = isShowJumpState
         ? const Color.fromRGBO(245, 166, 35, 1)
         : (widget.backgroundColor ?? defaultStyle);
