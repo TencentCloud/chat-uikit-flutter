@@ -795,8 +795,8 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                               forbiddenText == null)
                             InkWell(
                               onTap: () async {
+                                showKeyboard = showSendSoundText;
                                 if (showSendSoundText) {
-                                  showKeyboard = true;
                                   focusNode.requestFocus();
                                 }
                                 if (await Permissions.checkPermission(
@@ -806,7 +806,6 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                                 )) {
                                   setState(() {
                                     showEmojiPanel = false;
-                                    showKeyboard = false;
                                     showMore = false;
                                     showSendSoundText = !showSendSoundText;
                                   });

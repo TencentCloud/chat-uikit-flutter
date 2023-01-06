@@ -520,6 +520,7 @@ class _TIMUIKItHistoryMessageListItemState
           )!;
         }
         return TIMUIKitMergerElem(
+          messageItemBuilder: messageItemBuilder,
             model: model,
             isShowJump: isShowJump,
             clearJump: clearJump,

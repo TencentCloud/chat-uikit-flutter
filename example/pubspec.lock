@@ -963,14 +963,14 @@ packages:
       name: tencent_cloud_chat_sdk
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.0.6"
+    version: "5.0.7"
   tencent_cloud_chat_uikit:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "1.1.0"
+    version: "1.2.0"
   tencent_extended_text:
     dependency: transitive
     description:
@@ -998,7 +998,7 @@ packages:
       name: tencent_im_base
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.14"
+    version: "1.0.17"
   tencent_im_sdk_plugin_platform_interface:
     dependency: transitive
     description:

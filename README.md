@@ -45,7 +45,7 @@
   </a>
 </p>
 
-<h1 align="center">Tencent Cloud Chat UIKIt</h1>
+<h1 align="center">Tencent Cloud Chat UIKit</h1>
 
 <br>
 

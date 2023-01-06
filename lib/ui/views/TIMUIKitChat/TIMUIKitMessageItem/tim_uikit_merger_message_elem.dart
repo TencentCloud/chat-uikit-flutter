@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_item.dart';
 
 
 import 'package:tencent_cloud_chat_uikit/ui/widgets/merger_message_screen.dart';
@@ -21,6 +22,7 @@ class TIMUIKitMergerElem extends StatefulWidget {
   final V2TimMessage message;
   final bool? isShowMessageReaction;
   final TUIChatSeparateViewModel model;
+  final MessageItemBuilder? messageItemBuilder;
 
   const TIMUIKitMergerElem(
       {Key? key,
@@ -31,7 +33,7 @@ class TIMUIKitMergerElem extends StatefulWidget {
       this.isShowMessageReaction,
       required this.messageID,
       required this.isShowJump,
-      this.clearJump})
+      this.clearJump, this.messageItemBuilder})
       : super(key: key);
 
   @override
@@ -71,6 +73,7 @@ class TIMUIKitMergerElemState extends TIMUIKitState<TIMUIKitMergerElem> {
             context,
             MaterialPageRoute(
               builder: (context) => MergerMessageScreen(
+                messageItemBuilder: widget.messageItemBuilder,
                   model: model, msgID: widget.messageID),
             ));
       }

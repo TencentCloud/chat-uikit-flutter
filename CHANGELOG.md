@@ -1,4 +1,10 @@
-## 1.1.0
+## 1.2.0
+
+* Fix: The issue of input area not showing, when switching from recording to keyboard, on `TIMUIKitChat`.
+* Fix: Only the first receiver can receive the merged multiple forward messages.
+* Optimize: `MessageItemBuilder` can now be used for shows on the merger message screen.
+
+## 1.1.0 And 1.1.0+1
 
 * Add: Supports two new languages, Japanese and Korean.
 * Add: Supports adding new other languages, apart from our default ones, including English, Chinese(Simplified and Traditional), Japanese and Korean, or modifying the translations, refers to [this documentation](https://www.tencentcloud.com/document/product/1047/52154).

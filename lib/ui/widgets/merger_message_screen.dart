@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_item.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
@@ -18,9 +19,13 @@ import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 class MergerMessageScreen extends StatefulWidget {
   final TUIChatSeparateViewModel model;
   final String msgID;
+  final MessageItemBuilder? messageItemBuilder;
 
   const MergerMessageScreen(
-      {Key? key, required this.model, required this.msgID})
+      {Key? key,
+      required this.model,
+      required this.msgID,
+      this.messageItemBuilder})
       : super(key: key);
 
   @override
@@ -39,7 +44,8 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
   }
 
   void initMessageList() async {
-    final mergerMessageList = await _messageService.downloadMergerMessage(msgID: widget.msgID);
+    final mergerMessageList =
+        await _messageService.downloadMergerMessage(msgID: widget.msgID);
     setState(() {
       messageList = mergerMessageList ?? [];
     });
@@ -51,7 +57,7 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
     if (hasCustomData) {
       try {
         final CloudCustomData messageCloudCustomData =
-        CloudCustomData.fromJson(json.decode(message.cloudCustomData!));
+            CloudCustomData.fromJson(json.decode(message.cloudCustomData!));
         if (messageCloudCustomData.messageReply != null) {
           MessageRepliedData.fromJson(messageCloudCustomData.messageReply!);
           return true;
@@ -70,8 +76,22 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
 
     switch (type) {
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
+        if (widget.messageItemBuilder?.customMessageItemBuilder != null) {
+          return widget.messageItemBuilder!.customMessageItemBuilder!(
+            message,
+            false,
+            () {},
+          )!;
+        }
         return Text(TIM_t("[自定义]"));
       case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
+        if (widget.messageItemBuilder?.soundMessageItemBuilder != null) {
+          return widget.messageItemBuilder!.soundMessageItemBuilder!(
+            message,
+            false,
+            () {},
+          )!;
+        }
         return TIMUIKitSoundElem(
             chatModel: widget.model,
             isShowMessageReaction: false,
@@ -82,6 +102,13 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
             localCustomInt: message.localCustomInt);
       case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
         if (isReplyMessage(message)) {
+          if (widget.messageItemBuilder?.textReplyMessageItemBuilder != null) {
+            return widget.messageItemBuilder!.textReplyMessageItemBuilder!(
+              message,
+              false,
+              () {},
+            )!;
+          }
           return TIMUIKitReplyElem(
               isShowMessageReaction: false,
               chatModel: widget.model,
@@ -89,14 +116,29 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
               scrollToIndex: () {},
               clearJump: () {});
         }
-
-        return Text(
-          message.textElem!.text!,
-          softWrap: true,
-          style: const TextStyle(fontSize: 16),
+        if (widget.messageItemBuilder?.textMessageItemBuilder != null) {
+          return widget.messageItemBuilder!.textMessageItemBuilder!(
+            message,
+            false,
+            () {},
+          )!;
+        }
+        return TIMUIKitTextElem(
+          chatModel: widget.model,
+          message: message,
+          isFromSelf: message.isSelf ?? false,
+          clearJump: (){},
+          isShowJump: false,
+          isShowMessageReaction: false,
         );
-    // return Text(message.textElem!.text!);
       case MessageElemType.V2TIM_ELEM_TYPE_FACE:
+        if (widget.messageItemBuilder?.faceMessageItemBuilder != null) {
+          return widget.messageItemBuilder!.faceMessageItemBuilder!(
+            message,
+            false,
+            () {},
+          )!;
+        }
         return TIMUIKitFaceElem(
             model: widget.model,
             isShowJump: false,
@@ -104,6 +146,13 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
             path: message.faceElem?.data ?? "",
             message: message);
       case MessageElemType.V2TIM_ELEM_TYPE_FILE:
+        if (widget.messageItemBuilder?.fileMessageItemBuilder != null) {
+          return widget.messageItemBuilder!.fileMessageItemBuilder!(
+            message,
+            false,
+            () {},
+          )!;
+        }
         return TIMUIKitFileElem(
             chatModel: widget.model,
             isShowMessageReaction: false,
@@ -113,6 +162,13 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
             isSelf: isFromSelf,
             isShowJump: false);
       case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
+        if (widget.messageItemBuilder?.imageMessageItemBuilder != null) {
+          return widget.messageItemBuilder!.imageMessageItemBuilder!(
+            message,
+            false,
+            () {},
+          )!;
+        }
         return TIMUIKitImageElem(
           chatModel: widget.model,
           isShowMessageReaction: false,
@@ -121,12 +177,34 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
           key: Key("${message.seq}_${message.timestamp}"),
         );
       case MessageElemType.V2TIM_ELEM_TYPE_VIDEO:
+        if (widget.messageItemBuilder?.videoMessageItemBuilder != null) {
+          return widget.messageItemBuilder!.videoMessageItemBuilder!(
+            message,
+            false,
+            () {},
+          )!;
+        }
         return TIMUIKitVideoElem(message,
             chatModel: widget.model,
-            isFrom: "merger", isShowMessageReaction: false);
+            isFrom: "merger",
+            isShowMessageReaction: false);
       case MessageElemType.V2TIM_ELEM_TYPE_LOCATION:
+        if (widget.messageItemBuilder?.locationMessageItemBuilder != null) {
+          return widget.messageItemBuilder!.locationMessageItemBuilder!(
+            message,
+            false,
+            () {},
+          )!;
+        }
         return Text(TIM_t("[位置]"));
       case MessageElemType.V2TIM_ELEM_TYPE_MERGER:
+        if (widget.messageItemBuilder?.mergerMessageItemBuilder != null) {
+          return widget.messageItemBuilder!.mergerMessageItemBuilder!(
+            message,
+            false,
+            () {},
+          )!;
+        }
         return TIMUIKitMergerElem(
             model: widget.model,
             isShowJump: false,
@@ -204,31 +282,36 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
           iconTheme: const IconThemeData(
             color: Colors.white,
           )),
-      body: messageList.isEmpty ? Row(children: [
-        Expanded(child: Column(
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            LoadingAnimationWidget.staggeredDotsWave(
-              color: theme.weakTextColor ?? Colors.grey,
-              size: 48,
+      body: messageList.isEmpty
+          ? Row(
+              children: [
+                Expanded(
+                    child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    LoadingAnimationWidget.staggeredDotsWave(
+                      color: theme.weakTextColor ?? Colors.grey,
+                      size: 48,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(TIM_t("消息列表加载中"))
+                  ],
+                ))
+              ],
+            )
+          : Padding(
+              padding: const EdgeInsets.all(16),
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: messageList.length,
+                itemBuilder: (context, index) {
+                  final message = messageList[index];
+                  return _itemBuilder(message, context);
+                },
+              ),
             ),
-            const SizedBox(height: 20),
-            Text(TIM_t("消息列表加载中"))
-          ],
-        ))
-      ],) : Padding(
-        padding: const EdgeInsets.all(16),
-        child: ListView.builder(
-          shrinkWrap: true,
-          itemCount: messageList.length,
-          itemBuilder: (context, index) {
-            final messageItem = messageList[index];
-            return _itemBuilder(messageItem, context);
-          },
-        ),
-      ),
     );
   }
 }

@@ -982,10 +982,10 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
           lifeCycleMsg =
               await lifeCycle?.messageWillSend(messageInfoWithSender);
           if (lifeCycleMsg == null) {
-            return null;
+            continue;
           }
         }
-        return _sendMessage(
+        _sendMessage(
           id: mergerMessageInfo.id!,
           convID: convID,
           convType: convType == 1 ? ConvType.c2c : ConvType.group,

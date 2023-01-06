@@ -1,7 +1,6 @@
 // ignore_for_file: unused_import
 
 import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -19,9 +18,9 @@ class PermissionRequestInfo extends StatefulWidget {
 
   const PermissionRequestInfo(
       {Key? key,
-      required this.removeOverLay,
-      required this.permissionType,
-      required this.appName})
+        required this.removeOverLay,
+        required this.permissionType,
+        required this.appName})
       : super(key: key);
 
   @override
@@ -205,11 +204,11 @@ class Permissions {
   }
 
   static Future<bool> checkPermission(
-    BuildContext context,
-    int value, [
-    TUITheme? theme,
-    bool isShowPermissionPage = true,
-  ]) async {
+      BuildContext context,
+      int value, [
+        TUITheme? theme,
+        bool isShowPermissionPage = true,
+      ]) async {
     final status = await Permission.byValue(value).status;
     if (status.isGranted || status.isLimited) {
       return true;
@@ -256,7 +255,11 @@ class Permissions {
 
   static Future<bool?> showPermissionConfirmDialog(BuildContext context, value,
       [TUITheme? theme, bool isShowPermissionPage = true]) async {
+    final platformUtils = PlatformUtils();
+    // 第一次直接走系统文案
+    if (!await checkPermissionSetBefore(value)) {
       await setLocalPermission(value);
+      if (platformUtils.isAndroid && isShowPermissionPage) {
         showPermissionRequestInfoDialog(context, value);
       }
       return true;
@@ -280,54 +283,54 @@ class Permissions {
       builder: (context) {
         return platformUtils.isIOS
             ? CupertinoAlertDialog(
-                title: Text("“$appName”" +
-                    TIM_t_para(" 想访问您的{{option2}}", " 想访问您的$option2")(
-                        option2: option2)),
-                content: Text(permissionText),
-                actions: <Widget>[
-                  CupertinoDialogAction(
-                    child: Text(TIM_t("以后再说")),
-                    onPressed: closeDialog, // 关闭对话框
-                  ),
-                  CupertinoDialogAction(
-                    child: Text(TIM_t("去开启")),
-                    onPressed: getPermission,
-                  ),
-                ],
-              )
+          title: Text("“$appName”" +
+              TIM_t_para(" 想访问您的{{option2}}", " 想访问您的$option2")(
+                  option2: option2)),
+          content: Text(permissionText),
+          actions: <Widget>[
+            CupertinoDialogAction(
+              child: Text(TIM_t("以后再说")),
+              onPressed: closeDialog, // 关闭对话框
+            ),
+            CupertinoDialogAction(
+              child: Text(TIM_t("去开启")),
+              onPressed: getPermission,
+            ),
+          ],
+        )
             : AlertDialog(
-                content: Text(permissionText),
-                actions: <Widget>[
-                  const Divider(),
-                  SizedBox(
-                    height: 48,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Expanded(
-                          child: TextButton(
-                            child: Text(TIM_t("以后再说"),
-                                style: TextStyle(
-                                  color: theme?.black ?? Colors.black,
-                                )),
-                            onPressed: closeDialog, // 关闭对话框
-                          ),
-                        ),
-                        const VerticalDivider(),
-                        Expanded(
-                          child: TextButton(
-                            child: Text(TIM_t("去开启"),
-                                style: TextStyle(
-                                  color: theme?.black ?? Colors.black,
-                                )),
-                            onPressed: getPermission,
-                          ),
-                        )
-                      ],
+          content: Text(permissionText),
+          actions: <Widget>[
+            const Divider(),
+            SizedBox(
+              height: 48,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Expanded(
+                    child: TextButton(
+                      child: Text(TIM_t("以后再说"),
+                          style: TextStyle(
+                            color: theme?.black ?? Colors.black,
+                          )),
+                      onPressed: closeDialog, // 关闭对话框
+                    ),
+                  ),
+                  const VerticalDivider(),
+                  Expanded(
+                    child: TextButton(
+                      child: Text(TIM_t("去开启"),
+                          style: TextStyle(
+                            color: theme?.black ?? Colors.black,
+                          )),
+                      onPressed: getPermission,
                     ),
                   )
                 ],
-              );
+              ),
+            )
+          ],
+        );
       },
     );
   }
