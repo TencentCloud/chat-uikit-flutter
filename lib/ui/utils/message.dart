@@ -2,11 +2,12 @@
 
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/time.dart';
-
 
 class MessageUtils {
   // 判断CallingData的方式和Trtc的方法一致
@@ -36,7 +37,8 @@ class MessageUtils {
     return false;
   }
 
-  static String _getGroupChangeType(V2TimGroupChangeInfo info) {
+  static Future<String> _getGroupChangeType(V2TimGroupChangeInfo info,
+      List<V2TimGroupMemberFullInfo?> groupMemberList) async {
     int? type = info.type;
     var value = info.value;
     String s = TIM_t('群资料信息');
@@ -58,6 +60,25 @@ class MessageUtils {
         break;
       case GroupChangeInfoType.V2TIM_GROUP_INFO_CHANGE_TYPE_OWNER:
         s = TIM_t("群主");
+        final V2TimGroupMemberFullInfo? groupMemberInfo = groupMemberList
+            .firstWhereOrNull((element) => element?.userID == value);
+        if (groupMemberInfo != null) {
+          value = TencentUtils.checkString(groupMemberInfo.friendRemark) ??
+              TencentUtils.checkString(groupMemberInfo.nameCard) ??
+              TencentUtils.checkString(groupMemberInfo.nickName) ??
+              TencentUtils.checkString(groupMemberInfo.userID);
+        } else {
+          final res = await TencentImSDKPlugin.v2TIMManager
+              .getUsersInfo(userIDList: [value ?? ""]);
+          if (res.code == 0) {
+            final List<V2TimUserFullInfo> data = res.data ?? [];
+            if (data.isNotEmpty) {
+              final firstPerson = data[0];
+              value = TencentUtils.checkString(firstPerson.nickName) ??
+                  TencentUtils.checkString(firstPerson.userID);
+            }
+          }
+        }
         break;
       case GroupChangeInfoType.V2TIM_GROUP_INFO_CHANGE_TYPE_SHUT_UP_ALL:
         s = TIM_t("全员禁言状态");
@@ -73,18 +94,16 @@ class MessageUtils {
     final String option8 = s;
     if (value != null && value.isNotEmpty) {
       return TIM_t_para("{{option8}}为 ", "$option8为 ")(option8: option8) +
-          ' $value';
+          value;
     } else {
       return option8;
     }
   }
 
   static String? _getOpUserNick(V2TimGroupMemberInfo opUser) {
-    return opUser.friendRemark == null || opUser.friendRemark == ''
-        ? opUser.nickName == null || opUser.nickName == ''
-            ? opUser.userID
-            : opUser.nickName
-        : opUser.friendRemark;
+    return TencentUtils.checkString(opUser.friendRemark) ??
+        TencentUtils.checkString(opUser.nickName) ??
+        TencentUtils.checkString(opUser.userID);
   }
 
   static String? _getMemberNickName(V2TimGroupMemberInfo e) {
@@ -104,7 +123,9 @@ class MessageUtils {
     }
   }
 
-  static String groupTipsMessageAbstract(V2TimGroupTipsElem groupTipsElem) {
+  static Future<String> groupTipsMessageAbstract(
+      V2TimGroupTipsElem groupTipsElem,
+      List<V2TimGroupMemberFullInfo?> groupMemberList) async {
     String displayMessage;
     final operationType = groupTipsElem.type;
     final operationMember = groupTipsElem.opMember;
@@ -112,10 +133,14 @@ class MessageUtils {
     final opUserNickName = _getOpUserNick(operationMember);
     switch (operationType) {
       case GroupTipsElemType.V2TIM_GROUP_TIPS_TYPE_GROUP_INFO_CHANGE:
-        final groupChangeInfoList = groupTipsElem.groupChangeInfoList;
         final String? option7 = opUserNickName ?? "";
-        var changedInfoString =
-            groupChangeInfoList!.map((e) => _getGroupChangeType(e!)).join("、");
+        final groupChangeInfoList = groupTipsElem.groupChangeInfoList ?? [];
+        String changedInfoString = "";
+        for (V2TimGroupChangeInfo? element in groupChangeInfoList) {
+          final newText = await _getGroupChangeType(element!, groupMemberList);
+          changedInfoString +=
+              (changedInfoString.isEmpty ? "" : " / ") + newText;
+        }
         if (changedInfoString.isEmpty) {
           changedInfoString = TIM_t("群资料");
         }
@@ -220,7 +245,8 @@ class MessageUtils {
         margin: const EdgeInsets.symmetric(vertical: 10), child: child);
   }
 
-  static String getAbstractMessage(V2TimMessage message) {
+  static Future<String> getAbstractMessage(V2TimMessage message,
+      List<V2TimGroupMemberFullInfo?> groupMemberList) async {
     final msgType = message.elemType;
     switch (msgType) {
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
@@ -236,7 +262,8 @@ class MessageUtils {
         return TIM_t_para("[文件] {{option2}}", "[文件] $option2")(
             option2: option2);
       case MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS:
-        return MessageUtils.groupTipsMessageAbstract(message.groupTipsElem!);
+        return await MessageUtils.groupTipsMessageAbstract(
+            message.groupTipsElem!, groupMemberList);
       case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
         return TIM_t("[图片]");
       case MessageElemType.V2TIM_ELEM_TYPE_VIDEO:

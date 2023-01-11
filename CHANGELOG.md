@@ -1,3 +1,7 @@
+## 1.3.0
+* Fix: Group tips not shows the nickname or remarks when transferring group owner.
+* Optimize: Remove the confirmation pop-up before opening the file.
+
 ## 1.2.0
 
 * Fix: The issue of input area not showing, when switching from recording to keyboard, on `TIMUIKitChat`.

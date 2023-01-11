@@ -57,8 +57,8 @@
 
 <p align="center">
 More languages:
-  <a href="https://tencentcloud.com/document/product/269/70746?from=pub">简体中文-快速入门</a>
-  <a href="https://github.com/TencentCloud/tc-chat-uikit-flutter/README_ZH.md?from=pub">简体中文-README</a>
+  <a href="https://cloud.tencent.com/document/product/269/70747">简体中文-TUIKit介绍</a>
+  <a href="https://cloud.tencent.com/document/product/269/70746">简体中文-快速集成</a>
 </p>
 
 <br>
@@ -79,16 +79,7 @@ You can experience our Chat and Voice/Video Call modules via the following demos
 
 **Those following versions of demo has been build by the same Flutter project with our SDKs and extensions.**
 
-<table style="text-align:center; vertical-align:middle; max-width: 800px">
-  <tr>
-    <th style="text-align:center;">Mobile APP</th>
-    <th style="text-align:center;">WEB - H5</th>
-  </tr>
-  <tr>
-    <td><div style="display: flex; justify-content: center; align-items: center; flex-direction: column; padding-top: 10px">[Recommend] iOS/Android APP<img style="max-width:200px; margin: 20px 0 20px 0" src="https://qcloudimg.tencent-cloud.cn/raw/ca2aaff551410c74fce48008c771b9f6.png"/></div></td>
-    <td><div style="display: flex; justify-content: center; align-items: center; flex-direction: column; padding-top: 10px">Scan for the Web DEMO<img style="max-width:200px; margin: 20px 0 20px 0" src="https://qcloudimg.tencent-cloud.cn/raw/3c79e8bb16dd0eeab35e894a690e0444.png"/></div></td>
-	 </tr>
-</table>
+![](https://qcloudimg.tencent-cloud.cn/raw/89234f5032d4f6f8d89a8b439ca97ca2.png)
 
 **Also, taking a look of the screenshots of TUIKit from [here](https://www.tencentcloud.com/document/product/1047/50059?from=pub) are suggested.**
 

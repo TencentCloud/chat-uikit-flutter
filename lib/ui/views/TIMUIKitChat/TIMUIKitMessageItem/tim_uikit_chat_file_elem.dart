@@ -3,11 +3,9 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_open_file/tencent_open_file.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
@@ -52,42 +50,6 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
   String filePath = "";
   bool isDownloading = false;
   final TUIChatGlobalModel model = serviceLocator<TUIChatGlobalModel>();
-
-  Future<bool?> showOpenFileConfirmDialog(
-      BuildContext context, String path, TUITheme? theme) async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    String option2 = packageInfo.appName;
-    return showDialog<bool>(
-      context: context,
-      builder: (context) {
-        return CupertinoAlertDialog(
-          title: Text(widget.fileElem!.fileName!),
-          content: Text(TIM_t_para("“{{option2}}”暂不可以打开此类文件，你可以使用其他应用打开并预览",
-              "“$option2”暂不可以打开此类文件，你可以使用其他应用打开并预览")(option2: option2)),
-          actions: <Widget>[
-            CupertinoDialogAction(
-              child: Text(TIM_t("取消"),
-                  style: TextStyle(color: theme?.secondaryColor)),
-              onPressed: () => Navigator.of(context).pop(), // 关闭对话框
-            ),
-            CupertinoDialogAction(
-              child: Text(TIM_t("用其他应用打开"),
-                  style: TextStyle(color: theme?.primaryColor)),
-              onPressed: () {
-                //关闭对话框并返回true
-                Navigator.of(context).pop();
-                try {
-                  OpenFile.open(path);
-                } catch (e) {
-                  print(e);
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
 
   @override
   void initState() {
@@ -177,7 +139,11 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
         context, Permission.storage.value, theme)) {
       return;
     }
-    showOpenFileConfirmDialog(context, filePath, theme);
+    try {
+      OpenFile.open(filePath);
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override

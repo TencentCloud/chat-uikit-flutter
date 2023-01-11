@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:math';
-
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_setting_model.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/optimize_utils.dart';
 import 'package:tencent_extended_text_field/extended_text_field.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -185,14 +183,14 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     return const SizedBox(height: 0);
   }
 
-  void addStickerToText(String sticker){
+  void addStickerToText(String sticker) {
     final oldText = textEditingController.text;
-    if(currentCursor != null && currentCursor! > -1){
+    if (currentCursor != null && currentCursor! > -1) {
       final firstString = oldText.substring(0, currentCursor);
       final secondString = oldText.substring(currentCursor!);
       currentCursor = currentCursor! + sticker.length;
       textEditingController.text = "$firstString$sticker$secondString";
-    }else{
+    } else {
       textEditingController.text = "$oldText$sticker";
     }
   }
@@ -281,7 +279,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     final haveRepliedMessage = repliedMessage != null;
     if (haveRepliedMessage) {
       final text =
-          "${MessageUtils.getDisplayName(widget.model.repliedMessage!)}:${widget.model.abstractMessageBuilder != null ? widget.model.abstractMessageBuilder!(widget.model.repliedMessage!) : MessageUtils.getAbstractMessage(widget.model.repliedMessage!)}";
+          "${MessageUtils.getDisplayName(widget.model.repliedMessage!)}:${widget.model.abstractMessageBuilder != null ? widget.model.abstractMessageBuilder!(widget.model.repliedMessage!) : MessageUtils.getAbstractMessage(widget.model.repliedMessage!, widget.model.groupMemberList ?? [])}";
       return Container(
         color: widget.backgroundColor ?? hexToColor("f5f5f6"),
         alignment: Alignment.centerLeft,
@@ -865,7 +863,8 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                                               isDense: true,
                                               hintText: widget.hintText ?? ''),
                                           controller: textEditingController,
-                                          specialTextSpanBuilder: PlatformUtils().isWeb
+                                          specialTextSpanBuilder: PlatformUtils()
+                                                  .isWeb
                                               ? null
                                               : DefaultSpecialTextSpanBuilder(
                                                   isUseDefaultEmoji:
@@ -873,8 +872,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                                                   customEmojiStickerList: widget
                                                       .customEmojiStickerList,
                                                   showAtBackground: true,
-                                                )
-                                      ),
+                                                )),
                                       onChanged: (bool visibility) {
                                         if (showKeyboard != visibility &&
                                             visibility == false) {

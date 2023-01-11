@@ -3,5 +3,7 @@ class TencentUtils{
     return text != null && text.isNotEmpty;
   }
 
-
+  static String? checkString(String? text){
+    return (text != null && text.isEmpty) ? null : text;
+  }
 }

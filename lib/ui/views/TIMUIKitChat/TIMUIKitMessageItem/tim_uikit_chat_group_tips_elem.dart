@@ -1,22 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
-
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
-
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
-class TIMUIKitGroupTipsElem extends TIMUIKitStatelessWidget {
+class TIMUIKitGroupTipsElem extends StatefulWidget {
   final V2TimGroupTipsElem groupTipsElem;
+  final List<V2TimGroupMemberFullInfo?> groupMemberList;
 
-  TIMUIKitGroupTipsElem({Key? key, required this.groupTipsElem})
+  const TIMUIKitGroupTipsElem({Key? key, required this.groupMemberList, required this.groupTipsElem})
       : super(key: key);
+
+  @override
+  State<TIMUIKitGroupTipsElem> createState() => _TIMUIKitGroupTipsElemState();
+}
+
+class _TIMUIKitGroupTipsElemState extends TIMUIKitState<TIMUIKitGroupTipsElem> {
+
+  String groupTipsAbstractText = "";
+
+  @override
+  void initState() {
+    super.initState();
+    getText();
+  }
+
+  void getText() async {
+    setState(() async {
+      groupTipsAbstractText =
+          await MessageUtils.groupTipsMessageAbstract(widget.groupTipsElem, widget.groupMemberList);
+    });
+  }
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final TUITheme theme = value.theme;
-    final groupTipsAbstractText =
-        MessageUtils.groupTipsMessageAbstract(groupTipsElem);
 
     return MessageUtils.wrapMessageTips(
         Text(

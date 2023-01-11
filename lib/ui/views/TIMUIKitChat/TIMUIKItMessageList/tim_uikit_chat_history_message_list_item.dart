@@ -534,12 +534,12 @@ class _TIMUIKItHistoryMessageListItemState
     }
   }
 
-  Widget _groupTipsMessageBuilder() {
+  Widget _groupTipsMessageBuilder(TUIChatSeparateViewModel model) {
     final messageItem = widget.message;
     return Container(
         padding: const EdgeInsets.only(bottom: 20),
         child:
-            TIMUIKitGroupTipsElem(groupTipsElem: messageItem.groupTipsElem!));
+            TIMUIKitGroupTipsElem(groupTipsElem: messageItem.groupTipsElem!, groupMemberList: model.groupMemberList ?? []));
   }
 
   Widget _selfRevokeEditMessageBuilder(theme, model) {
@@ -834,9 +834,9 @@ class _TIMUIKItHistoryMessageListItemState
           (model.jumpMsgID == message.msgID),
           clearJump,
         );
-        return groupTipsMessage ?? _groupTipsMessageBuilder();
+        return groupTipsMessage ?? _groupTipsMessageBuilder(model);
       }
-      return _groupTipsMessageBuilder();
+      return _groupTipsMessageBuilder(model);
     }
 
     if (isRevokedMsg) {
