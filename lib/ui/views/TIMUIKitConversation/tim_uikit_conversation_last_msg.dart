@@ -55,9 +55,9 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
             "{{option1}}撤回了一条消息", "$option1撤回了一条消息")(option1: option1);
       });
     } else {
-      setState(() async {
-        groupTipsAbstractText =
-            await _getLastMsgShowText(widget.lastMsg, widget.context);
+      final newText = await _getLastMsgShowText(widget.lastMsg, widget.context);
+      setState(() {
+        groupTipsAbstractText = newText;
       });
     }
   }

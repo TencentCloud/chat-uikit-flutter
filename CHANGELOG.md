@@ -1,4 +1,13 @@
+## 1.3.2
+
+* Fix: Text input field height, after choosing to mention someone.
+
+## 1.3.1
+
+* Optimize: Improve performance.
+
 ## 1.3.0
+
 * Fix: Group tips not shows the nickname or remarks when transferring group owner.
 * Optimize: Remove the confirmation pop-up before opening the file.
 
@@ -11,8 +20,8 @@
 ## 1.1.0 And 1.1.0+1
 
 * Add: Supports two new languages, Japanese and Korean.
-* Add: Supports adding new other languages, apart from our default ones, including English, Chinese(Simplified and Traditional), Japanese and Korean, or modifying the translations, refers to [this documentation](https://www.tencentcloud.com/document/product/1047/52154).
-* Add: Sticker plug-in has been embedded in TUIKit by default. Now we support three types of stickers, Unicode Emoji, small image emoji and big image stickers, the usage has been optimized, refers to [this documentation](https://www.tencentcloud.com/document/product/1047/52227).
+* Add: Supports adding new other languages, apart from our default ones, including English, Chinese(Simplified and Traditional), Japanese and Korean, or modifying the translations, refers to [this documentation](https://www.tencentcloud.com/document/product/1047/52154?from=pub).
+* Add: Sticker plug-in has been embedded in TUIKit by default. Now we support three types of stickers, Unicode Emoji, small image emoji and big image stickers, the usage has been optimized, refers to [this documentation](https://www.tencentcloud.com/document/product/1047/52227?from=pub).
 * Optimize: Themes, more customization.
 * Optimize: The animation of the input area, keyboard, sticker panel and the more panel.
 * Optimize: Emoji, both Unicode and small images, can be inserted to any position in text messages.
@@ -30,7 +39,7 @@
 
 ## 1.0.0
 
-* Add: Support adding Flutter module to Native APP, for details, please refer to [this documentation](https://www.tencentcloud.com/document/product/1047/51456) to implement.
+* Add: Support adding Flutter module to Native APP, for details, please refer to [this documentation](https://www.tencentcloud.com/document/product/1047/51456?from=pub) to implement.
 * Add: Customize sticker and Emoji for text messages. For details, please refer to [this documentation](https://cloud.tencent.com/document/product/269/80882) to modify.
 * Optimize: The loading duration for history message list, especially with lots of media and file messages.
 * Optimize: More panel area supports scroll.

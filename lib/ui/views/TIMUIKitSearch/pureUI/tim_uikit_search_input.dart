@@ -14,6 +14,7 @@ class TIMUIKitSearchInput extends StatefulWidget {
   final Widget? prefixIcon;
   final Widget? prefixText;
   final bool? isAutoFocus;
+  final FocusNode focusNode;
 
   const TIMUIKitSearchInput({
     required this.onChange,
@@ -23,6 +24,7 @@ class TIMUIKitSearchInput extends StatefulWidget {
     this.prefixIcon,
     this.isAutoFocus = true,
     this.prefixText,
+    required this.focusNode,
   }) : super(key: key);
 
   @override
@@ -30,7 +32,6 @@ class TIMUIKitSearchInput extends StatefulWidget {
 }
 
 class TIMUIKitSearchInputState extends TIMUIKitState<TIMUIKitSearchInput> {
-  late FocusNode focusNode = FocusNode();
   late TextEditingController textEditingController =
       widget.controller ?? TextEditingController();
   bool isEmptyInput = true;
@@ -43,7 +44,7 @@ class TIMUIKitSearchInputState extends TIMUIKitState<TIMUIKitSearchInput> {
   }
 
   hideAllPanel() {
-    focusNode.unfocus();
+    widget.focusNode.unfocus();
   }
 
   @override
@@ -79,7 +80,7 @@ class TIMUIKitSearchInputState extends TIMUIKitState<TIMUIKitSearchInput> {
               textInputAction: TextInputAction.search,
               maxLines: 4,
               minLines: 1,
-              focusNode: focusNode,
+              focusNode: widget.focusNode,
               controller: textEditingController,
               textAlignVertical: TextAlignVertical.center,
               decoration: InputDecoration(

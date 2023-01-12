@@ -51,6 +51,7 @@ class TIMUIKitSearch extends StatefulWidget {
 class TIMUIKitSearchState extends TIMUIKitState<TIMUIKitSearch> {
   late TextEditingController textEditingController = TextEditingController();
   final model = serviceLocator<TUISearchViewModel>();
+  final FocusNode focusNode = FocusNode();
   GlobalKey<dynamic> inputTextField = GlobalKey();
   List<SearchType> searchTypes = [
     SearchType.group,
@@ -96,6 +97,7 @@ class TIMUIKitSearchState extends TIMUIKitState<TIMUIKitSearch> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 TIMUIKitSearchInput(
+                  focusNode: focusNode,
                   key: inputTextField,
                   isAutoFocus: widget.isAutoFocus,
                   onChange: (String value) {
@@ -127,12 +129,25 @@ class TIMUIKitSearchState extends TIMUIKitState<TIMUIKitSearch> {
                         ),
                       if (searchTypes.contains(SearchType.contact))
                         TIMUIKitSearchFriend(
-                            onTapConversation: widget.onTapConversation,
+                            onTapConversation: (conversation, message) {
+                              focusNode.unfocus();
+                              Future.delayed(const Duration(milliseconds: 100),
+                                  () {
+                                widget.onTapConversation(conversation, message);
+                              });
+                            },
                             friendResultList: friendResultList),
                       if (searchTypes.contains(SearchType.group))
                         TIMUIKitSearchGroup(
-                            groupList: groupList,
-                            onTapConversation: widget.onTapConversation),
+                          groupList: groupList,
+                          onTapConversation: (conversation, message) {
+                            focusNode.unfocus();
+                            Future.delayed(const Duration(milliseconds: 100),
+                                () {
+                              widget.onTapConversation(conversation, message);
+                            });
+                          },
+                        ),
                       if (searchTypes.contains(SearchType.history))
                         TIMUIKitSearchMsg(
                           onTapConversation: widget.onTapConversation,

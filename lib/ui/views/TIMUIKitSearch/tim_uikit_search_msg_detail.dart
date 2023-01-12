@@ -41,6 +41,7 @@ class TIMUIKitSearchMsgDetailState
   final model = serviceLocator<TUISearchViewModel>();
   String keywordState = "";
   int currentPage = 0;
+  final FocusNode focusNode = FocusNode();
 
   @override
   void initState() {
@@ -96,10 +97,17 @@ class TIMUIKitSearchMsgDetailState
         ),
         child: TIMUIKitSearchItem(
           faceUrl: message.faceUrl ?? "",
-          showName: message.nickName ?? message.userID ?? message.sender ?? "",
-          lineOne: message.nickName ?? message.userID ?? message.sender ?? "",
+          showName: TencentUtils.checkString(message.nickName) ??
+              TencentUtils.checkString(message.userID) ??
+              message.sender ??
+              "",
+          lineOne: TencentUtils.checkString(message.nickName) ??
+              TencentUtils.checkString(message.userID) ??
+              message.sender ??
+              "",
           lineTwo: _getMsgElem(message),
           onClick: () {
+            focusNode.unfocus();
             widget.onTapConversation(widget.currentConversation, message);
           },
         ),
@@ -165,6 +173,7 @@ class TIMUIKitSearchMsgDetailState
               body: Column(
             children: [
               TIMUIKitSearchInput(
+                focusNode: focusNode,
                 isAutoFocus: widget.isAutoFocus,
                 onChange: (String value) {
                   updateMsgResult(value, true);

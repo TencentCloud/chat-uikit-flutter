@@ -874,8 +874,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                                                   showAtBackground: true,
                                                 )),
                                       onChanged: (bool visibility) {
-                                        if (showKeyboard != visibility &&
-                                            visibility == false) {
+                                        if (showKeyboard != visibility) {
                                           setState(() {
                                             showKeyboard = visibility;
                                           });

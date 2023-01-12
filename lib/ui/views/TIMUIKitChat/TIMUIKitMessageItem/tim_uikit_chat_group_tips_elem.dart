@@ -26,9 +26,9 @@ class _TIMUIKitGroupTipsElemState extends TIMUIKitState<TIMUIKitGroupTipsElem> {
   }
 
   void getText() async {
-    setState(() async {
-      groupTipsAbstractText =
-          await MessageUtils.groupTipsMessageAbstract(widget.groupTipsElem, widget.groupMemberList);
+    final newText = await MessageUtils.groupTipsMessageAbstract(widget.groupTipsElem, widget.groupMemberList);
+    setState(() {
+      groupTipsAbstractText = newText;
     });
   }
 
