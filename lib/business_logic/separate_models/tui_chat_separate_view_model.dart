@@ -3,10 +3,13 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
+
 // ignore: unnecessary_import
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/models/link_preview_content.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/chat_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_model_tools.dart';
@@ -53,6 +56,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
   V2TimGroupInfo? _groupInfo;
   String groupMemberListSeq = "0";
   List<V2TimGroupMemberFullInfo?>? groupMemberList = [];
+
   V2TimGroupInfo? get groupInfo => _groupInfo;
 
   set groupInfo(V2TimGroupInfo? value) {
@@ -1211,6 +1215,26 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
         messageList.removeWhere((element) => element.msgID == msgID);
       }
       globalModel.setMessageList(conversationID, messageList);
+    }
+  }
+
+  translateText(V2TimMessage message) async {
+    final String originText = message.textElem?.text ?? "";
+    final String deviceLocale =
+    WidgetsBinding.instance?.window.locale.toLanguageTag() ?? "en";
+    final String targetMessage = deviceLocale.split("-")[0];
+    final translatedText =
+        await _messageService.translateText(originText, targetMessage);
+
+    final LocalCustomDataModel localCustomData = LocalCustomDataModel.fromMap(
+        json.decode(TencentUtils.checkString(message.localCustomData) ?? "{}"));
+    localCustomData.translatedText = translatedText;
+    final result = await TencentImSDKPlugin.v2TIMManager.v2TIMMessageManager
+        .setLocalCustomData(
+            msgID: message.msgID!,
+            localCustomData: json.encode(localCustomData.toMap()));
+    if (result.code == 0 && TencentUtils.checkString(message.msgID) != null) {
+      updateMessageFromController(msgID: message.msgID!);
     }
   }
 

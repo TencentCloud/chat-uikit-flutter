@@ -9,11 +9,10 @@ import 'models/link_preview_content.dart';
 class LinkPreviewEntry {
   /// get the text message with hyperlinks
   static LinkPreviewText? getHyperlinksText(
-      V2TimMessage message, bool isMarkdown,
+      String messageText, bool isMarkdown,
       [Function(String)? onLinkTap,
       bool isUseDefaultEmoji = false,
       List customEmojiStickerList = const []]) {
-    final String? messageText = message.textElem!.text;
 
     if (messageText == null) {
       return null;
@@ -46,10 +45,10 @@ class LinkPreviewEntry {
       return null;
     }
 
-    final List<LinkPreviewModel?> previewItemList =
+    final List<LocalCustomDataModel?> previewItemList =
         await LinkUtils.getURLPreview([urlMatches[0]]);
     if (previewItemList.isNotEmpty) {
-      final LinkPreviewModel previewItem = previewItemList.first!;
+      final LocalCustomDataModel previewItem = previewItemList.first!;
       if (onUpdateMessage != null) {
         LinkUtils.saveToLocalAndUpdate(message, previewItem, onUpdateMessage);
       }
@@ -75,7 +74,7 @@ class LinkPreviewEntry {
       return [];
     }
 
-    final List<LinkPreviewModel> previewItemList =
+    final List<LocalCustomDataModel> previewItemList =
         await LinkUtils.getURLPreview([urlMatches[0]]);
     if (previewItemList.isNotEmpty) {
       final List<LinkPreviewContent?> resultList = previewItemList
@@ -91,7 +90,7 @@ class LinkPreviewEntry {
     }
   }
 
-  static String linkInfoToString(LinkPreviewModel linkInfo) {
+  static String linkInfoToString(LocalCustomDataModel linkInfo) {
     return linkInfo.toString();
   }
 

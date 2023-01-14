@@ -52,7 +52,7 @@ class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
       final sender = (e.nickName != null && e.nickName!.isNotEmpty)
           ? e.nickName
           : e.sender;
-      return "$sender: ${model.abstractMessageBuilder != null ? model.abstractMessageBuilder!(e) : MessageUtils.getAbstractMessage(e, [])}";
+      return "$sender: ${model.abstractMessageBuilder != null ? model.abstractMessageBuilder!(e) : MessageUtils.getAbstractMessageAsync(e, [])}";
     }).toList();
   }
 

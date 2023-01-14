@@ -245,6 +245,37 @@ class MessageUtils {
         margin: const EdgeInsets.symmetric(vertical: 10), child: child);
   }
 
+  static String getAbstractMessageAsync(V2TimMessage message,
+      List<V2TimGroupMemberFullInfo?> groupMemberList) {
+    final msgType = message.elemType;
+    switch (msgType) {
+      case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
+        return handleCustomMessageString(message);
+      case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
+        return TIM_t("[语音]");
+      case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
+        return message.textElem!.text as String;
+      case MessageElemType.V2TIM_ELEM_TYPE_FACE:
+        return TIM_t("[表情]");
+      case MessageElemType.V2TIM_ELEM_TYPE_FILE:
+        final String? option2 = message.fileElem!.fileName ?? "";
+        return TIM_t_para("[文件] {{option2}}", "[文件] $option2")(
+            option2: option2);
+      case MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS:
+        return TIM_t("群提示");
+      case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
+        return TIM_t("[图片]");
+      case MessageElemType.V2TIM_ELEM_TYPE_VIDEO:
+        return TIM_t("[视频]");
+      case MessageElemType.V2TIM_ELEM_TYPE_LOCATION:
+        return TIM_t("[位置]");
+      case MessageElemType.V2TIM_ELEM_TYPE_MERGER:
+        return TIM_t("[聊天记录]");
+      default:
+        return TIM_t("未知消息");
+    }
+  }
+
   static Future<String> getAbstractMessage(V2TimMessage message,
       List<V2TimGroupMemberFullInfo?> groupMemberList) async {
     final msgType = message.elemType;

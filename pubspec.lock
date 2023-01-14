@@ -1063,7 +1063,7 @@ packages:
       name: tencent_cloud_chat_sdk
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.0.7"
+    version: "5.0.8"
   tencent_extended_text:
     dependency: "direct main"
     description:
@@ -1091,14 +1091,14 @@ packages:
       name: tencent_im_base
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.17"
+    version: "1.0.19"
   tencent_im_sdk_plugin_platform_interface:
     dependency: transitive
     description:
       name: tencent_im_sdk_plugin_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.3.10"
+    version: "0.3.11"
   tencent_keyboard_visibility:
     dependency: "direct main"
     description:

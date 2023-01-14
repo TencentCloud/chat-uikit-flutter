@@ -45,10 +45,10 @@ class LinkUtils {
   }
 
   /// Get the URL preview information
-  static Future<List<LinkPreviewModel>> getURLPreview(
+  static Future<List<LocalCustomDataModel>> getURLPreview(
       List<String> urlMatches) async {
     // Request for preview information for all URL links synchronously
-    final List<LinkPreviewModel> urlPreview =
+    final List<LocalCustomDataModel> urlPreview =
         await Future.wait(urlMatches.map((e) async {
       String url = e;
       if (!e.contains("http")) {
@@ -56,7 +56,7 @@ class LinkUtils {
       }
       final WebInfo info = await LinkPreview.scrapeFromURL(url);
 
-      return LinkPreviewModel(
+      return LocalCustomDataModel(
           url: e,
           title: info.title,
           image: info.image,
@@ -68,7 +68,7 @@ class LinkUtils {
 
   /// save the link info to local and call updating the message on UI, only works with [onUpdateMessage]
   static Future<void> saveToLocalAndUpdate(V2TimMessage message,
-      LinkPreviewModel previewItem, VoidCallback onUpdateMessage) async {
+      LocalCustomDataModel previewItem, VoidCallback onUpdateMessage) async {
     if (message.msgID != null) {
       String saveInfo = LinkPreviewEntry.linkInfoToString(previewItem);
       final currentInfo = message.localCustomData;

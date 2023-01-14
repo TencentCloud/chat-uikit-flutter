@@ -798,4 +798,18 @@ class MessageServiceImpl extends MessageService {
     }
     return result;
   }
+
+  @override
+  Future<String> translateText(String text, String target) async {
+    final result = await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .translateText(texts: [text], targetLanguage: target);
+    if (result.code != 0) {
+      _coreService.callOnCallback(TIMCallback(
+          type: TIMCallbackType.API_ERROR,
+          errorMsg: result.desc,
+          errorCode: result.code));
+    }
+    return result.data?[text] ?? "";
+  }
 }

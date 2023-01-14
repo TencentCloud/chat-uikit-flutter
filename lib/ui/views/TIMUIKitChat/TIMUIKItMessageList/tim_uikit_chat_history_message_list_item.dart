@@ -7,6 +7,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_text_translate_elem.dart';
 import 'package:tencent_super_tooltip/tencent_super_tooltip.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
@@ -131,6 +132,7 @@ class ToolTipsConfig {
   final bool showRecallMessage;
   final bool showCopyMessage;
   final bool showForwardMessage;
+  final bool showTranslation;
   final Widget? Function(V2TimMessage message, Function() closeTooltip,
       [Key? key, BuildContext? context])? additionalItemBuilder;
 
@@ -139,6 +141,7 @@ class ToolTipsConfig {
       this.showMultipleChoiceMessage = true,
       this.showRecallMessage = true,
       this.showReplyMessage = true,
+      this.showTranslation = true,
       this.showCopyMessage = true,
       this.showForwardMessage = true,
       this.additionalItemBuilder});
@@ -200,6 +203,9 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
   /// padding for each message item
   final EdgeInsetsGeometry? padding;
 
+  /// The controller for text field.
+  final TIMUIKitInputTextFieldController? textFieldController;
+
   /// padding for text message、sound message、reply message
   final EdgeInsetsGeometry? textPadding;
 
@@ -253,7 +259,8 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
       this.isUseMessageReaction,
       this.bottomRowBuilder,
       this.isUseDefaultEmoji = false,
-      this.customEmojiStickerList = const []})
+      this.customEmojiStickerList = const [],
+        this.textFieldController})
       : super(key: key);
 
   @override
@@ -682,6 +689,7 @@ class _TIMUIKItHistoryMessageListItemState
       } else {
         if (box != null) {
           double screenWidth = MediaQuery.of(context).size.width;
+          double viewInsetsBottom = MediaQuery.of(context).viewInsets.bottom;
           Offset offset = box.localToGlobal(Offset.zero);
           double boxWidth = box.size.width;
           if (isSelf) {
@@ -689,7 +697,10 @@ class _TIMUIKItHistoryMessageListItemState
           } else {
             left = offset.dx;
           }
-          if (offset.dy < 300 && !isLongMessage) {
+          if (offset.dy < 300 && !isLongMessage && viewInsetsBottom == 0) {
+            selectEmojiPanelPosition = SelectEmojiPanelPosition.up;
+            popupDirection = TooltipDirection.down;
+          } else if(viewInsetsBottom != 0 && offset.dy < 220){
             selectEmojiPanelPosition = SelectEmojiPanelPosition.up;
             popupDirection = TooltipDirection.down;
           }
@@ -1033,44 +1044,64 @@ class _TIMUIKItHistoryMessageListItemState
                               Container(
                                 constraints: BoxConstraints(
                                   // maxWidth: getMaxWidth(false),
+                                  // maxWidth: getMaxWidth(false),
                                   maxWidth: constraints.maxWidth * 0.8,
                                 ),
                                 child: Builder(builder: (context) {
-                                  return GestureDetector(
-                                    child: IgnorePointer(
-                                        ignoring: model.isMultiSelect,
-                                        child: _getMessageItemBuilder(
-                                            message, message.status, model)),
-                                    onSecondaryTapDown: (details) {
-                                      if (PlatformUtils().isWeb) {
-                                        if (widget.allowLongPress) {
-                                          _onLongPress(
-                                            context,
-                                            message,
-                                            model,
-                                            theme,
-                                            details,
-                                          );
-                                        }
-                                        if (widget.onLongPress != null) {
-                                          widget.onLongPress!(context, message);
-                                        }
-                                      }
-                                    },
-                                    onLongPress: () {
-                                      if (widget.allowLongPress) {
-                                        _onLongPress(
-                                          context,
-                                          message,
-                                          model,
-                                          theme,
-                                          null,
-                                        );
-                                      }
-                                      if (widget.onLongPress != null) {
-                                        widget.onLongPress!(context, message);
-                                      }
-                                    },
+                                  return Column(
+                                    crossAxisAlignment:
+                                        (message.isSelf ?? false)
+                                            ? CrossAxisAlignment.end
+                                            : CrossAxisAlignment.start,
+                                    children: [
+                                      GestureDetector(
+                                        child: IgnorePointer(
+                                            ignoring: model.isMultiSelect,
+                                            child: _getMessageItemBuilder(
+                                                message, message.status, model)),
+                                        onSecondaryTapDown: (details) {
+                                          if (PlatformUtils().isWeb) {
+                                            if (widget.allowLongPress) {
+                                              _onLongPress(
+                                                context,
+                                                message,
+                                                model,
+                                                theme,
+                                                details,
+                                              );
+                                            }
+                                            if (widget.onLongPress != null) {
+                                              widget.onLongPress!(context, message);
+                                            }
+                                          }
+                                        },
+                                        onLongPress: () {
+                                          if (widget.allowLongPress) {
+                                            _onLongPress(
+                                              context,
+                                              message,
+                                              model,
+                                              theme,
+                                              null,
+                                            );
+                                          }
+                                          if (widget.onLongPress != null) {
+                                            widget.onLongPress!(context, message);
+                                          }
+                                        },
+                                      ),
+                                      Container(
+                                        color: theme.white,
+                                        child: TIMUIKitTextTranslationElem(
+                                            message: message,
+                                            isUseDefaultEmoji: widget.isUseDefaultEmoji,
+                                            customEmojiStickerList: widget.customEmojiStickerList,
+                                            isFromSelf: message.isSelf ?? false,
+                                            isShowJump: false,
+                                            clearJump: () {},
+                                            chatModel: model),
+                                      )
+                                    ],
                                   );
                                 }),
                               ),

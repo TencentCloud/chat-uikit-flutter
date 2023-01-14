@@ -12,7 +12,7 @@ import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/link_preview_en
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/widgets/link_preview.dart';
 import 'TIMUIKitMessageReaction/tim_uikit_message_reaction_show_panel.dart';
 
-class TIMUIKitTextElem extends StatefulWidget {
+class TIMUIKitTextTranslationElem extends StatefulWidget {
   final V2TimMessage message;
   final bool isFromSelf;
   final bool isShowJump;
@@ -26,7 +26,7 @@ class TIMUIKitTextElem extends StatefulWidget {
   final bool isUseDefaultEmoji;
   final List customEmojiStickerList;
 
-  const TIMUIKitTextElem(
+  const TIMUIKitTextTranslationElem(
       {Key? key,
       required this.message,
       required this.isFromSelf,
@@ -43,10 +43,10 @@ class TIMUIKitTextElem extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _TIMUIKitTextElemState();
+  State<StatefulWidget> createState() => _TIMUIKitTextTranslationElemState();
 }
 
-class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
+class _TIMUIKitTextTranslationElemState extends TIMUIKitState<TIMUIKitTextTranslationElem> {
   bool isShowJumpState = false;
   bool isShining = false;
 
@@ -58,7 +58,7 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
   }
 
   @override
-  void didUpdateWidget(TIMUIKitTextElem oldWidget) {
+  void didUpdateWidget(TIMUIKitTextTranslationElem oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.message.msgID == null && widget.message.msgID != null) {
       _getLinkPreview();
@@ -159,13 +159,6 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final theme = value.theme;
-    final textWithLink = LinkPreviewEntry.getHyperlinksText(
-      widget.message.textElem?.text ?? "",
-      widget.chatModel.chatConfig.isSupportMarkdownForTextMessage,
-      widget.chatModel.chatConfig.onTapLink,
-      widget.isUseDefaultEmoji,
-      widget.customEmojiStickerList,
-    );
     final borderRadius = widget.isFromSelf
         ? const BorderRadius.only(
             topLeft: Radius.circular(10),
@@ -196,7 +189,21 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
     final backgroundColor = isShowJumpState
         ? const Color.fromRGBO(245, 166, 35, 1)
         : (widget.backgroundColor ?? defaultStyle);
-    return Container(
+
+    final LocalCustomDataModel localCustomData = LocalCustomDataModel.fromMap(
+        json.decode(TencentUtils.checkString(widget.message.localCustomData) ?? "{}"));
+    final String? translateText = localCustomData.translatedText;
+
+    final textWithLink = LinkPreviewEntry.getHyperlinksText(
+      translateText ?? "",
+      widget.chatModel.chatConfig.isSupportMarkdownForTextMessage,
+      widget.chatModel.chatConfig.onTapLink,
+      widget.isUseDefaultEmoji,
+      widget.customEmojiStickerList,
+    );
+
+    return TencentUtils.checkString(translateText) != null ? Container(
+      margin: const EdgeInsets.only(top: 6),
       padding: widget.textPadding ?? const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: backgroundColor,
@@ -216,7 +223,7 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
                           fontSize: 16,
                           textBaseline: TextBaseline.ideographic,
                           height: widget.chatModel.chatConfig.textHight))
-              : ExtendedText(widget.message.textElem?.text ?? "",
+              : ExtendedText(translateText!,
                   softWrap: true,
                   style: widget.fontStyle ??
                       TextStyle(
@@ -227,15 +234,26 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
                     customEmojiStickerList: widget.customEmojiStickerList,
                     showAtBackground: true,
                   )),
-          // If the link preview info is available, render the preview card.
-          if (_renderPreviewWidget() != null &&
-              widget.chatModel.chatConfig.urlPreviewType ==
-                  UrlPreviewType.previewCardAndHyperlink)
-            _renderPreviewWidget()!,
-          if (widget.isShowMessageReaction ?? true)
-            TIMUIKitMessageReactionShowPanel(message: widget.message)
+          const SizedBox(height: 6),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              const Icon(Icons.check_circle,
+              color: Color(0x72282c34),
+              size: 12,),
+              const SizedBox(width: 4,),
+              Text(TIM_t("翻译完成"),
+                style: const TextStyle(
+                  color: Color(0x72282c34),
+                  fontSize: 10
+                ),
+              )
+            ],
+          )
         ],
       ),
-    );
+    ) : const SizedBox(width: 0, height: 0);
   }
 }

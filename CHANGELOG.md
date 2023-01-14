@@ -1,3 +1,9 @@
+## 1.4.0
+
+* Add: Text translation. Long press the text messages and choose `Translate`. This function can be turn off by `showTranslation` from `ToolTipsConfig`.
+* Optimize: The long press pop-up location.
+* Optimize: keyboard pop-up event.
+
 ## 1.3.2
 
 * Fix: Text input field height, after choosing to mention someone.

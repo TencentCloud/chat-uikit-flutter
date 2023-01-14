@@ -73,15 +73,15 @@ class TIMUIKitMessageTooltipState
 
   Widget ItemInkWell({
     Widget? child,
-    GestureTapCallback? onTap,
+    GestureTapCallback? onTap
   }) {
     return SizedBox(
-      width: 50,
+      width: 40,
       child: InkWell(
         onTap: onTap,
         splashColor: Colors.white,
         child: Container(
-          padding: const EdgeInsets.only(bottom: 8, top: 8),
+          padding: const EdgeInsets.only(bottom: 6, top: 6),
           child: child,
         ),
       ),
@@ -127,6 +127,11 @@ class TIMUIKitMessageTooltipState
         "id": "delete",
         "icon": "images/delete_message.png"
       },
+      {
+        "label": TIM_t("翻译"),
+        "id": "translate",
+        "icon": "images/translate.png"
+      },
       if (shouldShowRevokeAction)
         {
           "label": TIM_t("撤回"),
@@ -134,15 +139,12 @@ class TIMUIKitMessageTooltipState
           "icon": "images/revoke_message.png"
         }
     ];
-    if (widget.message.elemType != MessageElemType.V2TIM_ELEM_TYPE_TEXT) {
-      defaultTipsList.removeAt(0);
-    }
     List formatedTipsList = defaultTipsList;
     if (tooltipsConfig != null) {
       formatedTipsList = defaultTipsList.where((element) {
         final type = element["id"];
         if (type == "copyMessage") {
-          return tooltipsConfig.showCopyMessage;
+          return tooltipsConfig.showCopyMessage && widget.message.elemType == MessageElemType.V2TIM_ELEM_TYPE_TEXT;
         }
         if (type == "forwardMessage") {
           return tooltipsConfig.showForwardMessage;
@@ -156,7 +158,9 @@ class TIMUIKitMessageTooltipState
         if (type == "multiSelect") {
           return tooltipsConfig.showMultipleChoiceMessage;
         }
-
+        if (type == "translate") {
+          return tooltipsConfig.showTranslation && widget.message.elemType == MessageElemType.V2TIM_ELEM_TYPE_TEXT;
+        }
         if (type == "revoke") {
           return tooltipsConfig.showRecallMessage;
         }
@@ -211,6 +215,9 @@ class TIMUIKitMessageTooltipState
       case "multiSelect":
         model.updateMultiSelectStatus(true);
         model.addToMultiSelectedMessageList(widget.message);
+        break;
+      case 'translate':
+        model.translateText(widget.message);
         break;
       case "forwardMessage":
         model.addToMultiSelectedMessageList(widget.message);
@@ -313,10 +320,10 @@ class TIMUIKitMessageTooltipState
                             direction: Axis.horizontal,
                             alignment: ScreenUtils.getFormFactor(context) ==
                                     ScreenType.Handset
-                                ? WrapAlignment.spaceAround
+                                ? WrapAlignment.spaceBetween
                                 : WrapAlignment.start,
                             spacing: 4,
-                            runSpacing: 16,
+                            runSpacing: 8,
                             children: [
                               ..._buildLongPressTipItem(theme, model),
                               if (extraTipsActionItem != null)

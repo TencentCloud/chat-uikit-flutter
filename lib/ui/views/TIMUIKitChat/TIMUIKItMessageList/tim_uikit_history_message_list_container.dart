@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_text_field_controller.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
@@ -61,6 +62,9 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
 
   final List customEmojiStickerList;
 
+  /// The controller for text field.
+  final TIMUIKitInputTextFieldController? textFieldController;
+
   final bool isAllowScroll;
 
   const TIMUIKitHistoryMessageListContainer({
@@ -84,6 +88,7 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
     this.toolTipsConfig,
     this.isUseDefaultEmoji = false,
     this.customEmojiStickerList = const [],
+    this.textFieldController,
   }) : super(key: key);
 
   @override
@@ -155,6 +160,7 @@ class _TIMUIKitHistoryMessageListContainerState
                 message: message!,
                 showAvatar: chatConfig.isShowAvatar,
                 onTapForOthersPortrait: widget.onTapAvatar,
+                textFieldController: widget.textFieldController,
                 messageItemBuilder: widget.messageItemBuilder,
                 onLongPressForOthersHeadPortrait:
                     widget.onLongPressForOthersHeadPortrait,

@@ -4,19 +4,21 @@ import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/common/utils.da
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/models/link_preview_content.dart';
 
 class LinkPreviewWidget extends TIMStatelessWidget {
-  final LinkPreviewModel linkPreview;
+  final LocalCustomDataModel linkPreview;
 
   const LinkPreviewWidget({Key? key, required this.linkPreview})
       : super(key: key);
 
   @override
   Widget timBuild(BuildContext context) {
-    if (linkPreview.isEmpty()) {
+    if (linkPreview.isLinkPreviewEmpty()) {
       return Container();
     }
     return GestureDetector(
       onTap: () {
-        LinkUtils.launchURL(context, linkPreview.url);
+        if(linkPreview.url != null){
+          LinkUtils.launchURL(context, linkPreview.url!);
+        }
       },
       child: Container(
         padding: const EdgeInsets.only(top: 8, bottom: 8, left: 8, right: 8),

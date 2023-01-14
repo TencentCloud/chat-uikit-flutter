@@ -226,9 +226,9 @@ class _TIMUIKitReplyElemState extends TIMUIKitState<TIMUIKitReplyElem> {
     if (widget.message.localCustomData != null &&
         widget.message.localCustomData!.isNotEmpty) {
       final String localJSON = widget.message.localCustomData!;
-      final LinkPreviewModel? localPreviewInfo =
-          LinkPreviewModel.fromMap(json.decode(localJSON));
-      if (localPreviewInfo != null && !localPreviewInfo.isEmpty()) {
+      final LocalCustomDataModel? localPreviewInfo =
+          LocalCustomDataModel.fromMap(json.decode(localJSON));
+      if (localPreviewInfo != null && !localPreviewInfo.isLinkPreviewEmpty()) {
         return Container(
           margin: const EdgeInsets.only(top: 8),
           child:
@@ -290,7 +290,7 @@ class _TIMUIKitReplyElemState extends TIMUIKitState<TIMUIKitReplyElem> {
             bottomLeft: Radius.circular(10),
             bottomRight: Radius.circular(10));
     final textWithLink = LinkPreviewEntry.getHyperlinksText(
-        widget.message,
+        widget.message.textElem?.text ?? "",
         widget.chatModel.chatConfig.isSupportMarkdownForTextMessage,
         widget.chatModel.chatConfig.onTapLink);
     return Container(

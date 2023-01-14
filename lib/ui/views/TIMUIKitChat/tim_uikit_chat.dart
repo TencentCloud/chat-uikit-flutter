@@ -337,6 +337,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                             child: Listener(
                               onPointerMove: closePanel,
                               child: TIMUIKitHistoryMessageListContainer(
+                                textFieldController: textFieldController,
                                 customEmojiStickerList:
                                     widget.customEmojiStickerList,
                                 isUseDefaultEmoji:

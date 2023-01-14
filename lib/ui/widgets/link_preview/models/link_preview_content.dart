@@ -4,14 +4,15 @@ import 'package:flutter/cupertino.dart';
 
 typedef LinkPreviewText = Widget Function({TextStyle? style});
 
-class LinkPreviewModel {
+class LocalCustomDataModel {
   final String? description;
   final String? image;
-  final String url;
+  final String? url;
   final String? title;
+  String? translatedText;
 
-  LinkPreviewModel(
-      {this.description, this.image, required this.url, this.title});
+  LocalCustomDataModel(
+      {this.description, this.image, this.url, this.title, this.translatedText});
 
   Map<String, String?> toMap() {
     final Map<String, String?> data = {};
@@ -19,13 +20,15 @@ class LinkPreviewModel {
     data['image'] = image;
     data['title'] = title;
     data['description'] = description;
+    data['translatedText'] = translatedText;
     return data;
   }
 
-  LinkPreviewModel.fromMap(Map map)
+  LocalCustomDataModel.fromMap(Map map)
       : description = map['description'],
         image = map['image'],
         url = map['url'],
+        translatedText = map['translatedText'],
         title = map['title'];
 
   @override
@@ -33,7 +36,7 @@ class LinkPreviewModel {
     return json.encode(toMap());
   }
 
-  bool isEmpty() {
+  bool isLinkPreviewEmpty() {
     if ((image == null || image!.isEmpty) &&
         (title == null || title!.isEmpty) &&
         (description == null || description!.isEmpty)) {
@@ -49,6 +52,6 @@ class LinkPreviewContent {
     this.linkPreviewWidget,
   });
 
-  final LinkPreviewModel? linkInfo;
+  final LocalCustomDataModel? linkInfo;
   final Widget? linkPreviewWidget;
 }

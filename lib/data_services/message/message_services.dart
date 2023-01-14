@@ -204,4 +204,6 @@ abstract class MessageService {
     required int imageType, // 图片类型，仅messageType为图片消息是有效
     required bool isSnapshot, // 是否是视频封面，仅messageType为视频消息是有效
   });
+
+  Future<String> translateText(String text, String target);
 }
