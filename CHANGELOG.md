@@ -1,8 +1,15 @@
+
+## 1.5.0
+
+* Add: New configuration `defaultAvatarAssetPath` on global `TIMUIKitConfig`, aiming to define the default avatar.
+* Add: Supports Flutter 3.7.0.
+* Fix: `chatBgColor` configuration.
+
 ## 1.4.0
 
 * Add: Text translation. Long press the text messages and choose `Translate`. This function can be turn off by `showTranslation` from `ToolTipsConfig`.
 * Optimize: The long press pop-up location.
-* Optimize: keyboard pop-up event.
+* Optimize: Keyboard pop-up event.
 
 ## 1.3.2
 

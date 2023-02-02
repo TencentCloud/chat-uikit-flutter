@@ -71,7 +71,7 @@ class TIMUIKitMessageReactionShowItem extends TIMUIKitStatelessWidget {
           right: 10,
         ),
         decoration: const BoxDecoration(
-          color: Color(0x198a8a8a),
+          color: Color(0x19727271),
           borderRadius: BorderRadius.all(Radius.circular(20)),
         ),
         child: Row(

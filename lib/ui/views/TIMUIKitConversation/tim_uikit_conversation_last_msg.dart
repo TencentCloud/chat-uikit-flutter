@@ -50,15 +50,19 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
       final option1 = isSelf
           ? TIM_t("您")
           : widget.lastMsg!.nickName ?? widget.lastMsg?.sender;
-      setState(() {
-        groupTipsAbstractText = TIM_t_para(
-            "{{option1}}撤回了一条消息", "$option1撤回了一条消息")(option1: option1);
-      });
+      if(mounted){
+        setState(() {
+          groupTipsAbstractText = TIM_t_para(
+              "{{option1}}撤回了一条消息", "$option1撤回了一条消息")(option1: option1);
+        });
+      }
     } else {
       final newText = await _getLastMsgShowText(widget.lastMsg, widget.context);
-      setState(() {
-        groupTipsAbstractText = newText;
-      });
+      if(mounted){
+        setState(() {
+          groupTipsAbstractText = newText;
+        });
+      }
     }
   }
 

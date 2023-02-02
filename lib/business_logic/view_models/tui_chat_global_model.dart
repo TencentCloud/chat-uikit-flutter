@@ -49,8 +49,8 @@ class TUIChatGlobalModel extends ChangeNotifier with TIMUIKitClass {
 
   late V2TimAdvancedMsgListener advancedMsgListener;
   int _unreadCountForConversation = 0;
-  // use for generate a new sliver list to show recived messag list
-  int _recivedNewMessageCount = 0;
+  // use for generate a new sliver list to show received message list
+  int _receivedNewMessageCount = 0;
   TIMUIKitChatConfig chatConfig = const TIMUIKitChatConfig();
   List<V2TimGroupApplication>? _groupApplicationList;
   String Function(V2TimMessage message)? _abstractMessageBuilder;
@@ -58,7 +58,7 @@ class TUIChatGlobalModel extends ChangeNotifier with TIMUIKitClass {
       Map.from({}); // 0 normal 1 sending
   final Map<String, bool> _c2cMessageFromUserActiveMap = Map.from({});
   final Map<String, Timer> _c2cMessageActiveTimer = Map.from({});
-  bool _showC2cMessageEditStaus = true;
+  bool _showC2cMessageEditStatus = true;
   final Map<String, Timer> _c2cMessageStatusShowTimer = Map.from({});
   Map<String, List> loadingMessage = {};
 
@@ -73,8 +73,8 @@ class TUIChatGlobalModel extends ChangeNotifier with TIMUIKitClass {
       onRecvNewMessage: (V2TimMessage newMsg) {
         _onReceiveNewMsg(newMsg);
       },
-      onSendMessageProgress: (V2TimMessage messagae, int progress) {
-        _onSendMessageProgress(messagae, progress);
+      onSendMessageProgress: (V2TimMessage message, int progress) {
+        _onSendMessageProgress(message, progress);
       },
       onRecvMessageReadReceipts: (List<V2TimMessageReceipt> receiptList) {
         _onReceiveMessageReadReceipts(receiptList);
@@ -150,7 +150,7 @@ class TUIChatGlobalModel extends ChangeNotifier with TIMUIKitClass {
     // downloadFile();
   }
 
-  int getRecevied(msgID) {
+  int getReceived(msgID) {
     return messageListProgressMap[msgID] ?? 0;
   }
 
@@ -178,8 +178,8 @@ class TUIChatGlobalModel extends ChangeNotifier with TIMUIKitClass {
     return _totalUnreadCount;
   }
 
-  int get recivedMessageListCount {
-    return _recivedNewMessageCount;
+  int get receivedMessageListCount {
+    return _receivedNewMessageCount;
   }
 
   int get unreadCountForConversation => _unreadCountForConversation;
@@ -218,7 +218,7 @@ class TUIChatGlobalModel extends ChangeNotifier with TIMUIKitClass {
   }
 
   setShowC2cEditStatus(bool show) {
-    _showC2cMessageEditStaus = show;
+    _showC2cMessageEditStatus = show;
   }
 
   /// set edit status from chats
@@ -375,14 +375,14 @@ class TUIChatGlobalModel extends ChangeNotifier with TIMUIKitClass {
     _totalUnreadCount = 0;
     _groupApplicationList?.clear();
     _totalUnreadCount = 0;
-    _recivedNewMessageCount = 0;
+    _receivedNewMessageCount = 0;
     _messageReadReceiptMap.clear();
     _messageListProgressMap.clear();
     notifyListeners();
   }
 
   clearRecivedNewMessageCount() {
-    _recivedNewMessageCount = 0;
+    _receivedNewMessageCount = 0;
   }
 
   _preLoadImage(List<V2TimMessage> msgList) {
@@ -528,7 +528,7 @@ class TUIChatGlobalModel extends ChangeNotifier with TIMUIKitClass {
   }
 
   sendEditStatusMessage(bool isEditing, String toUser) async {
-    if (!_showC2cMessageEditStaus) {
+    if (!_showC2cMessageEditStatus) {
       return;
     }
     if (!(_c2cMessageFromUserActiveMap[toUser] ?? false)) {
@@ -602,7 +602,7 @@ class TUIChatGlobalModel extends ChangeNotifier with TIMUIKitClass {
           convID: convID,
           convType: currentSelectedConvType!,
         );
-        _recivedNewMessageCount = 0;
+        _receivedNewMessageCount = 0;
         final currentMsg = _messageListMap[convID] ?? [];
         _messageListMap[convID] = [newMsg, ...currentMsg];
         notifyListeners();
@@ -618,7 +618,7 @@ class TUIChatGlobalModel extends ChangeNotifier with TIMUIKitClass {
       } else {
         if (convID == currentSelectedConv) {
           unreadCountForConversation++;
-          _recivedNewMessageCount++;
+          _receivedNewMessageCount++;
           final currentMsg = _messageListMap[convID] ?? [];
           _messageListMap[convID] = [newMsg, ...currentMsg];
           notifyListeners();
@@ -880,7 +880,7 @@ class TUIChatGlobalModel extends ChangeNotifier with TIMUIKitClass {
       {bool needResetNewMessageCount = true}) {
     _messageListMap[conversationID] = messageList;
     if (needResetNewMessageCount) {
-      _recivedNewMessageCount = 0;
+      _receivedNewMessageCount = 0;
     }
     notifyListeners();
   }

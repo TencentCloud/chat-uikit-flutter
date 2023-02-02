@@ -10,7 +10,11 @@ class TIMUIKitConfig {
   /// type is `INFO`, while code is 6661403.
   final bool isCheckDiskStorageSpace;
 
+  /// The asset path of the default avatar image.
+  final String? defaultAvatarAssetPath;
+
   const TIMUIKitConfig({
+    this.defaultAvatarAssetPath,
     this.isCheckDiskStorageSpace = true,
     this.isShowOnlineStatus = true,
   });
