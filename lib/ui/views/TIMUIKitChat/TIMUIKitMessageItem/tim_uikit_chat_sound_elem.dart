@@ -99,10 +99,12 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
           widget.message.soundElem!.url == '') {
         final response = await _messageService.getMessageOnlineUrl(
             msgID: widget.message.msgID!);
-        widget.message.soundElem = response.data!.soundElem;
-        Future.delayed(const Duration(microseconds: 10), () {
-          setState(() => stateElement = response.data!.soundElem!);
-        });
+        if(response.data != null){
+          widget.message.soundElem = response.data!.soundElem;
+          Future.delayed(const Duration(microseconds: 10), () {
+            setState(() => stateElement = response.data!.soundElem!);
+          });
+        }
       }
       if (!PlatformUtils().isWeb) {
         if (widget.message.soundElem!.localUrl == null ||

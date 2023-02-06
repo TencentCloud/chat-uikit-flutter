@@ -3,7 +3,6 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
@@ -134,10 +133,12 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
           widget.message.videoElem!.videoUrl == '') {
         final response = await _messageService.getMessageOnlineUrl(
             msgID: widget.message.msgID!);
-        widget.message.videoElem = response.data!.videoElem;
-        Future.delayed(const Duration(microseconds: 10), () {
-          setState(() => stateElement = response.data!.videoElem!);
-        });
+        if(response.data != null){
+          widget.message.videoElem = response.data!.videoElem;
+          Future.delayed(const Duration(microseconds: 10), () {
+            setState(() => stateElement = response.data!.videoElem!);
+          });
+        }
       }
       if (!PlatformUtils().isWeb) {
         if (widget.message.videoElem!.localVideoUrl == null ||
@@ -185,95 +186,83 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
           ),
         );
       },
-      child: ScreenUtilInit(
-        builder: (BuildContext context, Widget? child) {
-          return Hero(
-              tag: heroTag,
-              child: TIMUIKitMessageReactionWrapper(
-                  chatModel: widget.chatModel,
-                  message: widget.message,
-                  isShowJump: widget.isShowJump,
-                  isShowMessageReaction: widget.isShowMessageReaction ?? true,
-                  clearJump: widget.clearJump,
-                  isFromSelf: widget.message.isSelf ?? true,
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(5)),
-                    child: LayoutBuilder(builder:
-                        (BuildContext context, BoxConstraints constraints) {
-                      double positionRadio = 0.56;
-                      if (stateElement.snapshotWidth != null &&
-                          stateElement.snapshotHeight != null &&
-                          stateElement.snapshotWidth != 0 &&
-                          stateElement.snapshotHeight != 0) {
-                        positionRadio = (stateElement.snapshotWidth! /
-                            stateElement.snapshotHeight!);
-                      }
+      child: Hero(
+          tag: heroTag,
+          child: TIMUIKitMessageReactionWrapper(
+              chatModel: widget.chatModel,
+              message: widget.message,
+              isShowJump: widget.isShowJump,
+              isShowMessageReaction: widget.isShowMessageReaction ?? true,
+              clearJump: widget.clearJump,
+              isFromSelf: widget.message.isSelf ?? true,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.all(Radius.circular(5)),
+                child: LayoutBuilder(builder:
+                    (BuildContext context, BoxConstraints constraints) {
+                  double positionRadio = 0.56;
+                  if (stateElement.snapshotWidth != null &&
+                      stateElement.snapshotHeight != null &&
+                      stateElement.snapshotWidth != 0 &&
+                      stateElement.snapshotHeight != 0) {
+                    positionRadio = (stateElement.snapshotWidth! /
+                        stateElement.snapshotHeight!);
+                  }
 
-                      return ConstrainedBox(
-                          constraints: BoxConstraints(
-                              maxWidth: PlatformUtils().isWeb
-                                  ? 300
-                                  : constraints.maxWidth * 0.5,
-                              maxHeight: min(constraints.maxHeight * 0.8, 300),
-                              minHeight: 20,
-                              minWidth: 20),
-                          child: AspectRatio(
-                            aspectRatio: positionRadio,
-                            child: Stack(
-                              children: <Widget>[
-                                if (stateElement.snapshotUrl != null ||
-                                    stateElement.snapshotUrl != null)
-                                  AspectRatio(
-                                    aspectRatio: positionRadio,
-                                    child: Container(
-                                      decoration: const BoxDecoration(
-                                          color: Colors.transparent),
-                                    ),
-                                  ),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                        child: generateSnapshot(
-                                            theme,
-                                            stateElement.snapshotHeight ??
-                                                100))
-                                  ],
-                                ),
-                                if (widget.message.status !=
-                                            MessageStatus
-                                                .V2TIM_MSG_STATUS_SENDING &&
-                                        (stateElement.snapshotUrl != null ||
-                                            stateElement.snapshotPath !=
-                                                null) &&
-                                        stateElement.videoPath != null ||
-                                    stateElement.videoUrl != null)
-                                  Positioned.fill(
-                                    // alignment: Alignment.center,
-                                    child: Center(
-                                        child: Image.asset('images/play.png',
-                                            package: 'tencent_cloud_chat_uikit',
-                                            height: 64)),
-                                  ),
-                                Positioned(
-                                    right: 10,
-                                    bottom: 10,
-                                    child: Text(
-                                        MessageUtils.formatVideoTime(widget
-                                                    .message
-                                                    .videoElem
-                                                    ?.duration ??
-                                                0)
-                                            .toString(),
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12))),
+                  return ConstrainedBox(
+                      constraints: BoxConstraints(
+                          maxWidth: PlatformUtils().isWeb
+                              ? 300
+                              : constraints.maxWidth * 0.5,
+                          maxHeight: min(constraints.maxHeight * 0.8, 300),
+                          minHeight: 20,
+                          minWidth: 20),
+                      child: AspectRatio(
+                        aspectRatio: positionRadio,
+                        child: Stack(
+                          children: <Widget>[
+                            Row(
+                              children: [
+                                Expanded(
+                                    child: generateSnapshot(
+                                        theme,
+                                        stateElement.snapshotHeight ??
+                                            100))
                               ],
                             ),
-                          ));
-                    }),
-                  )));
-        },
-      ),
+                            if (widget.message.status !=
+                                MessageStatus
+                                    .V2TIM_MSG_STATUS_SENDING &&
+                                (stateElement.snapshotUrl != null ||
+                                    stateElement.snapshotPath !=
+                                        null) &&
+                                stateElement.videoPath != null ||
+                                stateElement.videoUrl != null)
+                              Positioned.fill(
+                                // alignment: Alignment.center,
+                                child: Center(
+                                    child: Image.asset('images/play.png',
+                                        package: 'tencent_cloud_chat_uikit',
+                                        height: 64)),
+                              ),
+                            Positioned(
+                                right: 10,
+                                bottom: 10,
+                                child: Text(
+                                    MessageUtils.formatVideoTime(widget
+                                        .message
+                                        .videoElem
+                                        ?.duration ??
+                                        0)
+                                        .toString(),
+                                    style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12))),
+                          ],
+                        ),
+                      )
+                  );
+                }),
+              ))),
     );
   }
 }

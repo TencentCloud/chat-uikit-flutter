@@ -443,14 +443,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.0.15"
-  flutter_screenutil:
-    dependency: "direct main"
-    description:
-      name: flutter_screenutil
-      sha256: "8e049ecdc1a62c90e6bf0e9c8398ace8dde81b92889c70cfe06281d79d59113a"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.6.1"
   flutter_slidable_for_tencent_im:
     dependency: "direct main"
     description:
@@ -1225,10 +1217,10 @@ packages:
     dependency: "direct main"
     description:
       name: tencent_im_base
-      sha256: "2c8fd0f47d6b22d234f24042c5ac66febe6d71b7c9e131c95031e931efe9aa7b"
+      sha256: bbd2d70c82b018ce86c421f0b4eb02f650456d0bbd7ea5558110139c7b04c4b4
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.20"
+    version: "1.0.21"
   tencent_im_sdk_plugin_platform_interface:
     dependency: transitive
     description:

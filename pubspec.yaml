@@ -1,6 +1,6 @@
 name: tencent_cloud_chat_uikit
 description: Chat UI components library and basic chat business logic for Tencent Cloud Chat, helping you build In-APP Chat module easily.
-version: 1.5.0
+version: 1.5.0+1
 homepage: https://www.tencentcloud.com/products/im?from=pub
 repository: https://github.com/TencentCloud/chat-uikit-flutter
 documentation: https://comm.qq.com/im/doc/flutter/en/TUIKit/readme.html
@@ -57,12 +57,11 @@ dependencies:
   loading_animation_widget: ^1.1.0+3
   permission_handler: ^10.0.0
   tuple: ^2.0.0
-  flutter_screenutil: ^5.5.3+2
   flutter_markdown: ^0.6.9
   url_launcher: ^6.1.4
   universal_html: ^2.0.8
   link_preview_generator: ^1.2.0
-  tencent_im_base: ^1.0.20
+  tencent_im_base: ^1.0.21
   disk_space: ^0.2.1
   http: ^0.13.5
   crypto: ^3.0.2

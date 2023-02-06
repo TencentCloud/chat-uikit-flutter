@@ -354,7 +354,7 @@ class _TIMUIKitHistoryMessageListState
     }
 
     return Container(
-      color: theme.chatBgColor,
+      color: theme.chatBgColor ,
       child: Stack(
         alignment: Alignment.topCenter,
         children: [

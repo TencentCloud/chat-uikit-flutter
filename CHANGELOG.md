@@ -1,4 +1,8 @@
 
+## 1.5.0+1
+
+* Fix: Video message oversize.
+
 ## 1.5.0
 
 * Add: New configuration `defaultAvatarAssetPath` on global `TIMUIKitConfig`, aiming to define the default avatar.
