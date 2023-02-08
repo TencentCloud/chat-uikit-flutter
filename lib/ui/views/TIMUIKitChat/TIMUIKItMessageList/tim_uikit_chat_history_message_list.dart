@@ -1,4 +1,3 @@
-
 import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
@@ -354,7 +353,7 @@ class _TIMUIKitHistoryMessageListState
     }
 
     return Container(
-      color: theme.chatBgColor ,
+      color: theme.chatBgColor,
       child: Stack(
         alignment: Alignment.topCenter,
         children: [
@@ -369,24 +368,27 @@ class _TIMUIKitHistoryMessageListState
             // itemExtent: widget.mainHistoryListConfig?.itemExtent,
             // prototypeItem: widget.mainHistoryListConfig?.prototypeItem,
             cacheExtent: widget.mainHistoryListConfig?.cacheExtent ?? 1500,
-            semanticChildCount: widget.mainHistoryListConfig?.semanticChildCount,
-            dragStartBehavior: widget.mainHistoryListConfig?.dragStartBehavior ??
-                DragStartBehavior.start,
+            semanticChildCount:
+                widget.mainHistoryListConfig?.semanticChildCount,
+            dragStartBehavior:
+                widget.mainHistoryListConfig?.dragStartBehavior ??
+                    DragStartBehavior.start,
             keyboardDismissBehavior:
-            widget.mainHistoryListConfig?.keyboardDismissBehavior ??
-                ScrollViewKeyboardDismissBehavior.manual,
+                widget.mainHistoryListConfig?.keyboardDismissBehavior ??
+                    ScrollViewKeyboardDismissBehavior.manual,
             restorationId: widget.mainHistoryListConfig?.restorationId,
             clipBehavior:
-            widget.mainHistoryListConfig?.clipBehavior ?? Clip.hardEdge,
+                widget.mainHistoryListConfig?.clipBehavior ?? Clip.hardEdge,
             reverse: true,
             shrinkWrap: !shouldShowUnreadMessage,
             controller: _autoScrollController,
             slivers: [
               SliverPadding(
-                padding: widget.mainHistoryListConfig?.padding ?? EdgeInsets.zero,
+                padding:
+                    widget.mainHistoryListConfig?.padding ?? EdgeInsets.zero,
                 sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
+                        (BuildContext context, int index) {
                           final messageItem = unreadMessageList[index];
                           return AutoScrollTag(
                             controller: _autoScrollController,
@@ -395,20 +397,23 @@ class _TIMUIKitHistoryMessageListState
                                 getMessageIdentifier(messageItem, index)),
                             highlightColor: Colors.black.withOpacity(0.1),
                             child: KeepAliveWrapper(
+                                keepAlive: messageItem?.elemType ==
+                                    MessageElemType.V2TIM_ELEM_TYPE_SOUND,
                                 child: Container(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 16),
-                                    child: _getMessageItemBuilder(messageItem))),
+                                    child:
+                                        _getMessageItemBuilder(messageItem))),
                           );
                         },
                         childCount: unreadMessageList.length,
                         findChildIndexCallback: (Key key) {
                           final ValueKey<String> valueKey =
-                          key as ValueKey<String>;
+                              key as ValueKey<String>;
                           final String data = valueKey.value;
                           final int index = unreadMessageList.indexWhere(
-                                  (element) =>
-                              getMessageIdentifier(element, 0) == data);
+                              (element) =>
+                                  getMessageIdentifier(element, 0) == data);
                           return index != -1 ? index : null;
                         })),
               ),
@@ -417,10 +422,11 @@ class _TIMUIKitHistoryMessageListState
                 key: centerKey,
               ),
               SliverPadding(
-                padding: widget.mainHistoryListConfig?.padding ?? EdgeInsets.zero,
+                padding:
+                    widget.mainHistoryListConfig?.padding ?? EdgeInsets.zero,
                 sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
-                            (BuildContext context, int index) {
+                        (BuildContext context, int index) {
                           final messageItem = readMessageList[index];
                           if (index == readMessageList.length - 1) {
                             if (widget.model.haveMoreData) {
@@ -434,15 +440,19 @@ class _TIMUIKitHistoryMessageListState
                                   AutoScrollTag(
                                     controller: _autoScrollController,
                                     index: -index,
-                                    key: ValueKey(
-                                        getMessageIdentifier(messageItem, index)),
-                                    highlightColor: Colors.black.withOpacity(0.1),
+                                    key: ValueKey(getMessageIdentifier(
+                                        messageItem, index)),
+                                    highlightColor:
+                                        Colors.black.withOpacity(0.1),
                                     child: KeepAliveWrapper(
-                                        child: Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 16),
-                                            child: _getMessageItemBuilder(
-                                                messageItem))),
+                                      keepAlive: messageItem?.elemType ==
+                                          MessageElemType.V2TIM_ELEM_TYPE_SOUND,
+                                      child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16),
+                                          child: _getMessageItemBuilder(
+                                              messageItem)),
+                                    ),
                                   ),
                                 ],
                               );
@@ -455,24 +465,26 @@ class _TIMUIKitHistoryMessageListState
                                 getMessageIdentifier(messageItem, index)),
                             highlightColor: Colors.black.withOpacity(0.1),
                             child: KeepAliveWrapper(
+                                keepAlive: messageItem?.elemType ==
+                                    MessageElemType.V2TIM_ELEM_TYPE_SOUND,
                                 child: Container(
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 16),
-                                    child: _getMessageItemBuilder(messageItem))),
+                                    child:
+                                        _getMessageItemBuilder(messageItem))),
                           );
                         },
+                        addAutomaticKeepAlives: true,
                         childCount: readMessageList.length,
                         findChildIndexCallback: (Key key) {
                           final ValueKey<String> valueKey =
-                          key as ValueKey<String>;
+                              key as ValueKey<String>;
                           final String data = valueKey.value;
                           final int index = readMessageList.indexWhere(
-                                  (element) =>
-                              getMessageIdentifier(element, 0) == data);
+                              (element) =>
+                                  getMessageIdentifier(element, 0) == data);
                           return index > -1 ? index : null;
-                        }
-                    )
-                ),
+                        })),
               ),
             ],
           ),
@@ -500,9 +512,11 @@ class _TIMUIKitHistoryMessageListState
 class TIMUIKitHistoryMessageListSelector extends TIMUIKitStatelessWidget {
   final Widget Function(BuildContext, List<V2TimMessage?>, Widget?) builder;
   final String conversationID;
+
   TIMUIKitHistoryMessageListSelector(
       {Key? key, required this.builder, required this.conversationID})
       : super(key: key);
+
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     return Selector<TUIChatGlobalModel, List<V2TimMessage?>>(

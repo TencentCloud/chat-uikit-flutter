@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_slidable_for_tencent_im/flutter_slidable.dart';
 import 'package:provider/provider.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/conversation_life_cycle.dart';
@@ -9,6 +10,7 @@ import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_conversa
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendship_view_model.dart';
 
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/controller/tim_uikit_conversation_controller.dart';
 
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
@@ -140,6 +142,7 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
   final TUIThemeViewModel themeViewModel = serviceLocator<TUIThemeViewModel>();
   final TUIFriendShipViewModel friendShipViewModel =
       serviceLocator<TUIFriendShipViewModel>();
+  late AutoScrollController _autoScrollController;
 
   @override
   void initState() {
@@ -147,7 +150,7 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
     final controller = getController();
     _timuiKitConversationController = controller;
     _timuiKitConversationController.model = model;
-    // _timuiKitConversationController.loadData();
+    _autoScrollController =  AutoScrollController();
   }
 
   TIMUIKitConversationController getController() {
@@ -219,10 +222,44 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
     return widget.itemSlidableBuilder ?? _defaultSlidableBuilder;
   }
 
+  _onScrollToConversation(String conversationID) {
+    final msgList = getFilteredConversation();
+    bool isFound = false;
+    int targetIndex = 1;
+    for (int i = msgList.length - 1; i >= 0; i--) {
+      final currentConversation = msgList[i];
+      if (currentConversation?.conversationID == conversationID) {
+        isFound = true;
+        targetIndex = i;
+        break;
+      }
+    }
+    if (isFound) {
+      _autoScrollController.scrollToIndex(
+        targetIndex,
+        preferPosition: AutoScrollPosition.begin,
+      );
+    }
+  }
+
   @override
   void dispose() {
     super.dispose();
     // model.dispose();
+  }
+
+  List<V2TimConversation?> getFilteredConversation(){
+    List<V2TimConversation?> filteredConversationList = model
+        .conversationList
+        .where((element) =>
+    (element?.groupID != null || element?.userID != null))
+        .toList();
+    if (widget.conversationCollector != null) {
+      filteredConversationList = filteredConversationList
+          .where(widget.conversationCollector!)
+          .toList();
+    }
+    return filteredConversationList;
   }
 
   @override
@@ -235,19 +272,16 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
         ],
         builder: (BuildContext context, Widget? w) {
           final _model = Provider.of<TUIConversationViewModel>(context);
+          bool haveMoreData = _model.haveMoreData;
           final _friendShipViewModel =
               Provider.of<TUIFriendShipViewModel>(context);
           _model.lifeCycle = widget.lifeCycle;
-          List<V2TimConversation?> filteredConversationList = _model
-              .conversationList
-              .where((element) =>
-                  (element?.groupID != null || element?.userID != null))
-              .toList();
-          bool haveMoreData = _model.haveMoreData;
-          if (widget.conversationCollector != null) {
-            filteredConversationList = filteredConversationList
-                .where(widget.conversationCollector!)
-                .toList();
+
+          List<V2TimConversation?> filteredConversationList = getFilteredConversation();
+
+          if(TencentUtils.checkString(_model.scrollToConversation) != null){
+            _onScrollToConversation(_model.scrollToConversation!);
+            _model.clearScrollToConversation();
           }
 
           return SlidableAutoCloseBehavior(
@@ -258,6 +292,7 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
               },
               child: filteredConversationList.isNotEmpty
                   ? ListView.builder(
+                controller: _autoScrollController,
                       shrinkWrap: true,
                       itemCount: filteredConversationList.length,
                       itemBuilder: (context, index) {
@@ -283,37 +318,42 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
 
                         final slidableChildren =
                             _getSlidableBuilder()(conversationItem!);
-                        return Slidable(
-                            groupTag: 'conversation-list',
-                            child: InkWell(
-                              child: TIMUIKitConversationItem(
-                                  isShowDraft: widget.isShowDraft,
-                                  lastMessageBuilder: widget.lastMessageBuilder,
-                                  faceUrl: conversationItem.faceUrl ?? "",
-                                  nickName: conversationItem.showName ?? "",
-                                  isDisturb: conversationItem.recvOpt != 0,
-                                  lastMsg: conversationItem.lastMessage,
-                                  isPined: conversationItem.isPinned ?? false,
-                                  groupAtInfoList:
-                                      conversationItem.groupAtInfoList ?? [],
-                                  unreadCount:
-                                      conversationItem.unreadCount ?? 0,
-                                  draftText: conversationItem.draftText,
-                                  onlineStatus: (widget.isShowOnlineStatus &&
-                                          conversationItem.userID != null &&
-                                          conversationItem.userID!.isNotEmpty)
-                                      ? onlineStatus
-                                      : null,
-                                  draftTimestamp:
-                                      conversationItem.draftTimestamp,
-                                  convType: conversationItem.type),
-                              onTap: () => onTapConvItem(conversationItem),
-                            ),
-                            endActionPane: ActionPane(
-                                extentRatio:
-                                    slidableChildren.length > 2 ? 0.77 : 0.5,
-                                motion: const DrawerMotion(),
-                                children: slidableChildren));
+                        return AutoScrollTag(
+                            key: ValueKey(conversationItem.conversationID),
+                            controller: _autoScrollController,
+                            index: index,
+                          child: Slidable(
+                              groupTag: 'conversation-list',
+                              child: InkWell(
+                                child: TIMUIKitConversationItem(
+                                    isShowDraft: widget.isShowDraft,
+                                    lastMessageBuilder: widget.lastMessageBuilder,
+                                    faceUrl: conversationItem.faceUrl ?? "",
+                                    nickName: conversationItem.showName ?? "",
+                                    isDisturb: conversationItem.recvOpt != 0,
+                                    lastMsg: conversationItem.lastMessage,
+                                    isPined: conversationItem.isPinned ?? false,
+                                    groupAtInfoList:
+                                    conversationItem.groupAtInfoList ?? [],
+                                    unreadCount:
+                                    conversationItem.unreadCount ?? 0,
+                                    draftText: conversationItem.draftText,
+                                    onlineStatus: (widget.isShowOnlineStatus &&
+                                        conversationItem.userID != null &&
+                                        conversationItem.userID!.isNotEmpty)
+                                        ? onlineStatus
+                                        : null,
+                                    draftTimestamp:
+                                    conversationItem.draftTimestamp,
+                                    convType: conversationItem.type),
+                                onTap: () => onTapConvItem(conversationItem),
+                              ),
+                              endActionPane: ActionPane(
+                                  extentRatio:
+                                  slidableChildren.length > 2 ? 0.77 : 0.5,
+                                  motion: const DrawerMotion(),
+                                  children: slidableChildren)),
+                        );
                       })
                   : (widget.emptyBuilder != null
                       ? widget.emptyBuilder!()

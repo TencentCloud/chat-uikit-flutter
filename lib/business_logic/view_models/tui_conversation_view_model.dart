@@ -41,9 +41,20 @@ class TUIConversationViewModel extends ChangeNotifier {
   static V2TimConversation? _selectedConversation;
   bool _haveMoreData = true;
   int _totalUnReadCount = 0;
-
+  String? _scrollToConversation;
   String _nextSeq = "0";
   ConversationLifeCycle? _lifeCycle;
+
+  String? get scrollToConversation => _scrollToConversation;
+
+  set scrollToConversation(String? value) {
+    _scrollToConversation = value;
+    notifyListeners();
+  }
+
+  void clearScrollToConversation(){
+    _scrollToConversation = null;
+  }
 
   List<V2TimConversation?> get conversationList {
     if (PlatformUtils().isWeb) {
@@ -113,7 +124,7 @@ class TUIConversationViewModel extends ChangeNotifier {
   }
 
   loadInitConversation() async {
-    await loadData(count: 20);
+    await loadData(count: 40);
     _chatGlobalModel.initMessageMapFromLocalDatabase(_conversationList);
   }
 

@@ -35,7 +35,7 @@ class LinkPreviewEntry {
   /// If you provide `onUpdateMessage(String linkInfoJson)`, it can save the link info to local custom data than call updating the message on UI automatically.
   static Future<LinkPreviewContent?> getFirstLinkPreviewContent(
       {required V2TimMessage message, VoidCallback? onUpdateMessage}) async {
-    final String? messageText = message.textElem!.text;
+    final String? messageText = message.textElem?.text;
     if (messageText == null) {
       return null;
     }
@@ -64,7 +64,7 @@ class LinkPreviewEntry {
   /// get the [LinkPreviewContent] with preview widget and website information for all the links
   static Future<List<LinkPreviewContent?>?> getAllLinkPreviewContent(
       V2TimMessage message) async {
-    final String? messageText = message.textElem!.text;
+    final String? messageText = message.textElem?.text;
     if (messageText == null) {
       return null;
     }

@@ -1,4 +1,9 @@
 
+## 1.6.0
+
+* Add: `scrollToConversation` on `TIMUIKitConversationController`. You can now easily navigate to a specific conversation in the conversation list and move to the next unread conversation by double-clicking the tab bar, [refers to our sample app](https://github.com/TencentCloud/chat-demo-flutter/blob/main/lib/src/conversation.dart).
+* Optimize: The performance of the history message list while scrolling over a large distance.
+
 ## 1.5.0+1
 
 * Fix: Video message oversize.

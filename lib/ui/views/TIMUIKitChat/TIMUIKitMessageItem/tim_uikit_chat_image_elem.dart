@@ -419,12 +419,6 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
             ? AlignmentDirectional.topEnd
             : AlignmentDirectional.topStart,
         children: [
-          // AspectRatio(
-          //   aspectRatio: networkImagePositionRadio ?? positionRadio,
-          //   child: Container(
-          //     decoration: const BoxDecoration(color: Colors.white),
-          //   ),
-          // ),
           getImage(
               GestureDetector(
                 onTap: () {

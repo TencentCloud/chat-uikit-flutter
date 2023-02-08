@@ -20,7 +20,7 @@ class TIMUIKitConversationController {
   }
 
   /// Load the conversation list to UI
-  loadData({int count = 20}) {
+  loadData({int count = 40}) {
     model.loadData(count: count);
   }
 
@@ -62,5 +62,11 @@ class TIMUIKitConversationController {
   /// Clear the conversation list from UI
   dispose() {
     model.clearData();
+  }
+
+  /// Scroll to a specific conversation, this conversation must be existed in conversation list.
+  /// If not exist, invoking `loadData` recursively, until find the target conversation.
+  scrollToConversation(String conversationID){
+    model.scrollToConversation = conversationID;
   }
 }
