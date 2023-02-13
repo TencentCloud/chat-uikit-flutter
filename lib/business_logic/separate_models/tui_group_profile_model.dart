@@ -325,8 +325,9 @@ class TUIGroupProfileModel extends ChangeNotifier {
     return null;
   }
 
-  Future<V2TimCallback?> muteGroupMember(String userID, bool isMute) async {
-    const muteTime = 31556926 * 10;
+  Future<V2TimCallback?> muteGroupMember(
+      String userID, bool isMute, int? serverTime) async {
+    final muteTime = serverTime != null ? serverTime + 9999 : 51556926 * 10;
     final res = await _groupServices.muteGroupMember(
         groupID: _groupID, userID: userID, seconds: isMute ? muteTime : 0);
     if (res.code == 0) {

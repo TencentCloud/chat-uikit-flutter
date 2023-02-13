@@ -70,9 +70,19 @@ class GroupProfileGroupManagePage extends StatefulWidget {
 
 class _GroupProfileGroupManagePageState
     extends TIMUIKitState<GroupProfileGroupManagePage> {
+  int? serverTime;
+
   @override
   void initState() {
     super.initState();
+    getServerTime();
+  }
+
+  void getServerTime() async {
+    final res  = await TencentImSDKPlugin.v2TIMManager.getServerTime();
+    setState(() {
+      serverTime = res.data;
+    });
   }
 
   @override
@@ -228,7 +238,10 @@ class _GroupProfileGroupManagePageState
                               builder: (context) => GroupProfileAddAdmin(
                                     appbarTitle: TIM_t("设置禁言"),
                                     memberList: memberList.where((element) {
-                                      final isMute = element?.muteUntil != 0;
+                                      final isMute = (serverTime != null
+                                          ? (element?.muteUntil ?? 0) >
+                                              serverTime!
+                                          : false);
                                       final isMember = element!.role ==
                                           GroupMemberRoleType
                                               .V2TIM_GROUP_MEMBER_ROLE_MEMBER;
@@ -240,7 +253,7 @@ class _GroupProfileGroupManagePageState
                                         for (var member in selectedMember) {
                                           final userID = member!.userID;
                                           widget.model
-                                              .muteGroupMember(userID, true);
+                                              .muteGroupMember(userID, true, serverTime);
                                         }
                                       }
                                     },
@@ -249,14 +262,16 @@ class _GroupProfileGroupManagePageState
                   ),
                 if (!isAllMuted)
                   ...memberList
-                      .where((element) => element?.muteUntil != 0)
+                      .where((element) => (serverTime != null
+                          ? (element?.muteUntil ?? 0) > serverTime!
+                          : false))
                       .map((e) => _buildListItem(
                           context,
                           e!,
                           ActionPane(motion: const DrawerMotion(), children: [
                             SlidableAction(
                               onPressed: (_) {
-                                widget.model.muteGroupMember(e.userID, false);
+                                widget.model.muteGroupMember(e.userID, false, serverTime);
                               },
                               flex: 1,
                               backgroundColor: theme.cautionColor ??
@@ -292,35 +307,41 @@ Widget _buildListItem(BuildContext context, V2TimGroupMemberFullInfo memberInfo,
   final theme = Provider.of<TUIThemeViewModel>(context).theme;
   return Container(
       color: Colors.white,
-      child: Slidable(
-          endActionPane: endActionPane,
-          child: Column(children: [
-            ListTile(
-              tileColor: Colors.black,
-              leading: SizedBox(
-                width: 36,
-                height: 36,
-                child: Avatar(
-                  faceUrl: memberInfo.faceUrl ?? "",
-                  showName: _getShowName(memberInfo),
-                  type: 2,
+      child: ListView.builder(
+        itemCount: 1,
+          shrinkWrap: true,
+          itemBuilder: (context, index){
+        return Slidable(
+            endActionPane: endActionPane,
+            child: Column(children: [
+              ListTile(
+                tileColor: Colors.black,
+                leading: SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: Avatar(
+                    faceUrl: memberInfo.faceUrl ?? "",
+                    showName: _getShowName(memberInfo),
+                    type: 2,
+                  ),
                 ),
+                title: Row(
+                  children: [
+                    Text(_getShowName(memberInfo),
+                        style: const TextStyle(fontSize: 16)),
+                  ],
+                ),
+                onTap: () {},
               ),
-              title: Row(
-                children: [
-                  Text(_getShowName(memberInfo),
-                      style: const TextStyle(fontSize: 16)),
-                ],
-              ),
-              onTap: () {},
-            ),
-            Divider(
-                thickness: 1,
-                indent: 74,
-                endIndent: 0,
-                color: theme.weakDividerColor,
-                height: 0)
-          ])));
+              Divider(
+                  thickness: 1,
+                  indent: 74,
+                  endIndent: 0,
+                  color: theme.weakDividerColor,
+                  height: 0)
+            ]));
+      })
+  );
 }
 
 /// 选择管理员

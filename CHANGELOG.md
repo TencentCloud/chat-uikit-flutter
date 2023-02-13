@@ -1,3 +1,7 @@
+## 1.6.1
+
+* Fix: A bug of muting someone in a group.
+* Fix: A bug on Flutter 3.7.0.
 
 ## 1.6.0
 
