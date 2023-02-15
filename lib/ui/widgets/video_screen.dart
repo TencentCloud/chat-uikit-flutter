@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:crypto/crypto.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
@@ -78,11 +77,6 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
         a.remove();
       });
       xhr.send();
-      Fluttertoast.showToast(
-        msg: '开始下载',
-        webPosition: 'center',
-        gravity: ToastGravity.CENTER,
-      );
       return;
     }
     if (PlatformUtils().isIOS) {

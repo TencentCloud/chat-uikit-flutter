@@ -6,8 +6,6 @@ import 'package:example/TIMUIKitConversationExample.dart';
 import 'package:example/TIMUIKitProfileExample.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/toast.dart';
-
 import 'TIMUIKitAddFriendExample.dart';
 import 'TIMUIKitAddGroupExample.dart';
 import 'TIMUIKitBlackListExample.dart';
@@ -83,7 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
     String usersig = GenerateTestUserSig(sdkappid: sdkappid, key: secret)
         .genSig(identifier: userid, expire: 24 * 7 * 60 * 60 * 1000);
     if (sdkappid == 0 || userid == '' || secret == '' || usersig == '') {
-      Toast("The running parameters are abnormal, please check");
+      print("The running parameters are abnormal, please check");
       return;
     }
     await timCoreInstance.init(
@@ -145,7 +143,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       );
     } else {
-      Toast("no such ket");
+      print("no such ket");
     }
   }
 

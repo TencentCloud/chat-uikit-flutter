@@ -1,4 +1,3 @@
-
 // ignore_for_file: file_names
 
 import 'package:flutter/material.dart';
@@ -61,12 +60,16 @@ class CustomText extends StatefulWidget {
 
 class _ExtendTextState extends State<CustomText> {
   String? text;
+
   countTextSize() {
     TextStyle style = widget.style ?? const TextStyle(fontSize: 14);
     double textwidth = TextSize.boundingTextSize(widget.text, style).width;
     int offset = widget.offset ?? 3;
     if (textwidth > widget.width) {
       int position = widget.text.lastIndexOf('.');
+      if(position < 0){
+        position = widget.text.length;
+      }
       String overflowtext = widget.overflowtext ?? '...';
       int overflowtextLength = overflowtext.length;
       double singTextSize = textwidth / widget.text.length;

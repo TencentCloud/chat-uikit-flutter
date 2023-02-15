@@ -1,7 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/friendShip/friendship_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
@@ -98,15 +97,6 @@ class TUISearchViewModel extends ChangeNotifier {
         ...(searchResult.data!.messageSearchResultItems?[0].messageList ?? [])
       ];
     }
-    if (searchResult.code != 0) {
-      Fluttertoast.showToast(
-        msg: searchResult.desc,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        textColor: Colors.white,
-        backgroundColor: Colors.black,
-      );
-    }
     notifyListeners();
   }
 
@@ -129,15 +119,6 @@ class TUISearchViewModel extends ChangeNotifier {
       msgPage++;
       msgList = [...?msgList, ...?searchResult.data!.messageSearchResultItems];
       totalMsgCount = searchResult.data!.totalCount ?? 0;
-    }
-    if (searchResult.code != 0) {
-      Fluttertoast.showToast(
-        msg: searchResult.desc,
-        gravity: ToastGravity.BOTTOM,
-        timeInSecForIosWeb: 1,
-        textColor: Colors.white,
-        backgroundColor: Colors.black,
-      );
     }
     notifyListeners();
   }

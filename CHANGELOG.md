@@ -1,3 +1,8 @@
+## 1.6.2
+
+* Optimize: Remove `fluttertoast`.
+* Fix: An issue that caused errors when sending files without extensions.
+
 ## 1.6.1
 
 * Fix: A bug of muting someone in a group.
