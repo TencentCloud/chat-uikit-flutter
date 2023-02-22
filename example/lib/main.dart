@@ -4,8 +4,10 @@ import 'package:example/GenerateUserSig.dart';
 import 'package:example/TIMUIKitChatExample.dart';
 import 'package:example/TIMUIKitConversationExample.dart';
 import 'package:example/TIMUIKitProfileExample.dart';
+import 'package:example/config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+
 import 'TIMUIKitAddFriendExample.dart';
 import 'TIMUIKitAddGroupExample.dart';
 import 'TIMUIKitBlackListExample.dart';
@@ -63,15 +65,24 @@ class _MyHomePageState extends State<MyHomePage> {
   CoreServicesImpl timCoreInstance = TIMUIKitCore.getInstance();
 
   int getSDKAPPID() {
-    return const int.fromEnvironment('SDK_APPID', defaultValue: 0);
+    return const int.fromEnvironment(
+      'SDK_APPID',
+      defaultValue: IMConfig.imSDKAppId,
+    );
   }
 
   String getUserID() {
-    return const String.fromEnvironment('LOGINUSERID', defaultValue: "");
+    return const String.fromEnvironment(
+      'LOGINUSERID',
+      defaultValue: IMConfig.imLoginUserId,
+    );
   }
 
   String getSecret() {
-    return const String.fromEnvironment('SECRET', defaultValue: "");
+    return const String.fromEnvironment(
+      'SECRET',
+      defaultValue: IMConfig.imSDKSecret,
+    );
   }
 
   initTIMUIKIT() async {
