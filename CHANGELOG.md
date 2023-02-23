@@ -1,6 +1,15 @@
+## 1.7.0
+
+* Addition: Support for quickly navigating to the first unread message in a group chat with more than 20 new unread messages, using the dynamic tongue located in the top right corner of the screen. This feature allows for swift movement through the messages, regardless of their quantity.
+* Addition: Customize the border radius for all avatars is now supported. You can set the default avatar border radius using `defaultAvatarBorderRadius` in `TIMUIKitConfig`.
+* Optimization: The delete button on the sticker sending panel has been improved for better usability.
+* Optimization: Some English labels on the screen have been updated to better reflect local expressions.
+* Fix: An issue causing errors when sending a large number of stickers has been resolved.
+* Fix: Some errors that were occurring in the sticker panel have been addressed.
+
 ## 1.6.2
 
-* Optimize: Remove `fluttertoast`.
+* Optimization: Remove `fluttertoast`.
 * Fix: An issue that caused errors when sending files without extensions.
 
 ## 1.6.1
@@ -10,24 +19,23 @@
 
 ## 1.6.0
 
-* Add: `scrollToConversation` on `TIMUIKitConversationController`. You can now easily navigate to a specific conversation in the conversation list and move to the next unread conversation by double-clicking the tab bar, [refers to our sample app](https://github.com/TencentCloud/chat-demo-flutter/blob/main/lib/src/conversation.dart).
-* Optimize: The performance of the history message list while scrolling over a large distance.
+* Addition: `scrollToConversation` on `TIMUIKitConversationController`. You can now easily navigate to a specific conversation in the conversation list and move to the next unread conversation by double-clicking the tab bar, [refers to our sample app](https://github.com/TencentCloud/chat-demo-flutter/blob/main/lib/src/conversation.dart).
+* Optimization: The performance of the history message list while scrolling over a large distance.
 
 ## 1.5.0+1
 
-* Fix: Video message oversize.
+* Fix: An issue with video messages being oversize.
 
 ## 1.5.0
 
-* Add: New configuration `defaultAvatarAssetPath` on global `TIMUIKitConfig`, aiming to define the default avatar.
-* Add: Supports Flutter 3.7.0.
+* Addition: New configuration `defaultAvatarAssetPath` on global `TIMUIKitConfig` to define the default avatar.
+* Addition: Supports Flutter 3.7.0.
 * Fix: `chatBgColor` configuration.
 
 ## 1.4.0
 
-* Add: Text translation. Long press the text messages and choose `Translate`. This function can be turn off by `showTranslation` from `ToolTipsConfig`.
-* Optimize: The long press pop-up location.
-* Optimize: Keyboard pop-up event.
+* Addition: Text translation. Long press the text messages to choose `Translate`, which can be turned off by `showTranslation` from `ToolTipsConfig`.
+* Optimization: The long press pop-up location and keyboard pop-up event.
 
 ## 1.3.2
 
@@ -35,129 +43,128 @@
 
 ## 1.3.1
 
-* Optimize: Improve performance.
+* Optimization: Improve performance.
 
 ## 1.3.0
 
-* Fix: Group tips not shows the nickname or remarks when transferring group owner.
-* Optimize: Remove the confirmation pop-up before opening the file.
+* Fix: A bug where group tips were not showing the nickname or remarks when transferring group owner.
+* Optimization: Remove the confirmation pop-up before opening the file.
 
 ## 1.2.0
 
-* Fix: The issue of input area not showing, when switching from recording to keyboard, on `TIMUIKitChat`.
-* Fix: Only the first receiver can receive the merged multiple forward messages.
-* Optimize: `MessageItemBuilder` can now be used for shows on the merger message screen.
+* Fix: An issue where the input area was not showing when switching from recording to keyboard on `TIMUIKitChat`.
+* Fix: An issue where only the first receiver could receive the merged multiple forward messages.
+* Optimization: `MessageItemBuilder` can now be used for shows on the merger message screen.
 
 ## 1.1.0 And 1.1.0+1
 
-* Add: Supports two new languages, Japanese and Korean.
-* Add: Supports adding new other languages, apart from our default ones, including English, Chinese(Simplified and Traditional), Japanese and Korean, or modifying the translations, refers to [this documentation](https://www.tencentcloud.com/document/product/1047/52154?from=pub).
-* Add: Sticker plug-in has been embedded in TUIKit by default. Now we support three types of stickers, Unicode Emoji, small image emoji and big image stickers, the usage has been optimized, refers to [this documentation](https://www.tencentcloud.com/document/product/1047/52227?from=pub).
-* Optimize: Themes, more customization.
-* Optimize: The animation of the input area, keyboard, sticker panel and the more panel.
-* Optimize: Emoji, both Unicode and small images, can be inserted to any position in text messages.
-* Optimize: Avatar in profile can be previewed with a large image.
-* Optimize: UserID in profile can be copied.
-* Optimize: Several UI details, including `TIMUIKitAddFriend`, `TIMUIKitAddGroup`, `TIMUIKitGroupProfile` and `TIMUIKitProfile`.
-* Optimize: `TIMUIKitGroupProfile` and `TIMUIKitProfile` can update automatically after `ID` changed.
-* Optimize: New loading animation when downloading the image/video on `TIMUIKitGroupChat`. 
-* Fix: Some bugs.
+* Addition: We have added support for two new languages - Japanese and Korean.
+* Addition: You can now add other languages apart from our default ones, such as English, Chinese (Simplified and Traditional), Japanese, and Korean. You can also modify the translations using the instructions provided in [this documentation](https://www.tencentcloud.com/document/product/1047/52154?from=pub).
+* Addition: The sticker plug-in is now embedded in TUIKit by default. We support three types of stickers - Unicode Emoji, small image emoji, and big image stickers. You can refer to [this documentation](https://www.tencentcloud.com/document/product/1047/52227?from=pub) for optimized usage.
+* Optimization: Themes are now more customizable.
+* Optimization: We have optimized the animation of the input area, keyboard, sticker panel, and more panel.
+* Optimization: You can now insert both Unicode and small image emojis at any position in text messages.
+* Optimization: You can now preview profile avatars with a large image by clicking it, and copy UserIDs in profile.
+* Optimization: We have improved several UI details, including `TIMUIKitAddFriend`, `TIMUIKitAddGroup`, `TIMUIKitGroupProfile`, and `TIMUIKitProfile`.
+* Optimization: `TIMUIKitGroupProfile` and `TIMUIKitProfile` can now update automatically after the `ID` is changed.
+* Optimization: We have added a new loading animation when downloading images or videos on `TIMUIKitGroupChat`.
+* Fix: We have fixed some bugs.
 
 ## 1.0.1
 
-* Modify: Remove `groupTRTCTipsItemBuilder` from `MessageItemBuilder`, please use `customMessageItemBuilder` instead.
-* Modify: Remove default rendering for calling messages, you can choose to use the default widgets, `CallMessageItem` and `GroupCallMessageItem`, from our call plugin `tim_ui_kit_calling_plugin` directly. Refer to the [Demo](https://github.com/TencentCloud/chat-demo-flutter/tree/main/lib/utils/custom_message/custom_message_element.dart).
+* Modification: Remove `groupTRTCTipsItemBuilder` from `MessageItemBuilder`, please use `customMessageItemBuilder` instead.
+* Modification: Remove default rendering for calling messages, you can choose to use the default widgets, `CallMessageItem` and `GroupCallMessageItem`, from our call plugin `tim_ui_kit_calling_plugin` directly. Refer to the [Demo](https://github.com/TencentCloud/chat-demo-flutter/tree/main/lib/utils/custom_message/custom_message_element.dart).
 
 ## 1.0.0
 
-* Add: Support adding Flutter module to Native APP, for details, please refer to [this documentation](https://www.tencentcloud.com/document/product/1047/51456?from=pub) to implement.
-* Add: Customize sticker and Emoji for text messages. For details, please refer to [this documentation](https://cloud.tencent.com/document/product/269/80882) to modify.
-* Optimize: The loading duration for history message list, especially with lots of media and file messages.
-* Optimize: More panel area supports scroll.
-* Optimize: Load latest messages when scrolling back to bottom with more fluency.
-* Modify: It is required to provide the call record widget to `messageItemBuilder` => `customMessageItemBuilder` of `TIMUIKitChat`. You can choose to use the default widget, `CallMessageItem`, from our call plugin `tim_ui_kit_calling_plugin` directly. Refer to the [Demo](https://github.com/TencentCloud/chat-demo-flutter/tree/main/lib/utils/custom_message/custom_message_element.dart).
-* Fix: The amount of photos from the album on Android.
-* Fix: The out of bounds for long text in the group profile info card.
-* Fix: Some bugs.
+* Addition: We have added support for adding Flutter module to Native APP. For implementation details, please refer to [this documentation](https://www.tencentcloud.com/document/product/1047/51456?from=pub).
+* Addition: You can now customize stickers and emojis for text messages. For more information, please refer to [this documentation](https://cloud.tencent.com/document/product/269/80882).
+* Optimization: We have improved the loading duration for history message lists, especially those with lots of media and file messages.
+* Optimization: More panel area now supports scrolling.
+* Optimization: We have made loading latest messages when scrolling back to the bottom smoother.
+* Modification: It is now required to provide the call record widget to `messageItemBuilder` => `customMessageItemBuilder` of `TIMUIKitChat`. You can choose to use the default widget, `CallMessageItem`, from our call plugin `tim_ui_kit_calling_plugin` directly. Please refer to the [Demo](https://github.com/TencentCloud/chat-demo-flutter/tree/main/lib/utils/custom_message/custom_message_element.dart).
+* Fix: We have fixed the issue with the number of photos from the album on Android.
+* Fix: We have fixed the issue with long text going out of bounds in the group profile info card.
+* Fix: We have resolved some bugs.
 
-> **Please pay more attention to the second line and sixth line**, that some modifications are required, otherwise the module of sticker / emoji / call records will not work.
+> **Please note that modifications are required for the second and sixth lines**. Otherwise, the modules for stickers/emojis/call records will not work.
 
 ## 0.1.8
 
-* Optimize: File batch downloading queue, allow click multiple file messages once.
-* Optimize: Group list widgets can be updated automatically.
-* Optimize: Camera capture supports relatively lower performance devices, adjusting resolution automatically.
-* Optimize: Supports customize the color and text style of the app bar, especially on TIMUIKitChat widget.
-* Fix: Friend remark or nickname can not show on group tips.
-* Fix: Crash on video playing.
+* Optimization: File batch downloading queue now allows clicking on multiple file messages at once.
+* Optimization: Group list widgets are now automatically updated.
+* Optimization: Camera capture now supports relatively lower performance devices and adjusts resolution automatically.
+* Optimization: Supports customization of the color and text style of the app bar, especially on TIMUIKitChat widget.
+* Fix: Friend remark or nickname no longer fails to show on group tips.
+* Fix: Resolved a crash when playing videos.
 * Fix: Several bugs.
 
 ## 0.1.7
 
-* Add: Big and RAW images supported, especially for those captured from the latest version of iOS and iPhone 14 Pro series, compress and format before sending automatically.
-* Optimize: Performance and stability, especially for history message list and launching.
-* Optimize: Makes initializing the `TIMUIKitChat` an idempotent operation.
-* Optimize: Load latest messages when scrolling back to bottom.
-* Optimize: Supports Flutter both 2.x and 3.x series.
-* Fix: The issue of select photos permission.
+* Addition: Big and RAW images are now supported, especially for those captured from the latest version of iOS and iPhone 14 Pro series, with automatic compression and formatting before sending.
+* Optimization: Improved performance and stability, especially for the history message list and launching.
+* Optimization: Initializing the `TIMUIKitChat` is now an idempotent operation.
+* Optimization: Loads the latest messages when scrolling back to the bottom.
+* Optimization: Supports Flutter both 2.x and 3.x series.
+* Fix: Resolved an issue with select photos permission.
 * Fix: Several bugs.
 
 ## 0.1.5
 
-* Add: Web supports. Now, you could implement TUIKit on iOS/Android/Web platforms.
-* Add: Disk storage checking after log in, and controls in `config` of `init`.
-* Add: `timeDividerConfig`, `notificationAndroidSound`, `isSupportMarkdownForTextMessage` and `onTapLink` to `TIMUIKitChatConfig`.
-* Remove: The default Emoji list, due to the copyright issues. You can provide your own sticker list to the panel by [tim_ui_kit_sticker_plugin](https://pub.dev/packages/tim_ui_kit_sticker_plugin).
-* Optimize: You could now choose to disable Markdown parsing for text messages.
-* Optimize: You could now choose to disable the shows for @ message in conversation list.
-* Optimize: You could now return `null` for `notificationExt`/`notificationBody` in `TIMUIKitChatConfig` and `messageRowBuilder` in `MessageItemBuilder`, to use default value up to your needs in the specific case, means you can control whether or not using customized setting based on the provided situation, without the necessary to re-define the same logic as the TUIKit in your code.
-* Optimize: Supports multiple lines for text messages.
-* Optimize: Rebuild and improve the experience of `TIMUIKitChat`. While, `TIMUIKitChatController` needs to be specified to `controller` here, like how we shows in [Demo](https://github.com/TencentCloud/tc-chat-demo-flutter/lib/src/chat.dart).
+* Addition: Web support is now available, allowing TUIKit to be implemented on iOS/Android/Web platforms.
+* Addition: Disk storage checking is now performed after login, with controls available in `config` of `init`.
+* Addition: `timeDividerConfig`, `notificationAndroidSound`, `isSupportMarkdownForTextMessage`, and `onTapLink` are added to `TIMUIKitChatConfig`.
+* Remove: The default Emoji list has been removed due to copyright issues. You can provide your own sticker list to the panel using [tim_ui_kit_sticker_plugin](https://pub.dev/packages/tim_ui_kit_sticker_plugin).
+* Optimization: You can now choose to disable Markdown parsing for text messages.
+* Optimization: You can now choose to disable shows for @ messages in the conversation list.
+* Optimization: You can now return `null` for `notificationExt`/`notificationBody` in `TIMUIKitChatConfig` and `messageRowBuilder` in `MessageItemBuilder` to use default values based on your needs in a specific case. This means you can control whether to use customized settings based on the provided situation, without having to redefine the same logic as TUIKit in your code.
+* Optimization: Supports multiple lines for text messages.
+* Optimization: Rebuilt and improved the experience of `TIMUIKitChat`. Note that `TIMUIKitChatController` needs to be specified to `controller`, as shown in the [Demo](https://github.com/TencentCloud/tc-chat-demo-flutter/lib/src/chat.dart).
 * Fix: Several bugs.
 
 ## 0.1.3
 
-* Add: User inputting status.
-* Add: Message reactions, with sticker.
-* Add: User online status.
+* Addition: User inputting status is now available.
+* Addition: Message reactions with emoji/stickers are now available.
+* Addition: User online status is now available.
 
 ## 0.1.2
 
-* Upgrade: flutter_record_plugin_plus to 0.0.4.
+* Upgrade: flutter_record_plugin_plus to version 0.0.4.
 
 ## 0.1.1
 
-* Add: Lifecycle hooks for the main widgets, referring to the parameter description for details.
-* Add: Mute status display for group chat on the chat page.
-* Add: URL enrichment for text messages.
-* Add: Callback for global information (Flutter Error, Tips for Reminds, API Error) and you can display toast up to your needs.
-* Optimize: Image preview displaying.
-* Rebuild: TUIKitGroupProfile and TUIKitProfile, simplified usage.
+* Addition: Lifecycle hooks are now available for the main widgets, referring to the parameter description for details.
+* Addition: Mute status display is now available for group chat on the chat page.
+* Addition: URL enrichment is now available for text messages.
+* Addition: Callback for global information (Flutter Error, Tips for Reminds, API Error), and you can display toast as needed.
+* Optimization: Image preview display has been improved.
+* Rebuilt: TUIKitGroupProfile and TUIKitProfile have been simplified for ease of use.
 
 ## 0.1.0-bugfix
 
-* Upgrade: Tencent IM SDK.
+* Upgrade: Tencent IM Native SDK.
 
 ## 0.1.0
 
-* Add: Atomization widgets for TIMUIKitChat.
-* Add: Updating the UI when the message has been modified.
-* Add: The application page for joining the group.
-* Add: `updateMessage` API, users can refresh the view after modifying the local message.
-* Add: Support for Traditional Chinese.
-* Add: Customization for conversation list item.
+* Addition: Atomization widgets for TIMUIKitChat.
+* Addition: Updating the UI when the message has been modified.
+* Addition: The application page for joining the group.
+* Addition: `updateMessage` API, users can refresh the view after modifying the local message.
+* Addition: Support for Traditional Chinese.
+* Addition: Customization for conversation list item.
 
 ## 0.0.9
 
-* Add: Offline push along with [tim_ui_kit_push_plugin](https://pub.dev/packages/tim_ui_kit_push_plugin).
+* Addition: Offline push along with [tim_ui_kit_push_plugin](https://pub.dev/packages/tim_ui_kit_push_plugin).
 * Adapt: Flutter 3.0.0.
-* Optimize: Local preview of multimedia files.
+* Optimization: Local preview of multimedia files.
 
 ## 0.0.8
 
-* Add: Group read receipt module.
-* Add: Little tongue on the message list.
-* Add: Examples.
+* Addition: Group read receipt module.
+* Addition: Little tongue on the message list.
+* Addition: Examples.
 * Fix: Several bugs.
 
 ## 0.0.7
@@ -166,37 +173,37 @@
 
 ## 0.0.6
 
-* Add: New `sendMessage` method to the controller `TIMUIKitChatController` for TIMUIKitChat.
-* Add: Configuration for TIMUIKitChat, which can control the functions for TIMUIKitChat components.
+* Addition: New `sendMessage` method to the controller `TIMUIKitChatController` for TIMUIKitChat.
+* Addition: Configuration for TIMUIKitChat, which can control the functions for TIMUIKitChat components.
 * Support: Customized for more panel customized ability to TIMUIKitChat.
-* Optimize: User authorization standardized.
+* Optimization: User authorization standardized.
 
 ## 0.0.5
 
-* Add: Several new customized configs, includes, appBarConfig, morePanelConfig, and removed appBarActions config.
-* Optimize: Image preview displaying.
+* Addition: Several new customized configs, includes, appBarConfig, morePanelConfig, and removed appBarActions config.
+* Optimization: Image preview displaying.
 * Upgrade: Tencent IM SDK.
 * Fix: The issue of conversation item duplication for TIMUIKitConversation.
 
 ## 0.0.4
 
-* Optimize: TIMUIKitChat, especially for media files selector.
-* Optimize: Previewing of image messages, video messages.
-* Optimize: Theme color.
-* Optimize: UI for search components.
+* Optimization: TIMUIKitChat, especially for media files selector.
+* Optimization: Previewing of image messages, video messages.
+* Optimization: Theme color.
+* Optimization: UI for search components.
 * Upgrade: Tencent IM SDK.
 
 ## 0.0.3
 
-* Add: TIMUIKitSearch and TIMUIKitSearchMsgDetail, supports searching both in conversation and globally.
-* Add: TIMUIKitAddFriend.
-* Add: TIMUIKitAddGroup.
-* Add: Theme style configuration.
-* Optimize: Internationalization.
+* Addition: TIMUIKitSearch and TIMUIKitSearchMsgDetail, supports searching both in conversation and globally.
+* Addition: TIMUIKitAddFriend.
+* Addition: TIMUIKitAddGroup.
+* Addition: Theme style configuration.
+* Optimization: Internationalization.
 
 ## 0.0.2
 
-* Optimize: TIMUIKitChat.
+* Optimization: TIMUIKitChat.
 * Fix: Bugs on Internationalization.
 
 ## 0.0.1

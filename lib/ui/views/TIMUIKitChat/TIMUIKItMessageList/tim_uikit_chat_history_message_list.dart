@@ -76,7 +76,7 @@ class TIMUIKitHistoryMessageList extends StatefulWidget {
   final V2TimMessage? initFindingMsg;
 
   /// use for load more message
-  final Future<void> Function(String?, [int?]) onLoadMore;
+  final Future<void> Function(String?, LoadDirection direction, [int?]) onLoadMore;
 
   /// configuration for list view
   final TIMUIKitHistoryMessageListConfig? mainHistoryListConfig;
@@ -84,6 +84,8 @@ class TIMUIKitHistoryMessageList extends StatefulWidget {
   final TUIChatSeparateViewModel model;
 
   final bool isAllowScroll;
+
+  final V2TimConversation conversation;
 
   const TIMUIKitHistoryMessageList(
       {Key? key,
@@ -96,7 +98,8 @@ class TIMUIKitHistoryMessageList extends StatefulWidget {
       this.groupAtInfoList,
       this.initFindingMsg,
       this.isAllowScroll = true,
-      this.mainHistoryListConfig})
+      this.mainHistoryListConfig,
+        required this.conversation})
       : super(key: key);
 
   @override
@@ -123,7 +126,7 @@ class _TIMUIKitHistoryMessageListState
 
   initFinding() async {
     if (widget.initFindingMsg != null) {
-      await widget.onLoadMore(null);
+      await widget.onLoadMore(null, LoadDirection.previous);
       setState(() {
         findingMsg = widget.initFindingMsg!;
       });
@@ -216,7 +219,7 @@ class _TIMUIKitHistoryMessageListState
         // if the target message not in current message list, load more
         findingMsg = targetMsg;
         final lastMsgId = _getMessageId(widget.messageList.length - 1);
-        widget.onLoadMore(lastMsgId, singleLoadAmount);
+        widget.onLoadMore(lastMsgId, LoadDirection.previous, singleLoadAmount);
       } else {
         showCantFindMsg();
       }
@@ -270,7 +273,7 @@ class _TIMUIKitHistoryMessageListState
       if (widget.model.haveMoreData) {
         findingSeq = targetSeq;
         widget.onLoadMore(
-            _getMessageId(widget.messageList.length - 1), singleLoadAmount);
+            _getMessageId(widget.messageList.length - 1), LoadDirection.previous, singleLoadAmount);
       } else {
         showCantFindMsg();
       }
@@ -336,11 +339,16 @@ class _TIMUIKitHistoryMessageListState
         .sublist(unreadMessageList.length, messageList.length)
         .toList();
 
-    final throteFunction = OptimizeUtils.throttle((index) async {
+    final throteFunction = OptimizeUtils.multiThrottle((index, LoadDirection direction) async {
       final msgID =
-          TIMUIKitChatUtils.getMessageIDWithinIndex(messageList, index);
-      await widget.onLoadMore(msgID);
+          TIMUIKitChatUtils.getMessageIDWithinIndex(readMessageList, index);
+      await widget.onLoadMore(msgID, direction);
     }, 20);
+
+    final throteFunctionWithMsgID = OptimizeUtils.multiThrottle((msgID, LoadDirection direction) async {
+      await widget.onLoadMore(msgID, direction);
+    }, 200);
+
 
     if (findingMsg != null) {
       _onScrollToIndex(findingMsg!);
@@ -349,7 +357,7 @@ class _TIMUIKitHistoryMessageListState
     }
 
     String getMessageIdentifier(V2TimMessage? message, int index) {
-      return "${message?.msgID} - ${message?.timestamp} - ${message?.seq}";
+      return "${message?.msgID} - ${message?.timestamp} - ${message?.seq} -${message?.id}";
     }
 
     return Container(
@@ -390,6 +398,9 @@ class _TIMUIKitHistoryMessageListState
                     delegate: SliverChildBuilderDelegate(
                         (BuildContext context, int index) {
                           final messageItem = unreadMessageList[index];
+                          if(index == unreadMessageList.length - 1 && widget.model.haveMoreLatestData == true){
+                            throteFunctionWithMsgID(messageItem?.msgID ?? "", LoadDirection.latest);
+                          }
                           return AutoScrollTag(
                             controller: _autoScrollController,
                             index: -index,
@@ -430,7 +441,7 @@ class _TIMUIKitHistoryMessageListState
                           final messageItem = readMessageList[index];
                           if (index == readMessageList.length - 1) {
                             if (widget.model.haveMoreData) {
-                              throteFunction(index);
+                              throteFunction(index, LoadDirection.previous);
                               return Column(
                                 children: [
                                   LoadingAnimationWidget.staggeredDotsWave(
@@ -458,6 +469,9 @@ class _TIMUIKitHistoryMessageListState
                               );
                             }
                           }
+                          if(index == 0 && widget.model.haveMoreLatestData == true && globalModel.receivedMessageListCount < 10){
+                            throteFunction(index, LoadDirection.latest);
+                          }
                           return AutoScrollTag(
                             controller: _autoScrollController,
                             index: -index,
@@ -484,11 +498,13 @@ class _TIMUIKitHistoryMessageListState
                               (element) =>
                                   getMessageIdentifier(element, 0) == data);
                           return index > -1 ? index : null;
-                        })),
+                        }
+                        )),
               ),
             ],
           ),
           TIMUIKitHistoryMessageListTongueContainer(
+            conversation: widget.conversation,
             model: widget.model,
             scrollController: _autoScrollController,
             scrollToIndexBySeq: _onScrollToIndexBySeq,

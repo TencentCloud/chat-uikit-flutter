@@ -8,6 +8,7 @@ enum MessageListTongueType {
   none,
   toLatest,
   showUnread,
+  showPrevious,
   atMe,
   atAll,
 }
@@ -31,8 +32,11 @@ class TIMUIKitHistoryMessageListTongue extends TIMUIKitStatelessWidget {
   /// total amount of messages at me
   final String atNum;
 
+  final int previousCount;
+
   TIMUIKitHistoryMessageListTongue({
     Key? key,
+    required this.previousCount,
     required this.valueType,
     required this.onClick,
     required this.unreadCount,
@@ -51,6 +55,7 @@ class TIMUIKitHistoryMessageListTongue extends TIMUIKitStatelessWidget {
         unreadCount: unreadCount,
         valueType: valueType,
         atNum: atNum,
+        previousCount: previousCount,
       );
     }
     return valueType != MessageListTongueType.none ? tongueItem : Container();

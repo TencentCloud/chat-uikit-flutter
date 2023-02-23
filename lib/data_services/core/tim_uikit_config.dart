@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 class TIMUIKitConfig {
   /// Control if show online status of friends or contacts.
   /// This only works with [Ultimate Edition].
@@ -13,8 +15,12 @@ class TIMUIKitConfig {
   /// The asset path of the default avatar image.
   final String? defaultAvatarAssetPath;
 
+  /// The configuration of border radius for all the avatar shows in TUIKit.
+  final BorderRadius? defaultAvatarBorderRadius;
+
   const TIMUIKitConfig({
     this.defaultAvatarAssetPath,
+    this.defaultAvatarBorderRadius,
     this.isCheckDiskStorageSpace = true,
     this.isShowOnlineStatus = true,
   });

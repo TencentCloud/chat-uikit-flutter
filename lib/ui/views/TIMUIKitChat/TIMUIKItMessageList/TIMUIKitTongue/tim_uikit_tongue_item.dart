@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 
-
-
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
@@ -21,10 +19,13 @@ class TIMUIKitTongueItem extends TIMUIKitStatelessWidget {
   /// total amount of messages at me
   final String atNum;
 
-  TIMUIKitTongueItem({
+  final int previousCount;
+
+  TIMUIKitTongueItem( {
     Key? key,
     required this.onClick,
     required this.valueType,
+    required this.previousCount,
     required this.unreadCount,
     required this.atNum,
   }) : super(key: key);
@@ -32,11 +33,14 @@ class TIMUIKitTongueItem extends TIMUIKitStatelessWidget {
   Map<MessageListTongueType, String> textType(BuildContext context) {
     final option1 = unreadCount.toString();
     final option2 = atNum.toString();
+    final option3 = previousCount.toString();
     final String atMeString = option2 != ""
         ? TIM_t_para("有{{option2}}条@我消息", "有$option2条@我消息")(option2: option2)
         : TIM_t("有人@我");
 
     return {
+      MessageListTongueType.showPrevious:
+          TIM_t_para("{{option3}}条未读消息", "$option3条未读消息")(option3: option3),
       MessageListTongueType.toLatest: TIM_t("回到最新位置"),
       MessageListTongueType.showUnread:
           TIM_t_para("{{option1}}条新消息", "$option1条新消息")(option1: option1),
@@ -50,6 +54,7 @@ class TIMUIKitTongueItem extends TIMUIKitStatelessWidget {
     MessageListTongueType.showUnread: Icons.arrow_downward_outlined,
     MessageListTongueType.atMe: Icons.arrow_upward_outlined,
     MessageListTongueType.atAll: Icons.arrow_upward_outlined,
+    MessageListTongueType.showPrevious: Icons.arrow_upward_outlined,
   };
 
   @override
@@ -71,7 +76,7 @@ class TIMUIKitTongueItem extends TIMUIKitStatelessWidget {
         ),
         padding: const EdgeInsets.all(10),
         // width: 112,
-        height: 37,
+        // height: 37,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,

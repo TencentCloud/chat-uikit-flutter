@@ -363,6 +363,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
       goDownBottom();
     }
     setSendButton();
+    currentCursor = null;
   }
 
 // index为emoji的index,data为baseurl+name
@@ -435,6 +436,9 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
   }
 
   void goDownBottom() {
+    if(globalModel.getMessageListPosition(widget.conversationID) == HistoryMessagePosition.notShowLatest){
+      return;
+    }
     Future.delayed(const Duration(milliseconds: 50), () {
       try {
         if (widget.scrollController != null) {

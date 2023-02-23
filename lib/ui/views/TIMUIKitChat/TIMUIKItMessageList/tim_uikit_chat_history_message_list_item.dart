@@ -597,6 +597,57 @@ class _TIMUIKItHistoryMessageListItemState
     );
   }
 
+  Widget _latestDividerBuilder(TUITheme theme) {
+    return Container(
+      alignment: Alignment.center,
+      margin: const EdgeInsets.symmetric(vertical: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            margin: const EdgeInsets.only(right: 20),
+            child: SizedBox(
+              height: 1,
+              width: 100,
+              child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [
+                      const Color(0x00C0E1FF),
+                      theme.primaryColor ?? CommonColor.lightPrimaryColor
+                    ]),
+                  )
+              ),
+            ),
+          ),
+          Text(
+            TIM_t("以下为未读消息"),
+            style: widget.themeData?.timelineTextStyle ??
+                TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  color: theme.primaryColor,
+                ),
+          ),
+          Container(
+            margin: const EdgeInsets.only(left: 20),
+            child: SizedBox(
+              height: 1,
+              width: 100,
+              child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(colors: [
+                      theme.primaryColor ?? CommonColor.primaryColor,
+                      const Color(0x00C0E1FF),
+                    ]),
+                  )
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   bool isRevokable(int timestamp) =>
       (DateTime.now().millisecondsSinceEpoch / 1000).ceil() - timestamp < 120;
 
@@ -820,6 +871,7 @@ class _TIMUIKItHistoryMessageListItemState
         msgType == MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS;
     final isRevokedMsg = msgStatus == 6;
     final isTimeDivider = msgType == 11;
+    final isLatestDivider = msgType == 101;
     final isPeerRead = message.isPeerRead ?? false;
     final isGroupMessage = model.conversationType == ConvType.group;
     final bool isRevokeEditable =
@@ -830,6 +882,9 @@ class _TIMUIKItHistoryMessageListItemState
         isGroupMessage && model.chatConfig.isShowOthersNameInGroup;
     if (isTimeDivider) {
       return _timeDividerBuilder(theme, message.timestamp ?? 0, model);
+    }
+    if(isLatestDivider){
+      return _latestDividerBuilder(theme);
     }
     void clearJump() {
       Future.delayed(const Duration(milliseconds: 100), () {
@@ -941,8 +996,6 @@ class _TIMUIKItHistoryMessageListItemState
                                   width: 40,
                                   height: 40,
                                   child: Avatar(
-                                    borderRadius:
-                                        widget.themeData?.avatarBorderRadius,
                                     faceUrl: message.faceUrl ?? "",
                                     showName:
                                         MessageUtils.getDisplayName(message),
@@ -1146,8 +1199,6 @@ class _TIMUIKItHistoryMessageListItemState
                                   }
                                 },
                                 child: Avatar(
-                                    borderRadius:
-                                        widget.themeData?.avatarBorderRadius,
                                     faceUrl: message.faceUrl ?? "",
                                     showName:
                                         MessageUtils.getDisplayName(message)),
