@@ -270,7 +270,7 @@ class _TIMUIKitReplyElemState extends TIMUIKitState<TIMUIKitReplyElem> {
       }
     }
     final defaultStyle = (widget.message.isSelf ?? false)
-        ? theme.lightPrimaryMaterialColor.shade50
+        ? theme.chatMessageItemFromSelfBgColor
         : theme.weakBackgroundColor;
     final backgroundColor = isShowJumpState
         ? const Color.fromRGBO(245, 166, 35, 1)
