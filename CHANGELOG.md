@@ -1,3 +1,7 @@
+## 1.7.0+1
+
+* Fix: An issue that caused errors on mentioning all members.
+
 ## 1.7.0
 
 * Addition: Support for quickly navigating to the first unread message in a group chat with more than 20 new unread messages, using the dynamic tongue located in the top right corner of the screen. This feature allows for swift movement through the messages, regardless of their quantity.

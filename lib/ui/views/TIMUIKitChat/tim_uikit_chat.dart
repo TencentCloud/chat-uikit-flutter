@@ -406,6 +406,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                             : (widget.textFieldBuilder != null
                                 ? widget.textFieldBuilder!(context)
                                 : TIMUIKitInputTextField(
+                                    groupType: widget.conversation.groupType,
                                     model: model,
                                     controller: textFieldController,
                                     customEmojiStickerList:

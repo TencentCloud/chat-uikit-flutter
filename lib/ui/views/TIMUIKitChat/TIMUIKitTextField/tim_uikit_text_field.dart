@@ -71,6 +71,8 @@ class TIMUIKitInputTextField extends StatefulWidget {
 
   final List customEmojiStickerList;
 
+  final String? groupType;
+
   /// sticker panel customization
   final Widget Function(
           {void Function() sendTextMessage,
@@ -98,7 +100,7 @@ class TIMUIKitInputTextField extends StatefulWidget {
       this.onChanged,
       this.isUseDefaultEmoji = false,
       this.customEmojiStickerList = const [],
-      required this.model})
+      required this.model, this.groupType})
       : super(key: key);
 
   @override
@@ -569,7 +571,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
               groupMemberList: model.groupMemberList,
               groupInfo: model.groupInfo,
               groupID: groupID,
-              groupType: conversationModel.selectedConversation?.groupType),
+              groupType: widget.groupType),
         ),
       );
       final showName = _getShowName(memberInfo);
