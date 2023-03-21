@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
@@ -17,15 +18,17 @@ class TIMUIKitHistoryMessageListTongueContainer extends StatefulWidget {
   final Function(String targetSeq) scrollToIndexBySeq;
   final AutoScrollController scrollController;
   final TUIChatSeparateViewModel model;
+  final V2TimConversation conversation;
 
-  const TIMUIKitHistoryMessageListTongueContainer(
-      {Key? key,
-      this.tongueItemBuilder,
-      this.groupAtInfoList,
-      required this.scrollToIndexBySeq,
-      required this.scrollController,
-      required this.model})
-      : super(key: key);
+  const TIMUIKitHistoryMessageListTongueContainer({
+    Key? key,
+    this.tongueItemBuilder,
+    this.groupAtInfoList,
+    required this.conversation,
+    required this.scrollToIndexBySeq,
+    required this.scrollController,
+    required this.model,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() =>
@@ -37,6 +40,7 @@ class _TIMUIKitHistoryMessageListTongueContainerState
   bool isFinishJumpToAt = false;
   List<V2TimGroupAtInfo?>? groupAtInfoList = [];
   final TUIChatGlobalModel globalModel = serviceLocator<TUIChatGlobalModel>();
+  bool isClickShowPrevious = false;
 
   @override
   void initState() {
@@ -55,29 +59,22 @@ class _TIMUIKitHistoryMessageListTongueContainerState
 
   scrollHandler() {
     final screenHeight = MediaQuery.of(context).size.height;
-    if (widget.scrollController.offset <= 0.0 &&
-        widget.model.getConversationUnreadCount() != 0) {
-      // final double originalHeight =
-      //     widget.scrollController.position.extentAfter;
+    final offset = widget.scrollController.offset;
+    final conversationUnreadCount = widget.model.getConversationUnreadCount();
+    if (offset <= 0.0 &&
+        conversationUnreadCount != 0) {
       widget.model.showLatestUnread();
-      // Future.delayed(const Duration(milliseconds: 500), () {
-      //   if (widget.scrollController.position.maxScrollExtent > originalHeight) {
-      //     final animateToPosition =
-      //         widget.scrollController.position.maxScrollExtent - originalHeight;
-      //     widget.scrollController.jumpTo(animateToPosition);
-      //   }
-      // });
     }
     if (widget.scrollController.offset <=
             widget.scrollController.position.minScrollExtent &&
-        !widget.scrollController.position.outOfRange) {
+        !widget.scrollController.position.outOfRange && !widget.model.haveMoreLatestData) {
       changePositionState(HistoryMessagePosition.bottom);
     } else if (widget.scrollController.offset <= screenHeight * 1.6 &&
         widget.scrollController.offset > 0 &&
-        !widget.scrollController.position.outOfRange) {
+        !widget.scrollController.position.outOfRange && !widget.model.haveMoreLatestData) {
       changePositionState(HistoryMessagePosition.inTwoScreen);
     } else if (widget.scrollController.offset > screenHeight * 1.6 &&
-        !widget.scrollController.position.outOfRange) {
+        !widget.scrollController.position.outOfRange && !widget.model.haveMoreLatestData) {
       changePositionState(HistoryMessagePosition.awayTwoScreen);
     }
   }
@@ -88,6 +85,11 @@ class _TIMUIKitHistoryMessageListTongueContainerState
 
   MessageListTongueType _getTongueValueType(
       List<V2TimGroupAtInfo?>? groupAtInfoList) {
+
+    if(globalModel.getMessageListPosition(widget.model.conversationID) ==
+        HistoryMessagePosition.notShowLatest){
+      return MessageListTongueType.none;
+    }
     if (groupAtInfoList != null &&
         groupAtInfoList.isNotEmpty &&
         !isFinishJumpToAt) {
@@ -96,6 +98,10 @@ class _TIMUIKitHistoryMessageListTongueContainerState
       } else {
         return MessageListTongueType.atAll;
       }
+    }
+
+    if ((widget.conversation.unreadCount ?? 0) > 20 && !isClickShowPrevious) {
+      return MessageListTongueType.showPrevious;
     }
 
     if (globalModel.unreadCountForConversation > 0) {
@@ -121,12 +127,20 @@ class _TIMUIKitHistoryMessageListTongueContainerState
     return Selector<TUIChatGlobalModel, Tuple2<HistoryMessagePosition, int>>(
       builder: (context, value, child) {
         return Positioned(
-          bottom: 16,
+          bottom: _getTongueValueType(groupAtInfoList) !=
+                  MessageListTongueType.showPrevious
+              ? 16
+              : null,
+          top: _getTongueValueType(groupAtInfoList) ==
+                  MessageListTongueType.showPrevious
+              ? 16
+              : null,
           right: 16,
           child: TIMUIKitHistoryMessageListTongue(
+            previousCount: widget.conversation.unreadCount ?? 0,
             tongueItemBuilder: widget.tongueItemBuilder,
             unreadCount: globalModel.unreadCountForConversation,
-            onClick: () {
+            onClick: () async {
               if (groupAtInfoList != null && groupAtInfoList!.isNotEmpty) {
                 if (groupAtInfoList?.length == 1) {
                   widget.scrollToIndexBySeq(groupAtInfoList![0]!.seq);
@@ -138,8 +152,26 @@ class _TIMUIKitHistoryMessageListTongueContainerState
                 } else {
                   widget.scrollToIndexBySeq(groupAtInfoList!.removeAt(0)!.seq);
                 }
-              }
-              if (value.item1 == HistoryMessagePosition.awayTwoScreen ||
+              } else if ((widget.conversation.unreadCount ?? 0) > 20 && !isClickShowPrevious) {
+                try{
+                  isClickShowPrevious = true;
+                  final String? lastSeqString =
+                      widget.conversation.lastMessage?.seq;
+                  final int? lastSeq =
+                  TencentUtils.checkString(lastSeqString) != null
+                      ? int.parse(lastSeqString!)
+                      : null;
+                  final int? previousCount = widget.conversation.unreadCount;
+                  if (lastSeq != null && previousCount != null) {
+                    final targetSeq = lastSeq - previousCount;
+                    await widget.model.loadListForSpecificMessage(seq: targetSeq);
+                    // widget.scrollToIndexBySeq((targetSeq + 1).toString());
+                  }
+                }catch(e){
+                  // TODO: 这里后续加个弹窗提示客户，找消息失败了
+                }
+                // widget.model.loadListForSpecificMessage(seq: count);
+              } else if (value.item1 == HistoryMessagePosition.awayTwoScreen ||
                   globalModel.unreadCountForConversation > 0) {
                 widget.model.showLatestUnread();
                 widget.scrollController.animateTo(

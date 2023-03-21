@@ -13,8 +13,8 @@ class Avatar extends TIMUIKitStatelessWidget {
   final String faceUrl;
   final String showName;
   final bool isFromLocalAsset;
-  final CoreServicesImpl coreService = serviceLocator<CoreServicesImpl>();
   final BorderRadius? borderRadius;
+  final CoreServicesImpl coreService = serviceLocator<CoreServicesImpl>();
   final V2TimUserStatus? onlineStatus;
   final int? type; // 1 c2c 2 group
   final bool isShowBigWhenClick;
@@ -25,10 +25,10 @@ class Avatar extends TIMUIKitStatelessWidget {
       {Key? key,
       required this.faceUrl,
       this.onlineStatus,
-      required this.showName,
+        this.borderRadius,
+        required this.showName,
       this.isShowBigWhenClick = false,
       this.isFromLocalAsset = false,
-      this.borderRadius,
       this.type = 1})
       : super(key: key);
 
@@ -133,14 +133,14 @@ class Avatar extends TIMUIKitStatelessWidget {
             child: Hero(
               tag: faceUrl,
               child: ClipRRect(
-                borderRadius: borderRadius ?? BorderRadius.circular(4.8),
+                borderRadius: borderRadius ?? selfInfoViewModel.globalConfig?.defaultAvatarBorderRadius ?? BorderRadius.circular(4.8),
                 child: getImageWidget(context, theme),
               ),
             ),
           ),
         if (!isShowBigWhenClick)
           ClipRRect(
-            borderRadius: borderRadius ?? BorderRadius.circular(4.8),
+            borderRadius: borderRadius ?? selfInfoViewModel.globalConfig?.defaultAvatarBorderRadius ?? BorderRadius.circular(4.8),
             child: getImageWidget(context, theme),
           ),
         if (onlineStatus?.statusType != null && onlineStatus?.statusType != 0)

@@ -100,10 +100,10 @@ class MessageUtils {
     }
   }
 
-  static String? _getOpUserNick(V2TimGroupMemberInfo opUser) {
-    return TencentUtils.checkString(opUser.friendRemark) ??
-        TencentUtils.checkString(opUser.nickName) ??
-        TencentUtils.checkString(opUser.userID);
+  static String? _getOpUserNick(V2TimGroupMemberInfo? opUser) {
+    return TencentUtils.checkString(opUser?.friendRemark) ??
+        TencentUtils.checkString(opUser?.nickName) ??
+        TencentUtils.checkString(opUser?.userID) ?? "";
   }
 
   static String? _getMemberNickName(V2TimGroupMemberInfo e) {
