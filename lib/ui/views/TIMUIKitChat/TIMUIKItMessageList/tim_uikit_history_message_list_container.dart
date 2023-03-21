@@ -67,6 +67,8 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
 
   final bool isAllowScroll;
 
+  final V2TimConversation conversation;
+
   const TIMUIKitHistoryMessageListContainer({
     Key? key,
     this.itemBuilder,
@@ -89,6 +91,7 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
     this.isUseDefaultEmoji = false,
     this.customEmojiStickerList = const [],
     this.textFieldController,
+    required this.conversation,
   }) : super(key: key);
 
   @override
@@ -102,10 +105,12 @@ class _TIMUIKitHistoryMessageListContainerState
 
   List<V2TimMessage?> historyMessageList = [];
 
-  Future<void> requestForData(String? lastMsgID, TUIChatSeparateViewModel model,
+  Future<void> requestForData(String? lastMsgID, LoadDirection direction, TUIChatSeparateViewModel model,
       [int? count]) async {
-    if (model.haveMoreData) {
+    print("requestForData $lastMsgID $direction");
+    if ((direction == LoadDirection.previous && model.haveMoreData) || (direction == LoadDirection.latest && model.haveMoreLatestData)) {
       await model.loadData(
+        direction: direction,
           count: count ?? (kIsWeb ? 15 : HistoryMessageDartConstant.getCount),
           lastMsgID: lastMsgID);
     }
@@ -139,6 +144,7 @@ class _TIMUIKitHistoryMessageListContainerState
       conversationID: model.conversationID,
       builder: (context, messageList, child) {
         return TIMUIKitHistoryMessageList(
+          conversation: widget.conversation,
           model: model,
           isAllowScroll: widget.isAllowScroll,
           controller: _historyMessageListController,
@@ -172,8 +178,8 @@ class _TIMUIKitHistoryMessageListContainerState
           tongueItemBuilder: widget.tongueItemBuilder,
           initFindingMsg: widget.initFindingMsg,
           messageList: messageList,
-          onLoadMore: (String? a, [int? b]) async {
-            return await requestForData(a, model, b);
+          onLoadMore: (String? a, LoadDirection direction, [int? b]) async {
+            return await requestForData(a, direction, model, b);
           },
         );
       },

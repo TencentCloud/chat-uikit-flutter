@@ -18,7 +18,7 @@ import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 
 enum ConvType { none, c2c, group }
 
-enum HistoryMessagePosition { bottom, inTwoScreen, awayTwoScreen }
+enum HistoryMessagePosition { bottom, inTwoScreen, awayTwoScreen, notShowLatest }
 
 class CurrentConversation {
   final String conversationID;
@@ -180,6 +180,10 @@ class TUIChatGlobalModel extends ChangeNotifier with TIMUIKitClass {
 
   int get receivedMessageListCount {
     return _receivedNewMessageCount;
+  }
+
+  set receivedNewMessageCount(int value) {
+    _receivedNewMessageCount = value;
   }
 
   int get unreadCountForConversation => _unreadCountForConversation;
@@ -596,7 +600,11 @@ class TUIChatGlobalModel extends ChangeNotifier with TIMUIKitClass {
     _checkFromUserisActive(msgComing);
     final convID = newMsg.userID ?? newMsg.groupID;
     if (convID != null && convID == currentSelectedConv) {
-      if (getMessageListPosition(convID) == HistoryMessagePosition.bottom &&
+      final position = getMessageListPosition(convID);
+      if(position == HistoryMessagePosition.notShowLatest){
+        return;
+      }
+      if (position == HistoryMessagePosition.bottom &&
           unreadCountForConversation == 0) {
         markMessageAsRead(
           convID: convID,

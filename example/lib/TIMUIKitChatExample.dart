@@ -13,7 +13,7 @@ class TIMUIKitChatExample extends StatelessWidget {
       : super(key: key);
 
   String? _getConversationID() {
-    if (selectedConversation != null) {
+    if(selectedConversation != null){
       return selectedConversation!.type == 1
           ? selectedConversation!.userID
           : selectedConversation!.groupID;
@@ -38,56 +38,51 @@ class TIMUIKitChatExample extends StatelessWidget {
           GroupReceiptAllowType.public
         ],
       ),
-      conversationID: _getConversationID() ?? "10040818",
-      // Please fill in here according to the actual cleaning
-      conversationShowName: selectedConversation?.showName ??
-          selectedConversation?.userID ??
-          selectedConversation?.groupID ??
-          "Test Chat",
-      // Please fill in here according to the actual cleaning
-      conversationType: ConvType.values[selectedConversation?.type ?? 1],
-      appBarConfig: AppBar(
-        actions: [
+      conversation: selectedConversation ??
+          V2TimConversation(
+              conversationID: "c2c_10040818",
+              userID: "10040818",
+              showName: "Test Chat",
+              type: 1),
+        appBarConfig: AppBar(
+          actions: [
           IconButton(
-            padding: const EdgeInsets.only(left: 8, right: 16),
-            onPressed: () async {
-              final conversationType = selectedConversation?.type ?? 1;
+              padding: const EdgeInsets.only(left: 8, right: 16),
+              onPressed: () async {
+                final conversationType = selectedConversation?.type ?? 1;
 
-              if (conversationType == 1) {
-                final String? userID = selectedConversation?.userID;
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Scaffold(
-                          appBar: AppBar(title: Text(userID ?? "User Profile")),
-                          body: TIMUIKitProfileExample(userID: userID)),
-                    ));
-              } else {
-                final String? groupID = selectedConversation?.groupID;
-                if (groupID != null) {
+                if (conversationType == 1) {
+                  final String? userID = selectedConversation?.userID;
                   Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => Scaffold(
-                        appBar: AppBar(title: Text(groupID)),
-                        body: TIMUIKitGroupProfileExample(
-                          groupID: groupID,
-                        ),
-                      ),
-                    ),
-                  );
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => Scaffold(
+                          appBar: AppBar(title: Text(userID ?? "User Profile")),
+                            body: TIMUIKitProfileExample(userID: userID)),
+                      ));
+                } else {
+                  final String? groupID = selectedConversation?.groupID;
+                  if (groupID != null) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Scaffold(
+                              appBar: AppBar(title: Text(groupID)),
+                              body: TIMUIKitGroupProfileExample(
+                            groupID: groupID,
+                          )),
+                        ));
+                  }
                 }
-              }
-            },
-            icon: Image.asset(
-              'images/more.png',
-              package: 'tencent_cloud_chat_uikit',
-              height: 34,
-              width: 34,
-            ),
-          ),
-        ],
-      ),
+              },
+              icon: Image.asset(
+                'images/more.png',
+                package: 'tencent_cloud_chat_uikit',
+                  height: 34,
+                  width: 34,
+                ))
+          ],
+        ),
     );
   }
 }

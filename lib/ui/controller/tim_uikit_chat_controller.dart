@@ -25,6 +25,7 @@ class TIMUIKitChatController {
     int lastMsgSeq = -1,
     required int count,
     String? lastMsgID,
+    LoadDirection direction =  LoadDirection.previous
   }) async {
     return await model?.loadData(
           count: count,

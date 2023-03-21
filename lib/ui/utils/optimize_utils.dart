@@ -14,6 +14,19 @@ class OptimizeUtils {
     };
   }
 
+  static multiThrottle(Function func, int milliseconds) {
+    bool enable = true;
+    return (val1, val2) {
+      if (enable == true) {
+        enable = false;
+        Future.delayed(Duration(milliseconds: milliseconds), () {
+          enable = true;
+          func(val1, val2);
+        });
+      }
+    };
+  }
+
   static debounce(
     Function func, [
     Duration delay = const Duration(milliseconds: 100),
