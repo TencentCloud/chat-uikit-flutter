@@ -184,10 +184,7 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
                               ),
                             ),
                           ),
-                          if (medal != null) ...[
-                            const SizedBox(width: 8),
-                            medal!,
-                          ],
+                          if (medal != null) medal!,
                         ],
                       ),
                     ),
