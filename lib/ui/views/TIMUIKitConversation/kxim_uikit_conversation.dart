@@ -19,12 +19,19 @@ typedef KXConversationItemBuilder = Widget Function(
     V2TimConversation conversationItem,
     [V2TimUserStatus? onlineStatus]);
 
+typedef KXConversationSkinBuilder = DecorationImage? Function(
+  V2TimConversation conversationItem,
+);
+
 typedef KXConversationItemSlidableBuilder = List<ConversationItemSlidablePanel>
     Function(V2TimConversation conversationItem);
 
 class KXIMUIKitConversation extends StatefulWidget {
   /// 在顶部显示的组件：比如搜索按钮
   final List<Widget> topWidgets;
+
+  /// 会话皮肤
+  final KXConversationSkinBuilder? skinBuilder;
 
   /// the callback after clicking conversation item
   final ValueChanged<V2TimConversation>? onTapItem;
@@ -72,6 +79,7 @@ class KXIMUIKitConversation extends StatefulWidget {
     this.lastMessageBuilder,
     this.isShowOnlineStatus = true,
     this.topWidgets = const [],
+    this.skinBuilder,
   }) : super(key: key);
 
   @override
@@ -336,6 +344,8 @@ class _KXIMUIKitConversationState extends TIMUIKitState<KXIMUIKitConversation> {
                               child: InkWell(
                                 child: TIMUIKitConversationItem(
                                     isShowDraft: widget.isShowDraft,
+                                    skinImage: widget.skinBuilder
+                                        ?.call(conversationItem),
                                     lastMessageBuilder:
                                         widget.lastMessageBuilder,
                                     faceUrl: conversationItem.faceUrl ?? "",
