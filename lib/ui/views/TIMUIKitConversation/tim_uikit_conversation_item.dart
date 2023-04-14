@@ -1,16 +1,14 @@
 // ignore_for_file: avoid_print, empty_catches
 
 import 'package:flutter/material.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
-
 import 'package:tencent_cloud_chat_uikit/ui/utils/time_ago.dart';
-
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitConversation/tim_uikit_conversation_draft_text.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitConversation/tim_uikit_conversation_last_msg.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/unread_message.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_im_base/tencent_im_base.dart';
 
 typedef LastMessageBuilder = Widget? Function(
     V2TimMessage? lastMsg, List<V2TimGroupAtInfo?> groupAtInfoList);
@@ -28,6 +26,9 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
   final LastMessageBuilder? lastMessageBuilder;
   final V2TimUserStatus? onlineStatus;
   final int? convType;
+
+  // 会话皮肤
+  final DecorationImage? skinImage;
 
   /// Control if shows the identifier that the conversation has a draft text, inputted in previous.
   /// Also, you'd better specifying the `draftText` field for `TIMUIKitChat`, from the `draftText` in `V2TimConversation`,
@@ -49,6 +50,7 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
     this.draftTimestamp,
     this.lastMessageBuilder,
     this.convType,
+    this.skinImage,
   }) : super(key: key);
 
   Widget _getShowMsgWidget(BuildContext context) {
@@ -105,6 +107,7 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
     return Container(
       padding: const EdgeInsets.only(top: 6, bottom: 6, left: 16, right: 16),
       decoration: BoxDecoration(
+        image: skinImage,
         color: isPined
             ? theme.conversationItemPinedBgColor
             : theme.conversationItemBgColor,
