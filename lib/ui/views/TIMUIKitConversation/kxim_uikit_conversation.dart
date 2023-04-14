@@ -23,6 +23,10 @@ typedef KXConversationSkinBuilder = DecorationImage? Function(
   V2TimConversation conversationItem,
 );
 
+typedef KXConversationMedalBuilder = Widget? Function(
+  V2TimConversation conversationItem,
+);
+
 typedef KXConversationItemSlidableBuilder = List<ConversationItemSlidablePanel>
     Function(V2TimConversation conversationItem);
 
@@ -32,6 +36,9 @@ class KXIMUIKitConversation extends StatefulWidget {
 
   /// 会话皮肤
   final KXConversationSkinBuilder? skinBuilder;
+
+  /// 勋章
+  final KXConversationMedalBuilder? medalBuilder;
 
   /// the callback after clicking conversation item
   final ValueChanged<V2TimConversation>? onTapItem;
@@ -80,6 +87,7 @@ class KXIMUIKitConversation extends StatefulWidget {
     this.isShowOnlineStatus = true,
     this.topWidgets = const [],
     this.skinBuilder,
+    this.medalBuilder,
   }) : super(key: key);
 
   @override
@@ -345,6 +353,8 @@ class _KXIMUIKitConversationState extends TIMUIKitState<KXIMUIKitConversation> {
                                 child: TIMUIKitConversationItem(
                                     isShowDraft: widget.isShowDraft,
                                     skinImage: widget.skinBuilder
+                                        ?.call(conversationItem),
+                                    medal: widget.medalBuilder
                                         ?.call(conversationItem),
                                     lastMessageBuilder:
                                         widget.lastMessageBuilder,

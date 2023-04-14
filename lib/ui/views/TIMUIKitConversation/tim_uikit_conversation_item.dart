@@ -29,6 +29,8 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
 
   // 会话皮肤
   final DecorationImage? skinImage;
+  // 勋章
+  final Widget? medal;
 
   /// Control if shows the identifier that the conversation has a draft text, inputted in previous.
   /// Also, you'd better specifying the `draftText` field for `TIMUIKitChat`, from the `draftText` in `V2TimConversation`,
@@ -51,6 +53,7 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
     this.lastMessageBuilder,
     this.convType,
     this.skinImage,
+    this.medal,
   }) : super(key: key);
 
   Widget _getShowMsgWidget(BuildContext context) {
@@ -163,19 +166,31 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                        child: Text(
-                      nickName,
-                      softWrap: true,
-                      textAlign: TextAlign.left,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: TextStyle(
-                        height: 1,
-                        color: theme.conversationItemTitleTextColor,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              nickName,
+                              softWrap: true,
+                              textAlign: TextAlign.left,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                height: 1,
+                                color: theme.conversationItemTitleTextColor,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ),
+                          if (medal != null) ...[
+                            const SizedBox(width: 8),
+                            medal!,
+                          ],
+                        ],
                       ),
-                    )),
+                    ),
                     _getTimeStringForChatWidget(context, theme),
                   ],
                 ),
