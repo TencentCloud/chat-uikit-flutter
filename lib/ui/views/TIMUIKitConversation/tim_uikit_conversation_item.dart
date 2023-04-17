@@ -31,6 +31,8 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
   final DecorationImage? skinImage;
   // 勋章
   final Widget? medal;
+  // 头像
+  final Widget? cusAvatar;
 
   /// Control if shows the identifier that the conversation has a draft text, inputted in previous.
   /// Also, you'd better specifying the `draftText` field for `TIMUIKitChat`, from the `draftText` in `V2TimConversation`,
@@ -54,6 +56,7 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
     this.convType,
     this.skinImage,
     this.medal,
+    this.cusAvatar,
   }) : super(key: key);
 
   Widget _getShowMsgWidget(BuildContext context) {
@@ -135,10 +138,12 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
                 clipBehavior: Clip.none,
                 children: [
                   Avatar(
-                      onlineStatus: onlineStatus,
-                      faceUrl: faceUrl,
-                      showName: nickName,
-                      type: convType),
+                    onlineStatus: onlineStatus,
+                    faceUrl: faceUrl,
+                    showName: nickName,
+                    type: convType,
+                    cusAvatar: cusAvatar,
+                  ),
                   if (unreadCount != 0)
                     Positioned(
                       top: isDisturb ? -2.5 : -4.5,
