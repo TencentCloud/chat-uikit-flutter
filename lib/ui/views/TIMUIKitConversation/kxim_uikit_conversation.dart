@@ -23,6 +23,10 @@ typedef KXConversationSkinBuilder = DecorationImage? Function(
   V2TimConversation conversationItem,
 );
 
+typedef KXConversationEnableEndActionCaller = bool Function(
+  V2TimConversation conversationItem,
+);
+
 typedef KXConversationAvatarBuilder = Widget? Function(
   V2TimConversation conversationItem,
 );
@@ -46,6 +50,9 @@ class KXIMUIKitConversation extends StatefulWidget {
 
   /// 头像
   final KXConversationAvatarBuilder? avatarBuilder;
+
+  /// 是否允许侧滑操作
+  final KXConversationEnableEndActionCaller? enableEndActionCaller;
 
   /// the callback after clicking conversation item
   final ValueChanged<V2TimConversation>? onTapItem;
@@ -96,6 +103,7 @@ class KXIMUIKitConversation extends StatefulWidget {
     this.skinBuilder,
     this.medalBuilder,
     this.avatarBuilder,
+    this.enableEndActionCaller,
   }) : super(key: key);
 
   @override
@@ -351,50 +359,60 @@ class _KXIMUIKitConversationState extends TIMUIKitState<KXIMUIKitConversation> {
 
                         final slidableChildren =
                             _getSlidableBuilder()(conversationItem!);
+
+                        // 默认就是 true，表示需要支持侧滑事件，如果需要不支持，请明确返回 false
+                        final enableEndAction = widget.enableEndActionCaller
+                                ?.call(conversationItem) ??
+                            true;
                         return AutoScrollTag(
                           key: ValueKey(conversationItem.conversationID),
                           controller: _autoScrollController,
                           index: conversationIndex,
                           child: Slidable(
-                              groupTag: 'conversation-list',
-                              child: InkWell(
-                                child: TIMUIKitConversationItem(
-                                    isShowDraft: widget.isShowDraft,
-                                    cusAvatar: widget.avatarBuilder
-                                        ?.call(conversationItem),
-                                    skinImage: widget.skinBuilder
-                                        ?.call(conversationItem),
-                                    medal: widget.medalBuilder
-                                        ?.call(conversationItem),
-                                    lastMessageBuilder:
-                                        widget.lastMessageBuilder,
-                                    faceUrl: conversationItem.faceUrl ?? "",
-                                    nickName: conversationItem.showName ?? "",
-                                    isDisturb: conversationItem.recvOpt != 0,
-                                    lastMsg: conversationItem.lastMessage,
-                                    isPined: conversationItem.isPinned ?? false,
-                                    groupAtInfoList:
-                                        conversationItem.groupAtInfoList ?? [],
-                                    unreadCount:
-                                        conversationItem.unreadCount ?? 0,
-                                    draftText: conversationItem.draftText,
-                                    onlineStatus: (widget.isShowOnlineStatus &&
-                                            conversationItem.userID != null &&
-                                            conversationItem.userID!.isNotEmpty)
-                                        ? onlineStatus
-                                        : null,
-                                    draftTimestamp:
-                                        conversationItem.draftTimestamp,
-                                    convType: conversationItem.type),
-                                onTap: () => onTapConvItem(conversationItem),
-                              ),
-                              endActionPane: ActionPane(
-                                  extentRatio:
-                                      slidableChildren.length > 2 ? 0.77 : 0.5,
-                                  motion: const DrawerMotion(),
-                                  children: slidableChildren)),
+                            groupTag: 'conversation-list',
+                            child: InkWell(
+                              child: TIMUIKitConversationItem(
+                                  isShowDraft: widget.isShowDraft,
+                                  cusAvatar: widget.avatarBuilder
+                                      ?.call(conversationItem),
+                                  skinImage: widget.skinBuilder
+                                      ?.call(conversationItem),
+                                  medal: widget.medalBuilder
+                                      ?.call(conversationItem),
+                                  lastMessageBuilder: widget.lastMessageBuilder,
+                                  faceUrl: conversationItem.faceUrl ?? "",
+                                  nickName: conversationItem.showName ?? "",
+                                  isDisturb: conversationItem.recvOpt != 0,
+                                  lastMsg: conversationItem.lastMessage,
+                                  isPined: conversationItem.isPinned ?? false,
+                                  groupAtInfoList:
+                                      conversationItem.groupAtInfoList ?? [],
+                                  unreadCount:
+                                      conversationItem.unreadCount ?? 0,
+                                  draftText: conversationItem.draftText,
+                                  onlineStatus: (widget.isShowOnlineStatus &&
+                                          conversationItem.userID != null &&
+                                          conversationItem.userID!.isNotEmpty)
+                                      ? onlineStatus
+                                      : null,
+                                  draftTimestamp:
+                                      conversationItem.draftTimestamp,
+                                  convType: conversationItem.type),
+                              onTap: () => onTapConvItem(conversationItem),
+                            ),
+                            endActionPane: enableEndAction
+                                ? ActionPane(
+                                    extentRatio: slidableChildren.length > 2
+                                        ? 0.77
+                                        : 0.5,
+                                    motion: const DrawerMotion(),
+                                    children: slidableChildren,
+                                  )
+                                : null,
+                          ),
                         );
-                      })
+                      },
+                    )
                   : (widget.emptyBuilder != null
                       ? widget.emptyBuilder!()
                       : Container()),
