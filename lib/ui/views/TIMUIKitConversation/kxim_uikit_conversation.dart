@@ -23,6 +23,10 @@ typedef KXConversationSkinBuilder = DecorationImage? Function(
   V2TimConversation conversationItem,
 );
 
+typedef KXConversationEnableEndActionCaller = bool Function(
+  V2TimConversation conversationItem,
+);
+
 typedef KXConversationAvatarBuilder = Widget? Function(
   V2TimConversation conversationItem,
 );
@@ -46,6 +50,9 @@ class KXIMUIKitConversation extends StatefulWidget {
 
   /// 头像
   final KXConversationAvatarBuilder? avatarBuilder;
+
+  /// 是否允许侧滑操作
+  final KXConversationEnableEndActionCaller? enableEndActionCaller;
 
   /// the callback after clicking conversation item
   final ValueChanged<V2TimConversation>? onTapItem;
@@ -96,6 +103,7 @@ class KXIMUIKitConversation extends StatefulWidget {
     this.skinBuilder,
     this.medalBuilder,
     this.avatarBuilder,
+    this.enableEndActionCaller,
   }) : super(key: key);
 
   @override
@@ -289,117 +297,124 @@ class _KXIMUIKitConversationState extends TIMUIKitState<KXIMUIKitConversation> {
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final theme = value.theme;
     return MultiProvider(
-        providers: [
-          ChangeNotifierProvider.value(value: model),
-          ChangeNotifierProvider.value(value: friendShipViewModel)
-        ],
-        builder: (BuildContext context, Widget? w) {
-          final _model = Provider.of<TUIConversationViewModel>(context);
-          bool haveMoreData = _model.haveMoreData;
-          final _friendShipViewModel =
-              Provider.of<TUIFriendShipViewModel>(context);
-          _model.lifeCycle = widget.lifeCycle;
+      providers: [
+        ChangeNotifierProvider.value(value: model),
+        ChangeNotifierProvider.value(value: friendShipViewModel)
+      ],
+      builder: (BuildContext context, Widget? w) {
+        final _model = Provider.of<TUIConversationViewModel>(context);
+        bool haveMoreData = _model.haveMoreData;
+        final _friendShipViewModel =
+            Provider.of<TUIFriendShipViewModel>(context);
+        _model.lifeCycle = widget.lifeCycle;
 
-          List<V2TimConversation?> filteredConversationList =
-              getFilteredConversation();
+        List<V2TimConversation?> filteredConversationList =
+            getFilteredConversation();
 
-          if (TencentUtils.checkString(_model.scrollToConversation) != null) {
-            _onScrollToConversation(_model.scrollToConversation!);
-            _model.clearScrollToConversation();
-          }
+        if (TencentUtils.checkString(_model.scrollToConversation) != null) {
+          _onScrollToConversation(_model.scrollToConversation!);
+          _model.clearScrollToConversation();
+        }
 
-          int childCount =
-              widget.topWidgets.length + filteredConversationList.length;
+        int childCount =
+            widget.topWidgets.length + filteredConversationList.length;
 
-          return SlidableAutoCloseBehavior(
-            child: EasyRefresh(
-              // header: CustomizeBallPulseHeader(color: theme.primaryColor),
-              // onRefresh: () async {
-              //   model.refresh();
-              // },
-              child: filteredConversationList.isNotEmpty
-                  ? ListView.builder(
-                      controller: _autoScrollController,
-                      shrinkWrap: true,
-                      itemCount: childCount,
-                      itemBuilder: (context, index) {
-                        if (index < widget.topWidgets.length) {
-                          return widget.topWidgets[index];
+        return SlidableAutoCloseBehavior(
+          child: EasyRefresh(
+            // header: CustomizeBallPulseHeader(color: theme.primaryColor),
+            // onRefresh: () async {
+            //   model.refresh();
+            // },
+            child: filteredConversationList.isNotEmpty
+                ? ListView.builder(
+                    controller: _autoScrollController,
+                    shrinkWrap: true,
+                    itemCount: childCount,
+                    itemBuilder: (context, index) {
+                      if (index < widget.topWidgets.length) {
+                        return widget.topWidgets[index];
+                      }
+                      if (index == childCount - 1) {
+                        if (haveMoreData) {
+                          _timuiKitConversationController.loadData();
                         }
-                        if (index == childCount - 1) {
-                          if (haveMoreData) {
-                            _timuiKitConversationController.loadData();
-                          }
-                        }
+                      }
 
-                        final conversationIndex =
-                            index - widget.topWidgets.length;
+                      final conversationIndex =
+                          index - widget.topWidgets.length;
 
-                        final conversationItem =
-                            filteredConversationList[conversationIndex];
+                      final conversationItem =
+                          filteredConversationList[conversationIndex];
 
-                        final V2TimUserStatus? onlineStatus =
-                            _friendShipViewModel.userStatusList.firstWhere(
-                                (item) =>
-                                    item.userID == conversationItem?.userID,
-                                orElse: () => V2TimUserStatus(statusType: 0));
+                      final V2TimUserStatus? onlineStatus =
+                          _friendShipViewModel.userStatusList.firstWhere(
+                              (item) => item.userID == conversationItem?.userID,
+                              orElse: () => V2TimUserStatus(statusType: 0));
 
-                        if (widget.itembuilder != null) {
-                          return widget.itembuilder!(
-                              conversationItem!, onlineStatus);
-                        }
+                      if (widget.itembuilder != null) {
+                        return widget.itembuilder!(
+                            conversationItem!, onlineStatus);
+                      }
 
-                        final slidableChildren =
-                            _getSlidableBuilder()(conversationItem!);
-                        return AutoScrollTag(
-                          key: ValueKey(conversationItem.conversationID),
-                          controller: _autoScrollController,
-                          index: conversationIndex,
-                          child: Slidable(
-                              groupTag: 'conversation-list',
-                              child: InkWell(
-                                child: TIMUIKitConversationItem(
-                                    isShowDraft: widget.isShowDraft,
-                                    cusAvatar: widget.avatarBuilder
-                                        ?.call(conversationItem),
-                                    skinImage: widget.skinBuilder
-                                        ?.call(conversationItem),
-                                    medal: widget.medalBuilder
-                                        ?.call(conversationItem),
-                                    lastMessageBuilder:
-                                        widget.lastMessageBuilder,
-                                    faceUrl: conversationItem.faceUrl ?? "",
-                                    nickName: conversationItem.showName ?? "",
-                                    isDisturb: conversationItem.recvOpt != 0,
-                                    lastMsg: conversationItem.lastMessage,
-                                    isPined: conversationItem.isPinned ?? false,
-                                    groupAtInfoList:
-                                        conversationItem.groupAtInfoList ?? [],
-                                    unreadCount:
-                                        conversationItem.unreadCount ?? 0,
-                                    draftText: conversationItem.draftText,
-                                    onlineStatus: (widget.isShowOnlineStatus &&
-                                            conversationItem.userID != null &&
-                                            conversationItem.userID!.isNotEmpty)
-                                        ? onlineStatus
-                                        : null,
-                                    draftTimestamp:
-                                        conversationItem.draftTimestamp,
-                                    convType: conversationItem.type),
-                                onTap: () => onTapConvItem(conversationItem),
-                              ),
-                              endActionPane: ActionPane(
+                      final slidableChildren =
+                          _getSlidableBuilder()(conversationItem!);
+
+                      // 默认就是 true，表示需要支持侧滑事件，如果需要不支持，请明确返回 false
+                      final enableEndAction = widget.enableEndActionCaller
+                              ?.call(conversationItem) ??
+                          true;
+                      return AutoScrollTag(
+                        key: ValueKey(conversationItem.conversationID),
+                        controller: _autoScrollController,
+                        index: conversationIndex,
+                        child: Slidable(
+                          groupTag: 'conversation-list',
+                          child: InkWell(
+                            child: TIMUIKitConversationItem(
+                                isShowDraft: widget.isShowDraft,
+                                cusAvatar: widget.avatarBuilder
+                                    ?.call(conversationItem),
+                                skinImage:
+                                    widget.skinBuilder?.call(conversationItem),
+                                medal:
+                                    widget.medalBuilder?.call(conversationItem),
+                                lastMessageBuilder: widget.lastMessageBuilder,
+                                faceUrl: conversationItem.faceUrl ?? "",
+                                nickName: conversationItem.showName ?? "",
+                                isDisturb: conversationItem.recvOpt != 0,
+                                lastMsg: conversationItem.lastMessage,
+                                isPined: conversationItem.isPinned ?? false,
+                                groupAtInfoList:
+                                    conversationItem.groupAtInfoList ?? [],
+                                unreadCount: conversationItem.unreadCount ?? 0,
+                                draftText: conversationItem.draftText,
+                                onlineStatus: (widget.isShowOnlineStatus &&
+                                        conversationItem.userID != null &&
+                                        conversationItem.userID!.isNotEmpty)
+                                    ? onlineStatus
+                                    : null,
+                                draftTimestamp: conversationItem.draftTimestamp,
+                                convType: conversationItem.type),
+                            onTap: () => onTapConvItem(conversationItem),
+                          ),
+                          endActionPane: enableEndAction
+                              ? ActionPane(
                                   extentRatio:
                                       slidableChildren.length > 2 ? 0.77 : 0.5,
                                   motion: const DrawerMotion(),
-                                  children: slidableChildren)),
-                        );
-                      })
-                  : (widget.emptyBuilder != null
-                      ? widget.emptyBuilder!()
-                      : Container()),
-            ),
-          );
-        });
+                                  children: slidableChildren,
+                                )
+                              : null,
+                        ),
+                      );
+                    },
+                  )
+                : (widget.emptyBuilder != null
+                    ? widget.emptyBuilder!()
+                    : Container()),
+          ),
+        );
+      },
+    );
   }
 }
