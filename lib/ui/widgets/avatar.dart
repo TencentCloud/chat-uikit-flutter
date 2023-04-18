@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
@@ -35,14 +33,6 @@ class Avatar extends TIMUIKitStatelessWidget {
   }) : super(key: key);
 
   Widget getImageWidget(BuildContext context, TUITheme theme) {
-    return Container(
-      color: Color.fromARGB(
-        Random().nextInt(255),
-        Random().nextInt(255),
-        Random().nextInt(255),
-        Random().nextInt(255),
-      ),
-    );
     if (cusAvatar != null) return cusAvatar!;
     Widget defaultAvatar() {
       if (type == 1) {
