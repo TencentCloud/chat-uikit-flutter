@@ -372,8 +372,8 @@ class _KXIMUIKitConversationState extends TIMUIKitState<KXIMUIKitConversation> {
                           child: InkWell(
                             child: TIMUIKitConversationItem(
                                 isShowDraft: widget.isShowDraft,
-                                // cusAvatar: widget.avatarBuilder
-                                //     ?.call(conversationItem),
+                                cusAvatar: widget.avatarBuilder
+                                    ?.call(conversationItem),
                                 skinImage:
                                     widget.skinBuilder?.call(conversationItem),
                                 medal:
