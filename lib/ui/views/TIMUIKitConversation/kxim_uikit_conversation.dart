@@ -31,6 +31,10 @@ typedef KXConversationAvatarBuilder = Widget? Function(
   V2TimConversation conversationItem,
 );
 
+typedef KXConversationsFilter = List<V2TimConversation?> Function(
+  List<V2TimConversation?> conversations,
+);
+
 typedef KXConversationMedalBuilder = Widget? Function(
   V2TimConversation conversationItem,
 );
@@ -41,6 +45,9 @@ typedef KXConversationItemSlidableBuilder = List<ConversationItemSlidablePanel>
 class KXIMUIKitConversation extends StatefulWidget {
   /// 在顶部显示的组件：比如搜索按钮
   final List<Widget> topWidgets;
+
+  /// 会话过滤：可以添加自己需要的操作逻辑：比如把持康讯通知在第一个
+  final KXConversationsFilter? cusConversationsFilter;
 
   /// 会话皮肤
   final KXConversationSkinBuilder? skinBuilder;
@@ -104,6 +111,7 @@ class KXIMUIKitConversation extends StatefulWidget {
     this.medalBuilder,
     this.avatarBuilder,
     this.enableEndActionCaller,
+    this.cusConversationsFilter,
   }) : super(key: key);
 
   @override
@@ -289,6 +297,11 @@ class _KXIMUIKitConversationState extends TIMUIKitState<KXIMUIKitConversation> {
       filteredConversationList = filteredConversationList
           .where(widget.conversationCollector!)
           .toList();
+    }
+    if (widget.cusConversationsFilter != null) {
+      filteredConversationList = widget.cusConversationsFilter!(
+        List.from(filteredConversationList),
+      );
     }
     return filteredConversationList;
   }
