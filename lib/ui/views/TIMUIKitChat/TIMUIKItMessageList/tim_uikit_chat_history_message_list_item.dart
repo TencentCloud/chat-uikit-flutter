@@ -60,6 +60,8 @@ typedef MessageRowBuilder = Widget? Function(
 typedef MessageNickNameBuilder = Widget Function(
     BuildContext context, V2TimMessage message, TUIChatSeparateViewModel model);
 
+typedef MessageElemTypeHandle = int Function(V2TimMessage message);
+
 typedef MessageItemContent = Widget? Function(
   V2TimMessage message,
   bool isShowJump,
@@ -108,6 +110,8 @@ class MessageItemBuilder {
   /// message nick name builder
   final MessageNickNameBuilder? messageNickNameBuilder;
 
+  final MessageElemTypeHandle? messageElemTypeHandle;
+
   MessageItemBuilder({
     this.locationMessageItemBuilder,
     this.textMessageItemBuilder,
@@ -122,6 +126,7 @@ class MessageItemBuilder {
     this.mergerMessageItemBuilder,
     this.messageRowBuilder,
     this.messageNickNameBuilder,
+    this.messageElemTypeHandle,
   });
 }
 
@@ -260,7 +265,7 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
       this.bottomRowBuilder,
       this.isUseDefaultEmoji = false,
       this.customEmojiStickerList = const [],
-        this.textFieldController})
+      this.textFieldController})
       : super(key: key);
 
   @override
@@ -350,7 +355,10 @@ class _TIMUIKItHistoryMessageListItemState
       });
     }
 
-    switch (msgType) {
+    int? type = messageItemBuilder?.messageElemTypeHandle?.call(messageItem);
+    type ??= msgType;
+
+    switch (type) {
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
         if (messageItemBuilder?.customMessageItemBuilder != null) {
           return messageItemBuilder!.customMessageItemBuilder!(
@@ -527,7 +535,7 @@ class _TIMUIKItHistoryMessageListItemState
           )!;
         }
         return TIMUIKitMergerElem(
-          messageItemBuilder: messageItemBuilder,
+            messageItemBuilder: messageItemBuilder,
             model: model,
             isShowJump: isShowJump,
             clearJump: clearJump,
@@ -545,8 +553,9 @@ class _TIMUIKItHistoryMessageListItemState
     final messageItem = widget.message;
     return Container(
         padding: const EdgeInsets.only(bottom: 20),
-        child:
-            TIMUIKitGroupTipsElem(groupTipsElem: messageItem.groupTipsElem!, groupMemberList: model.groupMemberList ?? []));
+        child: TIMUIKitGroupTipsElem(
+            groupTipsElem: messageItem.groupTipsElem!,
+            groupMemberList: model.groupMemberList ?? []));
   }
 
   Widget _selfRevokeEditMessageBuilder(theme, model) {
@@ -611,12 +620,11 @@ class _TIMUIKItHistoryMessageListItemState
               width: 100,
               child: Container(
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [
-                      const Color(0x00C0E1FF),
-                      theme.primaryColor ?? CommonColor.lightPrimaryColor
-                    ]),
-                  )
-              ),
+                gradient: LinearGradient(colors: [
+                  const Color(0x00C0E1FF),
+                  theme.primaryColor ?? CommonColor.lightPrimaryColor
+                ]),
+              )),
             ),
           ),
           Text(
@@ -635,12 +643,11 @@ class _TIMUIKItHistoryMessageListItemState
               width: 100,
               child: Container(
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [
-                      theme.primaryColor ?? CommonColor.primaryColor,
-                      const Color(0x00C0E1FF),
-                    ]),
-                  )
-              ),
+                gradient: LinearGradient(colors: [
+                  theme.primaryColor ?? CommonColor.primaryColor,
+                  const Color(0x00C0E1FF),
+                ]),
+              )),
             ),
           ),
         ],
@@ -751,7 +758,7 @@ class _TIMUIKItHistoryMessageListItemState
           if (offset.dy < 300 && !isLongMessage && viewInsetsBottom == 0) {
             selectEmojiPanelPosition = SelectEmojiPanelPosition.up;
             popupDirection = TooltipDirection.down;
-          } else if(viewInsetsBottom != 0 && offset.dy < 220){
+          } else if (viewInsetsBottom != 0 && offset.dy < 220) {
             selectEmojiPanelPosition = SelectEmojiPanelPosition.up;
             popupDirection = TooltipDirection.down;
           }
@@ -883,7 +890,7 @@ class _TIMUIKItHistoryMessageListItemState
     if (isTimeDivider) {
       return _timeDividerBuilder(theme, message.timestamp ?? 0, model);
     }
-    if(isLatestDivider){
+    if (isLatestDivider) {
       return _latestDividerBuilder(theme);
     }
     void clearJump() {
@@ -1111,7 +1118,9 @@ class _TIMUIKItHistoryMessageListItemState
                                         child: IgnorePointer(
                                             ignoring: model.isMultiSelect,
                                             child: _getMessageItemBuilder(
-                                                message, message.status, model)),
+                                                message,
+                                                message.status,
+                                                model)),
                                         onSecondaryTapDown: (details) {
                                           if (PlatformUtils().isWeb) {
                                             if (widget.allowLongPress) {
@@ -1124,7 +1133,8 @@ class _TIMUIKItHistoryMessageListItemState
                                               );
                                             }
                                             if (widget.onLongPress != null) {
-                                              widget.onLongPress!(context, message);
+                                              widget.onLongPress!(
+                                                  context, message);
                                             }
                                           }
                                         },
@@ -1139,7 +1149,8 @@ class _TIMUIKItHistoryMessageListItemState
                                             );
                                           }
                                           if (widget.onLongPress != null) {
-                                            widget.onLongPress!(context, message);
+                                            widget.onLongPress!(
+                                                context, message);
                                           }
                                         },
                                       ),
@@ -1147,8 +1158,10 @@ class _TIMUIKItHistoryMessageListItemState
                                         color: theme.white,
                                         child: TIMUIKitTextTranslationElem(
                                             message: message,
-                                            isUseDefaultEmoji: widget.isUseDefaultEmoji,
-                                            customEmojiStickerList: widget.customEmojiStickerList,
+                                            isUseDefaultEmoji:
+                                                widget.isUseDefaultEmoji,
+                                            customEmojiStickerList:
+                                                widget.customEmojiStickerList,
                                             isFromSelf: message.isSelf ?? false,
                                             isShowJump: false,
                                             clearJump: () {},
