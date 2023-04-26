@@ -60,7 +60,7 @@ typedef MessageRowBuilder = Widget? Function(
 typedef MessageNickNameBuilder = Widget Function(
     BuildContext context, V2TimMessage message, TUIChatSeparateViewModel model);
 
-typedef MessageElemTypeHandle = int? Function(V2TimMessage message);
+typedef MessageElemTypeIsGroupTip = bool Function(V2TimMessage message);
 
 typedef MessageItemContent = Widget? Function(
   V2TimMessage message,
@@ -110,7 +110,7 @@ class MessageItemBuilder {
   /// message nick name builder
   final MessageNickNameBuilder? messageNickNameBuilder;
 
-  final MessageElemTypeHandle? messageElemTypeHandle;
+  final MessageElemTypeIsGroupTip? messageElemTypeIsGroupTip;
 
   MessageItemBuilder({
     this.locationMessageItemBuilder,
@@ -126,7 +126,7 @@ class MessageItemBuilder {
     this.mergerMessageItemBuilder,
     this.messageRowBuilder,
     this.messageNickNameBuilder,
-    this.messageElemTypeHandle,
+    this.messageElemTypeIsGroupTip,
   });
 }
 
@@ -355,10 +355,7 @@ class _TIMUIKItHistoryMessageListItemState
       });
     }
 
-    int? type = messageItemBuilder?.messageElemTypeHandle?.call(messageItem);
-    type ??= msgType;
-
-    switch (type) {
+    switch (msgType) {
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
         if (messageItemBuilder?.customMessageItemBuilder != null) {
           return messageItemBuilder!.customMessageItemBuilder!(
@@ -874,8 +871,10 @@ class _TIMUIKItHistoryMessageListItemState
     final msgType = message.elemType;
     final isSelf = message.isSelf ?? false;
     final msgStatus = message.status;
-    final isGroupTipsMsg =
-        msgType == MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS;
+    final isGroupTipsMsg = msgType ==
+            MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS ||
+        (widget.messageItemBuilder?.messageElemTypeIsGroupTip?.call(message) ??
+            false);
     final isRevokedMsg = msgStatus == 6;
     final isTimeDivider = msgType == 11;
     final isLatestDivider = msgType == 101;
