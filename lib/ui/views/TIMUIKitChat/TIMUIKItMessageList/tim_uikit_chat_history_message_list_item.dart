@@ -59,7 +59,7 @@ typedef MessageRowBuilder = Widget? Function(
 
 typedef MessageNickNameBuilder = Widget Function(
     BuildContext context, V2TimMessage message, TUIChatSeparateViewModel model);
-
+// 判断是否是群提示消息
 typedef MessageElemTypeIsGroupTip = bool Function(V2TimMessage message);
 
 typedef MessageItemContent = Widget? Function(
