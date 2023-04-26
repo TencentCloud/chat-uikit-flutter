@@ -28,7 +28,7 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
   final int? convType;
 
   // 会话皮肤
-  final Widget? skinImage;
+  final DecorationImage? skinImage;
   // 勋章
   final Widget? medal;
   // 头像
@@ -113,6 +113,7 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
     return Container(
       padding: const EdgeInsets.only(top: 6, bottom: 6, left: 16, right: 16),
       decoration: BoxDecoration(
+        image: skinImage,
         color: isPined
             ? theme.conversationItemPinedBgColor
             : theme.conversationItemBgColor,
@@ -124,105 +125,99 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
           ),
         ),
       ),
-      child: Stack(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          if (skinImage != null) skinImage!,
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.only(top: 0, bottom: 2, right: 0),
-                child: SizedBox(
-                  width: 44,
-                  height: 44,
-                  child: Stack(
-                    fit: StackFit.expand,
-                    clipBehavior: Clip.none,
-                    children: [
-                      Avatar(
-                        onlineStatus: onlineStatus,
-                        faceUrl: faceUrl,
-                        showName: nickName,
-                        type: convType,
-                        cusAvatar: cusAvatar,
-                      ),
-                      if (unreadCount != 0)
-                        Positioned(
-                          top: isDisturb ? -2.5 : -4.5,
-                          right: isDisturb ? -2.5 : -4.5,
-                          child: UnconstrainedBox(
-                            child: UnreadMessage(
-                                width: isDisturb ? 10 : 18,
-                                height: isDisturb ? 10 : 18,
-                                unreadCount: isDisturb ? 0 : unreadCount),
-                          ),
-                        )
-                    ],
+          Container(
+            padding: const EdgeInsets.only(top: 0, bottom: 2, right: 0),
+            child: SizedBox(
+              width: 44,
+              height: 44,
+              child: Stack(
+                fit: StackFit.expand,
+                clipBehavior: Clip.none,
+                children: [
+                  Avatar(
+                    onlineStatus: onlineStatus,
+                    faceUrl: faceUrl,
+                    showName: nickName,
+                    type: convType,
+                    cusAvatar: cusAvatar,
                   ),
-                ),
-              ),
-              Expanded(
-                  child: Container(
-                height: 60,
-                margin: const EdgeInsets.only(left: 12),
-                padding: const EdgeInsets.only(top: 0, bottom: 0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  nickName,
-                                  softWrap: true,
-                                  textAlign: TextAlign.left,
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 1,
-                                  style: TextStyle(
-                                    height: 1,
-                                    color: theme.conversationItemTitleTextColor,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ),
-                              if (medal != null) medal!,
-                            ],
-                          ),
-                        ),
-                        _getTimeStringForChatWidget(context, theme),
-                      ],
-                    ),
-                    if (isHaveSecondLine())
-                      const SizedBox(
-                        height: 6,
+                  if (unreadCount != 0)
+                    Positioned(
+                      top: isDisturb ? -2.5 : -4.5,
+                      right: isDisturb ? -2.5 : -4.5,
+                      child: UnconstrainedBox(
+                        child: UnreadMessage(
+                            width: isDisturb ? 10 : 18,
+                            height: isDisturb ? 10 : 18,
+                            unreadCount: isDisturb ? 0 : unreadCount),
                       ),
-                    Row(
-                      children: [
-                        Expanded(child: _getShowMsgWidget(context)),
-                        if (isDisturb)
-                          SizedBox(
-                            width: 18,
-                            height: 18,
-                            child: Icon(
-                              Icons.notifications_off,
-                              color:
-                                  theme.conversationItemNoNotificationIconColor,
-                              size: 16.0,
+                    )
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+              child: Container(
+            height: 60,
+            margin: const EdgeInsets.only(left: 12),
+            padding: const EdgeInsets.only(top: 0, bottom: 0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              nickName,
+                              softWrap: true,
+                              textAlign: TextAlign.left,
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                height: 1,
+                                color: theme.conversationItemTitleTextColor,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w400,
+                              ),
                             ),
-                          )
-                      ],
+                          ),
+                          if (medal != null) medal!,
+                        ],
+                      ),
                     ),
+                    _getTimeStringForChatWidget(context, theme),
                   ],
                 ),
-              ))
-            ],
-          ),
+                if (isHaveSecondLine())
+                  const SizedBox(
+                    height: 6,
+                  ),
+                Row(
+                  children: [
+                    Expanded(child: _getShowMsgWidget(context)),
+                    if (isDisturb)
+                      SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: Icon(
+                          Icons.notifications_off,
+                          color: theme.conversationItemNoNotificationIconColor,
+                          size: 16.0,
+                        ),
+                      )
+                  ],
+                ),
+              ],
+            ),
+          ))
         ],
       ),
     );

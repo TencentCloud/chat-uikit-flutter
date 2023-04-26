@@ -19,7 +19,7 @@ typedef KXConversationItemBuilder = Widget Function(
     V2TimConversation conversationItem,
     [V2TimUserStatus? onlineStatus]);
 
-typedef KXConversationSkinBuilder = Widget? Function(
+typedef KXConversationSkinBuilder = DecorationImage? Function(
   V2TimConversation conversationItem,
 );
 
