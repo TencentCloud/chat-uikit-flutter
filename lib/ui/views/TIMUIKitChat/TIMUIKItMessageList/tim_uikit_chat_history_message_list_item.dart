@@ -60,7 +60,7 @@ typedef MessageRowBuilder = Widget? Function(
 typedef MessageNickNameBuilder = Widget Function(
     BuildContext context, V2TimMessage message, TUIChatSeparateViewModel model);
 
-typedef MessageElemTypeHandle = int Function(V2TimMessage message);
+typedef MessageElemTypeHandle = int? Function(V2TimMessage message);
 
 typedef MessageItemContent = Widget? Function(
   V2TimMessage message,
