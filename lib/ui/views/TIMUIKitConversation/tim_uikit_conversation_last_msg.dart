@@ -9,16 +9,20 @@ import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
+typedef CustomLastMsgBuilder = String? Function(V2TimMessage lastMsg);
+
 class TIMUIKitLastMsg extends StatefulWidget {
   final V2TimMessage? lastMsg;
   final List<V2TimGroupAtInfo?> groupAtInfoList;
   final BuildContext context;
+  final CustomLastMsgBuilder? lastMsgBuilder;
 
   const TIMUIKitLastMsg(
       {Key? key,
       this.lastMsg,
       required this.groupAtInfoList,
-      required this.context})
+      required this.context,
+      this.lastMsgBuilder})
       : super(key: key);
 
   @override
@@ -50,7 +54,7 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
       final option1 = isSelf
           ? TIM_t("您")
           : widget.lastMsg!.nickName ?? widget.lastMsg?.sender;
-      if(mounted){
+      if (mounted) {
         setState(() {
           groupTipsAbstractText = TIM_t_para(
               "{{option1}}撤回了一条消息", "$option1撤回了一条消息")(option1: option1);
@@ -58,7 +62,7 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
       }
     } else {
       final newText = await _getLastMsgShowText(widget.lastMsg, widget.context);
-      if(mounted){
+      if (mounted) {
         setState(() {
           groupTipsAbstractText = newText;
         });
@@ -71,7 +75,9 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
     final msgType = message!.elemType;
     switch (msgType) {
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
-        return TIM_t("[自定义]");
+        return widget.lastMsgBuilder != null
+            ? widget.lastMsgBuilder!.call(message) ?? "未知的自定义消息"
+            : TIM_t("[自定义]");
       case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
         return TIM_t("[语音]");
       case MessageElemType.V2TIM_ELEM_TYPE_TEXT:

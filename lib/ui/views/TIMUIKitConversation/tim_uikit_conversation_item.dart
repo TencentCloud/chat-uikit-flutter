@@ -34,6 +34,8 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
   // 头像
   final Widget? cusAvatar;
 
+  final CustomLastMsgBuilder? customLastMsgBuilder;
+
   /// Control if shows the identifier that the conversation has a draft text, inputted in previous.
   /// Also, you'd better specifying the `draftText` field for `TIMUIKitChat`, from the `draftText` in `V2TimConversation`,
   /// to meet the identifier shows here.
@@ -57,6 +59,7 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
     this.skinImage,
     this.medal,
     this.cusAvatar,
+    this.customLastMsgBuilder,
   }) : super(key: key);
 
   Widget _getShowMsgWidget(BuildContext context) {
@@ -74,6 +77,7 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
         groupAtInfoList: groupAtInfoList,
         lastMsg: lastMsg,
         context: context,
+        lastMsgBuilder: customLastMsgBuilder,
       );
     }
 
