@@ -15,6 +15,8 @@ import 'package:tencent_cloud_chat_uikit/ui/controller/tim_uikit_conversation_co
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitConversation/tim_uikit_conversation_item.dart';
 
+import 'tim_uikit_conversation_last_msg.dart';
+
 typedef KXConversationItemBuilder = Widget Function(
     V2TimConversation conversationItem,
     [V2TimUserStatus? onlineStatus]);
@@ -94,6 +96,8 @@ class KXIMUIKitConversation extends StatefulWidget {
   /// to meet the identifier shows here.
   final bool isShowDraft;
 
+  final CustomLastMsgBuilder? customLastMsgBuilder;
+
   const KXIMUIKitConversation({
     Key? key,
     this.lifeCycle,
@@ -112,6 +116,7 @@ class KXIMUIKitConversation extends StatefulWidget {
     this.avatarBuilder,
     this.enableEndActionCaller,
     this.cusConversationsFilter,
+    this.customLastMsgBuilder,
   }) : super(key: key);
 
   @override
@@ -392,6 +397,7 @@ class _KXIMUIKitConversationState extends TIMUIKitState<KXIMUIKitConversation> {
                                 medal:
                                     widget.medalBuilder?.call(conversationItem),
                                 lastMessageBuilder: widget.lastMessageBuilder,
+                                customLastMsgBuilder: widget.customLastMsgBuilder,
                                 faceUrl: conversationItem.faceUrl ?? "",
                                 nickName: conversationItem.showName ?? "",
                                 isDisturb: conversationItem.recvOpt != 0,
