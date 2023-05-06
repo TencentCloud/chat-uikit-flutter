@@ -10,8 +10,6 @@ class TIMUIKitSearchExample extends StatelessWidget {
   Widget build(BuildContext context) {
     return TIMUIKitSearch(
       onTapConversation: (conv, message) {
-        print(conv.toJson());
-        print(message!.toJson());
       },
       onEnterConversation: (V2TimConversation conversation, String keyword) {},
     );

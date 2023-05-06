@@ -11,18 +11,6 @@ class TimeAgo {
     ];
   }
 
-  List<String> daysMap() {
-    return [
-      TIM_t("星期天"),
-      TIM_t("星期一"),
-      TIM_t("星期二"),
-      TIM_t("星期三"),
-      TIM_t("星期四"),
-      TIM_t("星期五"),
-      TIM_t("星期六")
-    ];
-  }
-
   List<String> weekdayMap() {
     return [
       '',
@@ -36,7 +24,7 @@ class TimeAgo {
     ];
   }
 
-  String getYearMounthDate(DateTime dateTime) {
+  String getYearMonthDate(DateTime dateTime) {
     String month = dateTime.month.toString();
     String date = dateTime.day.toString();
     return dateTime.year.toString() +
@@ -48,7 +36,7 @@ class TimeAgo {
         date;
   }
 
-  String getMounthDate(DateTime dateTime) {
+  String getMonthDate(DateTime dateTime) {
     String month = dateTime.month.toString();
     String date = dateTime.day.toString();
     return (month.length == 1 ? '0' : '') +
@@ -59,39 +47,33 @@ class TimeAgo {
   }
 
   String getTimeStringForChat(int timeStamp) {
-    final formatedTimeStamp = timeStamp * 1000;
-    final DateTime date =
-        DateTime.fromMillisecondsSinceEpoch(formatedTimeStamp);
-    final currentTimeStamp = DateTime.now().millisecondsSinceEpoch;
+    final DateTime date = DateTime.fromMillisecondsSinceEpoch(timeStamp * 1000);
     final Duration duration = DateTime.now().difference(date);
+    final int diffDays = duration.inDays +
+        (duration.inMinutes >
+                DateTime.now()
+                    .difference(DateTime(DateTime.now().year,
+                        DateTime.now().month, DateTime.now().day))
+                    .inMinutes
+            ? 1
+            : 0);
+    final int diffMinutes = duration.inMinutes;
 
-    int diffDays = duration.inDays;
-    final diffMinutes = duration.inMinutes;
     var res;
 
     // 一个礼拜之内
     if (diffDays > 0 && diffDays < 7) {
-      final String formatTodayZero =
-          DateFormat('yyyyMMdd').format(DateTime.now());
-      final todayZero = DateTime.parse(formatTodayZero).millisecondsSinceEpoch;
-      final todayDiff = currentTimeStamp - todayZero;
-
-      final isTwoDay = todayDiff < (diffMinutes - diffDays * 1440) * 60000;
-      if (isTwoDay) {
-        diffDays = diffDays + 1;
-      }
-
       if (diffDays <= 2) {
         res = dayMap()[diffDays - 1];
       } else {
-        res = daysMap()[date.weekday];
+        res = weekdayMap()[date.weekday];
       }
     } else if (diffDays >= 7) {
       //当年内
       if (date.year == DateTime.now().year) {
-        res = getMounthDate(date);
+        res = getMonthDate(date);
       } else {
-        res = getYearMounthDate(date);
+        res = getYearMonthDate(date);
       }
     } else {
       if (diffMinutes > 1) {
@@ -99,9 +81,9 @@ class TimeAgo {
           final String option2 = diffMinutes.toString();
           res = TIM_t_para("{{option2}} 分钟前", "$option2 分钟前")(option2: option2);
         } else {
-          final prefix = date.hour > 12 ? TIM_t("下午") : TIM_t("上午");
-          final timeStr = DateFormat('hh:mm').format(date);
-          res = "$prefix $timeStr";
+          res =
+              "${date.hour}:${date.minute < 10 ? date.minute.toString() + "0" : date.minute}";
+          // res = "$prefix $timeStr";
         }
       } else {
         res = TIM_t("现在");
@@ -115,26 +97,27 @@ class TimeAgo {
     var nowTime = DateTime.now();
     nowTime = DateTime(nowTime.year, nowTime.month, nowTime.day);
     var ftime = DateTime.fromMillisecondsSinceEpoch(timeStamp * 1000);
-    var preFix = ftime.hour >= 12 ? TIM_t("下午") : TIM_t("上午");
-    final timeStr = DateFormat('hh:mm').format(ftime);
-    // 一年外 年月日 + 上/下午 + 时间 (12小时制)
+    // var preFix = ftime.hour >= 12 ? TIM_t("下午") : TIM_t("上午");
+    final timeStr =
+        DateFormat('HH:mm').format(ftime); // Use 'HH:mm' for 24-hour format
+    // 一年外 年月日 + 时间 (24小时制)
     if (nowTime.year != ftime.year) {
-      return '${DateFormat('yyyy-MM-dd').format(ftime)} $preFix $timeStr';
+      return '${DateFormat('yyyy-MM-dd').format(ftime)} $timeStr';
     }
-    // 一年内一周外 月日 + 上/下午 + 时间 (12小时制）
+    // 一年内一周外 月日 + 时间 (24小时制）
     if (ftime.isBefore(nowTime.subtract(const Duration(days: 6)))) {
-      return '${DateFormat('MM-dd').format(ftime)} $preFix $timeStr';
+      return '${DateFormat('MM-dd').format(ftime)} $timeStr';
     }
-    // 一周内一天外 星期 + 上/下午 + 时间 (12小时制）
+    // 一周内一天外 星期 + 时间 (24小时制）
     if (ftime.isBefore(nowTime.subtract(const Duration(days: 1)))) {
-      return '${weekdayMap()[ftime.weekday]} $preFix $timeStr';
+      return '${weekdayMap()[ftime.weekday]} $timeStr';
     }
-    // 昨日 昨天 + 上/下午 + 时间 (12小时制)
+    // 昨日 昨天 + 时间 (24小时制)
     if (nowTime.day != ftime.day) {
-      String option2 = '$preFix $timeStr';
+      String option2 = timeStr;
       return TIM_t_para("昨天 {{option2}}", "昨天 $option2")(option2: option2);
     }
-    // 同年月日 上/下午 + 时间 (12小时制)
-    return '$preFix $timeStr';
+    // 同年月日 时间 (24小时制)
+    return timeStr;
   }
 }

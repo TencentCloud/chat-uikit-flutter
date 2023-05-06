@@ -1,10 +1,11 @@
 // ignore_for_file: must_be_immutable
 
-import 'package:azlistview/azlistview.dart';
+import 'package:azlistview_all_platforms/azlistview_all_platforms.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable_for_tencent_im/flutter_slidable.dart';
 import 'package:lpinyin/lpinyin.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/optimize_utils.dart';
@@ -25,7 +26,7 @@ class GroupProfileMemberList extends StatefulWidget {
   final Function(List<V2TimGroupMemberFullInfo> selectedMember)?
       onSelectedMemberChange;
   // notice: onTapMemberItem and onSelectedMemberChange use together will triger together
-  final Function(V2TimGroupMemberFullInfo memberInfo)? onTapMemberItem;
+  final Function(V2TimGroupMemberFullInfo memberInfo, TapDownDetails? tapDetails)? onTapMemberItem;
   // When sliding to the bottom bar callBack
   final Function()? touchBottomCallBack;
 
@@ -111,6 +112,8 @@ class _GroupProfileMemberListState
   Widget _buildListItem(
       BuildContext context, V2TimGroupMemberFullInfo memberInfo) {
     final theme = Provider.of<TUIThemeViewModel>(context).theme;
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor() == DeviceType.Desktop;
     final isGroupMember =
         memberInfo.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_MEMBER;
     return Container(
@@ -142,12 +145,12 @@ class _GroupProfileMemberListState
                         margin: const EdgeInsets.only(right: 10),
                         child: CheckBoxButton(
                             onChanged: (isChecked) {
-                              if (widget.maxSelectNum != null &&
-                                  selectedMember.length >=
-                                      widget.maxSelectNum!) {
-                                return;
-                              }
                               if (isChecked) {
+                                if (widget.maxSelectNum != null &&
+                                    selectedMember.length >=
+                                        widget.maxSelectNum!) {
+                                  return;
+                                }
                                 selectedMember.add(memberInfo);
                               } else {
                                 selectedMember.remove(memberInfo);
@@ -160,8 +163,8 @@ class _GroupProfileMemberListState
                             isChecked: selectedMember.contains(memberInfo)),
                       ),
                     Container(
-                      width: 36,
-                      height: 36,
+                      width: isDesktopScreen ? 30 : 36,
+                      height: isDesktopScreen ? 30 : 36,
                       margin: const EdgeInsets.only(right: 10),
                       child: Avatar(
                         faceUrl: memberInfo.faceUrl ?? "",
@@ -170,7 +173,7 @@ class _GroupProfileMemberListState
                       ),
                     ),
                     Text(_getShowName(memberInfo),
-                        style: const TextStyle(fontSize: 16)),
+                        style:  TextStyle(fontSize: isDesktopScreen ? 14 : 16)),
                     memberInfo.role ==
                             GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER
                         ? Container(
@@ -178,7 +181,7 @@ class _GroupProfileMemberListState
                             child: Text(TIM_t("群主"),
                                 style: TextStyle(
                                   color: theme.ownerColor,
-                                  fontSize: 12,
+                                  fontSize: isDesktopScreen ? 10 :12,
                                 )),
                             padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
                             decoration: BoxDecoration(
@@ -215,17 +218,17 @@ class _GroupProfileMemberListState
                 ),
                 onTap: () {
                   if (widget.onTapMemberItem != null) {
-                    widget.onTapMemberItem!(memberInfo);
+                    widget.onTapMemberItem!(memberInfo, null);
                   }
                   if (widget.canSelectMember) {
-                    if (widget.maxSelectNum != null &&
-                        selectedMember.length >= widget.maxSelectNum!) {
-                      return;
-                    }
                     final isChecked = selectedMember.contains(memberInfo);
                     if (isChecked) {
                       selectedMember.remove(memberInfo);
                     } else {
+                      if (widget.maxSelectNum != null &&
+                          selectedMember.length >= widget.maxSelectNum!) {
+                        return;
+                      }
                       selectedMember.add(memberInfo);
                     }
                     if (widget.onSelectedMemberChange != null) {
@@ -270,6 +273,9 @@ class _GroupProfileMemberListState
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final TUITheme theme = value.theme;
 
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor() == DeviceType.Desktop;
+
     final throteFunction =
         OptimizeUtils.throttle((ScrollNotification notification) {
       final pixels = notification.metrics.pixels;
@@ -283,7 +289,7 @@ class _GroupProfileMemberListState
     }, 300);
     final showList = _getShowList(widget.memberList);
     return Container(
-      color: theme.weakBackgroundColor,
+      color: isDesktopScreen ? null : theme.weakBackgroundColor,
       child: SafeArea(
           child: Column(
         children: [
@@ -298,19 +304,22 @@ class _GroupProfileMemberListState
                 ? Center(
                     child: Text(TIM_t("暂无群成员")),
                   )
-                : AZListViewContainer(
-                    memberList: showList,
-                    susItemBuilder: (context, index) {
-                      final model = showList[index];
-                      return getSusItem(
-                          context, theme, model.getSuspensionTag());
-                    },
-                    itemBuilder: (context, index) {
-                      final memberInfo = showList[index].memberInfo
-                          as V2TimGroupMemberFullInfo;
+                : Container(
+              padding: isDesktopScreen ? const EdgeInsets.symmetric( horizontal: 16) : null,
+              child: AZListViewContainer(
+                  memberList: showList,
+                  susItemBuilder: (context, index) {
+                    final model = showList[index];
+                    return getSusItem(
+                        context, theme, model.getSuspensionTag());
+                  },
+                  itemBuilder: (context, index) {
+                    final memberInfo = showList[index].memberInfo
+                    as V2TimGroupMemberFullInfo;
 
-                      return _buildListItem(context, memberInfo);
-                    }),
+                    return _buildListItem(context, memberInfo);
+                  }),
+            ),
           ))
         ],
       )),

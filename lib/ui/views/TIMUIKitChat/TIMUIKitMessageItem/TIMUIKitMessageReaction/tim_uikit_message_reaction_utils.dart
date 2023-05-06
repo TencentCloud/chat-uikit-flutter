@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
@@ -16,8 +16,10 @@ class MessageReactionUtils {
   static CloudCustomData getCloudCustomData(V2TimMessage message) {
     CloudCustomData messageCloudCustomData;
     try {
-      messageCloudCustomData =
-          CloudCustomData.fromJson(json.decode(message.cloudCustomData!));
+      messageCloudCustomData = CloudCustomData.fromJson(json.decode(
+          TencentUtils.checkString(message.cloudCustomData) != null
+              ? message.cloudCustomData!
+              : "{}"));
     } catch (e) {
       messageCloudCustomData = CloudCustomData();
     }

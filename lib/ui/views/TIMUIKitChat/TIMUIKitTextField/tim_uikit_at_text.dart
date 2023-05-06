@@ -4,6 +4,7 @@ import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitGroupProfile/widgets/tim_ui_group_member_search.dart';
@@ -15,14 +16,22 @@ class AtText extends StatefulWidget {
   final String? groupID;
   final V2TimGroupInfo? groupInfo;
   final List<V2TimGroupMemberFullInfo?>? groupMemberList;
+  final VoidCallback? closeFunc;
+  final Function(
+          V2TimGroupMemberFullInfo memberInfo, TapDownDetails? tapDetails)?
+      onChooseMember;
+
   // some Group type cant @all
   final String? groupType;
+
   const AtText({
     this.groupID,
     this.groupType,
     Key? key,
     this.groupInfo,
     this.groupMemberList,
+    this.closeFunc,
+    this.onChooseMember,
   }) : super(key: key);
 
   @override
@@ -47,8 +56,17 @@ class _AtTextState extends TIMUIKitState<AtText> {
     super.dispose();
   }
 
-  _onTapMemberItem(V2TimGroupMemberFullInfo memberInfo) {
-    Navigator.pop(context, memberInfo);
+  _onTapMemberItem(
+      V2TimGroupMemberFullInfo memberInfo, TapDownDetails? tapDetails) {
+    if (widget.closeFunc != null) {
+      widget.closeFunc!();
+    }
+
+    if (widget.onChooseMember != null) {
+      widget.onChooseMember!(memberInfo, tapDetails);
+    } else {
+      Navigator.pop(context, memberInfo);
+    }
   }
 
   Future<V2TimValueCallback<V2GroupMemberInfoSearchResult>> searchGroupMember(
@@ -93,61 +111,62 @@ class _AtTextState extends TIMUIKitState<AtText> {
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final TUITheme theme = value.theme;
 
-    return Scaffold(
-        appBar: AppBar(
-          shadowColor: theme.weakBackgroundColor,
-          iconTheme: const IconThemeData(
-            color: Colors.white,
-          ),
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(colors: [
-                theme.lightPrimaryColor ?? CommonColor.lightPrimaryColor,
-                theme.primaryColor ?? CommonColor.primaryColor
-              ]),
-            ),
-          ),
-          leading: Row(
-            children: [
-              IconButton(
-                padding: const EdgeInsets.only(left: 16),
-                constraints: const BoxConstraints(),
-                icon: Image.asset(
-                  'images/arrow_back.png',
-                  package: 'tencent_cloud_chat_uikit',
-                  height: 34,
-                  width: 34,
-                ),
-                onPressed: () async {
-                  Navigator.pop(context);
-                },
+    Widget mentionedMembersBody() {
+      return GroupProfileMemberList(
+          groupType: widget.groupType ?? "",
+          memberList: searchMemberList ?? [],
+          onTapMemberItem: _onTapMemberItem,
+          canAtAll: true,
+          canSlideDelete: false,
+          touchBottomCallBack: () {
+            // Get all by once, unnecessary to load more
+          },
+          customTopArea: PlatformUtils().isWeb
+              ? null
+              : GroupMemberSearchTextField(
+                  onTextChange: (text) =>
+                      handleSearchGroupMembers(text, context),
+                ));
+    }
+
+    return TUIKitScreenUtils.getDeviceWidget(
+        desktopWidget: mentionedMembersBody(),
+        defaultWidget: Scaffold(
+            appBar: AppBar(
+              shadowColor: theme.weakBackgroundColor,
+              iconTheme: IconThemeData(
+                color: theme.appbarTextColor,
               ),
-            ],
-          ),
-          centerTitle: true,
-          leadingWidth: 100,
-          title: Text(
-            TIM_t("选择提醒人"),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 17,
+              backgroundColor: theme.appbarBgColor ??
+                  theme.primaryColor,
+              leading: Row(
+                children: [
+                  IconButton(
+                    padding: const EdgeInsets.only(left: 16),
+                    constraints: const BoxConstraints(),
+                    icon: Image.asset(
+                      'images/arrow_back.png',
+                      package: 'tencent_cloud_chat_uikit',
+                      height: 34,
+                      width: 34,
+                      color: theme.appbarTextColor,
+                    ),
+                    onPressed: () async {
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+              centerTitle: true,
+              leadingWidth: 100,
+              title: Text(
+                TIM_t("选择提醒人"),
+                style: TextStyle(
+                  color: theme.appbarTextColor,
+                  fontSize: 17,
+                ),
+              ),
             ),
-          ),
-        ),
-        body: GroupProfileMemberList(
-            groupType: widget.groupType ?? "",
-            memberList: searchMemberList ?? [],
-            onTapMemberItem: _onTapMemberItem,
-            canAtAll: true,
-            canSlideDelete: false,
-            touchBottomCallBack: () {
-              // Get all by once, unnecessary to load more
-            },
-            customTopArea: PlatformUtils().isWeb
-                ? null
-                : GroupMemberSearchTextField(
-                    onTextChange: (text) =>
-                        handleSearchGroupMembers(text, context),
-                  )));
+            body: mentionedMembersBody()));
   }
 }

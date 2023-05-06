@@ -36,8 +36,17 @@ dependencies:
   cupertino_icons: ^1.0.2
   tencent_cloud_chat_uikit:
     path: ../../tim_ui_kit
-  tencent_im_sdk_plugin_web: ^0.3.2
+  tencent_im_sdk_plugin_web: ^0.3.9
   archive: ^3.3.0
+  tencent_im_sdk_plugin_desktop: ^0.1.13
+
+# dependency_overrides:
+#   tencent_cloud_chat_sdk:
+#     path: /Users/wangrunlin/Documents/GitHub/im-flutter-plugin/tencent_im_sdk_plugin
+#   tencent_im_sdk_plugin_desktop:
+#     path: /Users/wangrunlin/Documents/GitHub/im-flutter-plugin/tencent_im_sdk_plugin_desktop
+#   tencent_im_sdk_plugin_web:
+#     path: /Users/wangrunlin/Documents/GitHub/im-flutter-plugin/tencent_im_sdk_plugin_web
 
 dev_dependencies:
   flutter_test:

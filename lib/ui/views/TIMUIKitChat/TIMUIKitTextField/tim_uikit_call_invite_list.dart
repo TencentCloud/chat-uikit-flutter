@@ -135,26 +135,20 @@ class _SelectCallInviterState extends TIMUIKitState<SelectCallInviter> {
     return Scaffold(
         appBar: AppBar(
           shadowColor: theme.weakBackgroundColor,
-          iconTheme: const IconThemeData(
-            color: Colors.white,
+          iconTheme: IconThemeData(
+            color: theme.appbarTextColor,
           ),
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(colors: [
-                theme.lightPrimaryColor ?? CommonColor.lightPrimaryColor,
-                theme.primaryColor ?? CommonColor.primaryColor
-              ]),
-            ),
-          ),
+          backgroundColor: theme.appbarBgColor ??
+              theme.primaryColor,
           leading: TextButton(
             onPressed: () {
               Navigator.pop(context);
             },
             child: Text(
               TIM_t("取消"),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
+              style: TextStyle(
+                color: theme.appbarTextColor,
+                fontSize: 14,
               ),
             ),
           ),
@@ -167,19 +161,19 @@ class _SelectCallInviterState extends TIMUIKitState<SelectCallInviter> {
               },
               child: Text(
                 TIM_t("完成"),
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 16,
+                style: TextStyle(
+                  color: theme.appbarTextColor,
+                  fontSize: 14,
                 ),
               ),
             )
           ],
           centerTitle: true,
-          leadingWidth: 100,
+          leadingWidth: 80,
           title: Text(
             TIM_t("发起呼叫"),
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: theme.appbarTextColor,
               fontSize: 17,
             ),
           ),

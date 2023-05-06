@@ -1,3 +1,158 @@
+## 2.0.0
+
+If you are upgrading from version 1.7.0, please refer to the changelog of all 2.0.0-preview versions, ranging from preview.1 to preview.7.
+
+The main feature of this new 2.0.0 version is Desktop Support. Tencent Cloud Chat UIKit now supports all platforms, including iOS, Android, Web, Windows, and macOS, which has resulted in significant changes to the codebase. The UI has been improved to adapt to screens of various widths, with different layouts for both wide and narrow screens.
+
+In addition, there are some significant changes compared to version 2.0.0-preview.7.
+
+### New Features
+
+* Added drag and drop support for multiple files in `TIMUIKitChat`, allowing direct sending.
+* Introduced functionality to open files or their containing folder (using `Finder` on `macOS` or `Explorer` on `Windows`) for file messages via the message operation tooltip menu on desktop.
+* Implemented text selection and copying in messages on desktop.
+* Added group joining application processing on Desktop.
+* Introduced `isAutoReportRead` to `TIMUIKitChatConfig` for controlling read status reporting.
+
+### Improvements
+
+* Enhanced group members selection panel for mentioning someone in a group chat.
+* Refined image display ratio on Desktop.
+* The Reply or Quote button is now labeled as `Reply` when `isAtWhenReply` is set to true, and `Quote` otherwise.
+* @ member tags can now be deleted at once.
+
+### Bug Fixes
+
+* Fixed UI layout issue causing the `translate` button to display on two lines.
+* Addressed an issue causing the mute status not to change when switching to another conversation.
+* Fixed several issues causing bugs when opening files.
+* Resolved an issue causing secondary confirmation modal UI layout to be over-width on Desktop.
+* Fixed an issue causing UI layout errors on the profile page.
+* Addressed an issue where the `chatMessageItemFromSelfBgColor` configuration did not work.
+* Fixed an issue preventing files from being opened when the path contained Chinese characters on Windows.
+* Resolved an issue preventing images from being pasted and sent directly with Ctrl + V on Windows.
+* Fixed an issue causing errors in the muting members list.
+
+## 2.0.0-preview.7
+
+### New Features
+
+* Added `additionalMessageToolTips` to `ToolTipsConfig`. This new property allows developers to add additional message operation tooltip items, apart from the default ones. The previous `additionalItemBuilder` has been replaced by this new property. With `additionalMessageToolTips`, developers only need to specify the data for the tooltip items, rather than providing a whole widget. This makes usage easier, as you no longer need to worry about the UI display.
+* Added `isPreloadMessagesAfterInit` to `TIMUIKitConfig`, allows determines whether TUIKit should preload some messages after initialization for faster message display.
+
+### Improvements
+
+* Message operation menu shows when long-pressing messages will not show if nothing operation item includes and do not use message sticker reaction module.
+* Renamed `desktopMessageHoverBar` to `additionalDesktopMessageHoverBarItem` in `TIMUIKitChatConfig` to control only the addition of extra operation items displayed on the hover bar of messages on desktop (macOS, Windows, and desktop version of Web), without affecting the default ones. Previously, it controlled the entire message hover bar, including covering the default items.
+* Renamed `showWideScreenModalFunc` to `showDesktopModalFunc` in `TIMUIKitConfig` for better clarity.
+* Upgraded several dependencies to their latest versions, including `ffi` to ^2.0.1, `file_picker` to ^5.2.9 and `device_info_plus` to ^8.2.0.
+* Added support for the new permission authorization schema on Android 13 and `targetSdkVersion` greater than 33.
+* Corrected the `textHight` to `textHeight` in `TIMUIKitChatConfig`, and modified the default value to 1.3.
+
+### Bug Fixes
+
+* Fixed an issue where the `showVideoCall` and `showVoiceCall` configuration options were not working.
+* Fixed potential `Windows` platform deployment prohibition issue.
+* Fixed an issue that may cause `setLocalCustomData` to be triggered repeatedly.
+
+## 2.0.0-preview.6
+
+### Improvements
+
+* Permission requests now feature a gray translucent overlay for secondary confirmations on first-time requests, which was reintroduced after being removed in version 2.0.0-preview.4. Additionally, the overlay can now be successfully hidden once the permission authorization is complete.".
+* Time Divider on Message List: The default 12-hour display has been changed to a 24-hour display.
+* Message translation now targets the language of TUIKit instead of relying on the system language directly. The language of TUIKit can be set as the system language automatically or defined by the user. For more information, please refer to this documentation: https://www.tencentcloud.com/document/product/1047/52154.
+* Optimized the animation for message text input area.
+
+### Bug Fixes
+
+* Fixed an issue where the `Voice Call` and `Video Call` buttons were not working in group chat.
+* Fixed several null-safety issues.
+* Fixed a layout problem for the message operation menu when not using the message sticker reaction module.
+* Addressed a problem where the time ago display was not correct on the conversation item.
+* Fixed an issue where stickers could not be clicked in some cases.
+* Resolved an overflow error that occurred when opening the sticker panel.
+
+## 2.0.0-preview.5
+
+### New Features
+
+* New Chat Configuration: `isAllowLongPressAvatarToAt`. This option controls whether users are allowed to mention another user in the group by long-pressing on their avatar.
+
+### Improvements
+
+* Improved tool bar configuration on desktop: The tool bar can now be customized using `desktopControlBarConfig` for embedded default items and `additionalDesktopControlBarItems` for additional tool items. These configurations come from TIMUIKitChatConfig.
+* Renamed the `wideMessageHoverBar` configuration option to `desktopMessageHoverBar` for better clarity.
+* Eliminated the dependency on `fluttertoast`. All necessary customer reminders are now triggered through the `onTUIKitCallbackListener` info callback in your project. For more information, please see: https://www.tencentcloud.com/document/product/1047/50054#how-do-i-get-an-api-call-error.2Fflutter-layer-error.2Fpop-up-prompt-message.3F.3Ca-id.3D.22callback.22.3E.3C.2Fa.3E.
+* Eliminated other six unnecessary dependency packages to reduce the size and improve performance.
+* Improved the clarity of the `sendMessage` function in `TIMUIKitChatController` by replacing the use of `convID` to represent both `userID` and `groupID` with separate parameters.
+
+### Bug Fixes
+
+* Fixed an issue where the message operation menu may show inaccurately when the message is too long.
+* Fixed a problem where the message operation menu had the potential to be too wide for certain types of messages, causing display issues.
+* Corrected an issue where the button to remove group members was not functioning correctly.
+* Addressed a problem where the message item could exceed the pixel limit and appear too wide.
+* Fixed a bug where certain JSON decoding operations could potentially fail.
+* Fixed an issue with sound messages on iOS devices playing only through earpiece instead of speaker by default.
+
+## 2.0.0-preview.4
+
+### New Features
+
+* New Chat Configuration: `TIMUIKitChatConfig` now includes `offlinePushInfo`, which allows for customization of the entire `offlinePushInfo` for each message. This field has a higher priority than the previous separate configuration fields for this object.
+* New Color Configuration: Added `appbarTextColor` and `appbarBgColor` to configure the color for the Appbar. Also added `selectPanelBgColor` and `selectPanelTextIconColor` to configure the color of the messages multi-select panel.
+
+### Improvements
+
+* Improved Group Management: Muting members on Work Group is now not allowed.
+* Improved Avatar: Ensured that the avatar can be as small as possible while still covering the entire target box.
+* Permission Requests: Removed the gray translucent overlay for secondary confirmations on first-time permission requests.
+
+### Bug Fixes
+
+* Fixed an issue where the color defined by `chatBgColor` could not cover the entire chat screen when messages did not cover the whole page.
+* Fixed an issue where the history message list could not be scrolled in some cases.
+* Fixed an issue where the ratio of sending messages was incorrect, resulting in the wrong position of the read status label on the left.
+* Fixed an issue where loading messages could fail when the number of messages equaled the specified count.
+
+## 2.0.0-preview.3
+
+### New Features
+
+* Integrated Callkit: The Calls button no longer needs to be added to `MorePanelConfig`. If `tencent_calls_uikit` is installed, the Video Call and Voice Call buttons will be displayed automatically.
+* Paste Images on Desktop: Users can now paste an image on the text field on Desktop to send it.
+* Screenshot Capture on Desktop: Users can now capture a screenshot on Desktop and send it.
+
+### Improvements
+
+* Improved Compatibility: The TUIKit is now compatible with Flutter versions 3.0.0 to 3.7.7.
+
+### Bug Fixes
+
+* Fixed an issue where the `businessID` type may not be correct.
+* Fixed an issue where the `chatMessageItemFromSelfBgColor` configuration was not taking effect.
+
+## 2.0.0-preview.2
+
+### New Features
+
+* Added support for opening files locally from file messages.
+
+## 2.0.0-preview.1
+
+### New Features
+
+* Desktop Support: Tencent Cloud Chat UIKit now supports all platforms, including iOS, Android, Web, Windows, and macOS, resulting in significant changes to the codebase. The UI has been enhanced to adapt to screens of various widths, with different layouts for both wide and narrow screens.
+* Information Copy: The ability to copy information, such as Group ID, from the screen has been added.
+
+### Improvements
+
+* Improved group management logic, with non-administrators no longer able to access the management interface.
+* Optimized cursor positioning when sending messages.
+* Improved and optimized scrollbar functionality.
+* Enhanced clickable URL support in messages, with URLs now supporting both with and without the "https://" prefix.
+
 ## 1.7.0+1
 
 * Fix: An issue that caused errors on mentioning all members.

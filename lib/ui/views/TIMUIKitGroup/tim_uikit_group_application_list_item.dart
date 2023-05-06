@@ -27,10 +27,6 @@ class TIMUIKitGroupApplicationListItemState
     extends TIMUIKitState<TIMUIKitGroupApplicationListItem> {
   ApplicationStatus applicationStatus = ApplicationStatus.none;
 
-  @override
-  void initState() {
-    super.initState();
-  }
 
   String _getUserName() {
     if (widget.applicationInfo.fromUserNickName != null &&

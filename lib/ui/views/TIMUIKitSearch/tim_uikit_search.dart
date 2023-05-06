@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_search_view_model.dart';
-
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/pureUI/tim_uikit_search_indicator.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/tim_uikit_search_friend.dart';
@@ -31,6 +30,8 @@ class TIMUIKitSearch extends StatefulWidget {
   final Function(V2TimConversation conversation, String initKeyword)?
       onEnterSearchInConversation;
 
+  final VoidCallback? onBack;
+
   final bool? isAutoFocus;
 
   const TIMUIKitSearch(
@@ -41,7 +42,8 @@ class TIMUIKitSearch extends StatefulWidget {
       @Deprecated("You are supposed to use [onEnterSearchInConversation], though the effects are the same.")
           this.onEnterConversation,
       this.isAutoFocus = true,
-      this.onEnterSearchInConversation})
+      this.onEnterSearchInConversation,
+      this.onBack})
       : super(key: key);
 
   @override
@@ -106,29 +108,45 @@ class TIMUIKitSearchState extends TIMUIKitState<TIMUIKitSearch> {
                   controller: textEditingController,
                   prefixIcon: Icon(
                     Icons.search,
+                    size: 16,
                     color: hexToColor("979797"),
                   ),
                 ),
                 Expanded(
-                    child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      if (friendResultList.isEmpty ||
-                          !(searchTypes.contains(SearchType.contact)) &&
-                              (groupList.isEmpty ||
-                                  !(searchTypes.contains(SearchType.group))) &&
-                              (totalMsgCount == 0 ||
-                                  !(searchTypes.contains(SearchType.history))))
-                        TIMUIKitSearchIndicator(
-                          typeList: searchTypes,
-                          onChange: (list) {
-                            setState(() {
-                              searchTypes = list;
-                            });
-                          },
-                        ),
-                      if (searchTypes.contains(SearchType.contact))
-                        TIMUIKitSearchFriend(
+                    child: GestureDetector(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        if ((friendResultList.isEmpty ||
+                            !(searchTypes.contains(SearchType.contact))) &&
+                                (groupList.isEmpty ||
+                                    !(searchTypes
+                                        .contains(SearchType.group))) &&
+                                (totalMsgCount == 0 ||
+                                    !(searchTypes
+                                        .contains(SearchType.history))))
+                          TIMUIKitSearchIndicator(
+                            typeList: searchTypes,
+                            onChange: (list) {
+                              setState(() {
+                                searchTypes = list;
+                              });
+                            },
+                          ),
+                        if (searchTypes.contains(SearchType.contact))
+                          TIMUIKitSearchFriend(
+                              onTapConversation: (conversation, message) {
+                                focusNode.unfocus();
+                                Future.delayed(
+                                    const Duration(milliseconds: 100), () {
+                                  widget.onTapConversation(
+                                      conversation, message);
+                                });
+                              },
+                              friendResultList: friendResultList),
+                        if (searchTypes.contains(SearchType.group))
+                          TIMUIKitSearchGroup(
+                            groupList: groupList,
                             onTapConversation: (conversation, message) {
                               focusNode.unfocus();
                               Future.delayed(const Duration(milliseconds: 100),
@@ -136,37 +154,33 @@ class TIMUIKitSearchState extends TIMUIKitState<TIMUIKitSearch> {
                                 widget.onTapConversation(conversation, message);
                               });
                             },
-                            friendResultList: friendResultList),
-                      if (searchTypes.contains(SearchType.group))
-                        TIMUIKitSearchGroup(
-                          groupList: groupList,
-                          onTapConversation: (conversation, message) {
-                            focusNode.unfocus();
-                            Future.delayed(const Duration(milliseconds: 100),
-                                () {
-                              widget.onTapConversation(conversation, message);
-                            });
-                          },
-                        ),
-                      if (searchTypes.contains(SearchType.history))
-                        TIMUIKitSearchMsg(
-                          onTapConversation: widget.onTapConversation,
-                          keyword: textEditingController.text,
-                          totalMsgCount: totalMsgCount,
-                          msgList: msgList,
-                          onEnterConversation:
-                              (V2TimConversation conversation, String keyword) {
-                            if (widget.onEnterSearchInConversation != null) {
-                              widget.onEnterSearchInConversation!(
-                                  conversation, keyword);
-                            } else if (widget.onEnterConversation != null) {
-                              widget.onEnterConversation!(
-                                  conversation, keyword);
-                            }
-                          },
-                        )
-                    ],
+                          ),
+                        if (searchTypes.contains(SearchType.history))
+                          TIMUIKitSearchMsg(
+                            onTapConversation: widget.onTapConversation,
+                            keyword: textEditingController.text,
+                            totalMsgCount: totalMsgCount,
+                            msgList: msgList,
+                            onEnterConversation:
+                                (V2TimConversation conversation,
+                                    String keyword) {
+                              if (widget.onEnterSearchInConversation != null) {
+                                widget.onEnterSearchInConversation!(
+                                    conversation, keyword);
+                              } else if (widget.onEnterConversation != null) {
+                                widget.onEnterConversation!(
+                                    conversation, keyword);
+                              }
+                            },
+                          ),
+                      ],
+                    ),
                   ),
+                  onTap: () {
+                    if (widget.onBack != null) {
+                      widget.onBack!();
+                    }
+                  },
                 ))
               ],
             ),

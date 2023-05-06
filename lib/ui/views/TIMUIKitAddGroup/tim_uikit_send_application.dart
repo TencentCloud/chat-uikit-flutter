@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/add_group_life_cycle.dart';
@@ -74,26 +75,9 @@ class _SendJoinGroupApplicationState
     final groupID = widget.groupInfo.groupID;
     final showName = widget.groupInfo.groupName ?? groupID;
     final option1 = _getGroupType(widget.groupInfo.groupType);
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          TIM_t("进群申请"),
-          style: TextStyle(color: theme.white, fontSize: 17),
-        ),
-        shadowColor: theme.white,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-              theme.lightPrimaryColor ?? CommonColor.lightPrimaryColor,
-              theme.primaryColor ?? CommonColor.primaryColor
-            ]),
-          ),
-        ),
-        iconTheme: IconThemeData(
-          color: theme.white,
-        ),
-      ),
-      body: SingleChildScrollView(
+
+    Widget sendGroupApplicationBody(){
+      return SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -116,7 +100,7 @@ class _SendJoinGroupApplicationState
                       Text(
                         showName,
                         style:
-                            TextStyle(color: theme.darkTextColor, fontSize: 18),
+                        TextStyle(color: theme.darkTextColor, fontSize: 18),
                       ),
                       const SizedBox(
                         height: 4,
@@ -124,7 +108,7 @@ class _SendJoinGroupApplicationState
                       Text(
                         "ID: $groupID",
                         style:
-                            TextStyle(fontSize: 13, color: theme.weakTextColor),
+                        TextStyle(fontSize: 13, color: theme.weakTextColor),
                       ),
                       const SizedBox(
                         height: 4,
@@ -133,7 +117,7 @@ class _SendJoinGroupApplicationState
                         TIM_t_para("群类型: {{option1}}", "群类型: $option1")(
                             option1: option1),
                         style:
-                            TextStyle(fontSize: 12, color: theme.weakTextColor),
+                        TextStyle(fontSize: 12, color: theme.weakTextColor),
                       ),
                     ],
                   )
@@ -181,7 +165,26 @@ class _SendJoinGroupApplicationState
             )
           ],
         ),
+      );
+    }
+
+
+    return TUIKitScreenUtils.getDeviceWidget(
+      desktopWidget: sendGroupApplicationBody(),
+        defaultWidget: Scaffold(
+      appBar: AppBar(
+        title: Text(
+          TIM_t("进群申请"),
+          style: TextStyle(color: theme.appbarTextColor, fontSize: 17),
+        ),
+        shadowColor: theme.white,
+        backgroundColor: theme.appbarBgColor ??
+            theme.primaryColor,
+        iconTheme: IconThemeData(
+          color: theme.appbarTextColor,
+        ),
       ),
-    );
+      body: sendGroupApplicationBody(),
+    ));
   }
 }

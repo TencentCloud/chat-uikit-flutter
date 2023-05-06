@@ -127,14 +127,14 @@ class MessageServiceImpl extends MessageService {
             lastMsgID: lastMsgID,
             lastMsgSeq: lastMsgSeq,
             messageTypeList: messageTypeList);
-    final reponseMessageList = res.data;
+    final responseMessageList = res.data;
     if (res.code != 0) {
       _coreService.callOnCallback(TIMCallback(
           type: TIMCallbackType.API_ERROR,
           errorMsg: res.desc,
           errorCode: res.code));
     }
-    return reponseMessageList;
+    return responseMessageList;
   }
 
   @override
@@ -812,4 +812,5 @@ class MessageServiceImpl extends MessageService {
     }
     return result.data?[text] ?? "";
   }
+
 }

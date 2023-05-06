@@ -1,22 +1,21 @@
-import 'package:json_annotation/json_annotation.dart';
 
-part 'emoji.g.dart';
-
-@JsonSerializable()
-class Emoji extends Object {
-  @JsonKey(name: 'name')
+class Emoji {
   String name;
-
-  @JsonKey(name: 'unicode')
   int unicode;
 
-  Emoji(
-    this.name,
-    this.unicode,
-  );
+  Emoji({required this.name, required this.unicode});
 
-  factory Emoji.fromJson(Map<String, dynamic> srcJson) =>
-      _$EmojiFromJson(srcJson);
+  factory Emoji.fromJson(Map<String, dynamic> json) {
+    return Emoji(
+      name: json['name'],
+      unicode: json['unicode'],
+    );
+  }
 
-  Map<String, dynamic> toJson() => _$EmojiToJson(this);
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['name'] = name;
+    data['unicode'] = unicode;
+    return data;
+  }
 }

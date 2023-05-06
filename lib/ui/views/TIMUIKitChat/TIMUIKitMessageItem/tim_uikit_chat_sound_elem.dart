@@ -1,8 +1,8 @@
+
 import 'dart:async';
 import 'dart:math';
-
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_plugin_record_plus/const/play_state.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
@@ -10,11 +10,9 @@ import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_glo
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
-
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/sound_record.dart';
-
 import 'TIMUIKitMessageReaction/tim_uikit_message_reaction_show_panel.dart';
 
 class TIMUIKitSoundElem extends StatefulWidget {
@@ -65,13 +63,6 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
 
   _playSound() async {
     if (!SoundPlayer.isInited) {
-      // bool hasMicrophonePermission = await Permissions.checkPermission(
-      //     context, Permission.microphone.value);
-      // bool hasStoragePermission = isIosDevice ||
-      //     await Permissions.checkPermission(context, Permission.storage.value);
-      // if (!hasMicrophonePermission || !hasStoragePermission) {
-      //   return;
-      // }
       SoundPlayer.initSoundPlayer();
     }
     if (widget.localCustomInt == null ||
@@ -81,15 +72,10 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
     }
     if (isPlaying) {
       SoundPlayer.stop();
-      widget.chatModel.currentSelectedMsgId = "";
+      widget.chatModel.currentPlayedMsgId = "";
     } else {
       SoundPlayer.play(url: stateElement.url!);
-      widget.chatModel.currentSelectedMsgId = widget.msgID;
-      // SoundPlayer.setSoundInterruptListener(() {
-      //   // setState(() {
-      //   isPlaying = false;
-      //   // });
-      // });
+      widget.chatModel.currentPlayedMsgId = widget.msgID;
     }
   }
 
@@ -123,20 +109,22 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
   void didUpdateWidget(oldWidget) {
     super.didUpdateWidget(oldWidget);
     setState(() {
-      isPlaying = widget.chatModel.currentSelectedMsgId != '' &&
-          widget.chatModel.currentSelectedMsgId == widget.msgID;
+      isPlaying = widget.chatModel.currentPlayedMsgId != '' &&
+          widget.chatModel.currentPlayedMsgId == widget.msgID;
     });
   }
 
   @override
   void initState() {
     super.initState();
-    subscription = SoundPlayer.playStateListener(listener: (PlayState data) {
-      if (data.playState == 'complete') {
-        widget.chatModel.currentSelectedMsgId = "";
-        // SoundPlayer.removeSoundInterruptListener();
+
+    subscription =
+    SoundPlayer.playStateListener(listener: (PlayerState state) {
+      if(state == PlayerState.completed){
+        widget.chatModel.currentPlayedMsgId = "";
       }
     });
+
     downloadMessageDetailAndSave();
   }
 
@@ -144,7 +132,7 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
   void dispose() {
     if (isPlaying) {
       SoundPlayer.stop();
-      widget.chatModel.currentSelectedMsgId = "";
+      widget.chatModel.currentPlayedMsgId = "";
     }
     subscription?.cancel();
     super.dispose();
@@ -195,9 +183,12 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final theme = value.theme;
+
     final backgroundColor = widget.isFromSelf
-        ? theme.lightPrimaryMaterialColor.shade50
-        : theme.weakBackgroundColor ?? CommonColor.weakBackgroundColor;
+        ? (theme.chatMessageItemFromSelfBgColor ??
+        theme.lightPrimaryMaterialColor.shade50)
+        : (theme.chatMessageItemFromOthersBgColor);
+
     final borderRadius = widget.isFromSelf
         ? const BorderRadius.only(
             topLeft: Radius.circular(10),

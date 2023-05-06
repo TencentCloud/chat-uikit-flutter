@@ -77,6 +77,7 @@ class EmojiItem extends TIMUIKitStatelessWidget {
     return DefaultTextStyle(
       style: TextStyle(
         fontSize: (PlatformUtils().isAndroid) ? 20 : 26,
+        color: hexToColor("f9453d")
       ),
       child: Text(
         String.fromCharCode(unicode),

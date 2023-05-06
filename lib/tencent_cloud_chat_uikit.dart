@@ -32,12 +32,12 @@ export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/tim_uikit_searc
 export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_text_field_controller.dart';
 export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitAppBar/tim_uikit_appbar.dart';
 export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list.dart';
-export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_item.dart';
 export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_text_field.dart';
 export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitGroup/tim_uikit_group_application_list.dart';
 export 'package:tencent_im_base/tencent_im_base.dart';
 export 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/models/link_preview_content.dart';
-export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitProfile/widget/tim_uikit_profile_userinfo_card.dart';
+export 'package:tencent_cloud_chat_uikit/ui/widgets/column_menu.dart';
+export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitProfile/widget/tim_uikit_profile_userinfo_card/tim_uikit_profile_userinfo_card.dart';
 export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitConversation/tim_ui_kit_conversation_total_unread.dart';
 
 // Enum
@@ -52,6 +52,7 @@ export 'package:permission_handler/permission_handler.dart';
 
 // Utils
 export 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
+export 'package:tencent_cloud_uikit_core/tencent_cloud_uikit_core.dart';
 
 class TIMUIKitCore {
   static CoreServicesImpl getInstance() {

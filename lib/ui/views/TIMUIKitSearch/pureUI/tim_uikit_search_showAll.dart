@@ -5,6 +5,7 @@ import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget
 
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 
 class TIMUIKitSearchShowALl extends TIMUIKitStatelessWidget {
   final String textShow;
@@ -20,7 +21,8 @@ class TIMUIKitSearchShowALl extends TIMUIKitStatelessWidget {
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
-    return GestureDetector(
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+    return InkWell(
       onTap: onClick,
       child: Container(
         decoration: BoxDecoration(
@@ -47,9 +49,9 @@ class TIMUIKitSearchShowALl extends TIMUIKitStatelessWidget {
                     padding: const EdgeInsets.symmetric(vertical: 2),
                     child: Text(
                       textShow,
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: Colors.black,
-                          fontSize: 16.0,
+                          fontSize: isDesktopScreen ? 14 : 16.0,
                           fontWeight: FontWeight.w400),
                     ),
                   ),

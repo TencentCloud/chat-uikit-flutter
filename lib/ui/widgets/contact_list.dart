@@ -1,11 +1,12 @@
-import 'package:azlistview/azlistview.dart';
+
+import 'package:azlistview_all_platforms/azlistview_all_platforms.dart';
 import 'package:flutter/material.dart';
 import 'package:lpinyin/lpinyin.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendship_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-
 
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/az_list_view.dart';
@@ -19,6 +20,7 @@ class ContactList extends StatefulWidget {
   final Function(List<V2TimFriendInfo> selectedMember)?
       onSelectedMemberItemChange;
   final Function()? handleSlidableDelte;
+  final Color? bgColor;
 
   /// tap联系人列表项回调
   final void Function(V2TimFriendInfo item)? onTapItem;
@@ -39,21 +41,25 @@ class ContactList extends StatefulWidget {
   /// the builder for the empty item, especially when there is no contact
   final Widget Function(BuildContext context)? emptyBuilder;
 
-  const ContactList(
-      {Key? key,
-      required this.contactList,
-      this.isCanSelectMemberItem = false,
-      this.onSelectedMemberItemChange,
-      this.isCanSlidableDelete = false,
-      this.handleSlidableDelte,
-      this.onTapItem,
-      this.topList,
-      this.topListItemBuilder,
-      this.isShowOnlineStatus = false,
-      this.maxSelectNum,
-      this.groupMemberList,
-      this.emptyBuilder})
-      : super(key: key);
+  final String? currentItem;
+
+  const ContactList({
+    Key? key,
+    required this.contactList,
+    this.isCanSelectMemberItem = false,
+    this.onSelectedMemberItemChange,
+    this.isCanSlidableDelete = false,
+    this.handleSlidableDelte,
+    this.onTapItem,
+    this.bgColor,
+    this.topList,
+    this.topListItemBuilder,
+    this.isShowOnlineStatus = false,
+    this.maxSelectNum,
+    this.groupMemberList,
+    this.emptyBuilder,
+    this.currentItem,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _ContactListState();
@@ -116,6 +122,9 @@ class _ContactListState extends TIMUIKitState<ContactList> {
               -1) >
           -1;
     }
+
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+
     return Container(
       padding: const EdgeInsets.only(top: 8, left: 16, right: 12),
       decoration: BoxDecoration(
@@ -151,8 +160,8 @@ class _ContactListState extends TIMUIKitState<ContactList> {
             padding: const EdgeInsets.only(bottom: 12),
             margin: const EdgeInsets.only(right: 12),
             child: SizedBox(
-              height: 40,
-              width: 40,
+              height: isDesktopScreen ? 30 : 40,
+              width: isDesktopScreen ? 30 : 40,
               child: Avatar(
                   onlineStatus: onlineStatus,
                   faceUrl: faceUrl,
@@ -165,7 +174,8 @@ class _ContactListState extends TIMUIKitState<ContactList> {
             padding: const EdgeInsets.only(top: 10, bottom: 20, right: 28),
             child: Text(
               showName,
-              style: const TextStyle(color: Colors.black, fontSize: 18),
+              style: TextStyle(
+                  color: Colors.black, fontSize: isDesktopScreen ? 14 : 18),
             ),
           )),
         ],
@@ -174,6 +184,7 @@ class _ContactListState extends TIMUIKitState<ContactList> {
   }
 
   Widget generateTopItem(memberInfo) {
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     if (widget.topListItemBuilder != null) {
       final customWidget = widget.topListItemBuilder!(memberInfo);
       if (customWidget != null) {
@@ -193,8 +204,8 @@ class _ContactListState extends TIMUIKitState<ContactList> {
           child: Row(
             children: [
               Container(
-                height: 40,
-                width: 40,
+                height: isDesktopScreen ? 30 : 40,
+                width: isDesktopScreen ? 30 : 40,
                 margin: const EdgeInsets.only(right: 12, bottom: 12),
                 child: memberInfo.icon,
               ),
@@ -206,8 +217,9 @@ class _ContactListState extends TIMUIKitState<ContactList> {
                   children: [
                     Text(
                       memberInfo.name,
-                      style:
-                          TextStyle(color: hexToColor("111111"), fontSize: 18),
+                      style: TextStyle(
+                          color: hexToColor("111111"),
+                          fontSize: isDesktopScreen ? 14 : 18),
                     ),
                     Expanded(child: Container()),
                     // if (item.id == "newContact")
@@ -232,6 +244,7 @@ class _ContactListState extends TIMUIKitState<ContactList> {
     final TUITheme theme = value.theme;
 
     final showList = _getShowList(widget.contactList);
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
 
     if (widget.topList != null && widget.topList!.isNotEmpty) {
       final topList = widget.topList!
@@ -259,28 +272,35 @@ class _ContactListState extends TIMUIKitState<ContactList> {
         if (memberInfo is TopListItem) {
           return generateTopItem(memberInfo);
         } else {
-          return InkWell(
-            onTap: () {
-              if (widget.isCanSelectMemberItem) {
-                if (selectedMember.contains(memberInfo)) {
-                  selectedMember.remove(memberInfo);
-                } else {
-                  if (selectedMemberIsOverFlow()) {
-                    return;
+          return Material(
+            color: (isDesktopScreen)
+                ? (widget.currentItem == memberInfo.userProfile.userID
+                    ? theme.conversationItemChooseBgColor
+                    : widget.bgColor)
+                : null,
+            child: InkWell(
+              onTap: () {
+                if (widget.isCanSelectMemberItem) {
+                  if (selectedMember.contains(memberInfo)) {
+                    selectedMember.remove(memberInfo);
+                  } else {
+                    if (selectedMemberIsOverFlow()) {
+                      return;
+                    }
+                    selectedMember.add(memberInfo);
                   }
-                  selectedMember.add(memberInfo);
+                  if (widget.onSelectedMemberItemChange != null) {
+                    widget.onSelectedMemberItemChange!(selectedMember);
+                  }
+                  setState(() {});
+                  return;
                 }
-                if (widget.onSelectedMemberItemChange != null) {
-                  widget.onSelectedMemberItemChange!(selectedMember);
+                if (widget.onTapItem != null) {
+                  widget.onTapItem!(memberInfo);
                 }
-                setState(() {});
-                return;
-              }
-              if (widget.onTapItem != null) {
-                widget.onTapItem!(memberInfo);
-              }
-            },
-            child: _buildItem(theme, memberInfo),
+              },
+              child: _buildItem(theme, memberInfo),
+            ),
           );
         }
       },
@@ -293,5 +313,6 @@ class TopListItem {
   final String id;
   final Widget? icon;
   final Function()? onTap;
+
   TopListItem({required this.name, required this.id, this.icon, this.onTap});
 }

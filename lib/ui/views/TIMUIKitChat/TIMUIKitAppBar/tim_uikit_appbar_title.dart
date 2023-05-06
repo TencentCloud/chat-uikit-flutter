@@ -6,8 +6,9 @@ import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_glo
 class TIMUIKitAppBarTitle extends StatelessWidget {
   final Widget? title;
   final String conversationShowName;
-  final bool showC2cMessageEditStaus;
+  final bool showC2cMessageEditStatus;
   final String fromUser;
+  final GestureTapDownCallback? onClick;
   final TextStyle? textStyle;
 
   const TIMUIKitAppBarTitle(
@@ -15,9 +16,23 @@ class TIMUIKitAppBarTitle extends StatelessWidget {
       this.title,
       this.textStyle,
       required this.conversationShowName,
-      required this.showC2cMessageEditStaus,
-      required this.fromUser})
+      required this.showC2cMessageEditStatus,
+      required this.fromUser, this.onClick})
       : super(key: key);
+
+  Widget titleText(String text){
+    return InkWell(
+      onTapDown: onClick,
+      child: Text(
+        text,
+        style: textStyle ??
+            const TextStyle(
+              color: Colors.white,
+              fontSize: 17,
+            ),
+      ),
+    );
+  }
 
   // String conversationShowName;
   @override
@@ -28,36 +43,19 @@ class TIMUIKitAppBarTitle extends StatelessWidget {
       if (title != null) {
         return title!;
       }
-      return Text(
-        conversationShowName,
-        style: textStyle ??
-            const TextStyle(
-              color: Colors.white,
-              fontSize: 17,
-            ),
-      );
+      return titleText(conversationShowName,);
     } else {
-      if (showC2cMessageEditStaus) {
-        return Text(
-          TIM_t("对方正在输入中..."),
-          style: textStyle ??
-              const TextStyle(
-                color: Colors.white,
-                fontSize: 17,
-              ),
-        );
+      if (showC2cMessageEditStatus) {
+        return titleText(
+          TIM_t("对方正在输入中..."),);
+
       } else {
         if (title != null) {
           return title!;
         }
-        return Text(
-          conversationShowName,
-          style: textStyle ??
-              const TextStyle(
-                color: Colors.white,
-                fontSize: 17,
-              ),
-        );
+        return titleText(
+          conversationShowName,);
+
       }
     }
   }

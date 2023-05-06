@@ -39,7 +39,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Tencent IM UIKit'),
+      home: const MyHomePage(title: 'Tencent Cloud Chat UIKit'),
     );
   }
 }
@@ -67,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String getUserID() {
-    return const String.fromEnvironment('LOGINUSERID', defaultValue: "");
+    return const String.fromEnvironment('LOGINUSERID', defaultValue: "10045363");
   }
 
   String getSecret() {

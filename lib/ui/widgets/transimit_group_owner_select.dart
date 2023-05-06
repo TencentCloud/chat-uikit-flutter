@@ -5,34 +5,36 @@ import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitGroupProfile/widgets/tim_ui_group_member_search.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/group_member_list.dart';
 
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
-class SelectTransimitOwner extends StatefulWidget {
+GlobalKey<_SelectNewGroupOwner> selectNewGroupOwnerKey = GlobalKey();
+
+class SelectNewGroupOwner extends StatefulWidget {
   final String? groupID;
   final TUIGroupProfileModel model;
-  const SelectTransimitOwner({
+  final ValueChanged<List<V2TimGroupMemberFullInfo>>? onSelectedMember;
+
+  const SelectNewGroupOwner({
     this.groupID,
     Key? key,
     required this.model,
+    this.onSelectedMember,
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _SelectCallInviterState();
+  State<StatefulWidget> createState() => _SelectNewGroupOwner();
 }
 
-class _SelectCallInviterState extends TIMUIKitState<SelectTransimitOwner> {
+class _SelectNewGroupOwner extends TIMUIKitState<SelectNewGroupOwner> {
   final CoreServicesImpl _coreServicesImpl = serviceLocator<CoreServicesImpl>();
   List<V2TimGroupMemberFullInfo> selectedMember = [];
   List<V2TimGroupMemberFullInfo?>? searchMemberList;
   String? searchText;
 
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -81,81 +83,86 @@ class _SelectCallInviterState extends TIMUIKitState<SelectTransimitOwner> {
     });
   }
 
+  onSubmit() {
+    if (widget.onSelectedMember != null) {
+      widget.onSelectedMember!(selectedMember);
+    }
+  }
+
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final TUITheme theme = value.theme;
 
-    return Scaffold(
-        appBar: AppBar(
-          shadowColor: theme.weakBackgroundColor,
-          iconTheme: const IconThemeData(
-            color: Colors.white,
-          ),
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(colors: [
-                theme.lightPrimaryColor ?? CommonColor.lightPrimaryColor,
-                theme.primaryColor ?? CommonColor.primaryColor
-              ]),
-            ),
-          ),
-          leading: TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: Text(
-              TIM_t("取消"),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
+    Widget memberBody() {
+      return GroupProfileMemberList(
+        customTopArea: PlatformUtils().isWeb
+            ? null
+            : GroupMemberSearchTextField(
+                onTextChange: (text) => handleSearchGroupMembers(text, context),
               ),
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                if (selectedMember.isNotEmpty) {
-                  Navigator.pop(context, selectedMember);
-                }
-              },
-              child: Text(
-                TIM_t("完成"),
-                style: const TextStyle(
-                  color: Colors.white,
+        memberList: (searchMemberList ?? widget.model.groupMemberList)
+            .where((element) =>
+                element?.userID != _coreServicesImpl.loginInfo.userID)
+            .toList(),
+        canSlideDelete: false,
+        canSelectMember: true,
+        maxSelectNum: 1,
+        onSelectedMemberChange: (member) {
+          selectedMember = member;
+          setState(() {});
+        },
+        touchBottomCallBack: () {},
+      );
+    }
+
+    return TUIKitScreenUtils.getDeviceWidget(
+        defaultWidget: Scaffold(
+            appBar: AppBar(
+              shadowColor: theme.weakBackgroundColor,
+              iconTheme: IconThemeData(
+                color: theme.appbarTextColor,
+              ),
+              backgroundColor: theme.appbarBgColor ??
+                  theme.primaryColor,
+              leading: TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  TIM_t("取消"),
+                  style: TextStyle(
+                    color: theme.appbarTextColor,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    if (selectedMember.isNotEmpty) {
+                      Navigator.pop(context, selectedMember);
+                    }
+                  },
+                  child: Text(
+                    TIM_t("完成"),
+                    style: TextStyle(
+                      color: theme.appbarTextColor,
+                      fontSize: 16,
+                    ),
+                  ),
+                )
+              ],
+              centerTitle: true,
+              leadingWidth: 100,
+              title: Text(
+                "转让群主",
+                style: TextStyle(
+                  color: theme.appbarTextColor,
                   fontSize: 16,
                 ),
               ),
-            )
-          ],
-          centerTitle: true,
-          leadingWidth: 100,
-          title: const Text(
-            "转让群主",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 17,
             ),
-          ),
-        ),
-        body: GroupProfileMemberList(
-          customTopArea: PlatformUtils().isWeb
-              ? null
-              : GroupMemberSearchTextField(
-                  onTextChange: (text) =>
-                      handleSearchGroupMembers(text, context),
-                ),
-          memberList: (searchMemberList ?? widget.model.groupMemberList)
-              .where((element) =>
-                  element?.userID != _coreServicesImpl.loginInfo.userID)
-              .toList(),
-          canSlideDelete: false,
-          canSelectMember: true,
-          maxSelectNum: 1,
-          onSelectedMemberChange: (member) {
-            selectedMember = member;
-            setState(() {});
-          },
-          touchBottomCallBack: () {},
-        ));
+            body: memberBody()),
+        desktopWidget: memberBody());
   }
 }

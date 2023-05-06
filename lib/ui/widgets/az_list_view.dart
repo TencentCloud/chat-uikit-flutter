@@ -1,10 +1,11 @@
-import 'package:azlistview/azlistview.dart';
+import 'package:azlistview_all_platforms/azlistview_all_platforms.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 
 class AZListViewContainer extends StatefulWidget {
   final List<ISuspensionBeanImpl>? memberList;
@@ -74,36 +75,40 @@ class _AZListViewContainerState extends TIMUIKitState<AZListViewContainer> {
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     return ChangeNotifierProvider.value(
         value: serviceLocator<TUIThemeViewModel>(),
         child: Consumer<TUIThemeViewModel>(
-            builder: (context, tuiTheme, child) => AzListView(
-                physics: const BouncingScrollPhysics(
-                    parent: AlwaysScrollableScrollPhysics()),
-                data: _list!,
-                itemCount: _list!.length,
-                itemBuilder: widget.itemBuilder,
-                indexBarData: widget.isShowIndexBar
-                    ? SuspensionUtil.getTagIndexList(_list!)
-                        .where((element) => element != "@")
-                        .toList()
-                    : [],
-                susItemBuilder: (BuildContext context, int index) {
-                  if (widget.susItemBuilder != null) {
-                    return widget.susItemBuilder!(context, index);
-                  }
-                  ISuspensionBeanImpl model = _list![index];
-                  if (model.getSuspensionTag() == "@") {
-                    return Container();
-                  }
-                  return getSusItem(context, model.getSuspensionTag());
-                })));
+            builder: (context, tuiTheme, child) => Scrollbar(
+                child: AzListView(
+                    physics: const BouncingScrollPhysics(
+                        parent: AlwaysScrollableScrollPhysics()),
+                    data: _list!,
+                    itemCount: _list!.length,
+                    itemBuilder: widget.itemBuilder,
+                    indexBarData: (!isDesktopScreen && widget.isShowIndexBar)
+                        ? SuspensionUtil.getTagIndexList(_list!)
+                            .where((element) => element != "@")
+                            .toList()
+                        : [],
+                    susItemBuilder: (BuildContext context, int index) {
+                      if (widget.susItemBuilder != null) {
+                        return widget.susItemBuilder!(context, index);
+                      }
+                      ISuspensionBeanImpl model = _list![index];
+                      if (model.getSuspensionTag() == "@") {
+                        return Container();
+                      }
+                      return getSusItem(context, model.getSuspensionTag());
+                    }))));
   }
 }
 
 class ISuspensionBeanImpl<T> extends ISuspensionBean {
   String tagIndex;
   T memberInfo;
+
   ISuspensionBeanImpl({required this.tagIndex, required this.memberInfo});
 
   @override

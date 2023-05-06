@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
@@ -20,11 +23,15 @@ class TIMUIKitAddFriend extends StatefulWidget {
 
   /// The life cycle hooks for adding friends and contact business logic
   final AddFriendLifeCycle? lifeCycle;
+
+  final VoidCallback? closeFunc;
+
   const TIMUIKitAddFriend(
       {Key? key,
       this.isShowDefaultGroup = false,
       this.lifeCycle,
-      required this.onTapAlreadyFriendsItem})
+      required this.onTapAlreadyFriendsItem,
+      this.closeFunc})
       : super(key: key);
 
   @override
@@ -45,6 +52,9 @@ class _TIMUIKitAddFriendState extends TIMUIKitState<TIMUIKitAddFriend> {
 
   Widget _searchResultItemBuilder(
       V2TimUserFullInfo friendInfo, TUITheme theme) {
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+
     final faceUrl = friendInfo.faceUrl ?? "";
     final userID = friendInfo.userID ?? "";
     final String showName =
@@ -74,14 +84,32 @@ class _TIMUIKitAddFriendState extends TIMUIKitState<TIMUIKitAddFriend> {
           return;
         }
 
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => SendApplication(
-                    lifeCycle: widget.lifeCycle,
-                    isShowDefaultGroup: widget.isShowDefaultGroup ?? false,
-                    friendInfo: friendInfo,
-                    model: _selfInfoViewModel)));
+        if (isDesktopScreen) {
+          if (widget.closeFunc != null) {
+            widget.closeFunc!();
+          }
+          TUIKitWidePopup.showPopupWindow(
+            operationKey: TUIKitWideModalOperationKey.addFriend,
+            context: context,
+            width: MediaQuery.of(context).size.width * 0.3,
+            height: MediaQuery.of(context).size.width * 0.4,
+            title: TIM_t("添加好友"),
+            child: (closeFuncSendApplication) => SendApplication(
+                lifeCycle: widget.lifeCycle,
+                isShowDefaultGroup: widget.isShowDefaultGroup ?? false,
+                friendInfo: friendInfo,
+                model: _selfInfoViewModel),
+          );
+        } else {
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => SendApplication(
+                      lifeCycle: widget.lifeCycle,
+                      isShowDefaultGroup: widget.isShowDefaultGroup ?? false,
+                      friendInfo: friendInfo,
+                      model: _selfInfoViewModel)));
+        }
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -89,9 +117,9 @@ class _TIMUIKitAddFriendState extends TIMUIKitState<TIMUIKitAddFriend> {
           // crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 48,
-              height: 48,
-              margin: const EdgeInsets.only(right: 12),
+              width: isDesktopScreen ? 38 : 48,
+              height: isDesktopScreen ? 38 : 48,
+              margin: const EdgeInsets.only(right: 16),
               child: Avatar(faceUrl: faceUrl, showName: showName),
             ),
             Column(
@@ -99,7 +127,9 @@ class _TIMUIKitAddFriendState extends TIMUIKitState<TIMUIKitAddFriend> {
               children: [
                 Text(
                   showName,
-                  style: TextStyle(color: theme.darkTextColor, fontSize: 18),
+                  style: TextStyle(
+                      color: theme.darkTextColor,
+                      fontSize: isDesktopScreen ? 16 : 18),
                 ),
                 const SizedBox(
                   height: 4,

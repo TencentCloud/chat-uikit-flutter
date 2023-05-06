@@ -3,24 +3,24 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:http/http.dart' as http;
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
+import 'package:tencent_open_file/tencent_open_file.dart';
 import 'package:universal_html/html.dart' as html;
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 import 'package:cached_network_image/cached_network_image.dart';
-
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
-
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
@@ -31,6 +31,7 @@ import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageIt
 import 'package:tencent_cloud_chat_uikit/ui/widgets/image_screen.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TIMUIKitImageElem extends StatefulWidget {
   final V2TimMessage message;
@@ -79,10 +80,11 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
       decoration: BoxDecoration(
           borderRadius: const BorderRadius.all(Radius.circular(5)),
           border: Border.all(
-            width: 1,
-            color: theme?.black ?? Colors.white,
+            width: 2,
+            color: theme?.weakDividerColor ?? Colors.grey,
           )),
-      height: 100,
+      height: 170,
+      width: 170,
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -135,9 +137,27 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
         return;
       }
     } else {
-      if (!await Permissions.checkPermission(
-          context, Permission.storage.value, theme!)) {
-        return;
+      final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      if (PlatformUtils().isMobile) {
+        if ((androidInfo.version.sdkInt ?? 0) >= 33) {
+          final photos = await Permissions.checkPermission(
+            context,
+            Permission.photos.value,
+            theme,
+          );
+          if (!photos) {
+            return;
+          }
+        } else {
+          final storage = await Permissions.checkPermission(
+            context,
+            Permission.storage.value,
+          );
+          if (!storage) {
+            return;
+          }
+        }
       }
     }
 
@@ -233,7 +253,8 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     if (path != null && PlatformUtils().isWeb
         ? true
         : File(path!).existsSync()) {
-      return await _saveImageToLocal(context, path, isAsset: true, theme: theme);
+      return await _saveImageToLocal(context, path,
+          isAsset: true, theme: theme);
     } else {
       String imgUrl = getBigPicUrl();
       if (widget.message.imageElem!.imageList![0]!.localUrl != '' &&
@@ -288,17 +309,21 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
         child: errorDisplay(context, theme),
       ));
 
-  Widget _renderLocalImage(
-      String imgPath, dynamic heroTag, double positionRadio, TUITheme? theme) {
-    double? currentPositionRadio;
+  Widget _renderLocalImage(String smallImage, dynamic heroTag,
+      double? positionRadio, TUITheme? theme, String? originImage) {
+    double? currentPositionRadio = positionRadio;
+    File imgF = File(smallImage);
 
-    File imgF = File(imgPath);
     bool isExist = imgF.existsSync();
-
     if (!isExist) {
       return errorDisplay(context, theme);
     }
+
     Image image = Image.file(imgF);
+
+    String showImage = (originImage != null && File(originImage).existsSync())
+        ? originImage
+        : smallImage;
 
     image.image
         .resolve(const ImageConfiguration())
@@ -311,30 +336,42 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     final preloadImage = model.preloadImageMap[
         message.seq! + message.timestamp.toString() + (message.msgID ?? "")];
 
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+
     return Stack(
       alignment: AlignmentDirectional.topStart,
       children: [
-        AspectRatio(
-          aspectRatio: currentPositionRadio ?? positionRadio,
-          child: Container(
-            decoration: const BoxDecoration(color: Colors.transparent),
+        if (!isDesktopScreen && currentPositionRadio != null)
+          AspectRatio(
+            aspectRatio: currentPositionRadio!,
+            child: Container(
+              decoration: const BoxDecoration(color: Colors.transparent),
+            ),
           ),
-        ),
         getImage(
-            GestureDetector(
+            InkWell(
                 onTap: () {
-                  Navigator.of(context).push(
-                    PageRouteBuilder(
-                      opaque: false, // set to false
-                      pageBuilder: (_, __, ___) => ImageScreen(
-                          imageProvider: FileImage(File(imgPath)),
-                          heroTag: heroTag,
-                          messageID: widget.message.msgID,
-                          downloadFn: () async {
-                            return await _saveImg(theme!);
-                          }),
-                    ),
-                  );
+                  if (PlatformUtils().isDesktop) {
+                    if(PlatformUtils().isWindows){
+                      OpenFile.open(showImage);
+                    } else{
+                      launchUrl(Uri.file(showImage));
+                    }
+                  } else {
+                    Navigator.of(context).push(
+                      PageRouteBuilder(
+                        opaque: false, // set to false
+                        pageBuilder: (_, __, ___) => ImageScreen(
+                            imageProvider: FileImage(File(showImage)),
+                            heroTag: heroTag,
+                            messageID: widget.message.msgID,
+                            downloadFn: () async {
+                              return await _saveImg(theme!);
+                            }),
+                      ),
+                    );
+                  }
                 },
                 child: Container(
                   constraints:
@@ -344,13 +381,11 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
                     child: preloadImage != null
                         ? RawImage(
                             image: preloadImage,
-                            fit: BoxFit.fitWidth,
-                            width: double.infinity,
+                            fit: BoxFit.contain,
                           )
                         : Image.file(
-                            File(imgPath),
-                            fit: BoxFit.fitWidth,
-                            width: double.infinity,
+                            File(smallImage),
+                            fit: BoxFit.contain,
                           ),
                   ),
                 )),
@@ -406,35 +441,45 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
   }
 
   Widget _renderNetworkImage(
-      dynamic heroTag, double positionRadio, TUITheme? theme,
+      dynamic heroTag, double? positionRadio, TUITheme? theme,
       {String? path, V2TimImage? originalImg, V2TimImage? smallImg}) {
     try {
+      final isDesktopScreen =
+          TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
       String bigImgUrl = originalImg?.url ?? getBigPicUrl();
       if (bigImgUrl.isEmpty && smallImg?.url != null) {
         bigImgUrl = smallImg!.url!;
       }
       return Stack(
-        alignment: widget.message.isSelf ?? false
+        alignment: widget.message.isSelf ?? true
             ? AlignmentDirectional.topEnd
             : AlignmentDirectional.topStart,
         children: [
           getImage(
               GestureDetector(
                 onTap: () {
-                  Navigator.of(context).push(
-                    PageRouteBuilder(
-                        opaque: false, // set to false
-                        pageBuilder: (_, __, ___) => ImageScreen(
-                            imageProvider: CachedNetworkImageProvider(
-                              path ?? bigImgUrl,
-                              cacheKey: widget.message.msgID,
-                            ),
-                            heroTag: heroTag,
-                            messageID: widget.message.msgID,
-                            downloadFn: () async {
-                              return await _saveImg(theme!);
-                            })),
-                  );
+                  if (isDesktopScreen) {
+                    onTIMCallback(TIMCallback(
+                      infoCode: 6660414,
+                      infoRecommendText: TIM_t("正在下载中"),
+                      type: TIMCallbackType.INFO
+                    ));
+                  } else {
+                    Navigator.of(context).push(
+                      PageRouteBuilder(
+                          opaque: false, // set to false
+                          pageBuilder: (_, __, ___) => ImageScreen(
+                              imageProvider: CachedNetworkImageProvider(
+                                path ?? bigImgUrl,
+                                cacheKey: widget.message.msgID,
+                              ),
+                              heroTag: heroTag,
+                              messageID: widget.message.msgID,
+                              downloadFn: () async {
+                                return await _saveImg(theme!);
+                              })),
+                    );
+                  }
                 },
                 child: Container(
                   constraints:
@@ -474,13 +519,13 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
   bool isNeedShowLocalPath() {
     final current = (DateTime.now().millisecondsSinceEpoch / 1000).ceil();
     final timeStamp = widget.message.timestamp ?? current;
-    return (widget.message.isSelf ?? false) &&
+    return (widget.message.isSelf ?? true) &&
         (isSent || current - timeStamp < 300);
   }
 
   Widget? _renderImage(dynamic heroTag, TUITheme? theme,
       {V2TimImage? originalImg, V2TimImage? smallImg}) {
-    double positionRadio = 1.0;
+    double? positionRadio;
     if (smallImg?.width != null &&
         smallImg?.height != null &&
         smallImg?.width != 0 &&
@@ -501,8 +546,12 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
           widget.message.imageElem!.path != null &&
           widget.message.imageElem!.path!.isNotEmpty &&
           File(widget.message.imageElem!.path!).existsSync())) {
-        return _renderLocalImage(widget.message.imageElem!.path!, heroTag,
-            networkImagePositionRadio ?? positionRadio, theme);
+        return _renderLocalImage(
+            widget.message.imageElem!.path!,
+            heroTag,
+            networkImagePositionRadio ?? positionRadio,
+            theme,
+            widget.message.imageElem!.path!);
       }
     } catch (e) {
       // ignore: avoid_print
@@ -513,15 +562,18 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
       if (smallImg?.localUrl != null &&
           smallImg?.localUrl != "" &&
           File((smallImg?.localUrl!)!).existsSync()) {
-        return _renderLocalImage(smallImg!.localUrl!, heroTag,
-            networkImagePositionRadio ?? positionRadio, theme);
+        return _renderLocalImage(smallImg!.localUrl!, heroTag, positionRadio,
+            theme, originalImg?.localUrl);
       }
     } catch (e) {
       // ignore: avoid_print
       print(e);
+      return _renderNetworkImage(heroTag, positionRadio, theme,
+          smallImg: smallImg, originalImg: originalImg);
     }
 
-    if ((smallImg?.url ?? originalImg?.url) != null &&
+    if (
+        (smallImg?.url ?? originalImg?.url) != null &&
         (smallImg?.url ?? originalImg?.url)!.isNotEmpty) {
       return _renderNetworkImage(heroTag, positionRadio, theme,
           smallImg: smallImg, originalImg: originalImg);

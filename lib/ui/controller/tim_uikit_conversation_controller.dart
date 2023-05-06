@@ -9,6 +9,11 @@ class TIMUIKitConversationController {
     return model.selectedConversation;
   }
 
+  /// Set the selected conversation currently
+  set selectedConversation(V2TimConversation? conversation) {
+    model.selectedConversation = conversation;
+  }
+
   /// Get the conversation list
   List<V2TimConversation?> get conversationList {
     return model.conversationList;

@@ -1,6 +1,7 @@
 // ignore_for_file: unused_import
 
 import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -10,6 +11,7 @@ import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+
 
 class PermissionRequestInfo extends StatefulWidget {
   final Function removeOverLay;
@@ -32,14 +34,14 @@ class _PermissionRequestInfo extends TIMUIKitState<PermissionRequestInfo>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     widget.removeOverLay();
     super.dispose();
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
   }
 
   @override
@@ -65,8 +67,18 @@ class _PermissionRequestInfo extends TIMUIKitState<PermissionRequestInfo>
         "icon": "images/chat_permission_icon_mic.png",
         "text": TIM_t("为方便您发送语音消息、拍摄视频以及音视频通话，请允许我们使用麦克风进行录音。")
       },
+      9: {
+        "name": TIM_t("相册"),
+        "icon": "images/chat_permission_icon_file.png",
+        "text": TIM_t("为方便您查看和选择相册里的图片视频发送给朋友，以及保存内容到设备，请允许我们访问您设备上的照片、媒体内容。")
+      },
       15: {
         "name": TIM_t("存储"),
+        "icon": "images/chat_permission_icon_file.png",
+        "text": TIM_t("为方便您查看和选择相册里的图片视频发送给朋友，以及保存内容到设备，请允许我们访问您设备上的照片、媒体内容。")
+      },
+      32: {
+        "name": TIM_t("相册"),
         "icon": "images/chat_permission_icon_file.png",
         "text": TIM_t("为方便您查看和选择相册里的图片视频发送给朋友，以及保存内容到设备，请允许我们访问您设备上的照片、媒体内容。")
       },
@@ -128,6 +140,9 @@ class _PermissionRequestInfo extends TIMUIKitState<PermissionRequestInfo>
 }
 
 class Permissions {
+
+  static OverlayEntry? _entry;
+
   static List<String> _names(BuildContext context) {
     return <String>[
       TIM_t("日历"),
@@ -161,6 +176,10 @@ class Permissions {
       'bluetoothScan',
       'bluetoothAdvertise',
       'bluetoothConnect',
+      'nearbyWifiDevices',
+      TIM_t("视频"),
+      'audio',
+      'scheduleExactAlarm'
     ];
   }
 
@@ -199,6 +218,10 @@ class Permissions {
       'bluetoothScan',
       'bluetoothAdvertise',
       'bluetoothConnect',
+      'nearbyWifiDevices',
+      TIM_t(" 访问相册中视频权限，以正常使用发送视频等功能。"),
+      'audio',
+      'scheduleExactAlarm'
     ];
     return _prefix + appName + _postfixList[value];
   }
@@ -220,7 +243,10 @@ class Permissions {
       isShowPermissionPage,
     );
     if (shouldRequestPermission != null && shouldRequestPermission) {
-      return await Permission.byValue(value).request().isGranted;
+      final isGranted = await Permission.byValue(value).request().isGranted;
+      _entry?.remove();
+      _entry = null;
+      return isGranted;
     }
     return shouldRequestPermission ?? false;
   }
@@ -241,11 +267,13 @@ class Permissions {
   static showPermissionRequestInfoDialog(BuildContext context, value) async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     String appName = packageInfo.appName;
-    OverlayEntry? _entry;
     final entry = OverlayEntry(builder: (context) {
       return PermissionRequestInfo(
         appName: appName,
-        removeOverLay: () => _entry?.remove(),
+        removeOverLay: () {
+          _entry?.remove();
+          _entry = null;
+        },
         permissionType: value,
       );
     });
@@ -269,6 +297,7 @@ class Permissions {
     String appName = packageInfo.appName;
     final option2 = _names(context)[value];
     final permissionText = _permissionText(context, appName, value);
+
     void closeDialog() {
       Navigator.of(context).pop(false);
     }

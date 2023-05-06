@@ -1,6 +1,7 @@
 // ignore_for_file: unnecessary_getters_setters
 
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/conversation_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
@@ -29,6 +30,8 @@ List<T> removeDuplicates<T>(
 }
 
 class TUIConversationViewModel extends ChangeNotifier {
+  final TUISelfInfoViewModel selfInfoViewModel =
+      serviceLocator<TUISelfInfoViewModel>();
   final ConversationService _conversationService =
       serviceLocator<ConversationService>();
   final FriendshipServices _friendshipServices =
@@ -39,22 +42,15 @@ class TUIConversationViewModel extends ChangeNotifier {
   late V2TimConversationListener _conversationListener;
   List<V2TimConversation?> _conversationList = [];
   static V2TimConversation? _selectedConversation;
+
   bool _haveMoreData = true;
   int _totalUnReadCount = 0;
   String? _scrollToConversation;
+  final TUIChatGlobalModel globalChatModel =
+      serviceLocator<TUIChatGlobalModel>();
+
   String _nextSeq = "0";
   ConversationLifeCycle? _lifeCycle;
-
-  String? get scrollToConversation => _scrollToConversation;
-
-  set scrollToConversation(String? value) {
-    _scrollToConversation = value;
-    notifyListeners();
-  }
-
-  void clearScrollToConversation(){
-    _scrollToConversation = null;
-  }
 
   List<V2TimConversation?> get conversationList {
     if (PlatformUtils().isWeb) {
@@ -69,14 +65,24 @@ class TUIConversationViewModel extends ChangeNotifier {
             .toList();
         _conversationList.removeWhere((element) => element?.isPinned == true);
         _conversationList = [...pinnedConversation, ..._conversationList];
+      // ignore: empty_catches
       } catch (e) {
-        // ignore: avoid_print
-        print(e);
       }
     } else {
       _conversationList.sort((a, b) => b!.orderkey!.compareTo(a!.orderkey!));
     }
     return _conversationList;
+  }
+
+  String? get scrollToConversation => _scrollToConversation;
+
+  set scrollToConversation(String? value) {
+    _scrollToConversation = value;
+    notifyListeners();
+  }
+
+  void clearScrollToConversation() {
+    _scrollToConversation = null;
   }
 
   bool get haveMoreData {
@@ -95,6 +101,11 @@ class TUIConversationViewModel extends ChangeNotifier {
 
   set conversationList(List<V2TimConversation?> conversationList) {
     _conversationList = conversationList;
+    notifyListeners();
+  }
+
+  set selectedConversation(V2TimConversation? value) {
+    _selectedConversation = value;
     notifyListeners();
   }
 
@@ -125,7 +136,9 @@ class TUIConversationViewModel extends ChangeNotifier {
 
   loadInitConversation() async {
     await loadData(count: 40);
-    _chatGlobalModel.initMessageMapFromLocalDatabase(_conversationList);
+    if (selfInfoViewModel.globalConfig?.isPreloadMessagesAfterInit ?? true) {
+      _chatGlobalModel.initMessageMapFromLocalDatabase(_conversationList);
+    }
   }
 
   initConversation() async {
@@ -165,6 +178,7 @@ class TUIConversationViewModel extends ChangeNotifier {
 
   void setSelectedConversation(V2TimConversation conversation) {
     _selectedConversation = conversation;
+    notifyListeners();
   }
 
   Future<V2TimCallback> pinConversation({
@@ -182,6 +196,9 @@ class TUIConversationViewModel extends ChangeNotifier {
             false) {
       return null;
     }
+
+    globalChatModel.setMessageList(convID, []);
+
     if (convType == 1) {
       return _messageService.clearC2CHistoryMessage(userID: convID);
     } else {

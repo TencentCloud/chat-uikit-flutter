@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_item.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
@@ -56,8 +58,10 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
         message.cloudCustomData != null && message.cloudCustomData != "";
     if (hasCustomData) {
       try {
-        final CloudCustomData messageCloudCustomData =
-            CloudCustomData.fromJson(json.decode(message.cloudCustomData!));
+        final CloudCustomData messageCloudCustomData = CloudCustomData.fromJson(json.decode(
+            TencentUtils.checkString(message.cloudCustomData) != null
+                ? message.cloudCustomData!
+                : "{}"));
         if (messageCloudCustomData.messageReply != null) {
           MessageRepliedData.fromJson(messageCloudCustomData.messageReply!);
           return true;
@@ -72,7 +76,7 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
 
   Widget _getMsgItem(V2TimMessage message) {
     final type = message.elemType;
-    final isFromSelf = message.isSelf ?? false;
+    final isFromSelf = message.isSelf ?? true;
 
     switch (type) {
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
@@ -126,8 +130,8 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
         return TIMUIKitTextElem(
           chatModel: widget.model,
           message: message,
-          isFromSelf: message.isSelf ?? false,
-          clearJump: (){},
+          isFromSelf: message.isSelf ?? true,
+          clearJump: () {},
           isShowJump: false,
           isShowMessageReaction: false,
         );
@@ -229,7 +233,7 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
     final showName = message.nickName ?? message.userID ?? "";
     final theme = Provider.of<TUIThemeViewModel>(context).theme;
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: const EdgeInsets.only(top: 20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -264,25 +268,11 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final TUITheme theme = value.theme;
 
-    return Scaffold(
-      appBar: AppBar(
-          title: Text(
-            TIM_t("聊天记录"),
-            style: const TextStyle(color: Colors.white, fontSize: 17),
-          ),
-          shadowColor: theme.weakDividerColor,
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(colors: [
-                theme.lightPrimaryColor ?? CommonColor.lightPrimaryColor,
-                theme.primaryColor ?? CommonColor.primaryColor
-              ]),
-            ),
-          ),
-          iconTheme: const IconThemeData(
-            color: Colors.white,
-          )),
-      body: messageList.isEmpty
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+
+    Widget messageListPage() {
+      return messageList.isEmpty
           ? Row(
               children: [
                 Expanded(
@@ -301,8 +291,8 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
                 ))
               ],
             )
-          : Padding(
-              padding: const EdgeInsets.all(16),
+          : Container(
+              padding: isDesktopScreen ? null : const EdgeInsets.all(16),
               child: ListView.builder(
                 shrinkWrap: true,
                 itemCount: messageList.length,
@@ -311,7 +301,27 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
                   return _itemBuilder(message, context);
                 },
               ),
-            ),
-    );
+            );
+    }
+
+    return TUIKitScreenUtils.getDeviceWidget(
+        desktopWidget: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: messageListPage(),
+        ),
+        defaultWidget: Scaffold(
+          appBar: AppBar(
+              title: Text(
+                TIM_t("聊天记录"),
+                style: TextStyle(color: theme.appbarTextColor, fontSize: 17),
+              ),
+              shadowColor: theme.weakDividerColor,
+              backgroundColor: theme.appbarBgColor ??
+                  theme.primaryColor,
+              iconTheme: IconThemeData(
+                color: theme.appbarTextColor,
+              )),
+          body: messageListPage(),
+        ));
   }
 }

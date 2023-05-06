@@ -15,8 +15,10 @@ class GroupMessageDisturb extends TIMUIKitStatelessWidget {
     final model = Provider.of<TUIGroupProfileModel>(context);
     final isDisturb = model.conversation?.recvOpt != 0;
     return TIMUIKitOperationItem(
+      isEmpty: false,
       operationName: TIM_t("消息免打扰"),
       type: "switch",
+      isUseCheckedBoxOnWide: true,
       operationValue: isDisturb,
       onSwitchChange: (value) {
         model.setMessageDisturb(value);

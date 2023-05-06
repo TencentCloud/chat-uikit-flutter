@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use_from_same_package
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -33,6 +35,9 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
   /// message item builder, works for customize all message types and row layout.
   final MessageItemBuilder? messageItemBuilder;
 
+  /// The controller for text field.
+  final TIMUIKitInputTextFieldController? textFieldController;
+
   /// the builder for avatar
   final Widget Function(BuildContext context, V2TimMessage message)?
       userAvatarBuilder;
@@ -46,7 +51,7 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
   /// conversation type
   final ConvType conversationType;
 
-  final void Function(String userID)? onTapAvatar;
+  final void Function(String userID, TapDownDetails tapDetails)? onTapAvatar;
 
   @Deprecated(
       "Nickname will not show in one-to-one chat, if you tend to control it in group chat, please use `isShowSelfNameInGroup` and `isShowOthersNameInGroup` from `config: TIMUIKitChatConfig` instead")
@@ -61,9 +66,6 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
   final bool isUseDefaultEmoji;
 
   final List customEmojiStickerList;
-
-  /// The controller for text field.
-  final TIMUIKitInputTextFieldController? textFieldController;
 
   final bool isAllowScroll;
 
@@ -105,12 +107,13 @@ class _TIMUIKitHistoryMessageListContainerState
 
   List<V2TimMessage?> historyMessageList = [];
 
-  Future<void> requestForData(String? lastMsgID, LoadDirection direction, TUIChatSeparateViewModel model,
+  Future<void> requestForData(String? lastMsgID, LoadDirection direction,
+      TUIChatSeparateViewModel model,
       [int? count]) async {
-    print("requestForData $lastMsgID $direction");
-    if ((direction == LoadDirection.previous && model.haveMoreData) || (direction == LoadDirection.latest && model.haveMoreLatestData)) {
-      await model.loadData(
-        direction: direction,
+    if ((direction == LoadDirection.previous && model.haveMoreData) ||
+        (direction == LoadDirection.latest && model.haveMoreLatestData)) {
+      await model.loadChatRecord(
+          direction: direction,
           count: count ?? (kIsWeb ? 15 : HistoryMessageDartConstant.getCount),
           lastMsgID: lastMsgID);
     }
@@ -152,6 +155,7 @@ class _TIMUIKitHistoryMessageListContainerState
           mainHistoryListConfig: widget.mainHistoryListConfig,
           itemBuilder: (context, message) {
             return TIMUIKitHistoryMessageListItem(
+                textFieldController: widget.textFieldController,
                 userAvatarBuilder: widget.userAvatarBuilder,
                 customEmojiStickerList: widget.customEmojiStickerList,
                 isUseDefaultEmoji: widget.isUseDefaultEmoji,
@@ -166,7 +170,6 @@ class _TIMUIKitHistoryMessageListContainerState
                 message: message!,
                 showAvatar: chatConfig.isShowAvatar,
                 onTapForOthersPortrait: widget.onTapAvatar,
-                textFieldController: widget.textFieldController,
                 messageItemBuilder: widget.messageItemBuilder,
                 onLongPressForOthersHeadPortrait:
                     widget.onLongPressForOthersHeadPortrait,

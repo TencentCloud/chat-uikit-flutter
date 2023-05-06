@@ -3,14 +3,16 @@ import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/time_ago.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/pureUI/tim_uikit_search_input.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/pureUI/tim_uikit_search_item.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_search_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/pureUI/tim_uikit_search_showAll.dart';
-
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/tim_uikit_search_not_support.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 
 class TIMUIKitSearchMsgDetail extends StatefulWidget {
   /// Conversation need search
@@ -18,6 +20,8 @@ class TIMUIKitSearchMsgDetail extends StatefulWidget {
 
   /// initial keyword
   final String keyword;
+
+  final List<V2TimMessage>? initMessageList;
 
   /// the callback after clicking each conversation message item
   final Function(V2TimConversation, V2TimMessage?) onTapConversation;
@@ -29,7 +33,8 @@ class TIMUIKitSearchMsgDetail extends StatefulWidget {
       this.isAutoFocus = true,
       required this.currentConversation,
       required this.keyword,
-      required this.onTapConversation})
+      required this.onTapConversation,
+      this.initMessageList})
       : super(key: key);
 
   @override
@@ -42,6 +47,8 @@ class TIMUIKitSearchMsgDetailState
   String keywordState = "";
   int currentPage = 0;
   final FocusNode focusNode = FocusNode();
+  final TextEditingController _controller = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -54,7 +61,7 @@ class TIMUIKitSearchMsgDetailState
     final msgType = message.elemType;
     final isRevokedMessage = message.status == 6;
     if (isRevokedMessage) {
-      final isSelf = message.isSelf ?? false;
+      final isSelf = message.isSelf ?? true;
       final option2 = isSelf ? TIM_t("您") : message.nickName ?? message.sender;
       return TIM_t_para("{{option2}}撤回了一条消息", "$option2撤回了一条消息")(
           option2: option2);
@@ -86,15 +93,12 @@ class TIMUIKitSearchMsgDetailState
   }
 
   List<Widget> _renderListMessage(
-      List<V2TimMessage> msgList, BuildContext context) {
+      List<V2TimMessage> msgList, BuildContext context, bool isDesktopScreen) {
     List<Widget> listWidget = [];
 
     listWidget = msgList.map((message) {
       return Container(
         padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-        ),
         child: TIMUIKitSearchItem(
           faceUrl: message.faceUrl ?? "",
           showName: TencentUtils.checkString(message.nickName) ??
@@ -105,6 +109,9 @@ class TIMUIKitSearchMsgDetailState
               TencentUtils.checkString(message.userID) ??
               message.sender ??
               "",
+          lineOneRight: (isDesktopScreen && message.timestamp != null)
+              ? TimeAgo().getTimeForMessage(message.timestamp!)
+              : null,
           lineTwo: _getMsgElem(message),
           onClick: () {
             focusNode.unfocus();
@@ -147,6 +154,7 @@ class TIMUIKitSearchMsgDetailState
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
+    final theme = value.theme;
     if (PlatformUtils().isWeb) {
       return TIMUIKitSearchNotSupport();
     }
@@ -156,9 +164,19 @@ class TIMUIKitSearchMsgDetailState
             value: serviceLocator<TUISearchViewModel>())
       ],
       builder: (context, w) {
-        final List<V2TimMessage> currentMsgListForConversation =
+        final isDesktopScreen =
+            TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+
+        List<V2TimMessage> currentMsgListForConversation =
             Provider.of<TUISearchViewModel>(context)
                 .currentMsgListForConversation;
+        final currentText = _controller.text;
+        if (currentMsgListForConversation.isEmpty &&
+            widget.initMessageList != null &&
+            widget.initMessageList!.isNotEmpty && currentText.isEmpty) {
+          currentMsgListForConversation = widget.initMessageList!;
+        }
+
         final int totalMsgInConversationCount =
             Provider.of<TUISearchViewModel>(context)
                 .totalMsgInConversationCount;
@@ -169,35 +187,66 @@ class TIMUIKitSearchMsgDetailState
               currentFocus.unfocus();
             }
           },
-          child: Scaffold(
-              body: Column(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              if (isDesktopScreen)
+                Container(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                  child: Row(
+                    children: [
+                      SizedBox(
+                        child: Avatar(
+                            faceUrl: widget.currentConversation.faceUrl ?? "",
+                            showName: ""),
+                        width: 30,
+                        height: 30,
+                      ),
+                      const SizedBox(width: 16),
+                      Text(
+                        widget.currentConversation.showName ??
+                            widget.currentConversation.userID ??
+                            "",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: theme.darkTextColor,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
               TIMUIKitSearchInput(
                 focusNode: focusNode,
+                controller: _controller,
                 isAutoFocus: widget.isAutoFocus,
                 onChange: (String value) {
                   updateMsgResult(value, true);
                 },
                 initValue: widget.keyword,
-                prefixText: Text(
-                  widget.currentConversation.showName ??
-                      widget.currentConversation.userID ??
-                      "",
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                prefixIcon: Icon(
+                  Icons.search,
+                  size: 16,
+                  color: hexToColor("979797"),
                 ),
               ),
               Expanded(
-                  child: ListView(
-                children: [
-                  ..._renderListMessage(currentMsgListForConversation, context),
-                  _renderShowALl(keywordState.isNotEmpty &&
-                      totalMsgInConversationCount >
-                          currentMsgListForConversation.length)
-                ],
-              )),
+                  child: Scrollbar(
+                    controller: _scrollController,
+                    child: ListView(
+                      controller: _scrollController,
+                      children: [
+                        ..._renderListMessage(
+                            currentMsgListForConversation, context, isDesktopScreen),
+                        _renderShowALl(keywordState.isNotEmpty &&
+                            totalMsgInConversationCount >
+                                currentMsgListForConversation.length)
+                      ],
+                    ),
+                  )),
             ],
-          )),
+          ),
         );
       },
     );

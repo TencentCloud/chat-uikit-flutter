@@ -8,17 +8,14 @@ import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
-
 // ignore: unused_import
 import 'package:tencent_cloud_chat_uikit/ui/utils/optimize_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_config.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/keepalive_wrapper.dart';
-
 import 'TIMUIKitTongue/tim_uikit_chat_history_message_list_tongue.dart';
 import 'TIMUIKitTongue/tim_uikit_chat_history_message_list_tongue_container.dart';
 
@@ -76,7 +73,8 @@ class TIMUIKitHistoryMessageList extends StatefulWidget {
   final V2TimMessage? initFindingMsg;
 
   /// use for load more message
-  final Future<void> Function(String?, LoadDirection direction, [int?]) onLoadMore;
+  final Future<void> Function(String?, LoadDirection direction, [int?])
+      onLoadMore;
 
   /// configuration for list view
   final TIMUIKitHistoryMessageListConfig? mainHistoryListConfig;
@@ -99,7 +97,7 @@ class TIMUIKitHistoryMessageList extends StatefulWidget {
       this.initFindingMsg,
       this.isAllowScroll = true,
       this.mainHistoryListConfig,
-        required this.conversation})
+      required this.conversation})
       : super(key: key);
 
   @override
@@ -272,8 +270,8 @@ class _TIMUIKitHistoryMessageListState
     } else {
       if (widget.model.haveMoreData) {
         findingSeq = targetSeq;
-        widget.onLoadMore(
-            _getMessageId(widget.messageList.length - 1), LoadDirection.previous, singleLoadAmount);
+        widget.onLoadMore(_getMessageId(widget.messageList.length - 1),
+            LoadDirection.previous, singleLoadAmount);
       } else {
         showCantFindMsg();
       }
@@ -308,15 +306,15 @@ class _TIMUIKitHistoryMessageListState
     }
   }
 
-  List<V2TimMessage?> _getRecivedMessageList(int recivedMessageListCount) {
-    if (recivedMessageListCount == 0) {
+  List<V2TimMessage?> _getReceivedMessageList(int receivedMessageListCount) {
+    if (receivedMessageListCount == 0) {
       return [];
     }
     final haveTimeStampMessage =
-        widget.messageList[recivedMessageListCount]?.elemType == 11;
+        widget.messageList[receivedMessageListCount]?.elemType == 11;
     final endPoint = haveTimeStampMessage
-        ? recivedMessageListCount + 1
-        : recivedMessageListCount;
+        ? receivedMessageListCount + 1
+        : receivedMessageListCount;
     return widget.messageList.sublist(0, endPoint).reversed.toList();
   }
 
@@ -334,21 +332,22 @@ class _TIMUIKitHistoryMessageListState
     final globalModel = context.read<TUIChatGlobalModel>();
     final receivedNewMessageList = globalModel.receivedMessageListCount;
     final shouldShowUnreadMessage = receivedNewMessageList > 0;
-    final unreadMessageList = _getRecivedMessageList(receivedNewMessageList);
+    final unreadMessageList = _getReceivedMessageList(receivedNewMessageList);
     final readMessageList = messageList
         .sublist(unreadMessageList.length, messageList.length)
         .toList();
 
-    final throteFunction = OptimizeUtils.multiThrottle((index, LoadDirection direction) async {
+    final throttleFunction =
+        OptimizeUtils.multiThrottle((index, LoadDirection direction) async {
       final msgID =
           TIMUIKitChatUtils.getMessageIDWithinIndex(readMessageList, index);
       await widget.onLoadMore(msgID, direction);
     }, 20);
 
-    final throteFunctionWithMsgID = OptimizeUtils.multiThrottle((msgID, LoadDirection direction) async {
+    final throttleFunctionWithMsgID =
+        OptimizeUtils.multiThrottle((msgID, LoadDirection direction) async {
       await widget.onLoadMore(msgID, direction);
     }, 200);
-
 
     if (findingMsg != null) {
       _onScrollToIndex(findingMsg!);
@@ -360,167 +359,187 @@ class _TIMUIKitHistoryMessageListState
       return "${message?.msgID} - ${message?.timestamp} - ${message?.seq} -${message?.id}";
     }
 
-    return Container(
-      color: theme.chatBgColor,
-      child: Stack(
-        alignment: Alignment.topCenter,
-        children: [
-          CustomScrollView(
-            center: shouldShowUnreadMessage ? centerKey : null,
-            key: widget.mainHistoryListConfig?.key,
-            primary: widget.mainHistoryListConfig?.primary,
-            physics: (widget.isAllowScroll == false)
-                ? const NeverScrollableScrollPhysics()
-                : widget.mainHistoryListConfig?.physics,
-            // padding: widget.mainHistoryListConfig?.padding ?? EdgeInsets.zero,
-            // itemExtent: widget.mainHistoryListConfig?.itemExtent,
-            // prototypeItem: widget.mainHistoryListConfig?.prototypeItem,
-            cacheExtent: widget.mainHistoryListConfig?.cacheExtent ?? 1500,
-            semanticChildCount:
-                widget.mainHistoryListConfig?.semanticChildCount,
-            dragStartBehavior:
-                widget.mainHistoryListConfig?.dragStartBehavior ??
-                    DragStartBehavior.start,
-            keyboardDismissBehavior:
-                widget.mainHistoryListConfig?.keyboardDismissBehavior ??
-                    ScrollViewKeyboardDismissBehavior.manual,
-            restorationId: widget.mainHistoryListConfig?.restorationId,
-            clipBehavior:
-                widget.mainHistoryListConfig?.clipBehavior ?? Clip.hardEdge,
-            reverse: true,
-            shrinkWrap: !shouldShowUnreadMessage,
+    return Stack(
+      alignment: Alignment.topCenter,
+      children: [
+        Scrollbar(
             controller: _autoScrollController,
-            slivers: [
-              SliverPadding(
-                padding:
-                    widget.mainHistoryListConfig?.padding ?? EdgeInsets.zero,
-                sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                        (BuildContext context, int index) {
-                          final messageItem = unreadMessageList[index];
-                          if(index == unreadMessageList.length - 1 && widget.model.haveMoreLatestData == true){
-                            throteFunctionWithMsgID(messageItem?.msgID ?? "", LoadDirection.latest);
-                          }
-                          return AutoScrollTag(
-                            controller: _autoScrollController,
-                            index: -index,
-                            key: ValueKey(
-                                getMessageIdentifier(messageItem, index)),
-                            highlightColor: Colors.black.withOpacity(0.1),
-                            child: KeepAliveWrapper(
-                                keepAlive: messageItem?.elemType ==
-                                    MessageElemType.V2TIM_ELEM_TYPE_SOUND,
-                                child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16),
-                                    child:
-                                        _getMessageItemBuilder(messageItem))),
-                          );
-                        },
-                        childCount: unreadMessageList.length,
-                        findChildIndexCallback: (Key key) {
-                          final ValueKey<String> valueKey =
-                              key as ValueKey<String>;
-                          final String data = valueKey.value;
-                          final int index = unreadMessageList.indexWhere(
-                              (element) =>
-                                  getMessageIdentifier(element, 0) == data);
-                          return index != -1 ? index : null;
-                        })),
-              ),
-              SliverPadding(
-                padding: EdgeInsets.zero,
-                key: centerKey,
-              ),
-              SliverPadding(
-                padding:
-                    widget.mainHistoryListConfig?.padding ?? EdgeInsets.zero,
-                sliver: SliverList(
-                    delegate: SliverChildBuilderDelegate(
-                        (BuildContext context, int index) {
-                          final messageItem = readMessageList[index];
-                          if (index == readMessageList.length - 1) {
-                            if (widget.model.haveMoreData) {
-                              throteFunction(index, LoadDirection.previous);
-                              return Column(
-                                children: [
-                                  LoadingAnimationWidget.staggeredDotsWave(
-                                    color: theme.weakTextColor ?? Colors.grey,
-                                    size: 28,
-                                  ),
-                                  AutoScrollTag(
-                                    controller: _autoScrollController,
-                                    index: -index,
-                                    key: ValueKey(getMessageIdentifier(
-                                        messageItem, index)),
-                                    highlightColor:
-                                        Colors.black.withOpacity(0.1),
-                                    child: KeepAliveWrapper(
+            child: CustomScrollView(
+              center: shouldShowUnreadMessage ? centerKey : null,
+              key: widget.mainHistoryListConfig?.key,
+              primary: widget.mainHistoryListConfig?.primary,
+              physics: (widget.isAllowScroll == false)
+                  ? const NeverScrollableScrollPhysics()
+                  : widget.mainHistoryListConfig?.physics,
+              // padding: widget.mainHistoryListConfig?.padding ?? EdgeInsets.zero,
+              // itemExtent: widget.mainHistoryListConfig?.itemExtent,
+              // prototypeItem: widget.mainHistoryListConfig?.prototypeItem,
+              cacheExtent: widget.mainHistoryListConfig?.cacheExtent ?? 1500,
+              semanticChildCount:
+                  widget.mainHistoryListConfig?.semanticChildCount,
+              dragStartBehavior:
+                  widget.mainHistoryListConfig?.dragStartBehavior ??
+                      DragStartBehavior.start,
+              keyboardDismissBehavior:
+                  widget.mainHistoryListConfig?.keyboardDismissBehavior ??
+                      ScrollViewKeyboardDismissBehavior.manual,
+              restorationId: widget.mainHistoryListConfig?.restorationId,
+              clipBehavior:
+                  widget.mainHistoryListConfig?.clipBehavior ?? Clip.hardEdge,
+              reverse: true,
+              shrinkWrap: !shouldShowUnreadMessage,
+              controller: _autoScrollController,
+              slivers: [
+                SliverPadding(
+                  padding:
+                      widget.mainHistoryListConfig?.padding ?? EdgeInsets.zero,
+                  sliver: SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                          (BuildContext context, int index) {
+                            final messageItem = unreadMessageList[index];
+                            if (index == unreadMessageList.length - 1 &&
+                                widget.model.haveMoreLatestData == true) {
+                              throttleFunctionWithMsgID(
+                                  messageItem?.msgID ?? "",
+                                  LoadDirection.latest);
+                            }
+                            return AutoScrollTag(
+                              controller: _autoScrollController,
+                              index: -index,
+                              key: ValueKey(
+                                  getMessageIdentifier(messageItem, index)),
+                              highlightColor: Colors.black.withOpacity(0.1),
+                              child: KeepAliveWrapper(
+                                  keepAlive: messageItem?.elemType ==
+                                      MessageElemType.V2TIM_ELEM_TYPE_SOUND,
+                                  child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16),
+                                      child:
+                                          _getMessageItemBuilder(messageItem))),
+                            );
+                          },
+                          childCount: unreadMessageList.length,
+                          findChildIndexCallback: (Key key) {
+                            final ValueKey<String> valueKey =
+                                key as ValueKey<String>;
+                            final String data = valueKey.value;
+                            final int index = unreadMessageList.indexWhere(
+                                (element) =>
+                                    getMessageIdentifier(element, 0) == data);
+                            return index != -1 ? index : null;
+                          })),
+                ),
+                SliverPadding(
+                  padding: EdgeInsets.zero,
+                  key: centerKey,
+                ),
+                SliverPadding(
+                  padding:
+                      widget.mainHistoryListConfig?.padding ?? EdgeInsets.zero,
+                  sliver: Selector<TUIChatSeparateViewModel, bool>(
+                    selector: (context, model) {
+                      return model.haveMoreData;
+                    },
+                    shouldRebuild: (previous, next) {
+                      return previous != next;
+                    },
+                    builder: (context, haveMoreData, child) {
+                      return SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                              (BuildContext context, int index) {
+                                final messageItem = readMessageList[index];
+                                final isSelf = messageItem?.isSelf ?? true;
+                                if (index == readMessageList.length - 1) {
+                                  if (haveMoreData) {
+                                    throttleFunction(
+                                        index, LoadDirection.previous);
+                                    return Column(
+                                      children: [
+                                        LoadingAnimationWidget
+                                            .staggeredDotsWave(
+                                          color: theme.weakTextColor ??
+                                              Colors.grey,
+                                          size: 28,
+                                        ),
+                                        AutoScrollTag(
+                                          controller: _autoScrollController,
+                                          index: -index,
+                                          key: ValueKey(getMessageIdentifier(
+                                              messageItem, index)),
+                                          highlightColor:
+                                              Colors.black.withOpacity(0.1),
+                                          child: KeepAliveWrapper(
+                                              keepAlive: messageItem
+                                                      ?.elemType ==
+                                                  MessageElemType
+                                                      .V2TIM_ELEM_TYPE_SOUND,
+                                              child: Container(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 16),
+                                                  child: _getMessageItemBuilder(
+                                                      messageItem))),
+                                        ),
+                                      ],
+                                    );
+                                  }
+                                }
+                                if (index == 0 &&
+                                    widget.model.haveMoreLatestData == true &&
+                                    globalModel.receivedMessageListCount < 10) {
+                                  throttleFunction(index, LoadDirection.latest);
+                                }
+                                return AutoScrollTag(
+                                  controller: _autoScrollController,
+                                  index: -index,
+                                  key: ValueKey(
+                                      getMessageIdentifier(messageItem, index)),
+                                  highlightColor: Colors.black.withOpacity(0.1),
+                                  child: KeepAliveWrapper(
                                       keepAlive: messageItem?.elemType ==
                                           MessageElemType.V2TIM_ELEM_TYPE_SOUND,
                                       child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 16),
+                                          padding: EdgeInsets.only(
+                                              left: isSelf ? 0 : 16,
+                                              right: isSelf ? 16 : 0),
                                           child: _getMessageItemBuilder(
-                                              messageItem)),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }
-                          }
-                          if(index == 0 && widget.model.haveMoreLatestData == true && globalModel.receivedMessageListCount < 10){
-                            throteFunction(index, LoadDirection.latest);
-                          }
-                          return AutoScrollTag(
-                            controller: _autoScrollController,
-                            index: -index,
-                            key: ValueKey(
-                                getMessageIdentifier(messageItem, index)),
-                            highlightColor: Colors.black.withOpacity(0.1),
-                            child: KeepAliveWrapper(
-                                keepAlive: messageItem?.elemType ==
-                                    MessageElemType.V2TIM_ELEM_TYPE_SOUND,
-                                child: Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16),
-                                    child:
-                                        _getMessageItemBuilder(messageItem))),
-                          );
-                        },
-                        addAutomaticKeepAlives: true,
-                        childCount: readMessageList.length,
-                        findChildIndexCallback: (Key key) {
-                          final ValueKey<String> valueKey =
-                              key as ValueKey<String>;
-                          final String data = valueKey.value;
-                          final int index = readMessageList.indexWhere(
-                              (element) =>
-                                  getMessageIdentifier(element, 0) == data);
-                          return index > -1 ? index : null;
-                        }
-                        )),
-              ),
-            ],
-          ),
-          TIMUIKitHistoryMessageListTongueContainer(
-            conversation: widget.conversation,
-            model: widget.model,
-            scrollController: _autoScrollController,
-            scrollToIndexBySeq: _onScrollToIndexBySeq,
-            groupAtInfoList: widget.groupAtInfoList,
-            tongueItemBuilder: widget.tongueItemBuilder,
-          ),
-          if (loadingPlace == LoadingPlace.top)
-            Positioned(
-              top: 8,
-              child: LoadingAnimationWidget.staggeredDotsWave(
-                color: theme.weakTextColor ?? Colors.grey,
-                size: 28,
-              ),
+                                              messageItem))),
+                                );
+                              },
+                              childCount: readMessageList.length,
+                              findChildIndexCallback: (Key key) {
+                                final ValueKey<String> valueKey =
+                                    key as ValueKey<String>;
+                                final String data = valueKey.value;
+                                final int index = readMessageList.indexWhere(
+                                    (element) =>
+                                        getMessageIdentifier(element, 0) ==
+                                        data);
+                                return index > -1 ? index : null;
+                              }));
+                    },
+                  ),
+                ),
+              ],
+            )),
+        TIMUIKitHistoryMessageListTongueContainer(
+          conversation: widget.conversation,
+          model: widget.model,
+          scrollController: _autoScrollController,
+          scrollToIndexBySeq: _onScrollToIndexBySeq,
+          groupAtInfoList: widget.groupAtInfoList,
+          tongueItemBuilder: widget.tongueItemBuilder,
+        ),
+        if (loadingPlace == LoadingPlace.top)
+          Positioned(
+            top: 8,
+            child: LoadingAnimationWidget.staggeredDotsWave(
+              color: theme.weakTextColor ?? Colors.grey,
+              size: 28,
             ),
-        ],
-      ),
+          ),
+      ],
     );
   }
 }

@@ -6,6 +6,7 @@ import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_glo
 
 import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 
 
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
@@ -74,7 +75,7 @@ class TIMUIKitGroupApplicationListState
     }
 
     String _getRequestMessage() {
-      String option2 = applicationInfo.requestMsg!;
+      String option2 = applicationInfo.requestMsg ?? "";
       return TIM_t_para("验证消息: {{option2}}", "验证消息: $option2")(
           option2: option2);
     }
@@ -227,8 +228,10 @@ class TIMUIKitGroupApplicationListState
     return MultiProvider(
       providers: [ChangeNotifierProvider.value(value: model)],
       builder: (context, w) {
+        final isDesktopScreen =
+            TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
         return Container(
-          decoration: BoxDecoration(color: theme.weakBackgroundColor),
+          decoration: isDesktopScreen ? null : BoxDecoration(color: theme.weakBackgroundColor),
           child: ListView.builder(
             shrinkWrap: true,
             itemCount: groupApplicationList.length,

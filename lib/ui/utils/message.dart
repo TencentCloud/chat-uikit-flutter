@@ -1,13 +1,12 @@
 // ignore_for_file: unrelated_type_equality_checks, avoid_print
 
 import 'dart:convert';
-
-import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/time.dart';
+import 'package:collection/collection.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
 
 class MessageUtils {
   // 判断CallingData的方式和Trtc的方法一致
@@ -101,9 +100,12 @@ class MessageUtils {
   }
 
   static String? _getOpUserNick(V2TimGroupMemberInfo? opUser) {
-    return TencentUtils.checkString(opUser?.friendRemark) ??
-        TencentUtils.checkString(opUser?.nickName) ??
-        TencentUtils.checkString(opUser?.userID) ?? "";
+    if(opUser == null){
+      return "";
+    }
+    return TencentUtils.checkString(opUser.friendRemark) ??
+        TencentUtils.checkString(opUser.nickName) ??
+        TencentUtils.checkString(opUser.userID);
   }
 
   static String? _getMemberNickName(V2TimGroupMemberInfo e) {
@@ -155,21 +157,21 @@ class MessageUtils {
         break;
       case GroupTipsElemType.V2TIM_GROUP_TIPS_TYPE_INVITE:
         final option5 =
-            memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
+        memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
         final inviteUser = _getOpUserNick(operationMember);
         displayMessage = '$inviteUser' +
             TIM_t_para("邀请{{option5}}加入群组", "邀请$option5加入群组")(option5: option5);
         break;
       case GroupTipsElemType.V2TIM_GROUP_TIPS_TYPE_KICKED:
         final option4 =
-            memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
+        memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
         final kickUser = _getOpUserNick(operationMember);
         displayMessage = '$kickUser' +
             TIM_t_para("将{{option4}}踢出群组", "将$option4踢出群组")(option4: option4);
         break;
       case GroupTipsElemType.V2TIM_GROUP_TIPS_TYPE_JOIN:
         final option3 =
-            memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
+        memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
         displayMessage = TIM_t_para("用户{{option3}}加入了群聊", "用户$option3加入了群聊")(
             option3: option3);
         break;
@@ -186,7 +188,7 @@ class MessageUtils {
         break;
       case GroupTipsElemType.V2TIM_GROUP_TIPS_TYPE_SET_ADMIN:
         final adminMember =
-            memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
+        memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
         final opMember = _getOpUserNick(operationMember);
         final option1 = adminMember;
         displayMessage = '$opMember' +
@@ -195,7 +197,7 @@ class MessageUtils {
         break;
       case GroupTipsElemType.V2TIM_GROUP_TIPS_TYPE_CANCEL_ADMIN:
         final adminMember =
-            memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
+        memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
         final opMember = _getOpUserNick(operationMember);
         final option1 = adminMember;
         displayMessage = '$opMember' +
@@ -276,46 +278,14 @@ class MessageUtils {
     }
   }
 
-  static Future<String> getAbstractMessage(V2TimMessage message,
-      List<V2TimGroupMemberFullInfo?> groupMemberList) async {
-    final msgType = message.elemType;
-    switch (msgType) {
-      case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
-        return handleCustomMessageString(message);
-      case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
-        return TIM_t("[语音]");
-      case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
-        return message.textElem!.text as String;
-      case MessageElemType.V2TIM_ELEM_TYPE_FACE:
-        return TIM_t("[表情]");
-      case MessageElemType.V2TIM_ELEM_TYPE_FILE:
-        final String? option2 = message.fileElem!.fileName ?? "";
-        return TIM_t_para("[文件] {{option2}}", "[文件] $option2")(
-            option2: option2);
-      case MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS:
-        return await MessageUtils.groupTipsMessageAbstract(
-            message.groupTipsElem!, groupMemberList);
-      case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
-        return TIM_t("[图片]");
-      case MessageElemType.V2TIM_ELEM_TYPE_VIDEO:
-        return TIM_t("[视频]");
-      case MessageElemType.V2TIM_ELEM_TYPE_LOCATION:
-        return TIM_t("[位置]");
-      case MessageElemType.V2TIM_ELEM_TYPE_MERGER:
-        return TIM_t("[聊天记录]");
-      default:
-        return TIM_t("未知消息");
-    }
-  }
-
   static V2TimImage? getImageFromImgList(
       List<V2TimImage?>? list, List<String> order) {
     V2TimImage? img;
     try {
       for (String type in order) {
         img = list?.firstWhere(
-            (e) =>
-                e?.type == HistoryMessageDartConstant.V2_TIM_IMAGE_TYPES[type],
+                (e) =>
+            e?.type == HistoryMessageDartConstant.V2_TIM_IMAGE_TYPES[type],
             orElse: () => null);
       }
     } catch (e) {
@@ -332,10 +302,10 @@ class MessageUtils {
     final displayName = friendRemark.isNotEmpty
         ? friendRemark
         : nameCard.isNotEmpty
-            ? nameCard
-            : nickName.isNotEmpty
-                ? nickName
-                : sender;
+        ? nameCard
+        : nickName.isNotEmpty
+        ? nickName
+        : sender;
     return displayName.toString();
   }
 

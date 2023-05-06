@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/image_screen.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
@@ -13,8 +13,8 @@ class Avatar extends TIMUIKitStatelessWidget {
   final String faceUrl;
   final String showName;
   final bool isFromLocalAsset;
-  final BorderRadius? borderRadius;
   final CoreServicesImpl coreService = serviceLocator<CoreServicesImpl>();
+  final BorderRadius? borderRadius;
   final V2TimUserStatus? onlineStatus;
   final int? type; // 1 c2c 2 group
   final bool isShowBigWhenClick;
@@ -25,10 +25,10 @@ class Avatar extends TIMUIKitStatelessWidget {
       {Key? key,
       required this.faceUrl,
       this.onlineStatus,
-        this.borderRadius,
-        required this.showName,
+      required this.showName,
       this.isShowBigWhenClick = false,
       this.isFromLocalAsset = false,
+      this.borderRadius,
       this.type = 1})
       : super(key: key);
 
@@ -39,6 +39,7 @@ class Avatar extends TIMUIKitStatelessWidget {
             TencentUtils.checkString(
                     selfInfoViewModel.globalConfig?.defaultAvatarAssetPath) ??
                 'images/default_c2c_head.png',
+            fit: BoxFit.cover,
             package:
                 selfInfoViewModel.globalConfig?.defaultAvatarAssetPath != null
                     ? null
@@ -48,6 +49,7 @@ class Avatar extends TIMUIKitStatelessWidget {
             TencentUtils.checkString(
                     selfInfoViewModel.globalConfig?.defaultAvatarAssetPath) ??
                 'images/default_group_head.png',
+            fit: BoxFit.cover,
             package:
                 selfInfoViewModel.globalConfig?.defaultAvatarAssetPath != null
                     ? null
@@ -58,7 +60,10 @@ class Avatar extends TIMUIKitStatelessWidget {
     // final emptyAvatarBuilder = coreService.emptyAvatarBuilder;
     if (faceUrl != "") {
       if (isFromLocalAsset) {
-        return Image.asset(faceUrl);
+        return Image.asset(
+          faceUrl,
+          fit: BoxFit.cover,
+        );
       }
       return CachedNetworkImage(
         imageUrl: faceUrl,
@@ -79,6 +84,7 @@ class Avatar extends TIMUIKitStatelessWidget {
                 TencentUtils.checkString(selfInfoViewModel
                         .globalConfig?.defaultAvatarAssetPath) ??
                     'images/default_c2c_head.png',
+                fit: BoxFit.cover,
                 package:
                     selfInfoViewModel.globalConfig?.defaultAvatarAssetPath !=
                             null
@@ -90,6 +96,7 @@ class Avatar extends TIMUIKitStatelessWidget {
                 TencentUtils.checkString(selfInfoViewModel
                         .globalConfig?.defaultAvatarAssetPath) ??
                     'images/default_group_head.png',
+                fit: BoxFit.cover,
                 package:
                     selfInfoViewModel.globalConfig?.defaultAvatarAssetPath !=
                             null
@@ -133,14 +140,18 @@ class Avatar extends TIMUIKitStatelessWidget {
             child: Hero(
               tag: faceUrl,
               child: ClipRRect(
-                borderRadius: borderRadius ?? selfInfoViewModel.globalConfig?.defaultAvatarBorderRadius ?? BorderRadius.circular(4.8),
+                borderRadius: borderRadius ??
+                    selfInfoViewModel.globalConfig?.defaultAvatarBorderRadius ??
+                    BorderRadius.circular(4.8),
                 child: getImageWidget(context, theme),
               ),
             ),
           ),
         if (!isShowBigWhenClick)
           ClipRRect(
-            borderRadius: borderRadius ?? selfInfoViewModel.globalConfig?.defaultAvatarBorderRadius ?? BorderRadius.circular(4.8),
+            borderRadius: borderRadius ??
+                selfInfoViewModel.globalConfig?.defaultAvatarBorderRadius ??
+                BorderRadius.circular(4.8),
             child: getImageWidget(context, theme),
           ),
         if (onlineStatus?.statusType != null && onlineStatus?.statusType != 0)

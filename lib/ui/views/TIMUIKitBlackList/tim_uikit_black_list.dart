@@ -7,6 +7,7 @@ import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendsh
 
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
@@ -50,35 +51,33 @@ class _TIMUIKitBlackListState extends TIMUIKitState<TIMUIKitBlackList> {
     final theme = Provider.of<TUIThemeViewModel>(context).theme;
     final showName = _getShowName(friendInfo);
     final faceUrl = friendInfo.userProfile?.faceUrl ?? "";
-    return Slidable(
-        endActionPane: ActionPane(motion: const DrawerMotion(), children: [
-          SlidableAction(
-            onPressed: (context) async {
-              await _friendshipViewModel
-                  .deleteFromBlockList([friendInfo.userID]);
-            },
-            backgroundColor: theme.cautionColor ?? CommonColor.cautionColor,
-            foregroundColor: theme.white,
-            label: TIM_t("删除"),
-            autoClose: true,
-          )
-        ]),
-        child: GestureDetector(
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+
+    Widget itemWidget() {
+      return Material(
+        color: theme.wideBackgroundColor,
+        child: InkWell(
           onTap: () {
             if (widget.onTapItem != null) {
               widget.onTapItem!(friendInfo);
             }
           },
           child: Container(
-            padding: const EdgeInsets.only(top: 10, left: 16),
+            padding: const EdgeInsets.only(top: 10, left: 16, right: 16),
+            decoration: BoxDecoration(
+                border: Border(
+                    bottom: BorderSide(
+                        color: theme.weakDividerColor ??
+                            CommonColor.weakDividerColor))),
             child: Row(
               children: [
                 Container(
                   padding: const EdgeInsets.only(bottom: 12),
                   margin: const EdgeInsets.only(right: 12),
                   child: SizedBox(
-                    height: 40,
-                    width: 40,
+                    height: isDesktopScreen ? 30 : 40,
+                    width: isDesktopScreen ? 30 : 40,
                     child: Avatar(faceUrl: faceUrl, showName: showName),
                   ),
                 ),
@@ -86,19 +85,45 @@ class _TIMUIKitBlackListState extends TIMUIKitState<TIMUIKitBlackList> {
                     child: Container(
                   alignment: Alignment.centerLeft,
                   padding: const EdgeInsets.only(top: 10, bottom: 20),
-                  decoration: BoxDecoration(
-                      border: Border(
-                          bottom: BorderSide(
-                              color: theme.weakDividerColor ??
-                                  CommonColor.weakDividerColor))),
                   child: Text(
                     showName,
-                    style: TextStyle(color: theme.black, fontSize: 18),
+                    style: TextStyle(
+                        color: theme.black, fontSize: isDesktopScreen ? 14 : 18),
                   ),
-                ))
+                )),
+                if (isDesktopScreen)
+                  OutlinedButton(
+                      onPressed: () {
+                        _friendshipViewModel
+                            .deleteFromBlockList([friendInfo.userID]);
+                      },
+                      child: Text(
+                        TIM_t("移出黑名单"),
+                        style: TextStyle(color: theme.primaryColor),
+                      ))
               ],
             ),
           ),
+        ),
+      );
+    }
+
+    return TUIKitScreenUtils.getDeviceWidget(
+        desktopWidget: itemWidget(),
+        defaultWidget: Slidable(
+          endActionPane: ActionPane(motion: const DrawerMotion(), children: [
+            SlidableAction(
+              onPressed: (context) async {
+                await _friendshipViewModel
+                    .deleteFromBlockList([friendInfo.userID]);
+              },
+              backgroundColor: theme.cautionColor ?? CommonColor.cautionColor,
+              foregroundColor: theme.white,
+              label: TIM_t("删除"),
+              autoClose: true,
+            )
+          ]),
+          child: itemWidget(),
         ));
   }
 
@@ -106,10 +131,6 @@ class _TIMUIKitBlackListState extends TIMUIKitState<TIMUIKitBlackList> {
     return widget.itemBuilder ?? _itemBuilder;
   }
 
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {

@@ -13,12 +13,14 @@ class TIMUIKitLastMsg extends StatefulWidget {
   final V2TimMessage? lastMsg;
   final List<V2TimGroupAtInfo?> groupAtInfoList;
   final BuildContext context;
+  final double fontSize;
 
   const TIMUIKitLastMsg(
       {Key? key,
       this.lastMsg,
       required this.groupAtInfoList,
-      required this.context})
+      required this.context,
+      this.fontSize = 14.0})
       : super(key: key);
 
   @override
@@ -46,11 +48,11 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
   void _getMsgElem() async {
     final isRevokedMessage = widget.lastMsg!.status == 6;
     if (isRevokedMessage) {
-      final isSelf = widget.lastMsg!.isSelf ?? false;
+      final isSelf = widget.lastMsg!.isSelf ?? true;
       final option1 = isSelf
           ? TIM_t("您")
           : widget.lastMsg!.nickName ?? widget.lastMsg?.sender;
-      if(mounted){
+      if (mounted) {
         setState(() {
           groupTipsAbstractText = TIM_t_para(
               "{{option1}}撤回了一条消息", "$option1撤回了一条消息")(option1: option1);
@@ -58,7 +60,7 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
       }
     } else {
       final newText = await _getLastMsgShowText(widget.lastMsg, widget.context);
-      if(mounted){
+      if (mounted) {
         setState(() {
           groupTipsAbstractText = newText;
         });
@@ -75,7 +77,7 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
       case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
         return TIM_t("[语音]");
       case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
-        return widget.lastMsg?.textElem?.text ?? "";
+        return (widget.lastMsg?.textElem?.text)?.trim() ?? "";
       case MessageElemType.V2TIM_ELEM_TYPE_FACE:
         return TIM_t("[表情]");
       case MessageElemType.V2TIM_ELEM_TYPE_FILE:
@@ -134,14 +136,16 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
         ),
       if (widget.groupAtInfoList.isNotEmpty)
         Text(_getAtMessage(),
-            style: TextStyle(color: theme.cautionColor, fontSize: 14)),
+            style: TextStyle(
+                color: theme.cautionColor, fontSize: widget.fontSize)),
       Expanded(
           child: Text(
         groupTipsAbstractText,
         softWrap: true,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: TextStyle(height: 1, color: theme.weakTextColor, fontSize: 14),
+        style: TextStyle(
+            height: 1, color: theme.weakTextColor, fontSize: widget.fontSize),
       )),
     ]);
   }

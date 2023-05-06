@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/add_group_life_cycle.dart';
@@ -19,8 +22,10 @@ class TIMUIKitAddGroup extends StatefulWidget {
   final Function(String groupID, V2TimConversation conversation)
       onTapExistGroup;
 
+  final VoidCallback? closeFunc;
+
   const TIMUIKitAddGroup(
-      {Key? key, this.lifeCycle, required this.onTapExistGroup})
+      {Key? key, this.lifeCycle, required this.onTapExistGroup, this.closeFunc})
       : super(key: key);
 
   @override
@@ -67,6 +72,8 @@ class _TIMUIKitAddGroupState extends TIMUIKitState<TIMUIKitAddGroup> {
     final groupID = groupInfo.groupID;
     final showName = groupInfo.groupName ?? groupID;
     final groupType = _getGroupType(groupInfo.groupType);
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     return InkWell(
       onTap: () async {
         final V2TimConversation? groupConversation =
@@ -76,16 +83,38 @@ class _TIMUIKitAddGroupState extends TIMUIKitState<TIMUIKitAddGroup> {
               type: TIMCallbackType.INFO,
               infoRecommendText: TIM_t("您已是群成员"),
               infoCode: 6660202));
+          if (widget.closeFunc != null) {
+            widget.closeFunc!();
+          }
           widget.onTapExistGroup(groupID, groupConversation);
           return;
         }
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-                builder: (context) => SendJoinGroupApplication(
-                      lifeCycle: widget.lifeCycle,
-                      groupInfo: groupInfo,
-                    )));
+
+        if(isDesktopScreen){
+          if (widget.closeFunc != null) {
+            widget.closeFunc!();
+          }
+          TUIKitWidePopup.showPopupWindow(
+            operationKey: TUIKitWideModalOperationKey.addGroup,
+            context: context,
+            width: MediaQuery.of(context).size.width * 0.3,
+            height: MediaQuery.of(context).size.width * 0.4,
+            title: TIM_t("添加群聊"),
+            child: (closeFuncSendApplication) => SendJoinGroupApplication(
+                lifeCycle: widget.lifeCycle,
+                groupInfo: groupInfo,
+            ),
+          );
+        }else{
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => SendJoinGroupApplication(
+                    lifeCycle: widget.lifeCycle,
+                    groupInfo: groupInfo,
+                  )));
+        }
+
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -93,9 +122,9 @@ class _TIMUIKitAddGroupState extends TIMUIKitState<TIMUIKitAddGroup> {
           // crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              width: 48,
-              height: 48,
-              margin: const EdgeInsets.only(right: 12),
+              width: isDesktopScreen ? 38 : 48,
+              height: isDesktopScreen ? 38 : 48,
+              margin: const EdgeInsets.only(right: 16),
               child: Avatar(faceUrl: faceUrl, showName: showName),
             ),
             Column(
@@ -103,7 +132,7 @@ class _TIMUIKitAddGroupState extends TIMUIKitState<TIMUIKitAddGroup> {
               children: [
                 Text(
                   showName,
-                  style: const TextStyle(fontSize: 18),
+                  style: TextStyle(fontSize: isDesktopScreen ? 16 : 18),
                 ),
                 Text(
                   "ID: $groupID",

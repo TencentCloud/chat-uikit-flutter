@@ -3,14 +3,13 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_item.dart';
-
-
 import 'package:tencent_cloud_chat_uikit/ui/widgets/merger_message_screen.dart';
-
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-
 import 'TIMUIKitMessageReaction/tim_uikit_message_reaction_show_panel.dart';
 
 class TIMUIKitMergerElem extends StatefulWidget {
@@ -33,7 +32,8 @@ class TIMUIKitMergerElem extends StatefulWidget {
       this.isShowMessageReaction,
       required this.messageID,
       required this.isShowJump,
-      this.clearJump, this.messageItemBuilder})
+      this.clearJump,
+      this.messageItemBuilder})
       : super(key: key);
 
   @override
@@ -42,6 +42,13 @@ class TIMUIKitMergerElem extends StatefulWidget {
 
 class TIMUIKitMergerElemState extends TIMUIKitState<TIMUIKitMergerElem> {
   bool isShowJumpState = false;
+  late ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController();
+  }
 
   _showJumpColor() {
     int shineAmount = 6;
@@ -69,13 +76,34 @@ class TIMUIKitMergerElemState extends TIMUIKitState<TIMUIKitMergerElem> {
   _handleTap(BuildContext context, TUIChatSeparateViewModel model) async {
     try {
       if (widget.messageID != "") {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => MergerMessageScreen(
-                messageItemBuilder: widget.messageItemBuilder,
-                  model: model, msgID: widget.messageID),
-            ));
+        final isDesktopScreen =
+            TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+
+        if (isDesktopScreen) {
+          TUIKitWidePopup.showPopupWindow(
+            operationKey: TUIKitWideModalOperationKey.mergerMessageList,
+            context: context,
+            width: MediaQuery.of(context).size.width * 0.7,
+            title: TIM_t("聊天记录"),
+            height: MediaQuery.of(context).size.height * 0.7,
+            child: (onClose) => Scrollbar(
+              controller: _scrollController,
+              child: MergerMessageScreen(
+                  messageItemBuilder: widget.messageItemBuilder,
+                  model: model,
+                  msgID: widget.messageID),
+            ),
+          );
+        } else {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MergerMessageScreen(
+                    messageItemBuilder: widget.messageItemBuilder,
+                    model: model,
+                    msgID: widget.messageID),
+              ));
+        }
       }
     } catch (e) {
       onTIMCallback(TIMCallback(
@@ -101,9 +129,12 @@ class TIMUIKitMergerElemState extends TIMUIKitState<TIMUIKitMergerElem> {
         _showJumpColor();
       });
     }
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     return Container(
-      constraints:
-          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.6),
+      constraints: BoxConstraints(
+          maxWidth:
+              MediaQuery.of(context).size.width * (isDesktopScreen ? 0.3 : 0.6)),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.only(

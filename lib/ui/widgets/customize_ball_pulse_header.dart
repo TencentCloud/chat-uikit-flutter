@@ -115,10 +115,6 @@ class BallPulseHeaderWidgetState extends TIMUIKitState<BallPulseHeaderWidget> {
   // 是否运行动画
   bool _isAnimated = false;
 
-  @override
-  void initState() {
-    super.initState();
-  }
 
   // 循环动画
   void _loopAnimated() {

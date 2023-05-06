@@ -26,7 +26,7 @@ class TUIGroupProfileModel extends ChangeNotifier {
   List<V2TimGroupMemberFullInfo?>? _groupMemberList;
   String _groupMemberListSeq = "0";
   V2TimGroupInfo? _groupInfo;
-  Function(String userID)? onClickUser;
+  Function(String userID, TapDownDetails? tapDetails)? onClickUser;
 
   GroupProfileLifeCycle? get lifeCycle => _lifeCycle;
 
@@ -180,7 +180,6 @@ class TUIGroupProfileModel extends ChangeNotifier {
 
   setGroupNotification(String notification) async {
     if (_groupInfo != null) {
-      _groupInfo?.notification = notification;
       final response = await _groupServices.setGroupInfo(
           info: V2TimGroupInfo.fromJson({
         "groupID": _groupID,
@@ -189,6 +188,7 @@ class TUIGroupProfileModel extends ChangeNotifier {
       }));
       if (response.code == 0) {
         notifyListeners();
+        _groupInfo?.notification = notification;
       }
     }
   }
@@ -327,7 +327,7 @@ class TUIGroupProfileModel extends ChangeNotifier {
 
   Future<V2TimCallback?> muteGroupMember(
       String userID, bool isMute, int? serverTime) async {
-    final muteTime = serverTime != null ? serverTime + 9999 : 51556926 * 10;
+    const muteTime = 315360000;
     final res = await _groupServices.muteGroupMember(
         groupID: _groupID, userID: userID, seconds: isMute ? muteTime : 0);
     if (res.code == 0) {
@@ -335,7 +335,7 @@ class TUIGroupProfileModel extends ChangeNotifier {
           _groupMemberList!.indexWhere((e) => e!.userID == userID);
       if (targetIndex != -1) {
         final targetElem = _groupMemberList![targetIndex];
-        targetElem?.muteUntil = isMute ? muteTime : 0;
+        targetElem?.muteUntil = isMute ? (serverTime ?? 0) + muteTime : 0;
         _groupMemberList![targetIndex] = targetElem;
       }
       notifyListeners();

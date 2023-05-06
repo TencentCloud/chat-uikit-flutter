@@ -17,17 +17,16 @@ class TIMUIKitChatController {
     }
   }
 
-  Future<bool> loadHistoryMessageList({
-    HistoryMsgGetTypeEnum getType =
-        HistoryMsgGetTypeEnum.V2TIM_GET_CLOUD_OLDER_MSG,
-    String? userID,
-    String? groupID,
-    int lastMsgSeq = -1,
-    required int count,
-    String? lastMsgID,
-    LoadDirection direction =  LoadDirection.previous
-  }) async {
-    return await model?.loadData(
+  Future<bool> loadHistoryMessageList(
+      {HistoryMsgGetTypeEnum getType =
+          HistoryMsgGetTypeEnum.V2TIM_GET_CLOUD_OLDER_MSG,
+      String? userID,
+      String? groupID,
+      int lastMsgSeq = -1,
+      required int count,
+      String? lastMsgID,
+      LoadDirection direction = LoadDirection.previous}) async {
+    return await model?.loadChatRecord(
           count: count,
           getType: getType,
           lastMsgID: lastMsgID,
@@ -70,7 +69,6 @@ class TIMUIKitChatController {
   /// Please provide `convID`, if you use `TIMUIKitChatController` without specifying to a `TIMUIKitChat`.
   Future<void> updateMessage(
       {
-
       /// The ID of the target conversation
       String? convID,
 
@@ -88,32 +86,47 @@ class TIMUIKitChatController {
     return;
   }
 
-  /// Send message;
-  /// 发送消息
-  /// Please provide `convType` and `convID`, if you use `TIMUIKitChatController` without specifying to a `TIMUIKitChat`.
+  /// Sends a message to the specified conversation, or to the current conversation specified on `TIMUIKitChat`.
+  /// 发送消息到指定的对话，或者发送到 `TIMUIKitChat` 中指定的当前对话。
+  /// You must provide `convType` and either `userID` or `groupID`, only if you use `TIMUIKitChat` without specifying a `TIMUIKitChatController`, you must provide these parameters.
+  /// 您需要提供 `convType` 和 `userID` 或 `groupID`, 只有在如果您使用 `TIMUIKitChat` 而没有指定 `TIMUIKitChatController`，则必须提供这些参数。
   Future<V2TimValueCallback<V2TimMessage>?>? sendMessage({
     required V2TimMessage? messageInfo,
 
-    /// The type of the target conversation
+    /// The type of the target conversation: either ConvType.group or ConvType.c2c. Required if using `TIMUIKitChat` without specifying a `TIMUIKitChatController`.
+    /// 目标对话的类型：ConvType.group 或 ConvType.c2c。只有在如果您使用 `TIMUIKitChat` 而没有指定 `TIMUIKitChatController`，则必须提供此参数。
     ConvType? convType,
 
-    /// The ID of the target conversation
-    String? convID,
+    /// The user ID of the target one-to-one conversation. Required if convType is ConvType.c2c.
+    /// 目标一对一对话的用户 ID。如果 convType 是 ConvType.c2c，则必填。
+    String? userID,
 
-    /// The method for updating the input field when message sending failed
+    /// The target group ID. Required if convType is ConvType.group.
+    /// 目标群组的 ID。如果 convType 是 ConvType.group，则必填。
+    String? groupID,
+
+    /// A callback function to update the input field when message sending fails.
+    /// 当消息发送失败时，用于更新输入框的回调函数。
     ValueChanged<String>? setInputField,
 
-    /// Offline push info
+    /// Offline push information.
+    /// 离线推送信息。
     OfflinePushInfo? offlinePushInfo,
   }) {
-    if (convID != null && convType != null) {
+    if (convType != null) {
+      /// Sends a message to the specified conversation. 发送消息到指定的对话。
+      assert((groupID == null) != (userID == null));
+      assert(groupID != null || convType != ConvType.group);
+      assert(userID != null || convType != ConvType.c2c);
+
       return globalChatModel.sendMessageFromController(
           messageInfo: messageInfo,
           convType: convType,
-          convID: convID,
+          convID: (convType == ConvType.group ? groupID : userID) ?? "",
           setInputField: setInputField,
           offlinePushInfo: offlinePushInfo);
     } else if (model != null) {
+      /// Sends a message to the current conversation specified on `TIMUIKitChat`. 发送到 `TIMUIKitChat` 中指定的当前对话。
       return model!.sendMessageFromController(
           messageInfo: messageInfo, offlinePushInfo: offlinePushInfo);
     }

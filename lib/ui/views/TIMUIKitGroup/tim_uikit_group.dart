@@ -1,7 +1,8 @@
-import 'package:azlistview/azlistview.dart';
+import 'package:azlistview_all_platforms/azlistview_all_platforms.dart';
 import 'package:flutter/material.dart';
 import 'package:lpinyin/lpinyin.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/listener_model/tui_group_listener_model.dart';
@@ -17,7 +18,8 @@ typedef GroupItemBuilder = Widget Function(
     BuildContext context, V2TimGroupInfo groupInfo);
 
 class TIMUIKitGroup extends StatefulWidget {
-  final void Function(V2TimGroupInfo groupInfo)? onTapItem;
+  final void Function(V2TimGroupInfo groupInfo, V2TimConversation conversation)?
+      onTapItem;
   final Widget Function(BuildContext context)? emptyBuilder;
   final GroupItemBuilder? itemBuilder;
 
@@ -68,44 +70,67 @@ class _TIMUIKitGroupState extends TIMUIKitState<TIMUIKitGroup> {
     final theme = Provider.of<TUIThemeViewModel>(context).theme;
     final showName = groupInfo.groupName ?? groupInfo.groupID;
     final faceUrl = groupInfo.faceUrl ?? "";
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     return Container(
-      padding: const EdgeInsets.only(top: 10, left: 16),
       decoration: BoxDecoration(
           border: Border(
               bottom: BorderSide(
                   color:
                       theme.weakDividerColor ?? CommonColor.weakDividerColor))),
-      child: InkWell(
-        onTap: (() {
-          if (widget.onTapItem != null) {
-            widget.onTapItem!(groupInfo);
-          }
-        }),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.only(bottom: 12),
-              margin: const EdgeInsets.only(right: 12),
-              child: SizedBox(
-                height: 40,
-                width: 40,
-                child: Avatar(
-                  faceUrl: faceUrl,
-                  showName: showName,
-                  type: 2,
+      child: Material(
+        color: isDesktopScreen ? theme.wideBackgroundColor : null,
+        child: InkWell(
+          onTap: (() async {
+            if (widget.onTapItem != null) {
+              V2TimConversation conversation = V2TimConversation(
+                conversationID: "group_${groupInfo.groupID}",
+                groupID: groupInfo.groupID,
+                type: 2,
+                showName: groupInfo.groupName,
+                groupType: groupInfo.groupType,
+                faceUrl: groupInfo.faceUrl,
+              );
+              final res = await TencentImSDKPlugin
+                  .v2TIMManager.v2ConversationManager
+                  .getConversation(
+                      conversationID: "group_${groupInfo.groupID}");
+              if (res.code == 0 && res.data != null) {
+                conversation = res.data!;
+              }
+              widget.onTapItem!(groupInfo, conversation);
+            }
+          }),
+          child: Container(
+            padding: const EdgeInsets.only(top: 10, left: 16),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  margin: const EdgeInsets.only(right: 12),
+                  child: SizedBox(
+                    height: isDesktopScreen ? 30 : 40,
+                    width: isDesktopScreen ? 30 : 40,
+                    child: Avatar(
+                      faceUrl: faceUrl,
+                      showName: showName,
+                      type: 2,
+                    ),
+                  ),
                 ),
-              ),
+                Expanded(
+                    child: Container(
+                  alignment: Alignment.centerLeft,
+                  padding: const EdgeInsets.only(top: 10, bottom: 20),
+                  child: Text(
+                    showName,
+                    style: TextStyle(
+                        color: Colors.black, fontSize: isDesktopScreen ? 14 : 18),
+                  ),
+                ))
+              ],
             ),
-            Expanded(
-                child: Container(
-              alignment: Alignment.centerLeft,
-              padding: const EdgeInsets.only(top: 10, bottom: 20),
-              child: Text(
-                showName,
-                style: const TextStyle(color: Colors.black, fontSize: 18),
-              ),
-            ))
-          ],
+          ),
         ),
       ),
     );

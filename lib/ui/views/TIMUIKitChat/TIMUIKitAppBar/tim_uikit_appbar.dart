@@ -9,6 +9,7 @@ import 'package:tencent_cloud_chat_uikit/data_services/friendShip/friendship_ser
 import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitAppBar/tim_uikit_appbar_title.dart';
 import 'package:tuple/tuple.dart';
@@ -30,7 +31,9 @@ class TIMUIKitAppBar extends StatefulWidget implements PreferredSizeWidget {
   /// If allow update the conversation show name automatically.
   final bool isConversationShowNameFixed;
 
-  final bool showC2cMessageEditStaus;
+  final bool showC2cMessageEditStatus;
+
+  final GestureTapDownCallback? onClickTitle;
 
   const TIMUIKitAppBar({
     Key? key,
@@ -39,7 +42,8 @@ class TIMUIKitAppBar extends StatefulWidget implements PreferredSizeWidget {
     this.showTotalUnReadCount = true,
     this.conversationID = "",
     this.conversationShowName = "",
-    this.showC2cMessageEditStaus = true,
+    this.showC2cMessageEditStatus = true,
+    this.onClickTitle,
   }) : super(key: key);
 
   @override
@@ -76,9 +80,8 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
                     changedInfo.userProfile?.userID) ??
                 "";
           }
+        // ignore: empty_catches
         } catch (e) {
-          // ignore: avoid_print
-          print(e);
         }
       },
     );
@@ -100,9 +103,8 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
               setState(() {});
             }
           }
+        // ignore: empty_catches
         } catch (e) {
-          // ignore: avoid_print
-          print(e);
         }
       },
     );
@@ -159,9 +161,8 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
               "";
         });
       }
+    // ignore: empty_catches
     } catch (e) {
-      // ignore: avoid_print
-      print(e);
     }
   }
 
@@ -172,11 +173,16 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
     final setAppbar = widget.config;
     final TUIChatSeparateViewModel chatVM =
         Provider.of<TUIChatSeparateViewModel>(context);
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     return AppBar(
-      backgroundColor: setAppbar?.backgroundColor ?? theme.chatHeaderBgColor,
+      backgroundColor: setAppbar?.backgroundColor ??
+          theme.chatHeaderBgColor ??
+          theme.appbarBgColor ??
+          theme.primaryColor,
       actionsIconTheme: setAppbar?.actionsIconTheme,
       foregroundColor: setAppbar?.foregroundColor,
-      elevation: setAppbar?.elevation,
+      elevation: setAppbar?.elevation ?? (isDesktopScreen ? 0 : 1),
       bottom: setAppbar?.bottom,
       bottomOpacity: setAppbar?.bottomOpacity ?? 1.0,
       titleSpacing: setAppbar?.titleSpacing,
@@ -188,46 +194,28 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
       toolbarOpacity: setAppbar?.toolbarOpacity ?? 1.0,
       toolbarTextStyle: setAppbar?.toolbarTextStyle,
       textTheme: setAppbar?.textTheme,
-      flexibleSpace: setAppbar?.backgroundColor == null
-          ? theme.chatHeaderBgColor != null
-              ? setAppbar?.flexibleSpace ??
-                  Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(colors: [
-                        theme.lightPrimaryColor ??
-                            CommonColor.lightPrimaryColor,
-                        theme.primaryColor ?? CommonColor.primaryColor
-                      ]),
-                    ),
-                  )
-              : null
-          : null,
       iconTheme: setAppbar?.iconTheme ??
           const IconThemeData(
             color: Colors.white,
           ),
-      // title: setAppbar?.title ??
-      //     Text(
-      //       _conversationShowName,
-      //       style: const TextStyle(
-      //         color: Colors.white,
-      //         fontSize: 17,
-      //       ),
-      //     ),
       title: TIMUIKitAppBarTitle(
         title: setAppbar?.title,
-        textStyle: setAppbar?.textTheme?.titleMedium,
+        onClick: widget.onClickTitle,
+        textStyle: setAppbar?.textTheme?.titleMedium ??
+            TextStyle(
+                color: theme.appbarTextColor ?? hexToColor("010000"),
+                fontSize: 16),
         conversationShowName: _conversationShowName,
-        showC2cMessageEditStaus: widget.showC2cMessageEditStaus,
+        showC2cMessageEditStatus: widget.showC2cMessageEditStatus,
         fromUser: widget.conversationID,
       ),
-      centerTitle: setAppbar?.centerTitle ?? true,
-      leadingWidth: setAppbar?.leadingWidth ?? 70,
+      centerTitle: setAppbar?.centerTitle ?? (isDesktopScreen ? false : true),
+      leadingWidth: setAppbar?.leadingWidth ?? (isDesktopScreen ? 8 : 70),
       leading: Selector<TUIChatGlobalModel, Tuple2<bool, int>>(
           builder: (context, data, _) {
             final isMultiSelect = data.item1;
             final unReadCount = data.item2;
-            return isMultiSelect
+            return (!isDesktopScreen && isMultiSelect)
                 ? TextButton(
                     onPressed: () {
                       chatVM.updateMultiSelectStatus(false);
@@ -235,42 +223,49 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
                     child: Text(
                       TIM_t('取消'),
                       style: setAppbar?.textTheme?.titleMedium ??
-                          const TextStyle(
-                            color: Colors.white,
+                          TextStyle(
+                            color:
+                                theme.appbarTextColor ?? hexToColor("010000"),
                             fontSize: 16,
                           ),
                     ),
                   )
                 : setAppbar?.leading ??
-                    Row(
-                      children: [
-                        IconButton(
-                          padding: const EdgeInsets.only(left: 16),
-                          constraints: const BoxConstraints(),
-                          icon: Icon(
-                            Icons.arrow_back_ios,
-                            color: setAppbar?.textTheme?.titleMedium?.color ??
-                                Colors.white,
-                            size: 17,
-                          ),
-                          onPressed: () async {
-                            chatVM.repliedMessage = null;
-                            Navigator.pop(context);
-                          },
-                        ),
-                        if (widget.showTotalUnReadCount && unReadCount > 0)
-                          Container(
-                            width: 22,
-                            height: 22,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: theme.cautionColor,
-                            ),
-                            child: Text(_getTotalUnReadCount(unReadCount)),
-                          ),
-                      ],
-                    );
+                    (isDesktopScreen
+                        ? Container()
+                        : Row(
+                            children: [
+                              IconButton(
+                                padding: const EdgeInsets.only(left: 16),
+                                constraints: const BoxConstraints(),
+                                icon: Icon(
+                                  Icons.arrow_back_ios,
+                                  color: setAppbar
+                                          ?.textTheme?.titleMedium?.color ??
+                                      theme.appbarTextColor ??
+                                      hexToColor("010000"),
+                                  size: 17,
+                                ),
+                                onPressed: () async {
+                                  chatVM.repliedMessage = null;
+                                  Navigator.pop(context);
+                                },
+                              ),
+                              if (widget.showTotalUnReadCount &&
+                                  unReadCount > 0)
+                                Container(
+                                  width: 22,
+                                  height: 22,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: theme.cautionColor,
+                                  ),
+                                  child:
+                                      Text(_getTotalUnReadCount(unReadCount)),
+                                ),
+                            ],
+                          ));
           },
           shouldRebuild: (prev, next) =>
               prev.item1 != next.item1 || prev.item2 != next.item2,
