@@ -2,11 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-
-import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
-
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
 typedef CustomLastMsgBuilder = String? Function(V2TimMessage lastMsg);
@@ -16,14 +14,16 @@ class TIMUIKitLastMsg extends StatefulWidget {
   final List<V2TimGroupAtInfo?> groupAtInfoList;
   final BuildContext context;
   final CustomLastMsgBuilder? lastMsgBuilder;
+  final double fontSize;
 
-  const TIMUIKitLastMsg(
-      {Key? key,
-      this.lastMsg,
-      required this.groupAtInfoList,
-      required this.context,
-      this.lastMsgBuilder})
-      : super(key: key);
+  const TIMUIKitLastMsg({
+    Key? key,
+    this.lastMsg,
+    required this.groupAtInfoList,
+    required this.context,
+    this.lastMsgBuilder,
+    this.fontSize = 14.0,
+  }) : super(key: key);
 
   @override
   State<TIMUIKitLastMsg> createState() => _TIMUIKitLastMsgState();
@@ -50,7 +50,7 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
   void _getMsgElem() async {
     final isRevokedMessage = widget.lastMsg!.status == 6;
     if (isRevokedMessage) {
-      final isSelf = widget.lastMsg!.isSelf ?? false;
+      final isSelf = widget.lastMsg!.isSelf ?? true;
       final option1 = isSelf
           ? TIM_t("您")
           : widget.lastMsg!.nickName ?? widget.lastMsg?.sender;
@@ -81,7 +81,7 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
       case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
         return TIM_t("[语音]");
       case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
-        return widget.lastMsg?.textElem?.text ?? "";
+        return (widget.lastMsg?.textElem?.text)?.trim() ?? "";
       case MessageElemType.V2TIM_ELEM_TYPE_FACE:
         return TIM_t("[表情]");
       case MessageElemType.V2TIM_ELEM_TYPE_FILE:
@@ -140,14 +140,16 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
         ),
       if (widget.groupAtInfoList.isNotEmpty)
         Text(_getAtMessage(),
-            style: TextStyle(color: theme.cautionColor, fontSize: 14)),
+            style: TextStyle(
+                color: theme.cautionColor, fontSize: widget.fontSize)),
       Expanded(
           child: Text(
         groupTipsAbstractText,
         softWrap: true,
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
-        style: TextStyle(height: 1, color: theme.weakTextColor, fontSize: 14),
+        style: TextStyle(
+            height: 1, color: theme.weakTextColor, fontSize: widget.fontSize),
       )),
     ]);
   }

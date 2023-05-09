@@ -1,18 +1,24 @@
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 
 class TUIChatModelTools {
   final TUIChatGlobalModel globalModel = serviceLocator<TUIChatGlobalModel>();
   final CoreServicesImpl _coreServices = serviceLocator<CoreServicesImpl>();
-  final MessageService _messageService = serviceLocator<MessageService>();
 
   OfflinePushInfo buildMessagePushInfo(
       V2TimMessage message, String convID, ConvType convType) {
     String createJSON(String convID) {
       return "{\"conversationID\": \"$convID\"}";
+    }
+
+    if (globalModel.chatConfig.offlinePushInfo != null) {
+      final customData =
+          globalModel.chatConfig.offlinePushInfo!(message, convID, convType);
+      if(customData != null){
+        return customData;
+      }
     }
 
     String title = globalModel.chatConfig.notificationTitle;
@@ -109,35 +115,9 @@ class TUIChatModelTools {
     });
 
     if (targetIndex != null &&
-        targetIndex != -1 &&
+        targetIndex > -1 &&
         currentHistoryMsgList.isNotEmpty) {
-      List<V2TimMessage> response;
-      if (currentHistoryMsgList.length > targetIndex + 2) {
-        response = await _messageService.getHistoryMessageList(
-            count: 1,
-            getType: HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_NEWER_MSG,
-            userID: conversationType == ConvType.c2c ? conversationID : null,
-            groupID: conversationType == ConvType.group ? conversationID : null,
-            lastMsgID: currentHistoryMsgList[targetIndex + 1].msgID);
-      } else {
-        response = await _messageService.getHistoryMessageList(
-          count: 5,
-          getType: HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
-          userID: conversationType == ConvType.c2c ? conversationID : null,
-          groupID: conversationType == ConvType.group ? conversationID : null,
-          lastMsgID: currentHistoryMsgList.length - 3 < 0
-              ? null
-              : currentHistoryMsgList[currentHistoryMsgList.length - 3].msgID,
-        );
-      }
-
-      try {
-        return response.firstWhere((item) {
-          return item.msgID == msgID;
-        });
-      } catch (e) {
-        return null;
-      }
+      return currentHistoryMsgList[targetIndex];
     } else {
       return null;
     }

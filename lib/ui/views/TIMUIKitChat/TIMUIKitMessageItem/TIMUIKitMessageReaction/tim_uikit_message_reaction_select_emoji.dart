@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/message_reaction_emoji.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_emoji_panel.dart'
     as emoji;
@@ -33,6 +34,7 @@ class TIMUIKitMessageReactionEmojiSelectPanelState
 
   _buildSimplePanel(TUITheme theme) {
     final List<Map<String, Object>> emojiData = messageReactionEmojiData;
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor() == DeviceType.Desktop;
     return Material(
       color: Colors.white,
       child: ExtendedWrap(
@@ -41,7 +43,8 @@ class TIMUIKitMessageReactionEmojiSelectPanelState
         crossAxisAlignment: WrapCrossAlignment.center,
         runSpacing: 24,
         children: [
-          GestureDetector(
+          if(!isDesktopScreen)
+            GestureDetector(
             onTap: () {
               widget.onClickShowMore(!widget.isShowMoreSticker);
             },

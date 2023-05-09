@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_conversation_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/az_list_view.dart';
@@ -42,6 +43,9 @@ class _RecentForwardListState extends TIMUIKitState<RecentForwardList> {
   }
 
   Widget _buildItem(V2TimConversation conversation) {
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+
     final faceUrl = conversation.faceUrl ?? "";
     final showName = conversation.showName ?? "";
 
@@ -49,8 +53,8 @@ class _RecentForwardListState extends TIMUIKitState<RecentForwardList> {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         if (widget.isMultiSelect)
-          Padding(
-            padding: const EdgeInsets.only(left: 16.0),
+          Container(
+            padding: EdgeInsets.only(left: isDesktopScreen ? 8 : 16.0, top: isDesktopScreen ? 10 : 0),
             child: CheckBoxButton(
               isChecked: _selectedConversation.contains(conversation),
               onChanged: (value) {
@@ -91,8 +95,8 @@ class _RecentForwardListState extends TIMUIKitState<RecentForwardList> {
             child: Row(
               children: [
                 Container(
-                  height: 40,
-                  width: 40,
+                  height: isDesktopScreen ? 30 : 40,
+                  width: isDesktopScreen ? 30 : 40,
                   margin: const EdgeInsets.only(right: 12),
                   child: Avatar(
                     faceUrl: faceUrl,
@@ -103,15 +107,15 @@ class _RecentForwardListState extends TIMUIKitState<RecentForwardList> {
                 Expanded(
                     child: Container(
                   alignment: Alignment.centerLeft,
-                  padding: const EdgeInsets.only(top: 10, bottom: 19),
-                  decoration: const BoxDecoration(
+                  padding: EdgeInsets.only(top: 10, bottom: isDesktopScreen ? 12 : 19),
+                  decoration: isDesktopScreen ? null : const BoxDecoration(
                       border:
                           Border(bottom: BorderSide(color: Color(0xFFDBDBDB)))),
                   child: Text(
                     showName,
                     // textAlign: TextAlign.center,
                     style:
-                        const TextStyle(color: Color(0xFF111111), fontSize: 18),
+                    TextStyle(color: const Color(0xFF111111), fontSize: isDesktopScreen ? 16 : 18),
                   ),
                 ))
               ],
@@ -122,10 +126,6 @@ class _RecentForwardListState extends TIMUIKitState<RecentForwardList> {
     );
   }
 
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -147,12 +147,14 @@ class _RecentForwardListState extends TIMUIKitState<RecentForwardList> {
         final recentConvList =
             serviceLocator<TUIConversationViewModel>().conversationList;
         final showList = _buildMemberList(recentConvList);
+        final isDesktopScreen =
+            TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
 
         return AZListViewContainer(
           memberList: showList,
           isShowIndexBar: false,
           susItemBuilder: (context, index) {
-            return Container(
+            return isDesktopScreen ? Container() : Container(
               height: 40,
               width: MediaQuery.of(context).size.width,
               padding: const EdgeInsets.only(left: 16.0),

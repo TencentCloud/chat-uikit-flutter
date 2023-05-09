@@ -78,7 +78,7 @@ class TIMUIKitMessageReactionShowItem extends TIMUIKitStatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            GestureDetector(
+            InkWell(
               onTap: clickOnCurrentSticker,
               child: Container(
                 margin: EdgeInsets.only(
@@ -87,8 +87,8 @@ class TIMUIKitMessageReactionShowItem extends TIMUIKitStatelessWidget {
                 child: Text(
                   String.fromCharCode(sticker),
                   style: TextStyle(
-                    fontSize: (!PlatformUtils().isIOS) ? 12 : 16,
-                  ),
+                      fontSize: (!PlatformUtils().isIOS) ? 12 : 16,
+                      color: hexToColor("f9453d")),
                 ),
               ),
             ),
@@ -145,11 +145,11 @@ class TIMUIKitMessageReactionShowItem extends TIMUIKitStatelessWidget {
                         // e
                       }
                     }
-                    return GestureDetector(
-                      onTap: () {
+                    return InkWell(
+                      onTapDown: (tapDetails) {
                         if (model.onTapAvatar != null) {
                           if (e != selfInfoModel.loginInfo?.userID) {
-                            model.onTapAvatar!(e);
+                            model.onTapAvatar!(e, tapDetails);
                           }
                         }
                       },

@@ -8,6 +8,7 @@ import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_grou
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitGroupProfile/group_profile_widget.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitGroupProfile/widgets/tim_ui_group_profile_widget.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitGroupProfile/widgets/tim_uikit_group_button_area.dart';
@@ -54,7 +55,7 @@ class TIMUIKitGroupProfile extends StatefulWidget {
 
   /// The callback after user clicking a user,
   /// you may navigating to the specific profile page, or anywhere you want.
-  final Function(String userID)? onClickUser;
+  final Function(String userID, TapDownDetails? tapDetails)? onClickUser;
 
   const TIMUIKitGroupProfile(
       {Key? key,
@@ -96,7 +97,7 @@ class _TIMUIKitGroupProfileState extends TIMUIKitState<TIMUIKitGroupProfile> {
   @override
   void didUpdateWidget(covariant TIMUIKitGroupProfile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if(oldWidget.groupID != widget.groupID){
+    if (oldWidget.groupID != widget.groupID) {
       model.loadData(widget.groupID);
     }
   }
@@ -135,6 +136,8 @@ class _TIMUIKitGroupProfileState extends TIMUIKitState<TIMUIKitGroupProfile> {
           model.lifeCycle = widget.lifeCycle;
           final V2TimGroupInfo? groupInfo = model.groupInfo;
           final memberList = model.groupMemberList;
+          final isDesktopScreen =
+              TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
           if (groupInfo == null) {
             return Center(
               child: LoadingAnimationWidget.staggeredDotsWave(
@@ -170,7 +173,10 @@ class _TIMUIKitGroupProfileState extends TIMUIKitState<TIMUIKitGroupProfile> {
           Widget groupProfilePage({required Widget child}) {
             return SingleChildScrollView(
               child: Container(
-                color: widget.backGroundColor ?? theme.weakBackgroundColor,
+                color: widget.backGroundColor ??
+                    (isDesktopScreen
+                        ? theme.wideBackgroundColor
+                        : theme.weakBackgroundColor),
                 child: child,
               ),
             );
@@ -205,6 +211,7 @@ class _TIMUIKitGroupProfileState extends TIMUIKitState<TIMUIKitGroupProfile> {
                       ? customBuilder?.detailCard!(
                           groupInfo, model.setGroupName)
                       : TIMUIKitGroupProfileWidget.detailCard(
+                          isHavePermission: isAdmin || isGroupOwner,
                           groupInfo: groupInfo))!;
                 case GroupProfileWidgetEnum.memberListTile:
                   return (customBuilder?.memberListTile != null
@@ -216,7 +223,8 @@ class _TIMUIKitGroupProfileState extends TIMUIKitState<TIMUIKitGroupProfile> {
                           groupInfo.notification ?? "",
                           toDefaultNoticePage,
                           model.setGroupNotification)
-                      : TIMUIKitGroupProfileWidget.groupNotification())!;
+                      : TIMUIKitGroupProfileWidget.groupNotification(
+                          isHavePermission: isAdmin || isGroupOwner))!;
                 case GroupProfileWidgetEnum.groupManage:
                   if (isAdmin || isGroupOwner) {
                     return (customBuilder?.groupManage != null
@@ -232,14 +240,15 @@ class _TIMUIKitGroupProfileState extends TIMUIKitState<TIMUIKitGroupProfile> {
                 case GroupProfileWidgetEnum.operationDivider:
                   return (customBuilder?.operationDivider != null
                       ? customBuilder?.operationDivider!()
-                      : TIMUIKitGroupProfileWidget.operationDivider())!;
+                      : TIMUIKitGroupProfileWidget.operationDivider(theme))!;
                 case GroupProfileWidgetEnum.groupTypeBar:
                   return (customBuilder?.groupTypeBar != null
                       ? customBuilder?.groupTypeBar!(groupInfo.groupType)
                       : TIMUIKitGroupProfileWidget.groupType())!;
                 case GroupProfileWidgetEnum.groupJoiningModeBar:
                   final String groupType = groupInfo.groupType;
-                  if (groupType == "Work" ||
+                  if (!(isGroupOwner || isAdmin) ||
+                      groupType == "Work" ||
                       groupType == "Meeting" ||
                       groupType == "AVChatRoom") {
                     return Container();

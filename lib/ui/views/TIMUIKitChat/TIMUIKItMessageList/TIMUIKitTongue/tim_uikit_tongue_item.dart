@@ -21,7 +21,7 @@ class TIMUIKitTongueItem extends TIMUIKitStatelessWidget {
 
   final int previousCount;
 
-  TIMUIKitTongueItem( {
+  TIMUIKitTongueItem({
     Key? key,
     required this.onClick,
     required this.valueType,

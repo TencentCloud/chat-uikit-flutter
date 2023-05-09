@@ -8,10 +8,6 @@ import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 class TIMUIKitState<T extends StatefulWidget> extends TIMState<T> {
   final CoreServicesImpl _coreServices = serviceLocator<CoreServicesImpl>();
 
-  @override
-  initState() {
-    super.initState();
-  }
 
   @override
   void onTIMCallback(TIMCallback callbackValue) {

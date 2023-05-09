@@ -8,8 +8,8 @@ enum MessageListTongueType {
   none,
   toLatest,
   showUnread,
-  showPrevious,
   atMe,
+  showPrevious,
   atAll,
 }
 
@@ -36,9 +36,9 @@ class TIMUIKitHistoryMessageListTongue extends TIMUIKitStatelessWidget {
 
   TIMUIKitHistoryMessageListTongue({
     Key? key,
-    required this.previousCount,
     required this.valueType,
     required this.onClick,
+    required this.previousCount,
     required this.unreadCount,
     this.tongueItemBuilder,
     this.atNum = "",

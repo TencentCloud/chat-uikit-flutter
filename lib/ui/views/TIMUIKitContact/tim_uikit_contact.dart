@@ -8,6 +8,7 @@ import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 export 'package:tencent_cloud_chat_uikit/ui/widgets/contact_list.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 
 class TIMUIKitContact extends StatefulWidget {
   /// the callback after clicking contact item
@@ -44,11 +45,8 @@ class TIMUIKitContact extends StatefulWidget {
 
 class _TIMUIKitContactState extends TIMUIKitState<TIMUIKitContact> {
   final TUIFriendShipViewModel model = serviceLocator<TUIFriendShipViewModel>();
+  String currentItem = "";
 
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void dispose() {
@@ -57,6 +55,8 @@ class _TIMUIKitContactState extends TIMUIKitState<TIMUIKitContact> {
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
+    final theme = value.theme;
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     return MultiProvider(
         providers: [
           ChangeNotifierProvider.value(value: model),
@@ -67,10 +67,21 @@ class _TIMUIKitContactState extends TIMUIKitState<TIMUIKitContact> {
           final memberList = model.friendList ?? [];
 
           return ContactList(
+            currentItem: currentItem,
             emptyBuilder: widget.emptyBuilder,
             isShowOnlineStatus: widget.isShowOnlineStatus,
             contactList: memberList,
-            onTapItem: widget.onTapItem,
+            onTapItem: (item){
+              if(isDesktopScreen){
+                setState(() {
+                  currentItem = item.userID;
+                });
+              }
+              if(widget.onTapItem != null){
+                widget.onTapItem!(item);
+              }
+            },
+            bgColor: isDesktopScreen ? theme.wideBackgroundColor : null,
             topList: widget.topList,
             topListItemBuilder: widget.topListItemBuilder,
           );

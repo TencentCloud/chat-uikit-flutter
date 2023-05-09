@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_plugin_record_plus/const/play_state.dart';
 import 'package:flutter_plugin_record_plus/const/response.dart';
 import 'package:flutter_plugin_record_plus/index.dart';
@@ -14,33 +14,37 @@ class SoundPlayer {
   static final FlutterPluginRecord _recorder = FlutterPluginRecord();
   static SoundInterruptListener? _soundInterruptListener;
   static bool isInited = false;
+  static final AudioPlayer _audioPlayer = AudioPlayer();
 
   static initSoundPlayer() {
     if (!isInited) {
       _recorder.init();
+      AudioPlayer.global.setGlobalAudioContext(const AudioContext());
       isInited = true;
     }
   }
 
-  static play({required String url}) {
-    _recorder.stopPlay();
+  static Future<void> play({required String url}) async {
+    _audioPlayer.stop();
     if (_soundInterruptListener != null) {
       _soundInterruptListener!();
     }
-    _recorder.playByPath(url, 'url');
+    await _audioPlayer.play(UrlSource(url));
   }
 
   static stop() {
-    _recorder.stopPlay();
+    _audioPlayer.stop();
   }
 
   static dispose() {
+    _audioPlayer.dispose();
     _recorder.dispose();
   }
 
-  static StreamSubscription<PlayState> playStateListener(
-          {required PlayStateListener listener}) =>
-      _recorder.responsePlayStateController.listen(listener);
+  static StreamSubscription<PlayerState> playStateListener(
+      {required void Function(PlayerState)? listener}) =>
+      _audioPlayer.onPlayerStateChanged.listen(listener);
+
 
   static setSoundInterruptListener(SoundInterruptListener listener) {
     _soundInterruptListener = listener;

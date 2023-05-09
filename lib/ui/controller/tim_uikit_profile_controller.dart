@@ -47,15 +47,23 @@ class TIMUIKitProfileController {
   }
 
   /// Show the text input bottom sheet
-  showTextInputBottomSheet(
-    BuildContext context,
-    String title,
-    String tips,
-    void Function(String) onSubmitted,
-      TUITheme theme
-  ) {
+  showTextInputBottomSheet({
+    required BuildContext context,
+    required String title,
+    required String tips,
+    required Function(String text) onSubmitted,
+    required TUITheme theme,
+    Offset? initOffset,
+    String? initText,
+  }) {
     TextInputBottomSheet.showTextInputBottomSheet(
-        context, title, tips, onSubmitted, theme);
+        context: context,
+        title: title,
+        tips: tips,
+        onSubmitted: onSubmitted,
+        theme: theme,
+        initOffset: initOffset,
+        initText: initText);
   }
 
   /// Load the profile data

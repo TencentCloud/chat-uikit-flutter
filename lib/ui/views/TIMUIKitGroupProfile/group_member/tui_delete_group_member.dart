@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_group_profile_model.dart';
 
-
 import 'package:tencent_cloud_chat_uikit/ui/widgets/group_member_list.dart';
+
+GlobalKey<_DeleteGroupMemberPageState> deleteGroupMemberKey = GlobalKey();
 
 class DeleteGroupMemberPage extends StatefulWidget {
   final TUIGroupProfileModel model;
@@ -67,56 +69,65 @@ class _DeleteGroupMemberPageState extends TIMUIKitState<DeleteGroupMemberPage> {
         [];
   }
 
+  void submitDelete() async {
+    if (selectedGroupMember.isNotEmpty) {
+      final userIDs = selectedGroupMember.map((e) => e.userID).toList();
+      widget.model.kickOffMember(userIDs);
+      Navigator.pop(context);
+    }
+  }
+
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final TUITheme theme = value.theme;
 
-    return Scaffold(
-        appBar: AppBar(
-            title: Text(
-              TIM_t("删除群成员"),
-              style: const TextStyle(color: Colors.white, fontSize: 17),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () async {
-                  if (selectedGroupMember.isNotEmpty) {
-                    final userIDs =
-                        selectedGroupMember.map((e) => e.userID).toList();
-                    widget.model.kickOffMember(userIDs);
-                    Navigator.pop(context);
-                  }
-                },
-                child: Text(
-                  TIM_t("确定"),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                  ),
+    return TUIKitScreenUtils.getDeviceWidget(
+        desktopWidget: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: GroupProfileMemberList(
+            memberList:
+                handleRole(searchMemberList ?? widget.model.groupMemberList),
+            canSelectMember: true,
+            canSlideDelete: false,
+            onSelectedMemberChange: (selectedMember) {
+              selectedGroupMember = selectedMember;
+            },
+            touchBottomCallBack: () {},
+          ),
+        ),
+        defaultWidget: Scaffold(
+            appBar: AppBar(
+                title: Text(
+                  TIM_t("删除群成员"),
+                  style: TextStyle(color: theme.appbarTextColor, fontSize: 17),
                 ),
-              )
-            ],
-            shadowColor: theme.weakBackgroundColor,
-            flexibleSpace: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [
-                  theme.lightPrimaryColor ?? CommonColor.lightPrimaryColor,
-                  theme.primaryColor ?? CommonColor.primaryColor
-                ]),
-              ),
-            ),
-            iconTheme: const IconThemeData(
-              color: Colors.white,
-            )),
-        body: GroupProfileMemberList(
-          memberList:
-              handleRole(searchMemberList ?? widget.model.groupMemberList),
-          canSelectMember: true,
-          canSlideDelete: false,
-          onSelectedMemberChange: (selectedMember) {
-            selectedGroupMember = selectedMember;
-          },
-          touchBottomCallBack: () {},
-        ));
+                actions: [
+                  TextButton(
+                    onPressed: submitDelete,
+                    child: Text(
+                      TIM_t("确定"),
+                      style: TextStyle(
+                        color: theme.appbarTextColor,
+                        fontSize: 16,
+                      ),
+                    ),
+                  )
+                ],
+                shadowColor: theme.weakBackgroundColor,
+                backgroundColor: theme.appbarBgColor ??
+                    theme.primaryColor,
+                iconTheme: IconThemeData(
+                  color: theme.appbarTextColor,
+                )),
+            body: GroupProfileMemberList(
+              memberList:
+                  handleRole(searchMemberList ?? widget.model.groupMemberList),
+              canSelectMember: true,
+              canSlideDelete: false,
+              onSelectedMemberChange: (selectedMember) {
+                selectedGroupMember = selectedMember;
+              },
+              touchBottomCallBack: () {},
+            )));
   }
 }

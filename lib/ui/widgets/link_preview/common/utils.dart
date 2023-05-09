@@ -1,15 +1,14 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:link_preview_generator/link_preview_generator.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/common/extensions.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/link_preview_entry.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/models/link_preview_content.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LinkUtils {
   static RegExp urlReg = RegExp(
-      r"(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]");
+      r"([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/|[wW]{3}.|[wW][aA][pP].|[fF][tT][pP].|[fF][iI][lL][eE].)[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]");
 
   /// Get all the URL from a text message
   static List<String> getURLMatches(String textMessage) {
@@ -49,7 +48,7 @@ class LinkUtils {
       List<String> urlMatches) async {
     // Request for preview information for all URL links synchronously
     final List<LocalCustomDataModel> urlPreview =
-        await Future.wait(urlMatches.map((e) async {
+    await Future.wait(urlMatches.map((e) async {
       String url = e;
       if (!e.contains("http")) {
         url = 'http://$e';
@@ -68,7 +67,7 @@ class LinkUtils {
 
   /// save the link info to local and call updating the message on UI, only works with [onUpdateMessage]
   static Future<void> saveToLocalAndUpdate(V2TimMessage message,
-      LocalCustomDataModel previewItem, VoidCallback onUpdateMessage) async {
+      LocalCustomDataModel previewItem, ValueChanged<V2TimMessage> onUpdateMessage) async {
     if (message.msgID != null) {
       String saveInfo = LinkPreviewEntry.linkInfoToString(previewItem);
       final currentInfo = message.localCustomData;
@@ -80,10 +79,13 @@ class LinkUtils {
         data['description'] = previewItem.description;
         saveInfo = json.encode(data);
       }
-      final result = await TencentImSDKPlugin.v2TIMManager.v2TIMMessageManager
-          .setLocalCustomData(msgID: message.msgID!, localCustomData: saveInfo);
-      if (result.code == 0) {
-        onUpdateMessage();
+      message.localCustomData = saveInfo;
+      if(saveInfo != currentInfo){
+        final result = await TencentImSDKPlugin.v2TIMManager.v2TIMMessageManager
+            .setLocalCustomData(msgID: message.msgID!, localCustomData: saveInfo);
+        if (result.code == 0) {
+          onUpdateMessage(message);
+        }
       }
     }
   }

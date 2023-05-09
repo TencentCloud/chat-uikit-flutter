@@ -5,16 +5,18 @@ import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget
 
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 
-class TIMUIKitProfileUserInfoCard extends TIMUIKitStatelessWidget {
+class TIMUIKitProfileUserInfoCardNarrow extends TIMUIKitStatelessWidget {
   /// User info
   final V2TimUserFullInfo? userInfo;
   final bool isJumpToPersonalProfile;
+  final VoidCallback? onClickAvatar;
 
   /// If shows the arrow icon on the right
   final bool showArrowRightIcon;
 
-  TIMUIKitProfileUserInfoCard(
+  TIMUIKitProfileUserInfoCardNarrow(
       {Key? key,
+      this.onClickAvatar,
       this.userInfo,
       @Deprecated("This info card can no longer navigate to default personal profile page automatically, please deal with it manually.")
           this.isJumpToPersonalProfile = false,
@@ -43,11 +45,14 @@ class TIMUIKitProfileUserInfoCard extends TIMUIKitStatelessWidget {
           SizedBox(
             width: 48,
             height: 48,
-            child: Avatar(
-              faceUrl: faceUrl,
-              isShowBigWhenClick: true,
-              showName: showName ?? "",
-              type: 1,
+            child: GestureDetector(
+              onTap: onClickAvatar,
+              child: Avatar(
+                faceUrl: faceUrl,
+                isShowBigWhenClick: onClickAvatar == null,
+                showName: showName ?? "",
+                type: 1,
+              ),
             ),
           ),
           const SizedBox(
@@ -59,10 +64,9 @@ class TIMUIKitProfileUserInfoCard extends TIMUIKitStatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 SizedBox(
-                  child: Text(
+                  child: SelectableText(
                     showName ?? "",
                     style: const TextStyle(fontSize: 18, color: Colors.black),
-                    softWrap: true,
                   ),
                 ),
                 Container(
@@ -71,16 +75,18 @@ class TIMUIKitProfileUserInfoCard extends TIMUIKitStatelessWidget {
                     children: [
                       Text(
                         "ID:  ",
-                        style: TextStyle(fontSize: 13, color: theme.weakTextColor),
+                        style:
+                            TextStyle(fontSize: 13, color: theme.weakTextColor),
                       ),
                       SelectableText(
                         userInfo?.userID ?? "",
-                        style: TextStyle(fontSize: 13, color: theme.weakTextColor),
+                        style:
+                            TextStyle(fontSize: 13, color: theme.weakTextColor),
                       ),
                     ],
                   ),
                 ),
-                Text(signatureText,
+                SelectableText(signatureText,
                     style: TextStyle(fontSize: 13, color: theme.weakTextColor))
               ],
             ),

@@ -7,9 +7,11 @@ import 'package:tencent_im_base/tencent_im_base.dart';
 class TIMUIKitDraftText extends TIMUIKitStatelessWidget {
   final BuildContext context;
   final String draftText;
+  final double fontSize;
 
   TIMUIKitDraftText({
     Key? key,
+    this.fontSize = 14.0,
     required this.context,
     required this.draftText,
   }) : super(key: key);
@@ -37,7 +39,7 @@ class TIMUIKitDraftText extends TIMUIKitStatelessWidget {
         style: TextStyle(
             height: 1.5,
             color: theme.conversationItemLastMessageTextColor,
-            fontSize: 14),
+            fontSize: fontSize),
       )),
     ]);
   }

@@ -7,20 +7,24 @@ import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/recent_conversation_list.dart';
 
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+
+GlobalKey<_ForwardMessageScreenState> forwardMessageScreenKey = GlobalKey();
 
 class ForwardMessageScreen extends StatefulWidget {
   final bool isMergerForward;
   final ConvType conversationType;
   final TUIChatSeparateViewModel model;
+  final VoidCallback? onClose;
 
   const ForwardMessageScreen(
       {Key? key,
       this.isMergerForward = false,
       required this.conversationType,
-      required this.model})
+      required this.model, this.onClose})
       : super(key: key);
 
   @override
@@ -56,7 +60,7 @@ class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
     }).toList();
   }
 
-  _handleForwardMessage() async {
+  handleForwardMessage() async {
     if (widget.isMergerForward) {
       await widget.model.sendMergerMessage(
         conversationList: _conversationList,
@@ -69,30 +73,44 @@ class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
           .sendForwardMessage(conversationList: _conversationList);
     }
     widget.model.updateMultiSelectStatus(false);
-    Navigator.pop(context);
+
+    if(widget.onClose != null){
+      widget.onClose!();
+    }else{
+      Navigator.pop(context);
+    }
   }
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     final TUITheme theme = value.theme;
+    if(isDesktopScreen){
+      isMultiSelect = true;
+      return RecentForwardList(
+        isMultiSelect: isMultiSelect,
+        onChanged: (conversationList) {
+          _conversationList = conversationList;
+
+          if (!isMultiSelect) {
+            handleForwardMessage();
+          }
+        },
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: Text(
           TIM_t("选择"),
-          style: const TextStyle(
-            color: Colors.white,
+          style: TextStyle(
+            color: theme.appbarTextColor,
             fontSize: 17,
           ),
         ),
         shadowColor: theme.weakBackgroundColor,
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(colors: [
-              theme.lightPrimaryColor ?? CommonColor.lightPrimaryColor,
-              theme.primaryColor ?? CommonColor.primaryColor
-            ]),
-          ),
-        ),
+        backgroundColor: theme.appbarBgColor ??
+            theme.primaryColor,
         leading: TextButton(
           onPressed: () {
             if (isMultiSelect) {
@@ -102,17 +120,22 @@ class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
               });
             } else {
               widget.model.updateMultiSelectStatus(false);
-              Navigator.pop(context);
+              if(widget.onClose != null){
+                widget.onClose!();
+              }else{
+                Navigator.pop(context);
+              }
             }
           },
           child: Text(
             TIM_t("取消"),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 16,
+            style: TextStyle(
+              color: theme.appbarTextColor,
+              fontSize: 14,
             ),
           ),
         ),
+        leadingWidth: 80,
         actions: [
           TextButton(
             onPressed: () {
@@ -121,7 +144,7 @@ class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
                   isMultiSelect = true;
                 });
               } else {
-                _handleForwardMessage();
+                handleForwardMessage();
               }
             },
             child: Text(
@@ -140,7 +163,7 @@ class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
           _conversationList = conversationList;
 
           if (!isMultiSelect) {
-            _handleForwardMessage();
+            handleForwardMessage();
           }
         },
       ),

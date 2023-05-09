@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
@@ -61,20 +61,22 @@ class _TIMUIKitHistoryMessageListTongueContainerState
     final screenHeight = MediaQuery.of(context).size.height;
     final offset = widget.scrollController.offset;
     final conversationUnreadCount = widget.model.getConversationUnreadCount();
-    if (offset <= 0.0 &&
-        conversationUnreadCount != 0) {
+    if (offset <= 0.0 && conversationUnreadCount != 0) {
       widget.model.showLatestUnread();
     }
     if (widget.scrollController.offset <=
             widget.scrollController.position.minScrollExtent &&
-        !widget.scrollController.position.outOfRange && !widget.model.haveMoreLatestData) {
+        !widget.scrollController.position.outOfRange &&
+        !widget.model.haveMoreLatestData) {
       changePositionState(HistoryMessagePosition.bottom);
     } else if (widget.scrollController.offset <= screenHeight * 1.6 &&
         widget.scrollController.offset > 0 &&
-        !widget.scrollController.position.outOfRange && !widget.model.haveMoreLatestData) {
+        !widget.scrollController.position.outOfRange &&
+        !widget.model.haveMoreLatestData) {
       changePositionState(HistoryMessagePosition.inTwoScreen);
     } else if (widget.scrollController.offset > screenHeight * 1.6 &&
-        !widget.scrollController.position.outOfRange && !widget.model.haveMoreLatestData) {
+        !widget.scrollController.position.outOfRange &&
+        !widget.model.haveMoreLatestData) {
       changePositionState(HistoryMessagePosition.awayTwoScreen);
     }
   }
@@ -85,9 +87,8 @@ class _TIMUIKitHistoryMessageListTongueContainerState
 
   MessageListTongueType _getTongueValueType(
       List<V2TimGroupAtInfo?>? groupAtInfoList) {
-
-    if(globalModel.getMessageListPosition(widget.model.conversationID) ==
-        HistoryMessagePosition.notShowLatest){
+    if (globalModel.getMessageListPosition(widget.model.conversationID) ==
+        HistoryMessagePosition.notShowLatest) {
       return MessageListTongueType.none;
     }
     if (groupAtInfoList != null &&
@@ -152,22 +153,24 @@ class _TIMUIKitHistoryMessageListTongueContainerState
                 } else {
                   widget.scrollToIndexBySeq(groupAtInfoList!.removeAt(0)!.seq);
                 }
-              } else if ((widget.conversation.unreadCount ?? 0) > 20 && !isClickShowPrevious) {
-                try{
+              } else if ((widget.conversation.unreadCount ?? 0) > 20 &&
+                  !isClickShowPrevious) {
+                try {
                   isClickShowPrevious = true;
                   final String? lastSeqString =
                       widget.conversation.lastMessage?.seq;
                   final int? lastSeq =
-                  TencentUtils.checkString(lastSeqString) != null
-                      ? int.parse(lastSeqString!)
-                      : null;
+                      TencentUtils.checkString(lastSeqString) != null
+                          ? int.parse(lastSeqString!)
+                          : null;
                   final int? previousCount = widget.conversation.unreadCount;
                   if (lastSeq != null && previousCount != null) {
                     final targetSeq = lastSeq - previousCount;
-                    await widget.model.loadListForSpecificMessage(seq: targetSeq);
+                    await widget.model
+                        .loadListForSpecificMessage(seq: targetSeq);
                     // widget.scrollToIndexBySeq((targetSeq + 1).toString());
                   }
-                }catch(e){
+                } catch (e) {
                   // TODO: 这里后续加个弹窗提示客户，找消息失败了
                 }
                 // widget.model.loadListForSpecificMessage(seq: count);

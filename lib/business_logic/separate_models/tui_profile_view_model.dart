@@ -31,6 +31,11 @@ class TUIProfileViewModel extends ChangeNotifier {
     return _userProfile;
   }
 
+  set userProfile(UserProfile? value) {
+    _userProfile = value;
+    notifyListeners();
+  }
+
   bool? get isDisturb {
     return _isDisturb;
   }
@@ -48,6 +53,9 @@ class TUIProfileViewModel extends ChangeNotifier {
   }
 
   loadData({required String userID, bool isNeedConversation = true}) async {
+    if(userID.isEmpty){
+      return;
+    }
     V2TimFriendInfo? friendUserInfo;
     V2TimConversation? conversation;
     final userInfoList =
@@ -159,8 +167,6 @@ class TUIProfileViewModel extends ChangeNotifier {
     if (res.code == 0) {
       _userProfile?.friendInfo!.userProfile!.allowType = allowType;
       notifyListeners();
-    } else {
-      print("${res.code},${res.desc}");
     }
     return res;
   }
@@ -175,8 +181,6 @@ class TUIProfileViewModel extends ChangeNotifier {
     if (res.code == 0) {
       _userProfile?.friendInfo!.userProfile!.gender = gender;
       notifyListeners();
-    } else {
-      print("${res.code},${res.desc}");
     }
 
     return res;
@@ -192,8 +196,6 @@ class TUIProfileViewModel extends ChangeNotifier {
     if (res.code == 0) {
       _userProfile?.friendInfo!.userProfile!.nickName = nickName;
       notifyListeners();
-    } else {
-      print("${res.code},${res.desc}");
     }
 
     return res;
@@ -208,8 +210,6 @@ class TUIProfileViewModel extends ChangeNotifier {
     if (res.code == 0) {
       _userProfile?.friendInfo!.userProfile!.selfSignature = selfSignature;
       notifyListeners();
-    } else {
-      print("${res.code},${res.desc}");
     }
     return res;
   }
@@ -297,8 +297,6 @@ class TUIProfileViewModel extends ChangeNotifier {
       });
 
       notifyListeners();
-    } else {
-      print("${res.code},${res.desc}");
     }
     return res;
   }

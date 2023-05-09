@@ -1,7 +1,6 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_setting_model.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/listener_model/tui_group_listener_model.dart';
@@ -157,7 +156,7 @@ class CoreServicesImpl with CoreServices {
       onCallback = onTUIKitCallbackListener;
     }
     setGlobalConfig(config);
-    if (PlatformUtils().isIOS || PlatformUtils().isAndroid) {
+    if (!PlatformUtils().isWeb) {
       didLoginSuccess();
     }
   }
@@ -251,8 +250,8 @@ class CoreServicesImpl with CoreServices {
       }
 
       tuiFriendShipViewModel.userStatusList = currentUserStatusList;
+    // ignore: empty_catches
     } catch (e) {
-      print(e);
     }
   }
 
@@ -265,7 +264,7 @@ class CoreServicesImpl with CoreServices {
     _userSig = userSig;
     V2TimCallback result = await TencentImSDKPlugin.v2TIMManager
         .login(userID: userID, userSig: userSig);
-    if (PlatformUtils().isIOS || PlatformUtils().isAndroid) {
+    if (!PlatformUtils().isWeb) {
       didLoginSuccess();
     }
     if (result.code != 0) {
@@ -294,7 +293,7 @@ class CoreServicesImpl with CoreServices {
             }
         });
 
-    if (!kIsWeb &&
+    if (PlatformUtils().isMobile &&
         selfInfoViewModel.globalConfig?.isCheckDiskStorageSpace == true) {
       final diskSpace = await DiskSpace.getFreeDiskSpace;
       if (diskSpace != null && diskSpace < 1024) {

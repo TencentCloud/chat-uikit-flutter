@@ -15,8 +15,10 @@ class GroupPinConversation extends TIMUIKitStatelessWidget {
     final model = Provider.of<TUIGroupProfileModel>(context);
     final isPined = model.conversation?.isPinned ?? false;
     return TIMUIKitOperationItem(
+      isEmpty: false,
       operationName: TIM_t("置顶聊天"),
       type: "switch",
+      isUseCheckedBoxOnWide: true,
       operationValue: isPined,
       onSwitchChange: (value) {
         model.pinedConversation(value);

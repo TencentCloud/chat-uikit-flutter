@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/conversation/conversation_services.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_search_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/pureUI/tim_uikit_search_item.dart';
@@ -47,13 +48,19 @@ class TIMUIKitSearchMsg extends TIMUIKitStatelessWidget {
     if (msgList.isNotEmpty) {
       return TIMUIKitSearchFolder(folderName: TIM_t("聊天记录"), children: [
         ...msgList.map((conv) {
-          V2TimConversation conversation = _conversationList[
-              _conversationList.indexWhere(
-                  (item) => item!.conversationID == conv?.conversationID)]!;
+          V2TimConversation? conversation;
+          final index = _conversationList.indexWhere(
+                  (item) => item!.conversationID == conv?.conversationID);
+          if(index > -1){
+            conversation = _conversationList[index]!;
+          }
+          if(conversation == null){
+            return Container();
+          }
           final option1 = conv?.messageCount;
           return TIMUIKitSearchItem(
             onClick: () async {
-              onEnterConversation(conversation, keyword);
+              onEnterConversation(conversation!, keyword);
             },
             faceUrl: conversation.faceUrl ?? "",
             showName: conversation.showName ?? "",

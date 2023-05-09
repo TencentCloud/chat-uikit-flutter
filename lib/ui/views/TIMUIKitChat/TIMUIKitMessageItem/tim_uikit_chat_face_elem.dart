@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
@@ -28,10 +29,6 @@ class TIMUIKitFaceElem extends StatefulWidget {
 }
 
 class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitFaceElem> {
-  @override
-  void initState() {
-    super.initState();
-  }
 
   bool isFromNetwork() {
     return widget.path.startsWith('http');
@@ -51,8 +48,9 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitFaceElem> {
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     return TIMUIKitMessageReactionWrapper(
-        chatModel: widget.model,
+      chatModel: widget.model,
         isShowJump: widget.isShowJump,
         isFromSelf: widget.message.isSelf ?? true,
         clearJump: widget.clearJump,
@@ -61,7 +59,7 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitFaceElem> {
         child: Container(
           padding: const EdgeInsets.all(10),
           constraints:
-              BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.3),
+              BoxConstraints(maxWidth: MediaQuery.of(context).size.width * (isDesktopScreen ? 0.1 : 0.3)),
           child: isFromNetwork()
               ? Image.network(widget.path)
               : Image.asset(createPathFromNative(widget.path)),

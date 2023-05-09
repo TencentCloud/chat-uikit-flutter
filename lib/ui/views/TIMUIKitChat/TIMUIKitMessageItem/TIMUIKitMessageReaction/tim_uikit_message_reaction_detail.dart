@@ -20,7 +20,7 @@ class TIMUIKitMessageReactionDetail extends StatefulWidget {
   /// the sticker list from message reaction
   final List<int> stickerList;
 
-  final Function(String userID)? onTapAvatar;
+  final Function(String userID, TapDownDetails tapDetails)? onTapAvatar;
 
   const TIMUIKitMessageReactionDetail(
       {required this.currentStickerIndex,
@@ -42,7 +42,7 @@ class TIMUIKitMessageReactionDetailState
       serviceLocator<TUISelfInfoViewModel>();
 
   Widget getUserItem(
-      String userID, TUITheme theme, Function(String userID)? onTapAvatar) {
+      String userID, TUITheme theme, Function(String userID, TapDownDetails tapDetails)? onTapAvatar) {
     V2TimGroupMemberFullInfo? memberInfo;
     String showName = userID;
     try {
@@ -66,11 +66,11 @@ class TIMUIKitMessageReactionDetailState
       // e
     }
 
-    return GestureDetector(
-      onTap: () {
+    return InkWell(
+      onTapDown: (tapDetails) {
         if (onTapAvatar != null) {
           if (userID != selfInfoModel.loginInfo?.userID) {
-            onTapAvatar(userID);
+            onTapAvatar(userID, tapDetails);
           }
         }
       },
@@ -137,7 +137,7 @@ class TIMUIKitMessageReactionDetailState
   }
 
   Widget getStickerNameList(
-      int sticker, TUITheme theme, Function(String userID)? onTapAvatar) {
+      int sticker, TUITheme theme, Function(String userID, TapDownDetails tapDetails)? onTapAvatar) {
     final nameList = widget.messageReaction[sticker.toString()];
     return SingleChildScrollView(
       child: Column(

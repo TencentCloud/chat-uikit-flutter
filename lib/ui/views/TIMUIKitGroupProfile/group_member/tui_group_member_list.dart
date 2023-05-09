@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
@@ -81,6 +82,8 @@ class GroupProfileMemberListPageState
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final TUITheme theme = value.theme;
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor() == DeviceType.Desktop;
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: widget.model),
@@ -90,24 +93,36 @@ class GroupProfileMemberListPageState
             Provider.of<TUIGroupProfileModel>(context);
         String option1 = groupProfileModel.groupInfo?.memberCount.toString() ??
             widget.memberList.length.toString();
+        if(isDesktopScreen){
+          return  GroupProfileMemberList(
+            customTopArea: PlatformUtils().isWeb
+                ? null
+                : GroupMemberSearchTextField(
+              onTextChange: (text) =>
+                  handleSearchGroupMembers(text, context),
+            ),
+            memberList: searchMemberList ?? groupProfileModel.groupMemberList,
+            removeMember: _kickedOffMember,
+            touchBottomCallBack: () {},
+            onTapMemberItem: (friendInfo, details) {
+              if (widget.model.onClickUser != null) {
+                widget.model.onClickUser!(friendInfo.userID, details);
+              }
+            },
+          );
+        }
         return Scaffold(
             appBar: AppBar(
                 title: Text(
                   TIM_t_para("群成员({{option1}}人)", "群成员($option1人)")(
                       option1: option1),
-                  style: const TextStyle(color: Colors.white, fontSize: 17),
+                  style: TextStyle(color: theme.appbarTextColor, fontSize: 17),
                 ),
                 shadowColor: theme.weakBackgroundColor,
-                flexibleSpace: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(colors: [
-                      theme.lightPrimaryColor ?? CommonColor.lightPrimaryColor,
-                      theme.primaryColor ?? CommonColor.primaryColor
-                    ]),
-                  ),
-                ),
-                iconTheme: const IconThemeData(
-                  color: Colors.white,
+                backgroundColor: theme.appbarBgColor ??
+                    theme.primaryColor,
+                iconTheme: IconThemeData(
+                  color: theme.appbarTextColor,
                 )),
             body: GroupProfileMemberList(
               customTopArea: PlatformUtils().isWeb
@@ -119,12 +134,13 @@ class GroupProfileMemberListPageState
               memberList: searchMemberList ?? groupProfileModel.groupMemberList,
               removeMember: _kickedOffMember,
               touchBottomCallBack: () {},
-              onTapMemberItem: (friendInfo) {
+              onTapMemberItem: (friendInfo, details) {
                 if (widget.model.onClickUser != null) {
-                  widget.model.onClickUser!(friendInfo.userID);
+                  widget.model.onClickUser!(friendInfo.userID, details);
                 }
               },
-            ));
+            )
+        );
       },
     );
   }

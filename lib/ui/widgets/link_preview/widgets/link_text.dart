@@ -1,4 +1,7 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_extended_text/extended_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -60,10 +63,13 @@ class LinkText extends TIMStatelessWidget {
 
   final List customEmojiStickerList;
 
+  final bool? isEnableTextSelection;
+
   const LinkText(
       {Key? key,
       required this.messageText,
       this.onLinkTap,
+      this.isEnableTextSelection,
       this.style,
       this.isUseDefaultEmoji = false,
       this.customEmojiStickerList = const []})
@@ -124,6 +130,8 @@ class LinkText extends TIMStatelessWidget {
 
   @override
   Widget timBuild(BuildContext context) {
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     return
         // Text.rich(
         //   TextSpan(children: [..._getContentSpan(messageText, context)]),
@@ -140,6 +148,9 @@ class LinkText extends TIMStatelessWidget {
         }
       }
     },
+            selectionEnabled: isEnableTextSelection != null
+                ? isEnableTextSelection!
+                : isDesktopScreen,
             style: style ?? const TextStyle(fontSize: 16.0),
             specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
               isUseDefaultEmoji: isUseDefaultEmoji,

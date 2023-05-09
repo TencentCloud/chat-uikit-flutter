@@ -11,8 +11,8 @@ class Avatar extends TIMUIKitStatelessWidget {
   final String faceUrl;
   final String showName;
   final bool isFromLocalAsset;
-  final BorderRadius? borderRadius;
   final CoreServicesImpl coreService = serviceLocator<CoreServicesImpl>();
+  final BorderRadius? borderRadius;
   final V2TimUserStatus? onlineStatus;
   final int? type; // 1 c2c 2 group
   final bool isShowBigWhenClick;
@@ -40,6 +40,7 @@ class Avatar extends TIMUIKitStatelessWidget {
             TencentUtils.checkString(
                     selfInfoViewModel.globalConfig?.defaultAvatarAssetPath) ??
                 'images/default_c2c_head.png',
+            fit: BoxFit.cover,
             package:
                 selfInfoViewModel.globalConfig?.defaultAvatarAssetPath != null
                     ? null
@@ -49,6 +50,7 @@ class Avatar extends TIMUIKitStatelessWidget {
             TencentUtils.checkString(
                     selfInfoViewModel.globalConfig?.defaultAvatarAssetPath) ??
                 'images/default_group_head.png',
+            fit: BoxFit.cover,
             package:
                 selfInfoViewModel.globalConfig?.defaultAvatarAssetPath != null
                     ? null
@@ -59,7 +61,10 @@ class Avatar extends TIMUIKitStatelessWidget {
     // final emptyAvatarBuilder = coreService.emptyAvatarBuilder;
     if (faceUrl != "") {
       if (isFromLocalAsset) {
-        return Image.asset(faceUrl);
+        return Image.asset(
+          faceUrl,
+          fit: BoxFit.cover,
+        );
       }
       return CachedNetworkImage(
         imageUrl: faceUrl,
@@ -80,6 +85,7 @@ class Avatar extends TIMUIKitStatelessWidget {
                 TencentUtils.checkString(selfInfoViewModel
                         .globalConfig?.defaultAvatarAssetPath) ??
                     'images/default_c2c_head.png',
+                fit: BoxFit.cover,
                 package:
                     selfInfoViewModel.globalConfig?.defaultAvatarAssetPath !=
                             null
@@ -91,6 +97,7 @@ class Avatar extends TIMUIKitStatelessWidget {
                 TencentUtils.checkString(selfInfoViewModel
                         .globalConfig?.defaultAvatarAssetPath) ??
                     'images/default_group_head.png',
+                fit: BoxFit.cover,
                 package:
                     selfInfoViewModel.globalConfig?.defaultAvatarAssetPath !=
                             null

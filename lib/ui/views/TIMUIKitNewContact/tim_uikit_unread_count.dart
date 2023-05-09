@@ -20,10 +20,6 @@ class TIMUIKitUnreadCount extends StatefulWidget {
 class _TIMUIKitUnreadCountState extends TIMUIKitState<TIMUIKitUnreadCount> {
   final TUIFriendShipViewModel model = serviceLocator<TUIFriendShipViewModel>();
 
-  @override
-  void initState() {
-    super.initState();
-  }
 
   @override
   void dispose() {

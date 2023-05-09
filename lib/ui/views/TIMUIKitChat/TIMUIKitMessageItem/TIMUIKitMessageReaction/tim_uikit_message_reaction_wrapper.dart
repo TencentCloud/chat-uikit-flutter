@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
@@ -26,7 +27,7 @@ class TIMUIKitMessageReactionWrapper extends StatefulWidget {
       this.clearJump,
       required this.isFromSelf,
       this.backgroundColor,
-      required this.chatModel,
+        required this.chatModel,
       required this.message,
       this.borderRadius,
       required this.child,
@@ -76,8 +77,10 @@ class _TIMUIKitMessageReactionWrapperState
     Map<String, dynamic> messageReaction = {};
     CloudCustomData messageCloudCustomData;
     try {
-      messageCloudCustomData = CloudCustomData.fromJson(
-          json.decode(widget.message.cloudCustomData!));
+      messageCloudCustomData = CloudCustomData.fromJson(json.decode(
+          TencentUtils.checkString(widget.message.cloudCustomData) != null
+              ? widget.message.cloudCustomData!
+              : "{}"));
     } catch (e) {
       messageCloudCustomData = CloudCustomData();
     }
@@ -134,7 +137,7 @@ class _TIMUIKitMessageReactionWrapperState
       } else {
         if ((widget.chatModel.jumpMsgID == widget.message.msgID) &&
             (widget.message.msgID?.isNotEmpty ?? false)) {
-          if (widget.clearJump != null) {
+          if(widget.clearJump != null){
             widget.clearJump!();
           }
         }

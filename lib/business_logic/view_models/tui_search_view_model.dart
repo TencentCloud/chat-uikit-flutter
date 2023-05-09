@@ -1,5 +1,6 @@
 // ignore_for_file: constant_identifier_names
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/friendShip/friendship_services.dart';
@@ -91,10 +92,13 @@ class TUISearchViewModel extends ChangeNotifier {
       type: KeywordListMatchType.V2TIM_KEYWORD_LIST_MATCH_TYPE_OR.index,
     ));
     if (searchResult.code == 0 && searchResult.data != null) {
-      totalMsgInConversationCount = searchResult.data!.totalCount!;
+      final messageSearchResultItems = searchResult
+          .data!.messageSearchResultItems!
+          .firstWhereOrNull((element) => element.conversationID == conversationId);
+      totalMsgInConversationCount = messageSearchResultItems?.messageCount ?? 0;
       currentMsgListForConversation = [
         ...currentMsgListForConversation,
-        ...(searchResult.data!.messageSearchResultItems?[0].messageList ?? [])
+        ...(messageSearchResultItems?.messageList ?? [])
       ];
     }
     notifyListeners();

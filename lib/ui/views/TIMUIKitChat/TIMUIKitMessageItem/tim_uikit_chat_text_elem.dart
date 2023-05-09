@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
@@ -123,9 +124,9 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
     // The `onUpdateMessage` can use the `updateMessage()` from the [TIMUIKitChatController] directly.
     LinkPreviewEntry.getFirstLinkPreviewContent(
         message: widget.message,
-        onUpdateMessage: () {
-          widget.chatModel
-              .updateMessageFromController(msgID: widget.message.msgID!);
+        onUpdateMessage: (message) {
+          widget.chatModel.updateMessageFromController(
+              msgID: widget.message.msgID!, message: message);
         });
   }
 
@@ -138,7 +139,8 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
         final String localJSON = widget.message.localCustomData!;
         final LocalCustomDataModel? localPreviewInfo =
             LocalCustomDataModel.fromMap(json.decode(localJSON));
-        if (localPreviewInfo != null && !localPreviewInfo.isLinkPreviewEmpty()) {
+        if (localPreviewInfo != null &&
+            !localPreviewInfo.isLinkPreviewEmpty()) {
           return Container(
             margin: const EdgeInsets.only(top: 8),
             child:
@@ -159,13 +161,16 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final theme = value.theme;
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     final textWithLink = LinkPreviewEntry.getHyperlinksText(
-      widget.message.textElem?.text ?? "",
-      widget.chatModel.chatConfig.isSupportMarkdownForTextMessage,
-      widget.chatModel.chatConfig.onTapLink,
-      widget.isUseDefaultEmoji,
-      widget.customEmojiStickerList,
-    );
+        widget.message.textElem?.text ?? "",
+        widget.chatModel.chatConfig.isSupportMarkdownForTextMessage,
+        onLinkTap: widget.chatModel.chatConfig.onTapLink,
+        isUseDefaultEmoji: widget.isUseDefaultEmoji,
+        customEmojiStickerList: widget.customEmojiStickerList,
+        isEnableTextSelection:
+            widget.chatModel.chatConfig.isEnableTextSelection);
     final borderRadius = widget.isFromSelf
         ? const BorderRadius.only(
             topLeft: Radius.circular(10),
@@ -190,14 +195,18 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
         }
       }
     }
+
     final defaultStyle = widget.isFromSelf
-        ? theme.lightPrimaryMaterialColor.shade50
-        : theme.chatMessageItemFromOthersBgColor;
+        ? (theme.chatMessageItemFromSelfBgColor ??
+            theme.lightPrimaryMaterialColor.shade50)
+        : (theme.chatMessageItemFromOthersBgColor);
+
     final backgroundColor = isShowJumpState
         ? const Color.fromRGBO(245, 166, 35, 1)
-        : (widget.backgroundColor ?? defaultStyle);
+        : (defaultStyle ?? widget.backgroundColor);
+
     return Container(
-      padding: widget.textPadding ?? const EdgeInsets.all(10),
+      padding: widget.textPadding ?? EdgeInsets.all(isDesktopScreen ? 12 : 10),
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: widget.borderRadius ?? borderRadius,
@@ -213,15 +222,15 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
               ? textWithLink!(
                   style: widget.fontStyle ??
                       TextStyle(
-                          fontSize: 16,
+                          fontSize: isDesktopScreen ? 14 : 16,
                           textBaseline: TextBaseline.ideographic,
-                          height: widget.chatModel.chatConfig.textHight))
+                          height: widget.chatModel.chatConfig.textHeight))
               : ExtendedText(widget.message.textElem?.text ?? "",
                   softWrap: true,
                   style: widget.fontStyle ??
                       TextStyle(
-                          fontSize: 16,
-                          height: widget.chatModel.chatConfig.textHight),
+                          fontSize: isDesktopScreen ? 14 : 16,
+                          height: widget.chatModel.chatConfig.textHeight),
                   specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
                     isUseDefaultEmoji: widget.isUseDefaultEmoji,
                     customEmojiStickerList: widget.customEmojiStickerList,

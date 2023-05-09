@@ -7,8 +7,9 @@ import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget
 
 class TIMUIKitFileIcon extends TIMUIKitStatelessWidget {
   final String? fileFormat;
+  final double? size;
 
-  TIMUIKitFileIcon({this.fileFormat, Key? key}) : super(key: key);
+  TIMUIKitFileIcon( {this.size, this.fileFormat, Key? key}) : super(key: key);
 
   Map fileMap = {
     "doc": "images/word.png",
@@ -34,6 +35,11 @@ class TIMUIKitFileIcon extends TIMUIKitStatelessWidget {
     "tif": "images/image_icon.png",
     "wmf": "images/image_icon.png",
     "dib": "images/image_icon.png",
+    "mp4": "images/video_icon.png",
+    "avi": "images/video_icon.png",
+    "mov": "images/video_icon.png",
+    "wmv": "images/video_icon.png",
+    "flv": "images/video_icon.png",
   };
 
   Widget _getFileIcon() {
@@ -46,8 +52,8 @@ class TIMUIKitFileIcon extends TIMUIKitStatelessWidget {
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     return SizedBox(
-      height: 50,
-      width: 50,
+      height: size ?? 50,
+      width: size ?? 50,
       child: Container(padding: const EdgeInsets.all(4), child: _getFileIcon()),
     );
   }

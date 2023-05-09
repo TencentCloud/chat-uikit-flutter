@@ -1,13 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-
 import 'package:crypto/crypto.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
@@ -18,7 +18,6 @@ import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/video_custom_control.dart';
 import 'package:video_player/video_player.dart';
-
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
 class VideoScreen extends StatefulWidget {
@@ -79,27 +78,37 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
       xhr.send();
       return;
     }
-    if (PlatformUtils().isIOS) {
-      if (!await Permissions.checkPermission(
-        context,
-        Permission.photosAddOnly.value,
-      )) {
-        return;
-      }
-    } else {
-      if (!await Permissions.checkPermission(
-        context,
-        Permission.storage.value,
-      )) {
-        return;
+    if(PlatformUtils().isMobile){
+      if (PlatformUtils().isIOS) {
+        if (!await Permissions.checkPermission(
+          context,
+          Permission.photosAddOnly.value,
+        )) {
+          return;
+        }
+      } else {
+        final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+        if ((androidInfo.version.sdkInt ?? 0) >= 33) {
+          final videos = await Permissions.checkPermission(
+            context,Permission.videos.value,
+          );
+
+          if(!videos){
+            return;
+          }
+        } else {
+          final storage = await Permissions.checkPermission(
+            context, Permission.storage.value,
+          );
+          if(!storage){
+            return;
+          }
+        }
       }
     }
     String savePath = videoUrl;
     if (!isAsset) {
-      // var appDocDir = await getTemporaryDirectory();
-      // savePath = appDocDir.path + "/temp.mp4";
-      // await Dio().download(videoUrl, savePath);
-
       if (widget.message.msgID == null || widget.message.msgID!.isEmpty) {
         return;
       }
@@ -296,7 +305,7 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
                     widget.videoElement.localVideoUrl!,
                   ));
     await player.initialize();
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       double w = getVideoWidth();
       double h = getVideoHeight();
       ChewieController controller = ChewieController(

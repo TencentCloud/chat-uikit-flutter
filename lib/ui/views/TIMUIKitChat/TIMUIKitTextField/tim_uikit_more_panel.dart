@@ -1,35 +1,33 @@
 // ignore_for_file: unused_field, avoid_print, unused_import
 
 import 'dart:io';
-
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:fc_native_video_thumbnail_for_us/fc_native_video_thumbnail_for_us.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_call_invite_list.dart';
 import 'package:tencent_wechat_camera_picker/tencent_wechat_camera_picker.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-
+import 'package:path/path.dart' as p;
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/intl_camer_picker.dart';
-import 'package:video_thumbnail/video_thumbnail.dart' as video_thumbnail;
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+
 // ignore: unnecessary_import
 import 'dart:typed_data';
-
 import 'package:universal_html/html.dart' as html;
 
 class MorePanelConfig {
@@ -38,6 +36,8 @@ class MorePanelConfig {
   final bool showFilePickAction;
   final bool showWebImagePickAction;
   final bool showWebVideoPickAction;
+  final bool showVoiceCall;
+  final bool showVideoCall;
   final List<MorePanelItem>? extraAction;
   final Widget Function(MorePanelItem item)? actionBuilder;
 
@@ -47,6 +47,8 @@ class MorePanelConfig {
     this.showCameraAction = true,
     this.showWebImagePickAction = true,
     this.showWebVideoPickAction = true,
+    this.showVoiceCall = true,
+    this.showVideoCall = true,
     this.extraAction,
     this.actionBuilder,
   });
@@ -77,6 +79,7 @@ class MorePanel extends StatefulWidget {
       Key? key,
       this.morePanelConfig})
       : super(key: key);
+
   @override
   State<StatefulWidget> createState() => _MorePanelState();
 }
@@ -88,11 +91,28 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
   Uint8List? fileContent;
   String? fileName;
   File? tempFile;
+  final _tUICore = TUICore();
+  final _tUILogin = TUILogin();
+  bool isInstallCallkit = false;
+  final ScrollController _scrollController = ScrollController();
+  final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
+  @override
+  void initState() {
+    super.initState();
+    if (PlatformUtils().isMobile) {
+      _tUICore.getService(TUICALLKIT_SERVICE_NAME).then((value) {
+        setState(() {
+          isInstallCallkit = value;
+        });
+      });
+    }
+  }
 
   List<MorePanelItem> itemList(TUIChatSeparateViewModel model, TUITheme theme) {
     final config = widget.morePanelConfig ?? MorePanelConfig();
     return [
-      if (!PlatformUtils().isWeb)
+      if (PlatformUtils().isMobile)
         MorePanelItem(
             id: "screen",
             title: TIM_t("拍摄"),
@@ -212,6 +232,58 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
               width: 64,
             ),
           )),
+      if (isInstallCallkit && PlatformUtils().isMobile)
+        MorePanelItem(
+            id: "videoCall",
+            title: TIM_t("视频通话"),
+            onTap: (c) {
+              _onFeatureTap(
+                "videoCall",
+                c,
+                model,
+                theme,
+              );
+            },
+            icon: Container(
+              height: 64,
+              width: 64,
+              margin: const EdgeInsets.only(bottom: 4),
+              decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(5))),
+              child: SvgPicture.asset(
+                "images/video-call.svg",
+                package: 'tencent_cloud_chat_uikit',
+                height: 64,
+                width: 64,
+              ),
+            )),
+      if (isInstallCallkit && PlatformUtils().isMobile)
+        MorePanelItem(
+            id: "voiceCall",
+            title: TIM_t("语音通话"),
+            onTap: (c) {
+              _onFeatureTap(
+                "voiceCall",
+                c,
+                model,
+                theme,
+              );
+            },
+            icon: Container(
+              height: 64,
+              width: 64,
+              margin: const EdgeInsets.only(bottom: 4),
+              decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(5))),
+              child: SvgPicture.asset(
+                "images/voice-call.svg",
+                package: 'tencent_cloud_chat_uikit',
+                height: 64,
+                width: 64,
+              ),
+            )),
       if (config.extraAction != null) ...?config.extraAction,
     ].where((element) {
       if (element.id == "screen") {
@@ -233,11 +305,18 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
       if (element.id == "video") {
         return config.showWebVideoPickAction;
       }
+      if (element.id == "voiceCall") {
+        return config.showVoiceCall;
+      }
+      if (element.id == "videoCall") {
+        return config.showVideoCall;
+      }
       return true;
     }).toList();
   }
 
   _sendVideoMessage(AssetEntity asset, TUIChatSeparateViewModel model) async {
+    final plugin = FcNativeVideoThumbnail();
     final originFile = await asset.originFile;
     final size = await originFile!.length();
     if (size >= 104857600) {
@@ -253,21 +332,24 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
     final convID = widget.conversationID;
     final convType = widget.conversationType;
 
-    String tempPath = (await getTemporaryDirectory()).path;
+    String tempPath = (await getTemporaryDirectory()).path +
+        p.basename(originFile.path) +
+        ".jpeg";
 
-    String? thumbnail = await video_thumbnail.VideoThumbnail.thumbnailFile(
-      video: originFile.path,
-      thumbnailPath: tempPath,
-      imageFormat: video_thumbnail.ImageFormat.JPEG,
-      maxWidth:
-          128, // specify the width of the thumbnail, let the height auto-scaled to keep the source aspect ratio
-      quality: 25,
+    await plugin.getVideoThumbnail(
+      srcFile: originFile.path,
+      keepAspectRatio: true,
+      destFile: tempPath,
+      format: 'jpeg',
+      width: 128,
+      quality: 100,
+      height: 128,
     );
     MessageUtils.handleMessageError(
         model.sendVideoMessage(
             videoPath: filePath,
             duration: duration,
-            snapshotPath: thumbnail ?? '',
+            snapshotPath: tempPath,
             convID: convID,
             convType: convType),
         context);
@@ -275,36 +357,92 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
 
   _sendImageMessage(TUIChatSeparateViewModel model, TUITheme theme) async {
     try {
-      final bool isAndroid = PlatformUtils().isAndroid;
-      if (!PlatformUtils().isWeb &&
-          !await Permissions.checkPermission(
-            context,
-            isAndroid ? Permission.storage.value : Permission.photos.value,
-            theme,
-          )) {
-        return;
-      }
-      final convID = widget.conversationID;
-      final convType = widget.conversationType;
-      final pickedAssets = await AssetPicker.pickAssets(context);
-
-      if (pickedAssets != null) {
-        for (var asset in pickedAssets) {
-          final originFile = await asset.originFile;
-          final filePath = originFile?.path;
-          final type = asset.type;
-          if (filePath != null) {
-            if (type == AssetType.image) {
-              MessageUtils.handleMessageError(
-                  model.sendImageMessage(
-                      imagePath: filePath, convID: convID, convType: convType),
-                  context);
+      if (PlatformUtils().isMobile){
+        if(PlatformUtils().isAndroid){
+          AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+          if ((androidInfo.version.sdkInt ?? 0) >= 33) {
+            final videos = await Permissions.checkPermission(
+              context,Permission.videos.value,
+              theme,
+            );
+            final photos = await Permissions.checkPermission(
+              context,Permission.photos.value,
+              theme,
+            );
+            if(!videos && !photos){
+              return;
             }
-
-            if (type == AssetType.video) {
-              _sendVideoMessage(asset, model);
+          } else {
+            final storage = await Permissions.checkPermission(
+              context, Permission.storage.value,
+              theme,
+            );
+            if(!storage){
+              return;
             }
           }
+        }else{
+          final photos = await Permissions.checkPermission(
+            context,
+            Permission.photos.value,
+            theme,
+          );
+          if(!photos){
+            return;
+          }
+        }
+    }
+
+      final convID = widget.conversationID;
+      final convType = widget.conversationType;
+
+      if (PlatformUtils().isMobile) {
+        final pickedAssets = await AssetPicker.pickAssets(context);
+
+        if (pickedAssets != null) {
+          for (var asset in pickedAssets) {
+            final originFile = await asset.originFile;
+            final filePath = originFile?.path;
+            final type = asset.type;
+            if (filePath != null) {
+              if (type == AssetType.image) {
+                MessageUtils.handleMessageError(
+                    model.sendImageMessage(
+                        imagePath: filePath,
+                        convID: convID,
+                        convType: convType),
+                    context);
+              }
+
+              if (type == AssetType.video) {
+                _sendVideoMessage(asset, model);
+              }
+            }
+          }
+        }
+      } else {
+        FilePickerResult? result =
+            await FilePicker.platform.pickFiles(type: FileType.media);
+        if (result != null && result.files.isNotEmpty) {
+          File file = File(result.files.single.path!);
+          final String savePath = file.path;
+          final String type = TencentUtils.getFileType(
+                  savePath.split(".")[savePath.split(".").length - 1])
+              .split("/")[0];
+
+          if (type == "image") {
+            MessageUtils.handleMessageError(
+                model.sendImageMessage(
+                    imagePath: savePath, convID: convID, convType: convType),
+                context);
+          } else if (type == "video") {
+            MessageUtils.handleMessageError(
+                model.sendVideoMessage(
+                    videoPath: savePath, convID: convID, convType: convType),
+                context);
+          }
+        } else {
+          throw TypeError();
         }
       }
     } catch (err) {
@@ -317,14 +455,18 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
     TUITheme theme,
   ) async {
     try {
-      if (PlatformUtils().isIOS &&
-          !await Permissions.checkPermission(
+      if (!await Permissions.checkPermission(
             context,
             Permission.camera.value,
             theme,
           )) {
         return;
       }
+      await Permissions.checkPermission(
+        context,
+        Permission.microphone.value,
+        theme,
+      );
       final convID = widget.conversationID;
       final convType = widget.conversationType;
       final pickedFile = await CameraPicker.pickFromCamera(context,
@@ -417,14 +559,6 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
     TUIChatSeparateViewModel model,
     TUITheme theme,
   ) async {
-    if (!kIsWeb &&
-        !await Permissions.checkPermission(
-          context,
-          Permission.storage.value,
-          theme,
-        )) {
-      return;
-    }
     try {
       final convID = widget.conversationID;
       final convType = widget.conversationType;
@@ -462,7 +596,7 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
                 convType: convType),
             context);
       } else {
-        throw NullThrownError();
+        throw TypeError();
       }
     } catch (e) {
       print("_sendFileErr: ${e.toString()}");
@@ -493,6 +627,53 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
         // only for web
         _sendVideoFileOnWeb(model);
         break;
+      case "voiceCall":
+        _goToVideoUI(TYPE_AUDIO);
+        break;
+      case "videoCall":
+        _goToVideoUI(TYPE_VIDEO);
+        break;
+    }
+  }
+
+  _goToVideoUI(String type) async {
+    if (!PlatformUtils().isWeb) {
+      final hasCameraPermission = type == TYPE_VIDEO
+          ? await Permissions.checkPermission(context, Permission.camera.value)
+          : true;
+      final hasMicphonePermission = await Permissions.checkPermission(
+          context, Permission.microphone.value);
+      if (!hasCameraPermission || !hasMicphonePermission) {
+        return;
+      }
+    }
+
+    final isGroup = widget.conversationType == ConvType.group;
+    if (isGroup) {
+      List<V2TimGroupMemberFullInfo>? selectedMember = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => SelectCallInviter(
+            groupID: widget.conversationID,
+          ),
+        ),
+      );
+      if (selectedMember != null) {
+        final inviteMember = selectedMember.map((e) => e.userID).toList();
+        _tUICore.callService(TUICALLKIT_SERVICE_NAME, METHOD_NAME_CALL, {
+          PARAM_NAME_TYPE: type,
+          PARAM_NAME_USERIDS: inviteMember,
+          PARAM_NAME_GROUPID: widget.conversationType == ConvType.group
+              ? widget.conversationID
+              : ""
+        });
+      }
+    } else {
+      _tUICore.callService(TUICALLKIT_SERVICE_NAME, METHOD_NAME_CALL, {
+        PARAM_NAME_TYPE: type,
+        PARAM_NAME_USERIDS: [widget.conversationID],
+        PARAM_NAME_GROUPID: ""
+      });
     }
   }
 
@@ -512,42 +693,46 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
       ),
       padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
       width: screenWidth,
-      child: SingleChildScrollView(
-        child: Wrap(
-          spacing: (screenWidth - (23 * 2) - 64 * 4) / 3,
-          runSpacing: 20,
-          children: itemList(model, theme)
-              .map((item) => InkWell(
-                  onTap: () {
-                    if (item.onTap != null) {
-                      item.onTap!(context);
-                    }
-                  },
-                  child: widget.morePanelConfig?.actionBuilder != null
-                      ? widget.morePanelConfig?.actionBuilder!(item)
-                      : SizedBox(
-                          height: 94,
-                          width: 64,
-                          child: Column(
-                            children: [
-                              Container(
-                                height: 64,
-                                width: 64,
-                                margin: const EdgeInsets.only(bottom: 4),
-                                decoration: const BoxDecoration(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(5))),
-                                child: item.icon,
-                              ),
-                              Text(
-                                item.title,
-                                style: TextStyle(
-                                    fontSize: 12, color: theme.darkTextColor),
-                              )
-                            ],
-                          ),
-                        )))
-              .toList(),
+      child: Scrollbar(
+        controller: _scrollController,
+        child: SingleChildScrollView(
+          controller: _scrollController,
+          child: Wrap(
+            spacing: (screenWidth - (23 * 2) - 64 * 4) / 3,
+            runSpacing: 20,
+            children: itemList(model, theme)
+                .map((item) => InkWell(
+                onTap: () {
+                  if (item.onTap != null) {
+                    item.onTap!(context);
+                  }
+                },
+                child: widget.morePanelConfig?.actionBuilder != null
+                    ? widget.morePanelConfig?.actionBuilder!(item)
+                    : SizedBox(
+                  height: 94,
+                  width: 64,
+                  child: Column(
+                    children: [
+                      Container(
+                        height: 64,
+                        width: 64,
+                        margin: const EdgeInsets.only(bottom: 4),
+                        decoration: const BoxDecoration(
+                            borderRadius:
+                            BorderRadius.all(Radius.circular(5))),
+                        child: item.icon,
+                      ),
+                      Text(
+                        item.title,
+                        style: TextStyle(
+                            fontSize: 12, color: theme.darkTextColor),
+                      )
+                    ],
+                  ),
+                )))
+                .toList(),
+          ),
         ),
       ),
     );

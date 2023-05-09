@@ -1,6 +1,8 @@
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
+import 'TIMUIKitTextField/tim_uikit_text_field_layout/wide.dart';
+
 enum GroupReceptAllowType { work, public, meeting }
 
 enum GroupReceiptAllowType { work, public, meeting }
@@ -36,7 +38,7 @@ class TIMUIKitChatConfig {
   /// [Default]: true.
   final bool isReportGroupReadingStatus;
 
-  /// Control if allowed to show the menu after long pressing message.
+  /// Control if allowed to show the message operation menu after long pressing message.
   /// [Default]: true.
   final bool isAllowLongPressMessage;
 
@@ -77,6 +79,11 @@ class TIMUIKitChatConfig {
   /// [Default]: true.
   final bool isShowOthersNameInGroup;
 
+  /// Configuration for offline push.
+  /// If this field is specified, `notificationTitle`, `notificationOPPOChannelID`, `notificationIOSSound`, `notificationAndroidSound`, `notificationBody` and `notificationExt` will not work.
+  final OfflinePushInfo? Function(
+      V2TimMessage message, String convID, ConvType convType)? offlinePushInfo;
+
   /// The title shows in push notification
   final String notificationTitle;
 
@@ -91,7 +98,7 @@ class TIMUIKitChatConfig {
   final String notificationAndroidSound;
 
   ///Used to set the line height of text messages
-  final double textHight;
+  final double textHeight;
 
   /// The body content shows in push notification.
   /// Returning `null` means using default body in this case.
@@ -109,7 +116,7 @@ class TIMUIKitChatConfig {
 
   /// Whether to display the sending status of c2c messages
   /// [Default]: true.
-  final bool showC2cMessageEditStaus;
+  final bool showC2cMessageEditStatus;
 
   /// Control if take emoji stickers as message reaction.
   /// [Default]: true.
@@ -127,7 +134,9 @@ class TIMUIKitChatConfig {
   /// The suffix of face sticker URI.
   final String Function(String data)? faceURISuffix;
 
-  /// Control if text and replied messages can be show with markdown.
+  /// Controls whether text and replied messages can be displayed with Markdown formatting.
+  /// When enabled, small image stickers, including QQ stickers, will not work in message items.
+  /// Also, when enabled, `isEnableTextSelection` will not works.
   /// [Default]: false.
   final bool isSupportMarkdownForTextMessage;
 
@@ -142,12 +151,40 @@ class TIMUIKitChatConfig {
   /// [Default]: true.
   final bool isShowAvatar;
 
+  /// This list contains additional operation items that are displayed on the hover bar
+  /// of a message on desktop (macOS, Windows, and desktop version of Web). These items
+  /// are in addition to the default ones and do not affect them.
+  final List<MessageHoverControlItem>? additionalDesktopMessageHoverBarItem;
+
+  /// This list contains additional items that are displayed
+  /// on the control bar on desktop (macOS, Windows, and desktop version of Web).
+  /// Use `desktopControlBarConfig` to configure whether or not to show the default control items.
+  final List<DesktopControlBarItem>? additionalDesktopControlBarItems;
+
+  /// This configuration is used for the control bar
+  /// on desktop (macOS, Windows, and desktop version of Web).
+  /// Use `desktopControlBarConfig` to add additional items to the desktop control bar, in addition to the default ones.
+  final DesktopControlBarConfig? desktopControlBarConfig;
+
+  /// Controls whether users are allowed to mention another user in the group by long-pressing on their avatar.
+  /// [Default]: true.
+  final bool isAllowLongPressAvatarToAt;
+
+  /// Controls whether auto report message read status when new messages come.
+  /// [Default]: true.
+  final bool isAutoReportRead;
+
+  /// Controls whether enable text selection.
+  /// [Default]: true on Desktop while false on Mobile.
+  final bool? isEnableTextSelection;
+
   const TIMUIKitChatConfig(
       {this.onTapLink,
       this.timeDividerConfig,
+        this.isAutoReportRead = true,
       this.faceURIPrefix,
       this.faceURISuffix,
-      this.textHight = 1.0,
+      this.textHeight = 1.3,
       this.isAtWhenReply = true,
       this.notificationAndroidSound = "",
       this.isSupportMarkdownForTextMessage = false,
@@ -155,6 +192,7 @@ class TIMUIKitChatConfig {
       this.isUseMessageReaction = true,
       this.isShowAvatar = true,
       this.isShowSelfNameInGroup = false,
+      this.offlinePushInfo,
       @Deprecated("Please use [isShowGroupReadingStatus] instead")
           this.isShowGroupMessageReadReceipt = true,
       this.upperRecallTime = 120,
@@ -171,10 +209,15 @@ class TIMUIKitChatConfig {
       this.isAllowEmojiPanel = true,
       this.isAllowShowMorePanel = true,
       this.isShowReadingStatus = true,
+      this.desktopControlBarConfig,
       this.isAllowLongPressMessage = true,
       this.isAllowClickAvatar = true,
+        this.isEnableTextSelection,
+      this.additionalDesktopMessageHoverBarItem,
       this.isShowGroupReadingStatus = true,
       this.isReportGroupReadingStatus = true,
-      this.showC2cMessageEditStaus = true,
+      this.showC2cMessageEditStatus = true,
+      this.additionalDesktopControlBarItems,
+      this.isAllowLongPressAvatarToAt = true,
       this.isUseDefaultEmoji = false});
 }

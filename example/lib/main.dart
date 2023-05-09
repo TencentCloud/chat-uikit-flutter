@@ -4,10 +4,8 @@ import 'package:example/GenerateUserSig.dart';
 import 'package:example/TIMUIKitChatExample.dart';
 import 'package:example/TIMUIKitConversationExample.dart';
 import 'package:example/TIMUIKitProfileExample.dart';
-import 'package:example/config/config.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-
 import 'TIMUIKitAddFriendExample.dart';
 import 'TIMUIKitAddGroupExample.dart';
 import 'TIMUIKitBlackListExample.dart';
@@ -41,7 +39,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Tencent IM UIKit'),
+      home: const MyHomePage(title: 'Tencent Cloud Chat UIKit'),
     );
   }
 }
@@ -65,24 +63,15 @@ class _MyHomePageState extends State<MyHomePage> {
   CoreServicesImpl timCoreInstance = TIMUIKitCore.getInstance();
 
   int getSDKAPPID() {
-    return const int.fromEnvironment(
-      'SDK_APPID',
-      defaultValue: IMConfig.imSDKAppId,
-    );
+    return const int.fromEnvironment('SDK_APPID', defaultValue: 0);
   }
 
   String getUserID() {
-    return const String.fromEnvironment(
-      'LOGINUSERID',
-      defaultValue: IMConfig.imLoginUserId,
-    );
+    return const String.fromEnvironment('LOGINUSERID', defaultValue: "10045363");
   }
 
   String getSecret() {
-    return const String.fromEnvironment(
-      'SECRET',
-      defaultValue: IMConfig.imSDKSecret,
-    );
+    return const String.fromEnvironment('SECRET', defaultValue: "");
   }
 
   initTIMUIKIT() async {

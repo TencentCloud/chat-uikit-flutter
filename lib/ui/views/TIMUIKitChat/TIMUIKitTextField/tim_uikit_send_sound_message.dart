@@ -129,7 +129,7 @@ class _SendSoundMessageState extends TIMUIKitState<SendSoundMessage> {
           ),
         );
       });
-      Overlay.of(context)!.insert(overlayEntry!);
+      Overlay.of(context)?.insert(overlayEntry!);
     }
   }
 

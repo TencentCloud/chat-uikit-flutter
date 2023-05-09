@@ -39,7 +39,8 @@ class GroupProfileGroupSearch extends TIMUIKitStatelessWidget {
         }
       },
       child: Container(
-        padding: const EdgeInsets.only(top: 12, left: 16, bottom: 12),
+        padding: const EdgeInsets.symmetric(
+            vertical: 14, horizontal: 16),
         decoration: BoxDecoration(
             color: Colors.white,
             border: Border(
