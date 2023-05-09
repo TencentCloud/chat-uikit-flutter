@@ -35,12 +35,16 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   tencent_cloud_chat_uikit:
-    path: ../../tim_ui_kit
+    path: ../
   tencent_im_sdk_plugin_web: ^0.3.9
   archive: ^3.3.0
   tencent_im_sdk_plugin_desktop: ^0.1.13
+  tencent_calls_uikit: 1.5.4
+  tencent_calls_engine: 1.5.4
 
-# dependency_overrides:
+dependency_overrides:
+  package_info_plus: ^3.0.3
+  collection: ^1.17.1
 #   tencent_cloud_chat_sdk:
 #     path: /Users/wangrunlin/Documents/GitHub/im-flutter-plugin/tencent_im_sdk_plugin
 #   tencent_im_sdk_plugin_desktop:
