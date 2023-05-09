@@ -9,7 +9,7 @@ import audioplayers_darwin
 import desktop_drop
 import device_info_plus_macos
 import fc_native_video_thumbnail_for_us
-import package_info_plus_macos
+import package_info_plus
 import pasteboard
 import path_provider_foundation
 import photo_manager
