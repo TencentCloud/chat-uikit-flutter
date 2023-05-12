@@ -24,7 +24,8 @@ class TIMUIKitContact extends StatefulWidget {
   final List<BottomListItem>? bottomList;
 
   /// the builder for the list on top
-  final Widget? Function(BottomListItem item)? bottomListItemBuilder;
+  final Widget? Function(BottomListItem item, int friendCount)?
+      bottomListItemBuilder;
 
   /// The widget shows when no contacts exists.
   final Widget Function(BuildContext context)? emptyBuilder;
