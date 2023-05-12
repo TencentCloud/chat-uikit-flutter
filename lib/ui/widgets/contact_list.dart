@@ -72,10 +72,10 @@ class ContactList extends StatefulWidget {
     this.groupMemberList,
     this.emptyBuilder,
     this.currentItem,
-    this.bottomList,
-    this.bottomListItemBuilder,
     this.cusItemBuilder,
     this.cusAvatarBuilder,
+    this.bottomList,
+    this.bottomListItemBuilder,
   }) : super(key: key);
 
   @override

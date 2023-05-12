@@ -20,6 +20,14 @@ class TIMUIKitContact extends StatefulWidget {
   /// the builder for the list on top
   final Widget? Function(TopListItem item)? topListItemBuilder;
 
+  // 自定义好友 itembuilder
+  final Widget? Function(BuildContext context, V2TimFriendInfo user)?
+      cusItemBuilder;
+
+  // 自定义好友头像
+  final Widget? Function(BuildContext context, V2TimFriendInfo user)?
+      cusAvatarBuilder;
+
   /// the list on bottom
   final List<BottomListItem>? bottomList;
 
@@ -42,10 +50,12 @@ class TIMUIKitContact extends StatefulWidget {
     this.lifeCycle,
     this.topList,
     this.topListItemBuilder,
-    this.bottomList,
-    this.bottomListItemBuilder,
     this.emptyBuilder,
     this.isShowOnlineStatus = true,
+    this.cusAvatarBuilder,
+    this.cusItemBuilder,
+    this.bottomList,
+    this.bottomListItemBuilder,
   }) : super(key: key);
 
   @override
@@ -93,6 +103,8 @@ class _TIMUIKitContactState extends TIMUIKitState<TIMUIKitContact> {
             bgColor: isDesktopScreen ? theme.wideBackgroundColor : null,
             topList: widget.topList,
             topListItemBuilder: widget.topListItemBuilder,
+            cusItemBuilder: widget.cusItemBuilder,
+            cusAvatarBuilder: widget.cusAvatarBuilder,
             bottomList: widget.bottomList,
             bottomListItemBuilder: widget.bottomListItemBuilder,
           );
