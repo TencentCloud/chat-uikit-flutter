@@ -41,7 +41,8 @@ class ContactList extends StatefulWidget {
   final List<BottomListItem>? bottomList;
 
   /// 底部列表项构造器
-  final Widget? Function(BottomListItem item)? bottomListItemBuilder;
+  final Widget? Function(BottomListItem item, int friendCount)?
+      bottomListItemBuilder;
 
   /// Control if shows the online status for each user on its avatar.
   final bool isShowOnlineStatus;
@@ -302,7 +303,12 @@ class _ContactListState extends TIMUIKitState<ContactList> {
           return generateTopItem(memberInfo);
         }
         if (memberInfo is BottomListItem) {
-          return widget.bottomListItemBuilder?.call(memberInfo) ??
+          return widget.bottomListItemBuilder?.call(
+                memberInfo,
+                showList.length -
+                    (widget.topList?.length ?? 0) -
+                    (widget.bottomList?.length ?? 0),
+              ) ??
               const SizedBox();
         }
 
