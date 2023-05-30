@@ -10,13 +10,16 @@ class LinkPreviewEntry {
   /// get the text message with hyperlinks
   static LinkPreviewText? getHyperlinksText(String messageText, bool isMarkdown,
       {Function(String)? onLinkTap,
-      bool? isEnableTextSelection,
+      bool isEnableTextSelection = false,
       bool isUseDefaultEmoji = false,
       List customEmojiStickerList = const []}) {
     return ({TextStyle? style}) {
       return isMarkdown
           ? LinkTextMarkdown(
-              messageText: messageText, style: style, onLinkTap: onLinkTap)
+              isEnableTextSelection: isEnableTextSelection,
+              messageText: replaceSingleNewlineWithTwo(messageText),
+              style: style,
+              onLinkTap: onLinkTap)
           : LinkText(
               isEnableTextSelection: isEnableTextSelection,
               messageText: messageText,
@@ -25,6 +28,13 @@ class LinkPreviewEntry {
               isUseDefaultEmoji: isUseDefaultEmoji,
               customEmojiStickerList: customEmojiStickerList);
     };
+  }
+
+  static String replaceSingleNewlineWithTwo(String inputText) {
+    return inputText.replaceAllMapped(
+      RegExp(r'(?<!\n)\n(?!\n)'),
+          (match) => '\n\n',
+    );
   }
 
   /// get the [LinkPreviewContent] with preview widget and website information for the first link.

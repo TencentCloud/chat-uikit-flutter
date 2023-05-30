@@ -74,19 +74,6 @@ Official Documentation</button></a>
 
 <br>
 
-## Preview Version Release Notes
-
-This version is a major update with version number 2.0.0-preview series, which is not backward
-compatible. Tencent Cloud Chat UIKit has been extended from mobile-only (iOS/Android/mobile web) to
-support all platforms, including iOS/Android/Web/Windows/macOS, resulting in significant changes to
-the codebase.
-
-Therefore, users should evaluate the compatibility complexity of their business logic before
-upgrading, while new users can use this version without any impact.
-
-The documentation for the new version is still being improved, and users can refer to the sample app
-source code at at https://github.com/TencentCloud/chat-demo-flutter.
-
 ## Check Out Our Sample Apps
 
 Experience our Chat and Voice/Video Call modules by trying out our sample apps.

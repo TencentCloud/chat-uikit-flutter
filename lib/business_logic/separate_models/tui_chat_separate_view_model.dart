@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 
 // ignore: unnecessary_import
 import 'package:flutter/foundation.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
@@ -30,6 +31,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
   final GroupServices _groupServices = serviceLocator<GroupServices>();
   final TUIChatGlobalModel globalModel = serviceLocator<TUIChatGlobalModel>();
   final TUIChatModelTools tools = serviceLocator<TUIChatModelTools>();
+  final TUISelfInfoViewModel selfModel = serviceLocator<TUISelfInfoViewModel>();
   final _uuid = const Uuid();
 
   ChatLifeCycle? lifeCycle;
@@ -57,6 +59,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
   V2TimGroupInfo? _groupInfo;
   String groupMemberListSeq = "0";
   List<V2TimGroupMemberFullInfo?>? groupMemberList = [];
+  V2TimGroupMemberFullInfo? selfMemberInfo;
   double atPositionX = 0.0;
   double atPositionY = 0.0;
   int _activeAtIndex = -1;
@@ -191,6 +194,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
       isGroupExist = true;
       _groupInfo = null;
       groupMemberList?.clear();
+      selfMemberInfo = null;
       notifyListeners();
     }
     if (conversationType == ConvType.c2c) {
@@ -216,7 +220,6 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
         }
       }
     }
-    markMessageAsRead();
     globalModel.lifeCycle = lifeCycle;
     globalModel.setCurrentConversation(
         CurrentConversation(conversationID, conversationType ?? ConvType.c2c));
@@ -225,6 +228,9 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     globalModel.setChatConfig(chatConfig);
     globalModel.clearRecivedNewMessageCount();
     _isInit = true;
+    Future.delayed(const Duration(milliseconds: 300), (){
+      markMessageAsRead();
+    });
   }
 
   Future<bool> loadListForSpecificMessage({
@@ -504,6 +510,8 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
       return await loadGroupMemberList(
           groupID: groupID, count: count, seq: nextSeq);
     } else {
+      selfMemberInfo = groupMemberList
+          ?.firstWhere((e) => e?.userID == selfModel.loginInfo?.userID);
       notifyListeners();
     }
   }
@@ -575,6 +583,11 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     V2TimMessage? messageInfo,
     OfflinePushInfo? offlinePushInfo,
     bool? onlineUserOnly = false,
+    MessagePriorityEnum priority = MessagePriorityEnum.V2TIM_PRIORITY_NORMAL,
+    bool? isExcludedFromUnreadCount,
+    bool? needReadReceipt,
+    String? cloudCustomData,
+    String? localCustomData,
     bool? isEditStatusMessage = false,
   }) async {
     String receiver = convType == ConvType.c2c ? convID : '';
@@ -586,27 +599,32 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
       setLoadingMessageMap(convID, messageInfo);
     }
     final sendMsgRes = await _messageService.sendMessage(
+      priority: priority,
+      localCustomData: localCustomData,
+      isExcludedFromUnreadCount: isExcludedFromUnreadCount ?? false,
       id: id,
       receiver: receiver,
-      needReadReceipt: chatConfig.isShowGroupReadingStatus &&
-          convType == ConvType.group &&
-          ((chatConfig.groupReadReceiptPermissionList != null &&
-                  chatConfig.groupReadReceiptPermissionList!
-                      .contains(_groupType)) ||
-              (chatConfig.groupReadReceiptPermisionList != null &&
-                  chatConfig.groupReadReceiptPermisionList!
-                      .contains(oldGroupType))),
+      needReadReceipt: needReadReceipt ??
+          chatConfig.isShowGroupReadingStatus &&
+              convType == ConvType.group &&
+              ((chatConfig.groupReadReceiptPermissionList != null &&
+                      chatConfig.groupReadReceiptPermissionList!
+                          .contains(_groupType)) ||
+                  (chatConfig.groupReadReceiptPermisionList != null &&
+                      chatConfig.groupReadReceiptPermisionList!
+                          .contains(oldGroupType))),
       groupID: groupID,
       offlinePushInfo: offlinePushInfo,
       onlineUserOnly: onlineUserOnly ?? false,
-      cloudCustomData: showC2cMessageEditStatus == true
-          ? json.encode({
-              "messageFeature": {
-                "needTyping": 1,
-                "version": 1,
-              }
-            })
-          : "",
+      cloudCustomData: cloudCustomData ??
+          (showC2cMessageEditStatus == true
+              ? json.encode({
+                  "messageFeature": {
+                    "needTyping": 1,
+                    "version": 1,
+                  }
+                })
+              : ""),
     );
     if (isEditStatusMessage == false &&
         globalModel.getMessageListPosition(conversationID) !=
@@ -916,6 +934,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
 
   Future<V2TimValueCallback<V2TimMessage>?> sendImageMessage(
       {String? imagePath,
+      String? imageName,
       required String convID,
       dynamic inputElement,
       required ConvType convType}) async {
@@ -939,7 +958,9 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
       } catch (e) {}
     }
     final imageMessageInfo = await _messageService.createImageMessage(
-        imagePath: image ?? imagePath, inputElement: inputElement);
+        imageName: imageName,
+        imagePath: image ?? imagePath,
+        inputElement: inputElement);
     List<V2TimMessage> currentHistoryMsgList = getOriginMessageList();
     final messageInfo = imageMessageInfo!.messageInfo;
     if (messageInfo != null) {
@@ -1334,6 +1355,12 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
 
     /// Offline push info
     OfflinePushInfo? offlinePushInfo,
+    MessagePriorityEnum priority = MessagePriorityEnum.V2TIM_PRIORITY_NORMAL,
+    bool? onlineUserOnly,
+    bool? isExcludedFromUnreadCount,
+    bool? needReadReceipt,
+    String? cloudCustomData,
+    String? localCustomData,
   }) {
     List<V2TimMessage> currentHistoryMsgList = getOriginMessageList();
     if (messageInfo != null) {
@@ -1351,6 +1378,12 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
       }
 
       return _sendMessage(
+        priority: priority,
+        onlineUserOnly: onlineUserOnly,
+        isExcludedFromUnreadCount: isExcludedFromUnreadCount,
+        needReadReceipt: needReadReceipt,
+        cloudCustomData: cloudCustomData,
+        localCustomData: localCustomData,
         convID: conversationID,
         id: messageInfo.id as String,
         convType: conversationType ?? ConvType.c2c,

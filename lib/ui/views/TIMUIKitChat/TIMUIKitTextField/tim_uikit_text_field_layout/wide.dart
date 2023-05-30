@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:fc_native_video_thumbnail_for_us/fc_native_video_thumbnail_for_us.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:path/path.dart' as p;
@@ -26,7 +27,7 @@ import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_emoji_panel.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/drag_widget.dart';
-import 'package:tencent_extended_text_field/extended_text_field.dart';
+import 'package:extended_text_field/extended_text_field.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
@@ -39,6 +40,7 @@ class DesktopControlBarItem {
   final String item;
   final IconData? icon;
   final String? imgPath;
+  final String? svgPath;
   final Color? color;
   final ValueChanged<Offset?> onClick;
   final String? showName;
@@ -49,10 +51,13 @@ class DesktopControlBarItem {
       this.icon,
       this.color,
       this.imgPath,
+      this.svgPath,
       required this.onClick,
       this.showName,
       this.size})
-      : assert(icon != null || imgPath != null);
+      : assert(icon != null ||
+            TencentUtils.checkString(imgPath) != null ||
+            TencentUtils.checkString(svgPath) != null);
 }
 
 class DesktopControlBarConfig {
@@ -81,7 +86,7 @@ class TIMUIKitTextFieldLayoutWide extends StatefulWidget {
   final Function(String, bool) handleSendEditStatus;
   final VoidCallback backSpaceText;
   final ValueChanged<String> addStickerToText;
-
+  final TUITheme theme;
   final ValueChanged<String> handleAtText;
 
   /// Whether to use the default emoji
@@ -125,8 +130,6 @@ class TIMUIKitTextFieldLayoutWide extends StatefulWidget {
   /// show send audio icon
   final bool showSendAudio;
 
-  final VoidCallback handleSoftKeyBoardDelete;
-
   /// on text changed
   final void Function(String)? onChanged;
 
@@ -168,7 +171,6 @@ class TIMUIKitTextFieldLayoutWide extends StatefulWidget {
       this.onChanged,
       required this.handleSendEditStatus,
       required this.handleAtText,
-      required this.handleSoftKeyBoardDelete,
       this.repliedMessage,
       this.forbiddenText,
       required this.onSubmitted,
@@ -179,7 +181,8 @@ class TIMUIKitTextFieldLayoutWide extends StatefulWidget {
       this.hintText,
       required this.customEmojiStickerList,
       this.controller,
-      required this.currentConversation})
+      required this.currentConversation,
+      required this.theme})
       : super(key: key);
 
   @override
@@ -199,6 +202,7 @@ class _TIMUIKitTextFieldLayoutWideState
   double? bottomPadding;
   late ScrollController _scrollController;
   late FocusNode textFocusNode;
+  late List<DesktopControlBarItem> defaultControlBarItems;
 
   @override
   void initState() {
@@ -214,6 +218,27 @@ class _TIMUIKitTextFieldLayoutWideState
     textFocusNode = FocusNode();
     widget.focusNode.requestFocus();
     _scrollController = ScrollController();
+    try {
+      if (PlatformUtils().isWeb) {
+        html.window.addEventListener('paste', (event) {
+          _handlePaste(event as html.ClipboardEvent);
+        });
+      }
+    } catch (e) {
+      print(e);
+    }
+    generateDefaultControlBarItems();
+  }
+
+  Future<void> _handlePaste(html.ClipboardEvent event) async {
+    try {
+      if (event.clipboardData!.files!.isNotEmpty) {
+        html.File imageFile = event.clipboardData!.files![0];
+        sendFileUseJs(imageFile);
+      }
+    } catch (e) {
+      print("Paste image failed: ${e.toString()}");
+    }
   }
 
   hideAllPanel() {
@@ -324,6 +349,8 @@ class _TIMUIKitTextFieldLayoutWideState
                         addText: (int unicode) {
                           final newText = String.fromCharCode(unicode);
                           widget.addStickerToText(newText);
+                          entry?.remove();
+                          entry = null;
                         },
                         addCustomEmojiText: ((String singleEmojiName) {
                           String? emojiName = singleEmojiName.split('.png')[0];
@@ -335,6 +362,8 @@ class _TIMUIKitTextFieldLayoutWideState
                           }
                           final newText = '[$emojiName]';
                           widget.addStickerToText(newText);
+                          entry?.remove();
+                          entry = null;
                         }),
                         defaultCustomEmojiStickerList:
                             widget.isUseDefaultEmoji ? ConstData.emojiList : [])
@@ -349,7 +378,7 @@ class _TIMUIKitTextFieldLayoutWideState
               ),
             ));
       });
-      Overlay.of(context)?.insert(entry!);
+      Overlay.of(context).insert(entry!);
     }
   }
 
@@ -363,12 +392,12 @@ class _TIMUIKitTextFieldLayoutWideState
           color: const Color(0x7F000000),
         );
       });
-      Overlay.of(context)?.insert(entry!);
+      Overlay.of(context).insert(entry!);
     }
   }
 
   _removeOverlay() {
-    entry!.remove();
+    entry?.remove();
     entry = null;
   }
 
@@ -399,20 +428,19 @@ class _TIMUIKitTextFieldLayoutWideState
                   convID: convID,
                   convType: convType),
               context);
-          return;
+        } else {
+          File file = File(result.files.single.path!);
+          final int size = file.lengthSync();
+          final String savePath = file.path;
+
+          MessageUtils.handleMessageError(
+              model.sendFileMessage(
+                  filePath: savePath,
+                  size: size,
+                  convID: convID,
+                  convType: convType),
+              context);
         }
-
-        File file = File(result.files.single.path!);
-        final int size = file.lengthSync();
-        final String savePath = file.path;
-
-        MessageUtils.handleMessageError(
-            model.sendFileMessage(
-                filePath: savePath,
-                size: size,
-                convID: convID,
-                convType: convType),
-            context);
       } else {
         throw TypeError();
       }
@@ -424,10 +452,11 @@ class _TIMUIKitTextFieldLayoutWideState
 
   List<Widget> generateBarIcons(
       List<DesktopControlBarItem> items, TUITheme theme) {
+    final defaultItems = defaultControlBarItems.map((e) => e.item);
     return items.map((e) {
       final GlobalKey key = GlobalKey();
       return Container(
-        margin: const EdgeInsets.only(right: 6),
+        margin: const EdgeInsets.only(right: 10),
         child: InkWell(
           onTap: () {
             final alignBox =
@@ -445,20 +474,39 @@ class _TIMUIKitTextFieldLayoutWideState
             textStyle: TextStyle(fontSize: 12, color: theme.white),
             message: e.showName,
             child: Container(
-                decoration:
-                    BoxDecoration(borderRadius: BorderRadius.circular(2)),
-                padding: const EdgeInsets.all(4),
-                child: e.imgPath != null
-                    ? Image.asset(
-                        e.imgPath!,
-                        key: key,
-                        width: e.size ?? 20,
-                        height: e.size ?? 20,
-                      )
-                    : Icon(e.icon,
-                        key: key,
-                        color: e.color ?? hexToColor("646a73"),
-                        size: e.size ?? 20)),
+              decoration: BoxDecoration(borderRadius: BorderRadius.circular(2)),
+              padding: const EdgeInsets.all(4),
+              child: () {
+                if (TencentUtils.checkString(e.svgPath) != null) {
+                  return SvgPicture.asset(
+                    e.svgPath!,
+                    package: defaultItems.contains(e.item)
+                        ? 'tencent_cloud_chat_uikit'
+                        : null,
+                    key: key,
+                    width: e.size ?? 16,
+                    height: e.size ?? 16,
+                  );
+                }
+                if (TencentUtils.checkString(e.imgPath) != null) {
+                  return Image.asset(
+                    e.imgPath!,
+                    package: defaultItems.contains(e.item)
+                        ? 'tencent_cloud_chat_uikit'
+                        : null,
+                    key: key,
+                    width: e.size ?? 16,
+                    height: e.size ?? 16,
+                  );
+                }
+                return Icon(
+                  e.icon,
+                  key: key,
+                  color: e.color ?? hexToColor("646a73"),
+                  size: e.size ?? 20,
+                );
+              }(),
+            ),
           ),
         ),
       );
@@ -658,10 +706,11 @@ class _TIMUIKitTextFieldLayoutWideState
     }
   }
 
-  _sendImageWithConfirmation(String file) async {
+  _sendImageWithConfirmation(
+      {String? fileName, Size? fileSize, required String filePath}) async {
     final option1 = widget.currentConversation.showName ??
         (widget.conversationType == ConvType.group ? TIM_t("群聊") : TIM_t("对方"));
-    final size = await ScreenshotHelper.getImageSize(file);
+    final size = fileSize ?? await ScreenshotHelper.getImageSize(filePath);
 
     TUIKitWidePopup.showPopupWindow(
         operationKey: TUIKitWideModalOperationKey.beforeSendScreenShot,
@@ -679,12 +728,19 @@ class _TIMUIKitTextFieldLayoutWideState
                     height: min(360, size.height / 2),
                     child: InkWell(
                       onTap: () {
-                        launchUrl(Uri.file(file));
+                        launchUrl(PlatformUtils().isWeb
+                            ? Uri.parse(filePath)
+                            : Uri.file(filePath));
                       },
-                      child: Image.file(
-                        File(file),
-                        height: min(360, size.height / 2),
-                      ),
+                      child: PlatformUtils().isWeb
+                          ? Image.network(
+                              filePath,
+                              height: min(360, size.height / 2),
+                            )
+                          : Image.file(
+                              File(filePath),
+                              height: min(360, size.height / 2),
+                            ),
                     ),
                   ),
                   Row(
@@ -703,7 +759,8 @@ class _TIMUIKitTextFieldLayoutWideState
                           onPressed: () {
                             MessageUtils.handleMessageError(
                                 widget.model.sendImageMessage(
-                                    imagePath: file,
+                                    imagePath: filePath,
+                                    imageName: fileName,
                                     convID: widget.conversationID,
                                     convType: widget.conversationType),
                                 context);
@@ -720,12 +777,11 @@ class _TIMUIKitTextFieldLayoutWideState
   _sendScreenShot() async {
     final file = await ScreenshotHelper.captureScreen();
     if (file != null) {
-      _sendImageWithConfirmation(file);
+      _sendImageWithConfirmation(filePath: file);
     } else {}
   }
 
-  List<Widget> generateControlBar(
-      TUIChatSeparateViewModel model, TUITheme theme) {
+  generateDefaultControlBarItems() {
     final DesktopControlBarConfig config =
         widget.model.chatConfig.desktopControlBarConfig ??
             DesktopControlBarConfig();
@@ -735,9 +791,9 @@ class _TIMUIKitTextFieldLayoutWideState
             item: "face",
             showName: TIM_t("表情"),
             onClick: (offset) {
-              _sendEmoji(offset, theme);
+              _sendEmoji(offset, widget.theme);
             },
-            icon: Icons.mood),
+            svgPath: "images/svg/send_face.svg"),
       if (config.showScreenshotButton && PlatformUtils().isDesktop)
         DesktopControlBarItem(
             item: "screenShot",
@@ -745,15 +801,15 @@ class _TIMUIKitTextFieldLayoutWideState
             onClick: (offset) {
               _sendScreenShot();
             },
-            icon: Icons.cut_outlined),
+            svgPath: "images/svg/send_screenshot.svg"),
       if (config.showSendFileButton)
         DesktopControlBarItem(
             item: "file",
             showName: TIM_t("文件"),
             onClick: (offset) {
-              _sendFile(widget.model, theme);
+              _sendFile(widget.model, widget.theme);
             },
-            icon: Icons.file_copy_outlined),
+            svgPath: "images/svg/send_file.svg"),
       if (config.showSendImageButton)
         DesktopControlBarItem(
             item: "photo",
@@ -762,10 +818,10 @@ class _TIMUIKitTextFieldLayoutWideState
               if (PlatformUtils().isWeb) {
                 _sendImageFileOnWeb(widget.model);
               } else {
-                _sendMediaMessage(widget.model, theme, FileType.image);
+                _sendMediaMessage(widget.model, widget.theme, FileType.image);
               }
             },
-            icon: Icons.image_outlined),
+            svgPath: "images/svg/send_image.svg"),
       if (config.showSendVideoButton)
         DesktopControlBarItem(
             item: "video",
@@ -774,10 +830,10 @@ class _TIMUIKitTextFieldLayoutWideState
               if (PlatformUtils().isWeb) {
                 _sendVideoFileOnWeb(widget.model);
               } else {
-                _sendMediaMessage(widget.model, theme, FileType.video);
+                _sendMediaMessage(widget.model, widget.theme, FileType.video);
               }
             },
-            icon: Icons.video_library_outlined),
+            svgPath: "images/svg/send_video.svg"),
       if (config.showMessageHistoryButton)
         DesktopControlBarItem(
             item: "history",
@@ -801,19 +857,41 @@ class _TIMUIKitTextFieldLayoutWideState
                         onTapConversation: (V2TimConversation conversation,
                             V2TimMessage? message) {},
                       ),
-                  theme: theme);
+                  theme: widget.theme);
             },
-            icon: Icons.chat_outlined),
+            svgPath: "images/svg/message_history.svg"),
+    ];
+    defaultControlBarItems = itemsList;
+  }
+
+  List<Widget> generateControlBar(
+      TUIChatSeparateViewModel model, TUITheme theme) {
+    final List<DesktopControlBarItem> itemsList = [
+      ...defaultControlBarItems,
       ...(widget.model.chatConfig.additionalDesktopControlBarItems ?? [])
     ];
 
     return generateBarIcons(itemsList, theme);
   }
 
+  sendFileUseJs(html.File file) {
+    final mimeType = file.type.split('/');
+    final type = mimeType[0];
+    final blobUrl = html.Url.createObjectUrl(file);
+    if (type == 'image') {
+      _sendImageWithConfirmation(
+          filePath: blobUrl,
+          fileName: file.name,
+          fileSize: const Size(500, 500));
+    }
+  }
+
   Future<void> _handleKeyEvent(RawKeyEvent event) async {
-    if ((event.isKeyPressed(LogicalKeyboardKey.controlLeft) &&
-            event.logicalKey == LogicalKeyboardKey.keyV) ||
-        (event.isMetaPressed && event.logicalKey == LogicalKeyboardKey.keyV)) {
+    if (PlatformUtils().isDesktop &&
+        ((event.isKeyPressed(LogicalKeyboardKey.controlLeft) &&
+                event.logicalKey == LogicalKeyboardKey.keyV) ||
+            (event.isMetaPressed &&
+                event.logicalKey == LogicalKeyboardKey.keyV))) {
       final bytes = await Pasteboard.image;
       if (bytes != null) {
         String directory;
@@ -838,7 +916,7 @@ class _TIMUIKitTextFieldLayoutWideState
           await scDirectory.create(recursive: true);
         }
         await file.writeAsBytes(bytes.toList());
-        _sendImageWithConfirmation(filePath);
+        _sendImageWithConfirmation(filePath: filePath);
       }
     }
   }
@@ -857,10 +935,6 @@ class _TIMUIKitTextFieldLayoutWideState
       }
       widget.handleAtText(value);
       widget.handleSendEditStatus(value, true);
-      final isEmpty = value.isEmpty;
-      if (isEmpty) {
-        widget.handleSoftKeyBoardDelete();
-      }
     }, const Duration(milliseconds: 80));
 
     final MediaQueryData data = MediaQuery.of(context);
@@ -873,7 +947,7 @@ class _TIMUIKitTextFieldLayoutWideState
         focusNode: textFocusNode,
         onKey: _handleKeyEvent,
         child: Container(
-          color: widget.backgroundColor,
+          color: widget.backgroundColor ?? theme.desktopChatMessageInputBgColor,
           child: Column(
             children: [
               SizedBox(
@@ -899,7 +973,8 @@ class _TIMUIKitTextFieldLayoutWideState
                       Expanded(
                           child: Container(
                         height: 35,
-                        color: theme.weakBackgroundColor,
+                        color: widget.backgroundColor ??
+                            theme.desktopChatMessageInputBgColor,
                         alignment: Alignment.center,
                         child: Text(
                           TIM_t(widget.forbiddenText!),
@@ -913,45 +988,43 @@ class _TIMUIKitTextFieldLayoutWideState
                       )),
                     if (widget.forbiddenText == null)
                       Expanded(
-                        child: Scrollbar(
-                          controller: _scrollController,
-                          child: ExtendedTextField(
-                              autofocus: true,
-                              maxLines: 6,
-                              minLines: 6,
-                              focusNode: widget.focusNode,
-                              onChanged: debounceFunc,
-                              keyboardType: TextInputType.multiline,
-                              textInputAction: PlatformUtils().isAndroid
-                                  ? TextInputAction.newline
-                                  : TextInputAction.send,
-                              onEditingComplete: () {
-                                widget.onSubmitted();
-                              },
-                              textAlignVertical: TextAlignVertical.top,
-                              style: const TextStyle(fontSize: 14),
-                              decoration: InputDecoration(
-                                hoverColor: hexToColor("fafafa"),
-                                border: InputBorder.none,
-                                hintStyle: const TextStyle(
-                                  color: Color(0xffAEA4A3),
-                                ),
-                                fillColor: hexToColor("fafafa"),
-                                filled: true,
-                                isDense: true,
-                                hintText: widget.hintText ?? '',
+                        child: ExtendedTextField(
+                            scrollController: _scrollController,
+                            autofocus: true,
+                            maxLines: widget
+                                .model.chatConfig.desktopMessageInputFieldLines,
+                            minLines: widget
+                                .model.chatConfig.desktopMessageInputFieldLines,
+                            focusNode: widget.focusNode,
+                            onChanged: debounceFunc,
+                            keyboardType: TextInputType.multiline,
+                            onEditingComplete: () {
+                              //   // widget.onSubmitted();
+                            },
+                            textAlignVertical: TextAlignVertical.top,
+                            style: const TextStyle(fontSize: 14),
+                            decoration: InputDecoration(
+                              hoverColor: hexToColor("fafafa"),
+                              border: InputBorder.none,
+                              hintStyle: const TextStyle(
+                                color: Color(0xffAEA4A3),
                               ),
-                              controller: widget.textEditingController,
-                              specialTextSpanBuilder: PlatformUtils().isWeb
-                                  ? null
-                                  : DefaultSpecialTextSpanBuilder(
-                                      isUseDefaultEmoji:
-                                          widget.isUseDefaultEmoji,
-                                      customEmojiStickerList:
-                                          widget.customEmojiStickerList,
-                                      showAtBackground: true,
-                                    )),
-                        ),
+                              fillColor: widget.backgroundColor ??
+                                  theme.desktopChatMessageInputBgColor ??
+                                  hexToColor("fafafa"),
+                              filled: true,
+                              isDense: true,
+                              hintText: widget.hintText ?? '',
+                            ),
+                            controller: widget.textEditingController,
+                            specialTextSpanBuilder: PlatformUtils().isWeb
+                                ? null
+                                : DefaultSpecialTextSpanBuilder(
+                                    isUseDefaultEmoji: widget.isUseDefaultEmoji,
+                                    customEmojiStickerList:
+                                        widget.customEmojiStickerList,
+                                    showAtBackground: true,
+                                  )),
                       ),
                   ],
                 ),

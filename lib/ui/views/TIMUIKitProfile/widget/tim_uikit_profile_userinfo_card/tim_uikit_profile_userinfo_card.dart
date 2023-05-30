@@ -27,6 +27,7 @@ class TIMUIKitProfileUserInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TUIKitScreenUtils.getDeviceWidget(
+      context: context,
       defaultWidget: TIMUIKitProfileUserInfoCardNarrow(
         userInfo: userInfo,
         isJumpToPersonalProfile: isJumpToPersonalProfile,

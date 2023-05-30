@@ -80,9 +80,8 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
                     changedInfo.userProfile?.userID) ??
                 "";
           }
-        // ignore: empty_catches
-        } catch (e) {
-        }
+          // ignore: empty_catches
+        } catch (e) {}
       },
     );
     if (_friendshipListener != null) {
@@ -103,9 +102,8 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
               setState(() {});
             }
           }
-        // ignore: empty_catches
-        } catch (e) {
-        }
+          // ignore: empty_catches
+        } catch (e) {}
       },
     );
     if (_groupListener != null) {
@@ -161,9 +159,8 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
               "";
         });
       }
-    // ignore: empty_catches
-    } catch (e) {
-    }
+      // ignore: empty_catches
+    } catch (e) {}
   }
 
   @override
@@ -193,7 +190,8 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
       titleTextStyle: setAppbar?.titleTextStyle,
       toolbarOpacity: setAppbar?.toolbarOpacity ?? 1.0,
       toolbarTextStyle: setAppbar?.toolbarTextStyle,
-      textTheme: setAppbar?.textTheme,
+
+      // textTheme: setAppbar?.textTheme,
       iconTheme: setAppbar?.iconTheme ??
           const IconThemeData(
             color: Colors.white,
@@ -201,10 +199,8 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
       title: TIMUIKitAppBarTitle(
         title: setAppbar?.title,
         onClick: widget.onClickTitle,
-        textStyle: setAppbar?.textTheme?.titleMedium ??
-            TextStyle(
-                color: theme.appbarTextColor ?? hexToColor("010000"),
-                fontSize: 16),
+        textStyle: TextStyle(
+            color: theme.appbarTextColor ?? hexToColor("010000"), fontSize: 16),
         conversationShowName: _conversationShowName,
         showC2cMessageEditStatus: widget.showC2cMessageEditStatus,
         fromUser: widget.conversationID,
@@ -222,12 +218,10 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
                     },
                     child: Text(
                       TIM_t('取消'),
-                      style: setAppbar?.textTheme?.titleMedium ??
-                          TextStyle(
-                            color:
-                                theme.appbarTextColor ?? hexToColor("010000"),
-                            fontSize: 16,
-                          ),
+                      style: TextStyle(
+                        color: theme.appbarTextColor ?? hexToColor("010000"),
+                        fontSize: 16,
+                      ),
                     ),
                   )
                 : setAppbar?.leading ??
@@ -240,10 +234,7 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
                                 constraints: const BoxConstraints(),
                                 icon: Icon(
                                   Icons.arrow_back_ios,
-                                  color: setAppbar
-                                          ?.textTheme?.titleMedium?.color ??
-                                      theme.appbarTextColor ??
-                                      hexToColor("010000"),
+                                  color: hexToColor("010000"),
                                   size: 17,
                                 ),
                                 onPressed: () async {

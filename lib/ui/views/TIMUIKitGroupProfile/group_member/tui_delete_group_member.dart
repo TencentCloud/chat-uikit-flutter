@@ -82,6 +82,7 @@ class _DeleteGroupMemberPageState extends TIMUIKitState<DeleteGroupMemberPage> {
     final TUITheme theme = value.theme;
 
     return TUIKitScreenUtils.getDeviceWidget(
+        context: context,
         desktopWidget: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: GroupProfileMemberList(

@@ -1,3 +1,55 @@
+## 2.1.0
+
+### Breaking Changes
+
+* Migrated to Flutter 3.10.0 and Dart 3.0.0, no longer supporting projects with Flutter < 3.10.0 and Dart < 3.0.0.
+* Updated the minimum requirement for Android AGP to 7.0, projects with AGP < 7.0 are no longer supported.
+
+We highly recommend updating to these new versions for a better experience.
+
+### New Features
+
+* Added several methods to `TIMUIKitChatController`, including `hideAllBottomPanelOnMobile`, `mentionOtherMemberInGroup`, `setInputTextField`, and `getGroupMemberList`. Please refer to the corresponding annotations for usage.
+* Added more parameter fields to the `TIMUIKitChatController`'s `sendMessage` method. For details, please refer to the corresponding annotations.
+* Added `onSecondaryTapAvatar` to `TIMUIKitChat`, serving as callback trigger for secondary avatar clicks in the message list.
+* Introduced `isUseMessageHoverBarOnDesktop` and `desktopMessageInputFieldLines` to `TIMUIKitChatConfig`. For usage details, please refer to the corresponding annotations.
+
+### Improvements
+
+* Enhanced performance and user experience when switching conversations on Desktop, including features like text field auto-focus and draft text.
+* Enabled displaying correct new lines in markdown mode.
+* Changed the order of members in the mentioned member selection panel: Group Owner => Group Administrator => Member, sorted based on the code units' first differing position in the member show names.
+* Implemented auto-focus after clicking a member in the mentioned member selection panel.
+* Added text field auto-focus when replying to a message.
+* Updated other members' display names in at-tag messages to use `namecard`, followed by `nickname` and `userId`.
+* Widened Desktop message input area's control bar.
+* Replaced the default icon in Desktop's message input area from `png` to `svg` for better performance and clarity. `DesktopControlBarConfig` now supports defining `svgPath` for each item as well.
+* Improved Web platform detection.
+* Mentioning "all" or "at all" can now only be used by group owners and administrators.
+* Supported returning null for each message item builder in `MessageItemBuilder` to use the default message widget.
+* Enhanced group members filtering in the group member mentioned selection panel with case-insensitive fuzzy matching, leading to increased filtering accuracy.
+* For security purposes, downloading files by `fetch` and `blob` in the Web now replaces previewing files in a new browser tab, whereas previewing images and videos is displayed in a new tab on the Web.
+* Changed the default order in the message tooltip menu.
+* Previewing images and videos is set to open in a new tab on the Web.
+* Improved the ratio for sending video messages.
+
+### Bug Fixes
+
+* Fixed issues when enabling the section function in markdown mode with `inEnableTextSelection` set to `true`.
+* Addressed an issue where the replied message was removed when selecting all text in the message and clicking backspace.
+* Fixed an issue where Chinese characters could not be entered while replying to a message.
+* Resolved some console errors during debugging.
+* Fixed an issue with links not opening in markdown mode.
+* Fixed an issue that caused two `Scrollbar`s to appear in the message input field on Desktop.
+* Solved an issue that might cause incorrect layout when the app is launched.
+* Addressed an issue where messages were directly sent when the Enter key was pressed while entering Chinese text.
+* Fixed related issues with the mentioned member selection panel on Desktop.
+* Resolved an issue where images couldn't be pasted directly into the message input area for sending on the Web.
+* Fixed an issue where files couldn't be sent on the Web.
+* Remedied an issue where media and files couldn't be opened when local downloaded resources were deleted; now, resources will automatically re-download.
+* Fixed an issue that caused the `iconImageAsset` of the `MessageToolTipItem` config to head internally to this chat UIKit.
+* Improved the downloading process of media and files by avoiding frequent calls to `setState`, thus preventing the entire project from re-rendering.
+
 ## 2.0.0
 
 If you are upgrading from version 1.7.0, please refer to the changelog of all 2.0.0-preview versions, ranging from preview.1 to preview.7.

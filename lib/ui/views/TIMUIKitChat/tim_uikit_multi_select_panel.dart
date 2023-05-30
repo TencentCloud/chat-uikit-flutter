@@ -64,6 +64,7 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
         Provider.of<TUIChatSeparateViewModel>(context);
 
     return TUIKitScreenUtils.getDeviceWidget(
+      context: context,
       desktopWidget: Container(
         decoration: BoxDecoration(
           color: theme.selectPanelBgColor ?? theme.primaryColor,

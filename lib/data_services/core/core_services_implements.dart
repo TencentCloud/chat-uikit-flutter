@@ -31,7 +31,7 @@ class LoginInfo {
       {this.sdkAppID = 0, this.userSig = "", this.userID = "", this.loginUser});
 }
 
-class CoreServicesImpl with CoreServices {
+class CoreServicesImpl implements CoreServices {
   V2TimUserFullInfo? _loginInfo;
   late int _sdkAppID;
   late String _userID;

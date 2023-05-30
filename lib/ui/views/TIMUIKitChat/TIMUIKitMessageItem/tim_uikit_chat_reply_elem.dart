@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
-import 'package:tencent_extended_text/extended_text.dart';
+import 'package:extended_text/extended_text.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
@@ -302,7 +302,7 @@ class _TIMUIKitReplyElemState extends TIMUIKitState<TIMUIKitReplyElem> {
         isUseDefaultEmoji: widget.isUseDefaultEmoji,
         customEmojiStickerList: widget.customEmojiStickerList,
         isEnableTextSelection:
-            widget.chatModel.chatConfig.isEnableTextSelection);
+            widget.chatModel.chatConfig.isEnableTextSelection ?? false);
     return Container(
       padding: widget.textPadding ?? EdgeInsets.all(isDesktopScreen ? 12 : 10),
       decoration: BoxDecoration(

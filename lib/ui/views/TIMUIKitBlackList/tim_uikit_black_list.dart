@@ -109,6 +109,7 @@ class _TIMUIKitBlackListState extends TIMUIKitState<TIMUIKitBlackList> {
     }
 
     return TUIKitScreenUtils.getDeviceWidget(
+        context: context,
         desktopWidget: itemWidget(),
         defaultWidget: Slidable(
           endActionPane: ActionPane(motion: const DrawerMotion(), children: [

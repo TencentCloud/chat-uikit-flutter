@@ -362,6 +362,7 @@ class _MessageReadReceiptState extends TIMUIKitState<MessageReadReceipt> {
     }
 
     return TUIKitScreenUtils.getDeviceWidget(
+        context: context,
         desktopWidget: pageBody(),
         defaultWidget: DefaultTabController(
           length: 2,

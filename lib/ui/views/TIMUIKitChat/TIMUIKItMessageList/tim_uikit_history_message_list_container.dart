@@ -51,7 +51,12 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
   /// conversation type
   final ConvType conversationType;
 
+  /// Avatar and name in message reaction tap callback.
   final void Function(String userID, TapDownDetails tapDetails)? onTapAvatar;
+
+  /// Avatar and name in message reaction secondary tap callback.
+  final void Function(String userID, TapDownDetails tapDetails)?
+      onSecondaryTapAvatar;
 
   @Deprecated(
       "Nickname will not show in one-to-one chat, if you tend to control it in group chat, please use `isShowSelfNameInGroup` and `isShowOthersNameInGroup` from `config: TIMUIKitChatConfig` instead")
@@ -85,8 +90,9 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
     this.extraTipsActionItemBuilder,
     this.isAllowScroll = true,
     this.onTapAvatar,
-    @Deprecated("Nickname will not show in one-to-one chat, if you tend to control it in group chat, please use `isShowSelfNameInGroup` and `isShowOthersNameInGroup` from `config: TIMUIKitChatConfig` instead")
-        this.showNickName = true,
+    @Deprecated(
+        "Nickname will not show in one-to-one chat, if you tend to control it in group chat, please use `isShowSelfNameInGroup` and `isShowOthersNameInGroup` from `config: TIMUIKitChatConfig` instead")
+    this.showNickName = true,
     this.initFindingMsg,
     this.mainHistoryListConfig,
     this.toolTipsConfig,
@@ -94,6 +100,7 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
     this.customEmojiStickerList = const [],
     this.textFieldController,
     required this.conversation,
+    this.onSecondaryTapAvatar,
   }) : super(key: key);
 
   @override
@@ -169,6 +176,7 @@ class _TIMUIKitHistoryMessageListContainerState
                             widget.extraTipsActionItemBuilder),
                 message: message!,
                 showAvatar: chatConfig.isShowAvatar,
+                onSecondaryTapForOthersPortrait: widget.onSecondaryTapAvatar,
                 onTapForOthersPortrait: widget.onTapAvatar,
                 messageItemBuilder: widget.messageItemBuilder,
                 onLongPressForOthersHeadPortrait:

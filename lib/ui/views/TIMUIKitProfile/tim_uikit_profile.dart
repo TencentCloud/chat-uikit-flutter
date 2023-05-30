@@ -76,11 +76,11 @@ class TIMUIKitProfile extends StatefulWidget {
   /// The life cycle hooks for user profile business logic
   final ProfileLifeCycle? lifeCycle;
 
-  /// If the loading user is self.
+  /// Whether the specify user is current logged in user.
   /// Default: [false].
   final bool isSelf;
 
-  /// Is use the small card mode on Desktop. Usually shows on the Chat page.
+  /// Whether use the small card mode on Desktop. Usually shows on the Chat page.
   final bool smallCardMode;
 
   const TIMUIKitProfile(

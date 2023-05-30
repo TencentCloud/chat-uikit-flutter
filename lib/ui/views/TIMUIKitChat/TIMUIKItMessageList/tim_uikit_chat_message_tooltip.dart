@@ -85,7 +85,10 @@ class TIMUIKitMessageTooltipState
   }
 
   hasFile() {
-    if (PlatformUtils().isMobile || widget.message.fileElem == null) {
+    if (PlatformUtils().isMobile ||
+        (widget.message.fileElem == null &&
+            widget.message.imageElem == null &&
+            widget.message.videoElem == null)) {
       isShowOpenFile = false;
       return;
     }
@@ -94,26 +97,44 @@ class TIMUIKitMessageTooltipState
       return;
     }
     if (PlatformUtils().isDesktop) {
-      if (globalModal.getMessageProgress(widget.message.msgID) == 100) {
-        String savePath =
-            TencentUtils.checkString(widget.message.fileElem!.localUrl) ??
-                globalModal.getFileMessageLocation(widget.message.msgID);
+      if (widget.message.fileElem != null) {
+        if (globalModal.getMessageProgress(widget.message.msgID) == 100) {
+          String savePath =
+              TencentUtils.checkString(widget.message.fileElem!.localUrl) ??
+                  globalModal.getFileMessageLocation(widget.message.msgID);
+          File f = File(savePath);
+          if (f.existsSync() && widget.message.msgID != null) {
+            filePath = savePath;
+            isShowOpenFile = true;
+            return;
+          }
+          isShowOpenFile = false;
+          return;
+        }
+        String savePath = widget.message.fileElem!.localUrl ?? '';
         File f = File(savePath);
         if (f.existsSync() && widget.message.msgID != null) {
           filePath = savePath;
+          globalModal.setMessageProgress(widget.message.msgID!, 100);
           isShowOpenFile = true;
           return;
         }
-        isShowOpenFile = false;
-        return;
-      }
-      String savePath = widget.message.fileElem!.localUrl ?? '';
-      File f = File(savePath);
-      if (f.existsSync() && widget.message.msgID != null) {
-        filePath = savePath;
-        globalModal.setMessageProgress(widget.message.msgID!, 100);
-        isShowOpenFile = true;
-        return;
+      } else if (widget.message.imageElem != null) {
+        if (TencentUtils.checkString(
+                    widget.message.imageElem!.imageList![0]!.localUrl) !=
+                null &&
+            File(widget.message.imageElem!.imageList![0]!.localUrl!)
+                .existsSync()) {
+          isShowOpenFile = true;
+          return;
+        }
+      } else if (widget.message.videoElem != null) {
+        if (TencentUtils.checkString(widget.message.videoElem!.localVideoUrl) !=
+                null &&
+            File(widget.message.videoElem!.localVideoUrl!).existsSync()) {
+          isShowOpenFile = true;
+          return;
+        }
       }
     }
     isShowOpenFile = false;
@@ -198,11 +219,6 @@ class TIMUIKitMessageTooltipState
             id: "forwardMessage",
             iconImageAsset: "images/forward_message.png",
             onClick: () => _onTap("forwardMessage", model)),
-      MessageToolTipItem(
-          label: TIM_t("多选"),
-          id: "multiSelect",
-          iconImageAsset: "images/multi_message.png",
-          onClick: () => _onTap("multiSelect", model)),
       if (shouldShowReplyAction)
         MessageToolTipItem(
             label: TIM_t(model.chatConfig.isAtWhenReply ? "回复" : "引用"),
@@ -210,15 +226,20 @@ class TIMUIKitMessageTooltipState
             iconImageAsset: "images/reply_message.png",
             onClick: () => _onTap("replyMessage", model)),
       MessageToolTipItem(
-          label: TIM_t("删除"),
-          id: "delete",
-          iconImageAsset: "images/delete_message.png",
-          onClick: () => _onTap("delete", model)),
+          label: TIM_t("多选"),
+          id: "multiSelect",
+          iconImageAsset: "images/multi_message.png",
+          onClick: () => _onTap("multiSelect", model)),
       MessageToolTipItem(
           label: TIM_t("翻译"),
           id: "translate",
           iconImageAsset: "images/translate.png",
           onClick: () => _onTap("translate", model)),
+      MessageToolTipItem(
+          label: TIM_t("删除"),
+          id: "delete",
+          iconImageAsset: "images/delete_message.png",
+          onClick: () => _onTap("delete", model)),
       if (shouldShowRevokeAction)
         MessageToolTipItem(
             label: TIM_t("撤回"),
@@ -226,6 +247,7 @@ class TIMUIKitMessageTooltipState
             iconImageAsset: "images/revoke_message.png",
             onClick: () => _onTap("revoke", model)),
     ];
+    final defaultTipsIds = defaultTipsList.map((e) => e.id);
     List<MessageToolTipItem> defaultFormattedTipsList = defaultTipsList;
     if (tooltipsConfig != null) {
       defaultFormattedTipsList = defaultTipsList.where((element) {
@@ -235,10 +257,14 @@ class TIMUIKitMessageTooltipState
               widget.message.elemType == MessageElemType.V2TIM_ELEM_TYPE_TEXT;
         }
         if (type == "forwardMessage") {
-          return tooltipsConfig.showForwardMessage && !isDesktopScreen;
+          return tooltipsConfig.showForwardMessage &&
+              !(isDesktopScreen &&
+                  widget.model.chatConfig.isUseMessageHoverBarOnDesktop);
         }
         if (type == "replyMessage") {
-          return tooltipsConfig.showReplyMessage && !isDesktopScreen;
+          return tooltipsConfig.showReplyMessage &&
+              !(isDesktopScreen &&
+                  widget.model.chatConfig.isUseMessageHoverBarOnDesktop);
         }
         if (type == "delete") {
           return (!PlatformUtils().isWeb) && tooltipsConfig.showDeleteMessage;
@@ -286,7 +312,9 @@ class TIMUIKitMessageTooltipState
                     children: [
                       Image.asset(
                         item.iconImageAsset,
-                        package: 'tencent_cloud_chat_uikit',
+                        package: defaultTipsIds.contains(item.id)
+                            ? 'tencent_cloud_chat_uikit'
+                            : null,
                         width: 20,
                         height: 20,
                       ),
@@ -353,37 +381,53 @@ class TIMUIKitMessageTooltipState
     return widgetList;
   }
 
+  _onOpenDesktop(String path) {
+    if (PlatformUtils().isDesktop) {
+      OpenFile.open(path);
+    } else {
+      launchUrl(
+        Uri.parse(path),
+        mode: LaunchMode.externalApplication,
+      );
+    }
+  }
+
   _onTap(String operation, TUIChatSeparateViewModel model) async {
     final messageItem = widget.message;
     final msgID = messageItem.msgID as String;
     switch (operation) {
       case "open":
-        if (PlatformUtils().isDesktop) {
-          final String savePath =
-              TencentUtils.checkString(widget.message.fileElem!.localUrl) ??
-                  globalModal.getFileMessageLocation(widget.message.msgID);
-          launchUrl(Uri.file(savePath));
-        } else {
-          if (PlatformUtils().isWindows) {
-            OpenFile.open(widget.message.fileElem?.path ?? "");
-          } else {
-            launchUrl(
-              Uri.parse(widget.message.fileElem?.path ?? ""),
-              mode: LaunchMode.externalApplication,
-            );
-          }
+        if (widget.message.fileElem != null) {
+          _onOpenDesktop(widget.message.fileElem!.localUrl ??
+              widget.message.fileElem?.path ??
+              "");
+        } else if (widget.message.imageElem != null) {
+          _onOpenDesktop(widget.message.imageElem!.imageList?[0]?.localUrl ??
+              widget.message.imageElem?.path ??
+              "");
+        } else if (widget.message.videoElem != null) {
+          _onOpenDesktop(widget.message.videoElem!.localVideoUrl ??
+              widget.message.videoElem?.videoPath ??
+              "");
         }
         break;
       case "finder":
-        final String savePath =
-            TencentUtils.checkString(widget.message.fileElem!.localUrl) ??
-                globalModal.getFileMessageLocation(widget.message.msgID);
-        final String fileDir = path.dirname(savePath);
-        if (PlatformUtils().isWindows) {
-          OpenFile.open(fileDir);
-        } else {
-          launchUrl(Uri.file(fileDir));
+        String savePath = "";
+        if (widget.message.fileElem != null) {
+          savePath = (widget.message.fileElem!.localUrl ??
+              widget.message.fileElem?.path ??
+              "");
+        } else if (widget.message.imageElem != null) {
+          savePath = (widget.message.imageElem!.imageList?[0]?.localUrl ??
+              widget.message.imageElem?.path ??
+              "");
+        } else if (widget.message.videoElem != null) {
+          savePath = (widget.message.videoElem!.localVideoUrl ??
+              widget.message.videoElem?.videoPath ??
+              "");
         }
+        final String fileDir = path.dirname(savePath);
+        _onOpenDesktop(fileDir);
         break;
       case "delete":
         model.deleteMsg(msgID, webMessageInstance: messageItem.messageFromWeb);
@@ -423,12 +467,18 @@ class TIMUIKitMessageTooltipState
         break;
       case "replyMessage":
         model.repliedMessage = widget.message;
-        if (widget.allowAtUserWhenReply &&
-            widget.onLongPressForOthersHeadPortrait != null &&
-            !(widget.message.isSelf ?? true)) {
-          widget.onLongPressForOthersHeadPortrait!(
-              widget.message.sender, widget.message.nickName);
-        }
+        final isSelf = widget.message.isSelf ?? true;
+        final isGroup =
+            TencentUtils.checkString(widget.message.groupID) != null;
+        final isAtWhenReply = !isSelf &&
+            isGroup &&
+            widget.allowAtUserWhenReply &&
+            widget.onLongPressForOthersHeadPortrait != null;
+
+        /// If replying to a self message, do not add a at tag, only requestFocus.
+        widget.onLongPressForOthersHeadPortrait!(
+            !isAtWhenReply ? null : widget.message.sender,
+            !isAtWhenReply ? null : widget.message.nickName);
         break;
       default:
         onTIMCallback(TIMCallback(

@@ -55,7 +55,7 @@ class _SendApplicationState extends TIMUIKitState<SendApplication> {
         "";
     final option2 = widget.friendInfo.selfSignature ?? "";
 
-    Widget sendApplicationBody(){
+    Widget sendApplicationBody() {
       return SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,7 +79,7 @@ class _SendApplicationState extends TIMUIKitState<SendApplication> {
                       Text(
                         showName,
                         style:
-                        TextStyle(color: theme.darkTextColor, fontSize: 18),
+                            TextStyle(color: theme.darkTextColor, fontSize: 18),
                       ),
                       const SizedBox(
                         height: 4,
@@ -87,17 +87,18 @@ class _SendApplicationState extends TIMUIKitState<SendApplication> {
                       Text(
                         "ID: $userID",
                         style:
-                        TextStyle(fontSize: 13, color: theme.weakTextColor),
+                            TextStyle(fontSize: 13, color: theme.weakTextColor),
                       ),
                       const SizedBox(
                         height: 4,
                       ),
-                      if(TencentUtils.checkString(option2) != null)Text(
-                        TIM_t_para("个性签名: {{option2}}", "个性签名: $option2")(
-                            option2: option2),
-                        style:
-                        TextStyle(fontSize: 13, color: theme.weakTextColor),
-                      ),
+                      if (TencentUtils.checkString(option2) != null)
+                        Text(
+                          TIM_t_para("个性签名: {{option2}}", "个性签名: $option2")(
+                              option2: option2),
+                          style: TextStyle(
+                              fontSize: 13, color: theme.weakTextColor),
+                        ),
                     ],
                   )
                 ],
@@ -168,19 +169,19 @@ class _SendApplicationState extends TIMUIKitState<SendApplication> {
               Container(
                 color: theme.white,
                 padding:
-                const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       TIM_t("分组"),
                       style:
-                      TextStyle(color: theme.darkTextColor, fontSize: 16),
+                          TextStyle(color: theme.darkTextColor, fontSize: 16),
                     ),
                     Text(
                       TIM_t("我的好友"),
                       style:
-                      TextStyle(color: theme.darkTextColor, fontSize: 16),
+                          TextStyle(color: theme.darkTextColor, fontSize: 16),
                     )
                   ],
                 ),
@@ -197,7 +198,7 @@ class _SendApplicationState extends TIMUIKitState<SendApplication> {
 
                     if (widget.lifeCycle?.shouldAddFriend != null &&
                         await widget.lifeCycle!.shouldAddFriend(userID, remark,
-                            friendGroup, addWording, context) ==
+                                friendGroup, addWording, context) ==
                             false) {
                       return;
                     }
@@ -234,25 +235,25 @@ class _SendApplicationState extends TIMUIKitState<SendApplication> {
     }
 
     return TUIKitScreenUtils.getDeviceWidget(
-      desktopWidget: Container(
-        padding: const EdgeInsets.only(top: 10),
-        color: theme.weakBackgroundColor,
-        child: sendApplicationBody(),
-      ),
+        context: context,
+        desktopWidget: Container(
+          padding: const EdgeInsets.only(top: 10),
+          color: theme.weakBackgroundColor,
+          child: sendApplicationBody(),
+        ),
         defaultWidget: Scaffold(
-      appBar: AppBar(
-        title: Text(
-          TIM_t("添加好友"),
-          style: TextStyle(color: theme.appbarTextColor, fontSize: 17),
-        ),
-        shadowColor: theme.white,
-        backgroundColor: theme.appbarBgColor ??
-            theme.primaryColor,
-        iconTheme: IconThemeData(
-          color: theme.appbarTextColor,
-        ),
-      ),
-      body: sendApplicationBody(),
-    ));
+          appBar: AppBar(
+            title: Text(
+              TIM_t("添加好友"),
+              style: TextStyle(color: theme.appbarTextColor, fontSize: 17),
+            ),
+            shadowColor: theme.white,
+            backgroundColor: theme.appbarBgColor ?? theme.primaryColor,
+            iconTheme: IconThemeData(
+              color: theme.appbarTextColor,
+            ),
+          ),
+          body: sendApplicationBody(),
+        ));
   }
 }

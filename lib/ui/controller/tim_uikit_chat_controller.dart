@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/cupertino.dart';
+import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
@@ -8,6 +9,8 @@ import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 class TIMUIKitChatController {
   late TUIChatSeparateViewModel? model;
+  late TIMUIKitInputTextFieldController? textFieldController;
+  late AutoScrollController? scrollController;
   final TUIChatGlobalModel globalChatModel =
       serviceLocator<TUIChatGlobalModel>();
 
@@ -35,13 +38,11 @@ class TIMUIKitChatController {
         false;
   }
 
-  /// clear the current conversation;
-  /// 销毁
+  /// Clear the current conversation;
   @Deprecated("No need to dispose after tencent_cloud_chat_uikit 0.1.4")
   dispose() {}
 
-  /// clear the history of current conversation;
-  /// 清除历史记录
+  /// Clear the history of current conversation;
   /// Please provide `convID`, if you use `TIMUIKitChatController` without specifying to a `TIMUIKitChat`.
   clearHistory([String? convID]) {
     if (convID != null) {
@@ -51,7 +52,6 @@ class TIMUIKitChatController {
   }
 
   /// refresh the history message list manually;
-  /// 手动刷新会话历史消息列表
   /// Please provide `convType` and `convID`, if you use `TIMUIKitChatController` without specifying to a `TIMUIKitChat`.
   Future<bool> refreshCurrentHistoryList(
       [String? convID, ConvType? convType]) async {
@@ -64,8 +64,7 @@ class TIMUIKitChatController {
     return false;
   }
 
-  /// update single message at UI model
-  /// 更新单条消息
+  /// Update single message at UI model
   /// Please provide `convID`, if you use `TIMUIKitChatController` without specifying to a `TIMUIKitChat`.
   Future<void> updateMessage(
       {
@@ -87,39 +86,72 @@ class TIMUIKitChatController {
   }
 
   /// Sends a message to the specified conversation, or to the current conversation specified on `TIMUIKitChat`.
-  /// 发送消息到指定的对话，或者发送到 `TIMUIKitChat` 中指定的当前对话。
   /// You must provide `convType` and either `userID` or `groupID`, only if you use `TIMUIKitChat` without specifying a `TIMUIKitChatController`, you must provide these parameters.
-  /// 您需要提供 `convType` 和 `userID` 或 `groupID`, 只有在如果您使用 `TIMUIKitChat` 而没有指定 `TIMUIKitChatController`，则必须提供这些参数。
   Future<V2TimValueCallback<V2TimMessage>?>? sendMessage({
     required V2TimMessage? messageInfo,
 
     /// The type of the target conversation: either ConvType.group or ConvType.c2c. Required if using `TIMUIKitChat` without specifying a `TIMUIKitChatController`.
-    /// 目标对话的类型：ConvType.group 或 ConvType.c2c。只有在如果您使用 `TIMUIKitChat` 而没有指定 `TIMUIKitChatController`，则必须提供此参数。
     ConvType? convType,
 
     /// The user ID of the target one-to-one conversation. Required if convType is ConvType.c2c.
-    /// 目标一对一对话的用户 ID。如果 convType 是 ConvType.c2c，则必填。
     String? userID,
 
     /// The target group ID. Required if convType is ConvType.group.
-    /// 目标群组的 ID。如果 convType 是 ConvType.group，则必填。
     String? groupID,
 
     /// A callback function to update the input field when message sending fails.
-    /// 当消息发送失败时，用于更新输入框的回调函数。
     ValueChanged<String>? setInputField,
 
     /// Offline push information.
-    /// 离线推送信息。
     OfflinePushInfo? offlinePushInfo,
+
+    /// Whether automatically scrolling to the bottom of the message list after sending a message.
+    /// This field solely works when `TIMUIKitChatController` is specified for use within a `TIMUIKitChat`.
+    bool isNavigateToMessageListBottom = true,
+
+    /// Message priorities. This field is valid only for group chat messages.
+    /// You are advised to set higher priorities for important messages (such as red packet and gift messages)
+    /// and set lower priorities for frequent but unimportant messages (such as like messages).
+    MessagePriorityEnum priority = MessagePriorityEnum.V2TIM_PRIORITY_NORMAL,
+
+    /// Whether the message can be received only by online users.
+    /// If this field is set to true, the message cannot be pulled in recipient historical message pulling.
+    /// This field is often used to implement weak notification features such as "The other party is typing" or unimportant notifications in the group. This field is not supported by audio-video groups (AVChatRoom).
+    bool? onlineUserOnly,
+
+    /// Whether the message is excluded from the conversation unread message count.
+    bool? isExcludedFromUnreadCount,
+
+    /// Whether a read receipt is required.
+    bool? needReadReceipt,
+
+    /// Cloud custom data (saved in the cloud, will be sent to the peer end,
+    /// and can still be pulled after the app is uninstalled and reinstalled)
+    String? cloudCustomData,
+
+    /// Local custom message data (saved locally, will not be sent to the peer end,
+    /// and will become invalid after the app is uninstalled and reinstalled).
+    String? localCustomData,
   }) {
     if (convType != null) {
-      /// Sends a message to the specified conversation. 发送消息到指定的对话。
+      /// Sends a message to the specified conversation.
       assert((groupID == null) != (userID == null));
       assert(groupID != null || convType != ConvType.group);
       assert(userID != null || convType != ConvType.c2c);
-
+      if (isNavigateToMessageListBottom) {
+        scrollController?.animateTo(
+          scrollController!.position.minScrollExtent,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.ease,
+        );
+      }
       return globalChatModel.sendMessageFromController(
+          priority: priority,
+          onlineUserOnly: onlineUserOnly,
+          isExcludedFromUnreadCount: isExcludedFromUnreadCount,
+          needReadReceipt: needReadReceipt,
+          cloudCustomData: cloudCustomData,
+          localCustomData: localCustomData,
           messageInfo: messageInfo,
           convType: convType,
           convID: (convType == ConvType.group ? groupID : userID) ?? "",
@@ -127,15 +159,28 @@ class TIMUIKitChatController {
           offlinePushInfo: offlinePushInfo);
     } else if (model != null) {
       /// Sends a message to the current conversation specified on `TIMUIKitChat`. 发送到 `TIMUIKitChat` 中指定的当前对话。
+      if (isNavigateToMessageListBottom) {
+        scrollController?.animateTo(
+          scrollController!.position.minScrollExtent,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.ease,
+        );
+      }
       return model!.sendMessageFromController(
-          messageInfo: messageInfo, offlinePushInfo: offlinePushInfo);
+          priority: priority,
+          onlineUserOnly: onlineUserOnly,
+          isExcludedFromUnreadCount: isExcludedFromUnreadCount,
+          needReadReceipt: needReadReceipt,
+          cloudCustomData: cloudCustomData,
+          localCustomData: localCustomData,
+          messageInfo: messageInfo,
+          offlinePushInfo: offlinePushInfo);
     }
     return null;
   }
 
   /// Send forward message;
-  /// 逐条转发
-  /// This method needs use with TIMUIKitChat directly or model been initialized.
+  /// This function solely works when `TIMUIKitChatController` is specified for use within a `TIMUIKitChat`.
   sendForwardMessage({
     required List<V2TimConversation> conversationList,
   }) async {
@@ -143,7 +188,6 @@ class TIMUIKitChatController {
   }
 
   /// Send merger message;
-  /// 合并转发
   /// This method needs use with TIMUIKitChat directly or model been initialized.
   Future<V2TimValueCallback<V2TimMessage>?> sendMergerMessage({
     required List<V2TimConversation> conversationList,
@@ -158,8 +202,7 @@ class TIMUIKitChatController {
         context: context);
   }
 
-  /// Set local custom data; returns the bool shows if succeed
-  /// 为本地消息配置额外String字段
+  /// Set local custom data; returns the bool shows if succeed.
   /// Please provide `convID`, if you use `TIMUIKitChatController` without specifying to a `TIMUIKitChat`.
   Future<bool> setLocalCustomData(String msgID, String localCustomData,
       [String? convID]) async {
@@ -171,8 +214,7 @@ class TIMUIKitChatController {
         msgID, localCustomData, conversationID);
   }
 
-  /// Set local custom int; returns the bool shows if succeed
-  /// 为本地消息配置额外int字段
+  /// Set local custom int; returns the bool shows if succeed.
   /// Please provide `convID`, if you use `TIMUIKitChatController` without specifying to a `TIMUIKitChat`.
   Future<bool> setLocalCustomInt(String msgID, int localCustomInt,
       [String? convID]) async {
@@ -185,8 +227,52 @@ class TIMUIKitChatController {
   }
 
   /// Get current conversation, returns UserID or GroupID if in the chat page, returns "" if not.
-  /// 获取当前会话ID，如果在Chat页面，返回UserID or GroupID， 反之返回""
   String getCurrentConversation() {
     return globalChatModel.currentSelectedConv;
+  }
+
+  /// Hide all bottom panels, including the sticker panel and the additional functions panel, on mobile devices.
+  /// This function solely works when `TIMUIKitChatController` is specified for use within a `TIMUIKitChat`.
+  void hideAllBottomPanelOnMobile() {
+    textFieldController?.hideAllPanel();
+  }
+
+  /// Mention or @ other members in a group manually.
+  /// This function solely works when `TIMUIKitChatController` is specified for use within a `TIMUIKitChat`.
+  void mentionOtherMemberInGroup(
+      {required String showNameInMessage, required String userID}) {
+    textFieldController?.longPressToAt(showNameInMessage, userID);
+  }
+
+  /// Set the content within the message input text field.
+  /// This function solely works when `TIMUIKitChatController` is specified for use within a `TIMUIKitChat`.
+  void setInputTextField(String text) {
+    textFieldController?.setTextField(text);
+  }
+
+  /// Returns the list of group members of current group chat based on the provided keyword.
+  ///
+  /// This method filters the group members based on the given keyword. If the keyword is not provided,
+  /// it returns the entire list of group members. The filtering is performed by checking if the keyword
+  /// is contained within the userID, nickName, or friendRemark properties of each group member.
+  ///
+  /// [keyword] (optional) - The keyword to filter the group members. If not provided, the entire list of group members is returned.
+  /// This function solely works when `TIMUIKitChatController` is specified for use within a `TIMUIKitChat`.
+  List<V2TimGroupMemberFullInfo> getGroupMemberList({String? keyword}) {
+    final List<V2TimGroupMemberFullInfo> memberList =
+        (model?.groupMemberList ?? [])
+            .whereType<V2TimGroupMemberFullInfo>()
+            .toList();
+
+    return TencentUtils.checkString(keyword) == null
+        ? memberList
+        : memberList.where((e) {
+            final userID = e.userID;
+            final nickName = e.nickName ?? "";
+            final friendRemark = e.friendRemark ?? "";
+            return userID.contains(keyword!) ||
+                nickName.contains(keyword) ||
+                friendRemark.contains(keyword);
+          }).toList();
   }
 }
