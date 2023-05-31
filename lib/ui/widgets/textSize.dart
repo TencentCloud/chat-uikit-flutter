@@ -67,29 +67,35 @@ class _ExtendTextState extends State<CustomText> {
     int offset = widget.offset ?? 3;
     if (textwidth > widget.width) {
       int position = widget.text.lastIndexOf('.');
-      String overflowtext = widget.overflowtext ?? '...';
-      int overflowtextLength = overflowtext.length;
-      double singTextSize = textwidth / widget.text.length;
-      String newtext =
-          '${widget.text.substring(0, position - offset)}$overflowtext${widget.text.substring(position - offset, widget.text.length)}';
-      position += overflowtextLength;
-      int number = ((textwidth - widget.width) / singTextSize).ceil();
-      do {
-        int a = position - offset - overflowtextLength - number;
-        newtext = newtext.substring(0, a < 1 ? 1 : a) +
-            newtext.substring(
-                position - offset - overflowtextLength, newtext.length);
-        position -= number;
-        number =
-            ((TextSize.boundingTextSize(newtext, style).width - widget.width) /
-                    singTextSize)
-                .ceil();
-        if (a < 1 || number < 1) {
-          break;
-        }
-      } while (
-          TextSize.boundingTextSize(newtext, style).width > widget.width - 20);
-      text = newtext;
+      if(position < 1){
+        int numberOfCharsToRemove = ((textwidth - widget.width) / (style.fontSize ?? 14)).floor();
+        String overflowText = widget.overflowtext ?? '...';
+        text = widget.text.replaceRange(widget.text.length - numberOfCharsToRemove, widget.text.length, '') + overflowText;
+      }else{
+        String overflowtext = widget.overflowtext ?? '...';
+        int overflowtextLength = overflowtext.length;
+        double singTextSize = textwidth / widget.text.length;
+        String newtext =
+            '${widget.text.substring(0, position - offset)}$overflowtext${widget.text.substring(position - offset, widget.text.length)}';
+        position += overflowtextLength;
+        int number = ((textwidth - widget.width) / singTextSize).ceil();
+        do {
+          int a = position - offset - overflowtextLength - number;
+          newtext = newtext.substring(0, a < 1 ? 1 : a) +
+              newtext.substring(
+                  position - offset - overflowtextLength, newtext.length);
+          position -= number;
+          number =
+              ((TextSize.boundingTextSize(newtext, style).width - widget.width) /
+                  singTextSize)
+                  .ceil();
+          if (a < 1 || number < 1) {
+            break;
+          }
+        } while (
+        TextSize.boundingTextSize(newtext, style).width > widget.width - 20);
+        text = newtext;
+      }
     }
   }
 

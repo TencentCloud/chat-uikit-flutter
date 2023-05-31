@@ -1,3 +1,13 @@
+## 2.1.0+2
+
+### Improvements
+
+* Upgraded several dependencies to resolve conflicts with the Kotlin Gradle plugin.
+
+### Bug Fixes
+
+* Fixed an issue causing the message list to be displayed inaccurately when it contains a file without a suffix.
+
 ## 2.1.0+1
 
 ### Improvements
