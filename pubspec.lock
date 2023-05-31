@@ -322,13 +322,13 @@ packages:
     source: hosted
     version: "3.0.3"
   csslib:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: csslib
-      sha256: "831883fb353c8bdc1d71979e5b342c7d88acfbc643113c14ae51e2442ea0f20f"
+      sha256: b36c7f7e24c0bdf1bf9a3da461c837d1de64b9f8beb190c9011d8c72a3dfd745
       url: "https://pub.dev"
     source: hosted
-    version: "0.17.3"
+    version: "0.17.2"
   csv:
     dependency: transitive
     description:
@@ -385,14 +385,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.1"
-  disk_space:
-    dependency: "direct main"
-    description:
-      name: disk_space
-      sha256: fb27eb2d09ac04784f45b95b1355538b2355c76a081eeaa8439d1a5cfa263888
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.1"
   dotted_border:
     dependency: "direct main"
     description:
@@ -449,14 +441,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.12.6"
-  fc_native_video_thumbnail_for_us:
+  fc_native_video_thumbnail:
     dependency: "direct main"
     description:
-      name: fc_native_video_thumbnail_for_us
-      sha256: db6fa2998195ef5eadac690ae58d6a909ddb5b0283ebbbf9ae4e0e8f99a54902
+      name: fc_native_video_thumbnail
+      sha256: "6c029f017702435aabe96bd2f60be9a2415e62fe0b2f0ce31a51d7cd4b51f674"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.8+1"
+    version: "0.4.0"
   ffi:
     dependency: transitive
     description:

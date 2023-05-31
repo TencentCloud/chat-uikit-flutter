@@ -8,14 +8,10 @@ import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_glo
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_conversation_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendship_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-
 import 'package:tencent_cloud_chat_uikit/data_services/core/core_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_config.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-
-import 'package:disk_space/disk_space.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/web_support/uikit_web_support.dart'
     if (dart.library.html) 'package:tencent_cloud_chat_uikit/data_services/core/web_support/uikit_web_support_implement.dart';
 
@@ -292,17 +288,6 @@ class CoreServicesImpl implements CoreServices {
               selfInfoViewModel.setLoginInfo(_loginInfo!)
             }
         });
-
-    if (PlatformUtils().isMobile &&
-        selfInfoViewModel.globalConfig?.isCheckDiskStorageSpace == true) {
-      final diskSpace = await DiskSpace.getFreeDiskSpace;
-      if (diskSpace != null && diskSpace < 1024) {
-        callOnCallback(TIMCallback(
-            type: TIMCallbackType.INFO,
-            infoRecommendText: TIM_t("设备存储空间不足，建议清理，以获得更好使用体验"),
-            infoCode: 6661403));
-      }
-    }
   }
 
   // Deprecated

@@ -313,14 +313,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.4.1"
-  disk_space:
-    dependency: transitive
-    description:
-      name: disk_space
-      sha256: fb27eb2d09ac04784f45b95b1355538b2355c76a081eeaa8439d1a5cfa263888
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.2.1"
   dotted_border:
     dependency: transitive
     description:
@@ -385,14 +377,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.12.6"
-  fc_native_video_thumbnail_for_us:
+  fc_native_video_thumbnail:
     dependency: transitive
     description:
-      name: fc_native_video_thumbnail_for_us
-      sha256: db6fa2998195ef5eadac690ae58d6a909ddb5b0283ebbbf9ae4e0e8f99a54902
+      name: fc_native_video_thumbnail
+      sha256: "6c029f017702435aabe96bd2f60be9a2415e62fe0b2f0ce31a51d7cd4b51f674"
       url: "https://pub.dev"
     source: hosted
-    version: "0.4.8+1"
+    version: "0.4.0"
   ffi:
     dependency: transitive
     description:
@@ -1264,18 +1256,18 @@ packages:
     dependency: transitive
     description:
       name: universal_html
-      sha256: "5ff50b7c14d201421cf5230ec389a0591c4deb5c817c9d7ccca3b26fe5f31e34"
+      sha256: f2e0ff0c4af8e4bbda4d273ca4a11be4055414f478fad5c161609b74790ff696
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.8"
+    version: "2.2.2"
   universal_io:
     dependency: transitive
     description:
       name: universal_io
-      sha256: "79f78ddad839ee3aae3ec7c01eb4575faf0d5c860f8e5223bc9f9c17f7f03cef"
+      sha256: "06866290206d196064fd61df4c7aea1ffe9a4e7c4ccaa8fcded42dd41948005d"
       url: "https://pub.dev"
     source: hosted
-    version: "2.0.4"
+    version: "2.2.0"
   url_launcher:
     dependency: transitive
     description:

@@ -1,6 +1,6 @@
 name: tencent_cloud_chat_uikit
 description: A powerful chat UI component library and business logic for Tencent Cloud Chat, creating seamless in-app chat modules for delightful user experiences.
-version: 2.1.0
+version: 2.1.0+1
 homepage: https://www.tencentcloud.com/products/im?from=pub
 repository: https://github.com/TencentCloud/tc-chat-uikit-flutter
 documentation: https://comm.qq.com/im/doc/flutter/en/TUIKit/readme.html
@@ -22,10 +22,10 @@ dependencies:
     sdk: flutter
   adaptive_action_sheet: ^2.0.1
   provider: ^6.0.1
-  intl: ^0.18.0
+  intl: any
   get_it: ^7.2.0
   dotted_border: ^2.0.0+2
-  flutter_svg: ^1.0.0
+  flutter_svg: ^2.0.6
   image_picker: ^0.8.5+3
   file_picker: ^5.3.0
   tencent_super_tooltip: ^0.0.1
@@ -51,11 +51,10 @@ dependencies:
   loading_animation_widget: ^1.1.0+3
   permission_handler: ^10.2.0
   tuple: ^2.0.0
-  flutter_markdown: ^0.6.9
+  flutter_markdown: ^0.6.15
   url_launcher: ^6.1.4
-  universal_html: ^2.0.8
+  universal_html: ^2.2.2
   link_preview_generator: ^1.2.0
-  disk_space: ^0.2.1
   http: ^0.13.5
   crypto: ^3.0.2
   collection: ^1.15.0
@@ -65,14 +64,15 @@ dependencies:
   tencent_keyboard_visibility: ^1.0.1
   tim_ui_kit_sticker_plugin: ^2.0.1
   tencent_im_base: ^1.0.57
-  fc_native_video_thumbnail_for_us: ^0.4.8+1
+  fc_native_video_thumbnail: any
   audioplayers: ^3.0.1
   path: ^1.8.1
   tencent_cloud_uikit_core: ^1.0.2
   pasteboard: ^0.2.0
   desktop_drop: ^0.4.1
-  device_info_plus: ^9.0.1
+  device_info_plus: any
   cross_file: ^0.3.3+4
+  csslib: 0.17.2
   diff_match_patch: ^0.4.1
 
 dev_dependencies:

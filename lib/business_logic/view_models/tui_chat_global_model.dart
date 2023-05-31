@@ -212,7 +212,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
         (_messageListMap[currentSelectedConv] ?? []).sublist(
             max(0, ((_messageListMap[currentSelectedConv] ?? []).length - 20)));
     _currentConversationList.removeLast();
-    notifyListeners();
+    // notifyListeners();
   }
 
   V2TimMessageReceipt? getMessageReadReceipt(String msgID) {

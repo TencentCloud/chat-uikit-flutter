@@ -8,7 +8,7 @@ import Foundation
 import audioplayers_darwin
 import desktop_drop
 import device_info_plus
-import fc_native_video_thumbnail_for_us
+import fc_native_video_thumbnail
 import package_info_plus
 import pasteboard
 import path_provider_foundation

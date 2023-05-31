@@ -2,7 +2,7 @@
 
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:fc_native_video_thumbnail_for_us/fc_native_video_thumbnail_for_us.dart';
+import 'package:fc_native_video_thumbnail/fc_native_video_thumbnail.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
