@@ -8,6 +8,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:tencent_im_base/base_widgets/tim_stateless_widget.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/common/utils.dart';
+import 'package:markdown/markdown.dart' as md;
 
 class LinkTextMarkdown extends TIMStatelessWidget {
   /// Callback for when link is tapped
@@ -40,6 +41,7 @@ class LinkTextMarkdown extends TIMStatelessWidget {
           .copyWith(
         a: TextStyle(color: LinkUtils.hexToColor("015fff")),
       ),
+      extensionSet: md.ExtensionSet.gitHubWeb,
       onTapLink: (
         String link,
         String? href,
@@ -153,5 +155,22 @@ class LinkText extends TIMStatelessWidget {
           customEmojiStickerList: customEmojiStickerList,
           showAtBackground: true,
         ));
+  }
+}
+
+class TextBuilder extends MarkdownElementBuilder {
+  @override
+  Widget? visitText(md.Text text, TextStyle? preferredStyle) {
+    return Text(text.textContent);
+  }
+}
+
+class RawHtmlSyntax extends md.InlineSyntax {
+  RawHtmlSyntax() : super(r'<.+?>');
+
+  @override
+  bool onMatch(md.InlineParser parser, Match match) {
+    parser.addNode(md.Text(match[0]!));
+    return true;
   }
 }

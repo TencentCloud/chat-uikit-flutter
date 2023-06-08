@@ -93,6 +93,8 @@ class TIMUIKitInputTextField extends StatefulWidget {
 
   final String? groupType;
 
+  final String? groupID;
+
   const TIMUIKitInputTextField(
       {Key? key,
       required this.conversationID,
@@ -113,7 +115,8 @@ class TIMUIKitInputTextField extends StatefulWidget {
       required this.model,
       required this.currentConversation,
       this.groupType,
-      this.atMemberPanelScroll})
+      this.atMemberPanelScroll,
+      this.groupID})
       : super(key: key);
 
   @override
@@ -166,21 +169,22 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     return text.replaceAll(RegExp(r'\ufeff'), "");
   }
 
-  handleSetDraftText([String? id, ConvType? convType]) async {
+  Future handleSetDraftText([String? id, ConvType? convType]) async {
+    String text = textEditingController.text;
     String convID = id ?? widget.conversationID;
-    String conversationID = convID.contains("@TOPIC#")
+    final isTopic = convID.contains("@TOPIC#");
+    String conversationID = isTopic
         ? convID
         : ((convType ?? widget.conversationType) == ConvType.c2c
             ? "c2c_$convID"
             : "group_$convID");
-    String text = textEditingController.text;
-    String? draftText = _filterU200b(text);
-
-    if (draftText.isEmpty) {
-      draftText = "";
-    }
-    await conversationModel.setConversationDraft(
-        conversationID: conversationID, draftText: draftText);
+    String draftText = _filterU200b(text);
+    return await conversationModel.setConversationDraft(
+        groupID: widget.groupID,
+        isTopic: isTopic,
+        isAllowWeb: widget.model.chatConfig.isUseDraftOnWeb,
+        conversationID: conversationID,
+        draftText: draftText);
   }
 
   backSpaceText() {
@@ -189,11 +193,9 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
 
     if (originalText == zeroWidthSpace) {
       _handleSoftKeyBoardDelete();
-      // _addDeleteTag();
     } else {
       text = originalText.characters.skipLast(1);
       textEditingController.text = text;
-      // handleSetDraftText();
     }
   }
 
@@ -202,6 +204,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     lastText = "";
     final text = textEditingController.text.trim();
     final convType = widget.conversationType;
+    conversationModel.clearWebDraft(conversationID: widget.conversationID);
     if (text.isNotEmpty && text != zeroWidthSpace) {
       if (widget.model.repliedMessage != null) {
         MessageUtils.handleMessageError(
@@ -259,6 +262,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
   }
 
   onSubmitted() async {
+    conversationModel.clearWebDraft(conversationID: widget.conversationID);
     lastText = "";
     final text = textEditingController.text.trim();
     final convType = widget.conversationType;
@@ -417,6 +421,22 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     mentionedMembersMap = map;
   }
 
+  updateMentionedMap() {
+    Map<String, V2TimGroupMemberFullInfo> map = {};
+    Iterable<Match> matches = atTextReg.allMatches(textEditingController.text);
+    List<String?> parseAtList = [];
+    for (final item in matches) {
+      final str = item.group(0);
+      parseAtList.add(str);
+    }
+    for (String? key in parseAtList) {
+      if (key != null && mentionedMembersMap[key] != null) {
+        map[key] = mentionedMembersMap[key]!;
+      }
+    }
+    mentionedMembersMap = map;
+  }
+
   _handleAtText(String text, TUIChatSeparateViewModel model) async {
     final text = textEditingController.text;
     String? groupID = widget.conversationType == ConvType.group
@@ -449,22 +469,11 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
           textEditingController.selection =
               TextSelection.collapsed(offset: atIndex);
           lastText = newText;
-          Map<String, V2TimGroupMemberFullInfo> map = {};
-          Iterable<Match> matches = atTextReg.allMatches(text);
-          List<String?> parseAtList = [];
-          for (final item in matches) {
-            final str = item.group(0);
-            parseAtList.add(str);
-          }
-          for (String? key in parseAtList) {
-            if (key != null && mentionedMembersMap[key] != null) {
-              map[key] = mentionedMembersMap[key]!;
-            }
-          }
-          mentionedMembersMap = map;
+          updateMentionedMap();
           return;
         }
       }
+      updateMentionedMap();
     }
 
     final int selfRole = widget.model.selfMemberInfo?.role ?? 0;
@@ -709,8 +718,8 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
   void didUpdateWidget(TIMUIKitInputTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.conversationID != oldWidget.conversationID) {
-      handleSetDraftText(oldWidget.conversationID, oldWidget.conversationType);
       mentionedMembersMap.clear();
+      handleSetDraftText(oldWidget.conversationID, oldWidget.conversationType);
       if (oldWidget.initText != widget.initText) {
         textEditingController.text = widget.initText ?? "";
       } else {

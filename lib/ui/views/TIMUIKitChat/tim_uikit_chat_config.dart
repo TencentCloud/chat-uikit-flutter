@@ -185,6 +185,12 @@ class TIMUIKitChatConfig {
   /// Define the lines in the text message input field on Desktop.
   final int desktopMessageInputFieldLines;
 
+  /// Specifies whether to use the draft feature on the Web, as the Chat SDK does not support this functionality.
+  /// If enabled, draft data will be stored in TUIKit's memory.
+  /// Note that the draft text will be lost upon refreshing the website.
+  /// [Default]: true.
+  final bool isUseDraftOnWeb;
+
   const TIMUIKitChatConfig(
       {this.onTapLink,
       this.timeDividerConfig,
@@ -203,7 +209,7 @@ class TIMUIKitChatConfig {
       this.isShowSelfNameInGroup = false,
       this.offlinePushInfo,
       @Deprecated("Please use [isShowGroupReadingStatus] instead")
-          this.isShowGroupMessageReadReceipt = true,
+      this.isShowGroupMessageReadReceipt = true,
       this.upperRecallTime = 120,
       this.isShowOthersNameInGroup = true,
       this.urlPreviewType = UrlPreviewType.onlyHyperlink,
@@ -213,13 +219,14 @@ class TIMUIKitChatConfig {
       this.notificationIOSSound = "",
       this.isAllowSoundMessage = true,
       @Deprecated("Please use [groupReadReceiptPermissionList] instead")
-          this.groupReadReceiptPermisionList,
+      this.groupReadReceiptPermisionList,
       this.groupReadReceiptPermissionList,
       this.isAllowEmojiPanel = true,
       this.isAllowShowMorePanel = true,
       this.isShowReadingStatus = true,
       this.desktopControlBarConfig,
       this.isAllowLongPressMessage = true,
+      this.isUseDraftOnWeb = true,
       this.isAllowClickAvatar = true,
       this.isEnableTextSelection,
       this.additionalDesktopMessageHoverBarItem,

@@ -17,7 +17,8 @@ class LinkPreviewEntry {
       return isMarkdown
           ? LinkTextMarkdown(
               isEnableTextSelection: isEnableTextSelection,
-              messageText: replaceSingleNewlineWithTwo(messageText),
+              messageText: addSpaceAfterLeftBracket(
+                  addSpaceBeforeHttp(replaceSingleNewlineWithTwo(messageText))),
               style: style,
               onLinkTap: onLinkTap)
           : LinkText(
@@ -30,10 +31,27 @@ class LinkPreviewEntry {
     };
   }
 
+  static String addSpaceAfterLeftBracket(String inputText) {
+    return inputText.splitMapJoin(
+      RegExp(r'<\w+[^<>]*>'),
+      onMatch: (match) {
+        return match.group(0)!.replaceFirst('<', '< ');
+      },
+      onNonMatch: (text) => text,
+    );
+  }
+
   static String replaceSingleNewlineWithTwo(String inputText) {
-    return inputText.replaceAllMapped(
-      RegExp(r'(?<!\n)\n(?!\n)'),
-          (match) => '\n\n',
+    return inputText.split('\n').join('\n\n');
+  }
+
+  static String addSpaceBeforeHttp(String inputText) {
+    return inputText.splitMapJoin(
+      RegExp(r'http'),
+      onMatch: (match) {
+        return ' http';
+      },
+      onNonMatch: (text) => text,
     );
   }
 

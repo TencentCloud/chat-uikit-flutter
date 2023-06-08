@@ -3,6 +3,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_model_tools.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
@@ -57,7 +58,7 @@ class TIMUIKitReplyElem extends StatefulWidget {
 }
 
 class _TIMUIKitReplyElemState extends TIMUIKitState<TIMUIKitReplyElem> {
-  MessageRepliedData? repliedMessage;
+  MessageRepliedData? repliedMessage = null;
   V2TimMessage? rawMessage;
   bool isShowJumpState = false;
   bool isShining = false;
@@ -81,10 +82,32 @@ class _TIMUIKitReplyElemState extends TIMUIKitState<TIMUIKitReplyElem> {
   }
 
   _getMessageByMessageID() async {
-    final cloudCustomData = _getRepliedMessage();
+    final MessageRepliedData? cloudCustomData = _getRepliedMessage();
     if (cloudCustomData != null) {
+      if (mounted) {
+        setState(() {
+          repliedMessage = cloudCustomData;
+        });
+      }
+
       final messageID = cloudCustomData.messageID;
-      final message = await widget.chatModel.findMessage(messageID);
+      V2TimMessage? message = await widget.chatModel.findMessage(messageID);
+      if (message == null) {
+        try {
+          final RepliedMessageAbstract repliedMessageAbstract =
+              RepliedMessageAbstract.fromJson(
+                  jsonDecode(cloudCustomData.messageAbstract));
+          if (repliedMessageAbstract.isNotEmpty) {
+            message = V2TimMessage(
+                elemType: 0,
+                seq: repliedMessageAbstract.seq,
+                timestamp: repliedMessageAbstract.timestamp,
+                msgID: repliedMessageAbstract.msgID);
+          }
+        } catch (e) {
+          print(e.toString());
+        }
+      }
       if (message != null) {
         if (mounted) {
           setState(() {
@@ -93,19 +116,32 @@ class _TIMUIKitReplyElemState extends TIMUIKitState<TIMUIKitReplyElem> {
         }
       }
     }
-    if (mounted) {
-      setState(() {
-        repliedMessage = cloudCustomData;
-      });
-    }
   }
 
   Widget _defaultRawMessageText(String text, TUITheme? theme) {
     return Text(text,
+        maxLines: 2,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
             fontSize: 12,
             color: theme?.weakTextColor,
             fontWeight: FontWeight.w400));
+  }
+
+  _renderMessageSummary(TUITheme? theme) {
+    try {
+      final RepliedMessageAbstract repliedMessageAbstract =
+          RepliedMessageAbstract.fromJson(
+              jsonDecode(repliedMessage?.messageAbstract ?? ""));
+      if (TencentUtils.checkString(repliedMessageAbstract.summary) != null) {
+        return _defaultRawMessageText(repliedMessageAbstract.summary!, theme);
+      }
+      return _defaultRawMessageText(
+          repliedMessage?.messageAbstract ?? TIM_t("[未知消息]"), theme);
+    } catch (e) {
+      return _defaultRawMessageText(
+          repliedMessage?.messageAbstract ?? TIM_t("[未知消息]"), theme);
+    }
   }
 
   _rawMessageBuilder(V2TimMessage? message, TUITheme? theme) {
@@ -114,15 +150,19 @@ class _TIMUIKitReplyElemState extends TIMUIKitState<TIMUIKitReplyElem> {
     }
     if (message == null) {
       if (repliedMessage?.messageAbstract != null) {
-        return _defaultRawMessageText(repliedMessage!.messageAbstract, theme);
+        _renderMessageSummary(theme);
       }
       return const SizedBox(width: 0, height: 12);
     }
     final messageType = message.elemType;
     final isSelf = message.isSelf ?? true;
-    if (widget.chatModel.abstractMessageBuilder != null) {
+    final customAbstractMessage =
+        widget.chatModel.abstractMessageBuilder != null
+            ? widget.chatModel.abstractMessageBuilder!(message)
+            : null;
+    if (customAbstractMessage != null) {
       return _defaultRawMessageText(
-        widget.chatModel.abstractMessageBuilder!(message),
+        customAbstractMessage,
         theme,
       );
     }
@@ -173,7 +213,7 @@ class _TIMUIKitReplyElemState extends TIMUIKitState<TIMUIKitReplyElem> {
             messageID: message.msgID ?? "",
             isSelf: isSelf);
       default:
-        return _defaultRawMessageText(TIM_t("[未知消息]"), theme);
+        return _renderMessageSummary(theme);
     }
   }
 

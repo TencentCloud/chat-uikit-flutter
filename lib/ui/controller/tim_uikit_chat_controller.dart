@@ -138,8 +138,8 @@ class TIMUIKitChatController {
       assert((groupID == null) != (userID == null));
       assert(groupID != null || convType != ConvType.group);
       assert(userID != null || convType != ConvType.c2c);
-      if (isNavigateToMessageListBottom) {
-        scrollController?.animateTo(
+      if (isNavigateToMessageListBottom && scrollController != null) {
+        scrollController!.animateTo(
           scrollController!.position.minScrollExtent,
           duration: const Duration(milliseconds: 200),
           curve: Curves.ease,
@@ -159,7 +159,7 @@ class TIMUIKitChatController {
           offlinePushInfo: offlinePushInfo);
     } else if (model != null) {
       /// Sends a message to the current conversation specified on `TIMUIKitChat`. 发送到 `TIMUIKitChat` 中指定的当前对话。
-      if (isNavigateToMessageListBottom) {
+      if (isNavigateToMessageListBottom && scrollController != null) {
         scrollController?.animateTo(
           scrollController!.position.minScrollExtent,
           duration: const Duration(milliseconds: 200),

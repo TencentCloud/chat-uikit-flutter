@@ -2,6 +2,7 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_setting_model.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/listener_model/tui_group_listener_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
@@ -74,22 +75,28 @@ class CoreServicesImpl implements CoreServices {
   @override
   Future<bool?> init(
       {
-
       /// Callback from TUIKit invoke, includes IM SDK API error, notify information, Flutter error.
       ValueChanged<TIMCallback>? onTUIKitCallbackListener,
       required int sdkAppID,
       required LogLevelEnum loglevel,
       required V2TimSDKListener listener,
       LanguageEnum? language,
-        String? extraLanguage,
+      String? extraLanguage,
       TIMUIKitConfig? config,
+
+      /// Specify the current device platform, mobile or desktop, based on your needs.
+      /// TUIKit will automatically determine the platform if no specification is provided. DeviceType? platform,
+      DeviceType? platform,
       VoidCallback? onWebLoginSuccess}) async {
+    if (platform != null) {
+      TUIKitScreenUtils.deviceType = platform;
+    }
     addIdentifier();
-    if(extraLanguage != null){
+    if (extraLanguage != null) {
       Future.delayed(const Duration(milliseconds: 1), () {
         I18nUtils(null, extraLanguage);
       });
-    }else if (language != null) {
+    } else if (language != null) {
       Future.delayed(const Duration(milliseconds: 1), () {
         I18nUtils(null, languageEnumToString[language]);
       });
@@ -139,11 +146,11 @@ class CoreServicesImpl implements CoreServices {
     required String userId,
   }) async {
     _userID = userId;
-    if(extraLanguage != null){
+    if (extraLanguage != null) {
       Future.delayed(const Duration(milliseconds: 1), () {
         I18nUtils(null, extraLanguage);
       });
-    }else if (language != null) {
+    } else if (language != null) {
       Future.delayed(const Duration(milliseconds: 1), () {
         I18nUtils(null, languageEnumToString[language]);
       });
@@ -246,9 +253,8 @@ class CoreServicesImpl implements CoreServices {
       }
 
       tuiFriendShipViewModel.userStatusList = currentUserStatusList;
-    // ignore: empty_catches
-    } catch (e) {
-    }
+      // ignore: empty_catches
+    } catch (e) {}
   }
 
   @override
@@ -397,5 +403,10 @@ class CoreServicesImpl implements CoreServices {
           .getOfflinePushManager()
           .doBackground(unreadCount: totalCount ?? 0);
     }
+  }
+
+  @override
+  setDeviceType(DeviceType deviceType) {
+    TUIKitScreenUtils.deviceType = deviceType;
   }
 }

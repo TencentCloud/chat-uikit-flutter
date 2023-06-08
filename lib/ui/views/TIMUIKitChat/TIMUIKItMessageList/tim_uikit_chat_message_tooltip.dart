@@ -351,7 +351,9 @@ class TIMUIKitMessageTooltipState
                   children: [
                     Image.asset(
                       item.iconImageAsset,
-                      package: 'tencent_cloud_chat_uikit',
+                      package: defaultTipsIds.contains(item.id)
+                          ? 'tencent_cloud_chat_uikit'
+                          : null,
                       width: 20,
                       height: 20,
                     ),

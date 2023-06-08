@@ -309,12 +309,23 @@ class _TIMUIKitTextFieldLayoutNarrowState
       });
     };
   }
+  String getAbstractMessage(V2TimMessage message) {
+    final String? customAbstractMessage = widget
+        .model.abstractMessageBuilder != null ? widget.model
+        .abstractMessageBuilder!(widget.model.repliedMessage!) : null;
+    return customAbstractMessage ?? MessageUtils
+        .getAbstractMessageAsync(
+        widget.model.repliedMessage!, widget.model.groupMemberList ?? []);
+  }
 
   _buildRepliedMessage(V2TimMessage? repliedMessage) {
     final haveRepliedMessage = repliedMessage != null;
     if (haveRepliedMessage) {
       final text =
-          "${MessageUtils.getDisplayName(widget.model.repliedMessage!)}:${widget.model.abstractMessageBuilder != null ? widget.model.abstractMessageBuilder!(widget.model.repliedMessage!) : MessageUtils.getAbstractMessageAsync(widget.model.repliedMessage!, widget.model.groupMemberList ?? [])}";
+          "${MessageUtils.getDisplayName(
+          widget.model.repliedMessage!)}:${getAbstractMessage(
+          repliedMessage
+      )}";
       return Container(
         color: widget.backgroundColor ?? hexToColor("f5f5f6"),
         alignment: Alignment.centerLeft,

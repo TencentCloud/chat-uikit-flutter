@@ -7,6 +7,7 @@ import 'package:tencent_cloud_chat_uikit/ui/widgets/drag_widget.dart';
 
 class TUIKitWidePopup {
   static OverlayEntry? entry;
+  static bool isShow = false;
 
   static showSecondaryConfirmDialog({
     required TUIKitWideModalOperationKey operationKey,
@@ -17,7 +18,7 @@ class TUIKitWidePopup {
     VoidCallback? onCancel,
   }) {
     return TUIKitWidePopup.showPopupWindow(
-      operationKey: operationKey,
+        operationKey: operationKey,
         context: context,
         isDarkBackground: false,
         onCancel: onCancel,
@@ -56,37 +57,205 @@ class TUIKitWidePopup {
     VoidCallback? onConfirm,
     VoidCallback? onCancel,
   }) async {
+    if (isShow) {
+      return;
+    }
+    isShow = true;
 
     final TUISelfInfoViewModel selfInfoViewModel =
-      serviceLocator<TUISelfInfoViewModel>();
+        serviceLocator<TUISelfInfoViewModel>();
 
-    if(selfInfoViewModel.globalConfig?.showDesktopModalFunc != null){
+    if (selfInfoViewModel.globalConfig?.showDesktopModalFunc != null) {
       final res = await selfInfoViewModel.globalConfig!.showDesktopModalFunc!(
-        operationKey,
-        context,
-        child,
-        theme,
-        width,
-        height,
-        offset,
-        initText,
-        borderRadius,
-        isDarkBackground,
-        title,
-        onSubmit,
-        submitWidget,
-        onConfirm,
-        onCancel
-      );
+          operationKey,
+          context,
+          child,
+          theme,
+          width,
+          height,
+          offset,
+          initText,
+          borderRadius,
+          isDarkBackground,
+          title,
+          onSubmit,
+          submitWidget,
+          onConfirm,
+          onCancel);
 
-      if(res == true){
+      if (res == true) {
         return;
       }
+    }
+
+    final isUseMaterialAlert = (offset == null);
+
+    final Widget contentWidget = Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(
+        borderRadius:
+            borderRadius ?? const BorderRadius.all(Radius.circular(16)),
+        color: theme?.wideBackgroundColor ?? const Color(0xFFffffff),
+        border: isDarkBackground
+            ? Border.all(
+                width: 2,
+                color: theme?.weakBackgroundColor ?? const Color(0xFFbebebe),
+              )
+            : null,
+        boxShadow: (isDarkBackground || isUseMaterialAlert)
+            ? null
+            : const [
+                BoxShadow(
+                  color: Color(0xFFbebebe),
+                  offset: Offset(3, 3),
+                  blurRadius: 10,
+                  spreadRadius: 1,
+                ),
+              ],
+      ),
+      child: Column(
+        children: [
+          if (title != null)
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: hexToColor("f5f6f7"),
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(16),
+                    topRight: Radius.circular(16)),
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                        fontSize: 18,
+                        color: theme?.darkTextColor ?? const Color(0xFF444444)),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      if (onSubmit != null) {
+                        onSubmit();
+                      }
+                      isShow = false;
+                      if (offset == null) {
+                        Navigator.pop(context);
+                      } else {
+                        entry?.remove();
+                        entry = null;
+                      }
+                    },
+                    child: onSubmit != null
+                        ? (submitWidget ?? const Icon(Icons.check))
+                        : const Icon(Icons.close),
+                  )
+                ],
+              ),
+            ),
+          if (title != null)
+            SizedBox(
+              height: 1,
+              child: Container(
+                color: theme?.weakDividerColor ?? const Color(0xFFE5E6E9),
+              ),
+            ),
+          if (height != null && width != null)
+            Expanded(child: child(() {
+              isShow = false;
+              if (isUseMaterialAlert) {
+                Navigator.pop(context);
+              } else {
+                entry?.remove();
+                entry = null;
+              }
+            })),
+          if (height == null || width == null)
+            child(() {
+              isShow = false;
+              if (isUseMaterialAlert) {
+                Navigator.pop(context);
+              } else {
+                entry?.remove();
+                entry = null;
+              }
+            }),
+          if (onCancel != null || onConfirm != null)
+            Container(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  if (onCancel != null)
+                    Container(
+                      margin: const EdgeInsets.only(right: 16),
+                      child: OutlinedButton(
+                          onPressed: () {
+                            isShow = false;
+                            if (isUseMaterialAlert) {
+                              Navigator.pop(context);
+                            } else {
+                              entry?.remove();
+                              entry = null;
+                            }
+                            onCancel();
+                          },
+                          child: Text(
+                            TIM_t("取消"),
+                            style: TextStyle(
+                                color: theme?.weakTextColor ?? Colors.black),
+                          )),
+                    ),
+                  if (onConfirm != null)
+                    Container(
+                      margin: const EdgeInsets.only(right: 16),
+                      child: ElevatedButton(
+                          onPressed: () {
+                            isShow = false;
+                            if (isUseMaterialAlert) {
+                              Navigator.pop(context);
+                            } else {
+                              entry?.remove();
+                              entry = null;
+                            }
+                            onConfirm();
+                          },
+                          child: Text(
+                            TIM_t("确定"),
+                            style: TextStyle(color: theme?.primaryColor),
+                          )),
+                    ),
+                ],
+              ),
+            )
+        ],
+      ),
+    );
+
+    if (isUseMaterialAlert) {
+      return showDialog(
+          barrierDismissible: false,
+          context: context,
+          builder: (context) {
+            return WillPopScope(
+                child: AlertDialog(
+                  backgroundColor: Colors.transparent,
+                  titlePadding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                  contentPadding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                  content: contentWidget,
+                ),
+                onWillPop: () {
+                  return Future.value(false);
+                });
+          });
     }
 
     if (entry != null) {
       return;
     }
+
     entry = OverlayEntry(builder: (BuildContext context) {
       return Material(
         color: Colors.transparent,
@@ -100,133 +269,13 @@ class TUIKitWidePopup {
             },
             initOffset: offset ??
                 (width != null && height != null
-                    ? Offset(MediaQuery.of(context).size.width * 0.5 - width / 2,
-                    MediaQuery.of(context).size.height * 0.5 - height / 2)
+                    ? Offset(
+                        MediaQuery.of(context).size.width * 0.5 - width / 2,
+                        MediaQuery.of(context).size.height * 0.5 - height / 2)
                     : null),
-            child: Container(
-              width: width,
-              height: height,
-              decoration: BoxDecoration(
-                borderRadius:
-                borderRadius ?? const BorderRadius.all(Radius.circular(16)),
-                color: theme?.wideBackgroundColor ?? const Color(0xFFffffff),
-                border: isDarkBackground
-                    ? Border.all(
-                  width: 2,
-                  color:
-                  theme?.weakBackgroundColor ?? const Color(0xFFbebebe),
-                )
-                    : null,
-                boxShadow: isDarkBackground
-                    ? null
-                    : const [
-                  BoxShadow(
-                    color: Color(0xFFbebebe),
-                    offset: Offset(3, 3),
-                    blurRadius: 10,
-                    spreadRadius: 1,
-                  ),
-                ],
-              ),
-              child: Column(
-                children: [
-                  if (title != null)
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: hexToColor("f5f6f7"),
-                        borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(16),
-                            topRight: Radius.circular(16)),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Text(
-                            title,
-                            style: TextStyle(
-                                fontSize: 18,
-                                color: theme?.darkTextColor ??
-                                    const Color(0xFF444444)),
-                          ),
-                          InkWell(
-                            onTap: () {
-                              if (onSubmit != null) {
-                                onSubmit();
-                              }
-                              entry?.remove();
-                              entry = null;
-                            },
-                            child: onSubmit != null
-                                ? (submitWidget ?? const Icon(Icons.check))
-                                : const Icon(Icons.close),
-                          )
-                        ],
-                      ),
-                    ),
-                  if (title != null)
-                    SizedBox(
-                      height: 1,
-                      child: Container(
-                        color: theme?.weakDividerColor ?? const Color(0xFFE5E6E9),
-                      ),
-                    ),
-                  if (height != null && width != null)
-                    Expanded(child: child(() {
-                      entry?.remove();
-                      entry = null;
-                    })),
-                  if (height == null || width == null)
-                    child(() {
-                      entry?.remove();
-                      entry = null;
-                    }),
-                  if (onCancel != null || onConfirm != null)
-                    Container(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          if (onCancel != null)
-                            Container(
-                              margin: const EdgeInsets.only(right: 16),
-                              child: OutlinedButton(
-                                  onPressed: () {
-                                    entry?.remove();
-                                    entry = null;
-                                    onCancel();
-                                  },
-                                  child: Text(
-                                    TIM_t("取消"),
-                                    style: TextStyle(
-                                        color:
-                                        theme?.weakTextColor ?? Colors.black),
-                                  )),
-                            ),
-                          if (onConfirm != null)
-                            Container(
-                              margin: const EdgeInsets.only(right: 16),
-                              child: ElevatedButton(
-                                  onPressed: () {
-                                    entry?.remove();
-                                    entry = null;
-                                    onConfirm();
-                                  },
-                                  child: Text(
-                                    TIM_t("确定"),
-                                    style: TextStyle(color: theme?.primaryColor),
-                                  )),
-                            ),
-                        ],
-                      ),
-                    )
-                ],
-              ),
-            )),
+            child: contentWidget),
       );
     });
     Overlay.of(context).insert(entry!);
-
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+import 'dart:ui' as ui;
 import 'package:fc_native_video_thumbnail/fc_native_video_thumbnail.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -32,6 +33,7 @@ import 'package:universal_html/html.dart' as html;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 // ignore: unnecessary_import
 import 'dart:typed_data';
@@ -262,36 +264,62 @@ class _TIMUIKitTextFieldLayoutWideState
     };
   }
 
+  String getAbstractMessage(V2TimMessage message) {
+    final String? customAbstractMessage =
+        widget.model.abstractMessageBuilder != null
+            ? widget.model.abstractMessageBuilder!(widget.model.repliedMessage!)
+            : null;
+    return customAbstractMessage ??
+        MessageUtils.getAbstractMessageAsync(
+            widget.model.repliedMessage!, widget.model.groupMemberList ?? []);
+  }
+
   _buildRepliedMessage(V2TimMessage? repliedMessage) {
     final haveRepliedMessage = repliedMessage != null;
     if (haveRepliedMessage) {
-      final text =
-          "${MessageUtils.getDisplayName(widget.model.repliedMessage!)}:${widget.model.abstractMessageBuilder != null ? widget.model.abstractMessageBuilder!(widget.model.repliedMessage!) : MessageUtils.getAbstractMessageAsync(widget.model.repliedMessage!, widget.model.groupMemberList ?? [])}";
       return Container(
         color: widget.backgroundColor ?? hexToColor("f5f5f6"),
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
+            Text(
+              TIM_t("回复 "),
+              style: TextStyle(
+                  color: hexToColor("8f959e"), fontSize: 14),
+            ),
+            Text(
+              MessageUtils.getDisplayName(
+                  widget.model.repliedMessage!),
+              softWrap: true,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  color: hexToColor("8f959e"),
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold),
+            ),
             Expanded(
               child: Text(
-                text,
-                softWrap: true,
-                maxLines: 3,
+                ": ${getAbstractMessage(repliedMessage)}",
+                maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: hexToColor("8f959e"), fontSize: 14),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: hexToColor("8f959e"),
+                ),
               ),
             ),
             const SizedBox(
-              width: 16,
+              width: 8,
             ),
             InkWell(
               onTap: () {
                 widget.model.repliedMessage = null;
               },
-              child: Icon(Icons.clear, color: hexToColor("8f959e"), size: 18),
+              child: Icon(Icons.cancel, color: hexToColor("8f959e"), size: 18),
             )
           ],
         ),
@@ -314,8 +342,9 @@ class _TIMUIKitTextFieldLayoutWideState
                 entry = null;
               }
             },
-            initOffset: offset ??
-                Offset(MediaQuery.of(context).size.height * 0.5 + 20,
+            initOffset: offset != null
+                ? Offset(offset.dx, max(offset.dy, 16))
+                : Offset(MediaQuery.of(context).size.height * 0.5 + 20,
                     MediaQuery.of(context).size.height * 0.5 - 100),
             child: Container(
               decoration: BoxDecoration(
@@ -793,7 +822,7 @@ class _TIMUIKitTextFieldLayoutWideState
             onClick: (offset) {
               _sendEmoji(offset, widget.theme);
             },
-            svgPath: "images/svg/send_face.svg"),
+            imgPath: "images/svg/send_face.png"),
       if (config.showScreenshotButton && PlatformUtils().isDesktop)
         DesktopControlBarItem(
             item: "screenShot",
@@ -950,6 +979,7 @@ class _TIMUIKitTextFieldLayoutWideState
           color: widget.backgroundColor ?? theme.desktopChatMessageInputBgColor,
           child: Column(
             children: [
+              _buildRepliedMessage(widget.repliedMessage),
               SizedBox(
                   height: 1,
                   child: Container(
@@ -963,7 +993,6 @@ class _TIMUIKitTextFieldLayoutWideState
                     children: generateControlBar(widget.model, theme),
                   ),
                 ),
-              _buildRepliedMessage(widget.repliedMessage),
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
                 constraints: const BoxConstraints(minHeight: 50),
