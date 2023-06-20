@@ -1,3 +1,29 @@
+## 2.1.2
+
+### New Features
+
+* Introduced a new message recall mode, which enables group administrators to recall any message from any group member. To enable this feature, set `isGroupAdminRecallEnabled` in `TIMUIKitChatConfig` to `true`.
+* Added support for draft text functionality on the Web. Activate this feature by setting `isUseDraftOnWeb` in `TIMUIKitChatConfig` to `true`. Since the Chat SDK doesn't support this functionality, draft data will be stored in TUIKit's memory. Be aware that draft text will be lost upon refreshing the website.
+* Enabled using the default message abstract text when `abstractMessageBuilder` returns `null`.
+
+### Improvements
+
+* The duration for video messages sent from the Web will no longer be displayed, as this type of video message does not contain an accurate video duration.
+* Removed the hover color on the message input area on Desktop.
+* Added auto-focus support for the message input area on Desktop.
+* Enhanced the rendering of text messages in markdown mode, particularly for clickable link extraction and HTML tag handling.
+* Limited the number of lines displayed for replied messages to a maximum of 2 lines to avoid occupying excessive space.
+* Optimized the message replying process, ensuring that a message referencing another message can still display the replied message, even when it is too old.
+
+### Bug Fixes
+
+* Fixed an issue that could cause the profile page to display no data.
+* Fixed an issue that could prevent the message sending button from being displayed after selecting an emoji on mobile Web.
+* Fixed an issue that could prevent the message long-press menu from showing on mobile Web.
+* Fixed an issue where editing a message would carry over to another conversation when switching between conversations.
+* Fixed an issue that could prevent displaying the `Modal` on Desktop.
+* Fixed an issue that caused the `iconImageAsset` from the `MessageToolTipItem` class to not work properly.
+
 ## 2.1.0+2
 
 ### Improvements

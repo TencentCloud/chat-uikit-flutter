@@ -241,6 +241,8 @@ class TUIKitWidePopup {
           builder: (context) {
             return WillPopScope(
                 child: AlertDialog(
+                  surfaceTintColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
                   backgroundColor: Colors.transparent,
                   titlePadding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
                   contentPadding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
@@ -262,17 +264,13 @@ class TUIKitWidePopup {
         child: TUIKitDragArea(
             backgroundColor: isDarkBackground ? const Color(0x7F000000) : null,
             closeFun: () {
+              isShow = false;
               if (entry != null) {
                 entry?.remove();
                 entry = null;
               }
             },
-            initOffset: offset ??
-                (width != null && height != null
-                    ? Offset(
-                        MediaQuery.of(context).size.width * 0.5 - width / 2,
-                        MediaQuery.of(context).size.height * 0.5 - height / 2)
-                    : null),
+            initOffset: offset,
             child: contentWidget),
       );
     });

@@ -823,6 +823,81 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
     return null;
   }
 
+  Future<V2TimValueCallback<V2TimMessage>?> sendReplyMessageFromController({
+    required String text,
+    required V2TimMessage messageBeenReplied,
+    required String convID,
+    required ConvType convType,
+    ValueChanged<String>? setInputField,
+    OfflinePushInfo? offlinePushInfo,
+    MessagePriorityEnum priority = MessagePriorityEnum.V2TIM_PRIORITY_NORMAL,
+    bool? onlineUserOnly,
+    bool? isExcludedFromUnreadCount,
+    bool? needReadReceipt,
+    String? localCustomData,
+  }) async {
+    if (text.isEmpty) {
+      return null;
+    }
+    final TUIChatModelTools tools = serviceLocator<TUIChatModelTools>();
+    List<V2TimMessage> currentHistoryMsgList = _messageListMap[convID] ?? [];
+    V2TimMsgCreateInfoResult? textMessageInfo =
+        await _messageService.createTextMessage(text: text);
+
+    textMessageInfo = await _messageService.createTextAtMessage(
+        text: text +
+            " @${TencentUtils.checkString(messageBeenReplied.nickName) ?? TencentUtils.checkString(messageBeenReplied.sender) ?? TencentUtils.checkString(messageBeenReplied.userID)}",
+        atUserList: [
+          TencentUtils.checkString(messageBeenReplied.sender) ??
+              TencentUtils.checkString(messageBeenReplied.userID) ??
+              ""
+        ]);
+
+    final V2TimMessage? messageInfo = textMessageInfo!.messageInfo;
+
+    if (messageInfo != null) {
+      final messageInfoWithSender = messageInfo.sender == null
+          ? tools.setUserInfoForMessage(messageInfo, messageInfo.id ?? textMessageInfo.id ?? "")
+          : messageInfo;
+
+      final hasNickName = messageBeenReplied.nickName != null &&
+          messageBeenReplied.nickName != "";
+      final cloudCustomData = {
+        "messageReply": {
+          "messageID": messageBeenReplied.msgID,
+          "messageAbstract": tools.getMessageAbstract(
+              messageBeenReplied, abstractMessageBuilder),
+          "messageSender": hasNickName
+              ? messageBeenReplied.nickName
+              : messageBeenReplied.sender,
+          "messageType": messageBeenReplied.elemType,
+          "version": 1
+        }
+      };
+      messageInfoWithSender.cloudCustomData = json.encode(cloudCustomData);
+
+      currentHistoryMsgList = [messageInfoWithSender, ...currentHistoryMsgList];
+      setMessageList(convID, currentHistoryMsgList);
+
+      return _sendMessage(
+        cloudCustomData: json.encode(cloudCustomData),
+        id: textMessageInfo.id as String,
+        offlinePushInfo: offlinePushInfo ??
+            tools.buildMessagePushInfo(
+                messageInfo, convID, ConvType.values[convType.index]),
+        priority: priority,
+        onlineUserOnly: onlineUserOnly,
+        isExcludedFromUnreadCount: isExcludedFromUnreadCount,
+        needReadReceipt: needReadReceipt,
+        localCustomData: localCustomData,
+        convID: convID,
+        setInputField: setInputField,
+        convType: ConvType.values[convType.index],
+      );
+    }
+    return null;
+  }
+
   Future<bool> setLocalCustomData(
       String msgID, String localCustomData, String conversationID) async {
     final res = await _messageService.setLocalCustomData(

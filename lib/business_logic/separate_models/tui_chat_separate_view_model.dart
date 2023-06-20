@@ -20,7 +20,6 @@ import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_cloud_custom_data.dart';
 import 'package:uuid/uuid.dart';
 
 enum LoadDirection { previous, latest }
@@ -44,7 +43,6 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
   bool haveMoreData = false;
   bool haveMoreLatestData = false;
   String _currentPlayedMsgId = "";
-  String _editRevokedMsg = "";
   GroupReceiptAllowType? _groupType;
   List<V2TimMessage> _multiSelectedMessageList = [];
   V2TimMessage? _repliedMessage;
@@ -105,13 +103,6 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
 
   set currentPlayedMsgId(String value) {
     _currentPlayedMsgId = value;
-    notifyListeners();
-  }
-
-  String get editRevokedMsg => _editRevokedMsg;
-
-  set editRevokedMsg(String value) {
-    _editRevokedMsg = value;
     notifyListeners();
   }
 
@@ -810,54 +801,6 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     return null;
   }
 
-  String _getMessageAbstract(V2TimMessage message){
-    final messageAbstract = RepliedMessageAbstract(
-      summary: TIM_t(_getMessageSummary(message)),
-      elemType: message.elemType,
-      msgID: message.msgID,
-      timestamp: message.timestamp,
-      seq: message.seq
-    );
-    return jsonEncode(messageAbstract.toJson());
-  }
-
-  String _getMessageSummary(V2TimMessage message) {
-    final String? customAbstractMessage = abstractMessageBuilder != null
-        ? abstractMessageBuilder!(message)
-        : null;
-    if (customAbstractMessage != null) {
-      return customAbstractMessage;
-    }
-
-    final elemType = message.elemType;
-    switch (elemType) {
-      case MessageElemType.V2TIM_ELEM_TYPE_FACE:
-        return "[表情消息]";
-      case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
-        return "[自定义消息]";
-      case MessageElemType.V2TIM_ELEM_TYPE_FILE:
-        return "[文件消息]";
-      case MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS:
-        return "[群消息]";
-      case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
-        return "[图片消息]";
-      case MessageElemType.V2TIM_ELEM_TYPE_LOCATION:
-        return "[位置消息]";
-      case MessageElemType.V2TIM_ELEM_TYPE_MERGER:
-        return "[合并消息]";
-      case MessageElemType.V2TIM_ELEM_TYPE_NONE:
-        return "[没有元素]";
-      case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
-        return "[语音消息]";
-      case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
-        return message.textElem?.text ?? "[文本消息]";
-      case MessageElemType.V2TIM_ELEM_TYPE_VIDEO:
-        return "[视频消息]";
-      default:
-        return "";
-    }
-  }
-
   Future<V2TimValueCallback<V2TimMessage>?> sendReplyMessage({
     required String text,
     required String convID,
@@ -888,7 +831,8 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
         final cloudCustomData = {
           "messageReply": {
             "messageID": _repliedMessage!.msgID,
-            "messageAbstract": _getMessageAbstract(_repliedMessage!),
+            "messageAbstract": tools.getMessageAbstract(
+                _repliedMessage!, abstractMessageBuilder),
             "messageSender": hasNickName
                 ? _repliedMessage!.nickName
                 : _repliedMessage?.sender,
@@ -914,7 +858,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
 
         _repliedMessage = null;
         final sendMsgRes = await _messageService.sendMessage(
-          cloudCustomData: json.encode(cloudCustomData),
+            cloudCustomData: json.encode(cloudCustomData),
             id: textMessageInfo.id as String,
             offlinePushInfo: tools.buildMessagePushInfo(
                 messageInfoWithSender, convID, convType),
@@ -1439,11 +1383,27 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     globalModel.setMessageList(conversationID, []);
   }
 
-  Future<V2TimCallback> revokeMsg(String msgID,
+  Future<Object?> revokeMsg(String msgID, bool isAdmin,
       [Object? webMessageInstance]) async {
+    if (chatConfig.isGroupAdminRecallEnabled) {
+      final V2TimMessage? message = globalModel.messageListMap[conversationID]
+          ?.firstWhere((element) => element.msgID == msgID);
+      if (message != null) {
+        if (PlatformUtils().isWeb) {
+          final decodedMessage = jsonDecode(message.messageFromWeb!);
+          decodedMessage["cloudCustomData"] =
+              jsonEncode({"isRevoke": true, "revokeByAdmin": isAdmin});
+          message.messageFromWeb = jsonEncode(decodedMessage);
+        } else {
+          message.cloudCustomData =
+              jsonEncode({"isRevoke": true, "revokeByAdmin": isAdmin});
+        }
+        return await modifyMessage(message: message);
+      }
+    }
+
     final res = await _messageService.revokeMessage(
         msgID: msgID, webMessageInstance: webMessageInstance);
-
     if (res.code == 0) {
       globalModel.onMessageRevoked(msgID, conversationID);
     }

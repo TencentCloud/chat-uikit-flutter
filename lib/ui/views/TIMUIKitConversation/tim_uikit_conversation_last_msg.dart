@@ -1,5 +1,7 @@
 // ignore_for_file: unrelated_type_equality_checks
 
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
@@ -45,13 +47,35 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
     }
   }
 
+  (bool isRevoke, bool isRevokeByAdmin) isRevokeMessage(V2TimMessage? message) {
+    if (message == null) {
+      return (false, false);
+    }
+    if (message.status == 6) {
+      return (true, false);
+    } else {
+      try {
+        final customData = jsonDecode(message.cloudCustomData ?? "{}");
+        final isRevoke = customData["isRevoke"] ?? false;
+        final revokeByAdmin = customData["revokeByAdmin"] ?? false;
+        return (isRevoke, revokeByAdmin);
+      } catch (e) {
+        return (false, false);
+      }
+    }
+  }
+
   void _getMsgElem() async {
-    final isRevokedMessage = widget.lastMsg!.status == 6;
+    final revokeStatus = isRevokeMessage(widget.lastMsg);
+    final isRevokedMessage = revokeStatus.$1;
+    final isAdminRevoke = revokeStatus.$2;
     if (isRevokedMessage) {
       final isSelf = widget.lastMsg!.isSelf ?? true;
-      final option1 = isSelf
-          ? TIM_t("您")
-          : widget.lastMsg!.nickName ?? widget.lastMsg?.sender;
+      final option1 = isAdminRevoke
+          ? TIM_t("管理员")
+          : (isSelf
+              ? TIM_t("您")
+              : widget.lastMsg!.nickName ?? widget.lastMsg?.sender);
       if (mounted) {
         setState(() {
           groupTipsAbstractText = TIM_t_para(

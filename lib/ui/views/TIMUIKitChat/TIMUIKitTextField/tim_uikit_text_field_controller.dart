@@ -23,7 +23,7 @@ class TIMUIKitInputTextFieldController extends ChangeNotifier {
     }
   }
 
-  /// text field unfocus and hide all panel
+  /// text field unfocused and hide all panel
   hideAllPanel() {
     actionType = ActionType.hideAllPanel;
     notifyListeners();

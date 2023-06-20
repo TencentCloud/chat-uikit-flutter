@@ -52,6 +52,10 @@ class TIMUIKitMessageTooltip extends StatefulWidget {
 
   final bool isShowMoreSticker;
 
+  final V2TimGroupMemberFullInfo? groupMemberInfo;
+
+  final bool iSUseDefaultHoverBar;
+
   const TIMUIKitMessageTooltip(
       {Key? key,
       this.toolTipsConfig,
@@ -63,7 +67,9 @@ class TIMUIKitMessageTooltip extends StatefulWidget {
       required this.selectEmojiPanelPosition,
       required this.onCloseTooltip,
       required this.onSelectSticker,
-      this.isShowMoreSticker = false})
+      this.isShowMoreSticker = false,
+      this.groupMemberInfo,
+      required this.iSUseDefaultHoverBar})
       : super(key: key);
 
   @override
@@ -141,8 +147,9 @@ class TIMUIKitMessageTooltipState
   }
 
   bool isRevocable(int timestamp, int upperTimeLimit) =>
-      (DateTime.now().millisecondsSinceEpoch / 1000).ceil() - timestamp <
-      upperTimeLimit;
+      ((DateTime.now().millisecondsSinceEpoch / 1000).ceil() - timestamp <
+          upperTimeLimit) &&
+      (widget.message.isSelf ?? true);
 
   Widget ItemInkWell({
     Widget? child,
@@ -181,14 +188,24 @@ class TIMUIKitMessageTooltipState
     return isvote;
   }
 
+  bool isAdminCanRecall() {
+    if (widget.groupMemberInfo != null &&
+        widget.model.chatConfig.isGroupAdminRecallEnabled) {
+      final selfRole = widget.groupMemberInfo!.role;
+      return selfRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN ||
+          selfRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER;
+    } else {
+      return false;
+    }
+  }
+
   _buildLongPressTipItem(
       TUITheme theme, TUIChatSeparateViewModel model, V2TimMessage message) {
     final isDesktopScreen =
         TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
-    final isCanRevoke = isRevocable(
+    final isCanRevokeSelf = isRevocable(
         widget.message.timestamp!, model.chatConfig.upperRecallTime);
-    final shouldShowRevokeAction = isCanRevoke &&
-        (widget.message.isSelf ?? true) &&
+    final shouldShowRevokeAction = (isCanRevokeSelf || isAdminCanRecall()) &&
         widget.message.status != MessageStatus.V2TIM_MSG_STATUS_SEND_FAIL;
     final shouldShowReplyAction = !(widget.message.customElem?.data != null &&
         MessageUtils.isCallingData(widget.message.customElem!.data!));
@@ -258,13 +275,11 @@ class TIMUIKitMessageTooltipState
         }
         if (type == "forwardMessage") {
           return tooltipsConfig.showForwardMessage &&
-              !(isDesktopScreen &&
-                  widget.model.chatConfig.isUseMessageHoverBarOnDesktop);
+              !(isDesktopScreen && widget.iSUseDefaultHoverBar);
         }
         if (type == "replyMessage") {
           return tooltipsConfig.showReplyMessage &&
-              !(isDesktopScreen &&
-                  widget.model.chatConfig.isUseMessageHoverBarOnDesktop);
+              !(isDesktopScreen && widget.iSUseDefaultHoverBar);
         }
         if (type == "delete") {
           return (!PlatformUtils().isWeb) && tooltipsConfig.showDeleteMessage;
@@ -435,7 +450,11 @@ class TIMUIKitMessageTooltipState
         model.deleteMsg(msgID, webMessageInstance: messageItem.messageFromWeb);
         break;
       case "revoke":
-        model.revokeMsg(msgID, messageItem.messageFromWeb);
+        model.revokeMsg(
+            msgID,
+            !isRevocable(
+                widget.message.timestamp!, model.chatConfig.upperRecallTime),
+            messageItem.messageFromWeb);
         break;
       case 'translate':
         model.translateText(widget.message);

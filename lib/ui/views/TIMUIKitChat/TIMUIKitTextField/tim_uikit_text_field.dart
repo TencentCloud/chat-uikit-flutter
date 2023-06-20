@@ -316,18 +316,6 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     });
   }
 
-  void onModelChanged() {
-    if (widget.model.editRevokedMsg != "") {
-      narrowTextFieldKey.currentState?.showKeyboard = true;
-      focusNode.requestFocus();
-      textEditingController.text = widget.model.editRevokedMsg;
-      textEditingController.selection = TextSelection.fromPosition(TextPosition(
-          affinity: TextAffinity.downstream,
-          offset: widget.model.editRevokedMsg.length));
-      widget.model.editRevokedMsg = "";
-    }
-  }
-
   _onCursorChange() {
     final selection = textEditingController.selection;
     currentCursor = selection.baseOffset;
@@ -346,7 +334,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
         "";
   }
 
-  _longPressToAt(String? userID, String? nickName) {
+  mentionMemberInMessage(String? userID, String? nickName) {
     if (TencentUtils.checkString(userID) == null) {
       focusNode.requestFocus();
     } else {
@@ -682,7 +670,6 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     if (widget.controller != null) {
       widget.controller?.addListener(controllerHandler);
     }
-    widget.model.addListener(onModelChanged);
     final AppLocale appLocale = I18nUtils.findDeviceLocale(null);
     languageType =
         (appLocale == AppLocale.zhHans || appLocale == AppLocale.zhHant)
@@ -696,7 +683,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
   controllerHandler() {
     final actionType = widget.controller?.actionType;
     if (actionType == ActionType.longPressToAt) {
-      _longPressToAt(
+      mentionMemberInMessage(
           widget.controller?.atUserID, widget.controller?.atUserName);
     } else if (actionType == ActionType.setTextField) {
       final newText = widget.controller?.inputText ?? "";
@@ -704,6 +691,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
       textEditingController.selection = TextSelection.fromPosition(
           TextPosition(offset: textEditingController.text.length));
       lastText = textEditingController.text;
+      focusNode.requestFocus();
       return;
     } else if (actionType == ActionType.requestFocus) {
       focusNode.requestFocus();
@@ -736,7 +724,6 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
   @override
   void dispose() {
     handleSetDraftText();
-    widget.model.removeListener(onModelChanged);
     if (widget.controller != null) {
       widget.controller?.removeListener(controllerHandler);
     }

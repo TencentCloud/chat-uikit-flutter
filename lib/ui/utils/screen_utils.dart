@@ -28,7 +28,6 @@ class TUIKitScreenUtils {
 
       final diagonalInInches =
           sqrt(pow(screenWidth, 2) + pow(screenHeight, 2)) / 96.0;
-      print("diagonalInInches $diagonalInInches");
 
       deviceType =  diagonalInInches < 11.0 ? DeviceType.Mobile : DeviceType.Desktop;
       return deviceType ?? DeviceType.Mobile;

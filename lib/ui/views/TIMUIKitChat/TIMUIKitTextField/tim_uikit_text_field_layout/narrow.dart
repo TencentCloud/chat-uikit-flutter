@@ -201,6 +201,7 @@ class _TIMUIKitTextFieldLayoutNarrowState
           addText: (int unicode) {
             final newText = String.fromCharCode(unicode);
             widget.addStickerToText(newText);
+            setSendButton();
             // handleSetDraftText();
           },
           addCustomEmojiText: ((String singleEmojiName) {

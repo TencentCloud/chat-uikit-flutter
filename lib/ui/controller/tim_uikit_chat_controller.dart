@@ -179,6 +179,100 @@ class TIMUIKitChatController {
     return null;
   }
 
+  /// Sends a message, replying to another message, to the specified conversation, or to the current conversation specified on `TIMUIKitChat`.
+  /// You must provide `convType` and either `userID` or `groupID`, only if you use `TIMUIKitChat` without specifying a `TIMUIKitChatController`, you must provide these parameters.
+  Future<V2TimValueCallback<V2TimMessage>?>? sendReplyMessage({
+    required String messageText,
+    required V2TimMessage messageBeenReplied,
+
+    /// The type of the target conversation: either ConvType.group or ConvType.c2c. Required if using `TIMUIKitChat` without specifying a `TIMUIKitChatController`.
+    ConvType? convType,
+
+    /// The user ID of the target one-to-one conversation. Required if convType is ConvType.c2c.
+    String? userID,
+
+    /// The target group ID. Required if convType is ConvType.group.
+    String? groupID,
+
+    /// A callback function to update the input field when message sending fails.
+    ValueChanged<String>? setInputField,
+
+    /// Offline push information.
+    OfflinePushInfo? offlinePushInfo,
+
+    /// Whether automatically scrolling to the bottom of the message list after sending a message.
+    /// This field solely works when `TIMUIKitChatController` is specified for use within a `TIMUIKitChat`.
+    bool isNavigateToMessageListBottom = true,
+
+    /// Message priorities. This field is valid only for group chat messages.
+    /// You are advised to set higher priorities for important messages (such as red packet and gift messages)
+    /// and set lower priorities for frequent but unimportant messages (such as like messages).
+    MessagePriorityEnum priority = MessagePriorityEnum.V2TIM_PRIORITY_NORMAL,
+
+    /// Whether the message can be received only by online users.
+    /// If this field is set to true, the message cannot be pulled in recipient historical message pulling.
+    /// This field is often used to implement weak notification features such as "The other party is typing" or unimportant notifications in the group. This field is not supported by audio-video groups (AVChatRoom).
+    bool? onlineUserOnly,
+
+    /// Whether the message is excluded from the conversation unread message count.
+    bool? isExcludedFromUnreadCount,
+
+    /// Whether a read receipt is required.
+    bool? needReadReceipt,
+
+    /// Local custom message data (saved locally, will not be sent to the peer end,
+    /// and will become invalid after the app is uninstalled and reinstalled).
+    String? localCustomData,
+  }) {
+    if (convType != null) {
+      /// Sends a message to the specified conversation.
+      assert((groupID == null) != (userID == null));
+      assert(groupID != null || convType != ConvType.group);
+      assert(userID != null || convType != ConvType.c2c);
+      if (isNavigateToMessageListBottom && scrollController != null) {
+        scrollController!.animateTo(
+          scrollController!.position.minScrollExtent,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.ease,
+        );
+      }
+      return globalChatModel.sendReplyMessageFromController(
+          text: messageText,
+          messageBeenReplied: messageBeenReplied,
+          priority: priority,
+          onlineUserOnly: onlineUserOnly,
+          isExcludedFromUnreadCount: isExcludedFromUnreadCount,
+          needReadReceipt: needReadReceipt,
+          localCustomData: localCustomData,
+          convType: convType,
+          convID: (convType == ConvType.group ? groupID : userID) ?? "",
+          setInputField: setInputField,
+          offlinePushInfo: offlinePushInfo);
+    } else if (model != null) {
+      /// Sends a message to the current conversation specified on `TIMUIKitChat`. 发送到 `TIMUIKitChat` 中指定的当前对话。
+      if (isNavigateToMessageListBottom && scrollController != null) {
+        scrollController?.animateTo(
+          scrollController!.position.minScrollExtent,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.ease,
+        );
+      }
+      return globalChatModel.sendReplyMessageFromController(
+          text: messageText,
+          messageBeenReplied: messageBeenReplied,
+          priority: priority,
+          onlineUserOnly: onlineUserOnly,
+          isExcludedFromUnreadCount: isExcludedFromUnreadCount,
+          needReadReceipt: needReadReceipt,
+          localCustomData: localCustomData,
+          convType: model!.conversationType ?? ConvType.group,
+          convID: model!.conversationID,
+          setInputField: setInputField,
+          offlinePushInfo: offlinePushInfo);
+    }
+    return null;
+  }
+
   /// Send forward message;
   /// This function solely works when `TIMUIKitChatController` is specified for use within a `TIMUIKitChat`.
   sendForwardMessage({

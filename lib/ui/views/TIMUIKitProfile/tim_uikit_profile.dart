@@ -86,16 +86,21 @@ class TIMUIKitProfile extends StatefulWidget {
   const TIMUIKitProfile(
       {Key? key,
       required this.userID,
-      @Deprecated("[operationListBuilder] and [bottomOperationBuilder] merged into [builder], please use it instead")
-          this.operationListBuilder,
-      @Deprecated("[operationListBuilder] and [bottomOperationBuilder] merged into [builder], please use it instead")
-          this.bottomOperationBuilder,
-      @Deprecated("This widget will no longer shows the personal info card and can not jump to personal info page automatically, please navigate to your custom personal info page manually and directly, you may refer to our demo")
-          this.handleProfileDetailCardTap,
-      @Deprecated("This widget will no longer shows the personal info card and can not jump to personal info page automatically, please navigate to your custom personal info page manually and directly, you may refer to our demo")
-          this.canJumpToPersonalProfile = false,
-      @Deprecated("This widget will no longer shows the personal info card and will not support to change self avatar, please navigate to your custom personal info page manually and directly, you may refer to our demo")
-          this.onSelfAvatarTap,
+      @Deprecated(
+          "[operationListBuilder] and [bottomOperationBuilder] merged into [builder], please use it instead")
+      this.operationListBuilder,
+      @Deprecated(
+          "[operationListBuilder] and [bottomOperationBuilder] merged into [builder], please use it instead")
+      this.bottomOperationBuilder,
+      @Deprecated(
+          "This widget will no longer shows the personal info card and can not jump to personal info page automatically, please navigate to your custom personal info page manually and directly, you may refer to our demo")
+      this.handleProfileDetailCardTap,
+      @Deprecated(
+          "This widget will no longer shows the personal info card and can not jump to personal info page automatically, please navigate to your custom personal info page manually and directly, you may refer to our demo")
+      this.canJumpToPersonalProfile = false,
+      @Deprecated(
+          "This widget will no longer shows the personal info card and will not support to change self avatar, please navigate to your custom personal info page manually and directly, you may refer to our demo")
+      this.onSelfAvatarTap,
       this.controller,
       this.profileWidgetBuilder,
       this.profileWidgetsOrder,
@@ -130,7 +135,8 @@ class _TIMUIKitProfileState extends TIMUIKitState<TIMUIKitProfile> {
   @override
   void didUpdateWidget(covariant TIMUIKitProfile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (oldWidget.userID != widget.userID) {
+    if (oldWidget.userID != widget.userID ||
+        _model.userProfile?.friendInfo?.userID != widget.userID) {
       _model.userProfile = null;
       _model.loadData(
           userID: widget.userID, isNeedConversation: !widget.isSelf);

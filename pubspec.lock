@@ -764,7 +764,7 @@ packages:
     source: hosted
     version: "2.0.3"
   markdown:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: markdown
       sha256: "8e332924094383133cee218b676871f42db2514f1f6ac617b6cf6152a7faab8e"

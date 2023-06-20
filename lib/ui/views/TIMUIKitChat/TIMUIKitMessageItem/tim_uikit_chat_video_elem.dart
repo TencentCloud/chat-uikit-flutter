@@ -282,16 +282,17 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
                                       package: 'tencent_cloud_chat_uikit',
                                       height: 64)),
                             ),
-                          Positioned(
-                              right: 10,
-                              bottom: 10,
-                              child: Text(
-                                  MessageUtils.formatVideoTime(
-                                          widget.message.videoElem?.duration ??
-                                              0)
-                                      .toString(),
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 12))),
+                          if (widget.message.videoElem?.duration != null &&
+                              widget.message.videoElem!.duration! > 0)
+                            Positioned(
+                                right: 10,
+                                bottom: 10,
+                                child: Text(
+                                    MessageUtils.formatVideoTime(widget
+                                                .message.videoElem!.duration!)
+                                        .toString(),
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 12))),
                         ],
                       ));
                 }),

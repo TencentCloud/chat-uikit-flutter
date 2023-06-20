@@ -26,7 +26,7 @@ class TIMUIKitChatConfig {
   /// Customize the time divider among the two messages.
   final TimeDividerConfig? timeDividerConfig;
 
-  /// control if allowed to show reading status.
+  /// Control if allowed to show reading status.
   /// [Default]: true.
   final bool isShowReadingStatus;
 
@@ -191,9 +191,18 @@ class TIMUIKitChatConfig {
   /// [Default]: true.
   final bool isUseDraftOnWeb;
 
+  /// Determines whether a group administrator is allowed to recall any
+  /// message from any group member. If this capability is enabled,
+  /// recalled messages will not be interoperable with Native clients
+  /// and will only take effect on other Flutter clients.
+  ///
+  /// [Default]: false
+  final bool isGroupAdminRecallEnabled;
+
   const TIMUIKitChatConfig(
       {this.onTapLink,
       this.timeDividerConfig,
+      this.isGroupAdminRecallEnabled = false,
       this.isAutoReportRead = true,
       this.faceURIPrefix,
       this.faceURISuffix,

@@ -76,6 +76,14 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
 
   final V2TimConversation conversation;
 
+  final V2TimGroupMemberFullInfo? groupMemberInfo;
+
+  /// This parameter accepts a custom widget to be displayed when the mouse hovers over a message,
+  /// replacing the default message hover action bar.
+  /// Applicable only on desktop platforms.
+  /// If provided, the default message action functionality will appear in the right-click context menu instead.
+  final Widget Function(V2TimMessage message)? customMessageHoverBarOnDesktop;
+
   const TIMUIKitHistoryMessageListContainer({
     Key? key,
     this.itemBuilder,
@@ -101,6 +109,8 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
     this.textFieldController,
     required this.conversation,
     this.onSecondaryTapAvatar,
+    this.groupMemberInfo,
+    this.customMessageHoverBarOnDesktop,
   }) : super(key: key);
 
   @override
@@ -162,6 +172,9 @@ class _TIMUIKitHistoryMessageListContainerState
           mainHistoryListConfig: widget.mainHistoryListConfig,
           itemBuilder: (context, message) {
             return TIMUIKitHistoryMessageListItem(
+                customMessageHoverBarOnDesktop:
+                    widget.customMessageHoverBarOnDesktop,
+                groupMemberInfo: widget.groupMemberInfo,
                 textFieldController: widget.textFieldController,
                 userAvatarBuilder: widget.userAvatarBuilder,
                 customEmojiStickerList: widget.customEmojiStickerList,

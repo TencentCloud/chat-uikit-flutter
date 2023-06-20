@@ -12,6 +12,7 @@ import 'package:tencent_cloud_chat_uikit/business_logic/listener_model/tui_group
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_conversation_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
@@ -144,6 +145,12 @@ class TIMUIKitChat extends StatefulWidget {
   /// Custom emoji panel.
   final CustomStickerPanel? customStickerPanel;
 
+  /// This parameter accepts a custom widget to be displayed when the mouse hovers over a message,
+  /// replacing the default message hover action bar.
+  /// Applicable only on desktop platforms.
+  /// If provided, the default message action functionality will appear in the right-click context menu instead.
+  final Widget Function(V2TimMessage message)? customMessageHoverBarOnDesktop;
+
   /// Custom text field
   final Widget Function(BuildContext context)? textFieldBuilder;
 
@@ -181,7 +188,8 @@ class TIMUIKitChat extends StatefulWidget {
     this.textFieldBuilder,
     this.customEmojiStickerList = const [],
     this.customAppBar,
-    this.onSecondaryTapAvatar})
+    this.onSecondaryTapAvatar,
+    this.customMessageHoverBarOnDesktop})
       : super(key: key) {
     startTime = DateTime
         .now()
@@ -194,10 +202,12 @@ class TIMUIKitChat extends StatefulWidget {
 
 class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
   TUIChatSeparateViewModel model = TUIChatSeparateViewModel();
+  final TUISelfInfoViewModel selfInfoViewModel =
+  serviceLocator<TUISelfInfoViewModel>();
   final TUIThemeViewModel themeViewModel = serviceLocator<TUIThemeViewModel>();
   final TUIConversationViewModel conversationViewModel =
   serviceLocator<TUIConversationViewModel>();
-  final TIMUIKitInputTextFieldController textFieldController =
+  TIMUIKitInputTextFieldController textFieldController =
   TIMUIKitInputTextFieldController();
   bool isInit = false;
   final TUIChatGlobalModel chatGlobalModel =
@@ -278,6 +288,9 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
           // ignore: empty_catches
         } catch (e) {}
       });
+    }
+    if (oldWidget.textFieldBuilder != null && widget.textFieldBuilder == null) {
+      textFieldController = TIMUIKitInputTextFieldController();
     }
   }
 
@@ -388,6 +401,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                 }).toList();
           }
 
+          final selfUserID = selfInfoViewModel.loginInfo?.userID;
           final TUIGroupListenerModel groupListenerModel =
           Provider.of<TUIGroupListenerModel>(context, listen: true);
           final NeedUpdate? needUpdate = groupListenerModel.needUpdate;
@@ -464,7 +478,14 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                                     child: Listener(
                                       onPointerMove: closePanel,
                                       child: TIMUIKitHistoryMessageListContainer(
+                                        customMessageHoverBarOnDesktop: widget
+                                            .customMessageHoverBarOnDesktop,
                                         conversation: widget.conversation,
+                                        groupMemberInfo: model.groupMemberList
+                                            ?.firstWhere(
+                                                (element) =>
+                                            element?.userID == selfUserID,
+                                            orElse: () => null),
                                         textFieldController: textFieldController,
                                         customEmojiStickerList:
                                         widget.customEmojiStickerList,
@@ -532,14 +553,17 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                                 conversationID: _getConvID(),
                                 conversationType: _getConvType(),
                                 initText: TencentUtils.checkString(
-                                    widget.draftText) ?? (PlatformUtils().isWeb
-                                    ? TencentUtils.checkString(
-                                    conversationViewModel.getWebDraft(
-                                        conversationID: widget.conversation
-                                            .conversationID))
-                                    :
-                                TencentUtils.checkString(widget
-                                    .conversation.draftText)),
+                                    widget.draftText) ??
+                                    (PlatformUtils().isWeb
+                                        ? TencentUtils.checkString(
+                                        conversationViewModel
+                                            .getWebDraft(
+                                            conversationID: widget
+                                                .conversation
+                                                .conversationID))
+                                        : TencentUtils.checkString(
+                                        widget.conversation
+                                            .draftText)),
                                 hintText: widget.textFieldHintText,
                                 showMorePanel: widget.config
                                     ?.isAllowShowMorePanel ??

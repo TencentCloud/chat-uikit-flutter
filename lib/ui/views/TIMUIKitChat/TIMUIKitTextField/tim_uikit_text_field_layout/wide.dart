@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-import 'dart:ui' as ui;
 import 'package:fc_native_video_thumbnail/fc_native_video_thumbnail.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -227,6 +226,7 @@ class _TIMUIKitTextFieldLayoutWideState
         });
       }
     } catch (e) {
+      // ignore: avoid_print
       print(e);
     }
     generateDefaultControlBarItems();
@@ -239,6 +239,7 @@ class _TIMUIKitTextFieldLayoutWideState
         sendFileUseJs(imageFile);
       }
     } catch (e) {
+      // ignore: avoid_print
       print("Paste image failed: ${e.toString()}");
     }
   }
@@ -1033,7 +1034,7 @@ class _TIMUIKitTextFieldLayoutWideState
                             textAlignVertical: TextAlignVertical.top,
                             style: const TextStyle(fontSize: 14),
                             decoration: InputDecoration(
-                              hoverColor: hexToColor("fafafa"),
+                              hoverColor: Colors.transparent,
                               border: InputBorder.none,
                               hintStyle: const TextStyle(
                                 color: Color(0xffAEA4A3),
