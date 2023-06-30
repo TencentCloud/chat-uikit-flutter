@@ -470,6 +470,7 @@ class _TIMUIKitTextFieldLayoutNarrowState
                                         showMore = false;
                                       });
                                     },
+                                    cursorHeight: 20,
                                     keyboardType: TextInputType.multiline,
                                     textInputAction: PlatformUtils().isAndroid
                                         ? TextInputAction.newline
@@ -493,6 +494,8 @@ class _TIMUIKitTextFieldLayoutNarrowState
                                           // fontSize: 10,
                                           color: Color(0xffAEA4A3),
                                         ),
+                                        contentPadding:
+                                            EdgeInsets.symmetric(vertical: 8),
                                         fillColor: Colors.white,
                                         filled: true,
                                         isDense: true,
