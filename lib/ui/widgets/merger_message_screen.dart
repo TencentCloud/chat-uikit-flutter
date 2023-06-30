@@ -305,6 +305,7 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
     }
 
     return TUIKitScreenUtils.getDeviceWidget(
+        context: context,
         desktopWidget: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: messageListPage(),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_extended_text/extended_text.dart';
+import 'package:extended_text/extended_text.dart';
 import 'package:tim_ui_kit_sticker_plugin/constant/emoji.dart';
 
 ///emoji/image text

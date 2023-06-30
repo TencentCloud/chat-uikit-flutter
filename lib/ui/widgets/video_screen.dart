@@ -12,7 +12,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:universal_html/html.dart' as html;
-import 'package:chewie/chewie.dart';
+import 'package:chewie_for_us/chewie_for_us.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
@@ -89,7 +89,7 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
       } else {
         final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
         AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-        if ((androidInfo.version.sdkInt ?? 0) >= 33) {
+        if ((androidInfo.version.sdkInt) >= 33) {
           final videos = await Permissions.checkPermission(
             context,Permission.videos.value,
           );

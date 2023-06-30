@@ -2,20 +2,17 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_setting_model.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/listener_model/tui_group_listener_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_conversation_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendship_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-
 import 'package:tencent_cloud_chat_uikit/data_services/core/core_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_config.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-
-import 'package:disk_space/disk_space.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/web_support/uikit_web_support.dart'
     if (dart.library.html) 'package:tencent_cloud_chat_uikit/data_services/core/web_support/uikit_web_support_implement.dart';
 
@@ -31,7 +28,7 @@ class LoginInfo {
       {this.sdkAppID = 0, this.userSig = "", this.userID = "", this.loginUser});
 }
 
-class CoreServicesImpl with CoreServices {
+class CoreServicesImpl implements CoreServices {
   V2TimUserFullInfo? _loginInfo;
   late int _sdkAppID;
   late String _userID;
@@ -78,22 +75,28 @@ class CoreServicesImpl with CoreServices {
   @override
   Future<bool?> init(
       {
-
       /// Callback from TUIKit invoke, includes IM SDK API error, notify information, Flutter error.
       ValueChanged<TIMCallback>? onTUIKitCallbackListener,
       required int sdkAppID,
       required LogLevelEnum loglevel,
       required V2TimSDKListener listener,
       LanguageEnum? language,
-        String? extraLanguage,
+      String? extraLanguage,
       TIMUIKitConfig? config,
+
+      /// Specify the current device platform, mobile or desktop, based on your needs.
+      /// TUIKit will automatically determine the platform if no specification is provided. DeviceType? platform,
+      DeviceType? platform,
       VoidCallback? onWebLoginSuccess}) async {
+    if (platform != null) {
+      TUIKitScreenUtils.deviceType = platform;
+    }
     addIdentifier();
-    if(extraLanguage != null){
+    if (extraLanguage != null) {
       Future.delayed(const Duration(milliseconds: 1), () {
         I18nUtils(null, extraLanguage);
       });
-    }else if (language != null) {
+    } else if (language != null) {
       Future.delayed(const Duration(milliseconds: 1), () {
         I18nUtils(null, languageEnumToString[language]);
       });
@@ -143,11 +146,11 @@ class CoreServicesImpl with CoreServices {
     required String userId,
   }) async {
     _userID = userId;
-    if(extraLanguage != null){
+    if (extraLanguage != null) {
       Future.delayed(const Duration(milliseconds: 1), () {
         I18nUtils(null, extraLanguage);
       });
-    }else if (language != null) {
+    } else if (language != null) {
       Future.delayed(const Duration(milliseconds: 1), () {
         I18nUtils(null, languageEnumToString[language]);
       });
@@ -250,9 +253,8 @@ class CoreServicesImpl with CoreServices {
       }
 
       tuiFriendShipViewModel.userStatusList = currentUserStatusList;
-    // ignore: empty_catches
-    } catch (e) {
-    }
+      // ignore: empty_catches
+    } catch (e) {}
   }
 
   @override
@@ -292,17 +294,6 @@ class CoreServicesImpl with CoreServices {
               selfInfoViewModel.setLoginInfo(_loginInfo!)
             }
         });
-
-    if (PlatformUtils().isMobile &&
-        selfInfoViewModel.globalConfig?.isCheckDiskStorageSpace == true) {
-      final diskSpace = await DiskSpace.getFreeDiskSpace;
-      if (diskSpace != null && diskSpace < 1024) {
-        callOnCallback(TIMCallback(
-            type: TIMCallbackType.INFO,
-            infoRecommendText: TIM_t("设备存储空间不足，建议清理，以获得更好使用体验"),
-            infoCode: 6661403));
-      }
-    }
   }
 
   // Deprecated
@@ -412,5 +403,10 @@ class CoreServicesImpl with CoreServices {
           .getOfflinePushManager()
           .doBackground(unreadCount: totalCount ?? 0);
     }
+  }
+
+  @override
+  setDeviceType(DeviceType deviceType) {
+    TUIKitScreenUtils.deviceType = deviceType;
   }
 }

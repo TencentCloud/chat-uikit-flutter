@@ -2,7 +2,7 @@
 
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:fc_native_video_thumbnail_for_us/fc_native_video_thumbnail_for_us.dart';
+import 'package:fc_native_video_thumbnail/fc_native_video_thumbnail.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -12,7 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_call_invite_list.dart';
-import 'package:tencent_wechat_camera_picker/tencent_wechat_camera_picker.dart';
+import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
@@ -360,7 +360,7 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
       if (PlatformUtils().isMobile){
         if(PlatformUtils().isAndroid){
           AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-          if ((androidInfo.version.sdkInt ?? 0) >= 33) {
+          if ((androidInfo.version.sdkInt) >= 33) {
             final videos = await Permissions.checkPermission(
               context,Permission.videos.value,
               theme,

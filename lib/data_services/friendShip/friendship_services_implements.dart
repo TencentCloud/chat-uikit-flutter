@@ -3,7 +3,7 @@ import 'package:tencent_cloud_chat_uikit/data_services/friendShip/friendship_ser
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
-class FriendshipServicesImpl with FriendshipServices {
+class FriendshipServicesImpl implements FriendshipServices {
   final CoreServicesImpl _coreService = serviceLocator<CoreServicesImpl>();
 
   @override

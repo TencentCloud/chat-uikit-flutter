@@ -212,7 +212,7 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
         }
       }
     }
-    return InkWell(
+    return GestureDetector(
       onTap: () => _playSound(),
       child: Container(
         padding: widget.textPadding ?? const EdgeInsets.all(10),

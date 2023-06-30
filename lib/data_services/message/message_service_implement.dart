@@ -36,26 +36,26 @@ class MessageServiceImpl extends MessageService {
             lastMsgID: lastMsgID,
             lastMsgSeq: lastMsgSeq,
             messageTypeList: messageTypeList);
-    final List<V2TimMessage> reponseMessageList = res.data ?? [];
+    final List<V2TimMessage> responsedMessageList = res.data ?? [];
     final conversationID = userID ?? groupID;
     final cachedMessageList = messgaeListMap[conversationID];
-    List<V2TimMessage> commbinedMessageList = [];
+    List<V2TimMessage> combinedMessageList = [];
     // 加载更多
     if (lastMsgID != null && cachedMessageList != null) {
-      commbinedMessageList = [...cachedMessageList, ...reponseMessageList];
+      combinedMessageList = [...cachedMessageList, ...responsedMessageList];
       // 首次加载
     } else {
       final bool existSendingMessage = sendingMessage[conversationID] != null &&
           sendingMessage[conversationID]!.isNotEmpty;
       // 存在未发送完成的消息
       if (existSendingMessage) {
-        commbinedMessageList = [
+        combinedMessageList = [
           ...sendingMessage[conversationID]!,
-          ...reponseMessageList
+          ...responsedMessageList
         ];
       } else {
         sendingMessage.remove(conversationID);
-        commbinedMessageList = reponseMessageList;
+        combinedMessageList = responsedMessageList;
       }
     }
     if (res.code != 0) {
@@ -64,15 +64,16 @@ class MessageServiceImpl extends MessageService {
           errorMsg: res.desc,
           errorCode: res.code));
     }
-    if (reponseMessageList.isEmpty ||
-        (!PlatformUtils().isWeb && reponseMessageList.length < count) ||
-        (PlatformUtils().isWeb && reponseMessageList.length < min(count, 20))) {
+    if (responsedMessageList.isEmpty ||
+        (!PlatformUtils().isWeb && responsedMessageList.length < count) ||
+        (PlatformUtils().isWeb &&
+            responsedMessageList.length < min(count, 20))) {
       haveMoreData = false;
     } else {
       haveMoreData = true;
     }
     return MessageListResponse(
-        haveMoreData: haveMoreData, data: commbinedMessageList);
+        haveMoreData: haveMoreData, data: combinedMessageList);
   }
 
   @override
@@ -302,11 +303,13 @@ class MessageServiceImpl extends MessageService {
 
   @override
   Future<V2TimMsgCreateInfoResult?> createImageMessage(
-      {String? imagePath, dynamic inputElement}) async {
+      {String? imageName, String? imagePath, dynamic inputElement}) async {
     final res = await TencentImSDKPlugin.v2TIMManager
         .getMessageManager()
         .createImageMessage(
-            imagePath: imagePath ?? "", inputElement: inputElement);
+            imageName: imageName,
+            imagePath: imagePath ?? "",
+            inputElement: inputElement);
     if (res.code == 0) {
       return res.data;
     }
@@ -345,7 +348,7 @@ class MessageServiceImpl extends MessageService {
     bool isExcludedFromUnreadCount = false,
     bool needReadReceipt = false,
     OfflinePushInfo? offlinePushInfo,
-    String? cloudCustomData, // 云自定义消息字段，只能在消息发送前添加
+    String? cloudCustomData,
     String? localCustomData,
   }) async {
     final result =
@@ -812,5 +815,4 @@ class MessageServiceImpl extends MessageService {
     }
     return result.data?[text] ?? "";
   }
-
 }
