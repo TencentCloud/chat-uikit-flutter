@@ -376,7 +376,7 @@ class _GroupProfileGroupManagePageState
                                                   size: 16),
                                               onClick: () {
                                                 widget.model.muteGroupMember(
-                                                    e?.userID ?? "",
+                                                    e.userID,
                                                     false,
                                                     serverTime);
                                                 onClose();
@@ -409,6 +409,7 @@ class _GroupProfileGroupManagePageState
           }
 
           return TUIKitScreenUtils.getDeviceWidget(
+              context: context,
               desktopWidget: managePage(),
               defaultWidget: Scaffold(
                 appBar: AppBar(
@@ -501,6 +502,7 @@ Widget _buildListItem(BuildContext context, V2TimGroupMemberFullInfo memberInfo,
   }
 
   return TUIKitScreenUtils.getDeviceWidget(
+      context: context,
       desktopWidget: nameItem(),
       defaultWidget: SingleChildScrollView(
           child: Slidable(endActionPane: endActionPane, child: nameItem())));
@@ -724,7 +726,7 @@ class _GroupProfileSetManagerPageState
                                             Icons.remove_circle_outline,
                                             size: 16),
                                         onClick: () {
-                                          _removeAdmin(context, e!);
+                                          _removeAdmin(context, e);
                                           onClose();
                                         }),
                                   ]));
@@ -758,6 +760,7 @@ class _GroupProfileSetManagerPageState
         }
 
         return TUIKitScreenUtils.getDeviceWidget(
+            context: context,
             desktopWidget: adminPage(),
             defaultWidget: Scaffold(
               appBar: AppBar(
@@ -876,6 +879,7 @@ class _GroupProfileAddAdminState extends TIMUIKitState<GroupProfileAddAdmin> {
     }
 
     return TUIKitScreenUtils.getDeviceWidget(
+        context: context,
         desktopWidget: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: addAdminPage(),

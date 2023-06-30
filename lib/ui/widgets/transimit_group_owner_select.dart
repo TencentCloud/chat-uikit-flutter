@@ -116,6 +116,7 @@ class _SelectNewGroupOwner extends TIMUIKitState<SelectNewGroupOwner> {
     }
 
     return TUIKitScreenUtils.getDeviceWidget(
+        context: context,
         defaultWidget: Scaffold(
             appBar: AppBar(
               shadowColor: theme.weakBackgroundColor,

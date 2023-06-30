@@ -20,6 +20,7 @@ class AtText extends StatefulWidget {
   final Function(
           V2TimGroupMemberFullInfo memberInfo, TapDownDetails? tapDetails)?
       onChooseMember;
+  final bool canAtAll;
 
   // some Group type cant @all
   final String? groupType;
@@ -32,6 +33,7 @@ class AtText extends StatefulWidget {
     this.groupMemberList,
     this.closeFunc,
     this.onChooseMember,
+    this.canAtAll = false,
   }) : super(key: key);
 
   @override
@@ -116,7 +118,7 @@ class _AtTextState extends TIMUIKitState<AtText> {
           groupType: widget.groupType ?? "",
           memberList: searchMemberList ?? [],
           onTapMemberItem: _onTapMemberItem,
-          canAtAll: true,
+          canAtAll: widget.canAtAll,
           canSlideDelete: false,
           touchBottomCallBack: () {
             // Get all by once, unnecessary to load more
@@ -130,6 +132,7 @@ class _AtTextState extends TIMUIKitState<AtText> {
     }
 
     return TUIKitScreenUtils.getDeviceWidget(
+        context: context,
         desktopWidget: mentionedMembersBody(),
         defaultWidget: Scaffold(
             appBar: AppBar(
@@ -137,8 +140,7 @@ class _AtTextState extends TIMUIKitState<AtText> {
               iconTheme: IconThemeData(
                 color: theme.appbarTextColor,
               ),
-              backgroundColor: theme.appbarBgColor ??
-                  theme.primaryColor,
+              backgroundColor: theme.appbarBgColor ?? theme.primaryColor,
               leading: Row(
                 children: [
                   IconButton(

@@ -34,6 +34,7 @@ class _AddGroupMemberPageState extends TIMUIKitState<AddGroupMemberPage> {
     final TUITheme theme = value.theme;
 
     return TUIKitScreenUtils.getDeviceWidget(
+        context: context,
         desktopWidget: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: ContactList(

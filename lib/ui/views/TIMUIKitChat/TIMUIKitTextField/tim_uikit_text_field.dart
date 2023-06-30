@@ -38,8 +38,6 @@ typedef CustomStickerPanel = Widget Function({
   double? height,
 });
 
-GlobalKey<_InputTextFieldState> inputTextFieldState = GlobalKey();
-
 class TIMUIKitInputTextField extends StatefulWidget {
   /// conversation id
   final String conversationID;
@@ -59,7 +57,7 @@ class TIMUIKitInputTextField extends StatefulWidget {
   /// hint text for textField widget
   final String? hintText;
 
-  /// config for more pannel
+  /// config for more panel
   final MorePanelConfig? morePanelConfig;
 
   /// show send audio icon
@@ -95,6 +93,8 @@ class TIMUIKitInputTextField extends StatefulWidget {
 
   final String? groupType;
 
+  final String? groupID;
+
   const TIMUIKitInputTextField(
       {Key? key,
       required this.conversationID,
@@ -115,7 +115,8 @@ class TIMUIKitInputTextField extends StatefulWidget {
       required this.model,
       required this.currentConversation,
       this.groupType,
-      this.atMemberPanelScroll})
+      this.atMemberPanelScroll,
+      this.groupID})
       : super(key: key);
 
   @override
@@ -133,15 +134,13 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
   int? currentCursor;
   bool isAddingAtSearchWords = false;
   double inputWidth = 900;
-
-  Map<String, V2TimGroupMemberFullInfo> memberInfoMap = {};
-
+  Map<String, V2TimGroupMemberFullInfo> mentionedMembersMap = {};
   late TextEditingController textEditingController;
   final TUIConversationViewModel conversationModel =
       serviceLocator<TUIConversationViewModel>();
   final TUISelfInfoViewModel selfModel = serviceLocator<TUISelfInfoViewModel>();
   MuteStatus muteStatus = MuteStatus.none;
-
+  bool _isComposingText = false;
   int latestSendEditStatusTime = DateTime.now().millisecondsSinceEpoch;
 
   setCurrentCursor(int? value) {
@@ -160,7 +159,9 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     }
 
     if (TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop) {
-      focusNode.unfocus();
+      textEditingController.selection = TextSelection.fromPosition(TextPosition(
+          offset: currentCursor ?? textEditingController.text.length));
+      focusNode.requestFocus();
     }
   }
 
@@ -168,26 +169,22 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     return text.replaceAll(RegExp(r'\ufeff'), "");
   }
 
-  getShowName(message) {
-    return TencentUtils.checkStringWithoutSpace(message?.friendRemark) ??
-        TencentUtils.checkStringWithoutSpace(message?.nickName) ??
-        TencentUtils.checkStringWithoutSpace(message?.userID);
-  }
-
-  handleSetDraftText([String? id, ConvType? convType]) async {
-    String convID = id ?? widget.conversationID;
-    String conversationID =
-        (convType ?? widget.conversationType) == ConvType.c2c
-            ? "c2c_$convID"
-            : "group_$convID";
+  Future handleSetDraftText([String? id, ConvType? convType]) async {
     String text = textEditingController.text;
-    String? draftText = _filterU200b(text);
-
-    if (draftText.isEmpty) {
-      draftText = "";
-    }
-    await conversationModel.setConversationDraft(
-        conversationID: conversationID, draftText: draftText);
+    String convID = id ?? widget.conversationID;
+    final isTopic = convID.contains("@TOPIC#");
+    String conversationID = isTopic
+        ? convID
+        : ((convType ?? widget.conversationType) == ConvType.c2c
+            ? "c2c_$convID"
+            : "group_$convID");
+    String draftText = _filterU200b(text);
+    return await conversationModel.setConversationDraft(
+        groupID: widget.groupID,
+        isTopic: isTopic,
+        isAllowWeb: widget.model.chatConfig.isUseDraftOnWeb,
+        conversationID: conversationID,
+        draftText: draftText);
   }
 
   backSpaceText() {
@@ -196,11 +193,9 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
 
     if (originalText == zeroWidthSpace) {
       _handleSoftKeyBoardDelete();
-      // _addDeleteTag();
     } else {
       text = originalText.characters.skipLast(1);
       textEditingController.text = text;
-      // handleSetDraftText();
     }
   }
 
@@ -209,6 +204,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     lastText = "";
     final text = textEditingController.text.trim();
     final convType = widget.conversationType;
+    conversationModel.clearWebDraft(conversationID: widget.conversationID);
     if (text.isNotEmpty && text != zeroWidthSpace) {
       if (widget.model.repliedMessage != null) {
         MessageUtils.handleMessageError(
@@ -258,7 +254,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
 
   List<String> getUserIdFromMemberInfoMap() {
     List<String> userList = [];
-    memberInfoMap.forEach((String key, V2TimGroupMemberFullInfo info) {
+    mentionedMembersMap.forEach((String key, V2TimGroupMemberFullInfo info) {
       userList.add(info.userID);
     });
 
@@ -266,6 +262,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
   }
 
   onSubmitted() async {
+    conversationModel.clearWebDraft(conversationID: widget.conversationID);
     lastText = "";
     final text = textEditingController.text.trim();
     final convType = widget.conversationType;
@@ -278,7 +275,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                 convType: convType,
                 atUserIDList: getUserIdFromMemberInfoMap()),
             context);
-      } else if (memberInfoMap.isNotEmpty) {
+      } else if (mentionedMembersMap.isNotEmpty) {
         widget.model.sendTextAtMessage(
             text: text,
             convType: widget.conversationType,
@@ -293,7 +290,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
       textEditingController.clear();
       currentCursor = null;
       lastText = "";
-      memberInfoMap = {};
+      mentionedMembersMap = {};
 
       goDownBottom();
       _handleSendEditStatus("", false);
@@ -319,30 +316,6 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     });
   }
 
-  void onModelChanged() {
-    if (widget.model.repliedMessage != null) {
-      narrowTextFieldKey.currentState?.showKeyboard = true;
-      focusNode.requestFocus();
-      _addDeleteTag();
-    } else {}
-    if (widget.model.editRevokedMsg != "") {
-      narrowTextFieldKey.currentState?.showKeyboard = true;
-      focusNode.requestFocus();
-      textEditingController.text = widget.model.editRevokedMsg;
-      textEditingController.selection = TextSelection.fromPosition(TextPosition(
-          affinity: TextAffinity.downstream,
-          offset: widget.model.editRevokedMsg.length));
-      widget.model.editRevokedMsg = "";
-    }
-  }
-
-  _addDeleteTag() {
-    final originalText = textEditingController.text;
-    textEditingController.text = zeroWidthSpace + originalText;
-    textEditingController.selection = TextSelection.fromPosition(
-        TextPosition(offset: textEditingController.text.length));
-  }
-
   _onCursorChange() {
     final selection = textEditingController.selection;
     currentCursor = selection.baseOffset;
@@ -361,25 +334,33 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
         "";
   }
 
-  _longPressToAt(String? userID, String? nickName) {
-    final memberInfo = V2TimGroupMemberFullInfo(
-      userID: userID ?? "",
-      nickName: nickName,
-    );
-    final showName = _getShowName(memberInfo);
-    memberInfoMap["@$showName"] = memberInfo;
-    String text = "${textEditingController.text}@$showName ";
-    //please do not delete space
-    focusNode.requestFocus();
-    textEditingController.text = text;
-    textEditingController.selection =
-        TextSelection.fromPosition(TextPosition(offset: text.length - 1));
-    lastText = text;
+  mentionMemberInMessage(String? userID, String? nickName) {
+    if (TencentUtils.checkString(userID) == null) {
+      focusNode.requestFocus();
+    } else {
+      final memberInfo = widget.model.groupMemberList
+              ?.firstWhere((element) => element?.userID == userID) ??
+          V2TimGroupMemberFullInfo(
+            userID: userID ?? "",
+            nickName: nickName,
+          );
+      final showName = _getShowName(memberInfo);
+      mentionedMembersMap["@$showName"] = memberInfo;
+      String text = "${textEditingController.text}@$showName ";
+      //please do not delete space
+      focusNode.requestFocus();
+      textEditingController.text = text;
+      textEditingController.selection =
+          TextSelection.fromPosition(TextPosition(offset: text.length));
+      lastText = text;
+      _isComposingText = false;
+      narrowTextFieldKey.currentState?.showKeyboard = true;
+    }
   }
 
   bool shouldRemoveAtTag(String atTag, String deletedChar) {
     final atMemberArray = [];
-    memberInfoMap.forEach((key, value) {
+    mentionedMembersMap.forEach((key, value) {
       atMemberArray.add(key);
     });
     for (String member in atMemberArray) {
@@ -403,7 +384,11 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     final Offset caretPosition =
         textPainter.getOffsetForCaret(lastLineOffset, Rect.zero);
     final dx = min(inputWidth - 180, caretPosition.dx + 16);
-    final dy = max(24, 110 - caretPosition.dy).toDouble();
+    final dy = max(
+            24,
+            18 * widget.model.chatConfig.desktopMessageInputFieldLines -
+                caretPosition.dy)
+        .toDouble();
 
     return Offset(dx, dy);
   }
@@ -417,11 +402,27 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
       parseAtList.add(str);
     }
     for (String? key in parseAtList) {
-      if (key != null && memberInfoMap[key] != null) {
-        map[key] = memberInfoMap[key]!;
+      if (key != null && mentionedMembersMap[key] != null) {
+        map[key] = mentionedMembersMap[key]!;
       }
     }
-    memberInfoMap = map;
+    mentionedMembersMap = map;
+  }
+
+  updateMentionedMap() {
+    Map<String, V2TimGroupMemberFullInfo> map = {};
+    Iterable<Match> matches = atTextReg.allMatches(textEditingController.text);
+    List<String?> parseAtList = [];
+    for (final item in matches) {
+      final str = item.group(0);
+      parseAtList.add(str);
+    }
+    for (String? key in parseAtList) {
+      if (key != null && mentionedMembersMap[key] != null) {
+        map[key] = mentionedMembersMap[key]!;
+      }
+    }
+    mentionedMembersMap = map;
   }
 
   _handleAtText(String text, TUIChatSeparateViewModel model) async {
@@ -456,23 +457,17 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
           textEditingController.selection =
               TextSelection.collapsed(offset: atIndex);
           lastText = newText;
-          Map<String, V2TimGroupMemberFullInfo> map = {};
-          Iterable<Match> matches = atTextReg.allMatches(text);
-          List<String?> parseAtList = [];
-          for (final item in matches) {
-            final str = item.group(0);
-            parseAtList.add(str);
-          }
-          for (String? key in parseAtList) {
-            if (key != null && memberInfoMap[key] != null) {
-              map[key] = memberInfoMap[key]!;
-            }
-          }
-          memberInfoMap = map;
+          updateMentionedMap();
           return;
         }
       }
+      updateMentionedMap();
     }
+
+    final int selfRole = widget.model.selfMemberInfo?.role ?? 0;
+    final bool canAtAll =
+        (selfRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN ||
+            selfRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER);
 
     if (isDesktopScreen) {
       final atPlace = text.lastIndexOf("@");
@@ -484,16 +479,54 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
           model.atPositionY = atPosition.dy;
           isAddingAtSearchWords = true;
         }
-        final List<V2TimGroupMemberFullInfo?> showAtMemberList =
-            (model.groupMemberList ?? []).where((element) {
-          final friendRemark = element?.friendRemark ?? "";
-          final nickName = element?.nickName ?? "";
-          final showName = TencentUtils.checkString(friendRemark) ??
-              TencentUtils.checkString(nickName) ??
-              TencentUtils.checkString(element?.userID) ??
-              "";
-          return showName.contains(keyword);
-        }).toList();
+        List<V2TimGroupMemberFullInfo> showAtMemberList = (model
+                    .groupMemberList ??
+                [])
+            .where((element) {
+              final showName = (TencentUtils.checkStringWithoutSpace(
+                          element?.friendRemark) ??
+                      TencentUtils.checkStringWithoutSpace(element?.nameCard) ??
+                      TencentUtils.checkStringWithoutSpace(element?.nickName) ??
+                      TencentUtils.checkStringWithoutSpace(element?.userID) ??
+                      "")
+                  .toLowerCase();
+              return element != null &&
+                  showName.contains(keyword.toLowerCase()) &&
+                  TencentUtils.checkString(showName) != null &&
+                  element.userID != widget.model.selfMemberInfo?.userID;
+            })
+            .whereType<V2TimGroupMemberFullInfo>()
+            .toList();
+
+        showAtMemberList.sort(
+            (V2TimGroupMemberFullInfo userA, V2TimGroupMemberFullInfo userB) {
+          final isUserAIsGroupAdmin = userA.role == 300;
+          final isUserAIsGroupOwner = userA.role == 400;
+
+          final isUserBIsGroupAdmin = userB.role == 300;
+          final isUserBIsGroupOwner = userB.role == 400;
+
+          final String userAName = _getShowName(userA);
+          final String userBName = _getShowName(userB);
+
+          if (isUserAIsGroupOwner != isUserBIsGroupOwner) {
+            return isUserAIsGroupOwner ? -1 : 1;
+          }
+
+          if (isUserAIsGroupAdmin != isUserBIsGroupAdmin) {
+            return isUserAIsGroupAdmin ? -1 : 1;
+          }
+
+          return userAName.compareTo(userBName);
+        });
+
+        if (canAtAll && showAtMemberList.isNotEmpty && keyword.isEmpty) {
+          showAtMemberList = [
+            V2TimGroupMemberFullInfo(
+                userID: "__kImSDK_MesssageAtALL__", nickName: TIM_t("所有人")),
+            ...showAtMemberList
+          ];
+        }
 
         model.activeAtIndex = 0;
         model.showAtMemberList = showAtMemberList;
@@ -514,12 +547,13 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
               groupMemberList: model.groupMemberList,
               groupInfo: model.groupInfo,
               groupID: groupID,
+              canAtAll: canAtAll,
               groupType: widget.groupType),
         ),
       );
       final showName = _getShowName(memberInfo);
       if (memberInfo != null) {
-        memberInfoMap["@$showName"] = memberInfo;
+        mentionedMembersMap["@$showName"] = memberInfo;
         textEditingController.text = "$text$showName ";
         lastText = "$text$showName ";
       }
@@ -547,11 +581,75 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
       bool? isAddToCursorPosition = false}) {
     if (memberInfo != null) {
       final String showName = _getShowName(memberInfo);
-      memberInfoMap["@$showName"] = memberInfo;
+      mentionedMembersMap["@$showName"] = memberInfo;
       replaceAtTag(showName);
       widget.model.showAtMemberList = [];
       widget.model.activeAtIndex = -1;
+      focusNode.requestFocus();
     }
+  }
+
+  KeyEventResult handleDesktopKeyEvent(FocusNode node, RawKeyEvent event) {
+    final activeIndex = widget.model.activeAtIndex;
+    final showMemberList = widget.model.showAtMemberList;
+    if (event.runtimeType == RawKeyDownEvent) {
+      if (event.physicalKey == PhysicalKeyboardKey.backspace) {
+        if (textEditingController.text.isEmpty && lastText.isEmpty) {
+          widget.model.repliedMessage = null;
+          return KeyEventResult.handled;
+        }
+      } else if ((event.isShiftPressed ||
+              event.isAltPressed ||
+              event.isControlPressed ||
+              event.isMetaPressed) &&
+          event.physicalKey == PhysicalKeyboardKey.enter) {
+        final offset = textEditingController.selection.baseOffset;
+        textEditingController.text =
+            '${lastText.substring(0, offset)}\n${lastText.substring(offset)}';
+        textEditingController.selection =
+            TextSelection.fromPosition(TextPosition(offset: offset + 1));
+        lastText = textEditingController.text;
+
+        return KeyEventResult.handled;
+      } else if (event.physicalKey == PhysicalKeyboardKey.enter) {
+        if (!_isComposingText) {
+          if (!isAddingAtSearchWords || widget.model.showAtMemberList.isEmpty) {
+            onSubmitted();
+          } else {
+            isAddingAtSearchWords = false;
+            final V2TimGroupMemberFullInfo? memberInfo =
+                showMemberList[activeIndex];
+            if (memberInfo != null) {
+              handleAtMember(
+                  memberInfo: memberInfo, isAddToCursorPosition: true);
+            }
+          }
+          return KeyEventResult.handled;
+        }
+      }
+
+      if (event.isKeyPressed(LogicalKeyboardKey.arrowUp) &&
+          isAddingAtSearchWords &&
+          showMemberList.isNotEmpty) {
+        final newIndex = max(activeIndex - 1, 0);
+        widget.model.activeAtIndex = newIndex;
+        widget.atMemberPanelScroll?.scrollToIndex(newIndex,
+            preferPosition: AutoScrollPosition.middle);
+        return KeyEventResult.handled;
+      }
+
+      if (event.isKeyPressed(LogicalKeyboardKey.arrowDown) &&
+          isAddingAtSearchWords &&
+          showMemberList.isNotEmpty) {
+        final newIndex = min(activeIndex + 1, showMemberList.length - 1);
+        widget.model.activeAtIndex = newIndex;
+        widget.atMemberPanelScroll?.scrollToIndex(newIndex,
+            preferPosition: AutoScrollPosition.middle);
+        return KeyEventResult.handled;
+      }
+    }
+
+    return KeyEventResult.ignored;
   }
 
   @override
@@ -559,97 +657,56 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     super.initState();
     if (PlatformUtils().isWeb || PlatformUtils().isDesktop) {
       focusNode = FocusNode(
-        onKey: (node, event) {
-          final activeIndex = widget.model.activeAtIndex;
-          final showMemberList = widget.model.showAtMemberList;
-          if (event.runtimeType == RawKeyDownEvent) {
-            if (event.physicalKey == PhysicalKeyboardKey.backspace) {
-              if (textEditingController.text.isEmpty && lastText.isEmpty) {
-                widget.model.repliedMessage = null;
-                return KeyEventResult.handled;
-              }
-            } else if ((event.isShiftPressed ||
-                    event.isAltPressed ||
-                    event.isControlPressed ||
-                    event.isMetaPressed) &&
-                event.physicalKey == PhysicalKeyboardKey.enter) {
-              final offset = textEditingController.selection.baseOffset;
-              textEditingController.text =
-                  '${lastText.substring(0, offset)}\n${lastText.substring(offset)}';
-              textEditingController.selection =
-                  TextSelection.fromPosition(TextPosition(offset: offset + 1));
-              lastText = textEditingController.text;
-
-              return KeyEventResult.handled;
-            } else if (event.physicalKey == PhysicalKeyboardKey.enter) {
-              if (!isAddingAtSearchWords ||
-                  widget.model.showAtMemberList.isEmpty) {
-                onSubmitted();
-              } else {
-                isAddingAtSearchWords = false;
-                final V2TimGroupMemberFullInfo? memberInfo =
-                    showMemberList[activeIndex];
-                if (memberInfo != null) {
-                  handleAtMember(
-                      memberInfo: memberInfo, isAddToCursorPosition: true);
-                }
-              }
-              return KeyEventResult.handled;
-            }
-
-            if (event.isKeyPressed(LogicalKeyboardKey.arrowUp) &&
-                isAddingAtSearchWords &&
-                showMemberList.isNotEmpty) {
-              final newIndex = max(activeIndex - 1, 0);
-              widget.model.activeAtIndex = newIndex;
-              widget.atMemberPanelScroll?.scrollToIndex(newIndex,
-                  preferPosition: AutoScrollPosition.middle);
-              return KeyEventResult.handled;
-            }
-
-            if (event.isKeyPressed(LogicalKeyboardKey.arrowDown) &&
-                isAddingAtSearchWords &&
-                showMemberList.isNotEmpty) {
-              final newIndex = min(activeIndex + 1, showMemberList.length - 1);
-              widget.model.activeAtIndex = newIndex;
-              widget.atMemberPanelScroll?.scrollToIndex(newIndex,
-                  preferPosition: AutoScrollPosition.middle);
-              return KeyEventResult.handled;
-            }
-          }
-
-          return KeyEventResult.ignored;
-        },
+        onKey: (node, event) => handleDesktopKeyEvent(node, event),
       );
     } else {
       focusNode = FocusNode();
     }
     textEditingController =
         widget.controller?.textEditingController ?? TextEditingController();
-    if (widget.controller != null) {
-      widget.controller?.addListener(() {
-        final actionType = widget.controller?.actionType;
-        if (actionType == ActionType.longPressToAt) {
-          _longPressToAt(
-              widget.controller?.atUserID, widget.controller?.atUserName);
-        }
-      });
-    }
-    widget.model.addListener(onModelChanged);
     if (widget.initText != null) {
       textEditingController.text = widget.initText!;
+    }
+    if (widget.controller != null) {
+      widget.controller?.addListener(controllerHandler);
     }
     final AppLocale appLocale = I18nUtils.findDeviceLocale(null);
     languageType =
         (appLocale == AppLocale.zhHans || appLocale == AppLocale.zhHant)
             ? 'zh'
             : 'en';
+    textEditingController.addListener(() {
+      _isComposingText = textEditingController.value.composing.start != -1;
+    });
+  }
+
+  controllerHandler() {
+    final actionType = widget.controller?.actionType;
+    if (actionType == ActionType.longPressToAt) {
+      mentionMemberInMessage(
+          widget.controller?.atUserID, widget.controller?.atUserName);
+    } else if (actionType == ActionType.setTextField) {
+      final newText = widget.controller?.inputText ?? "";
+      textEditingController.text = newText;
+      textEditingController.selection = TextSelection.fromPosition(
+          TextPosition(offset: textEditingController.text.length));
+      lastText = textEditingController.text;
+      focusNode.requestFocus();
+      return;
+    } else if (actionType == ActionType.requestFocus) {
+      focusNode.requestFocus();
+      return;
+    } else if (actionType == ActionType.handleAtMember) {
+      handleAtMember(memberInfo: widget.controller?.groupMemberFullInfo);
+      return;
+    }
   }
 
   @override
   void didUpdateWidget(TIMUIKitInputTextField oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.conversationID != oldWidget.conversationID) {
+      mentionedMembersMap.clear();
       handleSetDraftText(oldWidget.conversationID, oldWidget.conversationType);
       if (oldWidget.initText != widget.initText) {
         textEditingController.text = widget.initText ?? "";
@@ -657,12 +714,19 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
         textEditingController.clear();
       }
     }
+    if (widget.initText != oldWidget.initText &&
+        TencentUtils.checkString(widget.initText) != null) {
+      textEditingController.text = widget.initText!;
+      focusNode.requestFocus();
+    }
   }
 
   @override
   void dispose() {
     handleSetDraftText();
-    widget.model.removeListener(onModelChanged);
+    if (widget.controller != null) {
+      widget.controller?.removeListener(controllerHandler);
+    }
     focusNode.dispose();
     super.dispose();
   }
@@ -738,6 +802,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
+    final theme = value.theme;
     final TUIChatSeparateViewModel model =
         Provider.of<TUIChatSeparateViewModel>(context);
 
@@ -763,6 +828,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
               builder: (BuildContext context, BoxConstraints constraints) {
             inputWidth = constraints.maxWidth;
             return TUIKitScreenUtils.getDeviceWidget(
+                context: context,
                 defaultWidget: TIMUIKitTextFieldLayoutNarrow(
                     onEmojiSubmitted: onEmojiSubmitted,
                     onCustomEmojiFaceSubmitted: onCustomEmojiFaceSubmitted,
@@ -798,6 +864,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                     showMorePanel: widget.showMorePanel,
                     customEmojiStickerList: widget.customEmojiStickerList),
                 desktopWidget: TIMUIKitTextFieldLayoutWide(
+                    theme: theme,
                     currentConversation: widget.currentConversation,
                     onEmojiSubmitted: onEmojiSubmitted,
                     onCustomEmojiFaceSubmitted: onCustomEmojiFaceSubmitted,
@@ -825,7 +892,6 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                     handleAtText: (text) {
                       _handleAtText(text, model);
                     },
-                    handleSoftKeyBoardDelete: _handleSoftKeyBoardDelete,
                     onSubmitted: onSubmitted,
                     goDownBottom: goDownBottom,
                     showSendAudio: widget.showSendAudio,

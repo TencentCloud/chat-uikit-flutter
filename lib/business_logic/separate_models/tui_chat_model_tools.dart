@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_cloud_custom_data.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
@@ -16,7 +19,7 @@ class TUIChatModelTools {
     if (globalModel.chatConfig.offlinePushInfo != null) {
       final customData =
           globalModel.chatConfig.offlinePushInfo!(message, convID, convType);
-      if(customData != null){
+      if (customData != null) {
         return customData;
       }
     }
@@ -102,6 +105,54 @@ class TUIChatModelTools {
     messageInfo.id = id;
 
     return messageInfo;
+  }
+
+  String getMessageSummary(V2TimMessage message,
+      String? Function(V2TimMessage message)? abstractMessageBuilder) {
+    final String? customAbstractMessage =
+        abstractMessageBuilder != null ? abstractMessageBuilder(message) : null;
+    if (customAbstractMessage != null) {
+      return customAbstractMessage;
+    }
+
+    final elemType = message.elemType;
+    switch (elemType) {
+      case MessageElemType.V2TIM_ELEM_TYPE_FACE:
+        return "[表情消息]";
+      case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
+        return "[自定义消息]";
+      case MessageElemType.V2TIM_ELEM_TYPE_FILE:
+        return "[文件消息]";
+      case MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS:
+        return "[群消息]";
+      case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
+        return "[图片消息]";
+      case MessageElemType.V2TIM_ELEM_TYPE_LOCATION:
+        return "[位置消息]";
+      case MessageElemType.V2TIM_ELEM_TYPE_MERGER:
+        return "[合并消息]";
+      case MessageElemType.V2TIM_ELEM_TYPE_NONE:
+        return "[没有元素]";
+      case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
+        return "[语音消息]";
+      case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
+        return message.textElem?.text ?? "[文本消息]";
+      case MessageElemType.V2TIM_ELEM_TYPE_VIDEO:
+        return "[视频消息]";
+      default:
+        return "";
+    }
+  }
+
+  String getMessageAbstract(V2TimMessage message,
+      String? Function(V2TimMessage message)? abstractMessageBuilder) {
+    final messageAbstract = RepliedMessageAbstract(
+        summary: TIM_t(getMessageSummary(message, abstractMessageBuilder)),
+        elemType: message.elemType,
+        msgID: message.msgID,
+        timestamp: message.timestamp,
+        seq: message.seq);
+    return jsonEncode(messageAbstract.toJson());
   }
 
   Future<V2TimMessage?> getExistingMessageByID(

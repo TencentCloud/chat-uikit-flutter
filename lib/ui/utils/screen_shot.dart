@@ -101,4 +101,5 @@ class ScreenshotHelper {
     }));
     return completer.future;
   }
+
 }

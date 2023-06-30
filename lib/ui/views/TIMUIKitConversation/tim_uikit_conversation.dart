@@ -64,8 +64,6 @@ class TIMUIKitConversation extends StatefulWidget {
   final bool isShowOnlineStatus;
 
   /// Control if shows the identifier that the conversation has a draft text, inputted in previous.
-  /// Also, you have better specifying the `draftText` field for `TIMUIKitChat`, from the `draftText` in `V2TimConversation`,
-  /// to meet the identifier shows here.
   final bool isShowDraft;
 
   const TIMUIKitConversation(
@@ -375,7 +373,7 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
                               : isPined
                                   ? theme.conversationItemPinedBgColor
                                   : theme.conversationItemBgColor,
-                          child: InkWell(
+                          child: GestureDetector(
                             child: TIMUIKitConversationItem(
                                 isCurrent: isCurrent,
                                 isShowDraft: widget.isShowDraft,
@@ -402,11 +400,12 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
                       }
 
                       return TUIKitScreenUtils.getDeviceWidget(
+                          context: context,
                           desktopWidget: AutoScrollTag(
                             key: ValueKey(conversationItem.conversationID),
                             controller: _autoScrollController,
                             index: index,
-                            child: GestureDetector(
+                            child: InkWell(
                               onSecondaryTapDown: (details) {
                                 TUIKitWidePopup.showPopupWindow(
                                     operationKey: TUIKitWideModalOperationKey
@@ -450,6 +449,7 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
           }
 
           return TUIKitScreenUtils.getDeviceWidget(
+              context: context,
               defaultWidget: SlidableAutoCloseBehavior(
                 child: EasyRefresh(
                   header: CustomizeBallPulseHeader(color: theme.primaryColor),

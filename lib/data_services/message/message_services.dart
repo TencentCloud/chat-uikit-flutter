@@ -3,6 +3,7 @@ import 'package:tencent_im_base/tencent_im_base.dart';
 class MessageListResponse {
   final bool haveMoreData;
   final List<V2TimMessage> data;
+
   MessageListResponse({required this.haveMoreData, required this.data});
 }
 
@@ -51,6 +52,7 @@ abstract class MessageService {
   Future<void> removeSimpleMsgListener({V2TimSimpleMsgListener? listener});
 
   Future<V2TimMsgCreateInfoResult?> createTextMessage({required String text});
+
   Future<V2TimMsgCreateInfoResult?> createFaceMessage(
       {required int index, required String data});
 
@@ -88,7 +90,7 @@ abstract class MessageService {
       {required V2TimMessage message});
 
   Future<V2TimMsgCreateInfoResult?> createImageMessage(
-      {String? imagePath, dynamic inputElement});
+      {String? imageName, String? imagePath, dynamic inputElement});
 
   Future<V2TimMsgCreateInfoResult?> createVideoMessage(
       {String? videoPath = "",

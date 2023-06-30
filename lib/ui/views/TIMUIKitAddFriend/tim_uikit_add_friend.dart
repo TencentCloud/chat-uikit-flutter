@@ -24,6 +24,7 @@ class TIMUIKitAddFriend extends StatefulWidget {
   /// The life cycle hooks for adding friends and contact business logic
   final AddFriendLifeCycle? lifeCycle;
 
+  /// The callback function to close the widget upon completion by the parent component.
   final VoidCallback? closeFunc;
 
   const TIMUIKitAddFriend(

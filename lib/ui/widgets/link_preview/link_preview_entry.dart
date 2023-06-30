@@ -10,13 +10,17 @@ class LinkPreviewEntry {
   /// get the text message with hyperlinks
   static LinkPreviewText? getHyperlinksText(String messageText, bool isMarkdown,
       {Function(String)? onLinkTap,
-      bool? isEnableTextSelection,
+      bool isEnableTextSelection = false,
       bool isUseDefaultEmoji = false,
       List customEmojiStickerList = const []}) {
     return ({TextStyle? style}) {
       return isMarkdown
           ? LinkTextMarkdown(
-              messageText: messageText, style: style, onLinkTap: onLinkTap)
+              isEnableTextSelection: isEnableTextSelection,
+              messageText: addSpaceAfterLeftBracket(
+                  addSpaceBeforeHttp(replaceSingleNewlineWithTwo(messageText))),
+              style: style,
+              onLinkTap: onLinkTap)
           : LinkText(
               isEnableTextSelection: isEnableTextSelection,
               messageText: messageText,
@@ -25,6 +29,30 @@ class LinkPreviewEntry {
               isUseDefaultEmoji: isUseDefaultEmoji,
               customEmojiStickerList: customEmojiStickerList);
     };
+  }
+
+  static String addSpaceAfterLeftBracket(String inputText) {
+    return inputText.splitMapJoin(
+      RegExp(r'<\w+[^<>]*>'),
+      onMatch: (match) {
+        return match.group(0)!.replaceFirst('<', '< ');
+      },
+      onNonMatch: (text) => text,
+    );
+  }
+
+  static String replaceSingleNewlineWithTwo(String inputText) {
+    return inputText.split('\n').join('\n\n');
+  }
+
+  static String addSpaceBeforeHttp(String inputText) {
+    return inputText.splitMapJoin(
+      RegExp(r'http'),
+      onMatch: (match) {
+        return ' http';
+      },
+      onNonMatch: (text) => text,
+    );
   }
 
   /// get the [LinkPreviewContent] with preview widget and website information for the first link.
