@@ -59,7 +59,7 @@ typedef MessageRowBuilder = Widget? Function(
 
 typedef MessageNickNameBuilder = Widget Function(
     BuildContext context, V2TimMessage message, TUIChatSeparateViewModel model);
-
+typedef MessageElemTypeIsGroupTip = bool Function(V2TimMessage message);
 typedef MessageItemContent = Widget? Function(
   V2TimMessage message,
   bool isShowJump,
@@ -116,7 +116,7 @@ class MessageItemBuilder {
 
   /// message nick name builder
   final MessageNickNameBuilder? messageNickNameBuilder;
-
+  final MessageElemTypeIsGroupTip? messageElemTypeIsGroupTip;
   MessageItemBuilder({
     this.locationMessageItemBuilder,
     this.textMessageItemBuilder,
@@ -131,6 +131,7 @@ class MessageItemBuilder {
     this.mergerMessageItemBuilder,
     this.messageRowBuilder,
     this.messageNickNameBuilder,
+    this.messageElemTypeIsGroupTip,
   });
 }
 
@@ -1207,8 +1208,10 @@ class _TIMUIKItHistoryMessageListItemState
     final message = widget.message;
     final msgType = message.elemType;
     final isSelf = message.isSelf ?? true;
-    final isGroupTipsMsg =
-        msgType == MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS;
+    final isGroupTipsMsg = msgType ==
+            MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS ||
+        (widget.messageItemBuilder?.messageElemTypeIsGroupTip?.call(message) ??
+            false);
 
     final revokeStatus = isRevokeMessage(message, model);
     final isRevokedMsg = revokeStatus.$1;

@@ -507,7 +507,8 @@ class _TIMUIKitTextFieldLayoutNarrowState
                                           color: Color(0xffAEA4A3),
                                         ),
                                         contentPadding:
-                                            EdgeInsets.symmetric(vertical: 8),
+                                            const EdgeInsets.symmetric(
+                                                vertical: 8),
                                         fillColor: Colors.white,
                                         filled: true,
                                         isDense: true,
