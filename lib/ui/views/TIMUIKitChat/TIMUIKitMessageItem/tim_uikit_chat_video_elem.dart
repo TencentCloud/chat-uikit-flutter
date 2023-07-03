@@ -1,14 +1,12 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
@@ -40,7 +38,6 @@ class TIMUIKitVideoElem extends StatefulWidget {
 }
 
 class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
-  final TUIChatGlobalModel globalModel = serviceLocator<TUIChatGlobalModel>();
   final MessageService _messageService = serviceLocator<MessageService>();
   late V2TimVideoElem stateElement = widget.message.videoElem!;
 
@@ -112,13 +109,13 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
         ),
       );
     }
-    return (!kIsWeb && stateElement.snapshotUrl == null ||
+    return (!PlatformUtils().isWeb && stateElement.snapshotUrl == null ||
             widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING)
         ? (stateElement.snapshotPath!.isNotEmpty
             ? Image.file(File(stateElement.snapshotPath!), fit: BoxFit.fitWidth)
             : Image.file(File(stateElement.localSnapshotUrl!),
                 fit: BoxFit.fitWidth))
-        : (kIsWeb ||
+        : (PlatformUtils().isWeb ||
                 stateElement.localSnapshotUrl == null ||
                 stateElement.localSnapshotUrl == "")
             ? Image.network(stateElement.snapshotUrl!, fit: BoxFit.fitWidth)
@@ -127,9 +124,9 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
   }
 
   downloadMessageDetailAndSave() async {
-    if (widget.message.msgID != null && widget.message.msgID != '') {
-      if (widget.message.videoElem!.videoUrl == null ||
-          widget.message.videoElem!.videoUrl == '') {
+    if (TencentUtils.checkString(widget.message.msgID) != null) {
+      if (TencentUtils.checkString(widget.message.videoElem!.videoUrl) ==
+          null) {
         final response = await _messageService.getMessageOnlineUrl(
             msgID: widget.message.msgID!);
         if (response.data != null) {
@@ -140,16 +137,19 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
         }
       }
       if (!PlatformUtils().isWeb) {
-        if (widget.message.videoElem!.localVideoUrl == null ||
-            widget.message.videoElem!.localVideoUrl == '') {
+        if (TencentUtils.checkString(widget.message.videoElem!.localVideoUrl) ==
+                null ||
+            !File(widget.message.videoElem!.localVideoUrl!).existsSync()) {
           _messageService.downloadMessage(
               msgID: widget.message.msgID!,
               messageType: 5,
               imageType: 0,
               isSnapshot: false);
         }
-        if (widget.message.videoElem!.localSnapshotUrl == null ||
-            widget.message.videoElem!.localSnapshotUrl == '') {
+        if (TencentUtils.checkString(
+                    widget.message.videoElem!.localSnapshotUrl) ==
+                null ||
+            !File(widget.message.videoElem!.localSnapshotUrl!).existsSync()) {
           _messageService.downloadMessage(
               msgID: widget.message.msgID!,
               messageType: 5,
@@ -172,33 +172,40 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
     final heroTag =
         "${widget.message.msgID ?? widget.message.id ?? widget.message.timestamp ?? DateTime.now().millisecondsSinceEpoch}${widget.isFrom}";
 
-    return InkWell(
+    return GestureDetector(
       onTap: () {
+        if (PlatformUtils().isWeb) {
+          launchUrl(
+            Uri.parse(widget.message.videoElem?.videoPath ?? ""),
+            mode: LaunchMode.externalApplication,
+          );
+          return;
+        }
         if (PlatformUtils().isDesktop) {
           final videoElem = widget.message.videoElem;
           if (videoElem != null) {
-            final localVideoUrl = TencentUtils.checkString(videoElem.localVideoUrl);
+            final localVideoUrl =
+                TencentUtils.checkString(videoElem.localVideoUrl);
             final videoPath = TencentUtils.checkString(videoElem.videoPath);
             final videoUrl = videoElem.videoUrl;
 
             if (localVideoUrl != null) {
-              if(PlatformUtils().isWindows){
+              if (PlatformUtils().isWindows) {
                 OpenFile.open(localVideoUrl);
-              } else{
+              } else {
                 launchUrl(Uri.file(localVideoUrl));
               }
             } else if (videoPath != null) {
-              if(PlatformUtils().isWindows){
+              if (PlatformUtils().isWindows) {
                 OpenFile.open(videoPath);
-              } else{
+              } else {
                 launchUrl(Uri.file(videoPath));
               }
             } else if (TencentUtils.isTextNotEmpty(videoUrl)) {
               onTIMCallback(TIMCallback(
                   infoCode: 6660414,
                   infoRecommendText: TIM_t("正在下载中"),
-                  type: TIMCallbackType.INFO
-              ));
+                  type: TIMCallbackType.INFO));
             }
           }
         } else {
@@ -227,15 +234,14 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
                 borderRadius: const BorderRadius.all(Radius.circular(5)),
                 child: LayoutBuilder(builder:
                     (BuildContext context, BoxConstraints constraints) {
-                  double positionRadio = 0.56;
-                  if (stateElement.snapshotWidth != null &&
+                  double? positionRadio;
+                  if ((stateElement.snapshotWidth) != null &&
                       stateElement.snapshotHeight != null &&
                       stateElement.snapshotWidth != 0 &&
                       stateElement.snapshotHeight != 0) {
                     positionRadio = (stateElement.snapshotWidth! /
                         stateElement.snapshotHeight!);
                   }
-
                   return ConstrainedBox(
                       constraints: BoxConstraints(
                           maxWidth: PlatformUtils().isWeb
@@ -244,52 +250,50 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
                           maxHeight: min(constraints.maxHeight * 0.8, 300),
                           minHeight: 20,
                           minWidth: 20),
-                      child: AspectRatio(
-                        aspectRatio: positionRadio,
-                        child: Stack(
-                          children: <Widget>[
-                            if (stateElement.snapshotUrl != null ||
-                                stateElement.snapshotUrl != null)
-                              AspectRatio(
-                                aspectRatio: positionRadio,
-                                child: Container(
-                                  decoration: const BoxDecoration(
-                                      color: Colors.transparent),
-                                ),
+                      child: Stack(
+                        children: <Widget>[
+                          if (positionRadio != null &&
+                              (stateElement.snapshotUrl != null ||
+                                  stateElement.snapshotUrl != null))
+                            AspectRatio(
+                              aspectRatio: positionRadio,
+                              child: Container(
+                                decoration: const BoxDecoration(
+                                    color: Colors.transparent),
                               ),
-                            Row(
-                              children: [
-                                Expanded(
-                                    child: generateSnapshot(theme,
-                                        stateElement.snapshotHeight ?? 100))
-                              ],
                             ),
-                            if (widget.message.status !=
-                                        MessageStatus
-                                            .V2TIM_MSG_STATUS_SENDING &&
-                                    (stateElement.snapshotUrl != null ||
-                                        stateElement.snapshotPath != null) &&
-                                    stateElement.videoPath != null ||
-                                stateElement.videoUrl != null)
-                              Positioned.fill(
-                                // alignment: Alignment.center,
-                                child: Center(
-                                    child: Image.asset('images/play.png',
-                                        package: 'tencent_cloud_chat_uikit',
-                                        height: 64)),
-                              ),
+                          Row(
+                            children: [
+                              Expanded(
+                                  child: generateSnapshot(theme,
+                                      stateElement.snapshotHeight ?? 100))
+                            ],
+                          ),
+                          if (widget.message.status !=
+                                      MessageStatus.V2TIM_MSG_STATUS_SENDING &&
+                                  (stateElement.snapshotUrl != null ||
+                                      stateElement.snapshotPath != null) &&
+                                  stateElement.videoPath != null ||
+                              stateElement.videoUrl != null)
+                            Positioned.fill(
+                              // alignment: Alignment.center,
+                              child: Center(
+                                  child: Image.asset('images/play.png',
+                                      package: 'tencent_cloud_chat_uikit',
+                                      height: 64)),
+                            ),
+                          if (widget.message.videoElem?.duration != null &&
+                              widget.message.videoElem!.duration! > 0)
                             Positioned(
                                 right: 10,
                                 bottom: 10,
                                 child: Text(
                                     MessageUtils.formatVideoTime(widget
-                                                .message.videoElem?.duration ??
-                                            0)
+                                                .message.videoElem!.duration!)
                                         .toString(),
                                     style: const TextStyle(
                                         color: Colors.white, fontSize: 12))),
-                          ],
-                        ),
+                        ],
                       ));
                 }),
               ))),

@@ -100,6 +100,7 @@ class _AtMemberPanelState extends TIMUIKitState<AtMemberPanel> {
                               width: 24,
                               child: Avatar(
                                   faceUrl: memberItem.faceUrl ?? "",
+                                  type: 1,
                                   showName: showName),
                             ),
                             const SizedBox(

@@ -2,7 +2,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/common/utils.dart';
-import 'package:tencent_extended_text/extended_text.dart';
+import 'package:extended_text/extended_text.dart';
 
 class HttpText extends SpecialText {
   HttpText(TextStyle? textStyle, SpecialTextGestureTapCallback? onTap,

@@ -54,6 +54,7 @@ class TIMUIKitSearchItem extends TIMUIKitStatelessWidget {
     final TUITheme theme = value.theme;
 
     return TUIKitScreenUtils.getDeviceWidget(
+      context: context,
       defaultWidget: GestureDetector(
         onTap: onClick,
         child: Container(

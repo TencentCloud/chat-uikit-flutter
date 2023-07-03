@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
@@ -57,12 +59,34 @@ class TIMUIKitSearchMsgDetailState
     updateMsgResult(widget.keyword, true);
   }
 
+  (bool isRevoke, bool isRevokeByAdmin) isRevokeMessage(V2TimMessage? message) {
+    if (message == null) {
+      return (false, false);
+    }
+    if (message.status == 6) {
+      return (true, false);
+    } else {
+      try {
+        final customData = jsonDecode(message.cloudCustomData ?? "{}");
+        final isRevoke = customData["isRevoke"] ?? false;
+        final revokeByAdmin = customData["revokeByAdmin"] ?? false;
+        return (isRevoke, revokeByAdmin);
+      } catch (e) {
+        return (false, false);
+      }
+    }
+  }
+
   String _getMsgElem(V2TimMessage message) {
     final msgType = message.elemType;
-    final isRevokedMessage = message.status == 6;
+    final revokeStatus = isRevokeMessage(message);
+    final isRevokedMessage = revokeStatus.$1;
+    final isAdminRevoke = revokeStatus.$2;
     if (isRevokedMessage) {
       final isSelf = message.isSelf ?? true;
-      final option2 = isSelf ? TIM_t("您") : message.nickName ?? message.sender;
+      final option2 = isAdminRevoke
+          ? TIM_t("管理员")
+          : (isSelf ? TIM_t("您") : message.nickName ?? message.sender);
       return TIM_t_para("{{option2}}撤回了一条消息", "$option2撤回了一条消息")(
           option2: option2);
     }
@@ -173,7 +197,8 @@ class TIMUIKitSearchMsgDetailState
         final currentText = _controller.text;
         if (currentMsgListForConversation.isEmpty &&
             widget.initMessageList != null &&
-            widget.initMessageList!.isNotEmpty && currentText.isEmpty) {
+            widget.initMessageList!.isNotEmpty &&
+            currentText.isEmpty) {
           currentMsgListForConversation = widget.initMessageList!;
         }
 
@@ -233,18 +258,18 @@ class TIMUIKitSearchMsgDetailState
               ),
               Expanded(
                   child: Scrollbar(
-                    controller: _scrollController,
-                    child: ListView(
-                      controller: _scrollController,
-                      children: [
-                        ..._renderListMessage(
-                            currentMsgListForConversation, context, isDesktopScreen),
-                        _renderShowALl(keywordState.isNotEmpty &&
-                            totalMsgInConversationCount >
-                                currentMsgListForConversation.length)
-                      ],
-                    ),
-                  )),
+                controller: _scrollController,
+                child: ListView(
+                  controller: _scrollController,
+                  children: [
+                    ..._renderListMessage(currentMsgListForConversation,
+                        context, isDesktopScreen),
+                    _renderShowALl(keywordState.isNotEmpty &&
+                        totalMsgInConversationCount >
+                            currentMsgListForConversation.length)
+                  ],
+                ),
+              )),
             ],
           ),
         );

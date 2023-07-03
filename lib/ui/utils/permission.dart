@@ -278,7 +278,7 @@ class Permissions {
       );
     });
     _entry = entry;
-    Overlay.of(context)?.insert(entry);
+    Overlay.of(context).insert(entry);
   }
 
   static Future<bool?> showPermissionConfirmDialog(BuildContext context, value,

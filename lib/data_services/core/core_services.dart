@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_config.dart';
 
@@ -92,4 +93,6 @@ abstract class CoreServices {
   setDarkTheme();
 
   setLightTheme();
+
+  setDeviceType(DeviceType deviceType);
 }

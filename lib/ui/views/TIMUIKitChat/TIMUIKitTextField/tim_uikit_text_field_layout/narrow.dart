@@ -17,7 +17,7 @@ import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_emoji_panel.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_send_sound_message.dart';
-import 'package:tencent_extended_text_field/extended_text_field.dart';
+import 'package:extended_text_field/extended_text_field.dart';
 import 'package:tencent_keyboard_visibility/tencent_keyboard_visibility.dart';
 
 GlobalKey<_TIMUIKitTextFieldLayoutNarrowState> narrowTextFieldKey = GlobalKey();
@@ -201,6 +201,7 @@ class _TIMUIKitTextFieldLayoutNarrowState
           addText: (int unicode) {
             final newText = String.fromCharCode(unicode);
             widget.addStickerToText(newText);
+            setSendButton();
             // handleSetDraftText();
           },
           addCustomEmojiText: ((String singleEmojiName) {
@@ -309,12 +310,23 @@ class _TIMUIKitTextFieldLayoutNarrowState
       });
     };
   }
+  String getAbstractMessage(V2TimMessage message) {
+    final String? customAbstractMessage = widget
+        .model.abstractMessageBuilder != null ? widget.model
+        .abstractMessageBuilder!(widget.model.repliedMessage!) : null;
+    return customAbstractMessage ?? MessageUtils
+        .getAbstractMessageAsync(
+        widget.model.repliedMessage!, widget.model.groupMemberList ?? []);
+  }
 
   _buildRepliedMessage(V2TimMessage? repliedMessage) {
     final haveRepliedMessage = repliedMessage != null;
     if (haveRepliedMessage) {
       final text =
-          "${MessageUtils.getDisplayName(widget.model.repliedMessage!)}:${widget.model.abstractMessageBuilder != null ? widget.model.abstractMessageBuilder!(widget.model.repliedMessage!) : MessageUtils.getAbstractMessageAsync(widget.model.repliedMessage!, widget.model.groupMemberList ?? [])}";
+          "${MessageUtils.getDisplayName(
+          widget.model.repliedMessage!)}:${getAbstractMessage(
+          repliedMessage
+      )}";
       return Container(
         color: widget.backgroundColor ?? hexToColor("f5f5f6"),
         alignment: Alignment.centerLeft,
@@ -495,7 +507,8 @@ class _TIMUIKitTextFieldLayoutNarrowState
                                           color: Color(0xffAEA4A3),
                                         ),
                                         contentPadding:
-                                            EdgeInsets.symmetric(vertical: 8),
+                                            const EdgeInsets.symmetric(
+                                                vertical: 8),
                                         fillColor: Colors.white,
                                         filled: true,
                                         isDense: true,

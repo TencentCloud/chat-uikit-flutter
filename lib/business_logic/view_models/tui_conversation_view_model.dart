@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/conversation_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/conversation/conversation_services.dart';
@@ -42,6 +42,7 @@ class TUIConversationViewModel extends ChangeNotifier {
   late V2TimConversationListener _conversationListener;
   List<V2TimConversation?> _conversationList = [];
   static V2TimConversation? _selectedConversation;
+  Map<String, String> webDraftMap = {};
 
   bool _haveMoreData = true;
   int _totalUnReadCount = 0;
@@ -65,9 +66,8 @@ class TUIConversationViewModel extends ChangeNotifier {
             .toList();
         _conversationList.removeWhere((element) => element?.isPinned == true);
         _conversationList = [...pinnedConversation, ..._conversationList];
-      // ignore: empty_catches
-      } catch (e) {
-      }
+        // ignore: empty_catches
+      } catch (e) {}
     } else {
       _conversationList.sort((a, b) => b!.orderkey!.compareTo(a!.orderkey!));
     }
@@ -259,10 +259,46 @@ class TUIConversationViewModel extends ChangeNotifier {
         listener: _conversationListener);
   }
 
-  Future<V2TimCallback> setConversationDraft(
-      {required String conversationID, String? draftText}) async {
-    return _conversationService.setConversationDraft(
-        conversationID: conversationID, draftText: draftText);
+  Future<V2TimCallback> setConversationDraft({
+    required String conversationID,
+    String? draftText,
+    bool isTopic = false,
+    String? groupID,
+    bool isAllowWeb = true,
+  }) async {
+    assert(!isTopic || (groupID != null && groupID.isNotEmpty),
+        "When 'isTopic' is true, 'groupID' must not be null or empty.");
+    if (PlatformUtils().isWeb && isAllowWeb) {
+      webDraftMap[conversationID] = draftText ?? "";
+      return V2TimCallback(code: 0, desc: "");
+    } else {
+      if (isTopic) {
+        final topicInfoList = await TencentImSDKPlugin.v2TIMManager
+            .getGroupManager()
+            .getTopicInfoList(groupID: groupID!, topicIDList: [conversationID]);
+        final topicInfo = topicInfoList.data?.first.topicInfo;
+        topicInfo?.draftText = draftText;
+        final res = await TencentImSDKPlugin.v2TIMManager
+            .getGroupManager()
+            .setTopicInfo(groupID: groupID, topicInfo: topicInfo!);
+        return res;
+      } else {
+        return _conversationService.setConversationDraft(
+            conversationID: conversationID, draftText: draftText);
+      }
+    }
+  }
+
+  clearWebDraft({
+    required String conversationID,
+  }) {
+    webDraftMap[conversationID] = "";
+  }
+
+  String? getWebDraft({
+    required String conversationID,
+  }) {
+    return TencentUtils.checkString(webDraftMap[conversationID]);
   }
 
   clearData() {

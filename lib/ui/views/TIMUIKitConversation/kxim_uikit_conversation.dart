@@ -397,7 +397,8 @@ class _KXIMUIKitConversationState extends TIMUIKitState<KXIMUIKitConversation> {
                                 medal:
                                     widget.medalBuilder?.call(conversationItem),
                                 lastMessageBuilder: widget.lastMessageBuilder,
-                                customLastMsgBuilder: widget.customLastMsgBuilder,
+                                customLastMsgBuilder:
+                                    widget.customLastMsgBuilder,
                                 faceUrl: conversationItem.faceUrl ?? "",
                                 nickName: conversationItem.showName ?? "",
                                 isDisturb: conversationItem.recvOpt != 0,

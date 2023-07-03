@@ -227,7 +227,7 @@ class TextInputBottomSheet {
               ),
             ));
       });
-      Overlay.of(context)?.insert(entry!);
+      Overlay.of(context).insert(entry!);
     } else {
       showModalBottomSheet(
           isScrollControlled: true, // !important

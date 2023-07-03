@@ -413,8 +413,6 @@ class _TIMUIKitHistoryMessageListState
                                   keepAlive: messageItem?.elemType ==
                                       MessageElemType.V2TIM_ELEM_TYPE_SOUND,
                                   child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16),
                                       child:
                                           _getMessageItemBuilder(messageItem))),
                             );
@@ -449,7 +447,6 @@ class _TIMUIKitHistoryMessageListState
                           delegate: SliverChildBuilderDelegate(
                               (BuildContext context, int index) {
                                 final messageItem = readMessageList[index];
-                                final isSelf = messageItem?.isSelf ?? true;
                                 if (index == readMessageList.length - 1) {
                                   if (haveMoreData) {
                                     throttleFunction(
@@ -475,9 +472,6 @@ class _TIMUIKitHistoryMessageListState
                                                   MessageElemType
                                                       .V2TIM_ELEM_TYPE_SOUND,
                                               child: Container(
-                                                  padding: const EdgeInsets
-                                                          .symmetric(
-                                                      horizontal: 16),
                                                   child: _getMessageItemBuilder(
                                                       messageItem))),
                                         ),
@@ -500,9 +494,6 @@ class _TIMUIKitHistoryMessageListState
                                       keepAlive: messageItem?.elemType ==
                                           MessageElemType.V2TIM_ELEM_TYPE_SOUND,
                                       child: Container(
-                                          padding: EdgeInsets.only(
-                                              left: isSelf ? 0 : 16,
-                                              right: isSelf ? 16 : 0),
                                           child: _getMessageItemBuilder(
                                               messageItem))),
                                 );

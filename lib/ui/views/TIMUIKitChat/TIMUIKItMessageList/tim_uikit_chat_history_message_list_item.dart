@@ -6,20 +6,23 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_text_translate_elem.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/forward_message_screen.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
+import 'package:tencent_super_tooltip/tencent_super_tooltip.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/time_ago.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_message_tooltip.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_message_read_receipt.dart';
@@ -27,13 +30,10 @@ import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageIt
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/main.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_custom_elem.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_face_elem.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_text_translate_elem.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_cloud_custom_data.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/forward_message_screen.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/radio_button.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
-import 'package:tencent_super_tooltip/tencent_super_tooltip.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
 import '../TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_select_emoji.dart';
 
@@ -59,9 +59,7 @@ typedef MessageRowBuilder = Widget? Function(
 
 typedef MessageNickNameBuilder = Widget Function(
     BuildContext context, V2TimMessage message, TUIChatSeparateViewModel model);
-// 判断是否是群提示消息
 typedef MessageElemTypeIsGroupTip = bool Function(V2TimMessage message);
-
 typedef MessageItemContent = Widget? Function(
   V2TimMessage message,
   bool isShowJump,
@@ -78,38 +76,38 @@ class MessageHoverControlItem {
 }
 
 class MessageItemBuilder {
-  /// text message builder
+  /// text message builder, returns null means using default widget.
   final MessageItemContent? textMessageItemBuilder;
 
-  /// text message builder for reply message
+  /// text message builder for reply message, returns null means using default widget.
   final MessageItemContent? textReplyMessageItemBuilder;
 
-  /// custom message builder
+  /// custom message builder, returns null means using default widget.
   final MessageItemContent? customMessageItemBuilder;
 
-  /// image message builder
+  /// image message builder, returns null means using default widget.
   final MessageItemContent? imageMessageItemBuilder;
 
-  /// sound message builder
+  /// sound message builder, returns null means using default widget.
   final MessageItemContent? soundMessageItemBuilder;
 
-  /// video message builder
+  /// video message builder, returns null means using default widget.
   final MessageItemContent? videoMessageItemBuilder;
 
-  /// file message builder
+  /// file message builder, returns null means using default widget.
   final MessageItemContent? fileMessageItemBuilder;
 
   /// location message (LBS) item builder;
   /// recommend to use our LBS plug-in: https://pub.dev/packages/tim_ui_kit_lbs_plugin
   final MessageItemContent? locationMessageItemBuilder;
 
-  /// face message, like emoji, message builder
+  /// face message, like emoji, message builder, returns null means using default widget.
   final MessageItemContent? faceMessageItemBuilder;
 
-  /// group tips message builder
+  /// group tips message builder, returns null means using default widget.
   final MessageItemContent? groupTipsMessageItemBuilder;
 
-  /// merger message builder
+  /// merger message builder, returns null means using default widget.
   final MessageItemContent? mergerMessageItemBuilder;
 
   /// The builder for the whole message line, expect for those message type without avatar and nickname.
@@ -118,9 +116,7 @@ class MessageItemBuilder {
 
   /// message nick name builder
   final MessageNickNameBuilder? messageNickNameBuilder;
-
   final MessageElemTypeIsGroupTip? messageElemTypeIsGroupTip;
-
   MessageItemBuilder({
     this.locationMessageItemBuilder,
     this.textMessageItemBuilder,
@@ -153,15 +149,32 @@ class MessageToolTipItem {
 }
 
 class ToolTipsConfig {
+  /// Whether to show the reply to a message option.
   final bool showReplyMessage;
+
+  /// Whether to show the multiple-choice option for messages.
   final bool showMultipleChoiceMessage;
+
+  /// Whether to show the option to delete a message.
   final bool showDeleteMessage;
+
+  /// Whether to show the option to recall a message.
   final bool showRecallMessage;
+
+  /// Whether to show the option to copy a message.
   final bool showCopyMessage;
+
+  /// Whether to show the option to forward a message.
   final bool showForwardMessage;
+
+  /// Whether to show the option to translate a text message. This module is not available by default. Please contact your Tencent Cloud sales representative or customer service team to enable this feature.
   final bool showTranslation;
+
+  /// A builder for additional custom items. We recommend using `additionalMessageToolTips` instead of this field since version 2.0, as you only need to provide the data rather than the whole widget. This makes usage easier and you don't need to worry about the UI display.
   final Widget? Function(V2TimMessage message, Function() closeTooltip,
       [Key? key, BuildContext? context])? additionalItemBuilder;
+
+  /// A list of additional message tooltip menu items, provided with the data only. We recommend using this field instead of the previous `additionalItemBuilder`.
   List<MessageToolTipItem> Function(
       V2TimMessage message, Function() closeTooltip)? additionalMessageToolTips;
 
@@ -174,8 +187,9 @@ class ToolTipsConfig {
       this.showCopyMessage = true,
       this.showForwardMessage = true,
       this.additionalMessageToolTips,
-      @Deprecated("Please use `additionalMessageToolTips` instead. You are now only expected to specify the data, rather than providing a whole widget. This makes usage easier, as you no longer need to worry about the UI display.")
-          this.additionalItemBuilder});
+      @Deprecated(
+          "Please use `additionalMessageToolTips` instead. You are now only expected to specify the data, rather than providing a whole widget. This makes usage easier, as you no longer need to worry about the UI display.")
+      this.additionalItemBuilder});
 }
 
 class TIMUIKitHistoryMessageListItem extends StatefulWidget {
@@ -185,6 +199,10 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
   /// tap remote user avatar callback function
   final void Function(String userID, TapDownDetails tapDetails)?
       onTapForOthersPortrait;
+
+  /// secondary tap remote user avatar callback function
+  final void Function(String userID, TapDownDetails tapDetails)?
+      onSecondaryTapForOthersPortrait;
 
   /// the function use for reply message, when click replied message can scroll to it.
   final Function? onScrollToIndex;
@@ -264,11 +282,20 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
 
   final List customEmojiStickerList;
 
+  final V2TimGroupMemberFullInfo? groupMemberInfo;
+
+  /// This parameter accepts a custom widget to be displayed when the mouse hovers over a message,
+  /// replacing the default message hover action bar.
+  /// Applicable only on desktop platforms.
+  /// If provided, the default message action functionality will appear in the right-click context menu instead.
+  final Widget Function(V2TimMessage message)? customMessageHoverBarOnDesktop;
+
   const TIMUIKitHistoryMessageListItem(
       {Key? key,
       required this.message,
-      @Deprecated("Nickname will not show in one-to-one chat, if you tend to control it in group chat, please use `isShowSelfNameInGroup` and `isShowOthersNameInGroup` from `config: TIMUIKitChatConfig` instead")
-          this.showNickName = false,
+      @Deprecated(
+          "Nickname will not show in one-to-one chat, if you tend to control it in group chat, please use `isShowSelfNameInGroup` and `isShowOthersNameInGroup` from `config: TIMUIKitChatConfig` instead")
+      this.showNickName = false,
       this.onScrollToIndex,
       this.onScrollToIndexBegin,
       this.onTapForOthersPortrait,
@@ -292,7 +319,10 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
       this.bottomRowBuilder,
       this.isUseDefaultEmoji = false,
       this.customEmojiStickerList = const [],
-      this.textFieldController})
+      this.textFieldController,
+      this.onSecondaryTapForOthersPortrait,
+      this.groupMemberInfo,
+      this.customMessageHoverBarOnDesktop})
       : super(key: key);
 
   @override
@@ -376,6 +406,23 @@ class _TIMUIKItHistoryMessageListItemState
     return false;
   }
 
+  (bool isRevoke, bool isRevokeByAdmin) isRevokeMessage(
+      V2TimMessage message, TUIChatSeparateViewModel model) {
+    if (message.status == 6) {
+      return (true, false);
+    } else if (model.chatConfig.isGroupAdminRecallEnabled) {
+      try {
+        final customData = jsonDecode(message.cloudCustomData ?? "{}");
+        final isRevoke = customData["isRevoke"] ?? false;
+        final revokeByAdmin = customData["revokeByAdmin"] ?? false;
+        return (isRevoke, revokeByAdmin);
+      } catch (e) {
+        return (false, false);
+      }
+    }
+    return (false, false);
+  }
+
   Widget _messageItemBuilder(
       V2TimMessage messageItem, TUIChatSeparateViewModel model) {
     final msgType = messageItem.elemType;
@@ -391,192 +438,206 @@ class _TIMUIKItHistoryMessageListItemState
 
     switch (msgType) {
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
-        if (messageItemBuilder?.customMessageItemBuilder != null) {
-          return messageItemBuilder!.customMessageItemBuilder!(
-            messageItem,
-            isShowJump,
-            () => model.jumpMsgID = "",
-          )!;
-        }
-        return TIMUIKitCustomElem(
-          message: messageItem,
-          customElem: messageItem.customElem,
-          isFromSelf: isFromSelf,
-          messageBackgroundColor: widget.themeData?.messageBackgroundColor,
-          messageBorderRadius: widget.themeData?.messageBorderRadius,
-          messageFontStyle: widget.themeData?.messageTextStyle,
-          textPadding: widget.textPadding,
-          isShowMessageReaction: widget.isUseMessageReaction,
-        );
+        final customWidget =
+            messageItemBuilder?.customMessageItemBuilder != null
+                ? messageItemBuilder!.customMessageItemBuilder!(
+                    messageItem,
+                    isShowJump,
+                    () => model.jumpMsgID = "",
+                  )
+                : null;
+        return customWidget ??
+            TIMUIKitCustomElem(
+              message: messageItem,
+              customElem: messageItem.customElem,
+              isFromSelf: isFromSelf,
+              messageBackgroundColor: widget.themeData?.messageBackgroundColor,
+              messageBorderRadius: widget.themeData?.messageBorderRadius,
+              messageFontStyle: widget.themeData?.messageTextStyle,
+              textPadding: widget.textPadding,
+              isShowMessageReaction: widget.isUseMessageReaction,
+            );
       case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
-        if (messageItemBuilder?.soundMessageItemBuilder != null) {
-          return messageItemBuilder!.soundMessageItemBuilder!(
-            messageItem,
-            isShowJump,
-            clearJump,
-          )!;
-        }
-        return TIMUIKitSoundElem(
-          chatModel: model,
-          message: messageItem,
-          soundElem: messageItem.soundElem!,
-          msgID: messageItem.msgID ?? "",
-          isFromSelf: messageItem.isSelf ?? true,
-          clearJump: clearJump,
-          isShowJump: isShowJump,
-          localCustomInt: messageItem.localCustomInt,
-          borderRadius: widget.themeData?.messageBorderRadius,
-          fontStyle: widget.themeData?.messageTextStyle,
-          backgroundColor: widget.themeData?.messageBackgroundColor,
-          textPadding: widget.textPadding,
-          isShowMessageReaction: widget.isUseMessageReaction,
-        );
+        final customWidget = messageItemBuilder?.soundMessageItemBuilder != null
+            ? messageItemBuilder!.soundMessageItemBuilder!(
+                messageItem,
+                isShowJump,
+                () => model.jumpMsgID = "",
+              )
+            : null;
+        return customWidget ??
+            TIMUIKitSoundElem(
+              chatModel: model,
+              message: messageItem,
+              soundElem: messageItem.soundElem!,
+              msgID: messageItem.msgID ?? "",
+              isFromSelf: messageItem.isSelf ?? true,
+              clearJump: clearJump,
+              isShowJump: isShowJump,
+              localCustomInt: messageItem.localCustomInt,
+              borderRadius: widget.themeData?.messageBorderRadius,
+              fontStyle: widget.themeData?.messageTextStyle,
+              backgroundColor: widget.themeData?.messageBackgroundColor,
+              textPadding: widget.textPadding,
+              isShowMessageReaction: widget.isUseMessageReaction,
+            );
       case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
         if (isReplyMessage(messageItem)) {
-          if (messageItemBuilder?.textReplyMessageItemBuilder != null) {
-            return messageItemBuilder!.textReplyMessageItemBuilder!(
-              messageItem,
-              isShowJump,
-              clearJump,
-            )!;
-          }
-          return TIMUIKitReplyElem(
-            message: messageItem,
-            clearJump: clearJump,
-            isShowJump: isShowJump,
-            scrollToIndex: widget.onScrollToIndex ?? () {},
-            borderRadius: widget.themeData?.messageBorderRadius,
-            fontStyle: widget.themeData?.messageTextStyle,
-            backgroundColor: widget.themeData?.messageBackgroundColor,
-            textPadding: widget.textPadding,
-            isUseDefaultEmoji: widget.isUseDefaultEmoji,
-            customEmojiStickerList: widget.customEmojiStickerList,
-            chatModel: model,
-            isShowMessageReaction: widget.isUseMessageReaction,
-          );
+          final customWidget =
+              messageItemBuilder?.textReplyMessageItemBuilder != null
+                  ? messageItemBuilder!.textReplyMessageItemBuilder!(
+                      messageItem,
+                      isShowJump,
+                      () => model.jumpMsgID = "",
+                    )
+                  : null;
+          return customWidget ??
+              TIMUIKitReplyElem(
+                message: messageItem,
+                clearJump: clearJump,
+                isShowJump: isShowJump,
+                scrollToIndex: widget.onScrollToIndex ?? () {},
+                borderRadius: widget.themeData?.messageBorderRadius,
+                fontStyle: widget.themeData?.messageTextStyle,
+                backgroundColor: widget.themeData?.messageBackgroundColor,
+                textPadding: widget.textPadding,
+                isUseDefaultEmoji: widget.isUseDefaultEmoji,
+                customEmojiStickerList: widget.customEmojiStickerList,
+                chatModel: model,
+                isShowMessageReaction: widget.isUseMessageReaction,
+              );
         }
-        if (messageItemBuilder?.textMessageItemBuilder != null) {
-          return messageItemBuilder!.textMessageItemBuilder!(
-            messageItem,
-            isShowJump,
-            clearJump,
-          )!;
-        }
-        return TIMUIKitTextElem(
-          chatModel: model,
-          message: messageItem,
-          isFromSelf: messageItem.isSelf ?? true,
-          clearJump: clearJump,
-          isShowJump: isShowJump,
-          borderRadius: widget.themeData?.messageBorderRadius,
-          fontStyle: widget.themeData?.messageTextStyle,
-          backgroundColor: widget.themeData?.messageBackgroundColor,
-          textPadding: widget.textPadding,
-          isShowMessageReaction: widget.isUseMessageReaction,
-          isUseDefaultEmoji: widget.isUseDefaultEmoji,
-          customEmojiStickerList: widget.customEmojiStickerList,
-        );
+        final customWidget = messageItemBuilder?.textMessageItemBuilder != null
+            ? messageItemBuilder!.textMessageItemBuilder!(
+                messageItem,
+                isShowJump,
+                () => model.jumpMsgID = "",
+              )
+            : null;
+        return customWidget ??
+            TIMUIKitTextElem(
+              chatModel: model,
+              message: messageItem,
+              isFromSelf: messageItem.isSelf ?? true,
+              clearJump: clearJump,
+              isShowJump: isShowJump,
+              borderRadius: widget.themeData?.messageBorderRadius,
+              fontStyle: widget.themeData?.messageTextStyle,
+              backgroundColor: widget.themeData?.messageBackgroundColor,
+              textPadding: widget.textPadding,
+              isShowMessageReaction: widget.isUseMessageReaction,
+              isUseDefaultEmoji: widget.isUseDefaultEmoji,
+              customEmojiStickerList: widget.customEmojiStickerList,
+            );
       case MessageElemType.V2TIM_ELEM_TYPE_FACE:
-        if (messageItemBuilder?.faceMessageItemBuilder != null) {
-          return messageItemBuilder!.faceMessageItemBuilder!(
-            messageItem,
-            isShowJump,
-            clearJump,
-          )!;
-        }
-        return TIMUIKitFaceElem(
-          model: model,
-          path: messageItem.faceElem!.data ?? "",
-          clearJump: clearJump,
-          isShowJump: isShowJump,
-          message: messageItem,
-          isShowMessageReaction: widget.isUseMessageReaction,
-        );
+        final customWidget = messageItemBuilder?.faceMessageItemBuilder != null
+            ? messageItemBuilder!.faceMessageItemBuilder!(
+                messageItem,
+                isShowJump,
+                () => model.jumpMsgID = "",
+              )
+            : null;
+        return customWidget ??
+            TIMUIKitFaceElem(
+              model: model,
+              path: messageItem.faceElem!.data ?? "",
+              clearJump: clearJump,
+              isShowJump: isShowJump,
+              message: messageItem,
+              isShowMessageReaction: widget.isUseMessageReaction,
+            );
       case MessageElemType.V2TIM_ELEM_TYPE_FILE:
-        if (messageItemBuilder?.fileMessageItemBuilder != null) {
-          return messageItemBuilder!.fileMessageItemBuilder!(
-            messageItem,
-            isShowJump,
-            clearJump,
-          )!;
-        }
-        return TIMUIKitFileElem(
-          chatModel: model,
-          message: messageItem,
-          messageID: messageItem.msgID,
-          fileElem: messageItem.fileElem,
-          isSelf: messageItem.isSelf ?? true,
-          clearJump: clearJump,
-          isShowJump: isShowJump,
-          isShowMessageReaction: widget.isUseMessageReaction,
-        );
+        final customWidget = messageItemBuilder?.fileMessageItemBuilder != null
+            ? messageItemBuilder!.fileMessageItemBuilder!(
+                messageItem,
+                isShowJump,
+                () => model.jumpMsgID = "",
+              )
+            : null;
+        return customWidget ??
+            TIMUIKitFileElem(
+              chatModel: model,
+              message: messageItem,
+              messageID: messageItem.msgID,
+              fileElem: messageItem.fileElem,
+              isSelf: messageItem.isSelf ?? true,
+              clearJump: clearJump,
+              isShowJump: isShowJump,
+              isShowMessageReaction: widget.isUseMessageReaction,
+            );
       case MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS:
-        if (messageItemBuilder?.groupTipsMessageItemBuilder != null) {
-          return messageItemBuilder!.groupTipsMessageItemBuilder!(
-            messageItem,
-            isShowJump,
-            clearJump,
-          )!;
-        }
-        return Text(TIM_t("[群系统消息]"));
+        final customWidget =
+            messageItemBuilder?.groupTipsMessageItemBuilder != null
+                ? messageItemBuilder!.groupTipsMessageItemBuilder!(
+                    messageItem,
+                    isShowJump,
+                    () => model.jumpMsgID = "",
+                  )
+                : null;
+        return customWidget ?? Text(TIM_t("[群系统消息]"));
       case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
-        if (messageItemBuilder?.imageMessageItemBuilder != null) {
-          return messageItemBuilder!.imageMessageItemBuilder!(
-            messageItem,
-            isShowJump,
-            clearJump,
-          )!;
-        }
-        return TIMUIKitImageElem(
-          clearJump: clearJump,
-          isShowJump: isShowJump,
-          chatModel: model,
-          message: messageItem,
-          isShowMessageReaction: widget.isUseMessageReaction,
-          key: Key("${messageItem.seq}_${messageItem.timestamp}"),
-        );
+        final customWidget = messageItemBuilder?.imageMessageItemBuilder != null
+            ? messageItemBuilder!.imageMessageItemBuilder!(
+                messageItem,
+                isShowJump,
+                () => model.jumpMsgID = "",
+              )
+            : null;
+        return customWidget ??
+            TIMUIKitImageElem(
+              clearJump: clearJump,
+              isShowJump: isShowJump,
+              chatModel: model,
+              message: messageItem,
+              isShowMessageReaction: widget.isUseMessageReaction,
+              key: Key("${messageItem.seq}_${messageItem.timestamp}"),
+            );
       case MessageElemType.V2TIM_ELEM_TYPE_VIDEO:
-        if (messageItemBuilder?.videoMessageItemBuilder != null) {
-          return messageItemBuilder!.videoMessageItemBuilder!(
-            messageItem,
-            isShowJump,
-            clearJump,
-          )!;
-        }
-        return TIMUIKitVideoElem(
-          messageItem,
-          isShowJump: isShowJump,
-          chatModel: model,
-          clearJump: clearJump,
-          isShowMessageReaction: widget.isUseMessageReaction,
-        );
+        final customWidget = messageItemBuilder?.videoMessageItemBuilder != null
+            ? messageItemBuilder!.videoMessageItemBuilder!(
+                messageItem,
+                isShowJump,
+                () => model.jumpMsgID = "",
+              )
+            : null;
+        return customWidget ??
+            TIMUIKitVideoElem(
+              messageItem,
+              isShowJump: isShowJump,
+              chatModel: model,
+              clearJump: clearJump,
+              isShowMessageReaction: widget.isUseMessageReaction,
+            );
       case MessageElemType.V2TIM_ELEM_TYPE_LOCATION:
-        if (messageItemBuilder?.locationMessageItemBuilder != null) {
-          return messageItemBuilder!.locationMessageItemBuilder!(
-            messageItem,
-            isShowJump,
-            clearJump,
-          )!;
-        }
-        return Text(TIM_t("[位置]"));
+        final customWidget =
+            messageItemBuilder?.locationMessageItemBuilder != null
+                ? messageItemBuilder!.locationMessageItemBuilder!(
+                    messageItem,
+                    isShowJump,
+                    () => model.jumpMsgID = "",
+                  )
+                : null;
+        return customWidget ?? Text(TIM_t("[位置]"));
       case MessageElemType.V2TIM_ELEM_TYPE_MERGER:
-        if (messageItemBuilder?.mergerMessageItemBuilder != null) {
-          return messageItemBuilder!.mergerMessageItemBuilder!(
-            messageItem,
-            isShowJump,
-            clearJump,
-          )!;
-        }
-        return TIMUIKitMergerElem(
-            messageItemBuilder: messageItemBuilder,
-            model: model,
-            isShowJump: isShowJump,
-            clearJump: clearJump,
-            message: messageItem,
-            isShowMessageReaction: widget.isUseMessageReaction,
-            mergerElem: messageItem.mergerElem!,
-            messageID: messageItem.msgID ?? "",
-            isSelf: messageItem.isSelf ?? true);
+        final customWidget =
+            messageItemBuilder?.mergerMessageItemBuilder != null
+                ? messageItemBuilder!.mergerMessageItemBuilder!(
+                    messageItem,
+                    isShowJump,
+                    () => model.jumpMsgID = "",
+                  )
+                : null;
+        return customWidget ??
+            TIMUIKitMergerElem(
+                messageItemBuilder: messageItemBuilder,
+                model: model,
+                isShowJump: isShowJump,
+                clearJump: clearJump,
+                message: messageItem,
+                isShowMessageReaction: widget.isUseMessageReaction,
+                mergerElem: messageItem.mergerElem!,
+                messageID: messageItem.msgID ?? "",
+                isSelf: messageItem.isSelf ?? true);
       default:
         return Text(TIM_t("[未知消息]"));
     }
@@ -591,7 +652,7 @@ class _TIMUIKItHistoryMessageListItemState
             groupMemberList: model.groupMemberList ?? []));
   }
 
-  Widget _selfRevokeEditMessageBuilder(theme, model) {
+  Widget _selfRevokeEditMessageBuilder(theme, TUIChatSeparateViewModel model) {
     return Container(
         margin: const EdgeInsets.symmetric(vertical: 20),
         alignment: Alignment.center,
@@ -604,7 +665,8 @@ class _TIMUIKItHistoryMessageListItemState
             text: TIM_t("重新编辑"),
             recognizer: TapGestureRecognizer()
               ..onTap = () {
-                model.editRevokedMsg = widget.message.textElem?.text ?? "";
+                widget.textFieldController
+                    ?.setTextField(widget.message.textElem?.text ?? "");
               },
             style: TextStyle(color: theme.primaryColor),
           )
@@ -708,10 +770,10 @@ class _TIMUIKItHistoryMessageListItemState
 
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
-    final isLongMessage =
-        context.size!.height + 350 > screenHeight && PlatformUtils().isMobile;
     final isDesktopScreen =
         TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+    final isLongMessage =
+        context.size!.height + 350 > screenHeight && !(isDesktopScreen);
     final tapDetails =
         (isDesktopScreen || isLongMessage) ? (details ?? _tapDetails) : details;
     final isSelf = message.isSelf ?? true;
@@ -840,7 +902,10 @@ class _TIMUIKItHistoryMessageListItemState
       showCloseButton: ShowCloseButton.none,
       touchThroughAreaShape: ClipAreaShape.rectangle,
       content: TIMUIKitMessageTooltip(
+        iSUseDefaultHoverBar: model.chatConfig.isUseMessageHoverBarOnDesktop &&
+            widget.customMessageHoverBarOnDesktop == null,
         model: model,
+        groupMemberInfo: widget.groupMemberInfo,
         isShowMoreSticker: isShowMoreSticker ?? false,
         toolTipsConfig: widget.toolTipsConfig,
         isUseMessageReaction: isUseMessageReaction,
@@ -946,12 +1011,18 @@ class _TIMUIKItHistoryMessageListItemState
           ),
           onClick: (_) {
             model.repliedMessage = widget.message;
-            if (widget.allowAtUserWhenReply &&
-                widget.onLongPressForOthersHeadPortrait != null &&
-                !(widget.message.isSelf ?? true)) {
-              widget.onLongPressForOthersHeadPortrait!(
-                  widget.message.sender, widget.message.nickName);
-            }
+            final isSelf = widget.message.isSelf ?? true;
+            final isGroup =
+                TencentUtils.checkString(widget.message.groupID) != null;
+            final isAtWhenReply = !isSelf &&
+                isGroup &&
+                widget.allowAtUserWhenReply &&
+                widget.onLongPressForOthersHeadPortrait != null;
+
+            /// If replying to a self message, do not add a at tag, only requestFocus.
+            widget.onLongPressForOthersHeadPortrait!(
+                !isAtWhenReply ? null : widget.message.sender,
+                !isAtWhenReply ? null : widget.message.nickName);
           },
         ),
       if ((widget.toolTipsConfig?.showForwardMessage ?? true) &&
@@ -1014,18 +1085,29 @@ class _TIMUIKItHistoryMessageListItemState
         context);
   }
 
-  Widget renderHoverTipAndReadStatus(TUIChatSeparateViewModel model,
-      bool isSelf, V2TimMessage message, bool isPeerRead, TUITheme theme) {
+  Widget renderHoverTipAndReadStatus(
+      TUIChatSeparateViewModel model,
+      bool isSelf,
+      V2TimMessage message,
+      bool isPeerRead,
+      TUITheme theme,
+      bool isDownloadWaiting) {
     final isDesktopScreen =
         TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
-    final wideHoverTipList = getMessageHoverControlBar(model, theme);
-    final lastItemName = wideHoverTipList.last.name;
+    final wideHoverTipList = (model.chatConfig.isUseMessageHoverBarOnDesktop &&
+            widget.customMessageHoverBarOnDesktop == null)
+        ? getMessageHoverControlBar(model, theme)
+        : [];
+    final lastItemName =
+        wideHoverTipList.isNotEmpty ? wideHoverTipList.last.name : "";
     return Column(
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        if (isDesktopScreen && isShowWideToolTip)
+        if (isDesktopScreen &&
+            isShowWideToolTip &&
+            !((widget.message.elemType == 6 && isDownloadWaiting)))
           Container(
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(4),
@@ -1061,7 +1143,14 @@ class _TIMUIKItHistoryMessageListItemState
                   .toList(),
             ),
           ),
-        if (!isDesktopScreen || !isShowWideToolTip)
+        if (isDesktopScreen &&
+            isShowWideToolTip &&
+            widget.customMessageHoverBarOnDesktop != null)
+          widget.customMessageHoverBarOnDesktop!(message),
+        if (!isDesktopScreen ||
+            (model.chatConfig.isUseMessageHoverBarOnDesktop &&
+                widget.customMessageHoverBarOnDesktop == null &&
+                !isShowWideToolTip))
           const SizedBox(
             height: 24,
           ),
@@ -1119,12 +1208,15 @@ class _TIMUIKItHistoryMessageListItemState
     final message = widget.message;
     final msgType = message.elemType;
     final isSelf = message.isSelf ?? true;
-    final msgStatus = message.status;
     final isGroupTipsMsg = msgType ==
             MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS ||
         (widget.messageItemBuilder?.messageElemTypeIsGroupTip?.call(message) ??
             false);
-    final isRevokedMsg = msgStatus == 6;
+
+    final revokeStatus = isRevokeMessage(message, model);
+    final isRevokedMsg = revokeStatus.$1;
+    final isAdminRevoke = revokeStatus.$2;
+
     final isTimeDivider = msgType == 11;
     final isLatestDivider = msgType == 101;
     final isPeerRead = message.isPeerRead ?? false;
@@ -1163,8 +1255,13 @@ class _TIMUIKItHistoryMessageListItemState
     }
 
     if (isRevokedMsg) {
-      final displayName =
-          isSelf ? TIM_t("您") : message.nickName ?? message.sender;
+      final displayName = isAdminRevoke
+          ? TIM_t("管理员")
+          : (isSelf
+              ? TIM_t("您")
+              : TencentUtils.checkString(message.nickName) ??
+                  TencentUtils.checkString(message.sender) ??
+                  message.userID);
       return isSelf && isRevokeEditable && isRevocable(message.timestamp!)
           ? _selfRevokeEditMessageBuilder(theme, model)
           : _revokedMessageBuilder(theme, displayName ?? "");
@@ -1187,6 +1284,7 @@ class _TIMUIKItHistoryMessageListItemState
 
     return LayoutBuilder(
       builder: (context, constraints) => Container(
+        padding: EdgeInsets.only(left: isSelf ? 0 : 16, right: isSelf ? 16 : 0),
         margin: widget.padding ?? const EdgeInsets.only(bottom: 20),
         child: Row(
           key: _key,
@@ -1211,14 +1309,16 @@ class _TIMUIKItHistoryMessageListItemState
             Expanded(
               child: MouseRegion(
                 onEnter: (_) {
-                  if (isDesktopScreen) {
+                  if (isDesktopScreen &&
+                      model.chatConfig.isUseMessageHoverBarOnDesktop) {
                     setState(() {
                       isShowWideToolTip = true;
                     });
                   }
                 },
                 onExit: (_) {
-                  if (isDesktopScreen) {
+                  if (isDesktopScreen &&
+                      model.chatConfig.isUseMessageHoverBarOnDesktop) {
                     setState(() {
                       isShowWideToolTip = false;
                     });
@@ -1236,6 +1336,8 @@ class _TIMUIKItHistoryMessageListItemState
                       } else {
                         model.addToMultiSelectedMessageList(message);
                       }
+                    } else {
+                      return;
                     }
                   },
                   child: Row(
@@ -1245,7 +1347,7 @@ class _TIMUIKItHistoryMessageListItemState
                         : MainAxisAlignment.start,
                     children: [
                       if (!isSelf && widget.showAvatar)
-                        InkWell(
+                        GestureDetector(
                           onLongPress: () {
                             if (widget.onLongPressForOthersHeadPortrait !=
                                 null) {}
@@ -1272,6 +1374,26 @@ class _TIMUIKItHistoryMessageListItemState
                                         message.sender ?? "", TapDownDetails());
                                   }
                                 },
+                          onSecondaryTap: isDesktopScreen
+                              ? null
+                              : () {
+                                  if (widget.onSecondaryTapForOthersPortrait !=
+                                          null &&
+                                      widget.allowAvatarTap) {
+                                    widget.onSecondaryTapForOthersPortrait!(
+                                        message.sender ?? "", TapDownDetails());
+                                  }
+                                },
+                          onSecondaryTapDown: isDesktopScreen
+                              ? (details) {
+                                  if (widget.onSecondaryTapForOthersPortrait !=
+                                          null &&
+                                      widget.allowAvatarTap) {
+                                    widget.onSecondaryTapForOthersPortrait!(
+                                        message.sender ?? "", details);
+                                  }
+                                }
+                              : null,
                           child: widget.userAvatarBuilder != null
                               ? widget.userAvatarBuilder!(context, message)
                               : Container(
@@ -1289,6 +1411,16 @@ class _TIMUIKItHistoryMessageListItemState
                                     ),
                                   ),
                                 ),
+                        ),
+                      if (isSelf &&
+                          widget.message.elemType == 6 &&
+                          isDownloadWaiting)
+                        Container(
+                          margin: const EdgeInsets.only(top: 2),
+                          child: LoadingAnimationWidget.threeArchedCircle(
+                            color: theme.weakTextColor ?? Colors.grey,
+                            size: 20,
+                          ),
                         ),
                       Container(
                         margin: widget.showAvatar
@@ -1327,72 +1459,73 @@ class _TIMUIKItHistoryMessageListItemState
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 if (isSelf)
-                                  renderHoverTipAndReadStatus(model, isSelf,
-                                      message, isPeerRead, theme),
+                                  renderHoverTipAndReadStatus(
+                                      model,
+                                      isSelf,
+                                      message,
+                                      isPeerRead,
+                                      theme,
+                                      isDownloadWaiting),
                                 Container(
                                   constraints: BoxConstraints(
                                     maxWidth: constraints.maxWidth * 0.77,
                                   ),
-                                  child: Builder(
-                                    builder: (context) {
-                                      return Column(
-                                        crossAxisAlignment:
-                                            (message.isSelf ?? true)
-                                                ? CrossAxisAlignment.end
-                                                : CrossAxisAlignment.start,
-                                        children: [
-                                          GestureDetector(
-                                            child: IgnorePointer(
+                                  child: Builder(builder: (context) {
+                                    return Column(
+                                      crossAxisAlignment:
+                                          (message.isSelf ?? true)
+                                              ? CrossAxisAlignment.end
+                                              : CrossAxisAlignment.start,
+                                      children: [
+                                        GestureDetector(
+                                          child: IgnorePointer(
                                               ignoring: model.isMultiSelect,
                                               child: _getMessageItemBuilder(
-                                                message,
-                                                message.status,
-                                                model,
-                                              ),
-                                            ),
-                                            onSecondaryTapDown: (details) {
-                                              if (widget.onLongPress != null) {
-                                                widget.onLongPress!(
-                                                    context, message);
-                                                return;
-                                              }
-                                              if (!PlatformUtils().isMobile) {
-                                                if (widget.allowLongPress) {
-                                                  _onOpenToolTip(
-                                                      context,
-                                                      message,
-                                                      model,
-                                                      theme,
-                                                      details,
-                                                      false,
-                                                      false);
-                                                }
-                                              }
-                                            },
-                                            onLongPress: () {
-                                              if (widget.onLongPress != null) {
-                                                widget.onLongPress!(
-                                                    context, message);
-                                                return;
-                                              }
-                                              if (widget.allowLongPress &&
-                                                  PlatformUtils().isMobile) {
+                                                  message,
+                                                  message.status,
+                                                  model)),
+                                          onSecondaryTapDown: (details) {
+                                            if (widget.onLongPress != null) {
+                                              widget.onLongPress!(
+                                                  context, message);
+                                              return;
+                                            }
+                                            if (!PlatformUtils().isMobile) {
+                                              if (widget.allowLongPress) {
                                                 _onOpenToolTip(
+                                                    context,
+                                                    message,
+                                                    model,
+                                                    theme,
+                                                    details,
+                                                    false,
+                                                    false);
+                                              }
+                                            }
+                                          },
+                                          onLongPress: () {
+                                            if (widget.onLongPress != null) {
+                                              widget.onLongPress!(
+                                                  context, message);
+                                              return;
+                                            }
+                                            if (widget.allowLongPress &&
+                                                !isDesktopScreen) {
+                                              _onOpenToolTip(
                                                   context,
                                                   message,
                                                   model,
                                                   theme,
                                                   null,
                                                   false,
-                                                  false,
-                                                );
-                                              }
-                                            },
-                                            onTapDown: (details) {
-                                              _tapDetails = details;
-                                            },
-                                          ),
-                                          TIMUIKitTextTranslationElem(
+                                                  false);
+                                            }
+                                          },
+                                          onTapDown: (details) {
+                                            _tapDetails = details;
+                                          },
+                                        ),
+                                        TIMUIKitTextTranslationElem(
                                             message: message,
                                             isUseDefaultEmoji:
                                                 widget.isUseDefaultEmoji,
@@ -1401,12 +1534,10 @@ class _TIMUIKItHistoryMessageListItemState
                                             isFromSelf: message.isSelf ?? true,
                                             isShowJump: false,
                                             clearJump: () {},
-                                            chatModel: model,
-                                          )
-                                        ],
-                                      );
-                                    },
-                                  ),
+                                            chatModel: model)
+                                      ],
+                                    );
+                                  }),
                                 ),
                                 if (!isSelf &&
                                     message.elemType ==
@@ -1415,17 +1546,18 @@ class _TIMUIKItHistoryMessageListItemState
                                     message.localCustomInt !=
                                         HistoryMessageDartConstant.read)
                                   Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 5, bottom: 12),
-                                    child: Icon(
-                                      Icons.circle,
-                                      color: theme.cautionColor,
-                                      size: 10,
-                                    ),
-                                  ),
+                                      padding: const EdgeInsets.only(
+                                          left: 5, bottom: 12),
+                                      child: Icon(Icons.circle,
+                                          color: theme.cautionColor, size: 10)),
                                 if (!isSelf)
-                                  renderHoverTipAndReadStatus(model, isSelf,
-                                      message, isPeerRead, theme),
+                                  renderHoverTipAndReadStatus(
+                                      model,
+                                      isSelf,
+                                      message,
+                                      isPeerRead,
+                                      theme,
+                                      isDownloadWaiting),
                               ],
                             ),
                             if (widget.bottomRowBuilder != null)
@@ -1433,7 +1565,9 @@ class _TIMUIKItHistoryMessageListItemState
                           ],
                         ),
                       ),
-                      if (widget.message.elemType == 6 && isDownloadWaiting)
+                      if (!isSelf &&
+                          widget.message.elemType == 6 &&
+                          isDownloadWaiting)
                         Container(
                           margin: const EdgeInsets.only(top: 24, left: 6),
                           child: LoadingAnimationWidget.threeArchedCircle(
@@ -1456,10 +1590,9 @@ class _TIMUIKItHistoryMessageListItemState
                                     }
                                   },
                                   child: Avatar(
-                                    faceUrl: message.faceUrl ?? "",
-                                    showName:
-                                        MessageUtils.getDisplayName(message),
-                                  ),
+                                      faceUrl: message.faceUrl ?? "",
+                                      showName:
+                                          MessageUtils.getDisplayName(message)),
                                 ),
                               ),
                     ],

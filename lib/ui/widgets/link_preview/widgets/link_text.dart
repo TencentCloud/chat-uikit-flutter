@@ -1,14 +1,14 @@
 // ignore_for_file: deprecated_member_use
 
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_extended_text/extended_text.dart';
+import 'package:extended_text/extended_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:tencent_im_base/base_widgets/tim_stateless_widget.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/common/utils.dart';
+import 'package:markdown/markdown.dart' as md;
 
 class LinkTextMarkdown extends TIMStatelessWidget {
   /// Callback for when link is tapped
@@ -20,29 +20,37 @@ class LinkTextMarkdown extends TIMStatelessWidget {
   /// text style for default words
   final TextStyle? style;
 
+  final bool? isEnableTextSelection;
+
   const LinkTextMarkdown(
-      {Key? key, required this.messageText, this.onLinkTap, this.style})
+      {Key? key,
+      required this.messageText,
+      this.isEnableTextSelection,
+      this.onLinkTap,
+      this.style})
       : super(key: key);
 
   @override
   Widget timBuild(BuildContext context) {
     return MarkdownBody(
       data: messageText,
+      selectable: isEnableTextSelection ?? false,
       styleSheet: MarkdownStyleSheet.fromTheme(ThemeData(
               textTheme: TextTheme(
                   bodyText2: style ?? const TextStyle(fontSize: 16.0))))
           .copyWith(
         a: TextStyle(color: LinkUtils.hexToColor("015fff")),
       ),
+      extensionSet: md.ExtensionSet.gitHubWeb,
       onTapLink: (
         String link,
         String? href,
         String title,
       ) {
         if (onLinkTap != null) {
-          onLinkTap!(link);
+          onLinkTap!(href ?? "");
         } else {
-          LinkUtils.launchURL(context, link);
+          LinkUtils.launchURL(context, href ?? "");
         }
       },
     );
@@ -130,15 +138,8 @@ class LinkText extends TIMStatelessWidget {
 
   @override
   Widget timBuild(BuildContext context) {
-    final isDesktopScreen =
-        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
-    return
-        // Text.rich(
-        //   TextSpan(children: [..._getContentSpan(messageText, context)]),
-        //   style: style ?? const TextStyle(fontSize: 16.0),
-        // );
-        ExtendedText(_getContentSpan(messageText, context), softWrap: true,
-            onSpecialTextTap: (dynamic parameter) {
+    return ExtendedText(_getContentSpan(messageText, context), softWrap: true,
+        onSpecialTextTap: (dynamic parameter) {
       if (parameter.toString().startsWith('\$')) {
         if (onLinkTap != null) {
           onLinkTap!((parameter.toString()).replaceAll('\$', ''));
@@ -148,14 +149,28 @@ class LinkText extends TIMStatelessWidget {
         }
       }
     },
-            selectionEnabled: isEnableTextSelection != null
-                ? isEnableTextSelection!
-                : isDesktopScreen,
-            style: style ?? const TextStyle(fontSize: 16.0),
-            specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
-              isUseDefaultEmoji: isUseDefaultEmoji,
-              customEmojiStickerList: customEmojiStickerList,
-              showAtBackground: true,
-            ));
+        style: style ?? const TextStyle(fontSize: 16.0),
+        specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
+          isUseDefaultEmoji: isUseDefaultEmoji,
+          customEmojiStickerList: customEmojiStickerList,
+          showAtBackground: true,
+        ));
+  }
+}
+
+class TextBuilder extends MarkdownElementBuilder {
+  @override
+  Widget? visitText(md.Text text, TextStyle? preferredStyle) {
+    return Text(text.textContent);
+  }
+}
+
+class RawHtmlSyntax extends md.InlineSyntax {
+  RawHtmlSyntax() : super(r'<.+?>');
+
+  @override
+  bool onMatch(md.InlineParser parser, Match match) {
+    parser.addNode(md.Text(match[0]!));
+    return true;
   }
 }
