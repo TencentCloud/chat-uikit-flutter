@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_wrapper.dart';
@@ -23,15 +23,23 @@ class TIMUIKitVideoElem extends StatefulWidget {
   final String? isFrom;
   final TUIChatSeparateViewModel chatModel;
   final bool? isShowMessageReaction;
+  final Size? Function(
+    double minWidth,
+    double maxWidth,
+    double minHeight,
+    double maxHeight,
+  )? calculateSizeFunc;
 
-  const TIMUIKitVideoElem(this.message,
-      {Key? key,
-      this.isShowJump = false,
-      this.clearJump,
-      this.isFrom,
-      this.isShowMessageReaction,
-      required this.chatModel})
-      : super(key: key);
+  const TIMUIKitVideoElem(
+    this.message, {
+    Key? key,
+    this.isShowJump = false,
+    this.clearJump,
+    this.isFrom,
+    this.isShowMessageReaction,
+    required this.chatModel,
+    this.calculateSizeFunc,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _TIMUIKitVideoElemState();
@@ -242,59 +250,83 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
                     positionRadio = (stateElement.snapshotWidth! /
                         stateElement.snapshotHeight!);
                   }
-                  return ConstrainedBox(
-                      constraints: BoxConstraints(
-                          maxWidth: PlatformUtils().isWeb
-                              ? 300
-                              : constraints.maxWidth * 0.5,
-                          maxHeight: min(constraints.maxHeight * 0.8, 300),
-                          minHeight: 20,
-                          minWidth: 20),
-                      child: Stack(
-                        children: <Widget>[
-                          if (positionRadio != null &&
-                              (stateElement.snapshotUrl != null ||
-                                  stateElement.snapshotUrl != null))
-                            AspectRatio(
-                              aspectRatio: positionRadio,
-                              child: Container(
-                                decoration: const BoxDecoration(
-                                    color: Colors.transparent),
-                              ),
-                            ),
-                          Row(
-                            children: [
-                              Expanded(
-                                  child: generateSnapshot(theme,
-                                      stateElement.snapshotHeight ?? 100))
-                            ],
+                  final child = Stack(
+                    children: <Widget>[
+                      if (positionRadio != null &&
+                          (stateElement.snapshotUrl != null ||
+                              stateElement.snapshotUrl != null))
+                        AspectRatio(
+                          aspectRatio: positionRadio,
+                          child: Container(
+                            decoration:
+                                const BoxDecoration(color: Colors.transparent),
                           ),
-                          if (widget.message.status !=
-                                      MessageStatus.V2TIM_MSG_STATUS_SENDING &&
-                                  (stateElement.snapshotUrl != null ||
-                                      stateElement.snapshotPath != null) &&
-                                  stateElement.videoPath != null ||
-                              stateElement.videoUrl != null)
-                            Positioned.fill(
-                              // alignment: Alignment.center,
-                              child: Center(
-                                  child: Image.asset('images/play.png',
-                                      package: 'tencent_cloud_chat_uikit',
-                                      height: 64)),
-                            ),
-                          if (widget.message.videoElem?.duration != null &&
-                              widget.message.videoElem!.duration! > 0)
-                            Positioned(
-                                right: 10,
-                                bottom: 10,
-                                child: Text(
-                                    MessageUtils.formatVideoTime(widget
-                                                .message.videoElem!.duration!)
-                                        .toString(),
-                                    style: const TextStyle(
-                                        color: Colors.white, fontSize: 12))),
+                        ),
+                      Row(
+                        children: [
+                          Expanded(
+                              child: generateSnapshot(
+                                  theme, stateElement.snapshotHeight ?? 100))
                         ],
-                      ));
+                      ),
+                      if (widget.message.status !=
+                                  MessageStatus.V2TIM_MSG_STATUS_SENDING &&
+                              (stateElement.snapshotUrl != null ||
+                                  stateElement.snapshotPath != null) &&
+                              stateElement.videoPath != null ||
+                          stateElement.videoUrl != null)
+                        Positioned.fill(
+                          // alignment: Alignment.center,
+                          child: Center(
+                              child: Image.asset('images/play.png',
+                                  package: 'tencent_cloud_chat_uikit',
+                                  height: 64)),
+                        ),
+                      if (widget.message.videoElem?.duration != null &&
+                          widget.message.videoElem!.duration! > 0)
+                        Positioned(
+                            right: 10,
+                            bottom: 10,
+                            child: Text(
+                                MessageUtils.formatVideoTime(
+                                        widget.message.videoElem!.duration!)
+                                    .toString(),
+                                style: const TextStyle(
+                                    color: Colors.white, fontSize: 12))),
+                    ],
+                  );
+
+                  double maxWidth =
+                      PlatformUtils().isWeb ? 300 : constraints.maxWidth * 0.5;
+                  double minWidth = 20;
+                  double maxHeight = min(constraints.maxHeight * 0.8, 300);
+                  double minHeight = 20;
+                  Size? size = widget.calculateSizeFunc?.call(
+                    minWidth,
+                    maxWidth,
+                    minHeight,
+                    maxHeight,
+                  );
+
+                  if (size != null &&
+                      size != Size.zero &&
+                      size != Size.infinite) {
+                    return SizedBox(
+                      width: size.width,
+                      height: size.height,
+                      child: child,
+                    );
+                  }
+                  return ConstrainedBox(
+                    constraints: BoxConstraints(
+                        maxWidth: PlatformUtils().isWeb
+                            ? 300
+                            : constraints.maxWidth * 0.5,
+                        maxHeight: min(constraints.maxHeight * 0.8, 300),
+                        minHeight: 20,
+                        minWidth: 20),
+                    child: child,
+                  );
                 }),
               ))),
     );
