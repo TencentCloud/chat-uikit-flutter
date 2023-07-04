@@ -2,35 +2,36 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'package:crypto/crypto.dart';
-import 'package:device_info_plus/device_info_plus.dart';
-import 'package:http/http.dart' as http;
-import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_open_file/tencent_open_file.dart';
-import 'package:universal_html/html.dart' as html;
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:crypto/crypto.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_wrapper.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/image_screen.dart';
+import 'package:tencent_open_file/tencent_open_file.dart';
 import 'package:transparent_image/transparent_image.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:universal_html/html.dart' as html;
 import 'package:url_launcher/url_launcher.dart';
 
 class TIMUIKitImageElem extends StatefulWidget {
@@ -40,16 +41,23 @@ class TIMUIKitImageElem extends StatefulWidget {
   final String? isFrom;
   final bool? isShowMessageReaction;
   final TUIChatSeparateViewModel chatModel;
+  final Size? Function(
+    double minWidth,
+    double maxWidth,
+    double minHeight,
+    double maxHeight,
+  )? calculateSizeFunc;
 
-  const TIMUIKitImageElem(
-      {required this.message,
-      this.isShowJump = false,
-      required this.chatModel,
-      this.clearJump,
-      this.isFrom,
-      Key? key,
-      this.isShowMessageReaction})
-      : super(key: key);
+  const TIMUIKitImageElem({
+    required this.message,
+    this.isShowJump = false,
+    required this.chatModel,
+    this.clearJump,
+    this.isFrom,
+    Key? key,
+    this.isShowMessageReaction,
+    this.calculateSizeFunc,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _TIMUIKitImageElem();
@@ -348,7 +356,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
                         launchUrl(Uri.file(widget
                             .message.imageElem!.imageList![0]!.localUrl!));
                       }
-                    }else{
+                    } else {
                       onTIMCallback(TIMCallback(
                           infoCode: 6660414,
                           infoRecommendText: TIM_t("正在下载中"),
@@ -637,6 +645,29 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
         message: widget.message,
         child: LayoutBuilder(
             builder: (BuildContext context, BoxConstraints constraints) {
+          double maxWidth = constraints.maxWidth * 0.5;
+          double minWidth = 64;
+          double maxHeight = 256;
+
+          Size? size = widget.calculateSizeFunc?.call(
+            minWidth,
+            maxWidth,
+            0,
+            maxHeight,
+          );
+          if (size != null && size != Size.zero && size != Size.infinite) {
+            return SizedBox(
+              width: size.width,
+              height: size.height,
+              child: _renderImage(
+                heroTag,
+                theme,
+                originalImg: originalImg,
+                smallImg: smallImg,
+              ),
+            );
+          }
+
           return ConstrainedBox(
             constraints: BoxConstraints(
               maxWidth: constraints.maxWidth * 0.5,

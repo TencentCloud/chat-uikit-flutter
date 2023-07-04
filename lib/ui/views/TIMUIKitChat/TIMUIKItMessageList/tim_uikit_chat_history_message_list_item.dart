@@ -6,23 +6,20 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_text_translate_elem.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/forward_message_screen.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
-import 'package:tencent_super_tooltip/tencent_super_tooltip.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/time_ago.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_message_tooltip.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_message_read_receipt.dart';
@@ -30,10 +27,13 @@ import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageIt
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/main.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_custom_elem.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_face_elem.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_text_translate_elem.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_cloud_custom_data.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/forward_message_screen.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/radio_button.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
+import 'package:tencent_super_tooltip/tencent_super_tooltip.dart';
 
 import '../TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_select_emoji.dart';
 
@@ -193,6 +193,26 @@ class ToolTipsConfig {
 }
 
 class TIMUIKitHistoryMessageListItem extends StatefulWidget {
+  /// avatar image builder
+  final Widget? Function(BuildContext context, V2TimMessage message)?
+      userAvatarImageBuilder;
+
+  final Size? Function(
+    double minWidth,
+    double maxWidth,
+    double minHeight,
+    double maxHeight,
+    V2TimMessage message,
+  )? calculateImgSizeFunc;
+
+  final Size? Function(
+    double minWidth,
+    double maxWidth,
+    double minHeight,
+    double maxHeight,
+    V2TimMessage message,
+  )? calculateVideoSizeFunc;
+
   /// message instance
   final V2TimMessage message;
 
@@ -290,40 +310,43 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
   /// If provided, the default message action functionality will appear in the right-click context menu instead.
   final Widget Function(V2TimMessage message)? customMessageHoverBarOnDesktop;
 
-  const TIMUIKitHistoryMessageListItem(
-      {Key? key,
-      required this.message,
-      @Deprecated(
-          "Nickname will not show in one-to-one chat, if you tend to control it in group chat, please use `isShowSelfNameInGroup` and `isShowOthersNameInGroup` from `config: TIMUIKitChatConfig` instead")
-      this.showNickName = false,
-      this.onScrollToIndex,
-      this.onScrollToIndexBegin,
-      this.onTapForOthersPortrait,
-      this.messageItemBuilder,
-      this.onLongPressForOthersHeadPortrait,
-      this.showAvatar = true,
-      this.showMessageSending = true,
-      this.showMessageReadRecipt = true,
-      this.allowLongPress = true,
-      this.toolTipsConfig,
-      this.onLongPress,
-      this.showGroupMessageReadRecipt = false,
-      this.allowAtUserWhenReply = true,
-      this.allowAvatarTap = true,
-      this.userAvatarBuilder,
-      this.themeData,
-      this.padding,
-      this.textPadding,
-      this.topRowBuilder,
-      this.isUseMessageReaction,
-      this.bottomRowBuilder,
-      this.isUseDefaultEmoji = false,
-      this.customEmojiStickerList = const [],
-      this.textFieldController,
-      this.onSecondaryTapForOthersPortrait,
-      this.groupMemberInfo,
-      this.customMessageHoverBarOnDesktop})
-      : super(key: key);
+  const TIMUIKitHistoryMessageListItem({
+    Key? key,
+    required this.message,
+    @Deprecated(
+        "Nickname will not show in one-to-one chat, if you tend to control it in group chat, please use `isShowSelfNameInGroup` and `isShowOthersNameInGroup` from `config: TIMUIKitChatConfig` instead")
+    this.showNickName = false,
+    this.onScrollToIndex,
+    this.onScrollToIndexBegin,
+    this.onTapForOthersPortrait,
+    this.messageItemBuilder,
+    this.onLongPressForOthersHeadPortrait,
+    this.showAvatar = true,
+    this.showMessageSending = true,
+    this.showMessageReadRecipt = true,
+    this.allowLongPress = true,
+    this.toolTipsConfig,
+    this.onLongPress,
+    this.showGroupMessageReadRecipt = false,
+    this.allowAtUserWhenReply = true,
+    this.allowAvatarTap = true,
+    this.userAvatarBuilder,
+    this.themeData,
+    this.padding,
+    this.textPadding,
+    this.topRowBuilder,
+    this.isUseMessageReaction,
+    this.bottomRowBuilder,
+    this.isUseDefaultEmoji = false,
+    this.customEmojiStickerList = const [],
+    this.textFieldController,
+    this.onSecondaryTapForOthersPortrait,
+    this.groupMemberInfo,
+    this.customMessageHoverBarOnDesktop,
+    this.userAvatarImageBuilder,
+    this.calculateImgSizeFunc,
+    this.calculateVideoSizeFunc,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _TIMUIKItHistoryMessageListItemState();
@@ -585,6 +608,15 @@ class _TIMUIKItHistoryMessageListItemState
             : null;
         return customWidget ??
             TIMUIKitImageElem(
+              calculateSizeFunc: (minWidth, maxWidth, minHeight, maxHeight) {
+                return widget.calculateImgSizeFunc?.call(
+                  minWidth,
+                  maxWidth,
+                  minHeight,
+                  maxHeight,
+                  messageItem,
+                );
+              },
               clearJump: clearJump,
               isShowJump: isShowJump,
               chatModel: model,
@@ -602,6 +634,15 @@ class _TIMUIKItHistoryMessageListItemState
             : null;
         return customWidget ??
             TIMUIKitVideoElem(
+              calculateSizeFunc: (minWidth, maxWidth, minHeight, maxHeight) {
+                return widget.calculateVideoSizeFunc?.call(
+                  minWidth,
+                  maxWidth,
+                  minHeight,
+                  maxHeight,
+                  messageItem,
+                );
+              },
               messageItem,
               isShowJump: isShowJump,
               chatModel: model,
@@ -1406,6 +1447,8 @@ class _TIMUIKItHistoryMessageListItemState
                                     height: 40,
                                     child: Avatar(
                                       faceUrl: message.faceUrl ?? "",
+                                      cusAvatar: widget.userAvatarImageBuilder
+                                          ?.call(context, message),
                                       showName:
                                           MessageUtils.getDisplayName(message),
                                     ),
@@ -1591,6 +1634,8 @@ class _TIMUIKItHistoryMessageListItemState
                                   },
                                   child: Avatar(
                                       faceUrl: message.faceUrl ?? "",
+                                      cusAvatar: widget.userAvatarImageBuilder
+                                          ?.call(context, message),
                                       showName:
                                           MessageUtils.getDisplayName(message)),
                                 ),
