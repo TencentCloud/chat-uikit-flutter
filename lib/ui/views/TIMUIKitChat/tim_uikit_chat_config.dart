@@ -199,6 +199,9 @@ class TIMUIKitChatConfig {
   /// [Default]: false
   final bool isGroupAdminRecallEnabled;
 
+//  判断某条消息是否可以点击
+  final MessageCanLongPres? messageCanLongPres;
+
   const TIMUIKitChatConfig(
       {this.onTapLink,
       this.timeDividerConfig,
@@ -244,5 +247,6 @@ class TIMUIKitChatConfig {
       this.showC2cMessageEditStatus = true,
       this.additionalDesktopControlBarItems,
       this.isAllowLongPressAvatarToAt = true,
-      this.isUseDefaultEmoji = false});
+      this.isUseDefaultEmoji = false,
+      this.messageCanLongPres});
 }

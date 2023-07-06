@@ -195,35 +195,36 @@ class _TIMUIKitHistoryMessageListContainerState
           mainHistoryListConfig: widget.mainHistoryListConfig,
           itemBuilder: (context, message) {
             return TIMUIKitHistoryMessageListItem(
-                userAvatarImageBuilder: widget.userAvatarImageBuilder,
-                calculateImgSizeFunc: widget.calculateImgSizeFunc,
-                calculateVideoSizeFunc: widget.calculateVideoSizeFunc,
-                customMessageHoverBarOnDesktop:
-                    widget.customMessageHoverBarOnDesktop,
-                groupMemberInfo: widget.groupMemberInfo,
-                textFieldController: widget.textFieldController,
-                userAvatarBuilder: widget.userAvatarBuilder,
-                customEmojiStickerList: widget.customEmojiStickerList,
-                isUseDefaultEmoji: widget.isUseDefaultEmoji,
-                topRowBuilder: _getTopRowBuilder(model),
-                onScrollToIndex: _historyMessageListController.scrollToIndex,
-                onScrollToIndexBegin:
-                    _historyMessageListController.scrollToIndexBegin,
-                toolTipsConfig: widget.toolTipsConfig ??
-                    ToolTipsConfig(
-                        additionalItemBuilder:
-                            widget.extraTipsActionItemBuilder),
-                message: message!,
-                showAvatar: chatConfig.isShowAvatar,
-                onSecondaryTapForOthersPortrait: widget.onSecondaryTapAvatar,
-                onTapForOthersPortrait: widget.onTapAvatar,
-                messageItemBuilder: widget.messageItemBuilder,
-                onLongPressForOthersHeadPortrait:
-                    widget.onLongPressForOthersHeadPortrait,
-                allowAtUserWhenReply: chatConfig.isAtWhenReply,
-                allowAvatarTap: chatConfig.isAllowClickAvatar,
-                allowLongPress: chatConfig.isAllowLongPressMessage,
-                isUseMessageReaction: chatConfig.isUseMessageReaction);
+              userAvatarImageBuilder: widget.userAvatarImageBuilder,
+              calculateImgSizeFunc: widget.calculateImgSizeFunc,
+              calculateVideoSizeFunc: widget.calculateVideoSizeFunc,
+              customMessageHoverBarOnDesktop:
+                  widget.customMessageHoverBarOnDesktop,
+              groupMemberInfo: widget.groupMemberInfo,
+              textFieldController: widget.textFieldController,
+              userAvatarBuilder: widget.userAvatarBuilder,
+              customEmojiStickerList: widget.customEmojiStickerList,
+              isUseDefaultEmoji: widget.isUseDefaultEmoji,
+              topRowBuilder: _getTopRowBuilder(model),
+              onScrollToIndex: _historyMessageListController.scrollToIndex,
+              onScrollToIndexBegin:
+                  _historyMessageListController.scrollToIndexBegin,
+              toolTipsConfig: widget.toolTipsConfig ??
+                  ToolTipsConfig(
+                      additionalItemBuilder: widget.extraTipsActionItemBuilder),
+              message: message!,
+              showAvatar: chatConfig.isShowAvatar,
+              onSecondaryTapForOthersPortrait: widget.onSecondaryTapAvatar,
+              onTapForOthersPortrait: widget.onTapAvatar,
+              messageItemBuilder: widget.messageItemBuilder,
+              onLongPressForOthersHeadPortrait:
+                  widget.onLongPressForOthersHeadPortrait,
+              allowAtUserWhenReply: chatConfig.isAtWhenReply,
+              allowAvatarTap: chatConfig.isAllowClickAvatar,
+              allowLongPress: chatConfig.isAllowLongPressMessage,
+              isUseMessageReaction: chatConfig.isUseMessageReaction,
+              messageCanLongPres: chatConfig.messageCanLongPres,
+            );
           },
           tongueItemBuilder: widget.tongueItemBuilder,
           initFindingMsg: widget.initFindingMsg,

@@ -192,6 +192,9 @@ class ToolTipsConfig {
       this.additionalItemBuilder});
 }
 
+/// 判断消息是否能点击的回调
+typedef MessageCanLongPres = bool Function(V2TimMessage message);
+
 class TIMUIKitHistoryMessageListItem extends StatefulWidget {
   /// avatar image builder
   final Widget? Function(BuildContext context, V2TimMessage message)?
@@ -310,6 +313,9 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
   /// If provided, the default message action functionality will appear in the right-click context menu instead.
   final Widget Function(V2TimMessage message)? customMessageHoverBarOnDesktop;
 
+//  判断某条消息是否可以点击
+  final MessageCanLongPres? messageCanLongPres;
+
   const TIMUIKitHistoryMessageListItem({
     Key? key,
     required this.message,
@@ -346,6 +352,7 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
     this.userAvatarImageBuilder,
     this.calculateImgSizeFunc,
     this.calculateVideoSizeFunc,
+    this.messageCanLongPres,
   }) : super(key: key);
 
   @override
@@ -1528,6 +1535,11 @@ class _TIMUIKItHistoryMessageListItemState
                                                   message.status,
                                                   model)),
                                           onSecondaryTapDown: (details) {
+                                            if (!(widget.messageCanLongPres
+                                                    ?.call(message) ??
+                                                true)) {
+                                              return;
+                                            }
                                             if (widget.onLongPress != null) {
                                               widget.onLongPress!(
                                                   context, message);
@@ -1547,6 +1559,11 @@ class _TIMUIKItHistoryMessageListItemState
                                             }
                                           },
                                           onLongPress: () {
+                                            if (!(widget.messageCanLongPres
+                                                    ?.call(message) ??
+                                                true)) {
+                                              return;
+                                            }
                                             if (widget.onLongPress != null) {
                                               widget.onLongPress!(
                                                   context, message);
