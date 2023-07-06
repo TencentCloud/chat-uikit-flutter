@@ -4,18 +4,18 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_text_field_controller.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/TIMUIKitTongue/tim_uikit_chat_history_message_list_tongue.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_config.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_item.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_text_field_controller.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_chat_config.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_im_base/tencent_im_base.dart';
 
 enum LoadingPlace {
   none,
@@ -24,6 +24,26 @@ enum LoadingPlace {
 }
 
 class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
+  /// the builder for avatar
+  final Widget Function(BuildContext context, V2TimMessage message)?
+      userAvatarBuilder;
+
+  final Size? Function(
+    double minWidth,
+    double maxWidth,
+    double minHeight,
+    double maxHeight,
+    V2TimMessage message,
+  )? calculateImgSizeFunc;
+
+  final Size? Function(
+    double minWidth,
+    double maxWidth,
+    double minHeight,
+    double maxHeight,
+    V2TimMessage message,
+  )? calculateVideoSizeFunc;
+
   final Widget Function(BuildContext, V2TimMessage?)? itemBuilder;
   final AutoScrollController? scrollController;
   final String conversationID;
@@ -38,9 +58,9 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
   /// The controller for text field.
   final TIMUIKitInputTextFieldController? textFieldController;
 
-  /// the builder for avatar
-  final Widget Function(BuildContext context, V2TimMessage message)?
-      userAvatarBuilder;
+  /// avatar image builder
+  final Widget? Function(BuildContext context, V2TimMessage message)?
+      userAvatarImageBuilder;
 
   /// the builder for tongue
   final TongueItemBuilder? tongueItemBuilder;
@@ -111,6 +131,9 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
     this.onSecondaryTapAvatar,
     this.groupMemberInfo,
     this.customMessageHoverBarOnDesktop,
+    this.userAvatarImageBuilder,
+    this.calculateImgSizeFunc,
+    this.calculateVideoSizeFunc,
   }) : super(key: key);
 
   @override
@@ -172,6 +195,9 @@ class _TIMUIKitHistoryMessageListContainerState
           mainHistoryListConfig: widget.mainHistoryListConfig,
           itemBuilder: (context, message) {
             return TIMUIKitHistoryMessageListItem(
+                userAvatarImageBuilder: widget.userAvatarImageBuilder,
+                calculateImgSizeFunc: widget.calculateImgSizeFunc,
+                calculateVideoSizeFunc: widget.calculateVideoSizeFunc,
                 customMessageHoverBarOnDesktop:
                     widget.customMessageHoverBarOnDesktop,
                 groupMemberInfo: widget.groupMemberInfo,
