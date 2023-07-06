@@ -9,7 +9,7 @@ import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
-typedef CustomLastMsgBuilder = String? Function(V2TimMessage lastMsg);
+typedef CustomLastMsgBuilder = Future<String?> Function(V2TimMessage lastMsg);
 
 class TIMUIKitLastMsg extends StatefulWidget {
   final V2TimMessage? lastMsg;
@@ -100,7 +100,7 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
     switch (msgType) {
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
         return widget.lastMsgBuilder != null
-            ? widget.lastMsgBuilder!.call(message) ?? "未知的自定义消息"
+            ? await widget.lastMsgBuilder!.call(message) ?? "未知的自定义消息"
             : TIM_t("[自定义]");
       case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
         return TIM_t("[语音]");
