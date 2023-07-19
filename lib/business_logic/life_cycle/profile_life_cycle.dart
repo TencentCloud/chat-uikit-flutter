@@ -24,10 +24,10 @@ class ProfileLifeCycle {
   FutureBool Function(String userID) didRemarkUpdated;
 
   ProfileLifeCycle({
-    this.didRemarkUpdated = DefaultLifeCycle.defaultBooleanSolution,
+    this.didRemarkUpdated = DefaultLifeCycle.defaultAsyncBooleanSolution,
     this.didGetFriendInfo = DefaultLifeCycle.defaultFriendInfoSolution,
-    this.shouldAddToBlockList = DefaultLifeCycle.defaultBooleanSolution,
-    this.shouldAddFriend = DefaultLifeCycle.defaultBooleanSolution,
-    this.shouldDeleteFriend = DefaultLifeCycle.defaultBooleanSolution,
+    this.shouldAddToBlockList = DefaultLifeCycle.defaultAsyncBooleanSolution,
+    this.shouldAddFriend = DefaultLifeCycle.defaultAsyncBooleanSolution,
+    this.shouldDeleteFriend = DefaultLifeCycle.defaultAsyncBooleanSolution,
   });
 }

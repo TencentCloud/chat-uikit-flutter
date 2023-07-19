@@ -232,21 +232,23 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
     final faceUrl = message.faceUrl ?? "";
     final showName = message.nickName ?? message.userID ?? "";
     final theme = Provider.of<TUIThemeViewModel>(context).theme;
+    final isSelf = message.isSelf ?? false;
     return Container(
       margin: const EdgeInsets.only(top: 20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: isSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
-          SizedBox(
+          if(!isSelf) SizedBox(
             width: 40,
             height: 40,
             child: Avatar(faceUrl: faceUrl, showName: showName),
           ),
-          const SizedBox(
+          if(!isSelf) const SizedBox(
             width: 12,
           ),
           Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: isSelf ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
               Text(showName,
                   style: TextStyle(fontSize: 12, color: theme.weakTextColor)),
@@ -258,7 +260,15 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
                 child: _getMsgItem(message),
               )
             ],
-          )
+          ),
+          if(isSelf) const SizedBox(
+            width: 12,
+          ),
+          if(isSelf) SizedBox(
+            width: 40,
+            height: 40,
+            child: Avatar(faceUrl: faceUrl, showName: showName),
+          ),
         ],
       ),
     );

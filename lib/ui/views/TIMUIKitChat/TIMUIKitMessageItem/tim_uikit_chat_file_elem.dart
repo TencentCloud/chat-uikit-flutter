@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_open_file/tencent_open_file.dart';
@@ -49,10 +50,12 @@ class TIMUIKitFileElem extends StatefulWidget {
 
 class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
   String filePath = "";
-  bool isDownloading = false;
+  bool isWebDownloading = false;
   final TUIChatGlobalModel model = serviceLocator<TUIChatGlobalModel>();
   int downloadProgress = 0;
   late V2TimAdvancedMsgListener advancedMsgListener;
+  final GlobalKey containerKey = GlobalKey();
+  double? containerHeight;
 
   @override
   void dispose() {
@@ -75,18 +78,18 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
           (V2TimMessageDownloadProgress messageProgress) async {
         if (messageProgress.msgID == widget.message.msgID) {
           if (messageProgress.isFinish) {
-            if(mounted){
+            if (mounted) {
               setState(() {
                 downloadProgress = 100;
               });
             }
           } else {
-            if(mounted){
+            final currentProgress =
+                (messageProgress.currentSize / messageProgress.totalSize * 100)
+                    .floor();
+            if (mounted && currentProgress > downloadProgress) {
               setState(() {
-                downloadProgress = (messageProgress.currentSize /
-                    messageProgress.totalSize *
-                    100)
-                    .ceil();
+                downloadProgress = currentProgress;
               });
             }
           }
@@ -110,30 +113,22 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
     if (PlatformUtils().isWeb) {
       return true;
     }
-
-    if (model.getMessageProgress(widget.messageID) == 100 ||
-        downloadProgress == 100) {
-      String savePath =
-          TencentUtils.checkString(widget.message.fileElem!.localUrl) ??
-              model.getFileMessageLocation(widget.messageID);
-      File f = File(savePath);
-      if (f.existsSync() && widget.messageID != null) {
-        filePath = savePath;
-        setState(() {
-          downloadProgress = 100;
-        });
-        return true;
-      }
-      return false;
-    }
-    String savePath = widget.message.fileElem!.localUrl ?? '';
+    String savePath = TencentUtils.checkString(
+            model.getFileMessageLocation(widget.messageID)) ??
+        TencentUtils.checkString(widget.message.fileElem!.localUrl) ??
+        widget.message.fileElem?.path ??
+        '';
     File f = File(savePath);
     if (f.existsSync() && widget.messageID != null) {
       filePath = savePath;
-      setState(() {
-        downloadProgress = 100;
-      });
-      model.setMessageProgress(widget.messageID!, 100);
+      if (downloadProgress != 100) {
+        setState(() {
+          downloadProgress = 100;
+        });
+      }
+      if (model.getMessageProgress(widget.messageID) != 100) {
+        model.setMessageProgress(widget.messageID!, 100);
+      }
       return true;
     }
     return false;
@@ -151,10 +146,12 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
     }
   }
 
-  addUrlToWaitingPath() async {
+  addUrlToWaitingPath(TUITheme theme) async {
     if (widget.messageID != null) {
       model.addWaitingList(widget.messageID!);
-      print("add path success");
+    }
+    if (model.getWaitingListLength() == 1) {
+      await downloadFile(theme);
     }
   }
 
@@ -195,7 +192,25 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
     await model.downloadFile();
   }
 
+  Future<bool> hasZeroSize(String filePath) async {
+    try {
+      final file = File(filePath);
+      final fileSize = await file.length();
+      return fileSize == 0;
+    } catch (e) {
+      return false;
+    }
+  }
+
   tryOpenFile(context, theme) async {
+    if (!PlatformUtils().isWeb &&
+        (await hasZeroSize(filePath) || widget.message.status == 3)) {
+      onTIMCallback(TIMCallback(
+          type: TIMCallbackType.INFO,
+          infoRecommendText: "不支持 0KB 文件的传输",
+          infoCode: 6660417));
+      return;
+    }
     if (PlatformUtils().isMobile) {
       if (PlatformUtils().isIOS) {
         if (!await Permissions.checkPermission(
@@ -229,6 +244,11 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
   }
 
   void downloadWebFile(String fileUrl) async {
+    if (mounted) {
+      setState(() {
+        isWebDownloading = true;
+      });
+    }
     String fileName = Uri.parse(fileUrl).pathSegments.last;
     try {
       http.Response response = await http.get(
@@ -255,6 +275,11 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
         ..style.display = "none"
         ..click();
     }
+    if (mounted) {
+      setState(() {
+        isWebDownloading = false;
+      });
+    }
   }
 
   @override
@@ -280,111 +305,144 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
       final String fileName = widget.fileElem!.fileName!;
       fileFormat = fileName.split(".")[max(fileName.split(".").length - 1, 0)];
     }
-    return TIMUIKitMessageReactionWrapper(
-        chatModel: widget.chatModel,
-        isShowJump: widget.isShowJump,
-        clearJump: widget.clearJump,
-        isFromSelf: widget.message.isSelf ?? true,
-        isShowMessageReaction: widget.isShowMessageReaction ?? true,
-        message: widget.message,
-        child: GestureDetector(
-            onTap: () async {
-              if (PlatformUtils().isWeb) {
-                downloadWebFile(widget.fileElem?.path ?? "");
-                return;
-              }
-              if (await hasFile()) {
-                if (received == 100) {
-                  tryOpenFile(context, theme);
-                } else {
-                  // 正在下载中，文件可能不完整
-                  onTIMCallback(
-                    TIMCallback(
-                      type: TIMCallbackType.INFO,
-                      infoRecommendText: TIM_t("正在下载中"),
-                      infoCode: 6660411,
-                    ),
-                  );
-                }
-                return;
-              }
+    final RenderBox? containerRenderBox =
+        containerKey.currentContext?.findRenderObject() as RenderBox?;
+    if (containerRenderBox != null) {
+      containerHeight = containerRenderBox.size.height;
+    }
 
-              if (checkIsWaiting()) {
-                onTIMCallback(
-                  TIMCallback(
-                      type: TIMCallbackType.INFO,
-                      infoRecommendText: TIM_t("已加入待下载队列，其他文件下载中"),
-                      infoCode: 6660413),
-                );
-                return;
-              } else {
-                await addUrlToWaitingPath();
-              }
-              await downloadFile(theme);
-            },
-            child: Container(
-              width: 237,
-              decoration: BoxDecoration(
-                  border: Border.all(
-                    color:
-                        theme.weakDividerColor ?? CommonColor.weakDividerColor,
-                  ),
-                  borderRadius: borderRadius),
-              child: Stack(children: [
-                ClipRRect(
-                  //剪裁为圆角矩形
-                  borderRadius: borderRadius,
-                  child: LinearProgressIndicator(
-                      minHeight: 66,
-                      value: (received == 100 ? 0 : received) / 100,
-                      backgroundColor: received == 100
-                          ? theme.weakBackgroundColor
-                          : Colors.white,
-                      valueColor: AlwaysStoppedAnimation(
-                          theme.lightPrimaryMaterialColor.shade50)),
-                ),
-                Padding(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                    child: Row(
-                        mainAxisAlignment: widget.isSelf
-                            ? MainAxisAlignment.end
-                            : MainAxisAlignment.start,
-                        children: [
-                          Expanded(
-                              child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                constraints:
-                                    const BoxConstraints(maxWidth: 160),
-                                child: LayoutBuilder(
-                                  builder: (buildContext, boxConstraints) {
-                                    return CustomText(
-                                      fileName,
-                                      width: boxConstraints.maxWidth,
-                                      style: TextStyle(
-                                        color: theme.darkTextColor,
-                                        fontSize: 16,
-                                      ),
-                                    );
-                                  },
-                                ),
-                              ),
-                              if (fileSize != null)
-                                Text(
-                                  showFileSize(fileSize),
-                                  // "${received > 0 ? (received / 1024).ceil() : (received / 1024).ceil()} KB",
-                                  style: TextStyle(
-                                      fontSize: 14, color: theme.weakTextColor),
-                                )
-                            ],
-                          )),
-                          TIMUIKitFileIcon(
-                            fileFormat: fileFormat,
+    return Row(
+      key: containerKey,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (widget.isSelf && isWebDownloading)
+          Container(
+            margin: const EdgeInsets.only(top: 2),
+            child: LoadingAnimationWidget.threeArchedCircle(
+              color: theme.weakTextColor ?? Colors.grey,
+              size: 20,
+            ),
+          ),
+        TIMUIKitMessageReactionWrapper(
+            chatModel: widget.chatModel,
+            isShowJump: widget.isShowJump,
+            clearJump: widget.clearJump,
+            isFromSelf: widget.message.isSelf ?? true,
+            isShowMessageReaction: widget.isShowMessageReaction ?? true,
+            message: widget.message,
+            child: GestureDetector(
+                onTap: () async {
+                  try {
+                    if (PlatformUtils().isWeb) {
+                      if (!isWebDownloading) {
+                        downloadWebFile(widget.fileElem?.path ?? "");
+                      }
+                      return;
+                    }
+                    if (await hasFile()) {
+                      if (received == 100) {
+                        tryOpenFile(context, theme);
+                      } else {
+                        onTIMCallback(
+                          TIMCallback(
+                            type: TIMCallbackType.INFO,
+                            infoRecommendText: TIM_t("正在下载中"),
+                            infoCode: 6660411,
                           ),
-                        ])),
-              ]),
-            )));
+                        );
+                      }
+                      return;
+                    }
+                    if (checkIsWaiting()) {
+                      onTIMCallback(
+                        TIMCallback(
+                            type: TIMCallbackType.INFO,
+                            infoRecommendText: TIM_t("已加入待下载队列，其他文件下载中"),
+                            infoCode: 6660413),
+                      );
+                      return;
+                    } else {
+                      await addUrlToWaitingPath(theme);
+                    }
+                  } catch (e) {
+                    onTIMCallback(TIMCallback(
+                        type: TIMCallbackType.INFO,
+                        infoRecommendText: "文件处理异常",
+                        infoCode: 6660416));
+                  }
+                },
+                child: Container(
+                  width: 237,
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                        color: theme.weakDividerColor ??
+                            CommonColor.weakDividerColor,
+                      ),
+                      borderRadius: borderRadius),
+                  child: Stack(children: [
+                    ClipRRect(
+                      borderRadius: borderRadius,
+                      child: LinearProgressIndicator(
+                          minHeight: ((containerHeight) ?? 72) - 6,
+                          value: (received == 100 ? 0 : received) / 100,
+                          backgroundColor: received == 100
+                              ? theme.weakBackgroundColor
+                              : Colors.white,
+                          valueColor: AlwaysStoppedAnimation(
+                              theme.lightPrimaryMaterialColor.shade50)),
+                    ),
+                    Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 12),
+                        child: Row(
+                            mainAxisAlignment: widget.isSelf
+                                ? MainAxisAlignment.end
+                                : MainAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                  child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    constraints:
+                                        const BoxConstraints(maxWidth: 160),
+                                    child: LayoutBuilder(
+                                      builder: (buildContext, boxConstraints) {
+                                        return CustomText(
+                                          fileName,
+                                          width: boxConstraints.maxWidth,
+                                          style: TextStyle(
+                                            color: theme.darkTextColor,
+                                            fontSize: 16,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  if (fileSize != null)
+                                    Text(
+                                      showFileSize(fileSize),
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: theme.weakTextColor),
+                                    )
+                                ],
+                              )),
+                              TIMUIKitFileIcon(
+                                fileFormat: fileFormat,
+                              ),
+                            ])),
+                  ]),
+                ))),
+        if (!widget.isSelf && isWebDownloading)
+          Container(
+            margin: const EdgeInsets.only(top: 2),
+            child: LoadingAnimationWidget.threeArchedCircle(
+              color: theme.weakTextColor ?? Colors.grey,
+              size: 20,
+            ),
+          ),
+      ],
+    );
   }
 }

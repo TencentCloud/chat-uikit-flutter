@@ -13,6 +13,7 @@ import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_wrapper.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/video_screen.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
 import 'package:tencent_open_file/tencent_open_file.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -166,6 +167,15 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
     downloadMessageDetailAndSave();
   }
 
+  void launchDesktopFile(String path) {
+    if (PlatformUtils().isWindows) {
+      OpenFile.open(path);
+    } else {
+      launchUrl(Uri.file(path));
+    }
+  }
+
+
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final theme = value.theme;
@@ -175,10 +185,14 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
     return GestureDetector(
       onTap: () {
         if (PlatformUtils().isWeb) {
-          launchUrl(
-            Uri.parse(widget.message.videoElem?.videoPath ?? ""),
-            mode: LaunchMode.externalApplication,
-          );
+          final url = widget.message.videoElem?.videoUrl ?? widget.message.videoElem?.videoPath ?? "";
+          TUIKitWidePopup.showMedia(
+              context: context,
+              mediaURL: url,
+              onClickOrigin: () => launchUrl(
+                Uri.parse(url),
+                mode: LaunchMode.externalApplication,
+              ));
           return;
         }
         if (PlatformUtils().isDesktop) {
@@ -188,19 +202,20 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
                 TencentUtils.checkString(videoElem.localVideoUrl);
             final videoPath = TencentUtils.checkString(videoElem.videoPath);
             final videoUrl = videoElem.videoUrl;
-
             if (localVideoUrl != null) {
-              if (PlatformUtils().isWindows) {
-                OpenFile.open(localVideoUrl);
-              } else {
-                launchUrl(Uri.file(localVideoUrl));
-              }
+              launchDesktopFile(localVideoUrl);
+              // todo
+              // TUIKitWidePopup.showMedia(
+              //     context: context,
+              //     mediaPath: localVideoUrl,
+              //     onClickOrigin: () => launchDesktopFile(localVideoUrl));
             } else if (videoPath != null) {
-              if (PlatformUtils().isWindows) {
-                OpenFile.open(videoPath);
-              } else {
-                launchUrl(Uri.file(videoPath));
-              }
+              launchDesktopFile(videoPath);
+              // todo
+              // TUIKitWidePopup.showMedia(
+              //     context: context,
+              //     mediaPath: videoPath,
+              //     onClickOrigin: () => launchDesktopFile(videoPath));
             } else if (TencentUtils.isTextNotEmpty(videoUrl)) {
               onTIMCallback(TIMCallback(
                   infoCode: 6660414,

@@ -7,6 +7,6 @@ class BlockListLifeCycle {
   FutureBool Function(List<String> userIDList) shouldDeleteFromBlockList;
 
   BlockListLifeCycle({
-    this.shouldDeleteFromBlockList = DefaultLifeCycle.defaultBooleanSolution,
+    this.shouldDeleteFromBlockList = DefaultLifeCycle.defaultAsyncBooleanSolution,
   });
 }

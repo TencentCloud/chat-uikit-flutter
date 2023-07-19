@@ -131,6 +131,8 @@ class TIMUIKitTextFieldLayoutWide extends StatefulWidget {
   /// show send audio icon
   final bool showSendAudio;
 
+  final TIMUIKitChatConfig chatConfig;
+
   /// on text changed
   final void Function(String)? onChanged;
 
@@ -183,7 +185,8 @@ class TIMUIKitTextFieldLayoutWide extends StatefulWidget {
       required this.customEmojiStickerList,
       this.controller,
       required this.currentConversation,
-      required this.theme})
+      required this.theme,
+      required this.chatConfig})
       : super(key: key);
 
   @override
@@ -288,12 +291,10 @@ class _TIMUIKitTextFieldLayoutWideState
           children: [
             Text(
               TIM_t("回复 "),
-              style: TextStyle(
-                  color: hexToColor("8f959e"), fontSize: 14),
+              style: TextStyle(color: hexToColor("8f959e"), fontSize: 14),
             ),
             Text(
-              MessageUtils.getDisplayName(
-                  widget.model.repliedMessage!),
+              MessageUtils.getDisplayName(widget.model.repliedMessage!),
               softWrap: true,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -367,7 +368,7 @@ class _TIMUIKitTextFieldLayoutWideState
               child: Container(
                 child: widget.customStickerPanel != null
                     ? widget.customStickerPanel!(
-                        height: 400,
+                        height: widget.chatConfig.desktopStickerPanelHeight,
                         width: 350,
                         sendTextMessage: () {
                           widget.onEmojiSubmitted();
@@ -495,7 +496,8 @@ class _TIMUIKitTextFieldLayoutWideState
             final double? dx = (offset?.dx != null) ? offset!.dx : null;
             final double? dy =
                 (offset?.dy != null && alignBox?.size.height != null)
-                    ? offset!.dy - 420
+                    ? offset!.dy -
+                        (widget.chatConfig.desktopStickerPanelHeight + 20)
                     : null;
             e.onClick((dx != null && dy != null) ? Offset(dx, dy) : null);
           },
@@ -813,8 +815,7 @@ class _TIMUIKitTextFieldLayoutWideState
 
   generateDefaultControlBarItems() {
     final DesktopControlBarConfig config =
-        widget.model.chatConfig.desktopControlBarConfig ??
-            DesktopControlBarConfig();
+        widget.chatConfig.desktopControlBarConfig ?? DesktopControlBarConfig();
     final List<DesktopControlBarItem> itemsList = [
       if (config.showStickerPanel)
         DesktopControlBarItem(
@@ -898,7 +899,7 @@ class _TIMUIKitTextFieldLayoutWideState
       TUIChatSeparateViewModel model, TUITheme theme) {
     final List<DesktopControlBarItem> itemsList = [
       ...defaultControlBarItems,
-      ...(widget.model.chatConfig.additionalDesktopControlBarItems ?? [])
+      ...(widget.chatConfig.additionalDesktopControlBarItems ?? [])
     ];
 
     return generateBarIcons(itemsList, theme);
@@ -1021,10 +1022,10 @@ class _TIMUIKitTextFieldLayoutWideState
                         child: ExtendedTextField(
                             scrollController: _scrollController,
                             autofocus: true,
-                            maxLines: widget
-                                .model.chatConfig.desktopMessageInputFieldLines,
-                            minLines: widget
-                                .model.chatConfig.desktopMessageInputFieldLines,
+                            maxLines:
+                                widget.chatConfig.desktopMessageInputFieldLines,
+                            minLines:
+                                widget.chatConfig.desktopMessageInputFieldLines,
                             focusNode: widget.focusNode,
                             onChanged: debounceFunc,
                             keyboardType: TextInputType.multiline,

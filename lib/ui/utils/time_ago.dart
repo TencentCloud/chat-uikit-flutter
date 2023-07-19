@@ -1,7 +1,7 @@
 // ignore_for_file: prefer_typing_uninitialized_variables
 
 import 'package:intl/intl.dart';
-import 'package:tencent_im_base/i18n/i18n_utils.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 class TimeAgo {
   List<String> dayMap() {

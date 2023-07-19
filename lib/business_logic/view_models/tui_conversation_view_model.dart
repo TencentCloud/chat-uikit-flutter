@@ -151,8 +151,8 @@ class TUIConversationViewModel extends ChangeNotifier {
     final isRefresh = _nextSeq == "0";
     final conversationResult = await _conversationService.getConversationList(
         nextSeq: _nextSeq, count: count);
-    _nextSeq = conversationResult!.nextSeq ?? "";
-    final conversationList = conversationResult.conversationList;
+    _nextSeq = conversationResult?.nextSeq ?? "";
+    final conversationList = conversationResult?.conversationList;
     if (conversationList != null) {
       if (conversationList.isEmpty || conversationList.length < count) {
         _haveMoreData = false;

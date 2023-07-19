@@ -9,6 +9,7 @@ import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
 import 'package:path/path.dart' as path;
 import 'package:url_launcher/url_launcher.dart';
@@ -31,15 +32,27 @@ sendFileWithConfirmation(
     required BuildContext context}) async {
   bool isCanSend = true;
 
-  files.map((e) => e.path).any((filePath) {
-    final directory = Directory(filePath);
-    final isDirectoryExists = directory.existsSync();
-    if (isDirectoryExists) {
-      isCanSend = false;
-      return false;
-    }
-    return true;
-  });
+  if (!PlatformUtils().isWeb) {
+    files.map((e) => e.path).any((filePath) {
+      final directory = Directory(filePath);
+      final isDirectoryExists = directory.existsSync();
+      if (isDirectoryExists) {
+        isCanSend = false;
+        return false;
+      }
+      return true;
+    });
+  } else {
+    files.map((e) => e.name).any((fileName) {
+      String fileExtension = path.extension(fileName);
+      bool hasNoExtension = fileExtension.isEmpty;
+      if (hasNoExtension) {
+        isCanSend = false;
+        return false;
+      }
+      return true;
+    });
+  }
 
   if (!isCanSend) {
     TUIKitWidePopup.showSecondaryConfirmDialog(
@@ -71,6 +84,9 @@ sendFileWithConfirmation(
                     child: ListView.separated(
                       itemBuilder: (BuildContext context, int index) {
                         final file = files[index];
+                        final fileName = PlatformUtils().isWeb
+                            ? file.name
+                            : path.basename(file.path);
                         return Material(
                           color: theme.wideBackgroundColor,
                           child: InkWell(
@@ -84,18 +100,13 @@ sendFileWithConfirmation(
                                 children: [
                                   TIMUIKitFileIcon(
                                     size: 44,
-                                    fileFormat: path
-                                        .extension(file.path)
-                                        .split(".")[path
-                                            .extension(file.path)
-                                            .split(".")
-                                            .length -
-                                        1],
+                                    fileFormat: fileName.split(
+                                        ".")[fileName.split(".").length - 1],
                                   ),
                                   const SizedBox(width: 16),
                                   Expanded(
                                     child: Text(
-                                      path.basename(file.path),
+                                      fileName,
                                       style: TextStyle(
                                           fontSize: 16,
                                           color: theme.darkTextColor),
@@ -154,9 +165,12 @@ Future<void> sendFiles(
     ConvType conversationType,
     BuildContext context) async {
   for (final file in files) {
+    final fileName = file.name;
+    final filePath = file.path;
     await MessageUtils.handleMessageError(
         model.sendFileMessage(
-            filePath: file.path,
+            fileName: fileName,
+            filePath: filePath,
             convID: _getConvID(conversation),
             convType: conversationType),
         context);

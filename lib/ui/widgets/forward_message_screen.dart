@@ -24,7 +24,8 @@ class ForwardMessageScreen extends StatefulWidget {
       {Key? key,
       this.isMergerForward = false,
       required this.conversationType,
-      required this.model, this.onClose})
+      required this.model,
+      this.onClose})
       : super(key: key);
 
   @override
@@ -74,11 +75,17 @@ class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
     }
     widget.model.updateMultiSelectStatus(false);
 
-    if(widget.onClose != null){
-      widget.onClose!();
-    }else{
+    if (widget.onClose != null) {
+      // widget.onClose!();
+    } else {
       Navigator.pop(context);
     }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.model.updateMultiSelectStatus(false);
   }
 
   @override
@@ -86,7 +93,7 @@ class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
     final isDesktopScreen =
         TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     final TUITheme theme = value.theme;
-    if(isDesktopScreen){
+    if (isDesktopScreen) {
       isMultiSelect = true;
       return RecentForwardList(
         isMultiSelect: isMultiSelect,
@@ -101,16 +108,17 @@ class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
     }
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Text(
-          TIM_t("选择"),
+          isMultiSelect ? TIM_t("选择多个会话") : TIM_t("选择一个会话"),
           style: TextStyle(
             color: theme.appbarTextColor,
             fontSize: 17,
           ),
         ),
         shadowColor: theme.weakBackgroundColor,
-        backgroundColor: theme.appbarBgColor ??
-            theme.primaryColor,
+        backgroundColor: theme.appbarBgColor ?? theme.primaryColor,
+        leadingWidth: 80,
         leading: TextButton(
           onPressed: () {
             if (isMultiSelect) {
@@ -120,9 +128,9 @@ class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
               });
             } else {
               widget.model.updateMultiSelectStatus(false);
-              if(widget.onClose != null){
+              if (widget.onClose != null) {
                 widget.onClose!();
-              }else{
+              } else {
                 Navigator.pop(context);
               }
             }
@@ -135,7 +143,6 @@ class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
             ),
           ),
         ),
-        leadingWidth: 80,
         actions: [
           TextButton(
             onPressed: () {
@@ -149,9 +156,9 @@ class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
             },
             child: Text(
               !isMultiSelect ? TIM_t("多选") : TIM_t("完成"),
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
+              style: TextStyle(
+                color: theme.appbarTextColor,
+                fontSize: 14,
               ),
             ),
           )

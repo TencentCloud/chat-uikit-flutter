@@ -1,9 +1,17 @@
+// ignore_for_file: unused_import
+
+import 'dart:io';
+
+import 'package:chewie_for_us/chewie_for_us.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/drag_widget.dart';
+import 'package:path/path.dart' as p;
+import 'package:video_player/video_player.dart';
 
 class TUIKitWidePopup {
   static OverlayEntry? entry;
@@ -236,7 +244,7 @@ class TUIKitWidePopup {
 
     if (isUseMaterialAlert) {
       return showDialog(
-          barrierDismissible: false,
+          barrierDismissible: true,
           context: context,
           builder: (context) {
             return WillPopScope(
@@ -249,7 +257,8 @@ class TUIKitWidePopup {
                   content: contentWidget,
                 ),
                 onWillPop: () {
-                  return Future.value(false);
+                  isShow = false;
+                  return Future.value(true);
                 });
           });
     }
@@ -275,5 +284,142 @@ class TUIKitWidePopup {
       );
     });
     Overlay.of(context).insert(entry!);
+  }
+
+  static void showMedia({
+    String? mediaLocalPath,
+    String? mediaURL,
+    required BuildContext context,
+    required VoidCallback onClickOrigin,
+    double? aspectRatio,
+  }) async {
+    assert((mediaLocalPath != null) || (mediaURL != null),
+        "At least one of mediaLocalPath or mediaURL must be provided.");
+
+    String _removeQueryString(String urlString) {
+      Uri uri = Uri.parse(urlString);
+      Uri cleanUri = Uri(
+        scheme: uri.scheme,
+        host: uri.host,
+        port: uri.port,
+        path: uri.path,
+      );
+      return cleanUri.toString();
+    }
+
+    final String mediaPath = mediaLocalPath ?? mediaURL ?? "";
+    final isLocalResource = mediaLocalPath != null;
+
+    String fileExtension = p
+        .extension(isLocalResource ? mediaPath : _removeQueryString(mediaPath));
+    bool isVideo =
+        ['.mp4', '.avi', '.mov', '.flv', '.wmv'].contains(fileExtension);
+
+    VideoPlayerController? videoController;
+    ChewieController? chewieController;
+    Widget mediaWidget;
+    double? aspectRatioFinal = aspectRatio;
+
+    if (isVideo) {
+      if (isLocalResource) {
+        videoController = VideoPlayerController.file(File(mediaPath));
+      } else {
+        videoController = VideoPlayerController.networkUrl(Uri.parse(mediaPath));
+      }
+
+      await videoController.initialize();
+      aspectRatioFinal = videoController.value.aspectRatio;
+
+      chewieController = ChewieController(
+        videoPlayerController: videoController,
+        aspectRatio: aspectRatioFinal,
+        autoPlay: true,
+        looping: false,
+        autoInitialize: true,
+      );
+
+      mediaWidget = Chewie(controller: chewieController);
+    } else {
+      mediaWidget = FittedBox(
+        fit: BoxFit.contain,
+        child: isLocalResource
+            ? Image.file(File(mediaPath), fit: BoxFit.contain)
+            : Image.network(mediaPath, fit: BoxFit.contain),
+      );
+    }
+
+    showDialog(
+        barrierDismissible: true,
+        context: context,
+        builder: (context) {
+          return WillPopScope(
+            child: AlertDialog(
+              surfaceTintColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              backgroundColor: Colors.transparent,
+              titlePadding: const EdgeInsets.all(0),
+              contentPadding: const EdgeInsets.all(0),
+              content: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.85,
+                          maxHeight: MediaQuery.of(context).size.height * 0.82,
+                        ),
+                        child: aspectRatioFinal != null
+                            ? AspectRatio(
+                            aspectRatio: aspectRatioFinal,
+                            child: mediaWidget)
+                            : mediaWidget,
+                      ),
+                      const SizedBox(height: 10),
+                      InkWell(
+                        onTap: onClickOrigin,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(top: 0),
+                              child: Icon(
+                                Icons.open_in_new,
+                                size: 14,
+                                color: Colors.grey.shade200,
+                              ),
+                            ),
+                            const SizedBox(
+                              width: 8,
+                            ),
+                            // Custom Text Widget with designer baseline
+                            Text(
+                              TIM_t("在新窗口中打开"),
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey.shade200,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            onWillPop: () {
+              if (isVideo) videoController?.dispose();
+              return Future.value(true);
+            },
+          );
+        });
   }
 }
