@@ -343,7 +343,7 @@ class _KXIMUIKitConversationState extends TIMUIKitState<KXIMUIKitConversation> {
             // onRefresh: () async {
             //   model.refresh();
             // },
-            child: filteredConversationList.isNotEmpty
+            child: childCount > 0
                 ? ListView.builder(
                     controller: _autoScrollController,
                     shrinkWrap: true,
