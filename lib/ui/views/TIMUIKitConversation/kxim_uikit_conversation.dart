@@ -13,8 +13,8 @@ import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/controller/tim_uikit_conversation_controller.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitConversation/tim_uikit_conversation_item.dart';
 
+import 'kxim_uikit_conversation_item.dart';
 import 'tim_uikit_conversation_last_msg.dart';
 
 typedef KXConversationItemBuilder = Widget Function(
@@ -313,7 +313,6 @@ class _KXIMUIKitConversationState extends TIMUIKitState<KXIMUIKitConversation> {
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
-    final theme = value.theme;
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: model),
@@ -388,7 +387,7 @@ class _KXIMUIKitConversationState extends TIMUIKitState<KXIMUIKitConversation> {
                         child: Slidable(
                           groupTag: 'conversation-list',
                           child: InkWell(
-                            child: TIMUIKitConversationItem(
+                            child: KXIMUIKitConversationItem(
                                 isShowDraft: widget.isShowDraft,
                                 cusAvatar: widget.avatarBuilder
                                     ?.call(conversationItem),
