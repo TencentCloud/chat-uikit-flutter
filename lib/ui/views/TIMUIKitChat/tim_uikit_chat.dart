@@ -163,6 +163,8 @@ class TIMUIKitChat extends StatefulWidget {
 
   final Widget? customAppBar;
 
+  final Widget? inputTopBuilder;
+
   /// Custom emoji panel.
   final CustomStickerPanel? customStickerPanel;
 
@@ -211,6 +213,7 @@ class TIMUIKitChat extends StatefulWidget {
     this.textFieldBuilder,
     this.customEmojiStickerList = const [],
     this.customAppBar,
+    this.inputTopBuilder,
     this.onSecondaryTapAvatar,
     this.customMessageHoverBarOnDesktop,
     this.userAvatarImageBuilder,
@@ -479,6 +482,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                   child: Stack(
                     children: [
                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           if (widget.customAppBar != null) widget.customAppBar!,
                           if (filteredApplicationList.isNotEmpty)
@@ -543,6 +547,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                                   ),
                                 )),
                           )),
+                          widget.inputTopBuilder ?? Container(),
                           Selector<TUIChatSeparateViewModel, bool>(
                             builder: (context, value, child) {
                               return value
@@ -552,6 +557,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                                   : (widget.textFieldBuilder != null
                                       ? widget.textFieldBuilder!(context)
                                       : TIMUIKitInputTextField(
+                                          chatConfig: widget.config,
                                           groupID: widget.groupID,
                                           atMemberPanelScroll:
                                               atMemberPanelScroll,

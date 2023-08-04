@@ -13,8 +13,8 @@ class NewContactLifeCycle {
 
   NewContactLifeCycle({
     this.shouldAcceptContactApplication =
-        DefaultLifeCycle.defaultBooleanSolution,
+        DefaultLifeCycle.defaultAsyncBooleanSolution,
     this.shouldRefuseContactApplication =
-        DefaultLifeCycle.defaultBooleanSolution,
+        DefaultLifeCycle.defaultAsyncBooleanSolution,
   });
 }

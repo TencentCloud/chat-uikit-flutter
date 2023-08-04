@@ -19,7 +19,7 @@ class ConversationLifeCycle {
     this.conversationListWillMount =
         DefaultLifeCycle.defaultConversationListSolution,
     this.shouldClearHistoricalMessageForConversation =
-        DefaultLifeCycle.defaultBooleanSolution,
-    this.shouldDeleteConversation = DefaultLifeCycle.defaultBooleanSolution,
+        DefaultLifeCycle.defaultAsyncBooleanSolution,
+    this.shouldDeleteConversation = DefaultLifeCycle.defaultAsyncBooleanSolution,
   });
 }

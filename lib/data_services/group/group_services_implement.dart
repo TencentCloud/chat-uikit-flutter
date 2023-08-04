@@ -105,7 +105,6 @@ class GroupServicesImpl extends GroupServices {
             count: count,
             offset: offset);
     if (res.code != 0) {
-
       _coreService.callOnCallback(TIMCallback(
           type: TIMCallbackType.API_ERROR,
           errorMsg: res.desc,

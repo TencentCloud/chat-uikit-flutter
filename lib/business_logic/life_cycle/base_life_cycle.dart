@@ -4,6 +4,8 @@ import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_class.dart';
 
 typedef MessageFunction = Future<V2TimMessage?> Function(V2TimMessage message);
 
+typedef MessageFunctionNullCallback = Function(V2TimValueCallback<V2TimMessage> res);
+
 typedef MessageFunctionOptional = Future<V2TimMessage?> Function(
     V2TimMessage message);
 
@@ -46,8 +48,15 @@ abstract class DefaultLifeCycle {
     return list;
   }
 
-  static Future<bool> defaultBooleanSolution(dynamic) async {
+  static Future<bool> defaultAsyncBooleanSolution(dynamic) async {
     return true;
+  }
+
+  static bool defaultBooleanSolution(dynamic) {
+    return true;
+  }
+
+  static defaultNullCallbackSolution(dynamic) {
   }
 
   static Future<bool> defaultAddFriend(

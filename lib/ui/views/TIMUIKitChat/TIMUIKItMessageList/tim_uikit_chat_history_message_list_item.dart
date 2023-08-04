@@ -1466,7 +1466,7 @@ class _TIMUIKItHistoryMessageListItemState
                           widget.message.elemType == 6 &&
                           isDownloadWaiting)
                         Container(
-                          margin: const EdgeInsets.only(top: 2),
+                          margin: const EdgeInsets.only(top: 46, right: 10),
                           child: LoadingAnimationWidget.threeArchedCircle(
                             color: theme.weakTextColor ?? Colors.grey,
                             size: 20,
@@ -1629,7 +1629,7 @@ class _TIMUIKItHistoryMessageListItemState
                           widget.message.elemType == 6 &&
                           isDownloadWaiting)
                         Container(
-                          margin: const EdgeInsets.only(top: 24, left: 6),
+                          margin: const EdgeInsets.only(top: 46, left: 10),
                           child: LoadingAnimationWidget.threeArchedCircle(
                             color: theme.weakTextColor ?? Colors.grey,
                             size: 20,

@@ -1,4 +1,5 @@
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/base_life_cycle.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 class ChatLifeCycle {
   /// Before a new message will be added to historical message list from long connection.
@@ -11,6 +12,9 @@ class ChatLifeCycle {
   /// Before a new message will be sent.
   /// Returns null can block the message from sending.
   MessageFunction messageWillSend;
+
+  /// After a new message been sent.
+  MessageFunctionNullCallback messageDidSend;
 
   /// After getting the latest message list from API,
   /// and before historical message list will be rendered.
@@ -27,14 +31,20 @@ class ChatLifeCycle {
   /// You can make a second confirmation here by a modal, etc.
   FutureBool Function(String conversationID) shouldClearHistoricalMessageList;
 
+
+  /// Before rendering a message to message list.
+  bool Function(V2TimMessage msgID) messageShouldMount;
+
   ChatLifeCycle({
     this.shouldClearHistoricalMessageList =
-        DefaultLifeCycle.defaultBooleanSolution,
-    this.shouldDeleteMessage = DefaultLifeCycle.defaultBooleanSolution,
+        DefaultLifeCycle.defaultAsyncBooleanSolution,
+    this.shouldDeleteMessage = DefaultLifeCycle.defaultAsyncBooleanSolution,
+    this.messageDidSend = DefaultLifeCycle.defaultNullCallbackSolution,
     this.didGetHistoricalMessageList =
         DefaultLifeCycle.defaultMessageListSolution,
     this.messageWillSend = DefaultLifeCycle.defaultMessageSolution,
     this.modifiedMessageWillMount = DefaultLifeCycle.defaultMessageSolution,
     this.newMessageWillMount = DefaultLifeCycle.defaultMessageSolution,
+    this.messageShouldMount = DefaultLifeCycle.defaultBooleanSolution,
   });
 }

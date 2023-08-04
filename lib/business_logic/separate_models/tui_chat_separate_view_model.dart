@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 
 // ignore: unnecessary_import
@@ -177,16 +178,18 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     setInputField = onChangeInputField;
     conversationType = convType;
     conversationID = convID;
+
+    _groupType = null;
+    isGroupExist = true;
+    _groupInfo = null;
+    groupMemberList?.clear();
+    selfMemberInfo = null;
+
     if (conversationType == ConvType.group) {
       globalModel.refreshGroupApplicationList();
-      getGroupInfo(groupID ?? convID);
+      loadGroupInfo(groupID ?? convID);
       loadGroupMemberList(groupID: groupID ?? convID);
     } else {
-      _groupType = null;
-      isGroupExist = true;
-      _groupInfo = null;
-      groupMemberList?.clear();
-      selfMemberInfo = null;
       notifyListeners();
     }
     if (conversationType == ConvType.c2c) {
@@ -482,18 +485,6 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     }
   }
 
-  loadGroupInfo(String groupID) async {
-    final groupInfo =
-        await _groupServices.getGroupsInfo(groupIDList: [groupID]);
-    if (groupInfo != null) {
-      final groupRes = groupInfo.first;
-      if (groupRes.resultCode == 0) {
-        _groupInfo = groupRes.groupInfo;
-      }
-    }
-    notifyListeners();
-  }
-
   Future<void> loadGroupMemberList(
       {required String groupID, int count = 100, String? seq}) async {
     final String? nextSeq = await _loadGroupMemberListFunction(
@@ -503,7 +494,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
           groupID: groupID, count: count, seq: nextSeq);
     } else {
       selfMemberInfo = groupMemberList
-          ?.firstWhere((e) => e?.userID == selfModel.loginInfo?.userID);
+          ?.firstWhereOrNull((e) => e?.userID == selfModel.loginInfo?.userID);
       notifyListeners();
     }
   }
@@ -513,38 +504,49 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     if (seq == null || seq == "" || seq == "0") {
       groupMemberList?.clear();
     }
-    final res = await _groupServices.getGroupMemberList(
-        groupID: groupID,
-        filter: GroupMemberFilterTypeEnum.V2TIM_GROUP_MEMBER_FILTER_ALL,
-        count: count,
-        nextSeq: seq ?? groupMemberListSeq);
-    final groupMemberListRes = res.data;
-    if (res.code == 0 && groupMemberListRes != null) {
-      final groupMemberListTemp = groupMemberListRes.memberInfoList ?? [];
-      groupMemberList = [...?groupMemberList, ...groupMemberListTemp];
-      groupMemberListSeq = groupMemberListRes.nextSeq ?? "0";
-    } else if (res.code == 10010) {
-      isGroupExist = false;
-    } else if (res.code == 10007) {
-      isNotAMember = true;
+    try {
+      final res = await _groupServices.getGroupMemberList(
+          groupID: groupID,
+          filter: GroupMemberFilterTypeEnum.V2TIM_GROUP_MEMBER_FILTER_ALL,
+          count: count,
+          nextSeq: seq ?? groupMemberListSeq);
+      final groupMemberListRes = res.data;
+      if (res.code == 0 && groupMemberListRes != null) {
+        final groupMemberListTemp = groupMemberListRes.memberInfoList ?? [];
+        groupMemberList = [...?groupMemberList, ...groupMemberListTemp];
+        groupMemberListSeq = groupMemberListRes.nextSeq ?? "0";
+      } else if (res.code == 10010) {
+        isGroupExist = false;
+      } else if (res.code == 10007) {
+        isNotAMember = true;
+      }
+      return groupMemberListRes?.nextSeq;
+    } catch (e) {
+      return "";
     }
-    return groupMemberListRes?.nextSeq;
   }
 
-  getGroupInfo(String groupID) async {
-    final res = await _groupServices.getGroupsInfo(groupIDList: [groupID]);
-    if (res != null) {
-      final groupRes = res.first;
+  Future<(V2TimGroupInfo?, GroupReceiptAllowType?)> loadGroupInfo(
+      String groupID) async {
+    final groupInfoList =
+        await _groupServices.getGroupsInfo(groupIDList: [groupID]);
+    if (groupInfoList != null && groupInfoList.isNotEmpty) {
+      final groupRes = groupInfoList.first;
       if (groupRes.resultCode == 0) {
+        _groupInfo = groupRes.groupInfo;
+
         const groupTypeMap = {
           "Meeting": GroupReceiptAllowType.meeting,
           "Public": GroupReceiptAllowType.public,
           "Work": GroupReceiptAllowType.work
         };
-        _groupInfo = groupRes.groupInfo;
         _groupType = groupTypeMap[groupRes.groupInfo?.groupType];
+
+        notifyListeners();
+        return (_groupInfo, _groupType);
       }
     }
+    return (null, null);
   }
 
   Future<void> updateMessageFromController(
@@ -584,6 +586,9 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
   }) async {
     String receiver = convType == ConvType.c2c ? convID : '';
     String groupID = convType == ConvType.group ? convID : '';
+    if (convType == ConvType.group && _groupType == null) {
+      await loadGroupInfo(groupID);
+    }
     final oldGroupType = _groupType != null
         ? GroupReceptAllowType.values[_groupType!.index]
         : null;
@@ -623,6 +628,9 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
             HistoryMessagePosition.notShowLatest) {
       globalModel.updateMessage(
           sendMsgRes, convID, id, convType, groupType, setInputField);
+    }
+    if(lifeCycle?.messageDidSend != null){
+      lifeCycle!.messageDidSend(sendMsgRes);
     }
 
     return sendMsgRes;
@@ -875,6 +883,9 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
         notifyListeners();
         globalModel.updateMessage(sendMsgRes, convID,
             messageInfoWithSender.id ?? "", convType, groupType, setInputField);
+        if(lifeCycle?.messageDidSend != null){
+          lifeCycle!.messageDidSend(sendMsgRes);
+        }
         return sendMsgRes;
       }
     }
@@ -1017,6 +1028,14 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
       dynamic inputElement,
       required String convID,
       required ConvType convType}) async {
+    if (await tools.hasZeroSize(filePath ?? "")) {
+      final CoreServicesImpl _coreServices = serviceLocator<CoreServicesImpl>();
+      _coreServices.callOnCallback(TIMCallback(
+          type: TIMCallbackType.INFO,
+          infoRecommendText: "不支持 0KB 文件的传输",
+          infoCode: 6660417));
+      return null;
+    }
     final fileMessageInfo = await _messageService.createFileMessage(
         inputElement: inputElement,
         fileName: fileName ?? filePath?.split('/').last ?? "",

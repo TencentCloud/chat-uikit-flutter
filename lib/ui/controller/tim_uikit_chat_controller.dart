@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, empty_catches
 
 import 'package:flutter/cupertino.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
@@ -139,11 +139,13 @@ class TIMUIKitChatController {
       assert(groupID != null || convType != ConvType.group);
       assert(userID != null || convType != ConvType.c2c);
       if (isNavigateToMessageListBottom && scrollController != null) {
-        scrollController!.animateTo(
-          scrollController!.position.minScrollExtent,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.ease,
-        );
+        try{
+          scrollController?.animateTo(
+            scrollController!.position.minScrollExtent,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.ease,
+          );
+        }catch(e){}
       }
       return globalChatModel.sendMessageFromController(
           priority: priority,
@@ -160,11 +162,13 @@ class TIMUIKitChatController {
     } else if (model != null) {
       /// Sends a message to the current conversation specified on `TIMUIKitChat`. 发送到 `TIMUIKitChat` 中指定的当前对话。
       if (isNavigateToMessageListBottom && scrollController != null) {
-        scrollController?.animateTo(
-          scrollController!.position.minScrollExtent,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.ease,
-        );
+        try{
+          scrollController?.animateTo(
+            scrollController!.position.minScrollExtent,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.ease,
+          );
+        }catch(e){}
       }
       return model!.sendMessageFromController(
           priority: priority,
@@ -230,11 +234,13 @@ class TIMUIKitChatController {
       assert(groupID != null || convType != ConvType.group);
       assert(userID != null || convType != ConvType.c2c);
       if (isNavigateToMessageListBottom && scrollController != null) {
-        scrollController!.animateTo(
-          scrollController!.position.minScrollExtent,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.ease,
-        );
+        try{
+          scrollController?.animateTo(
+            scrollController!.position.minScrollExtent,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.ease,
+          );
+        }catch(e){}
       }
       return globalChatModel.sendReplyMessageFromController(
           text: messageText,

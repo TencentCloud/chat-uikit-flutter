@@ -10,7 +10,6 @@ import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitAppBar/tim_uikit_appbar_title.dart';
 import 'package:tuple/tuple.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';

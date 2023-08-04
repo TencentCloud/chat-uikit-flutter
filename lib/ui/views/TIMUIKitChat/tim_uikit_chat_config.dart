@@ -199,12 +199,20 @@ class TIMUIKitChatConfig {
   /// [Default]: false
   final bool isGroupAdminRecallEnabled;
 
-//  判断某条消息是否可以点击
+  // 判断某条消息是否可以点击
   final MessageCanLongPres? messageCanLongPres;
+
+  /// Defines the height of the sticker panel on desktop platforms.
+  /// If the height of the sticker list exceeds this container height,
+  /// the sticker list will automatically become scrollable.
+  ///
+  /// [Default]: 400
+  final double desktopStickerPanelHeight;
 
   const TIMUIKitChatConfig(
       {this.onTapLink,
       this.timeDividerConfig,
+      this.desktopStickerPanelHeight = 400,
       this.isGroupAdminRecallEnabled = false,
       this.isAutoReportRead = true,
       this.faceURIPrefix,

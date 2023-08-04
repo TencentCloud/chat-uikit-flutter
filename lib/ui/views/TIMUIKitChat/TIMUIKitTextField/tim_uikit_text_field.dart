@@ -42,6 +42,8 @@ class TIMUIKitInputTextField extends StatefulWidget {
   /// conversation id
   final String conversationID;
 
+  final TIMUIKitChatConfig? chatConfig;
+
   /// conversation type
   final ConvType conversationType;
 
@@ -116,7 +118,8 @@ class TIMUIKitInputTextField extends StatefulWidget {
       required this.currentConversation,
       this.groupType,
       this.atMemberPanelScroll,
-      this.groupID})
+      this.groupID,
+      this.chatConfig})
       : super(key: key);
 
   @override
@@ -147,15 +150,51 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     currentCursor = value;
   }
 
+  void deleteStickerFromText() {
+    String originalText = textEditingController.text;
+    String text;
+    final cursorPosition =
+        currentCursor ?? originalText.length;
+
+    if (originalText == zeroWidthSpace) {
+      _handleSoftKeyBoardDelete();
+    } else if (originalText.isNotEmpty) {
+      if (cursorPosition == originalText.length) {
+        text = originalText.characters.skipLast(1).toString();
+        currentCursor = null;
+      } else if (cursorPosition > 0 && cursorPosition < originalText.length) {
+        final firstString = originalText.substring(0, cursorPosition - 2);
+        final secondString = originalText.substring(cursorPosition);
+        text = '$firstString$secondString';
+        if(currentCursor != null){
+          currentCursor = currentCursor! - 2;
+        }
+      } else {
+        text = originalText.characters.skipLast(1).toString();
+        currentCursor = null;
+      }
+      textEditingController.text = text;
+
+      if (TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop) {
+        textEditingController.selection = TextSelection.fromPosition(TextPosition(
+            offset: currentCursor ?? textEditingController.text.length));
+        focusNode.requestFocus();
+      }
+    }
+  }
+
   void addStickerToText(String sticker) {
-    final oldText = textEditingController.text;
-    if (currentCursor != null && currentCursor! > -1) {
-      final firstString = oldText.substring(0, currentCursor);
-      final secondString = oldText.substring(currentCursor!);
+    final currentText = textEditingController.text;
+    if (currentCursor != null &&
+        currentCursor! > -1 &&
+        currentCursor! < currentText.length + 1) {
+      final firstString = currentText.substring(0, currentCursor);
+      final secondString = currentText.substring(currentCursor!);
       currentCursor = currentCursor! + sticker.length;
       textEditingController.text = "$firstString$sticker$secondString";
     } else {
-      textEditingController.text = "$oldText$sticker";
+      currentCursor = null;
+      textEditingController.text = "$currentText$sticker";
     }
 
     if (TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop) {
@@ -169,7 +208,8 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     return text.replaceAll(RegExp(r'\ufeff'), "");
   }
 
-  Future handleSetDraftText([String? id, ConvType? convType]) async {
+  Future handleSetDraftText(
+      {String? id, ConvType? convType, String? groupID}) async {
     String text = textEditingController.text;
     String convID = id ?? widget.conversationID;
     final isTopic = convID.contains("@TOPIC#");
@@ -180,23 +220,11 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
             : "group_$convID");
     String draftText = _filterU200b(text);
     return await conversationModel.setConversationDraft(
-        groupID: widget.groupID,
+        groupID: groupID ?? widget.groupID,
         isTopic: isTopic,
         isAllowWeb: widget.model.chatConfig.isUseDraftOnWeb,
         conversationID: conversationID,
         draftText: draftText);
-  }
-
-  backSpaceText() {
-    String originalText = textEditingController.text;
-    dynamic text;
-
-    if (originalText == zeroWidthSpace) {
-      _handleSoftKeyBoardDelete();
-    } else {
-      text = originalText.characters.skipLast(1);
-      textEditingController.text = text;
-    }
   }
 
 // 和onSubmitted一样，只是保持焦点的不同
@@ -592,6 +620,8 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
   KeyEventResult handleDesktopKeyEvent(FocusNode node, RawKeyEvent event) {
     final activeIndex = widget.model.activeAtIndex;
     final showMemberList = widget.model.showAtMemberList;
+    final isEneter = (event.physicalKey == PhysicalKeyboardKey.enter) ||
+        (event.physicalKey == PhysicalKeyboardKey.numpadEnter);
     if (event.runtimeType == RawKeyDownEvent) {
       if (event.physicalKey == PhysicalKeyboardKey.backspace) {
         if (textEditingController.text.isEmpty && lastText.isEmpty) {
@@ -602,7 +632,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
               event.isAltPressed ||
               event.isControlPressed ||
               event.isMetaPressed) &&
-          event.physicalKey == PhysicalKeyboardKey.enter) {
+          isEneter) {
         final offset = textEditingController.selection.baseOffset;
         textEditingController.text =
             '${lastText.substring(0, offset)}\n${lastText.substring(offset)}';
@@ -611,7 +641,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
         lastText = textEditingController.text;
 
         return KeyEventResult.handled;
-      } else if (event.physicalKey == PhysicalKeyboardKey.enter) {
+      } else if (isEneter) {
         if (!_isComposingText) {
           if (!isAddingAtSearchWords || widget.model.showAtMemberList.isEmpty) {
             onSubmitted();
@@ -707,7 +737,10 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     super.didUpdateWidget(oldWidget);
     if (widget.conversationID != oldWidget.conversationID) {
       mentionedMembersMap.clear();
-      handleSetDraftText(oldWidget.conversationID, oldWidget.conversationType);
+      handleSetDraftText(
+          id: oldWidget.conversationID,
+          convType: oldWidget.conversationType,
+          groupID: oldWidget.groupID);
       if (oldWidget.initText != widget.initText) {
         textEditingController.text = widget.initText ?? "";
       } else {
@@ -832,7 +865,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                 defaultWidget: TIMUIKitTextFieldLayoutNarrow(
                     onEmojiSubmitted: onEmojiSubmitted,
                     onCustomEmojiFaceSubmitted: onCustomEmojiFaceSubmitted,
-                    backSpaceText: backSpaceText,
+                    backSpaceText: deleteStickerFromText,
                     addStickerToText: addStickerToText,
                     customStickerPanel: widget.customStickerPanel,
                     forbiddenText: forbiddenText,
@@ -864,11 +897,12 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                     showMorePanel: widget.showMorePanel,
                     customEmojiStickerList: widget.customEmojiStickerList),
                 desktopWidget: TIMUIKitTextFieldLayoutWide(
+                    chatConfig: widget.chatConfig ?? widget.model.chatConfig,
                     theme: theme,
                     currentConversation: widget.currentConversation,
                     onEmojiSubmitted: onEmojiSubmitted,
                     onCustomEmojiFaceSubmitted: onCustomEmojiFaceSubmitted,
-                    backSpaceText: backSpaceText,
+                    backSpaceText: deleteStickerFromText,
                     addStickerToText: addStickerToText,
                     customStickerPanel: widget.customStickerPanel,
                     forbiddenText: forbiddenText,

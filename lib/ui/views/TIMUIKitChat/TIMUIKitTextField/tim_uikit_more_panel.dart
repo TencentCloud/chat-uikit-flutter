@@ -456,8 +456,15 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
   ) async {
     try {
       if (!await Permissions.checkPermission(
+        context,
+        Permission.camera.value,
+        theme,
+      )) {
+        return;
+      }
+      if (!await Permissions.checkPermission(
             context,
-            Permission.camera.value,
+            Permission.photos.value,
             theme,
           )) {
         return;

@@ -1,3 +1,28 @@
+## 2.1.3+1
+
+### New Features
+
+* Introduced [a new custom internationalization language scheme](https://www.tencentcloud.com/document/product/1047/52154?from=pub) that supports adding language packs, adding or modifying entries, and makes customizing i18n more accessible. This feature helps your app achieve a more convenient globalization process and easier customer acquisition worldwide.
+* Provided a seamless experience for previewing large images and playing videos within desktop environments (applications and web) by avoiding frequent page transitions. Enhanced the user experience for image previews and video playback. Please note that video playback is currently supported only on the web and not in desktop applications.
+* Supported to integrate with the new online customer service plugin (tencent_cloud_chat_customer_service_plugin).
+* Added two new life cycle hooks, `messageDidSend` and `messageShouldMount` to `ChatLifeCycle`.
+
+### Improvements
+
+* Optimized the usage, interface, and interaction of the sticker panel.
+* Enhanced mobile video playback interaction and UI.
+* Refined the error prompt when sending a 0 KB file fails.
+* Enabled users to close modals on desktop by clicking the bottom gray overlay area.
+* Improved the UI and interaction of image and video messages in the message list.
+* Added the ability to open self-sent file messages without downloading.
+* Optimized the download status animation of file messages on the web.
+
+### Bug Fixes
+
+* Fixed an issue preventing mobile image previews from being dragged after zooming.
+* Resolved an issue that might cause the message selection status not to be removed after canceling a message forward action.
+* Addressed an issue that might cause the microphone usage not to end after sending a voice message, which means the microphone was not released.
+
 ## 2.1.2
 
 ### New Features

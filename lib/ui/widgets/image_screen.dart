@@ -122,124 +122,113 @@ class _ImageScreenState extends TIMUIKitState<ImageScreen>
                   },
                   child: GestureDetector(
                     onTap: close,
-                    child: ExtendedImageGesturePageView.builder(
-                        scrollDirection: Axis.horizontal,
-                        controller: ExtendedPageController(
-                          initialPage: 0,
-                          pageSpacing: 0,
-                          shouldIgnorePointerWhenScrolling: false,
-                        ),
-                        itemCount: 1,
-                        physics: const BouncingScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          return HeroWidget(
-                              tag: widget.heroTag,
-                              slidePagekey: slidePagekey,
-                              child: ExtendedImage(
-                                image: widget.imageProvider,
-                                extendedImageGestureKey:
-                                    extendedImageGestureKey,
-                                enableSlideOutPage: true,
-                                // fit: BoxFit.scaleDown,
-                                initGestureConfigHandler: (state) {
-                                  return GestureConfig(
-                                    minScale: 0.8,
-                                    animationMinScale: 0.6,
-                                    maxScale: 2 * fittedScale,
-                                    animationMaxScale: 2.5 * fittedScale,
-                                    speed: 1.0,
-                                    inertialSpeed: 100.0,
-                                    initialScale: initialScale,
-                                    initialAlignment:
-                                        InitialAlignment.topCenter,
-                                    hitTestBehavior: HitTestBehavior.opaque,
-                                  );
-                                },
-                                loadStateChanged: (ExtendedImageState state) {
-                                  switch (state.extendedImageLoadState) {
-                                    case LoadState.loading:
-                                      return Container(
-                                          color: Colors.black,
-                                          child: const Center(
-                                              child: CircularProgressIndicator(
-                                                  color: Colors.white)));
-                                    case LoadState.completed:
-                                      final screenHeight =
-                                          MediaQuery.of(context).size.height;
-                                      final screenWidth =
-                                          MediaQuery.of(context).size.width;
-                                      final imgHeight = state.extendedImageInfo
-                                              ?.image.height ??
-                                          1;
-                                      final imgWidth = state
-                                              .extendedImageInfo?.image.width ??
-                                          0;
-                                      final imgRatio = imgWidth / imgHeight;
-                                      final screenRatio =
-                                          screenWidth / screenHeight;
-                                      final fitWidthScale =
-                                          screenRatio / imgRatio;
-                                      if (screenRatio > imgRatio) {
-                                        // Long Image
-                                        // initialScale = fitWidthScale;
-                                        fittedScale = fitWidthScale;
-                                        doubleTapScales[1] = fitWidthScale;
-                                      } else {
-                                        fittedScale =
-                                            1 / fitWidthScale; // fittedHeight
-                                        doubleTapScales[1] = 1 / fitWidthScale;
-                                      }
-                                      return GesturedImage(state,
-                                          key: extendedImageGestureKey);
-                                    case LoadState.failed:
-                                      break;
-                                  }
-                                  return null;
-                                },
-                                onDoubleTap: (ExtendedImageGestureState state) {
-                                  ///you can use define pointerDownPosition as you can,
-                                  ///default value is double tap pointer down postion.
-                                  final Offset? pointerDownPosition =
-                                      state.pointerDownPosition;
-                                  final double? begin =
-                                      state.gestureDetails!.totalScale;
-                                  double end;
+                    child: HeroWidget(
+                        tag: widget.heroTag,
+                        slidePagekey: slidePagekey,
+                        child: ExtendedImage(
+                          image: widget.imageProvider,
+                          extendedImageGestureKey:
+                          extendedImageGestureKey,
+                          enableSlideOutPage: true,
+                          // fit: BoxFit.scaleDown,
+                          initGestureConfigHandler: (state) {
+                            return GestureConfig(
+                              minScale: 0.8,
+                              animationMinScale: 0.6,
+                              maxScale: 2 * fittedScale,
+                              animationMaxScale: 2.5 * fittedScale,
+                              speed: 1.0,
+                              inertialSpeed: 100.0,
+                              initialScale: initialScale,
+                              initialAlignment:
+                              InitialAlignment.topCenter,
+                              hitTestBehavior: HitTestBehavior.opaque,
+                            );
+                          },
+                          loadStateChanged: (ExtendedImageState state) {
+                            switch (state.extendedImageLoadState) {
+                              case LoadState.loading:
+                                return Container(
+                                    color: Colors.black,
+                                    child: const Center(
+                                        child: CircularProgressIndicator(
+                                            color: Colors.white)));
+                              case LoadState.completed:
+                                final screenHeight =
+                                    MediaQuery.of(context).size.height;
+                                final screenWidth =
+                                    MediaQuery.of(context).size.width;
+                                final imgHeight = state.extendedImageInfo
+                                    ?.image.height ??
+                                    1;
+                                final imgWidth = state
+                                    .extendedImageInfo?.image.width ??
+                                    0;
+                                final imgRatio = imgWidth / imgHeight;
+                                final screenRatio =
+                                    screenWidth / screenHeight;
+                                final fitWidthScale =
+                                    screenRatio / imgRatio;
+                                if (screenRatio > imgRatio) {
+                                  // Long Image
+                                  // initialScale = fitWidthScale;
+                                  fittedScale = fitWidthScale;
+                                  doubleTapScales[1] = fitWidthScale;
+                                } else {
+                                  fittedScale =
+                                      1 / fitWidthScale; // fittedHeight
+                                  doubleTapScales[1] = 1 / fitWidthScale;
+                                }
+                                return GesturedImage(state,
+                                    key: extendedImageGestureKey);
+                              case LoadState.failed:
+                                break;
+                            }
+                            return null;
+                          },
+                          onDoubleTap: (ExtendedImageGestureState state) {
+                            ///you can use define pointerDownPosition as you can,
+                            ///default value is double tap pointer down postion.
+                            final Offset? pointerDownPosition =
+                                state.pointerDownPosition;
+                            final double? begin =
+                                state.gestureDetails!.totalScale;
+                            double end;
 
-                                  //remove old
-                                  _doubleClickAnimation?.removeListener(
-                                      _doubleClickAnimationListener);
+                            //remove old
+                            _doubleClickAnimation?.removeListener(
+                                _doubleClickAnimationListener);
 
-                                  //stop pre
-                                  _doubleClickAnimationController.stop();
+                            //stop pre
+                            _doubleClickAnimationController.stop();
 
-                                  //reset to use
-                                  _doubleClickAnimationController.reset();
+                            //reset to use
+                            _doubleClickAnimationController.reset();
 
-                                  if (begin == doubleTapScales[0]) {
-                                    end = doubleTapScales[1];
-                                  } else {
-                                    end = doubleTapScales[0];
-                                  }
+                            if (begin == doubleTapScales[0]) {
+                              end = doubleTapScales[1];
+                            } else {
+                              end = doubleTapScales[0];
+                            }
 
-                                  _doubleClickAnimationListener = () {
-                                    //print(_animation.value);
-                                    state.handleDoubleTap(
-                                        scale: _doubleClickAnimation!.value,
-                                        doubleTapPosition: pointerDownPosition);
-                                  };
-                                  _doubleClickAnimation =
-                                      _doubleClickAnimationController.drive(
-                                          Tween<double>(
-                                              begin: begin, end: end));
+                            _doubleClickAnimationListener = () {
+                              //print(_animation.value);
+                              state.handleDoubleTap(
+                                  scale: _doubleClickAnimation!.value,
+                                  doubleTapPosition: pointerDownPosition);
+                            };
+                            _doubleClickAnimation =
+                                _doubleClickAnimationController.drive(
+                                    Tween<double>(
+                                        begin: begin, end: end));
 
-                                  _doubleClickAnimation!.addListener(
-                                      _doubleClickAnimationListener);
+                            _doubleClickAnimation!.addListener(
+                                _doubleClickAnimationListener);
 
-                                  _doubleClickAnimationController.forward();
-                                },
-                                mode: ExtendedImageMode.gesture,
-                              ));
-                        }),
+                            _doubleClickAnimationController.forward();
+                          },
+                          mode: ExtendedImageMode.gesture,
+                        )),
                   ),
                 ),
               ),
