@@ -68,6 +68,7 @@ class Avatar extends TIMUIKitStatelessWidget {
       }
       return CachedNetworkImage(
         imageUrl: faceUrl,
+        fit: BoxFit.cover,
         fadeInDuration: const Duration(milliseconds: 0),
         errorWidget: (BuildContext context, String c, dynamic s) {
           return defaultAvatar();
