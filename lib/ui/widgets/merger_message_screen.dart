@@ -3,20 +3,19 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_item.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-
+import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_item.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/main.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_face_elem.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_cloud_custom_data.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_im_base/tencent_im_base.dart';
 
 class MergerMessageScreen extends StatefulWidget {
   final TUIChatSeparateViewModel model;
@@ -45,6 +44,14 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
     initMessageList();
   }
 
+  // 语音消息连续播放新增逻辑 begin
+  @override
+  void dispose() {
+    widget.model.cancelSoundSubscription();
+    super.dispose();
+  }
+  // 语音消息连续播放新增逻辑 end
+
   void initMessageList() async {
     final mergerMessageList =
         await _messageService.downloadMergerMessage(msgID: widget.msgID);
@@ -58,10 +65,11 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
         message.cloudCustomData != null && message.cloudCustomData != "";
     if (hasCustomData) {
       try {
-        final CloudCustomData messageCloudCustomData = CloudCustomData.fromJson(json.decode(
-            TencentUtils.checkString(message.cloudCustomData) != null
-                ? message.cloudCustomData!
-                : "{}"));
+        final CloudCustomData messageCloudCustomData = CloudCustomData.fromJson(
+            json.decode(
+                TencentUtils.checkString(message.cloudCustomData) != null
+                    ? message.cloudCustomData!
+                    : "{}"));
         if (messageCloudCustomData.messageReply != null) {
           MessageRepliedData.fromJson(messageCloudCustomData.messageReply!);
           return true;
@@ -237,18 +245,22 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
       margin: const EdgeInsets.only(top: 20),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: isSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
         children: [
-          if(!isSelf) SizedBox(
-            width: 40,
-            height: 40,
-            child: Avatar(faceUrl: faceUrl, showName: showName),
-          ),
-          if(!isSelf) const SizedBox(
-            width: 12,
-          ),
+          if (!isSelf)
+            SizedBox(
+              width: 40,
+              height: 40,
+              child: Avatar(faceUrl: faceUrl, showName: showName),
+            ),
+          if (!isSelf)
+            const SizedBox(
+              width: 12,
+            ),
           Column(
-            crossAxisAlignment: isSelf ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            crossAxisAlignment:
+                isSelf ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
               Text(showName,
                   style: TextStyle(fontSize: 12, color: theme.weakTextColor)),
@@ -261,14 +273,16 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
               )
             ],
           ),
-          if(isSelf) const SizedBox(
-            width: 12,
-          ),
-          if(isSelf) SizedBox(
-            width: 40,
-            height: 40,
-            child: Avatar(faceUrl: faceUrl, showName: showName),
-          ),
+          if (isSelf)
+            const SizedBox(
+              width: 12,
+            ),
+          if (isSelf)
+            SizedBox(
+              width: 40,
+              height: 40,
+              child: Avatar(faceUrl: faceUrl, showName: showName),
+            ),
         ],
       ),
     );
@@ -327,8 +341,7 @@ class MergerMessageScreenState extends TIMUIKitState<MergerMessageScreen> {
                 style: TextStyle(color: theme.appbarTextColor, fontSize: 17),
               ),
               shadowColor: theme.weakDividerColor,
-              backgroundColor: theme.appbarBgColor ??
-                  theme.primaryColor,
+              backgroundColor: theme.appbarBgColor ?? theme.primaryColor,
               iconTheme: IconThemeData(
                 color: theme.appbarTextColor,
               )),
