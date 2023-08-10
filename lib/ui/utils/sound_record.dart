@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_plugin_record_plus/const/play_state.dart';
 import 'package:flutter_plugin_record_plus/const/response.dart';
@@ -32,6 +33,16 @@ class SoundPlayer {
     await _audioPlayer.play(UrlSource(url));
   }
 
+  // 语音消息连续播放新增逻辑 begin
+  static Future<void> playWith({required Source source}) async {
+    _audioPlayer.stop();
+    if (_soundInterruptListener != null) {
+      _soundInterruptListener!();
+    }
+    await _audioPlayer.play(source);
+  }
+  // 语音消息连续播放新增逻辑 end
+
   static stop() {
     _audioPlayer.stop();
   }
@@ -42,9 +53,8 @@ class SoundPlayer {
   }
 
   static StreamSubscription<PlayerState> playStateListener(
-      {required void Function(PlayerState)? listener}) =>
+          {required void Function(PlayerState)? listener}) =>
       _audioPlayer.onPlayerStateChanged.listen(listener);
-
 
   static setSoundInterruptListener(SoundInterruptListener listener) {
     _soundInterruptListener = listener;

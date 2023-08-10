@@ -3,24 +3,25 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
-
 // ignore: unnecessary_import
 import 'package:flutter/foundation.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/chat_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_model_tools.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/friendShip/friendship_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/sound_record.dart';
 import 'package:uuid/uuid.dart';
 
 enum LoadDirection { previous, latest }
@@ -222,6 +223,11 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
         conversationID, HistoryMessagePosition.bottom);
     globalModel.setChatConfig(chatConfig);
     globalModel.clearRecivedNewMessageCount();
+
+    // 语音消息连续播放新增逻辑 begin
+    _setSoundSubscription();
+    // 语音消息连续播放新增逻辑 end
+
     _isInit = true;
     Future.delayed(const Duration(milliseconds: 300), () {
       markMessageAsRead();
@@ -629,7 +635,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
       globalModel.updateMessage(
           sendMsgRes, convID, id, convType, groupType, setInputField);
     }
-    if(lifeCycle?.messageDidSend != null){
+    if (lifeCycle?.messageDidSend != null) {
       lifeCycle!.messageDidSend(sendMsgRes);
     }
 
@@ -883,7 +889,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
         notifyListeners();
         globalModel.updateMessage(sendMsgRes, convID,
             messageInfoWithSender.id ?? "", convType, groupType, setInputField);
-        if(lifeCycle?.messageDidSend != null){
+        if (lifeCycle?.messageDidSend != null) {
           lifeCycle!.messageDidSend(sendMsgRes);
         }
         return sendMsgRes;
@@ -1508,8 +1514,139 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
 
   @override
   void dispose() {
+    // 语音消息连续播放新增逻辑 begin
+    cancelSoundSubscription();
+    // 语音消息连续播放新增逻辑 end
+
     globalModel.clearCurrentConversation();
     _isInit = false;
     super.dispose();
+  }
+
+  // 语音消息连续播放新增逻辑 begin
+  bool isPlaying = false;
+  bool findNext = true;
+  StreamSubscription<Object>? subscription;
+  void cusNotifyListeners() {
+    if (_isInit) {
+      notifyListeners();
+    }
+  }
+  // 语音消息连续播放新增逻辑 end
+}
+
+extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
+  List<V2TimMessage> get soundMessageList =>
+      globalModel.getSoundMessageList(conversationID);
+
+  void _setSoundSubscription() {
+    subscription = SoundPlayer.playStateListener(listener: (PlayerState state) {
+      if (state == PlayerState.completed) {
+        if (!findNext) {
+          _stopAndRest();
+          return;
+        }
+
+        isPlaying = false;
+        final int index =
+            soundMessageList.indexWhere((e) => e.msgID == currentPlayedMsgId);
+        if (index == -1) {
+          _stopAndRest();
+          return;
+        }
+
+        if (index < soundMessageList.length - 1) {
+          final currentMessage = soundMessageList[index + 1];
+
+          // 遇到的音频已读，直接返回，不在往下进行
+          if (currentMessage.localCustomInt ==
+              HistoryMessageDartConstant.read) {
+            _stopAndRest();
+            return;
+          }
+
+          if (currentMessage.msgID != null) {
+            _currentPlayedMsgId = currentMessage.msgID!;
+
+            // 标记已读
+            globalModel.setLocalCustomInt(
+              currentPlayedMsgId,
+              HistoryMessageDartConstant.read,
+              conversationID,
+            );
+
+            bool isLocal = false;
+            String url = currentMessage.soundElem?.url ?? '';
+            if (url.isEmpty) {
+              url = currentMessage.soundElem?.localUrl ?? '';
+              isLocal = true;
+            }
+            playSound(
+              msgID: currentMessage.msgID!,
+              url: url,
+              isLocal: isLocal,
+            );
+          } else {
+            _currentPlayedMsgId = "";
+          }
+        } else {
+          _currentPlayedMsgId = "";
+        }
+
+        cusNotifyListeners();
+      }
+    });
+  }
+
+  void cancelSoundSubscription() {
+    if (isPlaying) {
+      _stopAndRest(notify: false);
+    }
+    subscription?.cancel();
+  }
+
+  void playSound({
+    required String msgID,
+    required String url,
+    required bool isLocal,
+    bool findNext = true,
+  }) {
+    this.findNext = findNext;
+    if (url.isEmpty) {
+      _stopAndRest();
+      return;
+    }
+
+    if (!SoundPlayer.isInited) {
+      SoundPlayer.initSoundPlayer();
+    }
+
+    if (isPlaying && msgID == currentPlayedMsgId) {
+      _stopAndRest();
+    } else {
+      // 非同一个音频：停止上一个
+      if (msgID != currentPlayedMsgId) {
+        _stopAndRest(notify: false);
+      }
+      if (isLocal) {
+        SoundPlayer.playWith(source: DeviceFileSource(url));
+      } else {
+        SoundPlayer.play(url: url);
+      }
+      isPlaying = true;
+      _currentPlayedMsgId = msgID;
+      cusNotifyListeners();
+    }
+  }
+
+  _stopAndRest({
+    bool notify = true,
+  }) {
+    SoundPlayer.stop();
+    isPlaying = false;
+    _currentPlayedMsgId = "";
+    if (notify) {
+      cusNotifyListeners();
+    }
   }
 }
