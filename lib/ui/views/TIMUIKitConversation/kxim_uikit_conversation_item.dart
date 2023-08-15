@@ -134,7 +134,7 @@ class KXIMUIKitConversationItem extends TIMUIKitStatelessWidget {
           bottom: BorderSide(
             color: theme.conversationItemBorderColor ??
                 CommonColor.weakDividerColor,
-            width: 1,
+            width: 0.5,
           ),
         ),
       ),
