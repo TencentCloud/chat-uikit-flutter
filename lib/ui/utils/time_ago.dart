@@ -46,8 +46,14 @@ class TimeAgo {
         date;
   }
 
-  String getTimeStringForChat(int timeStamp) {
+  String? getTimeStringForChat(int timeStamp) {
     final DateTime date = DateTime.fromMillisecondsSinceEpoch(timeStamp * 1000);
+    final DateTime epochLimit = DateTime.utc(1971);
+
+    if (date.isBefore(epochLimit)) {
+      return null;
+    }
+
     final Duration duration = DateTime.now().difference(date);
     final int diffDays = duration.inDays +
         (duration.inMinutes >

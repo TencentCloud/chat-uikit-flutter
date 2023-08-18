@@ -33,6 +33,7 @@ import 'package:tencent_cloud_chat_uikit/ui/widgets/image_screen.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 
 class TIMUIKitImageElem extends StatefulWidget {
   final V2TimMessage message;
@@ -58,7 +59,6 @@ class TIMUIKitImageElem extends StatefulWidget {
 
 class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
   final TUIChatGlobalModel globalModel = serviceLocator<TUIChatGlobalModel>();
-  double? networkImagePositionRadio; // 加这个字段用于异步获取被安全打击后的兜底图的比例
   final TUIChatGlobalModel model = serviceLocator<TUIChatGlobalModel>();
   final MessageService _messageService = serviceLocator<MessageService>();
   Widget? imageItem;
@@ -373,178 +373,145 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     }
   }
 
-  Widget _renderNetworkImage(
-      dynamic heroTag, double? positionRadio, TUITheme? theme,
-      {String? path, V2TimImage? originalImg, V2TimImage? smallImg}) {
-    try {
-      String originImgUrl = originalImg?.url ?? getOriginImgURL();
-      if (originImgUrl.isEmpty && smallImg?.url != null) {
-        originImgUrl = smallImg!.url!;
-      }
+  Future<double> calculateAspectRatio(ImageProvider imageProvider) async {
+    Completer<double> completer = Completer<double>();
 
-      final imageWidget = Hero(
-          tag: heroTag,
-          child: PlatformUtils().isWeb
-              ? Image.network(path ?? smallImg?.url ?? originalImg!.url!,
-                  fit: BoxFit.contain)
-              : CachedNetworkImage(
-                  alignment: Alignment.topCenter,
-                  imageUrl: path ?? smallImg?.url ?? originalImg!.url!,
-                  errorWidget: (context, error, stackTrace) => errorPage(theme),
-                  fit: BoxFit.contain,
-                  cacheKey: smallImg?.uuid ?? originalImg!.uuid,
-                  placeholder: (context, url) =>
-                      Image(image: MemoryImage(kTransparentImage)),
-                  fadeInDuration: const Duration(milliseconds: 0),
+    final imageStream = imageProvider.resolve(const ImageConfiguration());
+    imageStream.addListener(
+      ImageStreamListener((imageInfo, synchronousCall) {
+        if (imageInfo.image.width != 0 && imageInfo.image.height != 0) {
+          double aspectRatio = imageInfo.image.width / imageInfo.image.height;
+          completer.complete(aspectRatio);
+        } else {
+          // If unable to calculate aspect ratio, return default value of 0.5
+          completer.complete(0.5);
+        }
+      }, onError: (Object exception, StackTrace? stackTrace) {
+        // If there's an error, return default value of 0.5
+        completer.complete(1);
+      }),
+    );
+
+    return await completer.future;
+  }
+
+  void onClickImage({
+    required bool isNetworkImage,
+    dynamic heroTag,
+    TUITheme? theme,
+    String? imgUrl,
+    String? imgPath,
+  }) {
+    if (isNetworkImage) {
+      if (PlatformUtils().isWeb) {
+        TUIKitWidePopup.showMedia(
+            context: context,
+            mediaURL: widget.message.imageElem?.path ?? "",
+            onClickOrigin: () => launchUrl(
+                  Uri.parse(widget.message.imageElem?.path ?? ""),
+                  mode: LaunchMode.externalApplication,
                 ));
-
-      return Stack(
-        alignment: widget.message.isSelf ?? true
-            ? AlignmentDirectional.topEnd
-            : AlignmentDirectional.topStart,
-        children: [
-          getImage(
-              GestureDetector(
-                onTap: () async {
-                  if (PlatformUtils().isWeb) {
-                    TUIKitWidePopup.showMedia(
-                        aspectRatio: positionRadio,
-                        context: context,
-                        mediaURL: widget.message.imageElem?.path ?? "",
-                        onClickOrigin: () => launchUrl(
-                              Uri.parse(widget.message.imageElem?.path ?? ""),
-                              mode: LaunchMode.externalApplication,
-                            ));
-                    return;
-                  }
-                  if (PlatformUtils().isDesktop) {
-                    _handleOnTapPreviewImageOnDesktop(
-                      positionRadio: positionRadio,
-                      originImgUrl: originImgUrl,
-                    );
-                  } else {
-                    Navigator.of(context).push(
-                      PageRouteBuilder(
-                          opaque: false, // set to false
-                          pageBuilder: (_, __, ___) => ImageScreen(
-                              imageProvider: CachedNetworkImageProvider(
-                                path ?? originImgUrl,
-                                cacheKey: widget.message.msgID,
-                              ),
-                              heroTag: heroTag,
-                              messageID: widget.message.msgID,
-                              downloadFn: () async {
-                                return await _saveImg(theme!);
-                              })),
-                    );
-                  }
-                },
-                child: positionRadio != null
-                    ? AspectRatio(
-                        aspectRatio: positionRadio,
-                        child: imageWidget,
-                      )
-                    : imageWidget,
-              ),
-              imageElem: e)
-        ],
-      );
-    } catch (e) {
-      return errorDisplay(context, theme);
+        return;
+      }
+      if (PlatformUtils().isDesktop) {
+        _handleOnTapPreviewImageOnDesktop(
+          originImgUrl: imgUrl,
+        );
+      } else {
+        Navigator.of(context).push(
+          PageRouteBuilder(
+              opaque: false,
+              pageBuilder: (_, __, ___) => ImageScreen(
+                  imageProvider: CachedNetworkImageProvider(
+                    imgUrl ?? "",
+                    cacheKey: widget.message.msgID,
+                  ),
+                  heroTag: heroTag,
+                  messageID: widget.message.msgID,
+                  downloadFn: () async {
+                    return await _saveImg(theme!);
+                  })),
+        );
+      }
+    } else {
+      if (PlatformUtils().isDesktop) {
+        TUIKitWidePopup.showMedia(
+            mediaLocalPath: imgPath,
+            context: context,
+            onClickOrigin: () => launchDesktopFile(imgPath ?? ""));
+      } else {
+        Navigator.of(context).push(
+          PageRouteBuilder(
+            opaque: false, // set to false
+            pageBuilder: (_, __, ___) => ImageScreen(
+                imageProvider: FileImage(File(imgPath ?? "")),
+                heroTag: heroTag,
+                messageID: widget.message.msgID,
+                downloadFn: () async {
+                  return await _saveImg(theme!);
+                }),
+          ),
+        );
+      }
     }
   }
 
-  Widget _renderLocalImage(String smallImage, dynamic heroTag,
-      double? positionRadio, TUITheme? theme, String? originImage) {
-    double? currentPositionRadio = positionRadio;
-    File imgF = File(smallImage);
+  Widget _renderAllImage(
+      {dynamic heroTag,
+      TUITheme? theme,
+      bool isNetworkImage = false,
+      String? webPath,
+      V2TimImage? originalImg,
+      V2TimImage? smallImg,
+      String? smallLocalPath,
+      String? originLocalPath}) {
+    Widget getImageWidget() {
+      if (isNetworkImage) {
+        return Hero(
+            tag: heroTag,
+            child: PlatformUtils().isWeb
+                ? Image.network(webPath ?? smallImg?.url ?? originalImg!.url!,
+                    fit: BoxFit.contain)
+                : CachedNetworkImage(
+                    alignment: Alignment.topCenter,
+                    imageUrl: webPath ?? smallImg?.url ?? originalImg!.url!,
+                    errorWidget: (context, error, stackTrace) =>
+                        errorPage(theme),
+                    fit: BoxFit.contain,
+                    cacheKey: smallImg?.uuid ?? originalImg!.uuid,
+                    placeholder: (context, url) =>
+                        Image(image: MemoryImage(kTransparentImage)),
+                    fadeInDuration: const Duration(milliseconds: 0),
+                  ));
+      } else {
+        final imgPath = (TencentUtils.checkString(smallLocalPath) != null
 
-    bool isExist = imgF.existsSync();
-    if (!isExist) {
-      return errorDisplay(context, theme);
+            ? smallLocalPath
+            : originLocalPath)!;
+        return Hero(
+            tag: heroTag,
+            child: Image.file(File(imgPath), fit: BoxFit.contain));
+      }
     }
 
-    Image image = Image.file(imgF);
+    ImageProvider imageProvider;
+    if (isNetworkImage) {
+      imageProvider = CachedNetworkImageProvider(
+          webPath ?? smallImg?.url ?? originalImg!.url!);
+    } else {
+      imageProvider = FileImage(File(smallLocalPath ?? originLocalPath!));
+    }
 
-    String showImage = (originImage != null && File(originImage).existsSync())
-        ? originImage
-        : smallImage;
-
-    image.image
-        .resolve(const ImageConfiguration())
-        .addListener(ImageStreamListener((image, synchronousCall) {
-      if (image.image.width != 0 && image.image.height != 0) {
-        currentPositionRadio = image.image.width / image.image.height;
-      }
-    }));
-    final message = widget.message;
-    final preloadImage = model.preloadImageMap[
-        message.seq! + message.timestamp.toString() + (message.msgID ?? "")];
-
-    final isDesktopScreen =
-        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
-
-    final imageWidget = Hero(
-      tag: heroTag,
-      child: preloadImage != null
-          ? FittedBox(
-              fit: BoxFit.contain,
-              child: RawImage(
-                image: preloadImage,
-                fit: BoxFit.contain,
-              ),
-            )
-          : FittedBox(
-              fit: BoxFit.contain,
-              child: Image.file(
-                File(smallImage),
-                fit: BoxFit.contain,
-              ),
-            ),
-    );
-
-    return Stack(
-      alignment: AlignmentDirectional.topStart,
-      children: [
-        if (!isDesktopScreen && currentPositionRadio != null)
-          AspectRatio(
-            aspectRatio: currentPositionRadio!,
-            child: Container(
-              decoration: const BoxDecoration(color: Colors.transparent),
-            ),
-          ),
-        getImage(
-            GestureDetector(
-                onTap: () {
-                  if (PlatformUtils().isDesktop) {
-                    TUIKitWidePopup.showMedia(
-                        aspectRatio: positionRadio,
-                        mediaLocalPath: showImage,
-                        context: context,
-                        onClickOrigin: () => launchDesktopFile(showImage));
-                  } else {
-                    Navigator.of(context).push(
-                      PageRouteBuilder(
-                        opaque: false, // set to false
-                        pageBuilder: (_, __, ___) => ImageScreen(
-                            imageProvider: FileImage(File(showImage)),
-                            heroTag: heroTag,
-                            messageID: widget.message.msgID,
-                            downloadFn: () async {
-                              return await _saveImg(theme!);
-                            }),
-                      ),
-                    );
-                  }
-                },
-                child: positionRadio != null
-                    ? AspectRatio(
-                        aspectRatio: positionRadio,
-                        child: imageWidget,
-                      )
-                    : imageWidget),
-            imageElem: null)
-      ],
+    return GestureDetector(
+      onTap: () => onClickImage(
+          heroTag: heroTag,
+          isNetworkImage: isNetworkImage,
+          imgUrl: webPath ?? smallImg?.url ?? originalImg?.url ?? "",
+          imgPath: (TencentUtils.checkString(originLocalPath) != null
+              ? originLocalPath
+              : smallLocalPath) ?? ""
+      ),
+      child: getImageWidget(),
     );
   }
 
@@ -587,26 +554,6 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
             isSnapshot: false);
       }
     }
-    // 先暂时下掉用网络图片计算尺寸比例的feature，在没有找到准确的判断图片是否被打击前
-    // setOnlineImageRatio();
-  }
-
-  void setOnlineImageRatio() {
-    if (networkImagePositionRadio == null) {
-      V2TimImage? smallImg = getImageFromList(V2TimImageTypesEnum.small);
-      V2TimImage? originalImg = getImageFromList(V2TimImageTypesEnum.original);
-      Image image = Image.network(smallImg?.url ?? originalImg?.url ?? "");
-
-      image.image
-          .resolve(const ImageConfiguration())
-          .addListener(ImageStreamListener((ImageInfo info, bool _) {
-        if (info.image.width != 0 && info.image.height != 0) {
-          setState(() {
-            networkImagePositionRadio = (info.image.width / info.image.height);
-          });
-        }
-      }));
-    }
   }
 
   bool isNeedShowLocalPath() {
@@ -628,10 +575,13 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
 
     if (PlatformUtils().isWeb && widget.message.imageElem!.path != null) {
       // Displaying on Web only
-      return _renderNetworkImage(heroTag, positionRadio, theme,
+      return _renderAllImage(
+          heroTag: heroTag,
+          theme: theme,
+          isNetworkImage: true,
           smallImg: smallImg,
           originalImg: originalImg,
-          path: widget.message.imageElem!.path);
+          webPath: widget.message.imageElem!.path);
     }
 
     try {
@@ -639,36 +589,47 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
           widget.message.imageElem!.path != null &&
           widget.message.imageElem!.path!.isNotEmpty &&
           File(widget.message.imageElem!.path!).existsSync())) {
-        return _renderLocalImage(
-            widget.message.imageElem!.path!,
-            heroTag,
-            networkImagePositionRadio ?? positionRadio,
-            theme,
-            widget.message.imageElem!.path!);
+        return _renderAllImage(
+            smallLocalPath: widget.message.imageElem!.path!,
+            heroTag: heroTag,
+            theme: theme,
+            originLocalPath: widget.message.imageElem!.path!);
       }
     } catch (e) {
       // ignore: avoid_print
-      print(e);
+      outputLogger.i(e);
     }
 
     try {
-      if (smallImg?.localUrl != null &&
-          smallImg?.localUrl != "" &&
-          File((smallImg?.localUrl!)!).existsSync()) {
-        return _renderLocalImage(smallImg!.localUrl!, heroTag, positionRadio,
-            theme, originalImg?.localUrl);
+      if ((TencentUtils.checkString(smallImg?.localUrl) != null &&
+              File((smallImg?.localUrl!)!).existsSync()) ||
+          (TencentUtils.checkString(originalImg?.localUrl) != null &&
+              File((originalImg?.localUrl!)!).existsSync())) {
+        return _renderAllImage(
+            smallLocalPath: smallImg?.localUrl ?? "",
+            heroTag: heroTag,
+            theme: theme,
+            originLocalPath: originalImg?.localUrl);
       }
     } catch (e) {
       // ignore: avoid_print
-      print(e);
-      return _renderNetworkImage(heroTag, positionRadio, theme,
-          smallImg: smallImg, originalImg: originalImg);
+      outputLogger.i(e);
+      return _renderAllImage(
+          heroTag: heroTag,
+          theme: theme,
+          isNetworkImage: true,
+          smallImg: smallImg,
+          originalImg: originalImg);
     }
 
     if ((smallImg?.url ?? originalImg?.url) != null &&
         (smallImg?.url ?? originalImg?.url)!.isNotEmpty) {
-      return _renderNetworkImage(heroTag, positionRadio, theme,
-          smallImg: smallImg, originalImg: originalImg);
+      return _renderAllImage(
+          heroTag: heroTag,
+          theme: theme,
+          isNetworkImage: true,
+          smallImg: smallImg,
+          originalImg: originalImg);
     }
 
     return errorDisplay(context, theme);

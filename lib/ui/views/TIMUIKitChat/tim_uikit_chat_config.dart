@@ -22,7 +22,41 @@ class TimeDividerConfig {
   TimeDividerConfig({this.timeInterval, this.timestampParser});
 }
 
+/// StickerPanelConfig is a configuration class for the sticker panel component.
+/// It allows customization of specific features such as display options for the
+/// message area, sticker packages, unicode emoji lists, and custom sticker packages.
+class StickerPanelConfig {
+  /// Determines whether to use the QQ Sticker Package.
+  /// Default value: true
+  final bool useQQStickerPackage;
+
+  /// Determines whether to use the Tencent Cloud Chat Sticker Package.
+  /// Default value: true
+  final bool useTencentCloudChatStickerPackage;
+
+  /// A list of unicode emoji, represented as integers.
+  /// Default value: a list of common Unicode Emojis.
+  /// To exclude Unicode Emoji from the display, pass an empty list.
+  final List<int> unicodeEmojiList;
+
+  /// A list of CustomStickerPackage instances, where each instance represents a sticker package.
+  /// Default value: an empty list.
+  final List<CustomStickerPackage> customStickerPackages;
+
+  StickerPanelConfig({
+    this.useQQStickerPackage = true,
+    this.useTencentCloudChatStickerPackage = true,
+    this.unicodeEmojiList = TUIKitStickerConstData.defaultUnicodeEmojiList,
+    this.customStickerPackages = const [],
+  });
+}
+
 class TIMUIKitChatConfig {
+  /// A StickerPanelConfig instance to configure the sticker panel's behavior and appearance.
+  /// This includes options such as display settings, usage of specific sticker packages,
+  /// unicode emoji lists, and custom sticker packages.
+  final StickerPanelConfig? stickerPanelConfig;
+
   /// Customize the time divider among the two messages.
   final TimeDividerConfig? timeDividerConfig;
 
@@ -135,7 +169,6 @@ class TIMUIKitChatConfig {
   final String Function(String data)? faceURISuffix;
 
   /// Controls whether text and replied messages can be displayed with Markdown formatting.
-  /// When enabled, small image stickers, including QQ stickers, will not work in message items.
   /// Also, when enabled, `isEnableTextSelection` will not works.
   /// [Default]: false.
   final bool isSupportMarkdownForTextMessage;
@@ -210,6 +243,7 @@ class TIMUIKitChatConfig {
       {this.onTapLink,
       this.timeDividerConfig,
       this.desktopStickerPanelHeight = 400,
+      this.stickerPanelConfig,
       this.isGroupAdminRecallEnabled = false,
       this.isAutoReportRead = true,
       this.faceURIPrefix,

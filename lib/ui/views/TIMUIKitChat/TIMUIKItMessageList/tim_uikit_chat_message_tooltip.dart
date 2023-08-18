@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
@@ -79,6 +80,8 @@ class TIMUIKitMessageTooltip extends StatefulWidget {
 class TIMUIKitMessageTooltipState
     extends TIMUIKitState<TIMUIKitMessageTooltip> {
   final TUIChatGlobalModel globalModal = serviceLocator<TUIChatGlobalModel>();
+  final TUISelfInfoViewModel selfInfoViewModel =
+      serviceLocator<TUISelfInfoViewModel>();
   bool isShowMoreSticker = false;
   bool isShowOpenFile = false;
   String filePath = "";
@@ -179,9 +182,9 @@ class TIMUIKitMessageTooltipState
   }
 
   bool isAdminCanRecall() {
-    if (widget.groupMemberInfo != null &&
-        widget.model.chatConfig.isGroupAdminRecallEnabled) {
-      final selfRole = widget.groupMemberInfo!.role;
+    if (widget.model.chatConfig.isGroupAdminRecallEnabled) {
+      final selfMemberInfo = widget.groupMemberInfo ?? widget.model.selfMemberInfo;
+      final selfRole = selfMemberInfo?.role;
       return selfRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN ||
           selfRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER;
     } else {

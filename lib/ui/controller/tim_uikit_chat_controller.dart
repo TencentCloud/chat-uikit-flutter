@@ -51,17 +51,21 @@ class TIMUIKitChatController {
     return model?.clearHistory();
   }
 
-  /// refresh the history message list manually;
-  /// Please provide `convType` and `convID`, if you use `TIMUIKitChatController` without specifying to a `TIMUIKitChat`.
+  /// Refresh the history message list manually;
   Future<bool> refreshCurrentHistoryList(
       [String? convID, ConvType? convType]) async {
-    if (convID != null && convType != null) {
-      return globalChatModel.refreshCurrentHistoryListForConversation(
-          count: 50, convID: convID, convType: convType);
-    } else if (model != null) {
+    if(model != null){
+      try{
+        scrollController?.animateTo(
+          scrollController!.position.minScrollExtent,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.ease,
+        );
+      }catch(e){}
       return model!.loadDataFromController();
+    } else {
+      return false;
     }
-    return false;
   }
 
   /// Update single message at UI model

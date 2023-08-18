@@ -20,6 +20,7 @@ import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:uuid/uuid.dart';
 
@@ -171,7 +172,8 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
 
   void initForEachConversation(ConvType convType, String convID,
       ValueChanged<String>? onChangeInputField,
-      {String? groupID}) async {
+      {String? groupID,
+      List<V2TimGroupMemberFullInfo?>? preGroupMemberList}) async {
     if (_isInit) {
       return;
     }
@@ -188,7 +190,17 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     if (conversationType == ConvType.group) {
       globalModel.refreshGroupApplicationList();
       loadGroupInfo(groupID ?? convID);
-      loadGroupMemberList(groupID: groupID ?? convID);
+      if(preGroupMemberList != null){
+        groupMemberList = preGroupMemberList;
+        selfMemberInfo = preGroupMemberList
+            .firstWhereOrNull((e) => e?.userID == selfModel.loginInfo?.userID);
+      }else{
+        await loadSelfMemberInfo(groupID: groupID ?? convID);
+        loadGroupMemberList(groupID: groupID ?? convID);
+      }
+      if(selfMemberInfo == null){
+        await loadSelfMemberInfo(groupID: groupID ?? convID);
+      }
     } else {
       notifyListeners();
     }
@@ -274,12 +286,11 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
 
   // 加载聊天记录
   Future<bool> loadChatRecord({
-    HistoryMsgGetTypeEnum? getType, // 获取聊天记录的方式
-    int lastMsgSeq = -1, // 上一条消息的消息序号
-    required int count, // 加载的消息数量
-    String? lastMsgID, // 最后一条消息的ID
-    LoadDirection direction =
-        LoadDirection.previous, // 加载的方向，previous表示向上加载，latest表示向下加载
+    HistoryMsgGetTypeEnum? getType,
+    int lastMsgSeq = -1,
+    required int count,
+    String? lastMsgID,
+    LoadDirection direction = LoadDirection.previous,
   }) async {
     try {
       // 根据加载方向设置是否还能继续加载更多消息
@@ -349,20 +360,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
         List<V2TimMessage> receivedList = await lifeCycle
                 ?.didGetHistoricalMessageList(response.messageList) ??
             response.messageList;
-
-        // 根据加载方向拼接消息列表
-        if (globalModel.loadingMessage[conversationID]?.isNotEmpty ?? false) {
-          if (direction == LoadDirection.previous) {
-            receivedList = _combineMessageList(
-                globalModel.messageListMap[conversationID]!, receivedList);
-          } else {
-            receivedList = receivedList.reversed.toList();
-            receivedList = _combineMessageList(
-                receivedList, globalModel.messageListMap[conversationID]!);
-          }
-        } else {
-          globalModel.loadingMessage.remove(conversationID);
-        }
+        globalModel.loadingMessage.remove(conversationID);
 
         // 更新聊天记录到全局model
         globalModel.setMessageList(
@@ -394,7 +392,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
       return haveMoreData;
     } catch (e) {
       // ignore: avoid_print
-      print('loadChatRecord error: $e');
+      outputLogger.i('loadChatRecord error: $e');
       return false;
     }
   }
@@ -483,6 +481,23 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     if (res.code == 10015) {
       isGroupExist = false;
     }
+  }
+
+  Future<void> loadSelfMemberInfo({required String groupID}) async {
+    V2TimValueCallback<List<V2TimGroupMemberFullInfo>> getGroupMembersInfoRes =
+        await TencentImSDKPlugin.v2TIMManager
+            .getGroupManager()
+            .getGroupMembersInfo(
+      groupID: groupID,
+      memberList: [selfModel.loginInfo?.userID ?? ""],
+    );
+    if (getGroupMembersInfoRes.code == 0) {
+      final userList = getGroupMembersInfoRes.data;
+      selfMemberInfo = userList
+          ?.firstWhereOrNull((e) => e.userID == selfModel.loginInfo?.userID);
+      notifyListeners();
+    }
+    return;
   }
 
   Future<void> loadGroupMemberList(
@@ -629,7 +644,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
       globalModel.updateMessage(
           sendMsgRes, convID, id, convType, groupType, setInputField);
     }
-    if(lifeCycle?.messageDidSend != null){
+    if (lifeCycle?.messageDidSend != null) {
       lifeCycle!.messageDidSend(sendMsgRes);
     }
 
@@ -883,7 +898,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
         notifyListeners();
         globalModel.updateMessage(sendMsgRes, convID,
             messageInfoWithSender.id ?? "", convType, groupType, setInputField);
-        if(lifeCycle?.messageDidSend != null){
+        if (lifeCycle?.messageDidSend != null) {
           lifeCycle!.messageDidSend(sendMsgRes);
         }
         return sendMsgRes;

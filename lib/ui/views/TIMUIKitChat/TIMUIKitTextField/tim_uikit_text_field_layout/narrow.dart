@@ -15,7 +15,6 @@ import 'package:tencent_cloud_chat_uikit/ui/utils/optimize_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_emoji_panel.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_send_sound_message.dart';
 import 'package:extended_text_field/extended_text_field.dart';
 import 'package:tencent_keyboard_visibility/tencent_keyboard_visibility.dart';
@@ -91,7 +90,9 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
 
   final VoidCallback goDownBottom;
 
-  final List customEmojiStickerList;
+  final List<CustomEmojiFaceData> customEmojiStickerList;
+
+  final List<CustomStickerPackage> stickerPackageList;
 
   const TIMUIKitTextFieldLayoutNarrow(
       {Key? key,
@@ -125,7 +126,8 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
       required this.showMorePanel,
       this.hintText,
       required this.customEmojiStickerList,
-      this.controller})
+      this.controller,
+      required this.stickerPackageList})
       : super(key: key);
 
   @override
@@ -185,51 +187,71 @@ class _TIMUIKitTextFieldLayoutNarrowState
     }
   }
 
-  Widget _getBottomContainer() {
+  Widget _getBottomContainer(TUITheme theme) {
     if (showEmojiPanel) {
       return widget.customStickerPanel != null
           ? widget.customStickerPanel!(
-          sendTextMessage: () {
-            widget.onEmojiSubmitted();
-            setSendButton();
-          },
-          sendFaceMessage: widget.onCustomEmojiFaceSubmitted,
-          deleteText: () {
-            widget.backSpaceText();
-            setSendButton();
-          },
-          addText: (int unicode) {
-            final newText = String.fromCharCode(unicode);
-            widget.addStickerToText(newText);
-            setSendButton();
-            // handleSetDraftText();
-          },
-          addCustomEmojiText: ((String singleEmojiName) {
-            String? emojiName = singleEmojiName.split('.png')[0];
-            if (widget.isUseDefaultEmoji &&
-                widget.languageType == 'zh' &&
-                ConstData.emojiMapList[emojiName] != null &&
-                ConstData.emojiMapList[emojiName] != '') {
-              emojiName = ConstData.emojiMapList[emojiName];
-            }
-            final newText = '[$emojiName]';
-            widget.addStickerToText(newText);
-            setSendButton();
-          }),
-          defaultCustomEmojiStickerList:
-          widget.isUseDefaultEmoji ? ConstData.emojiList : [])
-          : EmojiPanel(onTapEmoji: (unicode) {
-              final newText = String.fromCharCode(unicode);
-              widget.addStickerToText(newText);
-              setSendButton();
-              // handleSetDraftText();
-            }, onSubmitted: () {
-              widget.onEmojiSubmitted();
-              setSendButton();
-            }, delete: () {
-              widget.backSpaceText();
-              setSendButton();
-            });
+              sendTextMessage: () {
+                widget.onEmojiSubmitted();
+                setSendButton();
+              },
+              sendFaceMessage: widget.onCustomEmojiFaceSubmitted,
+              deleteText: () {
+                widget.backSpaceText();
+                setSendButton();
+              },
+              addText: (int unicode) {
+                final newText = String.fromCharCode(unicode);
+                widget.addStickerToText(newText);
+                setSendButton();
+                // handleSetDraftText();
+              },
+              addCustomEmojiText: ((String singleEmojiName) {
+                String? emojiName = singleEmojiName.split('.png')[0];
+                if (widget.isUseDefaultEmoji &&
+                    widget.languageType == 'zh' &&
+                    TUIKitStickerConstData.emojiMapList[emojiName] != null &&
+                    TUIKitStickerConstData.emojiMapList[emojiName] != '') {
+                  emojiName = TUIKitStickerConstData.emojiMapList[emojiName];
+                }
+                final newText = '[$emojiName]';
+                widget.addStickerToText(newText);
+                setSendButton();
+              }),
+              defaultCustomEmojiStickerList: widget.isUseDefaultEmoji
+                  ? TUIKitStickerConstData.emojiList
+                  : [])
+          : StickerPanel(
+              isWideScreen: false,
+              sendTextMsg: () {
+                widget.onEmojiSubmitted();
+                setSendButton();
+              },
+              sendFaceMsg: widget.onCustomEmojiFaceSubmitted,
+              deleteText: () {
+                widget.backSpaceText();
+                setSendButton();
+              },
+              addText: (int unicode) {
+                final newText = String.fromCharCode(unicode);
+                widget.addStickerToText(newText);
+                setSendButton();
+                // handleSetDraftText();
+              },
+              addCustomEmojiText: ((String singleEmojiName) {
+                String? emojiName = singleEmojiName.split('.png')[0];
+                if (widget.isUseDefaultEmoji &&
+                    widget.languageType == 'zh' &&
+                    TUIKitStickerConstData.emojiMapList[emojiName] != null &&
+                    TUIKitStickerConstData.emojiMapList[emojiName] != '') {
+                  emojiName = TUIKitStickerConstData.emojiMapList[emojiName];
+                }
+                final newText = '[$emojiName]';
+                widget.addStickerToText(newText);
+                setSendButton();
+              }),
+              customStickerPackageList: widget.stickerPackageList,
+              lightPrimaryColor: theme.lightPrimaryColor);
     }
 
     if (showMore) {
@@ -310,23 +332,22 @@ class _TIMUIKitTextFieldLayoutNarrowState
       });
     };
   }
+
   String getAbstractMessage(V2TimMessage message) {
-    final String? customAbstractMessage = widget
-        .model.abstractMessageBuilder != null ? widget.model
-        .abstractMessageBuilder!(widget.model.repliedMessage!) : null;
-    return customAbstractMessage ?? MessageUtils
-        .getAbstractMessageAsync(
-        widget.model.repliedMessage!, widget.model.groupMemberList ?? []);
+    final String? customAbstractMessage =
+        widget.model.abstractMessageBuilder != null
+            ? widget.model.abstractMessageBuilder!(widget.model.repliedMessage!)
+            : null;
+    return customAbstractMessage ??
+        MessageUtils.getAbstractMessageAsync(
+            widget.model.repliedMessage!, widget.model.groupMemberList ?? []);
   }
 
   _buildRepliedMessage(V2TimMessage? repliedMessage) {
     final haveRepliedMessage = repliedMessage != null;
     if (haveRepliedMessage) {
       final text =
-          "${MessageUtils.getDisplayName(
-          widget.model.repliedMessage!)}:${getAbstractMessage(
-          repliedMessage
-      )}";
+          "${MessageUtils.getDisplayName(widget.model.repliedMessage!)}:${getAbstractMessage(repliedMessage)}";
       return Container(
         color: widget.backgroundColor ?? hexToColor("f5f5f6"),
         alignment: Alignment.centerLeft,
@@ -514,8 +535,19 @@ class _TIMUIKitTextFieldLayoutNarrowState
                                             .isWeb
                                         ? null
                                         : DefaultSpecialTextSpanBuilder(
-                                            isUseDefaultEmoji:
+                                            isUseQQPackage: (widget
+                                                        .model
+                                                        .chatConfig
+                                                        .stickerPanelConfig
+                                                        ?.useTencentCloudChatStickerPackage ??
+                                                    true) ||
                                                 widget.isUseDefaultEmoji,
+                                            isUseTencentCloudChatPackage: widget
+                                                    .model
+                                                    .chatConfig
+                                                    .stickerPanelConfig
+                                                    ?.useTencentCloudChatStickerPackage ??
+                                                true,
                                             customEmojiStickerList:
                                                 widget.customEmojiStickerList,
                                             showAtBackground: true,
@@ -609,9 +641,7 @@ class _TIMUIKitTextFieldLayoutNarrowState
                 height: max(_getBottomHeight(), 0.0),
                 child: ListView(
                   physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    _getBottomContainer()
-                  ],
+                  children: [_getBottomContainer(theme)],
                 ),
               ),
             ],

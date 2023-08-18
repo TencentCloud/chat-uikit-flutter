@@ -23,7 +23,7 @@ class TIMUIKitTextTranslationElem extends StatefulWidget {
   final TUIChatSeparateViewModel chatModel;
   final bool? isShowMessageReaction;
   final bool isUseDefaultEmoji;
-  final List customEmojiStickerList;
+  final List<CustomEmojiFaceData> customEmojiStickerList;
 
   const TIMUIKitTextTranslationElem(
       {Key? key,
@@ -124,7 +124,13 @@ class _TIMUIKitTextTranslationElemState
     final textWithLink = LinkPreviewEntry.getHyperlinksText(translateText ?? "",
         widget.chatModel.chatConfig.isSupportMarkdownForTextMessage,
         onLinkTap: widget.chatModel.chatConfig.onTapLink,
-        isUseDefaultEmoji: widget.isUseDefaultEmoji,
+        isUseQQPackage: (widget.chatModel.chatConfig.stickerPanelConfig
+                    ?.useTencentCloudChatStickerPackage ??
+                true) ||
+            widget.isUseDefaultEmoji,
+        isUseTencentCloudChatPackage: widget.chatModel.chatConfig
+                .stickerPanelConfig?.useTencentCloudChatStickerPackage ??
+            true,
         customEmojiStickerList: widget.customEmojiStickerList,
         isEnableTextSelection:
             widget.chatModel.chatConfig.isEnableTextSelection ?? false);
@@ -160,7 +166,19 @@ class _TIMUIKitTextTranslationElemState
                                 fontSize: isDesktopScreen ? 14 : 16,
                                 height: widget.chatModel.chatConfig.textHeight),
                         specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
-                          isUseDefaultEmoji: widget.isUseDefaultEmoji,
+                          isUseQQPackage: (widget
+                                      .chatModel
+                                      .chatConfig
+                                      .stickerPanelConfig
+                                      ?.useTencentCloudChatStickerPackage ??
+                                  true) ||
+                              widget.isUseDefaultEmoji,
+                          isUseTencentCloudChatPackage: widget
+                                  .chatModel
+                                  .chatConfig
+                                  .stickerPanelConfig
+                                  ?.useTencentCloudChatStickerPackage ??
+                              true,
                           customEmojiStickerList: widget.customEmojiStickerList,
                           showAtBackground: true,
                         )),

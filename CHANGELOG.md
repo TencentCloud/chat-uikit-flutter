@@ -1,3 +1,27 @@
+## 2.2.0
+
+### New Features
+
+* Introduced a newly-designed set of Emoji image stickers, available for seamless integration within textual content, providing an enhanced user experience.
+* Streamlined the implementation of stickers, removing the need for additional complex coding. Full functionality is enabled by default, with customization options available through the `stickerPanelConfig` configuration in `TIMUIKitChatConfig`.
+* Extended support for rendering embedded image stickers within text messages when the `Markdown` parsing mode is activated, combining a rich, user-friendly experience with the ability to display formatted Markdown text.
+
+### Improvements
+
+* Enhanced group chat functionality on the Desktop, enabling mentions (`@` tag) to be inserted at any position within a composed message, rather than only at the end. Additionally, deleting `@` tags has been optimized.
+* Maintained message sending permissions for the group owner and administrators during "mute all" scenarios.
+* Enabled the use of a return `null` value for the `customHoverBar` to utilize the default.
+* Refined the revoke button functionality for group administrators.
+* Removed full-screen support for video previews on the Web and introduced an alternative "Open in New Window" button for an enlarged view.
+* Implemented UIKit log recording to facilitate issue identification and troubleshooting.
+* Introduced a delete button for the small PNG sticker selection panel on mobile devices, which previously was only available in the Unicode emoji selection panel.
+
+### Bug Fixes
+
+* Resolved an issue preventing photo capturing on devices running Android 12 or lower.
+* Rectified display inaccuracies related to picture aspect ratios.
+* Addressed several issues concerning voice and video calls.
+
 ## 2.1.3+1
 
 ### New Features

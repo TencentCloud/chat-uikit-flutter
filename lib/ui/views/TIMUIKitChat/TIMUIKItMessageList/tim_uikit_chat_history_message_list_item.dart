@@ -279,7 +279,7 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
   /// Whether to use the default emoji
   final bool isUseDefaultEmoji;
 
-  final List customEmojiStickerList;
+  final List<CustomEmojiFaceData> customEmojiStickerList;
 
   final V2TimGroupMemberFullInfo? groupMemberInfo;
 
@@ -287,7 +287,7 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
   /// replacing the default message hover action bar.
   /// Applicable only on desktop platforms.
   /// If provided, the default message action functionality will appear in the right-click context menu instead.
-  final Widget Function(V2TimMessage message)? customMessageHoverBarOnDesktop;
+  final Widget? Function(V2TimMessage message)? customMessageHoverBarOnDesktop;
 
   const TIMUIKitHistoryMessageListItem(
       {Key? key,
@@ -1093,8 +1093,11 @@ class _TIMUIKItHistoryMessageListItemState
       bool isDownloadWaiting) {
     final isDesktopScreen =
         TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+    final customHoverBar = widget.customMessageHoverBarOnDesktop != null
+        ? widget.customMessageHoverBarOnDesktop!(message)
+        : null;
     final wideHoverTipList = (model.chatConfig.isUseMessageHoverBarOnDesktop &&
-            widget.customMessageHoverBarOnDesktop == null)
+            customHoverBar == null)
         ? getMessageHoverControlBar(model, theme)
         : [];
     final lastItemName =
@@ -1106,6 +1109,7 @@ class _TIMUIKItHistoryMessageListItemState
       children: [
         if (isDesktopScreen &&
             isShowWideToolTip &&
+            customHoverBar == null &&
             !((widget.message.elemType == 6 && isDownloadWaiting)))
           Container(
             decoration: BoxDecoration(
@@ -1142,13 +1146,11 @@ class _TIMUIKItHistoryMessageListItemState
                   .toList(),
             ),
           ),
-        if (isDesktopScreen &&
-            isShowWideToolTip &&
-            widget.customMessageHoverBarOnDesktop != null)
-          widget.customMessageHoverBarOnDesktop!(message),
+        if (isDesktopScreen && isShowWideToolTip && customHoverBar != null)
+          customHoverBar,
         if (!isDesktopScreen ||
             (model.chatConfig.isUseMessageHoverBarOnDesktop &&
-                widget.customMessageHoverBarOnDesktop == null &&
+                customHoverBar == null &&
                 !isShowWideToolTip))
           const SizedBox(
             height: 24,

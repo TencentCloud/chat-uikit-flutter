@@ -324,13 +324,15 @@ class TUIKitWidePopup {
       if (isLocalResource) {
         videoController = VideoPlayerController.file(File(mediaPath));
       } else {
-        videoController = VideoPlayerController.networkUrl(Uri.parse(mediaPath));
+        videoController =
+            VideoPlayerController.networkUrl(Uri.parse(mediaPath));
       }
 
       await videoController.initialize();
       aspectRatioFinal = videoController.value.aspectRatio;
 
       chewieController = ChewieController(
+        allowFullScreen: false,
         videoPlayerController: videoController,
         aspectRatio: aspectRatioFinal,
         autoPlay: true,
@@ -340,12 +342,9 @@ class TUIKitWidePopup {
 
       mediaWidget = Chewie(controller: chewieController);
     } else {
-      mediaWidget = FittedBox(
-        fit: BoxFit.contain,
-        child: isLocalResource
-            ? Image.file(File(mediaPath), fit: BoxFit.contain)
-            : Image.network(mediaPath, fit: BoxFit.contain),
-      );
+      mediaWidget = isLocalResource
+          ? Image.file(File(mediaPath), fit: BoxFit.contain)
+          : Image.network(mediaPath, fit: BoxFit.contain);
     }
 
     showDialog(

@@ -212,7 +212,7 @@ class _ImageScreenState extends TIMUIKitState<ImageScreen>
                             }
 
                             _doubleClickAnimationListener = () {
-                              //print(_animation.value);
+                              //outputLogger.i(_animation.value);
                               state.handleDoubleTap(
                                   scale: _doubleClickAnimation!.value,
                                   doubleTapPosition: pointerDownPosition);

@@ -4,6 +4,7 @@ import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 
 class EmojiPanel extends TIMUIKitStatelessWidget {
   final void Function(int unicode) onTapEmoji;
@@ -22,7 +23,7 @@ class EmojiPanel extends TIMUIKitStatelessWidget {
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     // ignore: avoid_print
-    print(TIM_t(
+    outputLogger.i(TIM_t(
         "暂未安装表情包插件，如需使用表情相关功能，请根据本文档安装：https://cloud.tencent.com/document/product/269/70746"));
     return SingleChildScrollView(
         child: Column(
