@@ -1,6 +1,7 @@
 // ignore_for_file: unnecessary_getters_setters, avoid_print
 
 import 'package:flutter/cupertino.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/group_profile_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/conversation/conversation_services.dart';
@@ -110,7 +111,7 @@ class TUIGroupProfileModel extends ChangeNotifier {
     if (res.code == 0 && groupMemberListRes != null) {
       final groupMemberListTemp = groupMemberListRes.memberInfoList ?? [];
       // TODO
-      print(
+      outputLogger.i(
           "loadGroupMemberListfinish,groupMemberListTemp, ${groupMemberListRes.nextSeq},  ${groupMemberListTemp.length}");
       _groupMemberList = [...?_groupMemberList, ...groupMemberListTemp];
       _groupMemberListSeq = groupMemberListRes.nextSeq ?? "0";

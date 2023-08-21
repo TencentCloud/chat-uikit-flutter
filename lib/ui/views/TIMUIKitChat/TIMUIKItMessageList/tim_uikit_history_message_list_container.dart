@@ -16,6 +16,7 @@ import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageLi
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_text_field_controller.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_chat_config.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tim_ui_kit_sticker_plugin/utils/tim_custom_face_data.dart';
 
 enum LoadingPlace {
   none,
@@ -90,7 +91,7 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
   /// Whether to use the default emoji
   final bool isUseDefaultEmoji;
 
-  final List customEmojiStickerList;
+  final List<CustomEmojiFaceData> customEmojiStickerList;
 
   final bool isAllowScroll;
 
@@ -102,7 +103,7 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
   /// replacing the default message hover action bar.
   /// Applicable only on desktop platforms.
   /// If provided, the default message action functionality will appear in the right-click context menu instead.
-  final Widget Function(V2TimMessage message)? customMessageHoverBarOnDesktop;
+  final Widget? Function(V2TimMessage message)? customMessageHoverBarOnDesktop;
 
   const TIMUIKitHistoryMessageListContainer({
     Key? key,

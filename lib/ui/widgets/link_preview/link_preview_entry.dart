@@ -3,6 +3,7 @@ import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/common/utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/widgets/link_preview.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/widgets/link_text.dart';
+import 'package:tim_ui_kit_sticker_plugin/utils/tim_custom_face_data.dart';
 
 import 'models/link_preview_content.dart';
 
@@ -11,11 +12,15 @@ class LinkPreviewEntry {
   static LinkPreviewText? getHyperlinksText(String messageText, bool isMarkdown,
       {Function(String)? onLinkTap,
       bool isEnableTextSelection = false,
-      bool isUseDefaultEmoji = false,
-      List customEmojiStickerList = const []}) {
+      bool isUseQQPackage = false,
+      bool isUseTencentCloudChatPackage = false,
+      List<CustomEmojiFaceData> customEmojiStickerList = const []}) {
     return ({TextStyle? style}) {
       return isMarkdown
           ? LinkTextMarkdown(
+              isUseQQPackage: isUseQQPackage,
+              isUseTencentCloudChatPackage: isUseTencentCloudChatPackage,
+              customEmojiStickerList: customEmojiStickerList,
               isEnableTextSelection: isEnableTextSelection,
               messageText: addSpaceAfterLeftBracket(
                   addSpaceBeforeHttp(replaceSingleNewlineWithTwo(messageText))),
@@ -26,7 +31,8 @@ class LinkPreviewEntry {
               messageText: messageText,
               style: style,
               onLinkTap: onLinkTap,
-              isUseDefaultEmoji: isUseDefaultEmoji,
+              isUseQQPackage: isUseQQPackage,
+              isUseTencentCloudChatPackage: isUseTencentCloudChatPackage,
               customEmojiStickerList: customEmojiStickerList);
     };
   }

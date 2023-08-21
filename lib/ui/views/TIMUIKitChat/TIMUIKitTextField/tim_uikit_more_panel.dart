@@ -29,6 +29,7 @@ import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 // ignore: unnecessary_import
 import 'dart:typed_data';
 import 'package:universal_html/html.dart' as html;
+import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 
 class MorePanelConfig {
   final bool showGalleryPickAction;
@@ -357,41 +358,44 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
 
   _sendImageMessage(TUIChatSeparateViewModel model, TUITheme theme) async {
     try {
-      if (PlatformUtils().isMobile){
-        if(PlatformUtils().isAndroid){
+      if (PlatformUtils().isMobile) {
+        if (PlatformUtils().isAndroid) {
           AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
           if ((androidInfo.version.sdkInt) >= 33) {
             final videos = await Permissions.checkPermission(
-              context,Permission.videos.value,
+              context,
+              Permission.videos.value,
               theme,
             );
             final photos = await Permissions.checkPermission(
-              context,Permission.photos.value,
+              context,
+              Permission.photos.value,
               theme,
             );
-            if(!videos && !photos){
+            if (!videos && !photos) {
               return;
             }
           } else {
             final storage = await Permissions.checkPermission(
-              context, Permission.storage.value,
+              context,
+              Permission.storage.value,
               theme,
             );
-            if(!storage){
+            if (!storage) {
               return;
             }
           }
-        }else{
+        } else {
           final photos = await Permissions.checkPermission(
             context,
             Permission.photos.value,
             theme,
           );
-          if(!photos){
+          if (!photos) {
             return;
           }
         }
-    }
+      }
 
       final convID = widget.conversationID;
       final convType = widget.conversationType;
@@ -446,7 +450,7 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
         }
       }
     } catch (err) {
-      print("err: $err");
+      outputLogger.i("err: $err");
     }
   }
 
@@ -462,18 +466,41 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
       )) {
         return;
       }
-      if (!await Permissions.checkPermission(
-            context,
-            Permission.photos.value,
-            theme,
-          )) {
-        return;
-      }
       await Permissions.checkPermission(
         context,
         Permission.microphone.value,
         theme,
       );
+
+      if (PlatformUtils().isAndroid) {
+        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+        if ((androidInfo.version.sdkInt) >= 33) {
+          if (!await Permissions.checkPermission(
+            context,
+            Permission.photos.value,
+            theme,
+          )) {
+            return;
+          }
+        } else {
+          if (!await Permissions.checkPermission(
+            context,
+            Permission.storage.value,
+            theme,
+          )) {
+            return;
+          }
+        }
+      } else {
+        if (!await Permissions.checkPermission(
+          context,
+          Permission.photos.value,
+          theme,
+        )) {
+          return;
+        }
+      }
+
       final convID = widget.conversationID;
       final convType = widget.conversationType;
       final pickedFile = await CameraPicker.pickFromCamera(context,
@@ -498,7 +525,7 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
         // Toast.showToast(ToastType.fail, TIM_t("图片不能为空"), context);
       }
     } catch (error) {
-      print("err: $error");
+      outputLogger.i("err: $error");
     }
   }
 
@@ -524,7 +551,7 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
               convType: convType),
           context);
     } catch (e) {
-      print("_sendFileErr: ${e.toString()}");
+      outputLogger.i("_sendFileErr: ${e.toString()}");
     }
   }
 
@@ -558,7 +585,7 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
               convType: convType),
           context);
     } catch (e) {
-      print("_sendFileErr: ${e.toString()}");
+      outputLogger.i("_sendFileErr: ${e.toString()}");
     }
   }
 
@@ -589,7 +616,8 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
         }
 
         String? option2 = result.files.single.path ?? "";
-        print(TIM_t_para("选择成功{{option2}}", "选择成功$option2")(option2: option2));
+        outputLogger
+            .i(TIM_t_para("选择成功{{option2}}", "选择成功$option2")(option2: option2));
 
         File file = File(result.files.single.path!);
         final int size = file.lengthSync();
@@ -606,7 +634,7 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
         throw TypeError();
       }
     } catch (e) {
-      print("_sendFileErr: ${e.toString()}");
+      outputLogger.i("_sendFileErr: ${e.toString()}");
     }
   }
 
@@ -709,35 +737,35 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
             runSpacing: 20,
             children: itemList(model, theme)
                 .map((item) => InkWell(
-                onTap: () {
-                  if (item.onTap != null) {
-                    item.onTap!(context);
-                  }
-                },
-                child: widget.morePanelConfig?.actionBuilder != null
-                    ? widget.morePanelConfig?.actionBuilder!(item)
-                    : SizedBox(
-                  height: 94,
-                  width: 64,
-                  child: Column(
-                    children: [
-                      Container(
-                        height: 64,
-                        width: 64,
-                        margin: const EdgeInsets.only(bottom: 4),
-                        decoration: const BoxDecoration(
-                            borderRadius:
-                            BorderRadius.all(Radius.circular(5))),
-                        child: item.icon,
-                      ),
-                      Text(
-                        item.title,
-                        style: TextStyle(
-                            fontSize: 12, color: theme.darkTextColor),
-                      )
-                    ],
-                  ),
-                )))
+                    onTap: () {
+                      if (item.onTap != null) {
+                        item.onTap!(context);
+                      }
+                    },
+                    child: widget.morePanelConfig?.actionBuilder != null
+                        ? widget.morePanelConfig?.actionBuilder!(item)
+                        : SizedBox(
+                            height: 94,
+                            width: 64,
+                            child: Column(
+                              children: [
+                                Container(
+                                  height: 64,
+                                  width: 64,
+                                  margin: const EdgeInsets.only(bottom: 4),
+                                  decoration: const BoxDecoration(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(5))),
+                                  child: item.icon,
+                                ),
+                                Text(
+                                  item.title,
+                                  style: TextStyle(
+                                      fontSize: 12, color: theme.darkTextColor),
+                                )
+                              ],
+                            ),
+                          )))
                 .toList(),
           ),
         ),

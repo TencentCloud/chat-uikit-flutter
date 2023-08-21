@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
@@ -85,7 +86,8 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
         });
       }
     } else {
-      final newText = await _getLastMsgShowText(widget.lastMsg, widget.context);
+      final newText =
+          await _getLastMsgShowText(widget.lastMsg, widget.context) ?? "";
       if (mounted) {
         setState(() {
           groupTipsAbstractText = newText;
@@ -94,7 +96,7 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
     }
   }
 
-  Future<String> _getLastMsgShowText(
+  Future<String?> _getLastMsgShowText(
       V2TimMessage? message, BuildContext context) async {
     final msgType = message!.elemType;
     switch (msgType) {
@@ -124,7 +126,7 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
       case MessageElemType.V2TIM_ELEM_TYPE_MERGER:
         return TIM_t("[聊天记录]");
       default:
-        return TIM_t("未知消息");
+        return null;
     }
   }
 
@@ -166,15 +168,16 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
         Text(_getAtMessage(),
             style: TextStyle(
                 color: theme.cautionColor, fontSize: widget.fontSize)),
-      Expanded(
-          child: Text(
-        groupTipsAbstractText,
-        softWrap: true,
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-        style: TextStyle(
-            height: 1, color: theme.weakTextColor, fontSize: widget.fontSize),
-      )),
+      if (TencentUtils.checkString(groupTipsAbstractText) != null)
+        Expanded(
+            child: Text(
+          groupTipsAbstractText,
+          softWrap: true,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: TextStyle(
+              height: 1, color: theme.weakTextColor, fontSize: widget.fontSize),
+        )),
     ]);
   }
 }

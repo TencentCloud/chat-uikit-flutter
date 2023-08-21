@@ -101,13 +101,13 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
   Widget _getTimeStringForChatWidget(BuildContext context, TUITheme theme) {
     try {
       if (draftTimestamp != null && draftTimestamp != 0) {
-        return Text(TimeAgo().getTimeStringForChat(draftTimestamp as int),
+        return Text(TimeAgo().getTimeStringForChat(draftTimestamp as int) ?? "",
             style: TextStyle(
               fontSize: 12,
               color: theme.conversationItemTitmeTextColor,
             ));
       } else if (lastMsg != null) {
-        return Text(TimeAgo().getTimeStringForChat(lastMsg!.timestamp as int),
+        return Text(TimeAgo().getTimeStringForChat(lastMsg!.timestamp as int) ?? "",
             style: TextStyle(
               fontSize: 11,
               color: theme.conversationItemTitmeTextColor,

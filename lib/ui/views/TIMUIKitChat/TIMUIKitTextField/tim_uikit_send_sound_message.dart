@@ -15,6 +15,7 @@ import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/sound_record.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 
 class SendSoundMessage extends StatefulWidget {
   /// conversation ID
@@ -255,12 +256,12 @@ class _SendSoundMessageState extends TIMUIKitState<SendSoundMessage> {
               path: soundPath!, duration: recordDuration!.ceil(), model: model);
         }
       } else if (status == "onStart") {
-        print("start record");
+        outputLogger.i("start record");
         setState(() {
           isRecording = true;
         });
       } else {
-        print(status);
+        outputLogger.i(status);
       }
     });
     final amplitudesResponseSubscription =

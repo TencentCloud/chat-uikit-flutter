@@ -15,6 +15,7 @@ import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 
 enum ConvType { none, c2c, group }
@@ -108,7 +109,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
   }
 
   void addWaitingList(String msgID) {
-    print("add to waiting list success");
+    outputLogger.i("add to waiting list success");
     bool contains = false;
     for (Map<String, String> element in _waitingDownloadList) {
       String msgIDItem = element["msgID"] ?? "";
@@ -146,7 +147,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
       isSnapshot: false,
     );
 
-    print("start another download");
+    outputLogger.i("start another download");
   }
 
   int getReceived(msgID) {
@@ -416,10 +417,10 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
             _preloadImageMap[msgItem.seq! +
                 msgItem.timestamp.toString() +
                 (msgItem.msgID ?? "")] = tempImg;
-            print("cacheImage ${msgItem.msgID}");
+            outputLogger.i("cacheImage ${msgItem.msgID}");
           }));
         } catch (e) {
-          print("cacheImage error ${msgItem.msgID}");
+          outputLogger.i("cacheImage error ${msgItem.msgID}");
         }
       }
     }
@@ -443,7 +444,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
         String msgIDItem = element["msgID"] ?? "";
         if (msgIDItem.isNotEmpty) {
           if (msgID == msgIDItem) {
-            print("remove download");
+            outputLogger.i("remove download");
             return true;
           }
         }
@@ -731,11 +732,12 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
   }
 
   _onSendMessageProgress(V2TimMessage messagae, int progress) {
-    print("message progress: $progress");
+    outputLogger.i("message progress: $progress");
   }
 
   Future<void> onMessageDownloadProgressCallback(
       V2TimMessageDownloadProgress messageProgress) async {
+    outputLogger.i(messageProgress.toJson());
     final currentProgress = getMessageProgress(messageProgress.msgID);
 
     if (messageProgress.isFinish && currentProgress < 100) {
@@ -809,7 +811,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
         }
       }
     } catch (e) {
-      print("calculate error: ${messageProgress.toJson()}");
+      outputLogger.i("calculate error: ${messageProgress.toJson()}");
     }
   }
 
@@ -1152,6 +1154,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
       }
     }
     final returnValue = listWithTimestamp.reversed.toList();
+    outputLogger.i(returnValue.map((e) => e.toJson()).toList().toString());
     return returnValue;
   }
 

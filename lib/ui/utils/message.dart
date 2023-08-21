@@ -7,6 +7,7 @@ import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.d
 import 'package:tencent_cloud_chat_uikit/ui/constants/time.dart';
 import 'package:collection/collection.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 
 class MessageUtils {
   // 判断CallingData的方式和Trtc的方法一致
@@ -18,7 +19,7 @@ class MessageUtils {
         return true;
       }
     } catch (e) {
-      print("isCallingData json parse error");
+      outputLogger.i("isCallingData json parse error");
       return false;
     }
     return false;
@@ -289,7 +290,7 @@ class MessageUtils {
             orElse: () => null);
       }
     } catch (e) {
-      print('getImageFromImgList error ${e.toString()}');
+      outputLogger.i('getImageFromImgList error ${e.toString()}');
     }
     return img;
   }

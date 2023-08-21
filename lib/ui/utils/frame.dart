@@ -1,6 +1,7 @@
 // ignore_for_file: avoid_print, prefer_typing_uninitialized_variables
 
 import 'dart:ui';
+import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 
 class Frame {
   static var orginalCallback;
@@ -27,7 +28,7 @@ class Frame {
     if (orginalCallback != null) {
       orginalCallback(timings);
     }
-    print("fps: $fps");
+    outputLogger.i("fps: $fps");
   }
 
   static double get fps {

@@ -19,6 +19,7 @@ import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/controller/tim_uikit_chat_controller.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/frame.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/optimize_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/at_member_panel.dart';
@@ -159,7 +160,8 @@ class TIMUIKitChat extends StatefulWidget {
   /// The top fixed widget.
   final Widget? topFixWidget;
 
-  final List customEmojiStickerList;
+  /// Specify the custom small png emoji packages.
+  final List<CustomEmojiFaceData> customEmojiStickerList;
 
   final Widget? customAppBar;
 
@@ -172,10 +174,18 @@ class TIMUIKitChat extends StatefulWidget {
   /// replacing the default message hover action bar.
   /// Applicable only on desktop platforms.
   /// If provided, the default message action functionality will appear in the right-click context menu instead.
-  final Widget Function(V2TimMessage message)? customMessageHoverBarOnDesktop;
+  /// Returns `null` to use default hover bar.
+  final Widget? Function(V2TimMessage message)? customMessageHoverBarOnDesktop;
 
   /// Custom text field
   final Widget Function(BuildContext context)? textFieldBuilder;
+
+  /// An optional parameter `groupMemberList` can be provided.
+  /// `groupMemberList` accepts a list of nullable `V2TimGroupMemberFullInfo` objects.
+  /// The purpose of this parameter is to allow the client to supply a pre-fetched list
+  /// of group member information. If this list is provided, it will not make
+  /// additional network requests to fetch the group member information internally.
+  List<V2TimGroupMemberFullInfo?>? groupMemberList;
 
   TIMUIKitChat({
     Key? key,
@@ -183,6 +193,7 @@ class TIMUIKitChat extends StatefulWidget {
     required this.conversation,
     this.conversationID,
     this.conversationType,
+    this.groupMemberList,
     this.conversationShowName,
     this.abstractMessageBuilder,
     this.onTapAvatar,
@@ -265,11 +276,9 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
     model.abstractMessageBuilder = widget.abstractMessageBuilder;
     model.onTapAvatar = widget.onTapAvatar;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (kProfileMode) {
-        widget.endTime = DateTime.now().millisecondsSinceEpoch;
-        int timeSpend = widget.endTime - widget.startTime;
-        print("Page render time:$timeSpend ms");
-      }
+      widget.endTime = DateTime.now().millisecondsSinceEpoch;
+      int timeSpend = widget.endTime - widget.startTime;
+      outputLogger.i("Page render time:$timeSpend ms");
     });
     Future.delayed(const Duration(milliseconds: 500), () {
       updateDraft();
@@ -396,6 +405,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
         scrollController: autoController,
         textFieldController: textFieldController,
         conversationID: _getConvID(),
+        groupMemberList: widget.groupMemberList,
         conversationType: _getConvType(),
         lifeCycle: widget.lifeCycle,
         config: widget.config,
@@ -432,12 +442,35 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                 model.loadGroupInfo(_getConvID());
                 break;
               case UpdateType.memberList:
-                model.loadGroupMemberList(groupID: _getConvID());
+                if (widget.groupMemberList == null) {
+                  model.loadGroupMemberList(groupID: _getConvID());
+                }
                 model.loadGroupInfo(_getConvID());
                 break;
               default:
                 break;
             }
+          }
+
+          List<CustomEmojiFaceData> customImageSmallPngEmojiPackages = [];
+          if (widget.config?.stickerPanelConfig?.customStickerPackages !=
+                  null &&
+              widget.config!.stickerPanelConfig!.customStickerPackages
+                  .isNotEmpty) {
+            customImageSmallPngEmojiPackages = widget
+                .config!.stickerPanelConfig!.customStickerPackages
+                .where((element) => element.isEmoji == true)
+                .map((e) {
+              return CustomEmojiFaceData(
+                  name: e.name,
+                  isEmoji: true,
+                  icon: e.menuItem.url ?? "",
+                  list: e.stickerList.map((e) => e.url ?? "").toList());
+            }).toList();
+          }
+          if (customImageSmallPngEmojiPackages.isEmpty) {
+            customImageSmallPngEmojiPackages
+                .addAll(widget.customEmojiStickerList);
           }
 
           return GestureDetector(
@@ -568,7 +601,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                                           model: model,
                                           controller: textFieldController,
                                           customEmojiStickerList:
-                                              widget.customEmojiStickerList,
+                                              customImageSmallPngEmojiPackages,
                                           isUseDefaultEmoji:
                                               widget.config!.isUseDefaultEmoji,
                                           customStickerPanel:
@@ -662,10 +695,18 @@ class TIMUIKitChatProviderScope extends StatelessWidget {
 
   final AutoScrollController? scrollController;
 
+  /// An optional parameter `groupMemberList` can be provided.
+  /// `groupMemberList` accepts a list of nullable `V2TimGroupMemberFullInfo` objects.
+  /// The purpose of this parameter is to allow the client to supply a pre-fetched list
+  /// of group member information. If this list is provided, it will not make
+  /// additional network requests to fetch the group member information internally.
+  List<V2TimGroupMemberFullInfo?>? groupMemberList;
+
   TIMUIKitChatProviderScope(
       {Key? key,
       this.child,
       this.providers,
+      this.groupMemberList,
       this.textFieldController,
       required this.builder,
       this.model,
@@ -695,6 +736,7 @@ class TIMUIKitChatProviderScope extends StatelessWidget {
       (String value) {
         textFieldController?.textEditingController?.text = value;
       },
+      preGroupMemberList: groupMemberList,
       groupID: groupID,
     );
     model?.showC2cMessageEditStatus = (conversationType == ConvType.c2c
