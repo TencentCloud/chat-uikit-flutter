@@ -12,6 +12,7 @@ import 'package:tencent_im_base/tencent_im_base.dart';
 
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
+import '../../business_logic/view_models/tui_chat_global_model.dart';
 class RecentForwardList extends StatefulWidget {
   final bool isMultiSelect;
   final Function(List<V2TimConversation> conversationList)? onChanged;
@@ -29,6 +30,7 @@ class RecentForwardList extends StatefulWidget {
 class _RecentForwardListState extends TIMUIKitState<RecentForwardList> {
   final TUIConversationViewModel _conversationViewModel =
       serviceLocator<TUIConversationViewModel>();
+  final TUIChatGlobalModel model = serviceLocator<TUIChatGlobalModel>();
   final List<V2TimConversation> _selectedConversation = [];
 
   List<ISuspensionBeanImpl<V2TimConversation?>> _buildMemberList(
@@ -36,6 +38,15 @@ class _RecentForwardListState extends TIMUIKitState<RecentForwardList> {
     final List<ISuspensionBeanImpl<V2TimConversation?>> showList =
         List.empty(growable: true);
     for (var i = 0; i < conversationList.length; i++) {
+      // 自定义过滤不能转发的会话
+      if (model.chatConfig.disableForwardConversions != null &&
+          model.chatConfig.disableForwardConversions!.call().isNotEmpty) {
+        List<String> convIds =
+            model.chatConfig.disableForwardConversions!.call();
+        if (convIds.contains(conversationList[i]?.userID ?? "")) {
+          continue;
+        }
+      }
       final item = conversationList[i];
       showList.add(ISuspensionBeanImpl(memberInfo: item, tagIndex: "#"));
     }
