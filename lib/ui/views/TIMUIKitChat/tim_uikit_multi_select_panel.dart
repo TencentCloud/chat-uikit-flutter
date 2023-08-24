@@ -13,6 +13,9 @@ import 'package:tencent_im_base/tencent_im_base.dart';
 
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
+import '../../../data_services/core/core_services_implements.dart';
+import '../../../data_services/services_locatar.dart';
+
 class MultiSelectPanel extends TIMUIKitStatelessWidget {
   final ConvType conversationType;
 
@@ -21,6 +24,20 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
 
   _handleForwardMessage(BuildContext context, bool isMergerForward,
       TUIChatSeparateViewModel model) {
+    for (var message in model.multiSelectedMessageList) {
+      if (model.chatConfig.messageCanLongPres != null) {
+        if (!model.chatConfig.messageCanLongPres!(message)) {
+          final CoreServicesImpl _coreServices =
+              serviceLocator<CoreServicesImpl>();
+          _coreServices.callOnCallback(TIMCallback(
+            type: TIMCallbackType.INFO,
+            infoRecommendText: "包含不支持转发的消息",
+          ));
+          return;
+        }
+      }
+    }
+
     Navigator.push(
         context,
         MaterialPageRoute(

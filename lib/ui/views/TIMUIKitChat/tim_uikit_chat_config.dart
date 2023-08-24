@@ -242,6 +242,9 @@ class TIMUIKitChatConfig {
   /// [Default]: 400
   final double desktopStickerPanelHeight;
 
+  /// 添加 不能转发的会话过滤
+  final List<String> Function()? disableForwardConversions;
+
   const TIMUIKitChatConfig(
       {this.onTapLink,
       this.timeDividerConfig,
@@ -290,5 +293,6 @@ class TIMUIKitChatConfig {
       this.additionalDesktopControlBarItems,
       this.isAllowLongPressAvatarToAt = true,
       this.isUseDefaultEmoji = false,
-      this.messageCanLongPres});
+      this.messageCanLongPres,
+      this.disableForwardConversions});
 }
