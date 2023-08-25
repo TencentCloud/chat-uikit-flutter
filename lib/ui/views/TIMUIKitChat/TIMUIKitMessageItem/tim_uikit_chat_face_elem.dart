@@ -63,8 +63,16 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitFaceElem> {
               maxWidth: MediaQuery.of(context).size.width *
                   (isDesktopScreen ? 0.1 : 0.3)),
           child: isFromNetwork()
-              ? Image.network(createPathFromNative(widget.path))
-              : Image.asset(createPathFromNative(widget.path)),
+              ? Image.network(
+                  createPathFromNative(widget.path),
+                  errorBuilder: (context, error, stackTrace) =>
+                      Text(TIM_t("该版本不支持此消息")),
+                )
+              : Image.asset(
+                  createPathFromNative(widget.path),
+                  errorBuilder: (context, error, stackTrace) =>
+                      Text(TIM_t("该版本不支持此消息")),
+                ),
         ));
   }
 }
