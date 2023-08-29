@@ -102,8 +102,6 @@ class TUIKitOutput extends LogOutput {
           }
         });
       }
-    } else {
-      print(msg);
     }
   }
 }

@@ -184,7 +184,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     _groupType = null;
     isGroupExist = true;
     _groupInfo = null;
-    groupMemberList?.clear();
+    groupMemberList = null;
     selfMemberInfo = null;
 
     if (conversationType == ConvType.group) {

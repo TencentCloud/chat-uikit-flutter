@@ -683,6 +683,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
+  image_clipboard:
+    dependency: "direct main"
+    description:
+      name: image_clipboard
+      sha256: "1939365dc3b65acd3b1199176a330180075f4e803a6512f5622d050b62e7eff4"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0+2"
   image_gallery_saver:
     dependency: "direct main"
     description:

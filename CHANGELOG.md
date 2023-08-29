@@ -1,3 +1,17 @@
+## 2.2.1
+
+### New Features
+
+* Introduced a new `groupMemberList` configuration in `TUIKitChat`; when specified, TUIKit will not load it automatically, optimizing network traffic usage.
+* Added support for image copying on desktop platforms.
+
+### Bug Fixes
+
+* Fixed an issue preventing the removal of image loading status.
+* Resolved a problem that prevented images from being saved to the device gallery.
+* Addressed a potential issue causing the `mentionOtherMemberInGroup` function in `TIMUIKitChatController` to fail.
+* Corrected an issue that could lead to improper image rendering.
+
 ## 2.2.0
 
 ### New Features

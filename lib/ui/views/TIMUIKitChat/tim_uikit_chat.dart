@@ -296,6 +296,9 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
     if (oldWidget.textFieldBuilder != null && widget.textFieldBuilder == null) {
       textFieldController = TIMUIKitInputTextFieldController();
     }
+    if (oldWidget.groupMemberList != widget.groupMemberList) {
+      model.groupMemberList = widget.groupMemberList;
+    }
   }
 
   updateDraft() async {

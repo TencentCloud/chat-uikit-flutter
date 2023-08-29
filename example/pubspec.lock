@@ -608,6 +608,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.0.2"
+  image_clipboard:
+    dependency: transitive
+    description:
+      name: image_clipboard
+      sha256: "1939365dc3b65acd3b1199176a330180075f4e803a6512f5622d050b62e7eff4"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0+2"
   image_gallery_saver:
     dependency: transitive
     description:
@@ -1219,7 +1227,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "2.2.0"
+    version: "2.2.1-preview.0"
   tencent_cloud_uikit_core:
     dependency: transitive
     description:
