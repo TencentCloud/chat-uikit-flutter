@@ -36,13 +36,14 @@ class SoundPlayer {
   }
 
   // 语音消息连续播放新增逻辑 begin
-  // static Future<void> playWith({required Source source}) async {
-  //   _audioPlayer.stop();
-  //   if (_soundInterruptListener != null) {
-  //     _soundInterruptListener!();
-  //   }
-  //   await _audioPlayer.play(source);
-  // }
+  static Future<void> playWith({required AudioSource source}) async {
+    _audioPlayer.stop();
+    if (_soundInterruptListener != null) {
+      _soundInterruptListener!();
+    }
+    await _audioPlayer.setAudioSource(source);
+    await _audioPlayer.play();
+  }
   // 语音消息连续播放新增逻辑 end
 
   static stop() {
