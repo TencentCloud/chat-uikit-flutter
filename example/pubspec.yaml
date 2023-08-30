@@ -42,7 +42,7 @@ dependencies:
   tencent_calls_engine: 1.5.4
 
 dependency_overrides:
-  package_info_plus: ^3.0.3
+  package_info_plus: ^4.0.1
   collection: ^1.17.1
   win32: 4.0.0
 

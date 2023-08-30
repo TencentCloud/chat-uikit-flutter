@@ -124,8 +124,9 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
     super.initState();
 
     // 语音消息连续播放新增逻辑 begin
-    // subscription = SoundPlayer.playStateListener(listener: (PlayerState state) {
-    //   if (state == PlayerState.completed) {
+    // subscription =
+    // SoundPlayer.playStateListener(listener: (PlayerState state) {
+    //   if(state.processingState == ProcessingState.completed){
     //     widget.chatModel.currentPlayedMsgId = "";
     //   }
     // });
