@@ -1645,8 +1645,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
         _stopAndRest(notify: false);
       }
       if (isLocal) {
-        SoundPlayer.play(url: url);
-        // SoundPlayer.playWith(source: DeviceFileSource(url));
+        SoundPlayer.playWith(source: AudioSource.file(url));
       } else {
         SoundPlayer.play(url: url);
       }
