@@ -3,12 +3,13 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:audioplayers/audioplayers.dart';
+// import 'package:audioplayers/audioplayers.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/cupertino.dart';
 // ignore: unnecessary_import
 import 'package:flutter/foundation.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/chat_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_model_tools.dart';
@@ -191,15 +192,15 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     if (conversationType == ConvType.group) {
       globalModel.refreshGroupApplicationList();
       loadGroupInfo(groupID ?? convID);
-      if(preGroupMemberList != null){
+      if (preGroupMemberList != null) {
         groupMemberList = preGroupMemberList;
         selfMemberInfo = preGroupMemberList
             .firstWhereOrNull((e) => e?.userID == selfModel.loginInfo?.userID);
-      }else{
+      } else {
         await loadSelfMemberInfo(groupID: groupID ?? convID);
         loadGroupMemberList(groupID: groupID ?? convID);
       }
-      if(selfMemberInfo == null){
+      if (selfMemberInfo == null) {
         await loadSelfMemberInfo(groupID: groupID ?? convID);
       }
     } else {
@@ -1556,7 +1557,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
 
   void _setSoundSubscription() {
     subscription = SoundPlayer.playStateListener(listener: (PlayerState state) {
-      if (state == PlayerState.completed) {
+      if (state.processingState == ProcessingState.completed) {
         if (!findNext) {
           _stopAndRest();
           return;
@@ -1644,7 +1645,8 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
         _stopAndRest(notify: false);
       }
       if (isLocal) {
-        SoundPlayer.playWith(source: DeviceFileSource(url));
+        SoundPlayer.play(url: url);
+        // SoundPlayer.playWith(source: DeviceFileSource(url));
       } else {
         SoundPlayer.play(url: url);
       }
