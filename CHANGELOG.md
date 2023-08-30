@@ -1,26 +1,36 @@
-## 2.2.1
+# 2.3.0
 
-### New Features
+## Breaking Changes
+
+* Upgraded and migrated to support Flutter 3.13.0. Support for Flutter 3.10 and earlier versions has been dropped.
+
+## Recommendations
+
+* Customers who do not wish to upgrade to Flutter 3.13.0 are advised to continue using version 2.2.1 of our Chat UIKit. However, we strongly recommend upgrading to Flutter 3.13.0 as it includes numerous performance improvements and introduces cutting-edge features.
+
+# 2.2.1
+
+## New Features
 
 * Introduced a new `groupMemberList` configuration in `TUIKitChat`; when specified, TUIKit will not load it automatically, optimizing network traffic usage.
 * Added support for image copying on desktop platforms.
 
-### Bug Fixes
+## Bug Fixes
 
 * Fixed an issue preventing the removal of image loading status.
 * Resolved a problem that prevented images from being saved to the device gallery.
 * Addressed a potential issue causing the `mentionOtherMemberInGroup` function in `TIMUIKitChatController` to fail.
 * Corrected an issue that could lead to improper image rendering.
 
-## 2.2.0
+# 2.2.0
 
-### New Features
+## New Features
 
 * Introduced a newly-designed set of Emoji image stickers, available for seamless integration within textual content, providing an enhanced user experience.
 * Streamlined the implementation of stickers, removing the need for additional complex coding. Full functionality is enabled by default, with customization options available through the `stickerPanelConfig` configuration in `TIMUIKitChatConfig`.
 * Extended support for rendering embedded image stickers within text messages when the `Markdown` parsing mode is activated, combining a rich, user-friendly experience with the ability to display formatted Markdown text.
 
-### Improvements
+## Improvements
 
 * Enhanced group chat functionality on the Desktop, enabling mentions (`@` tag) to be inserted at any position within a composed message, rather than only at the end. Additionally, deleting `@` tags has been optimized.
 * Maintained message sending permissions for the group owner and administrators during "mute all" scenarios.
@@ -30,22 +40,22 @@
 * Implemented UIKit log recording to facilitate issue identification and troubleshooting.
 * Introduced a delete button for the small PNG sticker selection panel on mobile devices, which previously was only available in the Unicode emoji selection panel.
 
-### Bug Fixes
+## Bug Fixes
 
 * Resolved an issue preventing photo capturing on devices running Android 12 or lower.
 * Rectified display inaccuracies related to picture aspect ratios.
 * Addressed several issues concerning voice and video calls.
 
-## 2.1.3+1
+# 2.1.3+1
 
-### New Features
+## New Features
 
 * Introduced [a new custom internationalization language scheme](https://www.tencentcloud.com/document/product/1047/52154?from=pub) that supports adding language packs, adding or modifying entries, and makes customizing i18n more accessible. This feature helps your app achieve a more convenient globalization process and easier customer acquisition worldwide.
 * Provided a seamless experience for previewing large images and playing videos within desktop environments (applications and web) by avoiding frequent page transitions. Enhanced the user experience for image previews and video playback. Please note that video playback is currently supported only on the web and not in desktop applications.
 * Supported to integrate with the new online customer service plugin (tencent_cloud_chat_customer_service_plugin).
 * Added two new life cycle hooks, `messageDidSend` and `messageShouldMount` to `ChatLifeCycle`.
 
-### Improvements
+## Improvements
 
 * Optimized the usage, interface, and interaction of the sticker panel.
 * Enhanced mobile video playback interaction and UI.
@@ -55,21 +65,21 @@
 * Added the ability to open self-sent file messages without downloading.
 * Optimized the download status animation of file messages on the web.
 
-### Bug Fixes
+## Bug Fixes
 
 * Fixed an issue preventing mobile image previews from being dragged after zooming.
 * Resolved an issue that might cause the message selection status not to be removed after canceling a message forward action.
 * Addressed an issue that might cause the microphone usage not to end after sending a voice message, which means the microphone was not released.
 
-## 2.1.2
+# 2.1.2
 
-### New Features
+## New Features
 
 * Introduced a new message recall mode, which enables group administrators to recall any message from any group member. To enable this feature, set `isGroupAdminRecallEnabled` in `TIMUIKitChatConfig` to `true`.
 * Added support for draft text functionality on the Web. Activate this feature by setting `isUseDraftOnWeb` in `TIMUIKitChatConfig` to `true`. Since the Chat SDK doesn't support this functionality, draft data will be stored in TUIKit's memory. Be aware that draft text will be lost upon refreshing the website.
 * Enabled using the default message abstract text when `abstractMessageBuilder` returns `null`.
 
-### Improvements
+## Improvements
 
 * The duration for video messages sent from the Web will no longer be displayed, as this type of video message does not contain an accurate video duration.
 * Removed the hover color on the message input area on Desktop.
@@ -78,7 +88,7 @@
 * Limited the number of lines displayed for replied messages to a maximum of 2 lines to avoid occupying excessive space.
 * Optimized the message replying process, ensuring that a message referencing another message can still display the replied message, even when it is too old.
 
-### Bug Fixes
+## Bug Fixes
 
 * Fixed an issue that could cause the profile page to display no data.
 * Fixed an issue that could prevent the message sending button from being displayed after selecting an emoji on mobile Web.
@@ -87,44 +97,44 @@
 * Fixed an issue that could prevent displaying the `Modal` on Desktop.
 * Fixed an issue that caused the `iconImageAsset` from the `MessageToolTipItem` class to not work properly.
 
-## 2.1.0+2
+# 2.1.0+2
 
-### Improvements
+## Improvements
 
 * Upgraded several dependencies to resolve conflicts with the Kotlin Gradle plugin.
 
-### Bug Fixes
+## Bug Fixes
 
 * Fixed an issue causing the message list to be displayed inaccurately when it contains a file without a suffix.
 
-## 2.1.0+1
+# 2.1.0+1
 
-### Improvements
+## Improvements
 
 * Removed `disk_space` dependency as many customers reported difficulty in obtaining this dependency successfully.
 * Replaced `fc_native_video_thumbnail_for_us` with its original version `fc_native_video_thumbnail`.
 
-### Bug Fixes
+## Bug Fixes
 
 * Fixed an issue where `universal_html` could be blocking the compilation.
 
-## 2.1.0
+# 2.1.0
 
-### Breaking Changes
+## Breaking Changes
 
 * Migrated to Flutter 3.10.0 and Dart 3.0.0, no longer supporting projects with Flutter < 3.10.0 and Dart < 3.0.0.
 * Updated the minimum requirement for Android AGP to 7.0, projects with AGP < 7.0 are no longer supported.
 
 We highly recommend updating to these new versions for a better experience.
 
-### New Features
+## New Features
 
 * Added several methods to `TIMUIKitChatController`, including `hideAllBottomPanelOnMobile`, `mentionOtherMemberInGroup`, `setInputTextField`, and `getGroupMemberList`. Please refer to the corresponding annotations for usage.
 * Added more parameter fields to the `TIMUIKitChatController`'s `sendMessage` method. For details, please refer to the corresponding annotations.
 * Added `onSecondaryTapAvatar` to `TIMUIKitChat`, serving as callback trigger for secondary avatar clicks in the message list.
 * Introduced `isUseMessageHoverBarOnDesktop` and `desktopMessageInputFieldLines` to `TIMUIKitChatConfig`. For usage details, please refer to the corresponding annotations.
 
-### Improvements
+## Improvements
 
 * Enhanced performance and user experience when switching conversations on Desktop, including features like text field auto-focus and draft text.
 * Enabled displaying correct new lines in markdown mode.
@@ -143,7 +153,7 @@ We highly recommend updating to these new versions for a better experience.
 * Previewing images and videos is set to open in a new tab on the Web.
 * Improved the ratio for sending video messages.
 
-### Bug Fixes
+## Bug Fixes
 
 * Fixed issues when enabling the section function in markdown mode with `inEnableTextSelection` set to `true`.
 * Addressed an issue where the replied message was removed when selecting all text in the message and clicking backspace.
@@ -160,7 +170,7 @@ We highly recommend updating to these new versions for a better experience.
 * Fixed an issue that caused the `iconImageAsset` of the `MessageToolTipItem` config to head internally to this chat UIKit.
 * Improved the downloading process of media and files by avoiding frequent calls to `setState`, thus preventing the entire project from re-rendering.
 
-## 2.0.0
+# 2.0.0
 
 If you are upgrading from version 1.7.0, please refer to the changelog of all 2.0.0-preview versions, ranging from preview.1 to preview.7.
 
@@ -168,7 +178,7 @@ The main feature of this new 2.0.0 version is Desktop Support. Tencent Cloud Cha
 
 In addition, there are some significant changes compared to version 2.0.0-preview.7.
 
-### New Features
+## New Features
 
 * Added drag and drop support for multiple files in `TIMUIKitChat`, allowing direct sending.
 * Introduced functionality to open files or their containing folder (using `Finder` on `macOS` or `Explorer` on `Windows`) for file messages via the message operation tooltip menu on desktop.
@@ -176,14 +186,14 @@ In addition, there are some significant changes compared to version 2.0.0-previe
 * Added group joining application processing on Desktop.
 * Introduced `isAutoReportRead` to `TIMUIKitChatConfig` for controlling read status reporting.
 
-### Improvements
+## Improvements
 
 * Enhanced group members selection panel for mentioning someone in a group chat.
 * Refined image display ratio on Desktop.
 * The Reply or Quote button is now labeled as `Reply` when `isAtWhenReply` is set to true, and `Quote` otherwise.
 * @ member tags can now be deleted at once.
 
-### Bug Fixes
+## Bug Fixes
 
 * Fixed UI layout issue causing the `translate` button to display on two lines.
 * Addressed an issue causing the mute status not to change when switching to another conversation.
@@ -195,14 +205,14 @@ In addition, there are some significant changes compared to version 2.0.0-previe
 * Resolved an issue preventing images from being pasted and sent directly with Ctrl + V on Windows.
 * Fixed an issue causing errors in the muting members list.
 
-## 2.0.0-preview.7
+# 2.0.0-preview.7
 
-### New Features
+## New Features
 
 * Added `additionalMessageToolTips` to `ToolTipsConfig`. This new property allows developers to add additional message operation tooltip items, apart from the default ones. The previous `additionalItemBuilder` has been replaced by this new property. With `additionalMessageToolTips`, developers only need to specify the data for the tooltip items, rather than providing a whole widget. This makes usage easier, as you no longer need to worry about the UI display.
 * Added `isPreloadMessagesAfterInit` to `TIMUIKitConfig`, allows determines whether TUIKit should preload some messages after initialization for faster message display.
 
-### Improvements
+## Improvements
 
 * Message operation menu shows when long-pressing messages will not show if nothing operation item includes and do not use message sticker reaction module.
 * Renamed `desktopMessageHoverBar` to `additionalDesktopMessageHoverBarItem` in `TIMUIKitChatConfig` to control only the addition of extra operation items displayed on the hover bar of messages on desktop (macOS, Windows, and desktop version of Web), without affecting the default ones. Previously, it controlled the entire message hover bar, including covering the default items.
@@ -211,22 +221,22 @@ In addition, there are some significant changes compared to version 2.0.0-previe
 * Added support for the new permission authorization schema on Android 13 and `targetSdkVersion` greater than 33.
 * Corrected the `textHight` to `textHeight` in `TIMUIKitChatConfig`, and modified the default value to 1.3.
 
-### Bug Fixes
+## Bug Fixes
 
 * Fixed an issue where the `showVideoCall` and `showVoiceCall` configuration options were not working.
 * Fixed potential `Windows` platform deployment prohibition issue.
 * Fixed an issue that may cause `setLocalCustomData` to be triggered repeatedly.
 
-## 2.0.0-preview.6
+# 2.0.0-preview.6
 
-### Improvements
+## Improvements
 
 * Permission requests now feature a gray translucent overlay for secondary confirmations on first-time requests, which was reintroduced after being removed in version 2.0.0-preview.4. Additionally, the overlay can now be successfully hidden once the permission authorization is complete.".
 * Time Divider on Message List: The default 12-hour display has been changed to a 24-hour display.
 * Message translation now targets the language of TUIKit instead of relying on the system language directly. The language of TUIKit can be set as the system language automatically or defined by the user. For more information, please refer to this documentation: https://www.tencentcloud.com/document/product/1047/52154.
 * Optimized the animation for message text input area.
 
-### Bug Fixes
+## Bug Fixes
 
 * Fixed an issue where the `Voice Call` and `Video Call` buttons were not working in group chat.
 * Fixed several null-safety issues.
@@ -235,13 +245,13 @@ In addition, there are some significant changes compared to version 2.0.0-previe
 * Fixed an issue where stickers could not be clicked in some cases.
 * Resolved an overflow error that occurred when opening the sticker panel.
 
-## 2.0.0-preview.5
+# 2.0.0-preview.5
 
-### New Features
+## New Features
 
 * New Chat Configuration: `isAllowLongPressAvatarToAt`. This option controls whether users are allowed to mention another user in the group by long-pressing on their avatar.
 
-### Improvements
+## Improvements
 
 * Improved tool bar configuration on desktop: The tool bar can now be customized using `desktopControlBarConfig` for embedded default items and `additionalDesktopControlBarItems` for additional tool items. These configurations come from TIMUIKitChatConfig.
 * Renamed the `wideMessageHoverBar` configuration option to `desktopMessageHoverBar` for better clarity.
@@ -249,7 +259,7 @@ In addition, there are some significant changes compared to version 2.0.0-previe
 * Eliminated other six unnecessary dependency packages to reduce the size and improve performance.
 * Improved the clarity of the `sendMessage` function in `TIMUIKitChatController` by replacing the use of `convID` to represent both `userID` and `groupID` with separate parameters.
 
-### Bug Fixes
+## Bug Fixes
 
 * Fixed an issue where the message operation menu may show inaccurately when the message is too long.
 * Fixed a problem where the message operation menu had the potential to be too wide for certain types of messages, causing display issues.
@@ -258,68 +268,68 @@ In addition, there are some significant changes compared to version 2.0.0-previe
 * Fixed a bug where certain JSON decoding operations could potentially fail.
 * Fixed an issue with sound messages on iOS devices playing only through earpiece instead of speaker by default.
 
-## 2.0.0-preview.4
+# 2.0.0-preview.4
 
-### New Features
+## New Features
 
 * New Chat Configuration: `TIMUIKitChatConfig` now includes `offlinePushInfo`, which allows for customization of the entire `offlinePushInfo` for each message. This field has a higher priority than the previous separate configuration fields for this object.
 * New Color Configuration: Added `appbarTextColor` and `appbarBgColor` to configure the color for the Appbar. Also added `selectPanelBgColor` and `selectPanelTextIconColor` to configure the color of the messages multi-select panel.
 
-### Improvements
+## Improvements
 
 * Improved Group Management: Muting members on Work Group is now not allowed.
 * Improved Avatar: Ensured that the avatar can be as small as possible while still covering the entire target box.
 * Permission Requests: Removed the gray translucent overlay for secondary confirmations on first-time permission requests.
 
-### Bug Fixes
+## Bug Fixes
 
 * Fixed an issue where the color defined by `chatBgColor` could not cover the entire chat screen when messages did not cover the whole page.
 * Fixed an issue where the history message list could not be scrolled in some cases.
 * Fixed an issue where the ratio of sending messages was incorrect, resulting in the wrong position of the read status label on the left.
 * Fixed an issue where loading messages could fail when the number of messages equaled the specified count.
 
-## 2.0.0-preview.3
+# 2.0.0-preview.3
 
-### New Features
+## New Features
 
 * Integrated Callkit: The Calls button no longer needs to be added to `MorePanelConfig`. If `tencent_calls_uikit` is installed, the Video Call and Voice Call buttons will be displayed automatically.
 * Paste Images on Desktop: Users can now paste an image on the text field on Desktop to send it.
 * Screenshot Capture on Desktop: Users can now capture a screenshot on Desktop and send it.
 
-### Improvements
+## Improvements
 
 * Improved Compatibility: The TUIKit is now compatible with Flutter versions 3.0.0 to 3.7.7.
 
-### Bug Fixes
+## Bug Fixes
 
 * Fixed an issue where the `businessID` type may not be correct.
 * Fixed an issue where the `chatMessageItemFromSelfBgColor` configuration was not taking effect.
 
-## 2.0.0-preview.2
+# 2.0.0-preview.2
 
-### New Features
+## New Features
 
 * Added support for opening files locally from file messages.
 
-## 2.0.0-preview.1
+# 2.0.0-preview.1
 
-### New Features
+## New Features
 
 * Desktop Support: Tencent Cloud Chat UIKit now supports all platforms, including iOS, Android, Web, Windows, and macOS, resulting in significant changes to the codebase. The UI has been enhanced to adapt to screens of various widths, with different layouts for both wide and narrow screens.
 * Information Copy: The ability to copy information, such as Group ID, from the screen has been added.
 
-### Improvements
+## Improvements
 
 * Improved group management logic, with non-administrators no longer able to access the management interface.
 * Optimized cursor positioning when sending messages.
 * Improved and optimized scrollbar functionality.
 * Enhanced clickable URL support in messages, with URLs now supporting both with and without the "https://" prefix.
 
-## 1.7.0+1
+# 1.7.0+1
 
 * Fix: An issue that caused errors on mentioning all members.
 
-## 1.7.0
+# 1.7.0
 
 * Addition: Support for quickly navigating to the first unread message in a group chat with more than 20 new unread messages, using the dynamic tongue located in the top right corner of the screen. This feature allows for swift movement through the messages, regardless of their quantity.
 * Addition: Customize the border radius for all avatars is now supported. You can set the default avatar border radius using `defaultAvatarBorderRadius` in `TIMUIKitConfig`.
@@ -328,56 +338,56 @@ In addition, there are some significant changes compared to version 2.0.0-previe
 * Fix: An issue causing errors when sending a large number of stickers has been resolved.
 * Fix: Some errors that were occurring in the sticker panel have been addressed.
 
-## 1.6.2
+# 1.6.2
 
 * Optimization: Remove `fluttertoast`.
 * Fix: An issue that caused errors when sending files without extensions.
 
-## 1.6.1
+# 1.6.1
 
 * Fix: A bug of muting someone in a group.
 * Fix: A bug on Flutter 3.7.0.
 
-## 1.6.0
+# 1.6.0
 
 * Addition: `scrollToConversation` on `TIMUIKitConversationController`. You can now easily navigate to a specific conversation in the conversation list and move to the next unread conversation by double-clicking the tab bar, [refers to our sample app](https://github.com/TencentCloud/chat-demo-flutter/blob/main/lib/src/conversation.dart).
 * Optimization: The performance of the history message list while scrolling over a large distance.
 
-## 1.5.0+1
+# 1.5.0+1
 
 * Fix: An issue with video messages being oversize.
 
-## 1.5.0
+# 1.5.0
 
 * Addition: New configuration `defaultAvatarAssetPath` on global `TIMUIKitConfig` to define the default avatar.
 * Addition: Supports Flutter 3.7.0.
 * Fix: `chatBgColor` configuration.
 
-## 1.4.0
+# 1.4.0
 
 * Addition: Text translation. Long press the text messages to choose `Translate`, which can be turned off by `showTranslation` from `ToolTipsConfig`.
 * Optimization: The long press pop-up location and keyboard pop-up event.
 
-## 1.3.2
+# 1.3.2
 
 * Fix: Text input field height, after choosing to mention someone.
 
-## 1.3.1
+# 1.3.1
 
 * Optimization: Improve performance.
 
-## 1.3.0
+# 1.3.0
 
 * Fix: A bug where group tips were not showing the nickname or remarks when transferring group owner.
 * Optimization: Remove the confirmation pop-up before opening the file.
 
-## 1.2.0
+# 1.2.0
 
 * Fix: An issue where the input area was not showing when switching from recording to keyboard on `TIMUIKitChat`.
 * Fix: An issue where only the first receiver could receive the merged multiple forward messages.
 * Optimization: `MessageItemBuilder` can now be used for shows on the merger message screen.
 
-## 1.1.0 And 1.1.0+1
+# 1.1.0 And 1.1.0+1
 
 * Addition: We have added support for two new languages - Japanese and Korean.
 * Addition: You can now add other languages apart from our default ones, such as English, Chinese (Simplified and Traditional), Japanese, and Korean. You can also modify the translations using the instructions provided in [this documentation](https://www.tencentcloud.com/document/product/1047/52154?from=pub).
@@ -391,12 +401,12 @@ In addition, there are some significant changes compared to version 2.0.0-previe
 * Optimization: We have added a new loading animation when downloading images or videos on `TIMUIKitGroupChat`.
 * Fix: We have fixed some bugs.
 
-## 1.0.1
+# 1.0.1
 
 * Modification: Remove `groupTRTCTipsItemBuilder` from `MessageItemBuilder`, please use `customMessageItemBuilder` instead.
 * Modification: Remove default rendering for calling messages, you can choose to use the default widgets, `CallMessageItem` and `GroupCallMessageItem`, from our call plugin `tim_ui_kit_calling_plugin` directly. Refer to the [Demo](https://github.com/TencentCloud/chat-demo-flutter/tree/main/lib/utils/custom_message/custom_message_element.dart).
 
-## 1.0.0
+# 1.0.0
 
 * Addition: We have added support for adding Flutter module to Native APP. For implementation details, please refer to [this documentation](https://www.tencentcloud.com/document/product/1047/51456?from=pub).
 * Addition: You can now customize stickers and emojis for text messages. For more information, please refer to [this documentation](https://cloud.tencent.com/document/product/269/80882).
@@ -410,7 +420,7 @@ In addition, there are some significant changes compared to version 2.0.0-previe
 
 > **Please note that modifications are required for the second and sixth lines**. Otherwise, the modules for stickers/emojis/call records will not work.
 
-## 0.1.8
+# 0.1.8
 
 * Optimization: File batch downloading queue now allows clicking on multiple file messages at once.
 * Optimization: Group list widgets are now automatically updated.
@@ -420,7 +430,7 @@ In addition, there are some significant changes compared to version 2.0.0-previe
 * Fix: Resolved a crash when playing videos.
 * Fix: Several bugs.
 
-## 0.1.7
+# 0.1.7
 
 * Addition: Big and RAW images are now supported, especially for those captured from the latest version of iOS and iPhone 14 Pro series, with automatic compression and formatting before sending.
 * Optimization: Improved performance and stability, especially for the history message list and launching.
@@ -430,7 +440,7 @@ In addition, there are some significant changes compared to version 2.0.0-previe
 * Fix: Resolved an issue with select photos permission.
 * Fix: Several bugs.
 
-## 0.1.5
+# 0.1.5
 
 * Addition: Web support is now available, allowing TUIKit to be implemented on iOS/Android/Web platforms.
 * Addition: Disk storage checking is now performed after login, with controls available in `config` of `init`.
@@ -443,17 +453,17 @@ In addition, there are some significant changes compared to version 2.0.0-previe
 * Optimization: Rebuilt and improved the experience of `TIMUIKitChat`. Note that `TIMUIKitChatController` needs to be specified to `controller`, as shown in the [Demo](https://github.com/TencentCloud/tc-chat-demo-flutter/lib/src/chat.dart).
 * Fix: Several bugs.
 
-## 0.1.3
+# 0.1.3
 
 * Addition: User inputting status is now available.
 * Addition: Message reactions with emoji/stickers are now available.
 * Addition: User online status is now available.
 
-## 0.1.2
+# 0.1.2
 
 * Upgrade: flutter_record_plugin_plus to version 0.0.4.
 
-## 0.1.1
+# 0.1.1
 
 * Addition: Lifecycle hooks are now available for the main widgets, referring to the parameter description for details.
 * Addition: Mute status display is now available for group chat on the chat page.
@@ -462,11 +472,11 @@ In addition, there are some significant changes compared to version 2.0.0-previe
 * Optimization: Image preview display has been improved.
 * Rebuilt: TUIKitGroupProfile and TUIKitProfile have been simplified for ease of use.
 
-## 0.1.0-bugfix
+# 0.1.0-bugfix
 
 * Upgrade: Tencent IM Native SDK.
 
-## 0.1.0
+# 0.1.0
 
 * Addition: Atomization widgets for TIMUIKitChat.
 * Addition: Updating the UI when the message has been modified.
@@ -475,38 +485,38 @@ In addition, there are some significant changes compared to version 2.0.0-previe
 * Addition: Support for Traditional Chinese.
 * Addition: Customization for conversation list item.
 
-## 0.0.9
+# 0.0.9
 
 * Addition: Offline push along with [tim_ui_kit_push_plugin](https://pub.dev/packages/tim_ui_kit_push_plugin).
 * Adapt: Flutter 3.0.0.
 * Optimization: Local preview of multimedia files.
 
-## 0.0.8
+# 0.0.8
 
 * Addition: Group read receipt module.
 * Addition: Little tongue on the message list.
 * Addition: Examples.
 * Fix: Several bugs.
 
-## 0.0.7
+# 0.0.7
 
 * Fix: Several bugs.
 
-## 0.0.6
+# 0.0.6
 
 * Addition: New `sendMessage` method to the controller `TIMUIKitChatController` for TIMUIKitChat.
 * Addition: Configuration for TIMUIKitChat, which can control the functions for TIMUIKitChat components.
 * Support: Customized for more panel customized ability to TIMUIKitChat.
 * Optimization: User authorization standardized.
 
-## 0.0.5
+# 0.0.5
 
 * Addition: Several new customized configs, includes, appBarConfig, morePanelConfig, and removed appBarActions config.
 * Optimization: Image preview displaying.
 * Upgrade: Tencent IM SDK.
 * Fix: The issue of conversation item duplication for TIMUIKitConversation.
 
-## 0.0.4
+# 0.0.4
 
 * Optimization: TIMUIKitChat, especially for media files selector.
 * Optimization: Previewing of image messages, video messages.
@@ -514,7 +524,7 @@ In addition, there are some significant changes compared to version 2.0.0-previe
 * Optimization: UI for search components.
 * Upgrade: Tencent IM SDK.
 
-## 0.0.3
+# 0.0.3
 
 * Addition: TIMUIKitSearch and TIMUIKitSearchMsgDetail, supports searching both in conversation and globally.
 * Addition: TIMUIKitAddFriend.
@@ -522,12 +532,12 @@ In addition, there are some significant changes compared to version 2.0.0-previe
 * Addition: Theme style configuration.
 * Optimization: Internationalization.
 
-## 0.0.2
+# 0.0.2
 
 * Optimization: TIMUIKitChat.
 * Fix: Bugs on Internationalization.
 
-## 0.0.1
+# 0.0.1
 
 The first released of TUIKit for Flutter of Tencent Cloud IM, the component of the first phase includes:
 

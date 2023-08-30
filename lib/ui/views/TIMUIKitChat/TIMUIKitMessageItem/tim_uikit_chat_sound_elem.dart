@@ -1,8 +1,9 @@
 
 import 'dart:async';
 import 'dart:math';
-import 'package:audioplayers/audioplayers.dart';
+// import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
@@ -120,7 +121,7 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
 
     subscription =
     SoundPlayer.playStateListener(listener: (PlayerState state) {
-      if(state == PlayerState.completed){
+      if(state.processingState == ProcessingState.completed){
         widget.chatModel.currentPlayedMsgId = "";
       }
     });

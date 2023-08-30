@@ -3,7 +3,6 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  audioplayers_windows
   desktop_drop
   fc_native_video_thumbnail
   file_selector_windows
