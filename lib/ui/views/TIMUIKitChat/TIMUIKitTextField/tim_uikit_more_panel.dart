@@ -1,5 +1,6 @@
 // ignore_for_file: unused_field, avoid_print, unused_import
 
+import 'dart:async';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:fc_native_video_thumbnail/fc_native_video_thumbnail.dart';
@@ -42,6 +43,9 @@ class MorePanelConfig {
   final List<MorePanelItem>? extraAction;
   final Widget Function(MorePanelItem item)? actionBuilder;
 
+  final FutureOr<List<V2TimGroupMemberFullInfo>?> Function()?
+      selectCallInviterFn;
+
   MorePanelConfig({
     this.showFilePickAction = true,
     this.showGalleryPickAction = true,
@@ -52,6 +56,7 @@ class MorePanelConfig {
     this.showVideoCall = true,
     this.extraAction,
     this.actionBuilder,
+    this.selectCallInviterFn,
   });
 }
 
@@ -685,14 +690,21 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
 
     final isGroup = widget.conversationType == ConvType.group;
     if (isGroup) {
-      List<V2TimGroupMemberFullInfo>? selectedMember = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SelectCallInviter(
-            groupID: widget.conversationID,
+      List<V2TimGroupMemberFullInfo>? selectedMember;
+
+      if (widget.morePanelConfig?.selectCallInviterFn?.call != null) {
+        selectedMember =
+            await widget.morePanelConfig?.selectCallInviterFn?.call();
+      } else {
+        selectedMember = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SelectCallInviter(
+              groupID: widget.conversationID,
+            ),
           ),
-        ),
-      );
+        );
+      }
       if (selectedMember != null) {
         final inviteMember = selectedMember.map((e) => e.userID).toList();
         _tUICore.callService(TUICALLKIT_SERVICE_NAME, METHOD_NAME_CALL, {
