@@ -690,16 +690,21 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
 
     final isGroup = widget.conversationType == ConvType.group;
     if (isGroup) {
-      List<V2TimGroupMemberFullInfo>? selectedMember =
-          await widget.morePanelConfig?.selectCallInviterFn?.call() ??
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SelectCallInviter(
-                    groupID: widget.conversationID,
-                  ),
-                ),
-              );
+      List<V2TimGroupMemberFullInfo>? selectedMember;
+
+      if (widget.morePanelConfig?.selectCallInviterFn?.call != null) {
+        selectedMember =
+            await widget.morePanelConfig?.selectCallInviterFn?.call();
+      } else {
+        selectedMember = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SelectCallInviter(
+              groupID: widget.conversationID,
+            ),
+          ),
+        );
+      }
       if (selectedMember != null) {
         final inviteMember = selectedMember.map((e) => e.userID).toList();
         _tUICore.callService(TUICALLKIT_SERVICE_NAME, METHOD_NAME_CALL, {
