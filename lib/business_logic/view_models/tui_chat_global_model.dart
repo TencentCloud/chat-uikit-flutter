@@ -17,6 +17,7 @@ import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 
 enum ConvType { none, c2c, group }
 
@@ -765,9 +766,11 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
           message.elemType == MessageElemType.V2TIM_ELEM_TYPE_VIDEO;
       bool isSoundType =
           message.elemType == MessageElemType.V2TIM_ELEM_TYPE_SOUND;
+
+      final originalImageType = PlatformUtils().isIOS ? 1 : 0;
       if (!isImageType && !isVideoType && !isSoundType) {
         _updateMessageLocationAndDownloadFile(messageProgress);
-      } else if ((isImageType && messageProgress.type == 0) ||
+      } else if ((isImageType && messageProgress.type == originalImageType) ||
           isVideoType ||
           isSoundType) {
         Future.delayed(const Duration(seconds: 1),

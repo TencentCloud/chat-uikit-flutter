@@ -1,9 +1,10 @@
 import 'dart:async';
 
-import 'package:audioplayers/audioplayers.dart';
+// import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_plugin_record_plus/const/play_state.dart';
 import 'package:flutter_plugin_record_plus/const/response.dart';
 import 'package:flutter_plugin_record_plus/index.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:tencent_cloud_chat_uikit/import_proxy/import_proxy.dart';
 
 typedef PlayStateListener = void Function(PlayState playState);
@@ -20,7 +21,7 @@ class SoundPlayer {
   static initSoundPlayer() {
     if (!isInited) {
       _recorder.init();
-      AudioPlayer.global.setGlobalAudioContext(const AudioContext());
+      // AudioPlayer.global.setGlobalAudioContext(const AudioContext());
       isInited = true;
     }
   }
@@ -30,16 +31,18 @@ class SoundPlayer {
     if (_soundInterruptListener != null) {
       _soundInterruptListener!();
     }
-    await _audioPlayer.play(UrlSource(url));
+    await _audioPlayer.setUrl(url);
+    await _audioPlayer.play();
   }
 
   // 语音消息连续播放新增逻辑 begin
-  static Future<void> playWith({required Source source}) async {
+  static Future<void> playWith({required AudioSource source}) async {
     _audioPlayer.stop();
     if (_soundInterruptListener != null) {
       _soundInterruptListener!();
     }
-    await _audioPlayer.play(source);
+    await _audioPlayer.setAudioSource(source);
+    await _audioPlayer.play();
   }
   // 语音消息连续播放新增逻辑 end
 
@@ -54,7 +57,7 @@ class SoundPlayer {
 
   static StreamSubscription<PlayerState> playStateListener(
           {required void Function(PlayerState)? listener}) =>
-      _audioPlayer.onPlayerStateChanged.listen(listener);
+      _audioPlayer.playerStateStream.listen(listener);
 
   static setSoundInterruptListener(SoundInterruptListener listener) {
     _soundInterruptListener = listener;

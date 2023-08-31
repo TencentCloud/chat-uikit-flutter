@@ -31,9 +31,8 @@ class ChatLifeCycle {
   /// You can make a second confirmation here by a modal, etc.
   FutureBool Function(String conversationID) shouldClearHistoricalMessageList;
 
-
   /// Before rendering a message to message list.
-  bool Function(V2TimMessage msgID) messageShouldMount;
+  bool Function(V2TimMessage msg) messageShouldMount;
 
   ChatLifeCycle({
     this.shouldClearHistoricalMessageList =

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:link_preview_generator/link_preview_generator.dart';
+import 'package:link_preview_generator_for_us/link_preview_generator.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/common/extensions.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/link_preview_entry.dart';
@@ -53,7 +53,7 @@ class LinkUtils {
       if (!e.contains("http")) {
         url = 'http://$e';
       }
-      final WebInfo info = await LinkPreview.scrapeFromURL(url);
+      final WebInfo info = await LinkPreviewForUs.scrapeFromURL(url);
 
       return LocalCustomDataModel(
           url: e,

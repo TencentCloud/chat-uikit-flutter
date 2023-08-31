@@ -490,6 +490,13 @@ defaultConfig {
 
 ---
 
+## Recommended Resources
+
+For those who require real-time voice and video call capabilities alongside our Chat UIKit, 
+we highly recommend our dedicated voice and video call UI component package, [tencent\_calls\_uikit](https://pub.dev/packages/tencent_calls_uikit).
+This robust and feature-rich package is specifically designed to complement our existing solution and seamlessly integrate with it, 
+providing a comprehensive, unified communication experience for your users.
+
 ## Contact Us
 
 Please do not hesitate to contact us in the following place, if you have any further questions or

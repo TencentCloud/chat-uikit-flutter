@@ -1,8 +1,8 @@
 name: tencent_cloud_chat_uikit
 description: A powerful chat UI component library and business logic for Tencent Cloud Chat, creating seamless in-app chat modules for delightful user experiences.
-version: 2.2.0
-homepage: https://www.tencentcloud.com/products/im?from=pub
-repository: https://github.com/TencentCloud/tc-chat-uikit-flutter
+version: 2.3.0
+homepage: https://trtc.io/products/chat?utm_source=gfs&utm_medium=link&utm_campaign=%E6%B8%A0%E9%81%93&_channel_track_key=k6WgfCKn
+repository: https://github.com/TencentCloud/chat-uikit-flutter
 documentation: https://comm.qq.com/im/doc/flutter/en/TUIKit/readme.html
 
 # publish_to: none
@@ -15,7 +15,7 @@ platforms:
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
-  flutter: '>=3.10.0'
+  flutter: ">=3.13.0"
 
 dependencies:
   flutter:
@@ -52,15 +52,15 @@ dependencies:
   url_launcher: ^6.1.9
   image_gallery_saver: ^2.0.1
   wechat_assets_picker: ^8.5.0
-  wechat_camera_picker: ^3.8.0
-  extended_image: ^8.0.1
-  extended_text_field: ^12.0.0
-  extended_text: ^11.0.0
+  wechat_camera_picker: ^4.0.0
+  extended_image: ^8.1.0
+  extended_text_field: ^12.1.0
+  extended_text: ^11.1.0
   package_info_plus: ^4.0.1
   flutter_markdown: ^0.6.15
   universal_html: ^2.2.2
-  link_preview_generator: ^1.2.0
-  http: ^0.13.5
+  link_preview_generator_for_us: ^2.0.0
+  http: ^1.0.0
   crypto: ^3.0.2
   collection: ^1.17.1
   flutter_image_compress: ^1.1.3
@@ -70,7 +70,6 @@ dependencies:
   tim_ui_kit_sticker_plugin: ^3.0.1+1
   tencent_im_base: ^3.0.1
   fc_native_video_thumbnail: any
-  audioplayers: ^3.0.1
   path: ^1.8.1
   tencent_cloud_uikit_core: ^1.1.0
   pasteboard: ^0.2.0
@@ -79,8 +78,10 @@ dependencies:
   cross_file: ^0.3.3+4
   csslib: 0.17.2
   diff_match_patch: ^0.4.1
+  just_audio: ^0.9.34
   markdown: ^7.1.0
   logger: ^2.0.1
+  image_clipboard: ^1.0.0+2
 
 dependency_overrides:
   # ffi: ^2.0.1
