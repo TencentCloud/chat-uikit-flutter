@@ -46,6 +46,9 @@ class MorePanelConfig {
   final FutureOr<List<V2TimGroupMemberFullInfo>?> Function()?
       selectCallInviterFn;
 
+  /// 发送文件是所允许的扩展类型
+  final List<String>? allowedFileExtensions;
+
   MorePanelConfig({
     this.showFilePickAction = true,
     this.showGalleryPickAction = true,
@@ -57,6 +60,7 @@ class MorePanelConfig {
     this.extraAction,
     this.actionBuilder,
     this.selectCallInviterFn,
+    this.allowedFileExtensions,
   });
 }
 
@@ -601,7 +605,9 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
     try {
       final convID = widget.conversationID;
       final convType = widget.conversationType;
-      FilePickerResult? result = await FilePicker.platform.pickFiles();
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        allowedExtensions: widget.morePanelConfig?.allowedFileExtensions,
+      );
       if (result != null && result.files.isNotEmpty) {
         if (PlatformUtils().isWeb) {
           html.Node? inputElem;
