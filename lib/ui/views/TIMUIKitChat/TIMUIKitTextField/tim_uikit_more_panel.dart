@@ -606,6 +606,7 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
       final convID = widget.conversationID;
       final convType = widget.conversationType;
       FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
         allowedExtensions: widget.morePanelConfig?.allowedFileExtensions,
       );
       if (result != null && result.files.isNotEmpty) {
