@@ -800,6 +800,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
+  open_file:
+    dependency: transitive
+    description:
+      name: open_file
+      sha256: a5a32d44acb7c899987d0999e1e3cbb0a0f1adebbf41ac813ec6d2d8faa0af20
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.3.2"
   package_config:
     dependency: transitive
     description:
@@ -1203,7 +1211,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "2.2.1"
+    version: "2.3.0"
   tencent_cloud_uikit_core:
     dependency: transitive
     description:
@@ -1252,14 +1260,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.1"
-  tencent_open_file:
-    dependency: transitive
-    description:
-      name: tencent_open_file
-      sha256: bb92d2f052c150a45942c564fba13d150a1b7b47525e6fdd74ccc58058ba5dcf
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.0.11"
   tencent_super_tooltip:
     dependency: transitive
     description:

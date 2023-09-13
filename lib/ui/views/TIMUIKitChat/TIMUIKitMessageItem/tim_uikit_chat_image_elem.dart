@@ -5,11 +5,11 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_file/open_file.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
-import 'package:tencent_open_file/tencent_open_file.dart';
 import 'package:universal_html/html.dart' as html;
 import 'dart:io';
 import 'dart:math';
@@ -489,14 +489,6 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
       }
     }
 
-    ImageProvider imageProvider;
-    if (isNetworkImage) {
-      imageProvider = CachedNetworkImageProvider(
-          webPath ?? smallImg?.url ?? originalImg!.url!);
-    } else {
-      imageProvider = FileImage(File(smallLocalPath ?? originLocalPath!));
-    }
-
     return GestureDetector(
       onTap: () => onClickImage(
           theme: theme,
@@ -580,14 +572,6 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
 
   Widget? _renderImage(dynamic heroTag, TUITheme theme,
       {V2TimImage? originalImg, V2TimImage? smallImg}) {
-    double? positionRadio;
-    if (smallImg?.width != null &&
-        smallImg?.height != null &&
-        smallImg?.width != 0 &&
-        smallImg?.height != 0) {
-      positionRadio = (smallImg!.width! / smallImg.height!);
-    }
-
     if (PlatformUtils().isWeb && widget.message.imageElem!.path != null) {
       // Displaying on Web only
       return _renderAllImage(
