@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
@@ -23,6 +24,7 @@ import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
@@ -30,11 +32,9 @@ import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_wrapper.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/image_screen.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
-import 'package:tencent_open_file/tencent_open_file.dart';
 import 'package:transparent_image/transparent_image.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 
 class TIMUIKitImageElem extends StatefulWidget {
   final V2TimMessage message;
@@ -497,14 +497,6 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
       }
     }
 
-    ImageProvider imageProvider;
-    if (isNetworkImage) {
-      imageProvider = CachedNetworkImageProvider(
-          webPath ?? smallImg?.url ?? originalImg!.url!);
-    } else {
-      imageProvider = FileImage(File(smallLocalPath ?? originLocalPath!));
-    }
-
     return GestureDetector(
       onTap: () => onClickImage(
           theme: theme,
@@ -588,14 +580,6 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
 
   Widget? _renderImage(dynamic heroTag, TUITheme theme,
       {V2TimImage? originalImg, V2TimImage? smallImg}) {
-    double? positionRadio;
-    if (smallImg?.width != null &&
-        smallImg?.height != null &&
-        smallImg?.width != 0 &&
-        smallImg?.height != 0) {
-      positionRadio = (smallImg!.width! / smallImg.height!);
-    }
-
     if (PlatformUtils().isWeb && widget.message.imageElem!.path != null) {
       // Displaying on Web only
       return _renderAllImage(

@@ -333,10 +333,6 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
       }
       notifyListeners();
 
-      if (response.messageList.isEmpty) {
-        return false;
-      }
-
       // 根据lastMsgID判断是否为分页加载
       if (lastMsgID != null && currentRecordList != null) {
         List<V2TimMessage> messageList = response.messageList;
