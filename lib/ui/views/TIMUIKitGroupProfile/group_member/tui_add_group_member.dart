@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_group_profile_model.dart';
-
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/contact_list.dart';
+import 'package:tencent_im_base/tencent_im_base.dart';
 
 GlobalKey<_AddGroupMemberPageState> addGroupMemberKey = GlobalKey();
 
 class AddGroupMemberPage extends StatefulWidget {
   final TUIGroupProfileModel model;
+  final VoidCallback? onClose;
 
-  const AddGroupMemberPage({Key? key, required this.model}) : super(key: key);
+  const AddGroupMemberPage({Key? key, required this.model, this.onClose}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _AddGroupMemberPageState();
@@ -25,7 +25,7 @@ class _AddGroupMemberPageState extends TIMUIKitState<AddGroupMemberPage> {
     if (selectedContacts.isNotEmpty) {
       final userIDs = selectedContacts.map((e) => e.userID).toList();
       await widget.model.inviteUserToGroup(userIDs);
-      Navigator.pop(context);
+      widget.onClose ?? Navigator.pop(context);
     }
   }
 
@@ -68,8 +68,7 @@ class _AddGroupMemberPageState extends TIMUIKitState<AddGroupMemberPage> {
                   )
                 ],
                 shadowColor: theme.weakDividerColor,
-                backgroundColor: theme.appbarBgColor ??
-                    theme.primaryColor,
+                backgroundColor: theme.appbarBgColor ?? theme.primaryColor,
                 iconTheme: IconThemeData(
                   color: theme.appbarTextColor,
                 )),

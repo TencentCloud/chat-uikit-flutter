@@ -706,7 +706,6 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
 
   Future<void> onMessageDownloadProgressCallback(
       V2TimMessageDownloadProgress messageProgress) async {
-    outputLogger.i(messageProgress.toJson());
     final currentProgress = getMessageProgress(messageProgress.msgID);
 
     if (messageProgress.isFinish && currentProgress < 100) {
@@ -1120,9 +1119,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
         listWithTimestamp.add(V2TimMessage.fromJson(item.toJson()));
       }
     }
-    final returnValue = listWithTimestamp.reversed.toList();
-    outputLogger.i(returnValue.map((e) => e.toJson()).toList().toString());
-    return returnValue;
+    return listWithTimestamp.reversed.toList();
   }
 
   HistoryMessagePosition getMessageListPosition(String? conversationID) {
