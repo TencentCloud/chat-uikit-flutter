@@ -42,7 +42,7 @@ class TUIKitOutput extends LogOutput {
 
   Future<String> getPlatformLogPath({String? path}) async {
     if (TencentUtils.checkString(path) != null) {
-      outputLogger.i("The path to local log: $path");
+      print("The path to local log: $path");
       return path!;
     }
 
@@ -54,7 +54,7 @@ class TUIKitOutput extends LogOutput {
         "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}";
     final logPath = p.join(documentsDirectoryPath, "Documents", ".TencentCloudChat",
         pkgName, "uikit_log", 'Flutter-TUIKit-$timeName.log');
-    outputLogger.i("The path to local log: $logPath");
+    print("The path to local log: $logPath");
 
     return logPath;
   }

@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_group_profile_model.dart';
-
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/group_member_list.dart';
+import 'package:tencent_im_base/tencent_im_base.dart';
 
 GlobalKey<_DeleteGroupMemberPageState> deleteGroupMemberKey = GlobalKey();
 
 class DeleteGroupMemberPage extends StatefulWidget {
   final TUIGroupProfileModel model;
+  final VoidCallback? onClose;
 
-  const DeleteGroupMemberPage({Key? key, required this.model})
-      : super(key: key);
+  const DeleteGroupMemberPage({Key? key, required this.model, this.onClose}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _DeleteGroupMemberPageState();
@@ -30,11 +29,8 @@ class _DeleteGroupMemberPageState extends TIMUIKitState<DeleteGroupMemberPage> {
 
   handleSearchGroupMembers(String searchText, context) async {
     searchText = searchText;
-    List<V2TimGroupMemberFullInfo?> currentGroupMember =
-        Provider.of<TUIGroupProfileModel>(context, listen: false)
-            .groupMemberList;
-    final res =
-        await widget.model.searchGroupMember(V2TimGroupMemberSearchParam(
+    List<V2TimGroupMemberFullInfo?> currentGroupMember = Provider.of<TUIGroupProfileModel>(context, listen: false).groupMemberList;
+    final res = await widget.model.searchGroupMember(V2TimGroupMemberSearchParam(
       keywordList: [searchText],
       groupIDList: [widget.model.groupInfo!.groupID],
     ));
@@ -55,25 +51,19 @@ class _DeleteGroupMemberPageState extends TIMUIKitState<DeleteGroupMemberPage> {
       currentGroupMember = [];
     }
     setState(() {
-      searchMemberList =
-          isSearchTextExist(searchText) ? currentGroupMember : null;
+      searchMemberList = isSearchTextExist(searchText) ? currentGroupMember : null;
     });
   }
 
   handleRole(groupMemberList) {
-    return groupMemberList
-            ?.where((value) =>
-                value?.role ==
-                GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_MEMBER)
-            .toList() ??
-        [];
+    return groupMemberList?.where((value) => value?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_MEMBER).toList() ?? [];
   }
 
   void submitDelete() async {
     if (selectedGroupMember.isNotEmpty) {
       final userIDs = selectedGroupMember.map((e) => e.userID).toList();
       widget.model.kickOffMember(userIDs);
-      Navigator.pop(context);
+      widget.onClose ?? Navigator.pop(context);
     }
   }
 
@@ -86,8 +76,7 @@ class _DeleteGroupMemberPageState extends TIMUIKitState<DeleteGroupMemberPage> {
         desktopWidget: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: GroupProfileMemberList(
-            memberList:
-                handleRole(searchMemberList ?? widget.model.groupMemberList),
+            memberList: handleRole(searchMemberList ?? widget.model.groupMemberList),
             canSelectMember: true,
             canSlideDelete: false,
             onSelectedMemberChange: (selectedMember) {
@@ -115,14 +104,12 @@ class _DeleteGroupMemberPageState extends TIMUIKitState<DeleteGroupMemberPage> {
                   )
                 ],
                 shadowColor: theme.weakBackgroundColor,
-                backgroundColor: theme.appbarBgColor ??
-                    theme.primaryColor,
+                backgroundColor: theme.appbarBgColor ?? theme.primaryColor,
                 iconTheme: IconThemeData(
                   color: theme.appbarTextColor,
                 )),
             body: GroupProfileMemberList(
-              memberList:
-                  handleRole(searchMemberList ?? widget.model.groupMemberList),
+              memberList: handleRole(searchMemberList ?? widget.model.groupMemberList),
               canSelectMember: true,
               canSlideDelete: false,
               onSelectedMemberChange: (selectedMember) {

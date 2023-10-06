@@ -1,3 +1,14 @@
+# 2.3.2
+
+## Improvements
+
+* Enhanced message list performance.
+
+## Bug Fixes
+
+* Fixed an issue that prevented the group member addition/removal modal from closing.
+* Addressed several other bugs.
+
 # 2.3.1
 
 ## Bug Fixes

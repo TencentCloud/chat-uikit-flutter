@@ -13,12 +13,13 @@ class KeepAliveWrapper extends StatefulWidget {
   _KeepAliveWrapperState createState() => _KeepAliveWrapperState();
 }
 
-class _KeepAliveWrapperState extends State<KeepAliveWrapper>
-    with AutomaticKeepAliveClientMixin {
+class _KeepAliveWrapperState extends State<KeepAliveWrapper> with AutomaticKeepAliveClientMixin {
   @override
   Widget build(BuildContext context) {
     super.build(context);
-    return widget.child;
+    return RepaintBoundary(
+      child: widget.child,
+    );
   }
 
   @override
