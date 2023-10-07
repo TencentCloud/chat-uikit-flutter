@@ -1399,12 +1399,24 @@ class _TIMUIKItHistoryMessageListItemState
                       if (!isSelf && widget.showAvatar)
                         GestureDetector(
                           onLongPress: () {
+                            // if (widget.onLongPressForOthersHeadPortrait !=
+                            //     null) {}
+                            // if (model.chatConfig.isAllowLongPressAvatarToAt) {
+                            //   widget.onLongPressForOthersHeadPortrait!(
+                            //       message.sender, message.nickName);
+                            // }
+
+                            //////////////// 自定义长按显示内容 ////////////////
                             if (widget.onLongPressForOthersHeadPortrait !=
-                                null) {}
-                            if (model.chatConfig.isAllowLongPressAvatarToAt) {
-                              widget.onLongPressForOthersHeadPortrait!(
-                                  message.sender, message.nickName);
+                                null) {
+                              if (model.chatConfig.isAllowLongPressAvatarToAt) {
+                                widget.onLongPressForOthersHeadPortrait!(
+                                  message.sender,
+                                  MessageUtils.getDisplayName(message),
+                                );
+                              }
                             }
+                            //////////////// 自定义长按显示内容 ////////////////
                           },
                           onTapDown: isDesktopScreen
                               ? (details) {
