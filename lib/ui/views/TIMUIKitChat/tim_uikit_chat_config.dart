@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
@@ -245,6 +246,8 @@ class TIMUIKitChatConfig {
   /// 添加 不能转发的会话过滤
   final List<String> Function()? disableForwardConversions;
 
+  // 添加会话聊天图片浏览长按事件
+  final ValueChanged<V2TimMessage>? onImageLongPress;
   const TIMUIKitChatConfig(
       {this.onTapLink,
       this.timeDividerConfig,
@@ -294,5 +297,6 @@ class TIMUIKitChatConfig {
       this.isAllowLongPressAvatarToAt = true,
       this.isUseDefaultEmoji = false,
       this.messageCanLongPres,
+      this.onImageLongPress,
       this.disableForwardConversions});
 }

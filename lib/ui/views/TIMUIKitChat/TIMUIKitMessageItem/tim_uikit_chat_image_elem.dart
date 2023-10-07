@@ -426,15 +426,20 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
           PageRouteBuilder(
               opaque: false,
               pageBuilder: (_, __, ___) => ImageScreen(
-                  imageProvider: CachedNetworkImageProvider(
-                    imgUrl ?? "",
-                    cacheKey: widget.message.msgID,
-                  ),
-                  heroTag: heroTag,
-                  messageID: widget.message.msgID,
-                  downloadFn: () async {
-                    return await _saveImg(theme);
-                  })),
+                    imageProvider: CachedNetworkImageProvider(
+                      imgUrl ?? "",
+                      cacheKey: widget.message.msgID,
+                    ),
+                    heroTag: heroTag,
+                    messageID: widget.message.msgID,
+                    downloadFn: () async {
+                      return await _saveImg(theme);
+                    },
+                    onLongPress: () async {
+                      widget.chatModel.chatConfig.onImageLongPress
+                          ?.call(widget.message);
+                    },
+                  )),
         );
       }
     } else {
@@ -448,12 +453,17 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
           PageRouteBuilder(
             opaque: false, // set to false
             pageBuilder: (_, __, ___) => ImageScreen(
-                imageProvider: FileImage(File(imgPath ?? "")),
-                heroTag: heroTag,
-                messageID: widget.message.msgID,
-                downloadFn: () async {
-                  return await _saveImg(theme);
-                }),
+              imageProvider: FileImage(File(imgPath ?? "")),
+              heroTag: heroTag,
+              messageID: widget.message.msgID,
+              downloadFn: () async {
+                return await _saveImg(theme);
+              },
+              onLongPress: () async {
+                widget.chatModel.chatConfig.onImageLongPress
+                    ?.call(widget.message);
+              },
+            ),
           ),
         );
       }
