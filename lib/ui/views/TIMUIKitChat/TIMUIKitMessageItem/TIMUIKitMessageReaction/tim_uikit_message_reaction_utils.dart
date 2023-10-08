@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
@@ -13,41 +12,6 @@ class MessageReactionUtils {
       serviceLocator<TUISelfInfoViewModel>();
   static final MessageService _messageService =
       serviceLocator<MessageService>();
-
-  ////////////////// 加载点击 sticker 的成员信息 //////////////////
-  static final GroupServices _groupServices = serviceLocator<GroupServices>();
-  static Future<String> _getGroupMemberShowName(
-    String groupID,
-    String memberUserID,
-  ) async {
-    final res = await _groupServices.getGroupMembersInfo(
-      groupID: groupID,
-      memberList: [memberUserID],
-    );
-
-    V2TimGroupMemberFullInfo? memberInfo;
-    if (res.code == 0 && res.data != null && res.data != []) {
-      memberInfo = res.data!.first;
-    }
-    String showName = memberUserID;
-    if (memberInfo != null) {
-      if (memberInfo.friendRemark != null &&
-          memberInfo.friendRemark!.isNotEmpty) {
-        showName = memberInfo.friendRemark!;
-      } else if (memberInfo.nameCard != null &&
-          memberInfo.nameCard!.isNotEmpty) {
-        showName = memberInfo.nameCard!;
-      } else if (memberInfo.nickName != null &&
-          memberInfo.nickName!.isNotEmpty) {
-        showName = memberInfo.nickName!;
-      } else {
-        showName = memberInfo.userID;
-      }
-    }
-
-    return showName;
-  }
-  ////////////////// 加载点击 sticker 的成员信息 //////////////////
 
   static CloudCustomData getCloudCustomData(V2TimMessage message) {
     CloudCustomData messageCloudCustomData;
@@ -73,35 +37,11 @@ class MessageReactionUtils {
     final Map<String, dynamic> messageReaction =
         messageCloudCustomData.messageReaction ?? {};
     List targetList = messageReaction["$sticker"] ?? [];
-
-    ////////////////// 加载点击 sticker 的成员信息 //////////////////
-    // 群组特殊处理
-    if (message.groupID?.isNotEmpty == true) {
-      final showName = await _getGroupMemberShowName(
-        message.groupID ?? '',
-        selfInfoModel.loginInfo!.userID!,
-      );
-      if (showName.isNotEmpty) {
-        if (targetList.contains(showName)) {
-          targetList.remove(showName);
-        } else {
-          targetList = [showName, ...targetList];
-        }
-      }
+    if (targetList.contains(selfInfoModel.loginInfo!.userID!)) {
+      targetList.remove(selfInfoModel.loginInfo!.userID!);
     } else {
-      if (targetList.contains(selfInfoModel.loginInfo!.userID!)) {
-        targetList.remove(selfInfoModel.loginInfo!.userID!);
-      } else {
-        targetList = [selfInfoModel.loginInfo!.userID!, ...targetList];
-      }
+      targetList = [selfInfoModel.loginInfo!.userID!, ...targetList];
     }
-    ////////////////// 加载点击 sticker 的成员信息 //////////////////
-
-    // if (targetList.contains(selfInfoModel.loginInfo!.userID!)) {
-    //   targetList.remove(selfInfoModel.loginInfo!.userID!);
-    // } else {
-    //   targetList = [selfInfoModel.loginInfo!.userID!, ...targetList];
-    // }
 
     messageReaction["$sticker"] = targetList;
 
