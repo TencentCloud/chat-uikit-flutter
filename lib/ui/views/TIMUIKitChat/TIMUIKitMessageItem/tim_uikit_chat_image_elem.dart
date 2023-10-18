@@ -538,8 +538,9 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
           TencentUtils.checkString(
                   widget.message.imageElem?.imageList?[0]?.localUrl) ==
               null ||
-          !File(widget.message.imageElem!.imageList![0]!.localUrl!)
-              .existsSync()) {
+          (widget.message.imageElem!.imageList![1]!.localUrl != null &&
+              !File(widget.message.imageElem!.imageList![0]!.localUrl!)
+                  .existsSync())) {
         _messageService.downloadMessage(
             msgID: widget.message.msgID!,
             messageType: 3,
@@ -551,8 +552,9 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
               TencentUtils.checkString(
                       widget.message.imageElem?.imageList?[1]?.localUrl) ==
                   null ||
-          !File(widget.message.imageElem!.imageList![1]!.localUrl!)
-              .existsSync()) {
+          (widget.message.imageElem!.imageList![1]!.localUrl != null &&
+              !File(widget.message.imageElem!.imageList![1]!.localUrl!)
+                  .existsSync())) {
         _messageService.downloadMessage(
             msgID: widget.message.msgID!,
             messageType: 3,
@@ -564,8 +566,9 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
           TencentUtils.checkString(
                   widget.message.imageElem?.imageList?[2]?.localUrl) ==
               null ||
-          !File(widget.message.imageElem!.imageList![2]!.localUrl!)
-              .existsSync()) {
+          (widget.message.imageElem!.imageList![1]!.localUrl != null &&
+              !File(widget.message.imageElem!.imageList![2]!.localUrl!)
+                  .existsSync())) {
         _messageService.downloadMessage(
             msgID: widget.message.msgID!,
             messageType: 3,
