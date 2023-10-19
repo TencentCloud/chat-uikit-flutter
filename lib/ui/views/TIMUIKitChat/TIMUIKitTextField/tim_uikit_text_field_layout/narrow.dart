@@ -697,7 +697,6 @@ class _LatestImageWidgetState extends State<LatestImageWidget> {
 
   void _onTap() {
     if (_latestImgPath.isNotEmpty) {
-      _hideSelf();
       MessageUtils.handleMessageError(
         widget.model.sendImageMessage(
           imagePath: _latestImgPath,
@@ -706,6 +705,7 @@ class _LatestImageWidgetState extends State<LatestImageWidget> {
         ),
         context,
       );
+      _hideSelf();
     }
   }
 
