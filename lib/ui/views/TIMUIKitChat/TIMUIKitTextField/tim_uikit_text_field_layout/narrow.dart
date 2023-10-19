@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:math';
 
+import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
@@ -10,13 +12,13 @@ import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_glo
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_setting_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/device_latest_pic_util.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/optimize_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_send_sound_message.dart';
-import 'package:extended_text_field/extended_text_field.dart';
 import 'package:tencent_keyboard_visibility/tencent_keyboard_visibility.dart';
 
 GlobalKey<_TIMUIKitTextFieldLayoutNarrowState> narrowTextFieldKey = GlobalKey();
@@ -420,6 +422,9 @@ class _TIMUIKitTextFieldLayoutNarrowState
 
     return Column(
       children: [
+        //////////////// 新增点击加号显示最近保存的图片 ////////////////
+        _buildLatestImg(),
+        //////////////// 新增点击加号显示最近保存的图片 ////////////////
         _buildRepliedMessage(widget.repliedMessage),
         Container(
           color: widget.backgroundColor ?? hexToColor("f5f5f6"),
@@ -655,3 +660,126 @@ class _TIMUIKitTextFieldLayoutNarrowState
     );
   }
 }
+
+//////////////// 新增点击加号显示最近保存的图片 ////////////////
+extension _TIMUIKitTextFieldLayoutNarrowCus
+    on _TIMUIKitTextFieldLayoutNarrowState {
+  Widget _buildLatestImg() {
+    if (showMore) {
+      return LatestImageWidget(
+        convID: widget.conversationID,
+        convType: widget.conversationType,
+        model: widget.model,
+      );
+    }
+    return const SizedBox();
+  }
+}
+
+class LatestImageWidget extends StatefulWidget {
+  const LatestImageWidget({
+    super.key,
+    required this.convID,
+    required this.convType,
+    required this.model,
+  });
+
+  final String convID;
+  final ConvType convType;
+  final TUIChatSeparateViewModel model;
+
+  @override
+  State<LatestImageWidget> createState() => _LatestImageWidgetState();
+}
+
+class _LatestImageWidgetState extends State<LatestImageWidget> {
+  String _latestImgPath = '';
+
+  void _onTap() {
+    if (_latestImgPath.isNotEmpty) {
+      _hideSelf();
+      MessageUtils.handleMessageError(
+        widget.model.sendImageMessage(
+          imagePath: _latestImgPath,
+          convID: widget.convID,
+          convType: widget.convType,
+        ),
+        context,
+      );
+    }
+  }
+
+  _getLatestImage() async {
+    final picPath = await DeviceLatestPicUtil.of.getLatestImage();
+    if (picPath.isEmpty) return;
+    if (!mounted) return;
+    _latestImgPath = picPath;
+    setState(() {});
+
+    await Future.delayed(const Duration(seconds: 5));
+    _hideSelf();
+  }
+
+  void _hideSelf() {
+    if (!mounted) return;
+    _latestImgPath = '';
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    _getLatestImage();
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _latestImgPath.isEmpty
+        ? const SizedBox()
+        : GestureDetector(
+            onTap: _onTap,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: Colors.white,
+                  ),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+                  margin: const EdgeInsets.only(right: 4, bottom: 8),
+                  height: 110,
+                  width: 75,
+                  child: Column(
+                    children: [
+                      Text(
+                        // TODO：国际化配置
+                        TIM_t('你可能要发送的照片:'),
+                        style: const TextStyle(
+                          fontSize: 12,
+                        ),
+                      ),
+                      if (_latestImgPath.isNotEmpty &&
+                          File(_latestImgPath).existsSync()) ...[
+                        const SizedBox(height: 4),
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: Image.file(
+                              File(_latestImgPath),
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+  }
+}
+//////////////// 新增点击加号显示最近保存的图片 ////////////////
