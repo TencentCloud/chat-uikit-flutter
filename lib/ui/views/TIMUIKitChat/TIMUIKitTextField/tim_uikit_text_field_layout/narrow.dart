@@ -20,6 +20,7 @@ import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_send_sound_message.dart';
 import 'package:tencent_keyboard_visibility/tencent_keyboard_visibility.dart';
+import 'package:tencent_super_tooltip/tencent_super_tooltip.dart';
 
 GlobalKey<_TIMUIKitTextFieldLayoutNarrowState> narrowTextFieldKey = GlobalKey();
 
@@ -694,6 +695,7 @@ class LatestImageWidget extends StatefulWidget {
 
 class _LatestImageWidgetState extends State<LatestImageWidget> {
   String _latestImgPath = '';
+  late SuperTooltip _tooltip;
 
   void _onTap() {
     if (_latestImgPath.isNotEmpty) {
@@ -714,7 +716,11 @@ class _LatestImageWidgetState extends State<LatestImageWidget> {
     if (picPath.isEmpty) return;
     if (!mounted) return;
     _latestImgPath = picPath;
-    setState(() {});
+
+    // 延时才能获取到正确的位置
+    await Future.delayed(const Duration(milliseconds: 200));
+    _initTooltip();
+    _tooltip.show(context);
 
     await Future.delayed(const Duration(seconds: 5));
     _hideSelf();
@@ -723,7 +729,7 @@ class _LatestImageWidgetState extends State<LatestImageWidget> {
   void _hideSelf() {
     if (!mounted) return;
     _latestImgPath = '';
-    setState(() {});
+    _tooltip.close();
   }
 
   @override
@@ -733,53 +739,78 @@ class _LatestImageWidgetState extends State<LatestImageWidget> {
   }
 
   @override
+  void dispose() {
+    if (_tooltip.isOpen) {
+      _tooltip.close();
+    }
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return _latestImgPath.isEmpty
-        ? const SizedBox()
-        : GestureDetector(
-            onTap: _onTap,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: Colors.white,
+    return const SizedBox();
+  }
+
+  _initTooltip() {
+    _tooltip = SuperTooltip(
+      popupDirection: TooltipDirection.up,
+      minimumOutSidePadding: 0,
+      hasArrow: false,
+      borderColor: Colors.transparent,
+      backgroundColor: Colors.transparent,
+      shadowColor: Colors.transparent,
+      hasShadow: false,
+      showCloseButton: ShowCloseButton.none,
+      // 透传点击事件
+      blockOutsidePointerEvents: false,
+      touchThroughAreaShape: ClipAreaShape.rectangle,
+      // 以下二项去除 bottom margin
+      arrowTipDistance: 0,
+      arrowLength: 0,
+      content: GestureDetector(
+        onTap: _onTap,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: Colors.white,
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
+              margin: const EdgeInsets.only(right: 4, bottom: 8),
+              height: 110,
+              width: 75,
+              child: Column(
+                children: [
+                  Text(
+                    // TODO：国际化配置
+                    TIM_t('你可能要发送的照片:'),
+                    style: const TextStyle(
+                      fontSize: 12,
+                    ),
                   ),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 2, vertical: 4),
-                  margin: const EdgeInsets.only(right: 4, bottom: 8),
-                  height: 110,
-                  width: 75,
-                  child: Column(
-                    children: [
-                      Text(
-                        // TODO：国际化配置
-                        TIM_t('你可能要发送的照片:'),
-                        style: const TextStyle(
-                          fontSize: 12,
+                  if (_latestImgPath.isNotEmpty &&
+                      File(_latestImgPath).existsSync()) ...[
+                    const SizedBox(height: 4),
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(6),
+                        child: Image.file(
+                          File(_latestImgPath),
+                          fit: BoxFit.cover,
+                          width: double.infinity,
                         ),
                       ),
-                      if (_latestImgPath.isNotEmpty &&
-                          File(_latestImgPath).existsSync()) ...[
-                        const SizedBox(height: 4),
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(6),
-                            child: Image.file(
-                              File(_latestImgPath),
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-              ],
+                    ),
+                  ],
+                ],
+              ),
             ),
-          );
+          ],
+        ),
+      ),
+    );
   }
 }
 //////////////// 新增点击加号显示最近保存的图片 ////////////////

@@ -9,6 +9,10 @@ class DeviceLatestPicUtil {
 
   String _lastImgPath = '';
 
+  // 间隔时间：多少毫秒之内保存的图片
+  // more 2 分钟内新增的图片
+  final int _spaceTime = 2 * 60 * 1000;
+
   Future<String> getLatestImage() async {
     try {
       List<AssetPathEntity> albums = await PhotoManager.getAssetPathList(
@@ -16,16 +20,13 @@ class DeviceLatestPicUtil {
         type: RequestType.image,
         filterOption: FilterOptionGroup(
           createTimeCond: DateTimeCond(
-            // 1分钟内新增的图片
             min: DateTime.fromMillisecondsSinceEpoch(
-              DateTime.now().millisecondsSinceEpoch - 1 * 60 * 1000,
+              DateTime.now().millisecondsSinceEpoch - _spaceTime,
             ),
             max: DateTime.now(),
           ),
         ),
       );
-
-      debugPrint('latestAsset albums: ${albums.length}');
 
       List<AssetEntity> allAssets = [];
 
@@ -36,13 +37,6 @@ class DeviceLatestPicUtil {
           allAssets.add(assets.first);
         }
       }
-
-      // allAssets.sort((a, b) => b.createDateTime.compareTo(a.createDateTime));
-      debugPrint('latestAsset allAssets: ${allAssets.length}');
-
-      allAssets.forEach((asset) {
-        debugPrint('latestAsset: ${asset.createDateTime}');
-      });
 
       if (allAssets.isNotEmpty) {
         AssetEntity latestAsset = allAssets.first;
@@ -61,7 +55,7 @@ class DeviceLatestPicUtil {
       return '';
     } catch (e) {
       debugPrint('getLatestImage error: $e');
-      rethrow;
+      return '';
     }
   }
 }
