@@ -1629,7 +1629,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
       return;
     }
 
-    if (!SoundPlayer.isInited) {
+    if (!SoundPlayer.isInit) {
       SoundPlayer.initSoundPlayer();
     }
 
