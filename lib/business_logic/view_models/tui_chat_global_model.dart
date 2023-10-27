@@ -759,19 +759,20 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
   void _handleFinishedDownload(
       V2TimMessageDownloadProgress messageProgress, V2TimMessage? message) {
     if (message != null) {
+      ////////////// 语音消息放入可下载类型 //////////////
       bool isImageType =
           message.elemType == MessageElemType.V2TIM_ELEM_TYPE_IMAGE;
       bool isVideoType =
           message.elemType == MessageElemType.V2TIM_ELEM_TYPE_VIDEO;
       bool isSoundType =
           message.elemType == MessageElemType.V2TIM_ELEM_TYPE_SOUND;
-
       final originalImageType = PlatformUtils().isIOS ? 1 : 0;
       if (!isImageType && !isVideoType && !isSoundType) {
         _updateMessageLocationAndDownloadFile(messageProgress);
       } else if ((isImageType && messageProgress.type == originalImageType) ||
           isVideoType ||
           isSoundType) {
+        ////////////// 语音消息放入可下载类型 //////////////
         Future.delayed(const Duration(seconds: 1),
             () => _updateMessageAndDownloadFile(message, messageProgress));
       } else {
@@ -1131,10 +1132,12 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
 
   List<V2TimMessage>? getMessageList(String conversationID) {
     final list = (messageListMap[conversationID]?.reversed.toList() ?? [])
-        .where((element) => _lifeCycle?.messageShouldMount(element) ?? true);
+        .where((element) => _lifeCycle?.messageShouldMount(element) ?? true)
+        .toList();
+    final finalList = _lifeCycle?.messageListShouldMount(list) ?? list;
     final List<V2TimMessage> listWithTimestamp = [];
     final interval = chatConfig.timeDividerConfig?.timeInterval ?? 300;
-    for (var item in list) {
+    for (var item in finalList) {
       {
         if (listWithTimestamp.isEmpty ||
             (listWithTimestamp[listWithTimestamp.length - 1].timestamp !=

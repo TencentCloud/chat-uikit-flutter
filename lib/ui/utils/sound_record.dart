@@ -15,14 +15,14 @@ class SoundPlayer {
   final ImportProxy importProxy = ImportProxy();
   static final FlutterPluginRecord _recorder = FlutterPluginRecord();
   static SoundInterruptListener? _soundInterruptListener;
-  static bool isInited = false;
+  static bool isInit = false;
   static final AudioPlayer _audioPlayer = AudioPlayer();
 
   static initSoundPlayer() {
-    if (!isInited) {
+    if (!isInit) {
       _recorder.init();
       // AudioPlayer.global.setGlobalAudioContext(const AudioContext());
-      isInited = true;
+      isInit = true;
     }
   }
 

@@ -12,38 +12,19 @@ class TimeAgo {
   }
 
   List<String> weekdayMap() {
-    return [
-      '',
-      TIM_t("星期一"),
-      TIM_t("星期二"),
-      TIM_t("星期三"),
-      TIM_t("星期四"),
-      TIM_t("星期五"),
-      TIM_t("星期六"),
-      TIM_t("星期天")
-    ];
+    return ['', TIM_t("星期一"), TIM_t("星期二"), TIM_t("星期三"), TIM_t("星期四"), TIM_t("星期五"), TIM_t("星期六"), TIM_t("星期天")];
   }
 
   String getYearMonthDate(DateTime dateTime) {
     String month = dateTime.month.toString();
     String date = dateTime.day.toString();
-    return dateTime.year.toString() +
-        '/' +
-        (month.length == 1 ? '0' : '') +
-        month +
-        '/' +
-        (date.length == 1 ? '0' : '') +
-        date;
+    return dateTime.year.toString() + '/' + (month.length == 1 ? '0' : '') + month + '/' + (date.length == 1 ? '0' : '') + date;
   }
 
   String getMonthDate(DateTime dateTime) {
     String month = dateTime.month.toString();
     String date = dateTime.day.toString();
-    return (month.length == 1 ? '0' : '') +
-        month +
-        '/' +
-        (date.length == 1 ? '0' : '') +
-        date;
+    return (month.length == 1 ? '0' : '') + month + '/' + (date.length == 1 ? '0' : '') + date;
   }
 
   String? getTimeStringForChat(int timeStamp) {
@@ -55,14 +36,7 @@ class TimeAgo {
     }
 
     final Duration duration = DateTime.now().difference(date);
-    final int diffDays = duration.inDays +
-        (duration.inMinutes >
-                DateTime.now()
-                    .difference(DateTime(DateTime.now().year,
-                        DateTime.now().month, DateTime.now().day))
-                    .inMinutes
-            ? 1
-            : 0);
+    final int diffDays = duration.inDays + (duration.inMinutes > DateTime.now().difference(DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day)).inMinutes ? 1 : 0);
     final int diffMinutes = duration.inMinutes;
 
     var res;
@@ -87,8 +61,7 @@ class TimeAgo {
           final String option2 = diffMinutes.toString();
           res = TIM_t_para("{{option2}} 分钟前", "$option2 分钟前")(option2: option2);
         } else {
-          res =
-              "${date.hour}:${date.minute < 10 ? date.minute.toString() + "0" : date.minute}";
+          res = "${date.hour}:${date.minute < 10 ? "0" + date.minute.toString() : date.minute}";
           // res = "$prefix $timeStr";
         }
       } else {
@@ -104,8 +77,7 @@ class TimeAgo {
     nowTime = DateTime(nowTime.year, nowTime.month, nowTime.day);
     var ftime = DateTime.fromMillisecondsSinceEpoch(timeStamp * 1000);
     // var preFix = ftime.hour >= 12 ? TIM_t("下午") : TIM_t("上午");
-    final timeStr =
-        DateFormat('HH:mm').format(ftime); // Use 'HH:mm' for 24-hour format
+    final timeStr = DateFormat('HH:mm').format(ftime); // Use 'HH:mm' for 24-hour format
     // 一年外 年月日 + 时间 (24小时制)
     if (nowTime.year != ftime.year) {
       return '${DateFormat('yyyy-MM-dd').format(ftime)} $timeStr';

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+// import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
@@ -64,13 +65,11 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
 
   // 语音消息连续播放新增逻辑 begin
   // _playSound() async {
-  //   if (!SoundPlayer.isInited) {
+  //   if (!SoundPlayer.isInit) {
   //     SoundPlayer.initSoundPlayer();
   //   }
-  //   if (widget.localCustomInt == null ||
-  //       widget.localCustomInt != HistoryMessageDartConstant.read) {
-  //     globalModel.setLocalCustomInt(widget.msgID,
-  //         HistoryMessageDartConstant.read, widget.chatModel.conversationID);
+  //   if (widget.localCustomInt == null || widget.localCustomInt != HistoryMessageDartConstant.read) {
+  //     globalModel.setLocalCustomInt(widget.msgID, HistoryMessageDartConstant.read, widget.chatModel.conversationID);
   //   }
   //   if (isPlaying) {
   //     SoundPlayer.stop();
@@ -109,12 +108,11 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
   }
 
   // 语音消息连续播放新增逻辑 begin
-  // @override
+  //  @override
   // void didUpdateWidget(oldWidget) {
   //   super.didUpdateWidget(oldWidget);
   //   setState(() {
-  //     isPlaying = widget.chatModel.currentPlayedMsgId != '' &&
-  //         widget.chatModel.currentPlayedMsgId == widget.msgID;
+  //     isPlaying = widget.chatModel.currentPlayedMsgId != '' && widget.chatModel.currentPlayedMsgId == widget.msgID;
   //   });
   // }
   // 语音消息连续播放新增逻辑 end
@@ -124,9 +122,8 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
     super.initState();
 
     // 语音消息连续播放新增逻辑 begin
-    // subscription =
-    // SoundPlayer.playStateListener(listener: (PlayerState state) {
-    //   if(state.processingState == ProcessingState.completed){
+    // subscription = SoundPlayer.playStateListener(listener: (PlayerState state) {
+    //   if (state.processingState == ProcessingState.completed) {
     //     widget.chatModel.currentPlayedMsgId = "";
     //   }
     // });
