@@ -770,7 +770,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
       if (!isImageType && !isVideoType && !isSoundType) {
         _updateMessageLocationAndDownloadFile(messageProgress);
       } else if ((isImageType && messageProgress.type == originalImageType) ||
-          isVideoType ||
+          (isVideoType && !messageProgress.isSnapshot) ||
           isSoundType) {
         ////////////// 语音消息放入可下载类型 //////////////
         Future.delayed(const Duration(seconds: 1),
