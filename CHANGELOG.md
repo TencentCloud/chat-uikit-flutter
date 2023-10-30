@@ -7,6 +7,7 @@
 ## Bug Fixes
 
 * Fixed an issue on time tag creator.
+* Fixed an issue on Video Message LocalURL.
 
 # 2.3.2
 

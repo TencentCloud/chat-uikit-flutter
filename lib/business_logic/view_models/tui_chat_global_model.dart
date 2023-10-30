@@ -660,7 +660,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
       final originalImageType = PlatformUtils().isIOS ? 1 : 0;
       if (!isImageType && !isVideoType) {
         _updateMessageLocationAndDownloadFile(messageProgress);
-      } else if ((isImageType && messageProgress.type == originalImageType) || isVideoType) {
+      } else if ((isImageType && messageProgress.type == originalImageType) || (isVideoType && !messageProgress.isSnapshot)) {
         Future.delayed(const Duration(seconds: 1), () => _updateMessageAndDownloadFile(message, messageProgress));
       } else {
         return;
