@@ -17,6 +17,8 @@ import 'package:tencent_cloud_chat_uikit/ui/widgets/video_screen.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../widgets/kang_xun_video_screen.dart';
+
 class TIMUIKitVideoElem extends StatefulWidget {
   final V2TimMessage message;
   final bool isShowJump;
@@ -235,11 +237,18 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
           Navigator.of(context).push(
             PageRouteBuilder(
               opaque: false, // set to false
-              pageBuilder: (_, __, ___) => VideoScreen(
-                message: widget.message,
-                heroTag: heroTag,
-                videoElement: stateElement,
-              ),
+              pageBuilder: (_, __, ___) =>
+                  widget.chatModel.chatConfig.useKangXunVideo
+                      ? KangXunVideoScreen(
+                          message: widget.message,
+                          heroTag: heroTag,
+                          videoElement: stateElement,
+                        )
+                      : VideoScreen(
+                          message: widget.message,
+                          heroTag: heroTag,
+                          videoElement: stateElement,
+                        ),
             ),
           );
         }

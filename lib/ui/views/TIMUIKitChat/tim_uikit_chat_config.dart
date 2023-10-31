@@ -248,6 +248,10 @@ class TIMUIKitChatConfig {
 
   // 添加会话聊天图片浏览长按事件
   final ValueChanged<V2TimMessage>? onImageLongPress;
+
+  // 因为部分视频格式官网不支持，加一个变量控制
+  final bool useKangXunVideo;
+
   const TIMUIKitChatConfig(
       {this.onTapLink,
       this.timeDividerConfig,
@@ -298,5 +302,6 @@ class TIMUIKitChatConfig {
       this.isUseDefaultEmoji = false,
       this.messageCanLongPres,
       this.onImageLongPress,
-      this.disableForwardConversions});
+      this.disableForwardConversions,
+      this.useKangXunVideo = false});
 }

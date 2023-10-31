@@ -82,6 +82,7 @@ dependencies:
   markdown: ^7.1.0
   logger: ^2.0.1
   image_clipboard: ^1.0.0+2
+  fijkplayer: ^0.11.0
 
 dependency_overrides:
   # ffi: ^2.0.1
