@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:system_info2/system_info2.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_call_invite_list.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
@@ -512,9 +513,11 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
 
       final convID = widget.conversationID;
       final convType = widget.conversationType;
+      final resolutionPreset = await getResolutionPreset();
       final pickedFile = await CameraPicker.pickFromCamera(context,
           pickerConfig: CameraPickerConfig(
               enableRecording: true,
+              resolutionPreset: resolutionPreset,
               textDelegate: IntlCameraPickerTextDelegate()));
       final originFile = await pickedFile?.originFile;
       if (originFile != null) {
@@ -535,6 +538,23 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
       }
     } catch (error) {
       outputLogger.i("err: $error");
+    }
+  }
+
+  Future<ResolutionPreset> getResolutionPreset() async {
+    if (Platform.isAndroid) {
+      final int totalMemory = SysInfo.getTotalPhysicalMemory();
+      if (totalMemory < 6144000000) {
+        return ResolutionPreset.medium;
+      } else if (totalMemory < 8192000000) {
+        return ResolutionPreset.high;
+      } else if (totalMemory < 12288000000) {
+        return ResolutionPreset.veryHigh;
+      } else {
+        return ResolutionPreset.ultraHigh;
+      }
+    } else {
+      return ResolutionPreset.veryHigh;
     }
   }
 
