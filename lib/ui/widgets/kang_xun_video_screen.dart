@@ -259,8 +259,21 @@ class _KangXunVideoScreenState extends TIMUIKitState<KangXunVideoScreen> {
       },
     );
 
-    String videoPath =
-        widget.videoElement.localVideoUrl ?? widget.videoElement.videoPath!;
+    String videoPath = PlatformUtils().isWeb
+        ? ((TencentUtils.checkString(widget.videoElement.videoPath) != null) ||
+                widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING
+            ? widget.videoElement.videoPath!
+            : (TencentUtils.checkString(widget.videoElement.localVideoUrl) ==
+                    null)
+                ? widget.videoElement.videoUrl!
+                : widget.videoElement.localVideoUrl!)
+        : (TencentUtils.checkString(widget.videoElement.videoPath) != null ||
+                widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING)
+            ? widget.videoElement.videoPath!
+            : (TencentUtils.checkString(widget.videoElement.localVideoUrl) ==
+                    null)
+                ? widget.videoElement.videoUrl!
+                : widget.videoElement.localVideoUrl!;
 
     fijkPlayer.setDataSource(videoPath, autoPlay: true, showCover: true);
 
