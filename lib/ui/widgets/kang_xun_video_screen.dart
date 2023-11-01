@@ -275,15 +275,17 @@ class _KangXunVideoScreenState extends TIMUIKitState<KangXunVideoScreen> {
                 ? widget.videoElement.videoUrl!
                 : widget.videoElement.localVideoUrl!;
 
-    fijkPlayer.setDataSource(videoPath, autoPlay: true, showCover: true);
-
+    fijkPlayer.setDataSource(
+      videoPath,
+      autoPlay: true,
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
       double w = getVideoWidth();
       double h = getVideoHeight();
 
-      setState(() {
-        isInit = true;
-      });
+      // setState(() {
+      //   isInit = true;
+      // });
     });
   }
 
