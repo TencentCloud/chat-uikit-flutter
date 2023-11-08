@@ -422,6 +422,16 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
           originImgUrl: imgUrl,
         );
       } else {
+        //////////////// 图片、视频消息连续浏览 ////////////////
+        if (widget.chatModel.chatConfig.onClickImg != null) {
+          widget.chatModel.chatConfig.onClickImg!(
+            msg: widget.message,
+            heroTag: heroTag,
+          );
+          return;
+        }
+        //////////////// 图片、视频消息连续浏览 ////////////////
+
         Navigator.of(context).push(
           PageRouteBuilder(
               opaque: false,
@@ -449,6 +459,16 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
             context: context,
             onClickOrigin: () => launchDesktopFile(imgPath ?? ""));
       } else {
+        //////////////// 图片、视频消息连续浏览 ////////////////
+        if (widget.chatModel.chatConfig.onClickImg != null) {
+          widget.chatModel.chatConfig.onClickImg!(
+            msg: widget.message,
+            heroTag: heroTag,
+          );
+          return;
+        }
+        //////////////// 图片、视频消息连续浏览 ////////////////
+
         Navigator.of(context).push(
           PageRouteBuilder(
             opaque: false, // set to false
