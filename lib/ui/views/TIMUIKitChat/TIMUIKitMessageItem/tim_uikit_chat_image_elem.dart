@@ -30,6 +30,7 @@ import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_wrapper.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/im_media_msg_browser/media_browser.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/image_screen.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
 import 'package:transparent_image/transparent_image.dart';
@@ -423,10 +424,19 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
         );
       } else {
         //////////////// 图片、视频消息连续浏览 ////////////////
-        if (widget.chatModel.chatConfig.onClickImg != null) {
-          widget.chatModel.chatConfig.onClickImg!(
-            msg: widget.message,
-            heroTag: heroTag,
+        if (widget.chatModel.chatConfig.useMediaBrowser) {
+          debugPrint(
+              'widget.chatModel.conversationID: ${widget.chatModel.conversationID}');
+          MediaBrowser.showIMMediaMsg(
+            context,
+            curMsg: widget.message,
+            userID: widget.chatModel.conversationType == ConvType.c2c
+                ? widget.chatModel.conversationID
+                : null,
+            groupID: widget.chatModel.conversationType == ConvType.group
+                ? widget.chatModel.conversationID
+                : null,
+            isFrom: widget.isFrom,
           );
           return;
         }
@@ -460,10 +470,19 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
             onClickOrigin: () => launchDesktopFile(imgPath ?? ""));
       } else {
         //////////////// 图片、视频消息连续浏览 ////////////////
-        if (widget.chatModel.chatConfig.onClickImg != null) {
-          widget.chatModel.chatConfig.onClickImg!(
-            msg: widget.message,
-            heroTag: heroTag,
+        if (widget.chatModel.chatConfig.useMediaBrowser) {
+          debugPrint(
+              'widget.chatModel.conversationID: ${widget.chatModel.conversationID}');
+          MediaBrowser.showIMMediaMsg(
+            context,
+            curMsg: widget.message,
+            userID: widget.chatModel.conversationType == ConvType.c2c
+                ? widget.chatModel.conversationID
+                : null,
+            groupID: widget.chatModel.conversationType == ConvType.group
+                ? widget.chatModel.conversationID
+                : null,
+            isFrom: widget.isFrom,
           );
           return;
         }

@@ -7,12 +7,14 @@ import 'package:open_file/open_file.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_wrapper.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/im_media_msg_browser/media_browser.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/video_screen.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -236,11 +238,17 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
           }
         } else {
           //////////////// 图片、视频消息连续浏览 ////////////////
-          if (widget.chatModel.chatConfig.onClickVideo != null) {
-            widget.chatModel.chatConfig.onClickVideo!(
-              msg: widget.message,
-              videoElem: stateElement,
-              heroTag: heroTag,
+          if (widget.chatModel.chatConfig.useMediaBrowser) {
+            MediaBrowser.showIMMediaMsg(
+              context,
+              curMsg: widget.message..videoElem = stateElement,
+              userID: widget.chatModel.conversationType == ConvType.c2c
+                  ? widget.chatModel.conversationID
+                  : null,
+              groupID: widget.chatModel.conversationType == ConvType.group
+                  ? widget.chatModel.conversationID
+                  : null,
+              isFrom: widget.isFrom,
             );
             return;
           }

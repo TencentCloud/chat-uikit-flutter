@@ -253,18 +253,7 @@ class TIMUIKitChatConfig {
   final bool useKangXunVideo;
 
   //////////////// 图片、视频消息连续浏览 ////////////////
-  /// final heroTag = "${widget.message.msgID ?? widget.message.id ?? widget.message.timestamp ?? DateTime.now().millisecondsSinceEpoch}${widget.isFrom}";
-  final void Function({
-    required V2TimMessage msg,
-    required String heroTag,
-  })? onClickImg;
-
-  /// final heroTag = "${widget.message.msgID ?? widget.message.id ?? widget.message.timestamp ?? DateTime.now().millisecondsSinceEpoch}${widget.isFrom}";
-  final void Function({
-    required V2TimMessage msg,
-    required V2TimVideoElem videoElem,
-    required String heroTag,
-  })? onClickVideo;
+  final bool useMediaBrowser;
   //////////////// 图片、视频消息连续浏览 ////////////////
 
   const TIMUIKitChatConfig({
@@ -320,8 +309,7 @@ class TIMUIKitChatConfig {
     this.disableForwardConversions,
     this.useKangXunVideo = false,
     //////////////// 图片、视频消息连续浏览 ////////////////
-    this.onClickImg,
-    this.onClickVideo,
+    this.useMediaBrowser = false,
     //////////////// 图片、视频消息连续浏览 ////////////////
   });
 }
