@@ -92,6 +92,7 @@ dependency_overrides:
   # intl: ^0.18.0
   tencent_cloud_chat_sdk: ^5.1.5
   win32: 4.0.0
+  system_info2: ^4.0.0
 
 dev_dependencies:
   flutter_lints: ^1.0.0

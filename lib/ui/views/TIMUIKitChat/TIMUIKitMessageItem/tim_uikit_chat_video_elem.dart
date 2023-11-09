@@ -185,7 +185,6 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
     }
   }
 
-
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final theme = value.theme;
@@ -195,14 +194,16 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
     return GestureDetector(
       onTap: () {
         if (PlatformUtils().isWeb) {
-          final url = widget.message.videoElem?.videoUrl ?? widget.message.videoElem?.videoPath ?? "";
+          final url = widget.message.videoElem?.videoUrl ??
+              widget.message.videoElem?.videoPath ??
+              "";
           TUIKitWidePopup.showMedia(
               context: context,
               mediaURL: url,
               onClickOrigin: () => launchUrl(
-                Uri.parse(url),
-                mode: LaunchMode.externalApplication,
-              ));
+                    Uri.parse(url),
+                    mode: LaunchMode.externalApplication,
+                  ));
           return;
         }
         if (PlatformUtils().isDesktop) {
@@ -234,6 +235,23 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
             }
           }
         } else {
+          //////////////// 图片、视频消息连续浏览 ////////////////
+          // if (widget.chatModel.chatConfig.useMediaBrowser) {
+          //   MediaBrowser.showIMMediaMsg(
+          //     context,
+          //     curMsg: widget.message..videoElem = stateElement,
+          //     userID: widget.chatModel.conversationType == ConvType.c2c
+          //         ? widget.chatModel.conversationID
+          //         : null,
+          //     groupID: widget.chatModel.conversationType == ConvType.group
+          //         ? widget.chatModel.conversationID
+          //         : null,
+          //     isFrom: widget.isFrom,
+          //   );
+          //   return;
+          // }
+          //////////////// 图片、视频消息连续浏览 ////////////////
+
           Navigator.of(context).push(
             PageRouteBuilder(
               opaque: false, // set to false
