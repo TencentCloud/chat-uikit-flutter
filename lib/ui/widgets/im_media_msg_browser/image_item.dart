@@ -30,7 +30,6 @@ class ImageItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('imgUrl: $imgUrl');
     Widget image = ExtendedImage.network(
       imgUrl,
       fit: BoxFit.contain,

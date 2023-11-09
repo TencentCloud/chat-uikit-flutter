@@ -49,7 +49,7 @@ class IMMediaMsgBrowserState extends State<IMMediaMsgBrowser>
 
   VideoPlayerController? videoPlayerController;
   ChewieController? chewieController;
-  late final ExtendedPageController _pageController;
+  ExtendedPageController? _pageController;
 
   bool _isNewerFinished = false;
   bool _isOldFinished = false;
@@ -94,6 +94,8 @@ class IMMediaMsgBrowserState extends State<IMMediaMsgBrowser>
     }
 
     if (_msgs.isEmpty) return;
+
+    debugPrint('_onPageChanged index: $index');
 
     if (index <= 3) {
       _getOldMsg(_msgs.first.msgID);
@@ -145,7 +147,7 @@ class IMMediaMsgBrowserState extends State<IMMediaMsgBrowser>
     }
 
     _slideEndAnimationController.dispose();
-    _pageController.dispose();
+    _pageController?.dispose();
     clearGestureDetailsCache();
     super.dispose();
   }
@@ -328,7 +330,6 @@ extension _IMMediaMsgBrowserStateApi on IMMediaMsgBrowserState {
         _msgs.indexWhere((element) => element.msgID == curMsg.msgID);
     debugPrint('_getInitialMsgs: newIndex: $newIndex');
     if (newIndex != -1) {
-      await Future.delayed(const Duration(milliseconds: 300));
       _pageController = ExtendedPageController(initialPage: newIndex);
     }
     _safeSetState(() {
@@ -339,7 +340,7 @@ extension _IMMediaMsgBrowserStateApi on IMMediaMsgBrowserState {
   Future<void> _getOldMsg(
     String? lastMsgID,
   ) async {
-    debugPrint('_getOldMsg');
+    debugPrint('_getOldMsg: _isOldFinished: $_isOldFinished');
     if (_isLoadingOld) return;
     if (_isOldFinished) return;
     _isLoadingOld = true;
@@ -348,9 +349,20 @@ extension _IMMediaMsgBrowserStateApi on IMMediaMsgBrowserState {
     _isOldFinished = res?.isFinished ?? true;
     final msgs = res?.messageList ?? [];
 
+    final curMsg = _msgs[_currentIndex];
     if (msgs.isNotEmpty) {
       _msgs.insertAll(0, msgs.reversed);
-      _safeSetState(() {});
+
+      _safeSetState(() {
+        final curMsgIndex =
+            _msgs.indexWhere((element) => element.msgID == curMsg.msgID);
+        debugPrint(
+            '_getOldMsg: curMsgIndex: $curMsgIndex, _currentIndex: $_currentIndex, msgs.length: ${msgs.length}');
+        if (curMsgIndex != -1 && !_isFirstLoading) {
+          _pageController = ExtendedPageController(initialPage: curMsgIndex);
+          // _pageController.jumpToPage(msgs.length + _currentIndex);
+        }
+      });
     }
     _isLoadingOld = false;
   }
@@ -358,7 +370,7 @@ extension _IMMediaMsgBrowserStateApi on IMMediaMsgBrowserState {
   Future<void> _getNewerMsg(
     String? lastMsgID,
   ) async {
-    debugPrint('_getNewerMsg');
+    debugPrint('_getNewerMsg: _isNewerFinished: $_isNewerFinished');
     if (_isLoadingNewer) return;
     if (_isNewerFinished) return;
     _isLoadingNewer = true;
@@ -384,7 +396,7 @@ extension _IMMediaMsgBrowserStateApi on IMMediaMsgBrowserState {
         HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
   }) async {
     final res = await _messageManager.getHistoryMessageListV2(
-      count: 10,
+      count: 100,
       userID: widget.userID,
       groupID: widget.groupID,
       getType: getType,
