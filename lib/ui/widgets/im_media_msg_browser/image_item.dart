@@ -57,7 +57,7 @@ class ImageItem extends StatelessWidget {
         }
         return GestureConfig(
           inPageView: true,
-          initialScale: initialScale ?? 1.0,
+          initialScale: 1.0,
           maxScale: max(initialScale ?? 1.0, 5.0),
           animationMaxScale: max(initialScale ?? 1.0, 5.0),
         );
