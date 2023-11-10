@@ -14,7 +14,7 @@ class MediaBrowser {
     required String? groupID,
     required String? isFrom,
     ValueChanged<String>? onDownloadFile,
-    ValueChanged<String>? onImgLongPress,
+    ValueChanged<V2TimMessage>? onImgLongPress,
   }) {
     Navigator.push(
       context,

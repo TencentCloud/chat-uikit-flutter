@@ -425,8 +425,6 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
       } else {
         //////////////// 图片、视频消息连续浏览 ////////////////
         if (widget.chatModel.chatConfig.useMediaBrowser) {
-          debugPrint(
-              'widget.chatModel.conversationID: ${widget.chatModel.conversationID}');
           MediaBrowser.showIMMediaMsg(
             context,
             curMsg: widget.message,
@@ -437,6 +435,9 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
                 ? widget.chatModel.conversationID
                 : null,
             isFrom: widget.isFrom,
+            onImgLongPress: (V2TimMessage msg) {
+              widget.chatModel.chatConfig.onImageLongPress?.call(msg);
+            },
           );
           return;
         }
@@ -471,8 +472,6 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
       } else {
         //////////////// 图片、视频消息连续浏览 ////////////////
         if (widget.chatModel.chatConfig.useMediaBrowser) {
-          debugPrint(
-              'widget.chatModel.conversationID: ${widget.chatModel.conversationID}');
           MediaBrowser.showIMMediaMsg(
             context,
             curMsg: widget.message,
@@ -483,6 +482,9 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
                 ? widget.chatModel.conversationID
                 : null,
             isFrom: widget.isFrom,
+            onImgLongPress: (V2TimMessage msg) {
+              widget.chatModel.chatConfig.onImageLongPress?.call(msg);
+            },
           );
           return;
         }
