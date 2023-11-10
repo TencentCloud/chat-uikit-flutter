@@ -15,6 +15,8 @@ class ImageItem extends StatelessWidget {
     required this.onImgTap,
     required this.onLongPress,
     required this.imageDetailY,
+    // 暂时不使用 hero，滑动返回的时候会有点问题
+    this.useHero = false,
   });
 
   final bool Function(GestureDetails? details) canScaleImage;
@@ -25,73 +27,79 @@ class ImageItem extends StatelessWidget {
   final GlobalKey<ExtendedImageSlidePageState> slidePagekey;
   final VoidCallback onImgTap;
   final VoidCallback onLongPress;
+  final bool useHero;
 
   @override
   Widget build(BuildContext context) {
+    Widget image = ExtendedImage.network(
+      imgUrl,
+      fit: BoxFit.contain,
+      enableSlideOutPage: true,
+      gaplessPlayback: false,
+      mode: ExtendedImageMode.gesture,
+      initGestureConfigHandler: (ExtendedImageState state) {
+        double? initialScale = 1.0;
+        if (state.extendedImageInfo != null) {
+          initialScale = _initScale(
+            size: size,
+            initialScale: initialScale,
+            imageSize: Size(
+              min(
+                size.width,
+                state.extendedImageInfo!.image.width.toDouble(),
+              ),
+              min(
+                size.height,
+                state.extendedImageInfo!.image.height.toDouble(),
+              ),
+            ),
+          );
+        }
+        return GestureConfig(
+          inPageView: true,
+          initialScale: 1.0,
+          maxScale: max(initialScale ?? 1.0, 5.0),
+          animationMaxScale: max(initialScale ?? 1.0, 5.0),
+        );
+      },
+      loadStateChanged: (ExtendedImageState state) {
+        if (state.extendedImageLoadState == LoadState.completed) {
+          return ExtendedImageGesture(
+            state,
+            canScaleImage: canScaleImage,
+            imageBuilder: (Widget image) {
+              return Stack(
+                children: <Widget>[
+                  Positioned.fill(
+                    top: imageDetailY,
+                    bottom: -imageDetailY,
+                    child: image,
+                  ),
+                ],
+              );
+            },
+          );
+        }
+        return InkWell(
+          onTap: onImgTap,
+          child: const UnconstrainedBox(
+            child: CircularProgressIndicator(color: Colors.white),
+          ),
+        );
+      },
+    );
+
+    if (useHero) {
+      image = HeroWidget(
+        tag: heroTag,
+        slidePagekey: slidePagekey,
+        child: image,
+      );
+    }
     return GestureDetector(
       onTap: onImgTap,
       onLongPress: onLongPress,
-      child: HeroWidget(
-        tag: heroTag,
-        slidePagekey: slidePagekey,
-        child: ExtendedImage.network(
-          imgUrl,
-          fit: BoxFit.contain,
-          enableSlideOutPage: true,
-          gaplessPlayback: false,
-          mode: ExtendedImageMode.gesture,
-          initGestureConfigHandler: (ExtendedImageState state) {
-            double? initialScale = 1.0;
-            if (state.extendedImageInfo != null) {
-              initialScale = _initScale(
-                size: size,
-                initialScale: initialScale,
-                imageSize: Size(
-                  min(
-                    size.width,
-                    state.extendedImageInfo!.image.width.toDouble(),
-                  ),
-                  min(
-                    size.height,
-                    state.extendedImageInfo!.image.height.toDouble(),
-                  ),
-                ),
-              );
-            }
-            return GestureConfig(
-              inPageView: true,
-              initialScale: 1.0,
-              maxScale: max(initialScale ?? 1.0, 5.0),
-              animationMaxScale: max(initialScale ?? 1.0, 5.0),
-            );
-          },
-          loadStateChanged: (ExtendedImageState state) {
-            if (state.extendedImageLoadState == LoadState.completed) {
-              return ExtendedImageGesture(
-                state,
-                canScaleImage: canScaleImage,
-                imageBuilder: (Widget image) {
-                  return Stack(
-                    children: <Widget>[
-                      Positioned.fill(
-                        top: imageDetailY,
-                        bottom: -imageDetailY,
-                        child: image,
-                      ),
-                    ],
-                  );
-                },
-              );
-            }
-            return InkWell(
-              onTap: onImgTap,
-              child: const UnconstrainedBox(
-                child: CircularProgressIndicator(color: Colors.white),
-              ),
-            );
-          },
-        ),
-      ),
+      child: image,
     );
   }
 
