@@ -16,13 +16,14 @@ class ImageItem extends StatelessWidget {
     required this.onImgTap,
     required this.onLongPress,
     required this.useHeroWrapper,
+    required this.imageDetailY,
   });
 
   final bool Function(GestureDetails? details) canScaleImage;
   final String imgUrl;
   final String heroTag;
   final Size size;
-  final double imageDetailY = 0;
+  final double imageDetailY;
   final GlobalKey<ExtendedImageSlidePageState> slidePagekey;
   final VoidCallback onImgTap;
   final VoidCallback onLongPress;
@@ -56,7 +57,7 @@ class ImageItem extends StatelessWidget {
         }
         return GestureConfig(
           inPageView: true,
-          initialScale: 1.0,
+          initialScale: initialScale ?? 1.0,
           maxScale: max(initialScale ?? 1.0, 5.0),
           animationMaxScale: max(initialScale ?? 1.0, 5.0),
         );
@@ -96,13 +97,11 @@ class ImageItem extends StatelessWidget {
       );
     }
 
-    // ignore: join_return_with_assignment
-    image = GestureDetector(
+    return GestureDetector(
       onTap: onImgTap,
       onLongPress: onLongPress,
       child: image,
     );
-    return image;
   }
 
   double? _initScale({

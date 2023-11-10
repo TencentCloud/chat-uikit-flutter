@@ -13,7 +13,7 @@ class BrowserHeroWrapper extends StatefulWidget {
     super.key,
   });
 
-  final Widget child;
+  final Widget? child;
   final SlideType slideType;
   final Object tag;
   final GlobalKey<ExtendedImageSlidePageState> slidePagekey;
@@ -111,7 +111,7 @@ class BrowserHeroWrapperState extends State<BrowserHeroWrapper> {
         }
         return hero.child;
       },
-      child: widget.child,
+      child: widget.child ?? const SizedBox(),
     );
   }
 }

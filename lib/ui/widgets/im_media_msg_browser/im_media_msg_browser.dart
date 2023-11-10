@@ -2,13 +2,20 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:chewie_for_us/chewie_for_us.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:fijkplayer/fijkplayer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/im_media_msg_browser/image_item.dart';
 import 'package:video_player/video_player.dart';
 
@@ -32,13 +39,13 @@ class IMMediaMsgBrowser extends StatefulWidget {
   final String? userID;
   final String? groupID;
   final ValueChanged<String>? onDownloadFile;
-  final ValueChanged<String>? onImgLongPress;
+  final ValueChanged<V2TimMessage>? onImgLongPress;
 
   @override
   IMMediaMsgBrowserState createState() => IMMediaMsgBrowserState();
 }
 
-class IMMediaMsgBrowserState extends State<IMMediaMsgBrowser>
+class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
     with TickerProviderStateMixin {
   final _messageManager = TencentImSDKPlugin.v2TIMManager.getMessageManager();
   late AnimationController _slideEndAnimationController;
@@ -46,6 +53,7 @@ class IMMediaMsgBrowserState extends State<IMMediaMsgBrowser>
   GlobalKey<ExtendedImageSlidePageState> slidePagekey =
       GlobalKey<ExtendedImageSlidePageState>();
   double _imageDetailY = 0;
+  bool _showSwiper = true;
 
   VideoPlayerController? videoPlayerController;
   ChewieController? chewieController;
@@ -57,6 +65,8 @@ class IMMediaMsgBrowserState extends State<IMMediaMsgBrowser>
   bool _isLoadingNewer = false;
   bool _isFirstLoading = true;
   final List<V2TimMessage> _msgs = [];
+
+  int _currentIndex = 0;
 
   bool get _isCurMsgVideo =>
       widget.curMsg.elemType == MessageElemType.V2TIM_ELEM_TYPE_VIDEO;
@@ -70,38 +80,8 @@ class IMMediaMsgBrowserState extends State<IMMediaMsgBrowser>
 
   void _safeSetState(void Function() fn) {
     if (mounted) {
-      slidePagekey = GlobalKey<ExtendedImageSlidePageState>();
+      // slidePagekey = GlobalKey<ExtendedImageSlidePageState>();
       setState(fn);
-    }
-  }
-
-  int _currentIndex = 0;
-
-  _onDownloadImg() {
-    // TODO: 区分视频和图片调用单独的下载逻辑
-  }
-
-  Future<void> _onLongPress() async {
-    final msg = _msgs[_currentIndex];
-    final url = msg.imageElem?.imageList?.firstOrNull?.url ?? '';
-    widget.onImgLongPress?.call(url);
-  }
-
-  void _onPageChanged(int index) {
-    _currentIndex = index;
-    if (_imageDetailY != 0) {
-      _imageDetailY = 0;
-    }
-
-    if (_msgs.isEmpty) return;
-
-    debugPrint('_onPageChanged index: $index');
-
-    if (index <= 3) {
-      _getOldMsg(_msgs.first.msgID);
-    }
-    if (index >= _msgs.length - 3) {
-      _getNewerMsg(_msgs.last.msgID);
     }
   }
 
@@ -127,7 +107,9 @@ class IMMediaMsgBrowserState extends State<IMMediaMsgBrowser>
     );
     _slideEndAnimationController.addListener(() {
       _imageDetailY = _slideEndAnimation.value;
-      if (_imageDetailY == 0) {}
+      if (_imageDetailY == 0) {
+        _showSwiper = true;
+      }
     });
     super.initState();
   }
@@ -153,7 +135,7 @@ class IMMediaMsgBrowserState extends State<IMMediaMsgBrowser>
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final Size size = MediaQuery.of(context).size;
     return Scaffold(
       body: ExtendedImageSlidePage(
@@ -198,7 +180,6 @@ class IMMediaMsgBrowserState extends State<IMMediaMsgBrowser>
 
                         if (msg.videoElem != null) {
                           final videoElement = msg.videoElem;
-                          debugPrint('videoElement: ${videoElement?.toJson()}');
                           return VideoItem(
                             isInit: isInit,
                             isTest: isTest,
@@ -218,6 +199,9 @@ class IMMediaMsgBrowserState extends State<IMMediaMsgBrowser>
                           return ImageItem(
                             imgUrl: smallImg?.url ?? '',
                             size: size,
+                            heroTag: heroTag,
+                            slidePagekey: slidePagekey,
+                            imageDetailY: _imageDetailY,
                             useHeroWrapper: index < min(9, _msgs.length),
                             canScaleImage: (_) => _imageDetailY == 0,
                             onImgTap: () {
@@ -228,8 +212,6 @@ class IMMediaMsgBrowserState extends State<IMMediaMsgBrowser>
                                 Navigator.pop(context);
                               }
                             },
-                            heroTag: heroTag,
-                            slidePagekey: slidePagekey,
                             onLongPress: _onLongPress,
                           );
                         }
@@ -243,7 +225,9 @@ class IMMediaMsgBrowserState extends State<IMMediaMsgBrowser>
                       child: SafeArea(
                         top: false,
                         child: BottomActions(
-                          onDownload: _onDownloadImg,
+                          onDownload: () async {
+                            return await _saveImg(value.theme);
+                          },
                         ),
                       ),
                     ),
@@ -256,6 +240,28 @@ class IMMediaMsgBrowserState extends State<IMMediaMsgBrowser>
 }
 
 extension _IMMediaMsgBrowserStateEvents on IMMediaMsgBrowserState {
+  Future<void> _onLongPress() async {
+    final msg = _msgs[_currentIndex];
+    widget.onImgLongPress?.call(msg);
+  }
+
+  void _onPageChanged(int index) {
+    _currentIndex = index;
+    if (_imageDetailY != 0) {
+      _imageDetailY = 0;
+    }
+    _showSwiper = true;
+
+    if (_msgs.isEmpty) return;
+
+    if (index <= 3) {
+      _getOldMsg(_msgs.first.msgID);
+    }
+    if (index >= _msgs.length - 3) {
+      _getNewerMsg(_msgs.last.msgID);
+    }
+  }
+
   double? _slideScaleHandler(
     Offset offset, {
     ExtendedImageSlidePageState? state,
@@ -272,7 +278,12 @@ extension _IMMediaMsgBrowserStateEvents on IMMediaMsgBrowserState {
     return null;
   }
 
-  void _onSlidingPage(ExtendedImageSlidePageState state) {}
+  void _onSlidingPage(ExtendedImageSlidePageState state) {
+    final bool showSwiper = !state.isSliding;
+    if (showSwiper != _showSwiper) {
+      _showSwiper = showSwiper;
+    }
+  }
 
   Offset? _slideOffsetHandler(
     Offset offset, {
@@ -289,6 +300,7 @@ extension _IMMediaMsgBrowserStateEvents on IMMediaMsgBrowserState {
 
       if (_imageDetailY != 0) {
         _imageDetailY = 0;
+        _showSwiper = true;
       }
     }
     return null;
@@ -328,8 +340,8 @@ extension _IMMediaMsgBrowserStateApi on IMMediaMsgBrowserState {
     await _getNewerMsg(widget.curMsg.msgID);
     final newIndex =
         _msgs.indexWhere((element) => element.msgID == curMsg.msgID);
-    debugPrint('_getInitialMsgs: newIndex: $newIndex');
     if (newIndex != -1) {
+      _currentIndex = newIndex;
       _pageController = ExtendedPageController(initialPage: newIndex);
     }
     _safeSetState(() {
@@ -340,7 +352,6 @@ extension _IMMediaMsgBrowserStateApi on IMMediaMsgBrowserState {
   Future<void> _getOldMsg(
     String? lastMsgID,
   ) async {
-    debugPrint('_getOldMsg: _isOldFinished: $_isOldFinished');
     if (_isLoadingOld) return;
     if (_isOldFinished) return;
     _isLoadingOld = true;
@@ -356,9 +367,8 @@ extension _IMMediaMsgBrowserStateApi on IMMediaMsgBrowserState {
       _safeSetState(() {
         final curMsgIndex =
             _msgs.indexWhere((element) => element.msgID == curMsg.msgID);
-        debugPrint(
-            '_getOldMsg: curMsgIndex: $curMsgIndex, _currentIndex: $_currentIndex, msgs.length: ${msgs.length}');
         if (curMsgIndex != -1 && !_isFirstLoading) {
+          _currentIndex = curMsgIndex;
           _pageController = ExtendedPageController(initialPage: curMsgIndex);
           // _pageController.jumpToPage(msgs.length + _currentIndex);
         }
@@ -370,7 +380,6 @@ extension _IMMediaMsgBrowserStateApi on IMMediaMsgBrowserState {
   Future<void> _getNewerMsg(
     String? lastMsgID,
   ) async {
-    debugPrint('_getNewerMsg: _isNewerFinished: $_isNewerFinished');
     if (_isLoadingNewer) return;
     if (_isNewerFinished) return;
     _isLoadingNewer = true;
@@ -406,8 +415,9 @@ extension _IMMediaMsgBrowserStateApi on IMMediaMsgBrowserState {
         // MessageElemType.V2TIM_ELEM_TYPE_VIDEO,
       ],
     );
-
-    debugPrint('getMediaMsgList: code = ${res.code}, desc = ${res.desc}');
+    if (res.code != 0) {
+      debugPrint('getMediaMsgList: code = ${res.code}, desc = ${res.desc}');
+    }
     return res.data;
   }
 }
@@ -455,5 +465,133 @@ extension _IMMediaMsgBrowserStatePrivate on IMMediaMsgBrowserState {
         },
       );
     }
+  }
+}
+
+extension IMMediaMsgBrowserStateDownloadImg on IMMediaMsgBrowserState {
+  Future<void> _saveImg(TUITheme theme) async {
+    try {
+      String? imageUrl;
+      final msg = _msgs[_currentIndex];
+      final imageElem = msg.imageElem;
+
+      if (imageElem != null) {
+        final originUrl = _getOriginImgURLOf(msg);
+        imageUrl = originUrl;
+      }
+
+      debugPrint('_saveImg imageUrl: $imageUrl');
+
+      if (imageUrl != null) {
+        return await _saveImageToLocal(
+          context,
+          imageUrl,
+          msg,
+          theme: theme,
+        );
+      }
+    } catch (e) {
+      onTIMCallback(
+        TIMCallback(
+          infoCode: 6660414,
+          infoRecommendText: TIM_t("正在下载中"),
+          type: TIMCallbackType.INFO,
+        ),
+      );
+      return;
+    }
+  }
+
+  //保存网络图片到本地
+  Future<void> _saveImageToLocal(
+    context,
+    String imageUrl,
+    V2TimMessage msg, {
+    TUITheme? theme,
+  }) async {
+    if (PlatformUtils().isIOS) {
+      if (!await Permissions.checkPermission(
+          context, Permission.photosAddOnly.value, theme!, false)) {
+        return;
+      }
+    } else {
+      final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+      if (PlatformUtils().isMobile) {
+        if ((androidInfo.version.sdkInt) >= 33) {
+          final photos = await Permissions.checkPermission(
+            context,
+            Permission.photos.value,
+            theme,
+          );
+          if (!photos) {
+            return;
+          }
+        } else {
+          final storage = await Permissions.checkPermission(
+            context,
+            Permission.storage.value,
+          );
+          if (!storage) {
+            return;
+          }
+        }
+      }
+    }
+
+    final http.Response r = await http.get(Uri.parse(imageUrl));
+    final data = r.bodyBytes;
+    final result = await ImageGallerySaver.saveImage(
+      Uint8List.fromList(data),
+      quality: 100,
+    );
+
+    if (PlatformUtils().isIOS) {
+      if (result['isSuccess']) {
+        onTIMCallback(
+          TIMCallback(
+            type: TIMCallbackType.INFO,
+            infoRecommendText: TIM_t("图片保存成功"),
+            infoCode: 6660406,
+          ),
+        );
+      } else {
+        onTIMCallback(
+          TIMCallback(
+            type: TIMCallbackType.INFO,
+            infoRecommendText: TIM_t("图片保存失败"),
+            infoCode: 6660407,
+          ),
+        );
+      }
+    } else {
+      if (result != null) {
+        onTIMCallback(
+          TIMCallback(
+            type: TIMCallbackType.INFO,
+            infoRecommendText: TIM_t("图片保存成功"),
+            infoCode: 6660406,
+          ),
+        );
+      } else {
+        onTIMCallback(
+          TIMCallback(
+            type: TIMCallbackType.INFO,
+            infoRecommendText: TIM_t("图片保存失败"),
+            infoCode: 6660407,
+          ),
+        );
+      }
+    }
+    return;
+  }
+
+  String _getOriginImgURLOf(V2TimMessage msg) {
+    // 实际拿的是原图
+    V2TimImage? img = MessageUtils.getImageFromImgList(
+      msg.imageElem!.imageList,
+      HistoryMessageDartConstant.oriImgPrior,
+    );
+    return img == null ? msg.imageElem!.path! : img.url!;
   }
 }
