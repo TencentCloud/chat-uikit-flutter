@@ -2,8 +2,7 @@ import 'dart:math';
 
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
-
-import 'browser_hero_wrapper.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/image_hero.dart';
 
 class ImageItem extends StatelessWidget {
   const ImageItem({
@@ -31,76 +30,70 @@ class ImageItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget image = ExtendedImage.network(
-      imgUrl,
-      fit: BoxFit.contain,
-      enableSlideOutPage: true,
-      gaplessPlayback: false,
-      mode: ExtendedImageMode.gesture,
-      initGestureConfigHandler: (ExtendedImageState state) {
-        double? initialScale = 1.0;
-        if (state.extendedImageInfo != null) {
-          initialScale = _initScale(
-            size: size,
-            initialScale: initialScale,
-            imageSize: Size(
-              min(
-                size.width,
-                state.extendedImageInfo!.image.width.toDouble(),
-              ),
-              min(
-                size.height,
-                state.extendedImageInfo!.image.height.toDouble(),
-              ),
-            ),
-          );
-        }
-        return GestureConfig(
-          inPageView: true,
-          initialScale: 1.0,
-          maxScale: max(initialScale ?? 1.0, 5.0),
-          animationMaxScale: max(initialScale ?? 1.0, 5.0),
-        );
-      },
-      loadStateChanged: (ExtendedImageState state) {
-        if (state.extendedImageLoadState == LoadState.completed) {
-          return ExtendedImageGesture(
-            state,
-            canScaleImage: canScaleImage,
-            imageBuilder: (Widget image) {
-              return Stack(
-                children: <Widget>[
-                  Positioned.fill(
-                    top: imageDetailY,
-                    bottom: -imageDetailY,
-                    child: image,
-                  ),
-                ],
-              );
-            },
-          );
-        }
-        return InkWell(
-          onTap: onImgTap,
-          child: const UnconstrainedBox(
-            child: CircularProgressIndicator(color: Colors.white),
-          ),
-        );
-      },
-    );
-
-    if (useHeroWrapper) {
-      image = BrowserHeroWrapper(
-        tag: heroTag,
-        slidePagekey: slidePagekey,
-        child: image,
-      );
-    }
-
     return GestureDetector(
       onTap: onImgTap,
       onLongPress: onLongPress,
-      child: image,
+      child: HeroWidget(
+        tag: heroTag,
+        slidePagekey: slidePagekey,
+        child: ExtendedImage.network(
+          imgUrl,
+          fit: BoxFit.contain,
+          enableSlideOutPage: true,
+          gaplessPlayback: false,
+          mode: ExtendedImageMode.gesture,
+          initGestureConfigHandler: (ExtendedImageState state) {
+            double? initialScale = 1.0;
+            if (state.extendedImageInfo != null) {
+              initialScale = _initScale(
+                size: size,
+                initialScale: initialScale,
+                imageSize: Size(
+                  min(
+                    size.width,
+                    state.extendedImageInfo!.image.width.toDouble(),
+                  ),
+                  min(
+                    size.height,
+                    state.extendedImageInfo!.image.height.toDouble(),
+                  ),
+                ),
+              );
+            }
+            return GestureConfig(
+              inPageView: true,
+              initialScale: 1.0,
+              maxScale: max(initialScale ?? 1.0, 5.0),
+              animationMaxScale: max(initialScale ?? 1.0, 5.0),
+            );
+          },
+          loadStateChanged: (ExtendedImageState state) {
+            if (state.extendedImageLoadState == LoadState.completed) {
+              return ExtendedImageGesture(
+                state,
+                canScaleImage: canScaleImage,
+                imageBuilder: (Widget image) {
+                  return Stack(
+                    children: <Widget>[
+                      Positioned.fill(
+                        top: imageDetailY,
+                        bottom: -imageDetailY,
+                        child: image,
+                      ),
+                    ],
+                  );
+                },
+              );
+            }
+            return InkWell(
+              onTap: onImgTap,
+              child: const UnconstrainedBox(
+                child: CircularProgressIndicator(color: Colors.white),
+              ),
+            );
+          },
+        ),
+      ),
     );
   }
 

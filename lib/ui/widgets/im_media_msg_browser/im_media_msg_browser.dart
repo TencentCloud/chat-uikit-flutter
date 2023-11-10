@@ -53,7 +53,6 @@ class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
   GlobalKey<ExtendedImageSlidePageState> slidePagekey =
       GlobalKey<ExtendedImageSlidePageState>();
   double _imageDetailY = 0;
-  bool _showSwiper = true;
 
   VideoPlayerController? videoPlayerController;
   ChewieController? chewieController;
@@ -65,6 +64,7 @@ class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
   bool _isLoadingNewer = false;
   bool _isFirstLoading = true;
   final List<V2TimMessage> _msgs = [];
+  final _isDownloadingImg = ValueNotifier(false);
 
   int _currentIndex = 0;
 
@@ -107,9 +107,7 @@ class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
     );
     _slideEndAnimationController.addListener(() {
       _imageDetailY = _slideEndAnimation.value;
-      if (_imageDetailY == 0) {
-        _showSwiper = true;
-      }
+      if (_imageDetailY == 0) {}
     });
     super.initState();
   }
@@ -131,110 +129,156 @@ class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
     _slideEndAnimationController.dispose();
     _pageController?.dispose();
     clearGestureDetailsCache();
+    _isDownloadingImg.dispose();
     super.dispose();
   }
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      body: ExtendedImageSlidePage(
-        key: slidePagekey,
-        slideAxis: SlideAxis.vertical,
-        slideScaleHandler: _slideScaleHandler,
-        slideOffsetHandler: _slideOffsetHandler,
-        slideEndHandler: _slideEndHandler,
-        onSlidingPage: _onSlidingPage,
-        child: Material(
-          color: Colors.black,
-          shadowColor: Colors.transparent,
-          child: _isFirstLoading
-              ? InkWell(
-                  onTap: () {
-                    slidePagekey.currentState?.popPage();
-                    Navigator.pop(context);
-                  },
-                  child: const SizedBox.expand(
-                    child: Center(
-                      child: CircularProgressIndicator(color: Colors.white),
-                    ),
-                  ),
-                )
-              : Stack(
-                  fit: StackFit.expand,
-                  children: <Widget>[
-                    ExtendedImageGesturePageView.builder(
-                      itemCount: _msgs.length,
-                      onPageChanged: _onPageChanged,
-                      controller: _pageController,
-                      physics: _msgs.length > 1
-                          ? const BouncingScrollPhysics()
-                          : const NeverScrollableScrollPhysics(),
-                      canScrollPage: (GestureDetails? gestureDetails) {
-                        return _imageDetailY >= 0;
-                      },
-                      itemBuilder: (BuildContext context, int index) {
-                        final msg = _msgs[index];
-                        final heroTag =
-                            "${msg.msgID ?? msg.id ?? msg.timestamp ?? DateTime.now().millisecondsSinceEpoch}${widget.isFrom}";
+    return Material(
+      color: Colors.transparent,
+      shadowColor: Colors.transparent,
+      child: _isFirstLoading
+          ? InkWell(
+              onTap: () {
+                slidePagekey.currentState?.popPage();
+                Navigator.pop(context);
+              },
+              child: const SizedBox.expand(
+                child: Center(
+                  child: CircularProgressIndicator(color: Colors.white),
+                ),
+              ),
+            )
+          : ExtendedImageSlidePage(
+              key: slidePagekey,
+              slideAxis: SlideAxis.vertical,
+              slidePageBackgroundHandler: (Offset offset, Size size) {
+                double opacity = 0.0;
+                opacity = offset.distance /
+                    (Offset(size.width, size.height).distance / 2.0);
+                return Colors.black
+                    .withOpacity(min(1.0, max(1.0 - opacity, 0.0)));
+              },
+              slideType: SlideType.onlyImage,
+              slideEndHandler: (
+                Offset offset, {
+                ExtendedImageSlidePageState? state,
+                ScaleEndDetails? details,
+              }) {
+                final vy = details?.velocity.pixelsPerSecond.dy ?? 0;
+                final oy = offset.dy;
+                if (vy > 300 || oy > 100) {
+                  return true;
+                }
+                return null;
+              },
+              child: Stack(
+                fit: StackFit.expand,
+                children: <Widget>[
+                  ExtendedImageGesturePageView.builder(
+                    itemCount: _msgs.length,
+                    onPageChanged: _onPageChanged,
+                    controller: _pageController,
+                    physics: _msgs.length > 1
+                        ? const BouncingScrollPhysics()
+                        : const NeverScrollableScrollPhysics(),
+                    canScrollPage: (GestureDetails? gestureDetails) {
+                      return _imageDetailY >= 0;
+                    },
+                    itemBuilder: (BuildContext context, int index) {
+                      final msg = _msgs[index];
+                      final heroTag =
+                          "${msg.msgID ?? msg.id ?? msg.timestamp ?? DateTime.now().millisecondsSinceEpoch}${widget.isFrom}";
 
-                        if (msg.videoElem != null) {
-                          final videoElement = msg.videoElem;
-                          return VideoItem(
-                            isInit: isInit,
-                            isTest: isTest,
-                            fijkPlayer: fijkPlayer,
-                            chewieController: chewieController,
-                            videoUrl: videoElement?.videoUrl ?? '',
-                            coverUrl: videoElement?.snapshotUrl ?? '',
-                            onDownloadFile: widget.onDownloadFile,
-                            heroTag: heroTag,
-                          );
-                        } else if (msg.imageElem != null) {
-                          final imageElement = msg.imageElem;
-                          final smallImg = MessageUtils.getImageFromImgList(
-                            imageElement?.imageList,
-                            HistoryMessageDartConstant.smallImgPrior,
-                          );
-                          return ImageItem(
-                            imgUrl: smallImg?.url ?? '',
-                            size: size,
-                            heroTag: heroTag,
-                            slidePagekey: slidePagekey,
-                            imageDetailY: _imageDetailY,
-                            useHeroWrapper: index < min(9, _msgs.length),
-                            canScaleImage: (_) => _imageDetailY == 0,
-                            onImgTap: () {
-                              if (_imageDetailY != 0) {
-                                _imageDetailY = 0;
-                              } else {
-                                slidePagekey.currentState?.popPage();
-                                Navigator.pop(context);
-                              }
-                            },
-                            onLongPress: _onLongPress,
-                          );
-                        }
-                        return const SizedBox();
-                      },
-                    ),
-                    Positioned(
-                      left: 10,
-                      right: 10,
-                      bottom: 0,
-                      child: SafeArea(
-                        top: false,
-                        child: BottomActions(
-                          onDownload: () async {
-                            return await _saveImg(value.theme);
+                      if (msg.videoElem != null) {
+                        final videoElement = msg.videoElem;
+                        return VideoItem(
+                          isInit: isInit,
+                          isTest: isTest,
+                          fijkPlayer: fijkPlayer,
+                          chewieController: chewieController,
+                          videoUrl: videoElement?.videoUrl ?? '',
+                          coverUrl: videoElement?.snapshotUrl ?? '',
+                          onDownloadFile: widget.onDownloadFile,
+                          heroTag: heroTag,
+                        );
+                      } else if (msg.imageElem != null) {
+                        final imageElement = msg.imageElem;
+                        final smallImg = MessageUtils.getImageFromImgList(
+                          imageElement?.imageList,
+                          HistoryMessageDartConstant.smallImgPrior,
+                        );
+                        return ImageItem(
+                          imgUrl: smallImg?.url ?? '',
+                          size: size,
+                          heroTag: heroTag,
+                          slidePagekey: slidePagekey,
+                          imageDetailY: _imageDetailY,
+                          useHeroWrapper: index < min(9, _msgs.length),
+                          canScaleImage: (_) => _imageDetailY == 0,
+                          onImgTap: () {
+                            if (_imageDetailY != 0) {
+                              _imageDetailY = 0;
+                            } else {
+                              slidePagekey.currentState?.popPage();
+                              Navigator.pop(context);
+                            }
                           },
-                        ),
+                          onLongPress: _onLongPress,
+                        );
+                      }
+                      return const SizedBox();
+                    },
+                  ),
+                  Positioned(
+                    left: 10,
+                    right: 10,
+                    bottom: 0,
+                    child: SafeArea(
+                      top: false,
+                      child: BottomActions(
+                        onDownload: () async {
+                          return await _saveImg(value.theme);
+                        },
                       ),
                     ),
-                  ],
-                ),
-        ),
-      ),
+                  ),
+                  Align(
+                    child: ValueListenableBuilder(
+                      valueListenable: _isDownloadingImg,
+                      builder: (context, isDownloadingImg, child) {
+                        return isDownloadingImg
+                            ? Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 20, vertical: 10),
+                                decoration: BoxDecoration(
+                                  color: Colors.black38,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const CircularProgressIndicator(
+                                        color: Colors.white),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      TIM_t("正在下载中"),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            : const SizedBox();
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 }
@@ -250,7 +294,6 @@ extension _IMMediaMsgBrowserStateEvents on IMMediaMsgBrowserState {
     if (_imageDetailY != 0) {
       _imageDetailY = 0;
     }
-    _showSwiper = true;
 
     if (_msgs.isEmpty) return;
 
@@ -260,76 +303,6 @@ extension _IMMediaMsgBrowserStateEvents on IMMediaMsgBrowserState {
     if (index >= _msgs.length - 3) {
       _getNewerMsg(_msgs.last.msgID);
     }
-  }
-
-  double? _slideScaleHandler(
-    Offset offset, {
-    ExtendedImageSlidePageState? state,
-  }) {
-    if (state != null && state.scale == 1.0) {
-      if (state.imageGestureState!.gestureDetails!.totalScale! > 1.0) {
-        return 1.0;
-      }
-      if (offset.dy < 0 || _imageDetailY < 0) {
-        return 1.0;
-      }
-    }
-
-    return null;
-  }
-
-  void _onSlidingPage(ExtendedImageSlidePageState state) {
-    final bool showSwiper = !state.isSliding;
-    if (showSwiper != _showSwiper) {
-      _showSwiper = showSwiper;
-    }
-  }
-
-  Offset? _slideOffsetHandler(
-    Offset offset, {
-    ExtendedImageSlidePageState? state,
-  }) {
-    if (state != null && state.scale == 1.0) {
-      if (state.imageGestureState!.gestureDetails!.totalScale! > 1.0) {
-        return Offset.zero;
-      }
-
-      if (offset.dy < 0 || _imageDetailY < 0) {
-        return Offset.zero;
-      }
-
-      if (_imageDetailY != 0) {
-        _imageDetailY = 0;
-        _showSwiper = true;
-      }
-    }
-    return null;
-  }
-
-  bool? _slideEndHandler(
-    Offset offset, {
-    ExtendedImageSlidePageState? state,
-    ScaleEndDetails? details,
-  }) {
-    if (_imageDetailY != 0 && state!.scale == 1) {
-      if (!_slideEndAnimationController.isAnimating) {
-        final double magnitude = details!.velocity.pixelsPerSecond.distance;
-        if (magnitude.greaterThanOrEqualTo(minMagnitude)) {
-          final Offset direction =
-              details.velocity.pixelsPerSecond / magnitude * 1000;
-          _slideEndAnimation = _slideEndAnimationController.drive(
-            Tween<double>(
-              begin: _imageDetailY,
-              end: _imageDetailY + direction.dy,
-            ),
-          );
-          _slideEndAnimationController.reset();
-          _slideEndAnimationController.forward();
-        }
-      }
-      return false;
-    }
-    return null;
   }
 }
 
@@ -491,6 +464,7 @@ extension IMMediaMsgBrowserStateDownloadImg on IMMediaMsgBrowserState {
         );
       }
     } catch (e) {
+      _isDownloadingImg.value = false;
       onTIMCallback(
         TIMCallback(
           infoCode: 6660414,
@@ -509,81 +483,87 @@ extension IMMediaMsgBrowserStateDownloadImg on IMMediaMsgBrowserState {
     V2TimMessage msg, {
     TUITheme? theme,
   }) async {
-    if (PlatformUtils().isIOS) {
-      if (!await Permissions.checkPermission(
-          context, Permission.photosAddOnly.value, theme!, false)) {
-        return;
-      }
-    } else {
-      final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      if (PlatformUtils().isMobile) {
-        if ((androidInfo.version.sdkInt) >= 33) {
-          final photos = await Permissions.checkPermission(
-            context,
-            Permission.photos.value,
-            theme,
-          );
-          if (!photos) {
-            return;
-          }
-        } else {
-          final storage = await Permissions.checkPermission(
-            context,
-            Permission.storage.value,
-          );
-          if (!storage) {
-            return;
+    try {
+      if (PlatformUtils().isIOS) {
+        if (!await Permissions.checkPermission(
+            context, Permission.photosAddOnly.value, theme!, false)) {
+          return;
+        }
+      } else {
+        final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+        if (PlatformUtils().isMobile) {
+          if ((androidInfo.version.sdkInt) >= 33) {
+            final photos = await Permissions.checkPermission(
+              context,
+              Permission.photos.value,
+              theme,
+            );
+            if (!photos) {
+              return;
+            }
+          } else {
+            final storage = await Permissions.checkPermission(
+              context,
+              Permission.storage.value,
+            );
+            if (!storage) {
+              return;
+            }
           }
         }
       }
-    }
 
-    final http.Response r = await http.get(Uri.parse(imageUrl));
-    final data = r.bodyBytes;
-    final result = await ImageGallerySaver.saveImage(
-      Uint8List.fromList(data),
-      quality: 100,
-    );
+      _isDownloadingImg.value = true;
+      final http.Response r = await http.get(Uri.parse(imageUrl));
+      final data = r.bodyBytes;
+      final result = await ImageGallerySaver.saveImage(
+        Uint8List.fromList(data),
+        quality: 100,
+      );
 
-    if (PlatformUtils().isIOS) {
-      if (result['isSuccess']) {
-        onTIMCallback(
-          TIMCallback(
-            type: TIMCallbackType.INFO,
-            infoRecommendText: TIM_t("图片保存成功"),
-            infoCode: 6660406,
-          ),
-        );
+      if (PlatformUtils().isIOS) {
+        if (result['isSuccess']) {
+          onTIMCallback(
+            TIMCallback(
+              type: TIMCallbackType.INFO,
+              infoRecommendText: TIM_t("图片保存成功"),
+              infoCode: 6660406,
+            ),
+          );
+        } else {
+          onTIMCallback(
+            TIMCallback(
+              type: TIMCallbackType.INFO,
+              infoRecommendText: TIM_t("图片保存失败"),
+              infoCode: 6660407,
+            ),
+          );
+        }
       } else {
-        onTIMCallback(
-          TIMCallback(
-            type: TIMCallbackType.INFO,
-            infoRecommendText: TIM_t("图片保存失败"),
-            infoCode: 6660407,
-          ),
-        );
+        if (result != null) {
+          onTIMCallback(
+            TIMCallback(
+              type: TIMCallbackType.INFO,
+              infoRecommendText: TIM_t("图片保存成功"),
+              infoCode: 6660406,
+            ),
+          );
+        } else {
+          onTIMCallback(
+            TIMCallback(
+              type: TIMCallbackType.INFO,
+              infoRecommendText: TIM_t("图片保存失败"),
+              infoCode: 6660407,
+            ),
+          );
+        }
       }
-    } else {
-      if (result != null) {
-        onTIMCallback(
-          TIMCallback(
-            type: TIMCallbackType.INFO,
-            infoRecommendText: TIM_t("图片保存成功"),
-            infoCode: 6660406,
-          ),
-        );
-      } else {
-        onTIMCallback(
-          TIMCallback(
-            type: TIMCallbackType.INFO,
-            infoRecommendText: TIM_t("图片保存失败"),
-            infoCode: 6660407,
-          ),
-        );
-      }
+      _isDownloadingImg.value = false;
+    } catch (e) {
+      _isDownloadingImg.value = false;
+      debugPrint('_saveImageToLocal error: $e');
     }
-    return;
   }
 
   String _getOriginImgURLOf(V2TimMessage msg) {
