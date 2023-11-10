@@ -48,8 +48,7 @@ class IMMediaMsgBrowser extends StatefulWidget {
 class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
     with TickerProviderStateMixin {
   final _messageManager = TencentImSDKPlugin.v2TIMManager.getMessageManager();
-  late AnimationController _slideEndAnimationController;
-  late Animation<double> _slideEndAnimation;
+
   GlobalKey<ExtendedImageSlidePageState> slidePagekey =
       GlobalKey<ExtendedImageSlidePageState>();
   double _imageDetailY = 0;
@@ -80,7 +79,6 @@ class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
 
   void _safeSetState(void Function() fn) {
     if (mounted) {
-      // slidePagekey = GlobalKey<ExtendedImageSlidePageState>();
       setState(fn);
     }
   }
@@ -101,14 +99,6 @@ class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
       ]);
     }
 
-    _slideEndAnimationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 150),
-    );
-    _slideEndAnimationController.addListener(() {
-      _imageDetailY = _slideEndAnimation.value;
-      if (_imageDetailY == 0) {}
-    });
     super.initState();
   }
 
@@ -126,7 +116,6 @@ class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
       chewieController?.dispose();
     }
 
-    _slideEndAnimationController.dispose();
     _pageController?.dispose();
     clearGestureDetailsCache();
     _isDownloadingImg.dispose();
@@ -141,10 +130,7 @@ class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
       shadowColor: Colors.transparent,
       child: _isFirstLoading
           ? InkWell(
-              onTap: () {
-                slidePagekey.currentState?.popPage();
-                Navigator.pop(context);
-              },
+              onTap: _close,
               child: const SizedBox.expand(
                 child: Center(
                   child: CircularProgressIndicator(color: Colors.white),
@@ -216,14 +202,12 @@ class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
                           heroTag: heroTag,
                           slidePagekey: slidePagekey,
                           imageDetailY: _imageDetailY,
-                          useHeroWrapper: index < min(9, _msgs.length),
                           canScaleImage: (_) => _imageDetailY == 0,
                           onImgTap: () {
                             if (_imageDetailY != 0) {
                               _imageDetailY = 0;
                             } else {
-                              slidePagekey.currentState?.popPage();
-                              Navigator.pop(context);
+                              _close();
                             }
                           },
                           onLongPress: _onLongPress,
@@ -284,6 +268,11 @@ class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
 }
 
 extension _IMMediaMsgBrowserStateEvents on IMMediaMsgBrowserState {
+  _close() {
+    slidePagekey.currentState?.popPage();
+    Navigator.pop(context);
+  }
+
   Future<void> _onLongPress() async {
     final msg = _msgs[_currentIndex];
     widget.onImgLongPress?.call(msg);

@@ -14,7 +14,6 @@ class ImageItem extends StatelessWidget {
     required this.slidePagekey,
     required this.onImgTap,
     required this.onLongPress,
-    required this.useHeroWrapper,
     required this.imageDetailY,
   });
 
@@ -26,7 +25,6 @@ class ImageItem extends StatelessWidget {
   final GlobalKey<ExtendedImageSlidePageState> slidePagekey;
   final VoidCallback onImgTap;
   final VoidCallback onLongPress;
-  final bool useHeroWrapper;
 
   @override
   Widget build(BuildContext context) {
