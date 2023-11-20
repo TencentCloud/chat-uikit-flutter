@@ -1629,13 +1629,19 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
   }) async {
     this.findNext = findNext;
     String playUrl = url;
+    bool playLocal = isLocal;
     if (playUrl.isEmpty) {
       try {
         final response = await _messageService.getMessageOnlineUrl(
           msgID: msgID,
         );
         if (response.data != null) {
-          playUrl = response.data!.soundElem?.url ?? '';
+          playUrl = response.data!.soundElem?.localUrl ?? '';
+          if (playUrl.isEmpty) {
+            playUrl = response.data!.soundElem?.url ?? '';
+          } else {
+            playLocal = true;
+          }
         }
       } catch (e) {
         _coreServices.callOnCallback(
@@ -1658,6 +1664,8 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
       return;
     }
 
+    debugPrint('playSound: msgID-$msgID\nurl-$playUrl\nplayLocal-$playLocal');
+
     if (!SoundPlayer.isInit) {
       SoundPlayer.initSoundPlayer();
     }
@@ -1670,19 +1678,19 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
         _stopAndReset(notify: false);
       }
       try {
-        if (isLocal) {
+        if (playLocal) {
           SoundPlayer.playWith(source: AudioSource.file(playUrl));
         } else {
           SoundPlayer.play(url: playUrl);
         }
       } catch (e) {
-        outputLogger.e(
-            'SoundPlayer error: msgID-$msgID\nurl-$playUrl\nisLocal-$isLocal');
+        debugPrint(
+            'SoundPlayer error: msgID-$msgID\nurl-$playUrl\nisLocal-$playLocal');
         _coreServices.callOnCallback(
           TIMCallback(
             type: TIMCallbackType.API_ERROR,
             errorMsg: TIM_t(
-                'SoundPlayer error: msgID-$msgID\nurl-$playUrl\nisLocal-$isLocal'),
+                'SoundPlayer error: msgID-$msgID\nurl-$playUrl\nisLocal-$playLocal'),
             errorCode: -1,
           ),
         );
