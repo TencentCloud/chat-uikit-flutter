@@ -1595,7 +1595,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
             String url = currentMessage.soundElem?.url ?? '';
             if (url.isEmpty) {
               url = currentMessage.soundElem?.localUrl ?? '';
-              isLocal = true;
+              isLocal = url.isNotEmpty;
             }
             playSound(
               msgID: currentMessage.msgID!,
@@ -1621,15 +1621,40 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
     subscription?.cancel();
   }
 
-  void playSound({
+  Future<void> playSound({
     required String msgID,
     required String url,
     required bool isLocal,
     bool findNext = true,
-  }) {
+  }) async {
     this.findNext = findNext;
-    if (url.isEmpty) {
+    String playUrl = url;
+    if (playUrl.isEmpty) {
+      try {
+        final response = await _messageService.getMessageOnlineUrl(
+          msgID: msgID,
+        );
+        if (response.data != null) {
+          playUrl = response.data!.soundElem?.url ?? '';
+        }
+      } catch (e) {
+        _coreServices.callOnCallback(
+          TIMCallback(
+            type: TIMCallbackType.INFO,
+            infoRecommendText: '音频下载失败，请稍后再试',
+          ),
+        );
+      }
+    }
+
+    if (playUrl.isEmpty) {
       _stopAndReset();
+      _coreServices.callOnCallback(
+        TIMCallback(
+          type: TIMCallbackType.INFO,
+          infoRecommendText: '音频播放地址为空，请稍后再试',
+        ),
+      );
       return;
     }
 
@@ -1646,18 +1671,18 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
       }
       try {
         if (isLocal) {
-          SoundPlayer.playWith(source: AudioSource.file(url));
+          SoundPlayer.playWith(source: AudioSource.file(playUrl));
         } else {
-          SoundPlayer.play(url: url);
+          SoundPlayer.play(url: playUrl);
         }
       } catch (e) {
-        outputLogger
-            .e('SoundPlayer error: msgID-$msgID\nurl-$url\nisLocal-$isLocal');
+        outputLogger.e(
+            'SoundPlayer error: msgID-$msgID\nurl-$playUrl\nisLocal-$isLocal');
         _coreServices.callOnCallback(
           TIMCallback(
             type: TIMCallbackType.API_ERROR,
             errorMsg: TIM_t(
-                'SoundPlayer error: msgID-$msgID\nurl-$url\nisLocal-$isLocal'),
+                'SoundPlayer error: msgID-$msgID\nurl-$playUrl\nisLocal-$isLocal'),
             errorCode: -1,
           ),
         );
