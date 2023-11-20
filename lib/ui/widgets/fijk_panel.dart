@@ -230,7 +230,7 @@ class _KangXunFijkPanelState extends State<_kangXunFijkPanel> {
                         onChangeEnd: (v) {
                           setState(() {
                             player.seekTo(v.toInt());
-                            print("seek to $v");
+                            debugPrint("seek to $v");
                             _currentPos =
                                 Duration(milliseconds: _seekPos.toInt());
                             _seekPos = -1;

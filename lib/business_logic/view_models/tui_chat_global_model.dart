@@ -759,20 +759,23 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
   void _handleFinishedDownload(
       V2TimMessageDownloadProgress messageProgress, V2TimMessage? message) {
     if (message != null) {
-      ////////////// 语音消息放入可下载类型 //////////////
+      ////////////// 语音消息放入可下载类型（暂时屏蔽） //////////////
       bool isImageType =
           message.elemType == MessageElemType.V2TIM_ELEM_TYPE_IMAGE;
       bool isVideoType =
           message.elemType == MessageElemType.V2TIM_ELEM_TYPE_VIDEO;
-      bool isSoundType =
-          message.elemType == MessageElemType.V2TIM_ELEM_TYPE_SOUND;
+      // 暂时不考虑语音：验证出现语音不能播放的问题
+      // bool isSoundType = false;
+      // message.elemType == MessageElemType.V2TIM_ELEM_TYPE_SOUND;
       final originalImageType = PlatformUtils().isIOS ? 1 : 0;
-      if (!isImageType && !isVideoType && !isSoundType) {
+      if (!isImageType && !isVideoType /* && !isSoundType*/) {
         _updateMessageLocationAndDownloadFile(messageProgress);
       } else if ((isImageType && messageProgress.type == originalImageType) ||
-          (isVideoType && !messageProgress.isSnapshot) ||
-          isSoundType) {
-        ////////////// 语音消息放入可下载类型 //////////////
+              (isVideoType &&
+                  !messageProgress.isSnapshot) /* ||
+          isSoundType*/
+          ) {
+        ////////////// 语音消息放入可下载类型（暂时屏蔽） //////////////
         Future.delayed(const Duration(seconds: 1),
             () => _updateMessageAndDownloadFile(message, messageProgress));
       } else {

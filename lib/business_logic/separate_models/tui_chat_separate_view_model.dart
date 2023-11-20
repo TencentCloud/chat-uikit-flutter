@@ -29,6 +29,10 @@ import 'package:uuid/uuid.dart';
 enum LoadDirection { previous, latest }
 
 class TUIChatSeparateViewModel extends ChangeNotifier {
+  //////////////// 新增语音消息播放错误回调 ////////////////
+  final CoreServicesImpl _coreServices = serviceLocator<CoreServicesImpl>();
+  //////////////// 新增语音消息播放错误回调 ////////////////
+
   final FriendshipServices _friendshipServices =
       serviceLocator<FriendshipServices>();
   final MessageService _messageService = serviceLocator<MessageService>();
@@ -1555,7 +1559,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
     subscription = SoundPlayer.playStateListener(listener: (PlayerState state) {
       if (state.processingState == ProcessingState.completed) {
         if (!findNext) {
-          _stopAndRest();
+          _stopAndReset();
           return;
         }
 
@@ -1563,7 +1567,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
         final int index =
             soundMessageList.indexWhere((e) => e.msgID == currentPlayedMsgId);
         if (index == -1) {
-          _stopAndRest();
+          _stopAndReset();
           return;
         }
 
@@ -1573,7 +1577,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
           // 遇到的音频已读，直接返回，不在往下进行
           if (currentMessage.localCustomInt ==
               HistoryMessageDartConstant.read) {
-            _stopAndRest();
+            _stopAndReset();
             return;
           }
 
@@ -1612,7 +1616,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
 
   void cancelSoundSubscription() {
     if (isPlaying) {
-      _stopAndRest(notify: false);
+      _stopAndReset(notify: false);
     }
     subscription?.cancel();
   }
@@ -1625,7 +1629,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
   }) {
     this.findNext = findNext;
     if (url.isEmpty) {
-      _stopAndRest();
+      _stopAndReset();
       return;
     }
 
@@ -1634,16 +1638,29 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
     }
 
     if (isPlaying && msgID == currentPlayedMsgId) {
-      _stopAndRest();
+      _stopAndReset();
     } else {
       // 非同一个音频：停止上一个
       if (msgID != currentPlayedMsgId) {
-        _stopAndRest(notify: false);
+        _stopAndReset(notify: false);
       }
-      if (isLocal) {
-        SoundPlayer.playWith(source: AudioSource.file(url));
-      } else {
-        SoundPlayer.play(url: url);
+      try {
+        if (isLocal) {
+          SoundPlayer.playWith(source: AudioSource.file(url));
+        } else {
+          SoundPlayer.play(url: url);
+        }
+      } catch (e) {
+        outputLogger
+            .e('SoundPlayer error: msgID-$msgID\nurl-$url\nisLocal-$isLocal');
+        _coreServices.callOnCallback(
+          TIMCallback(
+            type: TIMCallbackType.API_ERROR,
+            errorMsg: TIM_t(
+                'SoundPlayer error: msgID-$msgID\nurl-$url\nisLocal-$isLocal'),
+            errorCode: -1,
+          ),
+        );
       }
       isPlaying = true;
       _currentPlayedMsgId = msgID;
@@ -1651,7 +1668,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
     }
   }
 
-  _stopAndRest({
+  _stopAndReset({
     bool notify = true,
   }) {
     SoundPlayer.stop();
