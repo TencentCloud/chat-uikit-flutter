@@ -1,3 +1,10 @@
+# 2.4.0
+
+## Breaking Changes
+
+* Migrated to Flutter 3.16.0.
+* Upgraded the minimum supported Android Gradle Plugin to 7.3 to meet Flutter requirements.
+
 # 2.3.3
 
 ## New Features
