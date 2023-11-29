@@ -1574,7 +1574,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
         if (index < soundMessageList.length - 1) {
           final currentMessage = soundMessageList[index + 1];
 
-          // 遇到的音频已读，直接返回，不在往下进行
+          // 遇到的音频已读，直接返回，不再往下进行
           if (currentMessage.localCustomInt ==
               HistoryMessageDartConstant.read) {
             _stopAndReset();
@@ -1591,12 +1591,11 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
               conversationID,
             );
 
+            // 直接使用 localUrl
             bool isLocal = false;
-            String url = currentMessage.soundElem?.url ?? '';
-            if (url.isEmpty) {
-              url = currentMessage.soundElem?.localUrl ?? '';
-              isLocal = url.isNotEmpty;
-            }
+            String url = currentMessage.soundElem?.localUrl ?? '';
+            isLocal = url.isNotEmpty;
+
             playSound(
               msgID: currentMessage.msgID!,
               url: url,
@@ -1628,8 +1627,12 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
     bool findNext = true,
   }) async {
     this.findNext = findNext;
+
     String playUrl = url;
     bool playLocal = isLocal;
+
+    debugPrint('playSound url: $playUrl isLocal: $playLocal');
+
     if (playUrl.isEmpty) {
       try {
         final response = await _messageService.getMessageOnlineUrl(
@@ -1643,6 +1646,8 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
             playLocal = true;
           }
         }
+        debugPrint(
+            'playSound getMessageOnlineUrl url: $playUrl isLocal: $playLocal');
       } catch (e) {
         _coreServices.callOnCallback(
           TIMCallback(
@@ -1650,9 +1655,11 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
             infoRecommendText: '音频下载失败，请稍后再试',
           ),
         );
+        return;
       }
     }
 
+    debugPrint('playSound play isEmpty url: $playUrl isLocal: $playLocal');
     if (playUrl.isEmpty) {
       _stopAndReset();
       _coreServices.callOnCallback(
@@ -1664,13 +1671,13 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
       return;
     }
 
-    debugPrint('playSound: msgID-$msgID\nurl-$playUrl\nplayLocal-$playLocal');
-
     if (!SoundPlayer.isInit) {
       SoundPlayer.initSoundPlayer();
     }
 
     if (isPlaying && msgID == currentPlayedMsgId) {
+      debugPrint(
+          'playSound play url: $playUrl isLocal: $playLocal isPlaying: $isPlaying');
       _stopAndReset();
     } else {
       // 非同一个音频：停止上一个
@@ -1678,6 +1685,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
         _stopAndReset(notify: false);
       }
       try {
+        debugPrint('playSound play url: $playUrl isLocal: $playLocal');
         if (playLocal) {
           SoundPlayer.playWith(source: AudioSource.file(playUrl));
         } else {
@@ -1685,15 +1693,16 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
         }
       } catch (e) {
         debugPrint(
-            'SoundPlayer error: msgID-$msgID\nurl-$playUrl\nisLocal-$playLocal');
+            'playSound error: msgID-$msgID\nurl-$playUrl\nisLocal-$playLocal');
         _coreServices.callOnCallback(
           TIMCallback(
             type: TIMCallbackType.API_ERROR,
             errorMsg: TIM_t(
-                'SoundPlayer error: msgID-$msgID\nurl-$playUrl\nisLocal-$playLocal'),
+                'playSound error: msgID-$msgID\nurl-$playUrl\nisLocal-$playLocal'),
             errorCode: -1,
           ),
         );
+        return;
       }
       isPlaying = true;
       _currentPlayedMsgId = msgID;

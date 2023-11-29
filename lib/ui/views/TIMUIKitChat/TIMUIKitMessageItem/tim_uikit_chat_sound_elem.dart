@@ -301,8 +301,8 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
             }
             chatModel.playSound(
               msgID: widget.msgID,
-              url: stateElement.url ?? '',
-              isLocal: false,
+              url: stateElement.localUrl ?? stateElement.url ?? '',
+              isLocal: stateElement.localUrl?.isNotEmpty == true,
               findNext: !isRead,
             );
           },
