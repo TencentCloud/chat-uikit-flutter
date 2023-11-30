@@ -46,7 +46,7 @@ class IMMediaMsgBrowser extends StatefulWidget {
 }
 
 class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   final _messageManager = TencentImSDKPlugin.v2TIMManager.getMessageManager();
 
   GlobalKey<ExtendedImageSlidePageState> slidePagekey =
@@ -103,12 +103,35 @@ class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // TODO: implement didChangeAppLifecycleState
+    super.didChangeAppLifecycleState(state);
+    if (Platform.isIOS) {
+      return;
+    }
+
+    switch (state) {
+      case AppLifecycleState.inactive:
+      //
+      case AppLifecycleState.resumed:
+        //在前台
+        fijkPlayer.start();
+      case AppLifecycleState.paused:
+        // 在后台
+        fijkPlayer.pause();
+      default:
+        break;
+    }
+  }
+
+  @override
   void dispose() {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
 
     if (isTest) {
+      fijkPlayer.stop();
       fijkPlayer.dispose();
     }
     if (isInit) {
