@@ -38,7 +38,8 @@ class KangXunVideoScreen extends StatefulWidget {
   State<StatefulWidget> createState() => _KangXunVideoScreenState();
 }
 
-class _KangXunVideoScreenState extends TIMUIKitState<KangXunVideoScreen> {
+class _KangXunVideoScreenState extends TIMUIKitState<KangXunVideoScreen>
+    with WidgetsBindingObserver {
   GlobalKey<ExtendedImageSlidePageState> slidePagekey =
       GlobalKey<ExtendedImageSlidePageState>();
   final TUIChatGlobalModel model = serviceLocator<TUIChatGlobalModel>();
@@ -55,6 +56,7 @@ class _KangXunVideoScreenState extends TIMUIKitState<KangXunVideoScreen> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    WidgetsBinding.instance.addObserver(this); // 注册监听器
   }
 
   //保存网络视频到本地
@@ -299,10 +301,32 @@ class _KangXunVideoScreenState extends TIMUIKitState<KangXunVideoScreen> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // TODO: implement didChangeAppLifecycleState
+    super.didChangeAppLifecycleState(state);
+    if (Platform.isIOS) {
+      return;
+    }
+    switch (state) {
+      case AppLifecycleState.inactive:
+      //
+      case AppLifecycleState.resumed:
+        //在前台
+        fijkPlayer.start();
+      case AppLifecycleState.paused:
+        // 在后台
+        fijkPlayer.pause();
+      default:
+        break;
+    }
+  }
+
+  @override
   void dispose() {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
+    WidgetsBinding.instance.removeObserver(this); // 移除监听器
     if (isInit) {
       if (fijkPlayer.state == FijkState.started) {
         fijkPlayer.stop();
