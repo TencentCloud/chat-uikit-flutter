@@ -135,11 +135,7 @@ class _SendSoundMessageState extends TIMUIKitState<SendSoundMessage> {
     }
   }
 
-  //////////// 新增：开始录制语音信息是停止播放语音 ////////////
-  onLongPressStart(_, TUIChatSeparateViewModel model) {
-    model.stopAndResetAudio();
-    //////////// 新增：开始录制语音信息是停止播放语音 ////////////
-
+  onLongPressStart(_) {
     if (isInit) {
       setState(() {
         soundTipsText = TIM_t("手指上滑，取消发送");
@@ -290,6 +286,10 @@ class _SendSoundMessageState extends TIMUIKitState<SendSoundMessage> {
         Provider.of<TUIChatSeparateViewModel>(context);
     return GestureDetector(
       onTapDown: (detail) async {
+        //////////// 新增：开始录制语音信息是停止播放语音 ////////////
+        model.stopAndResetAudio();
+        //////////// 新增：开始录制语音信息是停止播放语音 ////////////
+
         if (!isInit) {
           bool hasMicrophonePermission = await Permissions.checkPermission(
             context,
@@ -302,7 +302,7 @@ class _SendSoundMessageState extends TIMUIKitState<SendSoundMessage> {
           initRecordSound(model);
         }
       },
-      onLongPressStart: (_) => onLongPressStart(_, model),
+      onLongPressStart: onLongPressStart,
       onLongPressMoveUpdate: onLongPressUpdate,
       onLongPressEnd: onLongPressEnd,
       onLongPressCancel: onLonePressCancel,
