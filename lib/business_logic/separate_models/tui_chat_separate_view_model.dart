@@ -1559,7 +1559,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
     subscription = SoundPlayer.playStateListener(listener: (PlayerState state) {
       if (state.processingState == ProcessingState.completed) {
         if (!findNext) {
-          _stopAndReset();
+          stopAndResetAudio();
           return;
         }
 
@@ -1567,7 +1567,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
         final int index =
             soundMessageList.indexWhere((e) => e.msgID == currentPlayedMsgId);
         if (index == -1) {
-          _stopAndReset();
+          stopAndResetAudio();
           return;
         }
 
@@ -1577,7 +1577,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
           // 遇到的音频已读，直接返回，不再往下进行
           if (currentMessage.localCustomInt ==
               HistoryMessageDartConstant.read) {
-            _stopAndReset();
+            stopAndResetAudio();
             return;
           }
 
@@ -1615,7 +1615,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
 
   void cancelSoundSubscription() {
     if (isPlaying) {
-      _stopAndReset(notify: false);
+      stopAndResetAudio(notify: false);
     }
     subscription?.cancel();
   }
@@ -1661,7 +1661,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
 
     debugPrint('playSound play isEmpty url: $playUrl isLocal: $playLocal');
     if (playUrl.isEmpty) {
-      _stopAndReset();
+      stopAndResetAudio();
       _coreServices.callOnCallback(
         TIMCallback(
           type: TIMCallbackType.INFO,
@@ -1678,11 +1678,11 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
     if (isPlaying && msgID == currentPlayedMsgId) {
       debugPrint(
           'playSound play url: $playUrl isLocal: $playLocal isPlaying: $isPlaying');
-      _stopAndReset();
+      stopAndResetAudio();
     } else {
       // 非同一个音频：停止上一个
       if (msgID != currentPlayedMsgId) {
-        _stopAndReset(notify: false);
+        stopAndResetAudio(notify: false);
       }
       try {
         debugPrint('playSound play url: $playUrl isLocal: $playLocal');
@@ -1710,7 +1710,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
     }
   }
 
-  _stopAndReset({
+  stopAndResetAudio({
     bool notify = true,
   }) {
     SoundPlayer.stop();

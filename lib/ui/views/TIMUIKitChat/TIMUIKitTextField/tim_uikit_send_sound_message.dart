@@ -3,19 +3,20 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/sound_record.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
+import 'package:tencent_im_base/tencent_im_base.dart';
 
 class SendSoundMessage extends StatefulWidget {
   /// conversation ID
@@ -134,7 +135,11 @@ class _SendSoundMessageState extends TIMUIKitState<SendSoundMessage> {
     }
   }
 
-  onLongPressStart(_) {
+  //////////// 新增：开始录制语音信息是停止播放语音 ////////////
+  onLongPressStart(_, TUIChatSeparateViewModel model) {
+    model.stopAndResetAudio();
+    //////////// 新增：开始录制语音信息是停止播放语音 ////////////
+
     if (isInit) {
       setState(() {
         soundTipsText = TIM_t("手指上滑，取消发送");
@@ -297,7 +302,7 @@ class _SendSoundMessageState extends TIMUIKitState<SendSoundMessage> {
           initRecordSound(model);
         }
       },
-      onLongPressStart: onLongPressStart,
+      onLongPressStart: (_) => onLongPressStart(_, model),
       onLongPressMoveUpdate: onLongPressUpdate,
       onLongPressEnd: onLongPressEnd,
       onLongPressCancel: onLonePressCancel,
