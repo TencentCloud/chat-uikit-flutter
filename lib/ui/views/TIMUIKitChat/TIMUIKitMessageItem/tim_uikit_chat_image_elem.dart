@@ -86,7 +86,12 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     return img == null ? widget.message.imageElem!.path! : img.url!;
   }
 
-  Widget errorDisplay(BuildContext context, TUITheme? theme) {
+  Widget errorDisplay(
+    BuildContext context,
+    TUITheme? theme, {
+    num? height,
+    num? width,
+  }) {
     return Container(
       decoration: BoxDecoration(
           borderRadius: const BorderRadius.all(Radius.circular(5)),
@@ -94,8 +99,8 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
             width: 2,
             color: theme?.weakDividerColor ?? Colors.grey,
           )),
-      height: 170,
-      width: 170,
+      height: height?.toDouble() ?? 170,
+      width: width?.toDouble() ?? 170,
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -316,7 +321,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
 
   Widget errorPage(theme) => Container(
       height: MediaQuery.of(context).size.height,
-      color: theme.black,
+      // color: theme.black,
       child: GestureDetector(
         onTap: () {
           Navigator.of(context).pop();
@@ -511,15 +516,18 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     }
   }
 
-  Widget _renderAllImage(
-      {dynamic heroTag,
-      required TUITheme theme,
-      bool isNetworkImage = false,
-      String? webPath,
-      V2TimImage? originalImg,
-      V2TimImage? smallImg,
-      String? smallLocalPath,
-      String? originLocalPath}) {
+  Widget _renderAllImage({
+    dynamic heroTag,
+    required TUITheme theme,
+    bool isNetworkImage = false,
+    String? webPath,
+    V2TimImage? originalImg,
+    V2TimImage? smallImg,
+    String? smallLocalPath,
+    String? originLocalPath,
+    num? height,
+    num? width,
+  }) {
     Widget getImageWidget() {
       if (isNetworkImage) {
         return Hero(
@@ -530,12 +538,24 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
                 : CachedNetworkImage(
                     alignment: Alignment.topCenter,
                     imageUrl: webPath ?? smallImg?.url ?? originalImg!.url!,
-                    errorWidget: (context, error, stackTrace) =>
-                        errorPage(theme),
+                    errorWidget: (context, error, stackTrace) => errorDisplay(
+                      context,
+                      theme,
+                      width: width,
+                      height: height,
+                    ),
                     fit: BoxFit.contain,
                     cacheKey: smallImg?.uuid ?? originalImg!.uuid,
-                    placeholder: (context, url) =>
-                        Image(image: MemoryImage(kTransparentImage)),
+                    //////////// 调整图片 placeholder ////////////
+                    placeholder: (context, url) => errorDisplay(
+                      context,
+                      theme,
+                      width: width,
+                      height: height,
+                    ),
+                    // Image(image: MemoryImage(kTransparentImage)),
+                    //////////// 调整图片 placeholder ////////////
+
                     fadeInDuration: const Duration(milliseconds: 0),
                   ));
       } else {
@@ -544,7 +564,18 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
             : originLocalPath)!;
         return Hero(
             tag: heroTag,
-            child: Image.file(File(imgPath), fit: BoxFit.contain));
+            child: Image.file(
+              File(imgPath),
+              fit: BoxFit.contain,
+              //////////// 增加图片 errorBuilder ////////////
+              errorBuilder: (context, error, stackTrace) => errorDisplay(
+                context,
+                theme,
+                width: width,
+                height: height,
+              ),
+              //////////// 增加图片 errorBuilder ////////////
+            ));
       }
     }
 
@@ -632,17 +663,26 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
         (isSent || current - timeStamp < 300);
   }
 
-  Widget? _renderImage(dynamic heroTag, TUITheme theme,
-      {V2TimImage? originalImg, V2TimImage? smallImg}) {
+  Widget? _renderImage(
+    dynamic heroTag,
+    TUITheme theme, {
+    V2TimImage? originalImg,
+    V2TimImage? smallImg,
+    num? height,
+    num? width,
+  }) {
     if (PlatformUtils().isWeb && widget.message.imageElem!.path != null) {
       // Displaying on Web only
       return _renderAllImage(
-          heroTag: heroTag,
-          theme: theme,
-          isNetworkImage: true,
-          smallImg: smallImg,
-          originalImg: originalImg,
-          webPath: widget.message.imageElem!.path);
+        heroTag: heroTag,
+        theme: theme,
+        isNetworkImage: true,
+        smallImg: smallImg,
+        originalImg: originalImg,
+        webPath: widget.message.imageElem!.path,
+        height: height,
+        width: width,
+      );
     }
 
     try {
@@ -651,10 +691,13 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
           widget.message.imageElem!.path!.isNotEmpty &&
           File(widget.message.imageElem!.path!).existsSync())) {
         return _renderAllImage(
-            smallLocalPath: widget.message.imageElem!.path!,
-            heroTag: heroTag,
-            theme: theme,
-            originLocalPath: widget.message.imageElem!.path!);
+          smallLocalPath: widget.message.imageElem!.path!,
+          heroTag: heroTag,
+          theme: theme,
+          originLocalPath: widget.message.imageElem!.path!,
+          height: height,
+          width: width,
+        );
       }
     } catch (e) {
       // ignore: avoid_print
@@ -667,33 +710,47 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
           (TencentUtils.checkString(originalImg?.localUrl) != null &&
               File((originalImg?.localUrl!)!).existsSync())) {
         return _renderAllImage(
-            smallLocalPath: smallImg?.localUrl ?? "",
-            heroTag: heroTag,
-            theme: theme,
-            originLocalPath: originalImg?.localUrl);
+          smallLocalPath: smallImg?.localUrl ?? "",
+          heroTag: heroTag,
+          theme: theme,
+          originLocalPath: originalImg?.localUrl,
+          height: height,
+          width: width,
+        );
       }
     } catch (e) {
       // ignore: avoid_print
       outputLogger.i(e);
       return _renderAllImage(
-          heroTag: heroTag,
-          theme: theme,
-          isNetworkImage: true,
-          smallImg: smallImg,
-          originalImg: originalImg);
+        heroTag: heroTag,
+        theme: theme,
+        isNetworkImage: true,
+        smallImg: smallImg,
+        originalImg: originalImg,
+        height: height,
+        width: width,
+      );
     }
 
     if ((smallImg?.url ?? originalImg?.url) != null &&
         (smallImg?.url ?? originalImg?.url)!.isNotEmpty) {
       return _renderAllImage(
-          heroTag: heroTag,
-          theme: theme,
-          isNetworkImage: true,
-          smallImg: smallImg,
-          originalImg: originalImg);
+        heroTag: heroTag,
+        theme: theme,
+        isNetworkImage: true,
+        smallImg: smallImg,
+        originalImg: originalImg,
+        height: height,
+        width: width,
+      );
     }
 
-    return errorDisplay(context, theme);
+    return errorDisplay(
+      context,
+      theme,
+      width: width,
+      height: height,
+    );
   }
 
   @override
@@ -737,6 +794,8 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
                 theme,
                 originalImg: originalImg,
                 smallImg: smallImg,
+                height: size.height,
+                width: size.width,
               ),
             );
           }
@@ -747,8 +806,12 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
               minWidth: 64,
               maxHeight: 256,
             ),
-            child: _renderImage(heroTag, theme,
-                originalImg: originalImg, smallImg: smallImg),
+            child: _renderImage(
+              heroTag,
+              theme,
+              originalImg: originalImg,
+              smallImg: smallImg,
+            ),
           );
         }));
   }

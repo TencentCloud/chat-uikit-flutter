@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:open_file/open_file.dart';
@@ -52,14 +53,14 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
   final MessageService _messageService = serviceLocator<MessageService>();
   late V2TimVideoElem stateElement = widget.message.videoElem!;
 
-  Widget errorDisplay(TUITheme? theme) {
+  Widget errorDisplay(TUITheme? theme, num? height) {
     return Container(
       decoration: BoxDecoration(
           border: Border.all(
         width: 1,
         color: Colors.black12,
       )),
-      height: 100,
+      height: height?.toDouble() ?? 100,
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -79,7 +80,11 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
     );
   }
 
-  Widget generateSnapshot(TUITheme theme, int height) {
+  Widget generateSnapshot(
+    TUITheme theme,
+    num height,
+    num width,
+  ) {
     if (!PlatformUtils().isWeb) {
       final current = (DateTime.now().millisecondsSinceEpoch / 1000).ceil();
       final timeStamp = widget.message.timestamp ?? current;
@@ -89,8 +94,14 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
           File imgF = File(stateElement.snapshotPath!);
           bool isExist = imgF.existsSync();
           if (isExist) {
-            return Image.file(File(stateElement.snapshotPath!),
-                fit: BoxFit.fitWidth);
+            return Image.file(
+              File(stateElement.snapshotPath!),
+              fit: BoxFit.fitWidth,
+              //////////// 增加图片 errorBuilder ////////////
+              errorBuilder: (context, error, stackTrace) =>
+                  errorDisplay(theme, height),
+              //////////// 增加图片 errorBuilder ////////////
+            );
           }
         }
       }
@@ -99,39 +110,82 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
     if ((stateElement.snapshotUrl == null || stateElement.snapshotUrl == '') &&
         (stateElement.snapshotPath == null ||
             stateElement.snapshotPath == '')) {
-      return Container(
-        decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(5)),
-            border: Border.all(
-              width: 1,
-              color: Colors.black12,
-            )),
-        height: double.parse(height.toString()),
-        child: Center(
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              LoadingAnimationWidget.staggeredDotsWave(
-                color: theme.weakTextColor ?? Colors.grey,
-                size: 28,
-              )
-            ],
-          ),
-        ),
+      return _loadingDisplay(
+        context,
+        theme,
+        height: height.toDouble(),
+        width: width.toDouble(),
       );
     }
     return (!PlatformUtils().isWeb && stateElement.snapshotUrl == null ||
             widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING)
         ? (stateElement.snapshotPath!.isNotEmpty
-            ? Image.file(File(stateElement.snapshotPath!), fit: BoxFit.fitWidth)
-            : Image.file(File(stateElement.localSnapshotUrl!),
-                fit: BoxFit.fitWidth))
+            ? Image.file(
+                File(stateElement.snapshotPath!),
+                fit:
+                    BoxFit.fitWidth, //////////// 增加图片 errorBuilder ////////////
+                errorBuilder: (context, error, stackTrace) =>
+                    errorDisplay(theme, height),
+                //////////// 增加图片 errorBuilder ////////////
+              )
+            : Image.file(
+                File(stateElement.localSnapshotUrl!),
+                fit:
+                    BoxFit.fitWidth, //////////// 增加图片 errorBuilder ////////////
+                errorBuilder: (context, error, stackTrace) =>
+                    errorDisplay(theme, height),
+                //////////// 增加图片 errorBuilder ////////////
+              ))
         : (PlatformUtils().isWeb ||
                 stateElement.localSnapshotUrl == null ||
                 stateElement.localSnapshotUrl == "")
-            ? Image.network(stateElement.snapshotUrl!, fit: BoxFit.fitWidth)
-            : Image.file(File(stateElement.localSnapshotUrl!),
-                fit: BoxFit.fitWidth);
+            ? PlatformUtils().isWeb
+                ? Image.network(
+                    stateElement.snapshotUrl!,
+                    fit: BoxFit.fitWidth,
+                    //////////// 增加图片 loadingBuilder ////////////
+                    loadingBuilder: (context, child, loadingProgress) =>
+                        loadingProgress != null &&
+                                loadingProgress.cumulativeBytesLoaded ==
+                                    loadingProgress.expectedTotalBytes
+                            ? const SizedBox()
+                            : _loadingDisplay(
+                                context,
+                                theme,
+                                height: height.toDouble(),
+                                width: width.toDouble(),
+                              ),
+                    //////////// 增加图片 loadingBuilder ////////////
+                    //////////// 增加图片 errorBuilder ////////////
+                    errorBuilder: (context, error, stackTrace) =>
+                        errorDisplay(theme, height),
+                    //////////// 增加图片 errorBuilder ////////////
+                  )
+                : CachedNetworkImage(
+                    alignment: Alignment.topCenter,
+                    imageUrl: stateElement.snapshotUrl!,
+                    errorWidget: (context, error, stackTrace) =>
+                        errorDisplay(theme, height),
+                    fit: BoxFit.contain,
+                    cacheKey: stateElement.UUID,
+                    //////////// 调整封面 placeholder ////////////
+                    placeholder: (context, url) => _loadingDisplay(
+                      context,
+                      theme,
+                      height: height.toDouble(),
+                      width: width.toDouble(),
+                    ),
+                    //////////// 调整封面 placeholder ////////////
+                    fadeInDuration: const Duration(milliseconds: 0),
+                  )
+            : Image.file(
+                File(stateElement.localSnapshotUrl!),
+                fit: BoxFit.fitWidth,
+                //////////// 增加图片 errorBuilder ////////////
+                errorBuilder: (context, error, stackTrace) =>
+                    errorDisplay(theme, height),
+                //////////// 增加图片 errorBuilder ////////////
+              );
   }
 
   downloadMessageDetailAndSave() async {
@@ -285,6 +339,19 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
                 child: LayoutBuilder(builder:
                     (BuildContext context, BoxConstraints constraints) {
                   double? positionRadio;
+
+                  double maxWidth =
+                      PlatformUtils().isWeb ? 300 : constraints.maxWidth * 0.5;
+                  double minWidth = 20;
+                  double maxHeight = min(constraints.maxHeight * 0.8, 300);
+                  double minHeight = 20;
+                  Size? size = widget.calculateSizeFunc?.call(
+                    minWidth,
+                    maxWidth,
+                    minHeight,
+                    maxHeight,
+                  );
+
                   if ((stateElement.snapshotWidth) != null &&
                       stateElement.snapshotHeight != null &&
                       stateElement.snapshotWidth != 0 &&
@@ -293,6 +360,7 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
                         stateElement.snapshotHeight!);
                   }
                   final child = Stack(
+                    fit: StackFit.expand,
                     children: <Widget>[
                       if (positionRadio != null &&
                           (stateElement.snapshotUrl != null ||
@@ -307,8 +375,14 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
                       Row(
                         children: [
                           Expanded(
-                              child: generateSnapshot(
-                                  theme, stateElement.snapshotHeight ?? 100))
+                            child: generateSnapshot(
+                              theme,
+                              size?.height ??
+                                  stateElement.snapshotHeight ??
+                                  170,
+                              size?.width ?? 170,
+                            ),
+                          )
                         ],
                       ),
                       if (widget.message.status !=
@@ -338,18 +412,6 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
                     ],
                   );
 
-                  double maxWidth =
-                      PlatformUtils().isWeb ? 300 : constraints.maxWidth * 0.5;
-                  double minWidth = 20;
-                  double maxHeight = min(constraints.maxHeight * 0.8, 300);
-                  double minHeight = 20;
-                  Size? size = widget.calculateSizeFunc?.call(
-                    minWidth,
-                    maxWidth,
-                    minHeight,
-                    maxHeight,
-                  );
-
                   if (size != null &&
                       size != Size.zero &&
                       size != Size.infinite) {
@@ -371,6 +433,37 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
                   );
                 }),
               ))),
+    );
+  }
+}
+
+extension _TIMUIKitVideoElemStateCustom on _TIMUIKitVideoElemState {
+  Widget _loadingDisplay(
+    BuildContext context,
+    TUITheme? theme, {
+    double? width,
+    double? height,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+          borderRadius: const BorderRadius.all(Radius.circular(5)),
+          border: Border.all(
+            width: 2,
+            color: theme?.weakDividerColor ?? Colors.grey,
+          )),
+      height: height ?? 170,
+      width: width ?? 170,
+      child: Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            LoadingAnimationWidget.staggeredDotsWave(
+              color: theme?.weakTextColor ?? Colors.grey,
+              size: 28,
+            )
+          ],
+        ),
+      ),
     );
   }
 }
