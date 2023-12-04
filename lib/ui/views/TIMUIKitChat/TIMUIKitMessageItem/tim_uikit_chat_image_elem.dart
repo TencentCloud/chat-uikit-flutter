@@ -531,33 +531,34 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     Widget getImageWidget() {
       if (isNetworkImage) {
         return Hero(
-            tag: heroTag,
-            child: PlatformUtils().isWeb
-                ? Image.network(webPath ?? smallImg?.url ?? originalImg!.url!,
-                    fit: BoxFit.contain)
-                : CachedNetworkImage(
-                    alignment: Alignment.topCenter,
-                    imageUrl: webPath ?? smallImg?.url ?? originalImg!.url!,
-                    errorWidget: (context, error, stackTrace) => errorDisplay(
-                      context,
-                      theme,
-                      width: width,
-                      height: height,
-                    ),
-                    fit: BoxFit.contain,
-                    cacheKey: smallImg?.uuid ?? originalImg!.uuid,
-                    //////////// 调整图片 placeholder ////////////
-                    placeholder: (context, url) => errorDisplay(
-                      context,
-                      theme,
-                      width: width,
-                      height: height,
-                    ),
-                    // Image(image: MemoryImage(kTransparentImage)),
-                    //////////// 调整图片 placeholder ////////////
+          tag: heroTag,
+          child: PlatformUtils().isWeb
+              ? Image.network(webPath ?? smallImg?.url ?? originalImg!.url!,
+                  fit: BoxFit.contain)
+              : CachedNetworkImage(
+                  alignment: Alignment.topCenter,
+                  imageUrl: webPath ?? smallImg?.url ?? originalImg!.url!,
+                  errorWidget: (context, error, stackTrace) => errorDisplay(
+                    context,
+                    theme,
+                    width: width,
+                    height: height,
+                  ),
+                  fit: BoxFit.contain,
+                  cacheKey: smallImg?.uuid ?? originalImg!.uuid,
+                  //////////// 调整图片 placeholder ////////////
+                  placeholder: (context, url) => errorDisplay(
+                    context,
+                    theme,
+                    width: width,
+                    height: height,
+                  ),
+                  // Image(image: MemoryImage(kTransparentImage)),
+                  //////////// 调整图片 placeholder ////////////
 
-                    fadeInDuration: const Duration(milliseconds: 0),
-                  ));
+                  fadeInDuration: const Duration(milliseconds: 100),
+                ),
+        );
       } else {
         final imgPath = (TencentUtils.checkString(smallLocalPath) != null
             ? smallLocalPath

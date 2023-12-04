@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
@@ -63,10 +64,13 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitFaceElem> {
               maxWidth: MediaQuery.of(context).size.width *
                   (isDesktopScreen ? 0.1 : 0.3)),
           child: isFromNetwork()
-              ? Image.network(
-                  createPathFromNative(widget.path),
-                  errorBuilder: (context, error, stackTrace) =>
+              ? CachedNetworkImage(
+                  imageUrl: createPathFromNative(widget.path),
+                  placeholder: (context, url) =>
+                      const CupertinoActivityIndicator(),
+                  errorWidget: (context, url, error) =>
                       Text(TIM_t("该版本不支持此消息")),
+                  fadeInDuration: const Duration(milliseconds: 100),
                 )
               : Image.asset(
                   createPathFromNative(widget.path),

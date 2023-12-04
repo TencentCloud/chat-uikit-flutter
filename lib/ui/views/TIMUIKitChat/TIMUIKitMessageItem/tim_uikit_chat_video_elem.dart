@@ -176,7 +176,7 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
                       width: width.toDouble(),
                     ),
                     //////////// 调整封面 placeholder ////////////
-                    fadeInDuration: const Duration(milliseconds: 0),
+                    fadeInDuration: const Duration(milliseconds: 100),
                   )
             : Image.file(
                 File(stateElement.localSnapshotUrl!),
@@ -360,7 +360,6 @@ class _TIMUIKitVideoElemState extends TIMUIKitState<TIMUIKitVideoElem> {
                         stateElement.snapshotHeight!);
                   }
                   final child = Stack(
-                    fit: StackFit.expand,
                     children: <Widget>[
                       if (positionRadio != null &&
                           (stateElement.snapshotUrl != null ||
