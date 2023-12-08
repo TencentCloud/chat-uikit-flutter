@@ -13,12 +13,14 @@ import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/unread_message.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
+typedef AvatarBuilder = Widget Function();
+
 typedef LastMessageBuilder = Widget? Function(
     V2TimMessage? lastMsg, List<V2TimGroupAtInfo?> groupAtInfoList);
 
 class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
   final String faceUrl;
-  final String nickName;
+  final Widget nickName;
   final V2TimMessage? lastMsg;
   final int unreadCount;
   final bool isPined;
@@ -27,6 +29,7 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
   final int? draftTimestamp;
   final bool isDisturb;
   final LastMessageBuilder? lastMessageBuilder;
+  final AvatarBuilder? avatarBuilder;
   final V2TimUserStatus? onlineStatus;
   final int? convType;
   final bool isCurrent;
@@ -51,6 +54,7 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
     this.draftText,
     this.draftTimestamp,
     this.lastMessageBuilder,
+    this.avatarBuilder,
     this.convType,
   }) : super(key: key);
 
@@ -111,15 +115,6 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
     final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     return Container(
       padding: const EdgeInsets.only(top: 6, bottom: 6, left: 16, right: 16),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: theme.conversationItemBorderColor ??
-                CommonColor.weakDividerColor,
-            width: 1,
-          ),
-        ),
-      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -132,10 +127,11 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
                 fit: StackFit.expand,
                 clipBehavior: Clip.none,
                 children: [
-                  Avatar(
+                  if(avatarBuilder != null) avatarBuilder!(),
+                  if(avatarBuilder == null) Avatar(
                       onlineStatus: onlineStatus,
                       faceUrl: faceUrl,
-                      showName: nickName,
+                      showName: "avatar",
                       type: convType),
                   if (unreadCount != 0)
                     Positioned(
@@ -164,19 +160,15 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
-                        child: Text(
-                      nickName,
-                      softWrap: true,
-                      textAlign: TextAlign.left,
-                      overflow: TextOverflow.ellipsis,
-                      maxLines: 1,
-                      style: TextStyle(
-                        height: 1,
-                        color: theme.conversationItemTitleTextColor,
-                        fontSize: isDesktopScreen ? 14 : 18,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    )),
+                        child: DefaultTextStyle(
+                          softWrap: true,
+                          textAlign: TextAlign.left,
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                          style: TextStyle(height: 1, color: theme.conversationItemTitleTextColor, fontSize: isDesktopScreen ? 14 : 18, fontWeight: FontWeight.w400),
+                          child: nickName,
+                        ),
+                    ),
                     _getTimeStringForChatWidget(context, theme),
                   ],
                 ),

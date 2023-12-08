@@ -25,22 +25,21 @@ class TIMUIKitDraftText extends TIMUIKitStatelessWidget {
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final TUITheme theme = value.theme;
-    return Row(children: [
-      Text(_getDraftShowText(),
-          style: TextStyle(
-            color: theme.conversationItemDraftTextColor,
-          )),
-      Expanded(
-          child: Text(
-        draftText,
-        softWrap: true,
-        overflow: TextOverflow.ellipsis,
-        maxLines: 1,
+    return RichText(
+      softWrap: true,
+      overflow: TextOverflow.ellipsis,
+      maxLines: 1,
+      text: TextSpan(
+        children: [
+          TextSpan(text: _getDraftShowText(), style: TextStyle(color: theme.conversationItemDraftTextColor)),
+          TextSpan(text: draftText),
+        ],
         style: TextStyle(
-            height: 1.5,
-            color: theme.conversationItemLastMessageTextColor,
-            fontSize: fontSize),
-      )),
-    ]);
+          height: 1,
+          color: theme.conversationItemLastMessageTextColor,
+          fontSize: fontSize,
+        ),
+      ),
+    );
   }
 }
