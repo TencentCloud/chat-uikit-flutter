@@ -1,4 +1,5 @@
 # 改动说明
+扩展仓库： https://github.com/JiangJuHong/chat-uikit-flutter  
 fork来源：https://github.com/TencentCloud/chat-uikit-flutter
 
 此仓库：在原有基础上增加通用性适配扩展，此改动不涉及到具体项目业务，尽可能的在原有基础上增加通用适配性，适应更多场景，改动说明参考以下内容：
