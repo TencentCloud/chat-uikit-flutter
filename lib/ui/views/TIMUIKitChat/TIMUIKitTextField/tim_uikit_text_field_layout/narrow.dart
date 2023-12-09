@@ -94,6 +94,9 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
 
   final List<CustomStickerPackage> stickerPackageList;
 
+  /// 图标颜色
+  final Color? iconColor;
+
   const TIMUIKitTextFieldLayoutNarrow(
       {Key? key,
       this.customStickerPanel,
@@ -127,7 +130,8 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
       this.hintText,
       required this.customEmojiStickerList,
       this.controller,
-      required this.stickerPackageList})
+      required this.stickerPackageList,
+      this.iconColor})
       : super(key: key);
 
   @override
@@ -450,7 +454,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                         child: SvgPicture.asset(
                           showSendSoundText ? 'images/keyboard.svg' : 'images/voice.svg',
                           package: 'tencent_cloud_chat_uikit',
-                          color: const Color.fromRGBO(68, 68, 68, 1),
+                          color: widget.iconColor ?? const Color.fromRGBO(68, 68, 68, 1),
                           height: 28,
                           width: 28,
                         ),
@@ -533,7 +537,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                             : SvgPicture.asset(
                                 showEmojiPanel ? 'images/keyboard.svg' : 'images/face.svg',
                                 package: 'tencent_cloud_chat_uikit',
-                                color: const Color.fromRGBO(68, 68, 68, 1),
+                                color: widget.iconColor ?? const Color.fromRGBO(68, 68, 68, 1),
                                 height: 28,
                                 width: 28,
                               ),
@@ -554,7 +558,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                             : SvgPicture.asset(
                                 'images/add.svg',
                                 package: 'tencent_cloud_chat_uikit',
-                                color: const Color.fromRGBO(68, 68, 68, 1),
+                                color: widget.iconColor ?? const Color.fromRGBO(68, 68, 68, 1),
                                 height: 28,
                                 width: 28,
                               ),

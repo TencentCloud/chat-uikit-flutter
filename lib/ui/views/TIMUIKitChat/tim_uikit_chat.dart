@@ -166,6 +166,12 @@ class TIMUIKitChat extends StatefulWidget {
   /// additional network requests to fetch the group member information internally.
   List<V2TimGroupMemberFullInfo?>? groupMemberList;
 
+  /// 输入框区域背景颜色
+  Color? inputPanelBackgroundColor;
+
+  /// 输入框区域图标颜色
+  Color? inputIconColor;
+
   TIMUIKitChat(
       {Key? key,
       this.groupID,
@@ -205,7 +211,9 @@ class TIMUIKitChat extends StatefulWidget {
       this.customAppBar,
       this.inputTopBuilder,
       this.onSecondaryTapAvatar,
-      this.customMessageHoverBarOnDesktop})
+      this.customMessageHoverBarOnDesktop,
+      this.inputPanelBackgroundColor,
+      this.inputIconColor})
       : super(key: key) {
     startTime = DateTime.now().millisecondsSinceEpoch;
   }
@@ -563,6 +571,8 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                                   : (widget.textFieldBuilder != null
                                       ? widget.textFieldBuilder!(context)
                                       : TIMUIKitInputTextField(
+                                          backgroundColor: widget.inputPanelBackgroundColor,
+                                          iconColor: widget.inputIconColor,
                                           chatConfig: widget.config,
                                           groupID: widget.groupID,
                                           atMemberPanelScroll:

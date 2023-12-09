@@ -100,6 +100,9 @@ class TIMUIKitInputTextField extends StatefulWidget {
 
   final String? groupID;
 
+  /// 图标颜色
+  final Color? iconColor;
+
   const TIMUIKitInputTextField(
       {Key? key,
       required this.conversationID,
@@ -122,7 +125,8 @@ class TIMUIKitInputTextField extends StatefulWidget {
       this.groupType,
       this.atMemberPanelScroll,
       this.groupID,
-      this.chatConfig})
+      this.chatConfig,
+      this.iconColor})
       : super(key: key);
 
   @override
@@ -863,6 +867,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                     forbiddenText: forbiddenText,
                     onChanged: widget.onChanged,
                     backgroundColor: widget.backgroundColor,
+                    iconColor: widget.iconColor,
                     morePanelConfig: widget.morePanelConfig,
                     repliedMessage: value,
                     currentCursor: currentCursor,

@@ -1227,7 +1227,7 @@ packages:
       path: ".."
       relative: true
     source: path
-    version: "2.3.3+1"
+    version: "2.4.0"
   tencent_cloud_uikit_core:
     dependency: transitive
     description:

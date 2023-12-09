@@ -19,3 +19,13 @@ fork来源：https://github.com/TencentCloud/chat-uikit-flutter
 
 ### [tim_uikit_conversation_last_msg.dart](lib%2Fui%2Fviews%2FTIMUIKitConversation%2Ftim_uikit_conversation_last_msg.dart)
 * feat 以Rich的方式完全重写内容展示格式，解决显示草稿时和不显示草稿时样式有细微差别的问题，调整行高和草稿时的一致，均为1.0
+
+### [tim_uikit_chat.dart](lib%2Fui%2Fviews%2FTIMUIKitChat%2Ftim_uikit_chat.dart)
+* feat 增加参数：`inputPanelBackgroundColor`，设置输入框区域的背景颜色（注：此属性实际上应该放在TUITheme中，但是此开源库无修改TUITheme的权限，故而提取为组件参数）
+* feat 增加参数：`inputIconColor`，设置输入框区域的图标颜色（注：此属性实际上应该放在TUITheme中，但是此开源库无修改TUITheme的权限，故而提取为组件参数）
+
+### [narrow.dart](lib%2Fui%2Fviews%2FTIMUIKitChat%2FTIMUIKitTextField%2Ftim_uikit_text_field_layout%2Fnarrow.dart)
+* feat 增加参数：`iconColor`，设置图标颜色（注：此属性实际上应该放在TUITheme中，但是此开源库无修改TUITheme的权限，故而提取为组件参数）
+
+### [tim_uikit_text_field.dart](lib%2Fui%2Fviews%2FTIMUIKitChat%2FTIMUIKitTextField%2Ftim_uikit_text_field.dart)
+* feat 增加参数：`iconColor`，设置图标颜色（注：此属性实际上应该放在TUITheme中，但是此开源库无修改TUITheme的权限，故而提取为组件参数）
