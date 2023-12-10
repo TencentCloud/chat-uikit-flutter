@@ -103,6 +103,9 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
   /// 自定义输入框的 Decoration
   final InputDecoration? inputDecoration;
 
+  /// 表情面板背景颜色
+  final Color? stickerPanelBackgroundColor;
+
   const TIMUIKitTextFieldLayoutNarrow(
       {Key? key,
       this.customStickerPanel,
@@ -139,7 +142,8 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
       required this.stickerPackageList,
       this.iconColor,
       this.soundBuilder,
-      this.inputDecoration})
+      this.inputDecoration,
+      this.stickerPanelBackgroundColor})
       : super(key: key);
 
   @override
@@ -229,6 +233,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
               }),
               defaultCustomEmojiStickerList: widget.isUseDefaultEmoji ? TUIKitStickerConstData.emojiList : [])
           : StickerPanel(
+              backgroundColor: widget.stickerPanelBackgroundColor,
               isWideScreen: false,
               sendTextMsg: () {
                 widget.onEmojiSubmitted();

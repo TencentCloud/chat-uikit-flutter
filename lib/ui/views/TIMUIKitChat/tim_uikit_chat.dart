@@ -180,6 +180,9 @@ class TIMUIKitChat extends StatefulWidget {
   /// 自定义输入框的 Decoration
   final InputDecoration? inputDecoration;
 
+  /// 表情面板背景颜色
+  final Color? stickerPanelBackgroundColor;
+
   TIMUIKitChat(
       {Key? key,
       this.groupID,
@@ -223,7 +226,8 @@ class TIMUIKitChat extends StatefulWidget {
       this.inputPanelBackgroundColor,
       this.inputIconColor,
       this.inputSoundBuilder,
-      this.inputDecoration})
+      this.inputDecoration,
+      this.stickerPanelBackgroundColor})
       : super(key: key) {
     startTime = DateTime.now().millisecondsSinceEpoch;
   }
@@ -581,6 +585,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                                   : (widget.textFieldBuilder != null
                                       ? widget.textFieldBuilder!(context)
                                       : TIMUIKitInputTextField(
+                                          stickerPanelBackgroundColor: widget.stickerPanelBackgroundColor,
                                           inputDecoration: widget.inputDecoration,
                                           soundBuilder: widget.inputSoundBuilder,
                                           backgroundColor: widget.inputPanelBackgroundColor,

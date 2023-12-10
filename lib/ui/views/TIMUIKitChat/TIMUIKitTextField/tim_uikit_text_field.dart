@@ -111,6 +111,9 @@ class TIMUIKitInputTextField extends StatefulWidget {
   /// 自定义输入框的 Decoration
   final InputDecoration? inputDecoration;
 
+  /// 表情面板背景颜色
+  final Color? stickerPanelBackgroundColor;
+
   const TIMUIKitInputTextField(
       {Key? key,
       required this.conversationID,
@@ -136,7 +139,8 @@ class TIMUIKitInputTextField extends StatefulWidget {
       this.chatConfig,
       this.iconColor,
       this.soundBuilder,
-      this.inputDecoration})
+      this.inputDecoration,
+      this.stickerPanelBackgroundColor})
       : super(key: key);
 
   @override
@@ -868,6 +872,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
             return TUIKitScreenUtils.getDeviceWidget(
                 context: context,
                 defaultWidget: TIMUIKitTextFieldLayoutNarrow(
+                    stickerPanelBackgroundColor: widget.stickerPanelBackgroundColor,
                     inputDecoration: widget.inputDecoration,
                     soundBuilder: widget.soundBuilder,
                     stickerPackageList: stickerPackageList,
