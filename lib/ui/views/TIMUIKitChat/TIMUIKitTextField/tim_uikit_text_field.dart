@@ -24,6 +24,8 @@ import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_text_field_layout/narrow.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_text_field_layout/wide.dart';
 
+import 'tim_uikit_send_sound_message.dart';
+
 enum MuteStatus { none, me, all }
 
 typedef CustomStickerPanel = Widget Function({
@@ -103,6 +105,9 @@ class TIMUIKitInputTextField extends StatefulWidget {
   /// 图标颜色
   final Color? iconColor;
 
+  /// 语音组件构建器
+  final SoundBuilderCallback? soundBuilder;
+
   const TIMUIKitInputTextField(
       {Key? key,
       required this.conversationID,
@@ -126,7 +131,8 @@ class TIMUIKitInputTextField extends StatefulWidget {
       this.atMemberPanelScroll,
       this.groupID,
       this.chatConfig,
-      this.iconColor})
+      this.iconColor,
+      this.soundBuilder})
       : super(key: key);
 
   @override
@@ -858,6 +864,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
             return TUIKitScreenUtils.getDeviceWidget(
                 context: context,
                 defaultWidget: TIMUIKitTextFieldLayoutNarrow(
+                    soundBuilder: widget.soundBuilder,
                     stickerPackageList: stickerPackageList,
                     onEmojiSubmitted: onEmojiSubmitted,
                     onCustomEmojiFaceSubmitted: onCustomEmojiFaceSubmitted,

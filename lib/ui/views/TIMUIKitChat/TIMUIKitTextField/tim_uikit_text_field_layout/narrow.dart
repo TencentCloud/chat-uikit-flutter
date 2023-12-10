@@ -97,6 +97,9 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
   /// 图标颜色
   final Color? iconColor;
 
+  /// 语音组件构建器
+  final SoundBuilderCallback? soundBuilder;
+
   const TIMUIKitTextFieldLayoutNarrow(
       {Key? key,
       this.customStickerPanel,
@@ -131,7 +134,8 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
       required this.customEmojiStickerList,
       this.controller,
       required this.stickerPackageList,
-      this.iconColor})
+      this.iconColor,
+      this.soundBuilder})
       : super(key: key);
 
   @override
@@ -466,7 +470,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                     if (widget.forbiddenText == null)
                       Expanded(
                         child: showSendSoundText
-                            ? SendSoundMessage(onDownBottom: widget.goDownBottom, conversationID: widget.conversationID, conversationType: widget.conversationType)
+                            ? SendSoundMessage(builder:widget.soundBuilder, onDownBottom: widget.goDownBottom, conversationID: widget.conversationID, conversationType: widget.conversationType)
                             : KeyboardVisibility(
                                 child: ExtendedTextField(
                                     maxLines: 4,

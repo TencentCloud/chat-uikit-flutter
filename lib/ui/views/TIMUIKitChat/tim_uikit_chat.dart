@@ -29,6 +29,8 @@ import 'TIMUIKItMessageList/tim_uikit_chat_history_message_list_config.dart';
 import 'TIMUIKItMessageList/tim_uikit_history_message_list_container.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
+import 'TIMUIKitTextField/tim_uikit_send_sound_message.dart';
+
 class TIMUIKitChat extends StatefulWidget {
   int startTime = 0;
   int endTime = 0;
@@ -167,10 +169,13 @@ class TIMUIKitChat extends StatefulWidget {
   List<V2TimGroupMemberFullInfo?>? groupMemberList;
 
   /// 输入框区域背景颜色
-  Color? inputPanelBackgroundColor;
+  final Color? inputPanelBackgroundColor;
 
   /// 输入框区域图标颜色
-  Color? inputIconColor;
+  final Color? inputIconColor;
+
+  /// 语音组件构建器
+  final SoundBuilderCallback? inputSoundBuilder;
 
   TIMUIKitChat(
       {Key? key,
@@ -213,7 +218,8 @@ class TIMUIKitChat extends StatefulWidget {
       this.onSecondaryTapAvatar,
       this.customMessageHoverBarOnDesktop,
       this.inputPanelBackgroundColor,
-      this.inputIconColor})
+      this.inputIconColor,
+      this.inputSoundBuilder})
       : super(key: key) {
     startTime = DateTime.now().millisecondsSinceEpoch;
   }
@@ -571,6 +577,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                                   : (widget.textFieldBuilder != null
                                       ? widget.textFieldBuilder!(context)
                                       : TIMUIKitInputTextField(
+                                          soundBuilder: widget.inputSoundBuilder,
                                           backgroundColor: widget.inputPanelBackgroundColor,
                                           iconColor: widget.inputIconColor,
                                           chatConfig: widget.config,
