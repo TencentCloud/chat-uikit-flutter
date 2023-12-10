@@ -108,6 +108,9 @@ class TIMUIKitInputTextField extends StatefulWidget {
   /// 语音组件构建器
   final SoundBuilderCallback? soundBuilder;
 
+  /// 自定义输入框的 Decoration
+  final InputDecoration? inputDecoration;
+
   const TIMUIKitInputTextField(
       {Key? key,
       required this.conversationID,
@@ -132,7 +135,8 @@ class TIMUIKitInputTextField extends StatefulWidget {
       this.groupID,
       this.chatConfig,
       this.iconColor,
-      this.soundBuilder})
+      this.soundBuilder,
+      this.inputDecoration})
       : super(key: key);
 
   @override
@@ -864,6 +868,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
             return TUIKitScreenUtils.getDeviceWidget(
                 context: context,
                 defaultWidget: TIMUIKitTextFieldLayoutNarrow(
+                    inputDecoration: widget.inputDecoration,
                     soundBuilder: widget.soundBuilder,
                     stickerPackageList: stickerPackageList,
                     onEmojiSubmitted: onEmojiSubmitted,

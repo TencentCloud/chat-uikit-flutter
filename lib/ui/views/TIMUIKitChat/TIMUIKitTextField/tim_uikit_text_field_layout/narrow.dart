@@ -100,6 +100,9 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
   /// 语音组件构建器
   final SoundBuilderCallback? soundBuilder;
 
+  /// 自定义输入框的 Decoration
+  final InputDecoration? inputDecoration;
+
   const TIMUIKitTextFieldLayoutNarrow(
       {Key? key,
       this.customStickerPanel,
@@ -135,7 +138,8 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
       this.controller,
       required this.stickerPackageList,
       this.iconColor,
-      this.soundBuilder})
+      this.soundBuilder,
+      this.inputDecoration})
       : super(key: key);
 
   @override
@@ -499,7 +503,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                                       });
                                     },
                                     textAlignVertical: TextAlignVertical.top,
-                                    decoration: InputDecoration(
+                                    decoration: widget.inputDecoration ?? InputDecoration(
                                         border: InputBorder.none,
                                         hintStyle: const TextStyle(
                                           // fontSize: 10,
