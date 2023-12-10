@@ -109,6 +109,9 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
   /// 表情面板内边距
   final EdgeInsetsGeometry? stickerPanelPadding;
 
+  /// 更多面板边框
+  final BoxBorder? morePanelBorder;
+
   const TIMUIKitTextFieldLayoutNarrow(
       {Key? key,
       this.customStickerPanel,
@@ -147,7 +150,8 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
       this.soundBuilder,
       this.inputDecoration,
       this.stickerPanelBackgroundColor,
-      this.stickerPanelPadding})
+      this.stickerPanelPadding,
+      this.morePanelBorder})
       : super(key: key);
 
   @override
@@ -269,7 +273,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
     }
 
     if (showMore) {
-      return MorePanel(morePanelConfig: widget.morePanelConfig, conversationID: widget.conversationID, conversationType: widget.conversationType);
+      return MorePanel(border: widget.morePanelBorder, morePanelConfig: widget.morePanelConfig, conversationID: widget.conversationID, conversationType: widget.conversationType);
     }
 
     return const SizedBox(height: 0);

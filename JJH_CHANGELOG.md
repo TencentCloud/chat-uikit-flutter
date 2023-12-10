@@ -27,6 +27,7 @@ fork来源：https://github.com/TencentCloud/chat-uikit-flutter
 * feat 增加参数：`inputDecoration`，自定义输入框的Decoration
 * feat 增加参数：`stickerPanelBackgroundColor`，设置表情面板背景颜色
 * feat 增加参数：`stickerPanelPadding`，设置表情面板内边距
+* feat 增加参数：`morePanelBorder`，设置更多面板的边框
 
 ### [narrow.dart](lib%2Fui%2Fviews%2FTIMUIKitChat%2FTIMUIKitTextField%2Ftim_uikit_text_field_layout%2Fnarrow.dart)
 * feat 增加参数：`iconColor`，设置图标颜色（注：此属性实际上应该放在TUITheme中，但是此开源库无修改TUITheme的权限，故而提取为组件参数）
@@ -34,6 +35,7 @@ fork来源：https://github.com/TencentCloud/chat-uikit-flutter
 * feat 增加参数：`inputDecoration`，自定义输入框的Decoration
 * feat 增加参数：`stickerPanelBackgroundColor`，设置表情面板背景颜色
 * feat 增加参数：`stickerPanelPadding`，设置表情面板内边距
+* feat 增加参数：`morePanelBorder`，设置更多面板的边框
 
 ### [tim_uikit_text_field.dart](lib%2Fui%2Fviews%2FTIMUIKitChat%2FTIMUIKitTextField%2Ftim_uikit_text_field.dart)
 * feat 增加参数：`iconColor`，设置图标颜色（注：此属性实际上应该放在TUITheme中，但是此开源库无修改TUITheme的权限，故而提取为组件参数）
@@ -41,6 +43,10 @@ fork来源：https://github.com/TencentCloud/chat-uikit-flutter
 * feat 增加参数：`inputDecoration`，自定义输入框的Decoration
 * feat 增加参数：`stickerPanelBackgroundColor`，设置表情面板背景颜色
 * feat 增加参数：`stickerPanelPadding`，设置表情面板内边距
+* feat 增加参数：`morePanelBorder`，设置更多面板的边框
 
 ### [tim_uikit_send_sound_message.dart](lib%2Fui%2Fviews%2FTIMUIKitChat%2FTIMUIKitTextField%2Ftim_uikit_send_sound_message.dart)
 * feat 增加参数：`builder`，可由用户自定义组件渲染
+
+### [tim_uikit_more_panel.dart](lib%2Fui%2Fviews%2FTIMUIKitChat%2FTIMUIKitTextField%2Ftim_uikit_more_panel.dart)
+* feat 增加参数：`border`，可由用户自定义边框

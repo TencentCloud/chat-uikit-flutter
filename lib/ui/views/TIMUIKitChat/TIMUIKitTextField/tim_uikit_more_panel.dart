@@ -72,13 +72,17 @@ class MorePanel extends StatefulWidget {
   /// 会话类型
   final ConvType conversationType;
 
+  /// 边框
+  final BoxBorder? border;
+
   final MorePanelConfig? morePanelConfig;
 
   const MorePanel(
       {required this.conversationID,
       required this.conversationType,
       Key? key,
-      this.morePanelConfig})
+      this.morePanelConfig,
+      this.border})
       : super(key: key);
 
   @override
@@ -722,7 +726,7 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
       height: 248,
       decoration: BoxDecoration(
         // color: hexToColor("EBF0F6"),
-        border: Border(
+        border: widget.border ?? Border(
           top: BorderSide(width: 1, color: Colors.grey.shade300),
         ),
       ),

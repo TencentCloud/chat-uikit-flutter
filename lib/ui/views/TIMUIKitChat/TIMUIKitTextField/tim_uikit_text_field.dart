@@ -117,6 +117,9 @@ class TIMUIKitInputTextField extends StatefulWidget {
   /// 表情面板内边距
   final EdgeInsetsGeometry? stickerPanelPadding;
 
+  /// 更多面板边框
+  final BoxBorder? morePanelBorder;
+
   const TIMUIKitInputTextField(
       {Key? key,
       required this.conversationID,
@@ -144,7 +147,8 @@ class TIMUIKitInputTextField extends StatefulWidget {
       this.soundBuilder,
       this.inputDecoration,
       this.stickerPanelBackgroundColor,
-      this.stickerPanelPadding})
+      this.stickerPanelPadding,
+      this.morePanelBorder})
       : super(key: key);
 
   @override
@@ -876,6 +880,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
             return TUIKitScreenUtils.getDeviceWidget(
                 context: context,
                 defaultWidget: TIMUIKitTextFieldLayoutNarrow(
+                    morePanelBorder: widget.morePanelBorder,
                     stickerPanelPadding: widget.stickerPanelPadding,
                     stickerPanelBackgroundColor: widget.stickerPanelBackgroundColor,
                     inputDecoration: widget.inputDecoration,
