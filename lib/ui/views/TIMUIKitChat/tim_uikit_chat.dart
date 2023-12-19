@@ -163,7 +163,7 @@ class TIMUIKitChat extends StatefulWidget {
   /// Specify the custom small png emoji packages.
   final List<CustomEmojiFaceData> customEmojiStickerList;
 
-  final Widget? customAppBar;
+  final PreferredSizeWidget? customAppBar;
 
   final Widget? inputTopBuilder;
 
@@ -482,16 +482,17 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
             },
             child: Scaffold(
                 resizeToAvoidBottomInset: false,
-                appBar: (widget.customAppBar == null)
-                    ? TIMUIKitAppBar(
-                        showTotalUnReadCount: widget.showTotalUnReadCount,
-                        config: widget.appBarConfig,
-                        conversationShowName: _getTitle(),
-                        conversationID: _getConvID(),
-                        showC2cMessageEditStatus:
-                            widget.config?.showC2cMessageEditStatus ?? true,
-                      )
-                    : null,
+                //////////////// 修改 customAppBar 实现方式 ////////////////
+                appBar: widget.customAppBar ??
+                    TIMUIKitAppBar(
+                      showTotalUnReadCount: widget.showTotalUnReadCount,
+                      config: widget.appBarConfig,
+                      conversationShowName: _getTitle(),
+                      conversationID: _getConvID(),
+                      showC2cMessageEditStatus:
+                          widget.config?.showC2cMessageEditStatus ?? true,
+                    ),
+                //////////////// 修改 customAppBar 实现方式 ////////////////
                 body: DropTarget(
                   onDragDone: (detail) {
                     setState(() {
@@ -520,7 +521,9 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (widget.customAppBar != null) widget.customAppBar!,
+                          //////////////// 修改 customAppBar 实现方式 ////////////////
+                          // if (widget.customAppBar != null) widget.customAppBar!,
+                          //////////////// 修改 customAppBar 实现方式 ////////////////
                           if (filteredApplicationList.isNotEmpty)
                             _renderJoinGroupApplication(
                                 filteredApplicationList.length, theme),
