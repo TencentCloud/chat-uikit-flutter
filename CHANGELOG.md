@@ -1,3 +1,9 @@
+# 2.4.1
+
+## Bug Fixes
+
+* Fixed some bugs.
+
 # 2.4.0
 
 ## Breaking Changes

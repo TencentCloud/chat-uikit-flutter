@@ -373,69 +373,74 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
                         infoCode: 6660416));
                   }
                 },
-                child: Container(
-                  width: 237,
-                  decoration: BoxDecoration(
-                      border: Border.all(
-                        color: theme.weakDividerColor ??
-                            CommonColor.weakDividerColor,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxHeight:  72),
+                  child: Container(
+                    width: 237,
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                          color: theme.weakDividerColor ??
+                              CommonColor.weakDividerColor,
+                        ),
+                        borderRadius: borderRadius),
+                    child: Stack(children: [
+                      ClipRRect(
+                        borderRadius: borderRadius,
+                        child: LinearProgressIndicator(
+                            minHeight: ((containerHeight) ?? 72) - 6,
+                            value: (received == 100 ? 0 : received) / 100,
+                            backgroundColor: received == 100
+                                ? theme.weakBackgroundColor
+                                : Colors.white,
+                            valueColor: AlwaysStoppedAnimation(
+                                theme.lightPrimaryMaterialColor.shade50),),
                       ),
-                      borderRadius: borderRadius),
-                  child: Stack(children: [
-                    ClipRRect(
-                      borderRadius: borderRadius,
-                      child: LinearProgressIndicator(
-                          minHeight: ((containerHeight) ?? 72) - 6,
-                          value: (received == 100 ? 0 : received) / 100,
-                          backgroundColor: received == 100
-                              ? theme.weakBackgroundColor
-                              : Colors.white,
-                          valueColor: AlwaysStoppedAnimation(
-                              theme.lightPrimaryMaterialColor.shade50)),
-                    ),
-                    Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 8, horizontal: 12),
-                        child: Row(
-                            mainAxisAlignment: widget.isSelf
-                                ? MainAxisAlignment.end
-                                : MainAxisAlignment.start,
-                            children: [
-                              Expanded(
-                                  child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    constraints:
-                                        const BoxConstraints(maxWidth: 160),
-                                    child: LayoutBuilder(
-                                      builder: (buildContext, boxConstraints) {
-                                        return CustomText(
-                                          fileName,
-                                          width: boxConstraints.maxWidth,
-                                          style: TextStyle(
-                                            color: theme.darkTextColor,
-                                            fontSize: 16,
+                      Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 12),
+                          child: Row(
+                              mainAxisAlignment: widget.isSelf
+                                  ? MainAxisAlignment.end
+                                  : MainAxisAlignment.start,
+                              children: [
+                                Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Container(
+                                          constraints:
+                                          const BoxConstraints(maxWidth: 160),
+                                          child: LayoutBuilder(
+                                            builder: (buildContext, boxConstraints) {
+                                              return CustomText(
+                                                fileName,
+                                                width: boxConstraints.maxWidth,
+                                                maxLines: 1,
+                                                style: TextStyle(
+                                                  color: theme.darkTextColor,
+                                                  fontSize: 16,
+                                                ),
+                                              );
+                                            },
                                           ),
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                  if (fileSize != null)
-                                    Text(
-                                      showFileSize(fileSize),
-                                      style: TextStyle(
-                                          fontSize: 14,
-                                          color: theme.weakTextColor),
-                                    )
-                                ],
-                              )),
-                              TIMUIKitFileIcon(
-                                fileFormat: fileFormat,
-                              ),
-                            ])),
-                  ]),
-                ))),
+                                        ),
+                                        if (fileSize != null)
+                                          Text(
+                                            showFileSize(fileSize),
+                                            style: TextStyle(
+                                                fontSize: 14,
+                                                color: theme.weakTextColor),
+                                          )
+                                      ],
+                                    )),
+                                TIMUIKitFileIcon(
+                                  fileFormat: fileFormat,
+                                ),
+                              ])),
+                    ]),
+                  ),
+                ),
+            )),
         if (!widget.isSelf && isWebDownloading)
           Container(
             margin: const EdgeInsets.only(top: 2),

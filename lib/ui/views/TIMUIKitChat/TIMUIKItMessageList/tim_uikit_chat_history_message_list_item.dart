@@ -1096,10 +1096,12 @@ class _TIMUIKItHistoryMessageListItemState
     final customHoverBar = widget.customMessageHoverBarOnDesktop != null
         ? widget.customMessageHoverBarOnDesktop!(message)
         : null;
+
     final wideHoverTipList = (model.chatConfig.isUseMessageHoverBarOnDesktop &&
             customHoverBar == null)
         ? getMessageHoverControlBar(model, theme)
         : [];
+
     final lastItemName =
         wideHoverTipList.isNotEmpty ? wideHoverTipList.last.name : "";
     return Column(
@@ -1318,8 +1320,11 @@ class _TIMUIKItHistoryMessageListItemState
                 onExit: (_) {
                   if (isDesktopScreen &&
                       model.chatConfig.isUseMessageHoverBarOnDesktop) {
-                    setState(() {
-                      isShowWideToolTip = false;
+                    Tooltip.dismissAllToolTips();
+                    Future.delayed(const Duration(milliseconds: 100), () {
+                      setState(() {
+                        isShowWideToolTip = false;
+                      });
                     });
                   }
                 },
