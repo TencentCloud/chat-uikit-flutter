@@ -81,8 +81,8 @@ class TUIChatModelTools {
     }
 
     return OfflinePushInfo.fromJson({
-      "title": title,
-      "desc": desc,
+      "title": "title",
+      "desc": "desc",
       "disablePush": false,
       "ext": ext,
       "iOSSound": globalModel.chatConfig.notificationIOSSound,
