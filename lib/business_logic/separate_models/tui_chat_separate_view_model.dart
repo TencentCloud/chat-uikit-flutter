@@ -71,6 +71,15 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
   double atPositionY = 0.0;
   int _activeAtIndex = -1;
   List<V2TimGroupMemberFullInfo?> _showAtMemberList = [];
+  Map<String, String> _groupUserShowName = {};
+  String? _groupID;
+
+  Map<String, String> get groupUserShowName => _groupUserShowName;
+
+  set groupUserShowName(Map<String, String> value) {
+    _groupUserShowName = value;
+    notifyListeners();
+  }
 
   int get activeAtIndex => _activeAtIndex;
 
@@ -176,6 +185,37 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     }
   }
 
+  void getUserShowName(List<String> userIDs) async {
+    final List<String> filteredList = userIDs
+        .where((element) => !_groupUserShowName.containsKey(element))
+        .toList();
+    for (final element in filteredList) {
+      _groupUserShowName[element] = element;
+    }
+
+    final String groupID = TencentUtils.checkString(_groupID) ?? conversationID;
+
+    if (filteredList.isNotEmpty) {
+      final res = await TencentImSDKPlugin.manager
+          ?.getGroupManager()
+          .getGroupMembersInfo(groupID: groupID, memberList: filteredList);
+      if (res?.code == 0 && res?.data != null) {
+        final data = res!.data;
+        for (final userInfo in data!) {
+          final showName = TencentUtils.checkString(userInfo.nameCard) ??
+              TencentUtils.checkString(userInfo.nickName) ??
+              TencentUtils.checkString(userInfo.userID);
+          if (TencentUtils.checkString(showName) != null) {
+            _groupUserShowName[userInfo.userID] = showName ?? userInfo.userID;
+          }
+        }
+        if (data.isNotEmpty) {
+          notifyListeners();
+        }
+      }
+    }
+  }
+
   void initForEachConversation(ConvType convType, String convID,
       ValueChanged<String>? onChangeInputField,
       {String? groupID,
@@ -194,6 +234,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     selfMemberInfo = null;
 
     if (conversationType == ConvType.group) {
+      _groupID = groupID;
       globalModel.refreshGroupApplicationList();
       loadGroupInfo(groupID ?? convID);
       if (preGroupMemberList != null) {
