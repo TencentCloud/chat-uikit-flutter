@@ -319,7 +319,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     }
   }
 
-  Widget errorPage(theme) => Container(
+  Widget errorPage(theme) => SizedBox(
       height: MediaQuery.of(context).size.height,
       // color: theme.black,
       child: GestureDetector(

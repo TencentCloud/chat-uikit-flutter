@@ -454,9 +454,15 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
     }
   }
 
-  setFileMessageLocation(String msgID, String location) {
+  setFileMessageLocation(
+    String msgID,
+    String location, {
+    bool notify = true,
+  }) {
     _fileListLocationMap[msgID] = location;
-    notifyListeners();
+    if (notify) {
+      notifyListeners();
+    }
   }
 
   _editStatusCheck(V2TimMessage msg) {
@@ -776,8 +782,13 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
           isSoundType*/
           ) {
         ////////////// 语音消息放入可下载类型（暂时屏蔽） //////////////
-        Future.delayed(const Duration(seconds: 1),
-            () => _updateMessageAndDownloadFile(message, messageProgress));
+        Future.delayed(
+            const Duration(seconds: 1),
+            () => _updateMessageAndDownloadFile(
+                  message,
+                  messageProgress,
+                  notify: !isImageType,
+                ));
       } else {
         return;
       }
@@ -787,19 +798,33 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
   }
 
   void _updateMessageAndDownloadFile(
-      V2TimMessage message, V2TimMessageDownloadProgress messageProgress) {
+    V2TimMessage message,
+    V2TimMessageDownloadProgress messageProgress, {
+    bool notify = true,
+  }) {
     updateAsyncMessage(
-        message,
-        TencentUtils.checkString(message.userID) ??
-            TencentUtils.checkString(message.groupID) ??
-            "");
+      message,
+      TencentUtils.checkString(message.userID) ??
+          TencentUtils.checkString(message.groupID) ??
+          "",
+      notify: notify,
+    );
 
-    _updateMessageLocationAndDownloadFile(messageProgress);
+    _updateMessageLocationAndDownloadFile(
+      messageProgress,
+      notify: notify,
+    );
   }
 
   void _updateMessageLocationAndDownloadFile(
-      V2TimMessageDownloadProgress messageProgress) {
-    setFileMessageLocation(messageProgress.msgID, messageProgress.path);
+    V2TimMessageDownloadProgress messageProgress, {
+    bool notify = true,
+  }) {
+    setFileMessageLocation(
+      messageProgress.msgID,
+      messageProgress.path,
+      notify: notify,
+    );
     setMessageProgress(messageProgress.msgID, 100);
     downloadFile();
   }
@@ -1113,8 +1138,9 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
 
   void updateAsyncMessage(
     V2TimMessage message,
-    String convID,
-  ) {
+    String convID, {
+    bool notify = true,
+  }) {
     message.id = DateTime.now().millisecondsSinceEpoch.toString();
 
     final activeMessageList = _messageListMap[convID];
@@ -1128,9 +1154,11 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
       }
       return item;
     }).toList();
-    if (convID == currentSelectedConv) {
+    //////////////////// 图片消息不需要更新状态：会导致图片闪烁 ////////////////////
+    if (notify && convID == currentSelectedConv) {
       notifyListeners();
     }
+    //////////////////// 图片消息不需要更新状态：会导致图片闪烁 ////////////////////
   }
 
   List<V2TimMessage>? getMessageList(String conversationID) {
