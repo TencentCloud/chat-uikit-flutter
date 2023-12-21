@@ -1674,7 +1674,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
 
     debugPrint('playSound url: $playUrl isLocal: $playLocal');
 
-    if (playUrl.isEmpty) {
+    if (!playLocal || playUrl.isEmpty) {
       try {
         final response = await _messageService.getMessageOnlineUrl(
           msgID: msgID,
