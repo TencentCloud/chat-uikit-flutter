@@ -1651,6 +1651,13 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
 
         cusNotifyListeners();
       }
+      _coreServices.callOnCallback(
+        TIMCallback(
+            type: TIMCallbackType.API_ERROR,
+            errorMsg:
+                'audio ${state.processingState.name} --msgId ${_currentPlayedMsgId}',
+            errorCode: 3),
+      );
     });
   }
 
@@ -1701,6 +1708,18 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
     }
 
     debugPrint('playSound play isEmpty url: $playUrl isLocal: $playLocal');
+
+    if (!playLocal) {
+      _coreServices.callOnCallback(
+        TIMCallback(
+          type: TIMCallbackType.INFO,
+          infoRecommendText: '音频暂未下载完成,请稍后再试',
+        ),
+      );
+
+      return;
+    }
+
     if (playUrl.isEmpty) {
       stopAndResetAudio();
       _coreServices.callOnCallback(
@@ -1728,8 +1747,20 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
       try {
         debugPrint('playSound play url: $playUrl isLocal: $playLocal');
         if (playLocal) {
+          _coreServices.callOnCallback(
+            TIMCallback(
+                type: TIMCallbackType.API_ERROR,
+                errorMsg: '播放本地音频',
+                errorCode: 1),
+          );
           SoundPlayer.playWith(source: AudioSource.file(playUrl));
         } else {
+          _coreServices.callOnCallback(
+            TIMCallback(
+                type: TIMCallbackType.API_ERROR,
+                errorMsg: '播放网络音频',
+                errorCode: 2),
+          );
           SoundPlayer.play(url: playUrl);
         }
       } catch (e) {
