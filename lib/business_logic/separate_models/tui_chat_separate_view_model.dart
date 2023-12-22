@@ -1717,6 +1717,12 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
         ),
       );
 
+      _messageService.downloadMessage(
+          msgID: msgID,
+          messageType: 4,
+          imageType: 0,
+          isSnapshot: false);
+
       return;
     }
 
