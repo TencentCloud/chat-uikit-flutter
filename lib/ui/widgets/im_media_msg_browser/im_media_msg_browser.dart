@@ -104,7 +104,6 @@ class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    // TODO: implement didChangeAppLifecycleState
     super.didChangeAppLifecycleState(state);
     if (Platform.isIOS) {
       return;
@@ -342,8 +341,8 @@ extension _IMMediaMsgBrowserStateApi on IMMediaMsgBrowserState {
     _isLoadingOld = true;
 
     final res = await _getMediaMsgList(lastMsgID: lastMsgID);
-    _isOldFinished = res?.isFinished ?? true;
-    final msgs = res?.messageList ?? [];
+    _isOldFinished = res.$1;
+    final msgs = res.$2;
 
     final curMsg = _msgs[_currentIndex];
     if (msgs.isNotEmpty) {
@@ -373,8 +372,8 @@ extension _IMMediaMsgBrowserStateApi on IMMediaMsgBrowserState {
       lastMsgID: widget.curMsg.msgID,
       getType: HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_NEWER_MSG,
     );
-    _isNewerFinished = res?.isFinished ?? true;
-    final msgs = res?.messageList ?? [];
+    _isNewerFinished = res.$1;
+    final msgs = res.$2;
     if (msgs.isNotEmpty) {
       _msgs.addAll(msgs);
       _safeSetState(() {});
@@ -384,7 +383,7 @@ extension _IMMediaMsgBrowserStateApi on IMMediaMsgBrowserState {
   }
 
   /// 获取媒体消息：图片、视频
-  Future<V2TimMessageListResult?> _getMediaMsgList({
+  Future<(bool isFinished, List<V2TimMessage> msgs)> _getMediaMsgList({
     String? lastMsgID,
     HistoryMsgGetTypeEnum getType =
         HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
@@ -403,7 +402,15 @@ extension _IMMediaMsgBrowserStateApi on IMMediaMsgBrowserState {
     if (res.code != 0) {
       debugPrint('getMediaMsgList: code = ${res.code}, desc = ${res.desc}');
     }
-    return res.data;
+
+    // 过滤被删除和撤回的消息
+    final msgList = List.of((res.data?.messageList ?? []).where((element) =>
+        element.status != MessageStatus.V2TIM_MSG_STATUS_HAS_DELETED &&
+        element.status != MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED));
+    return (
+      res.data?.isFinished ?? true,
+      msgList,
+    );
   }
 }
 
