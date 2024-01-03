@@ -73,6 +73,8 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
   Widget? imageItem;
   bool isSent = false;
 
+  bool _didRenderWithNet = false;
+
   @override
   didUpdateWidget(oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -529,7 +531,8 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     num? width,
   }) {
     Widget getImageWidget() {
-      if (isNetworkImage) {
+      if (isNetworkImage || _didRenderWithNet) {
+        _didRenderWithNet = true;
         return Hero(
           tag: heroTag,
           child: PlatformUtils().isWeb
