@@ -3,18 +3,18 @@
 import 'dart:async';
 
 import 'package:chewie_for_us/chewie_for_us.dart';
-import 'package:chewie_for_us/src/helpers/utils.dart';
 import 'package:chewie_for_us/src/animated_play_pause.dart';
+import 'package:chewie_for_us/src/helpers/utils.dart';
 import 'package:chewie_for_us/src/material/material_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
-
-import 'package:video_player/video_player.dart';
-import 'center_play_button.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:video_player/video_player.dart';
+
+import 'center_play_button.dart';
 
 class VideoCustomControls extends StatefulWidget {
   const VideoCustomControls({required this.downloadFn, Key? key})
@@ -84,10 +84,16 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
               Positioned(
                 bottom: 0,
                 width: MediaQuery.of(context).size.width,
-                child: Column(children: [
-                  _buildVideoControlBar(context),
-                  _buildBottomBar()
-                ]),
+                child: AnimatedOpacity(
+                  opacity: _hideStuff ? 0.0 : 1.0,
+                  duration: const Duration(milliseconds: 300),
+                  child: Column(
+                    children: [
+                      _buildVideoControlBar(context),
+                      _buildBottomBar()
+                    ],
+                  ),
+                ),
               ),
               if (isLoading)
                 Container(
@@ -168,7 +174,7 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
                   isLoading = true;
                 });
                 await widget.downloadFn();
-                Future.delayed(const Duration(milliseconds: 200),(){
+                Future.delayed(const Duration(milliseconds: 200), () {
                   setState(() {
                     isLoading = false;
                   });
@@ -181,30 +187,25 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
     );
   }
 
-  AnimatedOpacity _buildVideoControlBar(
+  Widget _buildVideoControlBar(
     BuildContext context,
   ) {
     const iconColor = Colors.white;
-
-    return AnimatedOpacity(
-      opacity: _hideStuff ? 0.0 : 1.0,
-      duration: const Duration(milliseconds: 300),
-      child: SizedBox(
-        height: barHeight,
-        child: Row(
-          children: <Widget>[
-            _buildPlayPause(controller, iconColor),
-            if (chewieController.isLive)
-              const Expanded(child: Text('LIVE'))
-            else
-              _buildPositionStart(iconColor),
-            if (chewieController.isLive)
-              const SizedBox()
-            else
-              _buildProgressBar(),
-            if (!chewieController.isLive) _buildPositionEnd(iconColor),
-          ],
-        ),
+    return SizedBox(
+      height: barHeight,
+      child: Row(
+        children: <Widget>[
+          _buildPlayPause(controller, iconColor),
+          if (chewieController.isLive)
+            const Expanded(child: Text('LIVE'))
+          else
+            _buildPositionStart(iconColor),
+          if (chewieController.isLive)
+            const SizedBox()
+          else
+            _buildProgressBar(),
+          if (!chewieController.isLive) _buildPositionEnd(iconColor),
+        ],
       ),
     );
   }

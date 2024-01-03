@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:chewie_for_us/chewie_for_us.dart';
 import 'package:chewie_for_us/src/animated_play_pause.dart';
 import 'package:chewie_for_us/src/material/material_progress_bar.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
@@ -93,18 +92,18 @@ class _VideoCustomControlsState extends State<VideoCustomControls>
                   ),
                 ),
               ),
-              if (isLoading)
-                Container(
-                  padding: const EdgeInsets.all(30),
-                  decoration: const BoxDecoration(
-                    color: Color(0xB22b2b2b),
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                  ),
-                  child: const CupertinoActivityIndicator(
-                    radius: 35,
-                    color: Colors.white,
-                  ),
-                ),
+              // if (isLoading)
+              //   Container(
+              //     padding: const EdgeInsets.all(30),
+              //     decoration: const BoxDecoration(
+              //       color: Color(0xB22b2b2b),
+              //       borderRadius: BorderRadius.all(Radius.circular(20)),
+              //     ),
+              //     child: const CupertinoActivityIndicator(
+              //       radius: 35,
+              //       color: Colors.white,
+              //     ),
+              //   ),
             ],
           ),
         ),
@@ -171,20 +170,20 @@ class _VideoCustomControlsState extends State<VideoCustomControls>
           Expanded(child: Container()),
           GestureDetector(
             onTap: () async {
-              _safeSetState(() {
-                isLoading = true;
-              });
+              // _safeSetState(() {
+              //   isLoading = true;
+              // });
               await widget.downloadFn();
-              Future.delayed(
-                const Duration(milliseconds: 200),
-                () {
-                  _safeSetState(
-                    () {
-                      isLoading = false;
-                    },
-                  );
-                },
-              );
+              // Future.delayed(
+              //   const Duration(milliseconds: 200),
+              //   () {
+              //     _safeSetState(
+              //       () {
+              //         isLoading = false;
+              //       },
+              //     );
+              //   },
+              // );
             },
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 15),
