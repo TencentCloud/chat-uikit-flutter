@@ -144,14 +144,15 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
   // 语音消息连续播放新增逻辑 end
 
   double _getSoundLen(double maxWidth) {
-    const minSoundLen = 60.0;
+    const baseSoubdLen = 50.0;
     const maxDuration = 60.0;
-    final maxSoundLen = maxWidth - 16;
+    final maxSoundLen = maxWidth - baseSoubdLen;
     if (stateElement.duration != null) {
       final realSoundLen = stateElement.duration!;
       double soundLen = (realSoundLen / maxDuration) * maxSoundLen;
-      if (soundLen < minSoundLen) {
-        soundLen = minSoundLen;
+      soundLen += baseSoubdLen;
+      if (soundLen < baseSoubdLen) {
+        soundLen = baseSoubdLen;
       }
       if (soundLen > maxSoundLen) {
         soundLen = maxSoundLen;
@@ -168,7 +169,7 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
       // soundLen = sdLen.toDouble();
     }
 
-    return minSoundLen;
+    return baseSoubdLen;
   }
 
   _showJumpColor() {
