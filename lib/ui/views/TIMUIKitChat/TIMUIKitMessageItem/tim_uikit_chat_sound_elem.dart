@@ -157,7 +157,6 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
       if (soundLen > maxSoundLen) {
         soundLen = maxSoundLen;
       }
-      print('soundLen: $soundLen');
       return soundLen;
       // int sdLen = 32;
       // if (realSoundLen > 10) {
