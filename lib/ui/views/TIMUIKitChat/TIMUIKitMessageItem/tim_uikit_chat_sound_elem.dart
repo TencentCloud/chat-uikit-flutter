@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 // import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -144,21 +143,32 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
   // }
   // 语音消息连续播放新增逻辑 end
 
-  double _getSoundLen() {
-    double soundLen = 32;
+  double _getSoundLen(double maxWidth) {
+    const minSoundLen = 60.0;
+    const maxDuration = 60.0;
+    final maxSoundLen = maxWidth - 16;
     if (stateElement.duration != null) {
       final realSoundLen = stateElement.duration!;
-      int sdLen = 32;
-      if (realSoundLen > 10) {
-        sdLen = 12 * charLen + ((realSoundLen - 10) * charLen / 0.5).floor();
-      } else if (realSoundLen > 2) {
-        sdLen = 2 * charLen + realSoundLen * charLen;
+      double soundLen = (realSoundLen / maxDuration) * maxSoundLen;
+      if (soundLen < minSoundLen) {
+        soundLen = minSoundLen;
       }
-      sdLen = min(sdLen, 20 * charLen);
-      soundLen = sdLen.toDouble();
+      if (soundLen > maxSoundLen) {
+        soundLen = maxSoundLen;
+      }
+      print('soundLen: $soundLen');
+      return soundLen;
+      // int sdLen = 32;
+      // if (realSoundLen > 10) {
+      //   sdLen = 12 * charLen + ((realSoundLen - 10) * charLen / 0.5).floor();
+      // } else if (realSoundLen > 2) {
+      //   sdLen = 2 * charLen + realSoundLen * charLen;
+      // }
+      // sdLen = min(sdLen, 20 * charLen);
+      // soundLen = sdLen.toDouble();
     }
 
-    return soundLen;
+    return minSoundLen;
   }
 
   _showJumpColor() {
@@ -306,69 +316,84 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
               findNext: !isRead,
             );
           },
-          child: Container(
-            padding: widget.textPadding ?? const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: isShowJumpState
-                  ? const Color.fromRGBO(245, 166, 35, 1)
-                  : (widget.backgroundColor ?? backgroundColor),
-              borderRadius: widget.borderRadius ?? borderRadius,
-            ),
-            constraints: const BoxConstraints(maxWidth: 240),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: widget.isFromSelf
-                      ? [
-                          Container(width: _getSoundLen()),
-                          Text(
-                            "''${stateElement.duration} ",
-                            style: widget.fontStyle,
-                          ),
-                          chatModel.isPlaying &&
-                                  chatModel.currentPlayedMsgId == widget.msgID
-                              ? Image.asset(
-                                  'images/play_voice_send.gif',
-                                  package: 'tencent_cloud_chat_uikit',
-                                  width: 16,
-                                  height: 16,
-                                )
-                              : Image.asset(
-                                  'images/voice_send.png',
-                                  package: 'tencent_cloud_chat_uikit',
-                                  width: 16,
-                                  height: 16,
-                                ),
-                        ]
-                      : [
-                          chatModel.isPlaying &&
-                                  chatModel.currentPlayedMsgId == widget.msgID
-                              ? Image.asset(
-                                  'images/play_voice_receive.gif',
-                                  package: 'tencent_cloud_chat_uikit',
-                                  width: 16,
-                                  height: 16,
-                                )
-                              : Image.asset(
-                                  'images/voice_receive.png',
-                                  width: 16,
-                                  height: 16,
-                                  package: 'tencent_cloud_chat_uikit',
-                                ),
-                          Text(
-                            " ${stateElement.duration}''",
-                            style: widget.fontStyle,
-                          ),
-                          Container(width: _getSoundLen()),
-                        ],
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              double maxWidth = 240;
+              if (constraints.maxWidth != double.infinity &&
+                  constraints.maxWidth < maxWidth) {
+                maxWidth = constraints.maxWidth;
+              }
+              return Container(
+                padding: widget.textPadding ?? const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: isShowJumpState
+                      ? const Color.fromRGBO(245, 166, 35, 1)
+                      : (widget.backgroundColor ?? backgroundColor),
+                  borderRadius: widget.borderRadius ?? borderRadius,
                 ),
-                if (widget.isShowMessageReaction ?? true)
-                  TIMUIKitMessageReactionShowPanel(
-                    message: widget.message,
-                  )
-              ],
-            ),
+                constraints: BoxConstraints(maxWidth: maxWidth),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: _getSoundLen(maxWidth),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: widget.isFromSelf
+                            ? MainAxisAlignment.end
+                            : MainAxisAlignment.start,
+                        children: widget.isFromSelf
+                            ? [
+                                Text(
+                                  "${stateElement.duration}'' ",
+                                  style: widget.fontStyle,
+                                ),
+                                chatModel.isPlaying &&
+                                        chatModel.currentPlayedMsgId ==
+                                            widget.msgID
+                                    ? Image.asset(
+                                        'images/play_voice_send.gif',
+                                        package: 'tencent_cloud_chat_uikit',
+                                        width: 16,
+                                        height: 16,
+                                      )
+                                    : Image.asset(
+                                        'images/voice_send.png',
+                                        package: 'tencent_cloud_chat_uikit',
+                                        width: 16,
+                                        height: 16,
+                                      ),
+                              ]
+                            : [
+                                chatModel.isPlaying &&
+                                        chatModel.currentPlayedMsgId ==
+                                            widget.msgID
+                                    ? Image.asset(
+                                        'images/play_voice_receive.gif',
+                                        package: 'tencent_cloud_chat_uikit',
+                                        width: 16,
+                                        height: 16,
+                                      )
+                                    : Image.asset(
+                                        'images/voice_receive.png',
+                                        width: 16,
+                                        height: 16,
+                                        package: 'tencent_cloud_chat_uikit',
+                                      ),
+                                Text(
+                                  " ${stateElement.duration}''",
+                                  style: widget.fontStyle,
+                                ),
+                              ],
+                      ),
+                    ),
+                    if (widget.isShowMessageReaction ?? true)
+                      TIMUIKitMessageReactionShowPanel(
+                        message: widget.message,
+                      )
+                  ],
+                ),
+              );
+            },
           ),
         );
       },
