@@ -1,15 +1,21 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
+
+// ignore: unnecessary_import
+import 'dart:typed_data';
+
+import 'package:extended_text_field/extended_text_field.dart';
 import 'package:fc_native_video_thumbnail/fc_native_video_thumbnail.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:path/path.dart' as p;
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
@@ -19,23 +25,18 @@ import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_setting_
 import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/optimize_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_shot.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_shot.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/drag_widget.dart';
-import 'package:extended_text_field/extended_text_field.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-
-// ignore: unnecessary_import
-import 'dart:typed_data';
-import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 
 class DesktopControlBarItem {
   final String item;
@@ -47,18 +48,8 @@ class DesktopControlBarItem {
   final String? showName;
   final double? size;
 
-  DesktopControlBarItem(
-      {required this.item,
-      this.icon,
-      this.color,
-      this.imgPath,
-      this.svgPath,
-      required this.onClick,
-      this.showName,
-      this.size})
-      : assert(icon != null ||
-            TencentUtils.checkString(imgPath) != null ||
-            TencentUtils.checkString(svgPath) != null);
+  DesktopControlBarItem({required this.item, this.icon, this.color, this.imgPath, this.svgPath, required this.onClick, this.showName, this.size})
+      : assert(icon != null || TencentUtils.checkString(imgPath) != null || TencentUtils.checkString(svgPath) != null);
 }
 
 class DesktopControlBarConfig {
@@ -193,12 +184,10 @@ class TIMUIKitTextFieldLayoutWide extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<TIMUIKitTextFieldLayoutWide> createState() =>
-      _TIMUIKitTextFieldLayoutWideState();
+  State<TIMUIKitTextFieldLayoutWide> createState() => _TIMUIKitTextFieldLayoutWideState();
 }
 
-class _TIMUIKitTextFieldLayoutWideState
-    extends TIMUIKitState<TIMUIKitTextFieldLayoutWide> {
+class _TIMUIKitTextFieldLayoutWideState extends TIMUIKitState<TIMUIKitTextFieldLayoutWide> {
   final TUISettingModel settingModel = serviceLocator<TUISettingModel>();
   OverlayEntry? entry;
   final ImagePicker _picker = ImagePicker();
@@ -272,13 +261,8 @@ class _TIMUIKitTextFieldLayoutWideState
   }
 
   String getAbstractMessage(V2TimMessage message) {
-    final String? customAbstractMessage =
-        widget.model.abstractMessageBuilder != null
-            ? widget.model.abstractMessageBuilder!(widget.model.repliedMessage!)
-            : null;
-    return customAbstractMessage ??
-        MessageUtils.getAbstractMessageAsync(
-            widget.model.repliedMessage!, widget.model.groupMemberList ?? []);
+    final String? customAbstractMessage = widget.model.abstractMessageBuilder != null ? widget.model.abstractMessageBuilder!(widget.model.repliedMessage!) : null;
+    return customAbstractMessage ?? MessageUtils.getAbstractMessageAsync(widget.model.repliedMessage!, widget.model.groupMemberList ?? []);
   }
 
   _buildRepliedMessage(V2TimMessage? repliedMessage) {
@@ -301,10 +285,7 @@ class _TIMUIKitTextFieldLayoutWideState
               softWrap: true,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  color: hexToColor("8f959e"),
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold),
+              style: TextStyle(color: hexToColor("8f959e"), fontSize: 14, fontWeight: FontWeight.bold),
             ),
             Expanded(
               child: Text(
@@ -347,10 +328,8 @@ class _TIMUIKitTextFieldLayoutWideState
                 entry = null;
               }
             },
-            initOffset: offset != null
-                ? Offset(offset.dx, max(offset.dy, 16))
-                : Offset(MediaQuery.of(context).size.height * 0.5 + 20,
-                    MediaQuery.of(context).size.height * 0.5 - 100),
+            initOffset:
+                offset != null ? Offset(offset.dx, max(offset.dy, 16)) : Offset(MediaQuery.of(context).size.height * 0.5 + 20, MediaQuery.of(context).size.height * 0.5 - 100),
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: const BorderRadius.all(Radius.circular(8)),
@@ -390,60 +369,55 @@ class _TIMUIKitTextFieldLayoutWideState
                           String? emojiName = singleEmojiName.split('.png')[0];
                           if (widget.isUseDefaultEmoji &&
                               widget.languageType == 'zh' &&
-                              TUIKitStickerConstData.emojiMapList[emojiName] !=
-                                  null &&
-                              TUIKitStickerConstData.emojiMapList[emojiName] !=
-                                  '') {
-                            emojiName =
-                                TUIKitStickerConstData.emojiMapList[emojiName];
+                              TUIKitStickerConstData.emojiMapList[emojiName] != null &&
+                              TUIKitStickerConstData.emojiMapList[emojiName] != '') {
+                            emojiName = TUIKitStickerConstData.emojiMapList[emojiName];
                           }
                           final newText = '[$emojiName]';
                           widget.addStickerToText(newText);
                           entry?.remove();
                           entry = null;
                         }),
-                        defaultCustomEmojiStickerList: widget.isUseDefaultEmoji
-                            ? TUIKitStickerConstData.emojiList
-                            : [])
-                    : StickerPanel(
-                        isWideScreen: true,
-                        height: widget.chatConfig.desktopStickerPanelHeight,
-                        width: 350,
-                        sendTextMsg: null,
-                        sendFaceMsg: (_, __){
-                          widget.onCustomEmojiFaceSubmitted(_, __);
-                          entry?.remove();
-                          entry = null;
-                        },
-                        deleteText: () {
-                          widget.backSpaceText();
-                        },
-                        addText: (int unicode) {
-                          final newText = String.fromCharCode(unicode);
-                          widget.addStickerToText(newText);
-                          entry?.remove();
-                          entry = null;
-                        },
-                        addCustomEmojiText: ((String singleEmojiName) {
-                          String? emojiName = singleEmojiName.split('.png')[0];
-                          if (widget.isUseDefaultEmoji &&
-                              widget.languageType == 'zh' &&
-                              TUIKitStickerConstData.emojiMapList[emojiName] !=
-                                  null &&
-                              TUIKitStickerConstData.emojiMapList[emojiName] !=
-                                  '') {
-                            emojiName =
-                                TUIKitStickerConstData.emojiMapList[emojiName];
-                          }
-                          final newText = '[$emojiName]';
-                          widget.addStickerToText(newText);
-                          entry?.remove();
-                          entry = null;
-                        }),
-                        customStickerPackageList: widget.stickerPackageList,
-                        bottomColor: theme.weakBackgroundColor,
-                        backgroundColor: theme.wideBackgroundColor,
-                        lightPrimaryColor: theme.lightPrimaryColor),
+                        defaultCustomEmojiStickerList: widget.isUseDefaultEmoji ? TUIKitStickerConstData.emojiList : [])
+                    : Material(
+                        color: Colors.transparent,
+                        child: StickerPanel(
+                            isWideScreen: true,
+                            height: widget.chatConfig.desktopStickerPanelHeight,
+                            width: 350,
+                            sendTextMsg: null,
+                            sendFaceMsg: (_, __) {
+                              widget.onCustomEmojiFaceSubmitted(_, __);
+                              entry?.remove();
+                              entry = null;
+                            },
+                            deleteText: () {
+                              widget.backSpaceText();
+                            },
+                            addText: (int unicode) {
+                              final newText = String.fromCharCode(unicode);
+                              widget.addStickerToText(newText);
+                              entry?.remove();
+                              entry = null;
+                            },
+                            addCustomEmojiText: ((String singleEmojiName) {
+                              String? emojiName = singleEmojiName.split('.png')[0];
+                              if (widget.isUseDefaultEmoji &&
+                                  widget.languageType == 'zh' &&
+                                  TUIKitStickerConstData.emojiMapList[emojiName] != null &&
+                                  TUIKitStickerConstData.emojiMapList[emojiName] != '') {
+                                emojiName = TUIKitStickerConstData.emojiMapList[emojiName];
+                              }
+                              final newText = '[$emojiName]';
+                              widget.addStickerToText(newText);
+                              entry?.remove();
+                              entry = null;
+                            }),
+                            customStickerPackageList: widget.stickerPackageList,
+                            bottomColor: theme.weakBackgroundColor,
+                            backgroundColor: theme.wideBackgroundColor,
+                            lightPrimaryColor: theme.lightPrimaryColor),
+                      ),
               ),
             ));
       });
@@ -485,30 +459,16 @@ class _TIMUIKitTextFieldLayoutWideState
       if (result != null && result.files.isNotEmpty) {
         if (PlatformUtils().isWeb) {
           html.Node? inputElem;
-          inputElem = html.document
-              .getElementById("__file_picker_web-file-input")
-              ?.querySelector("input");
+          inputElem = html.document.getElementById("__file_picker_web-file-input")?.querySelector("input");
           fileName = result.files.single.name;
 
-          MessageUtils.handleMessageError(
-              model.sendFileMessage(
-                  inputElement: inputElem,
-                  fileName: fileName,
-                  convID: convID,
-                  convType: convType),
-              context);
+          MessageUtils.handleMessageError(model.sendFileMessage(inputElement: inputElem, fileName: fileName, convID: convID, convType: convType), context);
         } else {
           File file = File(result.files.single.path!);
           final int size = file.lengthSync();
           final String savePath = file.path;
 
-          MessageUtils.handleMessageError(
-              model.sendFileMessage(
-                  filePath: savePath,
-                  size: size,
-                  convID: convID,
-                  convType: convType),
-              context);
+          MessageUtils.handleMessageError(model.sendFileMessage(filePath: savePath, size: size, convID: convID, convType: convType), context);
         }
       } else {
         throw TypeError();
@@ -519,8 +479,7 @@ class _TIMUIKitTextFieldLayoutWideState
     }
   }
 
-  List<Widget> generateBarIcons(
-      List<DesktopControlBarItem> items, TUITheme theme) {
+  List<Widget> generateBarIcons(List<DesktopControlBarItem> items, TUITheme theme) {
     final defaultItems = defaultControlBarItems.map((e) => e.item);
     return items.map((e) {
       final GlobalKey key = GlobalKey();
@@ -528,15 +487,10 @@ class _TIMUIKitTextFieldLayoutWideState
         margin: const EdgeInsets.only(right: 10),
         child: InkWell(
           onTap: () {
-            final alignBox =
-                key.currentContext?.findRenderObject() as RenderBox?;
+            final alignBox = key.currentContext?.findRenderObject() as RenderBox?;
             var offset = alignBox?.localToGlobal(Offset.zero);
             final double? dx = (offset?.dx != null) ? offset!.dx : null;
-            final double? dy =
-                (offset?.dy != null && alignBox?.size.height != null)
-                    ? offset!.dy -
-                        (widget.chatConfig.desktopStickerPanelHeight + 20)
-                    : null;
+            final double? dy = (offset?.dy != null && alignBox?.size.height != null) ? offset!.dy - (widget.chatConfig.desktopStickerPanelHeight + 20) : null;
             e.onClick((dx != null && dy != null) ? Offset(dx, dy) : null);
           },
           child: Tooltip(
@@ -550,9 +504,7 @@ class _TIMUIKitTextFieldLayoutWideState
                 if (TencentUtils.checkString(e.svgPath) != null) {
                   return SvgPicture.asset(
                     e.svgPath!,
-                    package: defaultItems.contains(e.item)
-                        ? 'tencent_cloud_chat_uikit'
-                        : null,
+                    package: defaultItems.contains(e.item) ? 'tencent_cloud_chat_uikit' : null,
                     key: key,
                     width: e.size ?? 16,
                     height: e.size ?? 16,
@@ -561,9 +513,7 @@ class _TIMUIKitTextFieldLayoutWideState
                 if (TencentUtils.checkString(e.imgPath) != null) {
                   return Image.asset(
                     e.imgPath!,
-                    package: defaultItems.contains(e.item)
-                        ? 'tencent_cloud_chat_uikit'
-                        : null,
+                    package: defaultItems.contains(e.item) ? 'tencent_cloud_chat_uikit' : null,
                     key: key,
                     width: e.size ?? 16,
                     height: e.size ?? 16,
@@ -592,18 +542,10 @@ class _TIMUIKitTextFieldLayoutWideState
       fileContent = imageContent;
 
       html.Node? inputElem;
-      inputElem = html.document
-          .getElementById("__image_picker_web-file-input")
-          ?.querySelector("input");
+      inputElem = html.document.getElementById("__image_picker_web-file-input")?.querySelector("input");
       final convID = widget.conversationID;
       final convType = widget.conversationType;
-      MessageUtils.handleMessageError(
-          model.sendImageMessage(
-              inputElement: inputElem,
-              imagePath: tempFile?.path,
-              convID: convID,
-              convType: convType),
-          context);
+      MessageUtils.handleMessageError(model.sendImageMessage(inputElement: inputElem, imagePath: tempFile?.path, convID: convID, convType: convType), context);
     } catch (e) {
       // ignore: avoid_print
       outputLogger.i("_sendFileErr: ${e.toString()}");
@@ -619,26 +561,15 @@ class _TIMUIKitTextFieldLayoutWideState
       fileContent = videoContent;
 
       if (fileName!.split(".")[fileName!.split(".").length - 1] != "mp4") {
-        onTIMCallback(TIMCallback(
-            type: TIMCallbackType.INFO,
-            infoRecommendText: TIM_t("视频消息仅限 mp4 格式"),
-            infoCode: 6660412));
+        onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频消息仅限 mp4 格式"), infoCode: 6660412));
         return;
       }
 
       html.Node? inputElem;
-      inputElem = html.document
-          .getElementById("__image_picker_web-file-input")
-          ?.querySelector("input");
+      inputElem = html.document.getElementById("__image_picker_web-file-input")?.querySelector("input");
       final convID = widget.conversationID;
       final convType = widget.conversationType;
-      MessageUtils.handleMessageError(
-          model.sendVideoMessage(
-              inputElement: inputElem,
-              videoPath: tempFile?.path,
-              convID: convID,
-              convType: convType),
-          context);
+      MessageUtils.handleMessageError(model.sendVideoMessage(inputElement: inputElem, videoPath: tempFile?.path, convID: convID, convType: convType), context);
     } catch (e) {
       // ignore: avoid_print
       outputLogger.i("_sendFileErr: ${e.toString()}");
@@ -651,10 +582,7 @@ class _TIMUIKitTextFieldLayoutWideState
       final originFile = await asset.originFile;
       final size = await originFile!.length();
       if (size >= 104857600) {
-        onTIMCallback(TIMCallback(
-            type: TIMCallbackType.INFO,
-            infoRecommendText: TIM_t("发送失败,视频不能大于100MB"),
-            infoCode: 6660405));
+        onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("发送失败,视频不能大于100MB"), infoCode: 6660405));
         return;
       }
 
@@ -663,9 +591,7 @@ class _TIMUIKitTextFieldLayoutWideState
       final convID = widget.conversationID;
       final convType = widget.conversationType;
 
-      String tempPath = (await getTemporaryDirectory()).path +
-          p.extension(originFile.path, 3) +
-          ".jpeg";
+      String tempPath = (await getTemporaryDirectory()).path + p.extension(originFile.path, 3) + ".jpeg";
 
       await plugin.getVideoThumbnail(
         srcFile: originFile.path,
@@ -676,24 +602,13 @@ class _TIMUIKitTextFieldLayoutWideState
         quality: 100,
         height: 128,
       );
-      MessageUtils.handleMessageError(
-          model.sendVideoMessage(
-              videoPath: filePath,
-              duration: duration,
-              snapshotPath: tempPath,
-              convID: convID,
-              convType: convType),
-          context);
+      MessageUtils.handleMessageError(model.sendVideoMessage(videoPath: filePath, duration: duration, snapshotPath: tempPath, convID: convID, convType: convType), context);
     } catch (e) {
-      onTIMCallback(TIMCallback(
-          type: TIMCallbackType.INFO,
-          infoRecommendText: TIM_t("视频文件异常"),
-          infoCode: 6660415));
+      onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频文件异常"), infoCode: 6660415));
     }
   }
 
-  _sendMediaMessage(
-      TUIChatSeparateViewModel model, TUITheme theme, FileType fileType) async {
+  _sendMediaMessage(TUIChatSeparateViewModel model, TUITheme theme, FileType fileType) async {
     try {
       final convID = widget.conversationID;
       final convType = widget.conversationType;
@@ -708,12 +623,7 @@ class _TIMUIKitTextFieldLayoutWideState
             final type = asset.type;
             if (filePath != null) {
               if (type == AssetType.image) {
-                MessageUtils.handleMessageError(
-                    model.sendImageMessage(
-                        imagePath: filePath,
-                        convID: convID,
-                        convType: convType),
-                    context);
+                MessageUtils.handleMessageError(model.sendImageMessage(imagePath: filePath, convID: convID, convType: convType), context);
               }
 
               if (type == AssetType.video) {
@@ -725,26 +635,17 @@ class _TIMUIKitTextFieldLayoutWideState
       } else {
         final plugin = FcNativeVideoThumbnail();
         _addGreyOverlay();
-        FilePickerResult? result =
-            await FilePicker.platform.pickFiles(type: fileType);
+        FilePickerResult? result = await FilePicker.platform.pickFiles(type: fileType);
         _removeOverlay();
         if (result != null && result.files.isNotEmpty) {
           File file = File(result.files.single.path!);
           final String savePath = file.path;
-          final String type = TencentUtils.getFileType(
-                  (savePath.split(".")[savePath.split(".").length - 1])
-                      .toLowerCase())
-              .split("/")[0];
+          final String type = TencentUtils.getFileType((savePath.split(".")[savePath.split(".").length - 1]).toLowerCase()).split("/")[0];
 
           if (type == "image") {
-            MessageUtils.handleMessageError(
-                model.sendImageMessage(
-                    imagePath: savePath, convID: convID, convType: convType),
-                context);
+            MessageUtils.handleMessageError(model.sendImageMessage(imagePath: savePath, convID: convID, convType: convType), context);
           } else if (type == "video") {
-            String tempPath = (await getTemporaryDirectory()).path +
-                p.basename(savePath) +
-                ".jpeg";
+            String tempPath = (await getTemporaryDirectory()).path + p.basename(savePath) + ".jpeg";
             await plugin.getVideoThumbnail(
               srcFile: savePath,
               keepAspectRatio: true,
@@ -754,13 +655,7 @@ class _TIMUIKitTextFieldLayoutWideState
               quality: 100,
               height: 128,
             );
-            MessageUtils.handleMessageError(
-                model.sendVideoMessage(
-                    videoPath: savePath,
-                    convID: convID,
-                    convType: convType,
-                    snapshotPath: tempPath),
-                context);
+            MessageUtils.handleMessageError(model.sendVideoMessage(videoPath: savePath, convID: convID, convType: convType, snapshotPath: tempPath), context);
           }
         } else {
           throw TypeError();
@@ -769,17 +664,12 @@ class _TIMUIKitTextFieldLayoutWideState
     } catch (err) {
       // ignore: avoid_print
       outputLogger.i("send media err: $err");
-      onTIMCallback(TIMCallback(
-          type: TIMCallbackType.INFO,
-          infoRecommendText: TIM_t("视频文件异常"),
-          infoCode: 6660415));
+      onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频文件异常"), infoCode: 6660415));
     }
   }
 
-  _sendImageWithConfirmation(
-      {String? fileName, Size? fileSize, required String filePath}) async {
-    final option1 = widget.currentConversation.showName ??
-        (widget.conversationType == ConvType.group ? TIM_t("群聊") : TIM_t("对方"));
+  _sendImageWithConfirmation({String? fileName, Size? fileSize, required String filePath}) async {
+    final option1 = widget.currentConversation.showName ?? (widget.conversationType == ConvType.group ? TIM_t("群聊") : TIM_t("对方"));
     final size = fileSize ?? await ScreenshotHelper.getImageSize(filePath);
 
     TUIKitWidePopup.showPopupWindow(
@@ -798,9 +688,7 @@ class _TIMUIKitTextFieldLayoutWideState
                     height: min(360, size.height / 2),
                     child: InkWell(
                       onTap: () {
-                        launchUrl(PlatformUtils().isWeb
-                            ? Uri.parse(filePath)
-                            : Uri.file(filePath));
+                        launchUrl(PlatformUtils().isWeb ? Uri.parse(filePath) : Uri.file(filePath));
                       },
                       child: PlatformUtils().isWeb
                           ? Image.network(
@@ -828,12 +716,7 @@ class _TIMUIKitTextFieldLayoutWideState
                       ElevatedButton(
                           onPressed: () {
                             MessageUtils.handleMessageError(
-                                widget.model.sendImageMessage(
-                                    imagePath: filePath,
-                                    imageName: fileName,
-                                    convID: widget.conversationID,
-                                    convType: widget.conversationType),
-                                context);
+                                widget.model.sendImageMessage(imagePath: filePath, imageName: fileName, convID: widget.conversationID, convType: widget.conversationType), context);
                             closeFunc();
                           },
                           child: Text(TIM_t("发送")))
@@ -852,8 +735,7 @@ class _TIMUIKitTextFieldLayoutWideState
   }
 
   generateDefaultControlBarItems() {
-    final DesktopControlBarConfig config =
-        widget.chatConfig.desktopControlBarConfig ?? DesktopControlBarConfig();
+    final DesktopControlBarConfig config = widget.chatConfig.desktopControlBarConfig ?? DesktopControlBarConfig();
     final List<DesktopControlBarItem> itemsList = [
       if (config.showStickerPanel)
         DesktopControlBarItem(
@@ -916,15 +798,8 @@ class _TIMUIKitTextFieldLayoutWideState
                   child: (onClose) => TIMUIKitSearchMsgDetail(
                         currentConversation: widget.currentConversation,
                         keyword: '',
-                        initMessageList: widget.model
-                            .getOriginMessageList()
-                            .getRange(
-                                0,
-                                min(widget.model.getOriginMessageList().length,
-                                    100))
-                            .toList(),
-                        onTapConversation: (V2TimConversation conversation,
-                            V2TimMessage? message) {},
+                        initMessageList: widget.model.getOriginMessageList().getRange(0, min(widget.model.getOriginMessageList().length, 100)).toList(),
+                        onTapConversation: (V2TimConversation conversation, V2TimMessage? message) {},
                       ),
                   theme: widget.theme);
             },
@@ -933,12 +808,8 @@ class _TIMUIKitTextFieldLayoutWideState
     defaultControlBarItems = itemsList;
   }
 
-  List<Widget> generateControlBar(
-      TUIChatSeparateViewModel model, TUITheme theme) {
-    final List<DesktopControlBarItem> itemsList = [
-      ...defaultControlBarItems,
-      ...(widget.chatConfig.additionalDesktopControlBarItems ?? [])
-    ];
+  List<Widget> generateControlBar(TUIChatSeparateViewModel model, TUITheme theme) {
+    final List<DesktopControlBarItem> itemsList = [...defaultControlBarItems, ...(widget.chatConfig.additionalDesktopControlBarItems ?? [])];
 
     return generateBarIcons(itemsList, theme);
   }
@@ -948,29 +819,22 @@ class _TIMUIKitTextFieldLayoutWideState
     final type = mimeType[0];
     final blobUrl = html.Url.createObjectUrl(file);
     if (type == 'image') {
-      _sendImageWithConfirmation(
-          filePath: blobUrl,
-          fileName: file.name,
-          fileSize: const Size(500, 500));
+      _sendImageWithConfirmation(filePath: blobUrl, fileName: file.name, fileSize: const Size(500, 500));
     }
   }
 
   Future<void> _handleKeyEvent(RawKeyEvent event) async {
     if (PlatformUtils().isDesktop &&
-        ((event.isKeyPressed(LogicalKeyboardKey.controlLeft) &&
-                event.logicalKey == LogicalKeyboardKey.keyV) ||
-            (event.isMetaPressed &&
-                event.logicalKey == LogicalKeyboardKey.keyV))) {
+        ((event.isKeyPressed(LogicalKeyboardKey.controlLeft) && event.logicalKey == LogicalKeyboardKey.keyV) ||
+            (event.isMetaPressed && event.logicalKey == LogicalKeyboardKey.keyV))) {
       final bytes = await Pasteboard.image;
       if (bytes != null) {
         String directory;
         if (PlatformUtils().isWindows) {
-          final String documentsDirectoryPath =
-              "${Platform.environment['USERPROFILE']}";
+          final String documentsDirectoryPath = "${Platform.environment['USERPROFILE']}";
           PackageInfo packageInfo = await PackageInfo.fromPlatform();
           String pkgName = packageInfo.packageName;
-          directory = p.join(documentsDirectoryPath, "Documents",
-              ".TencentCloudChat", pkgName, "screenshots");
+          directory = p.join(documentsDirectoryPath, "Documents", ".TencentCloudChat", pkgName, "screenshots");
         } else {
           final dic = await getApplicationSupportDirectory();
           directory = dic.path;
@@ -978,8 +842,7 @@ class _TIMUIKitTextFieldLayoutWideState
         const uuid = Uuid();
         final fileName = 'paste_image_${uuid.v4()}.png';
         final scDirectory = Directory(directory);
-        final filePath =
-            '${scDirectory.path}${PlatformUtils().isWindows ? "\\" : "/"}$fileName';
+        final filePath = '${scDirectory.path}${PlatformUtils().isWindows ? "\\" : "/"}$fileName';
         final file = File(filePath);
         if (!await scDirectory.exists()) {
           await scDirectory.create(recursive: true);
@@ -1020,14 +883,10 @@ class _TIMUIKitTextFieldLayoutWideState
           child: Column(
             children: [
               _buildRepliedMessage(widget.repliedMessage),
-              SizedBox(
-                  height: 1,
-                  child: Container(
-                      color: theme.weakDividerColor ?? Colors.black12)),
+              SizedBox(height: 1, child: Container(color: theme.weakDividerColor ?? Colors.black12)),
               if (widget.forbiddenText == null)
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: generateControlBar(widget.model, theme),
@@ -1042,8 +901,7 @@ class _TIMUIKitTextFieldLayoutWideState
                       Expanded(
                           child: Container(
                         height: 35,
-                        color: widget.backgroundColor ??
-                            theme.desktopChatMessageInputBgColor,
+                        color: widget.backgroundColor ?? theme.desktopChatMessageInputBgColor,
                         alignment: Alignment.center,
                         child: Text(
                           TIM_t(widget.forbiddenText!),
@@ -1060,10 +918,8 @@ class _TIMUIKitTextFieldLayoutWideState
                         child: ExtendedTextField(
                             scrollController: _scrollController,
                             autofocus: true,
-                            maxLines:
-                                widget.chatConfig.desktopMessageInputFieldLines,
-                            minLines:
-                                widget.chatConfig.desktopMessageInputFieldLines,
+                            maxLines: widget.chatConfig.desktopMessageInputFieldLines,
+                            minLines: widget.chatConfig.desktopMessageInputFieldLines,
                             focusNode: widget.focusNode,
                             onChanged: debounceFunc,
                             keyboardType: TextInputType.multiline,
@@ -1078,9 +934,7 @@ class _TIMUIKitTextFieldLayoutWideState
                               hintStyle: const TextStyle(
                                 color: Color(0xffAEA4A3),
                               ),
-                              fillColor: widget.backgroundColor ??
-                                  theme.desktopChatMessageInputBgColor ??
-                                  hexToColor("fafafa"),
+                              fillColor: widget.backgroundColor ?? theme.desktopChatMessageInputBgColor ?? hexToColor("fafafa"),
                               filled: true,
                               isDense: true,
                               hintText: widget.hintText ?? '',
@@ -1089,21 +943,9 @@ class _TIMUIKitTextFieldLayoutWideState
                             specialTextSpanBuilder: PlatformUtils().isWeb
                                 ? null
                                 : DefaultSpecialTextSpanBuilder(
-                                    isUseQQPackage: (widget
-                                                .model
-                                                .chatConfig
-                                                .stickerPanelConfig
-                                                ?.useTencentCloudChatStickerPackage ??
-                                            true) ||
-                                        widget.isUseDefaultEmoji,
-                                    isUseTencentCloudChatPackage: widget
-                                            .model
-                                            .chatConfig
-                                            .stickerPanelConfig
-                                            ?.useTencentCloudChatStickerPackage ??
-                                        true,
-                                    customEmojiStickerList:
-                                        widget.customEmojiStickerList,
+                                    isUseQQPackage: (widget.model.chatConfig.stickerPanelConfig?.useTencentCloudChatStickerPackage ?? true) || widget.isUseDefaultEmoji,
+                                    isUseTencentCloudChatPackage: widget.model.chatConfig.stickerPanelConfig?.useTencentCloudChatStickerPackage ?? true,
+                                    customEmojiStickerList: widget.customEmojiStickerList,
                                     showAtBackground: true,
                                   )),
                       ),

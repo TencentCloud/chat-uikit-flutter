@@ -1,7 +1,9 @@
 // ignore_for_file: unused_field
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
@@ -64,6 +66,20 @@ class TIMUIKitMessageReactionShowItem extends TIMUIKitStatelessWidget {
     final option1 = nameList.length;
     final TUIChatSeparateViewModel model =
         Provider.of<TUIChatSeparateViewModel>(context);
+
+    final List<String> userIDs = [];
+    for (final user in nameList) {
+      final V2TimGroupMemberFullInfo? memberInfo = memberList
+          .firstWhereOrNull((element) => element?.userID == user && TencentUtils.checkString(user) != null);
+      if((memberInfo == null || TencentUtils.checkString(memberInfo.userID) == null) && TencentUtils.checkString(user.toString()) != null){
+        userIDs.add(user.toString());
+      }
+    }
+    if(userIDs.isNotEmpty){
+      model.getUserShowName(userIDs);
+    }
+
+
     return LayoutBuilder(builder: (context, constraints) {
       return Container(
         padding: const EdgeInsets.only(
@@ -140,9 +156,22 @@ class TIMUIKitMessageReactionShowItem extends TIMUIKitStatelessWidget {
                           } else {
                             showName = memberInfo.userID;
                           }
+                        }else{
+                          final String? data = model.groupUserShowName[e];
+                          if(TencentUtils.checkString(data) != null){
+                            showName = data ?? e;
+                          }
                         }
-                      } catch (e) {
-                        // e
+                      } catch (error) {
+                        final String? data = model.groupUserShowName[e];
+                        if(TencentUtils.checkString(data) != null){
+                          showName = data ?? e;
+                        }
+                      }
+                    }else{
+                      final String? data = model.groupUserShowName[e];
+                      if(TencentUtils.checkString(data) != null){
+                        showName = data ?? e;
                       }
                     }
                     return InkWell(
