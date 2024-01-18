@@ -9,6 +9,7 @@ fork来源：https://github.com/TencentCloud/chat-uikit-flutter
 * feat 增加参数：`avatarBuilder`，使用时可直接传入该构建器替换默认头像显示组件
 * feat 修改参数：`nickName` 从 string 类型替换为 Widget 类型，并增加DefaultTextStyle保持原有样式不变
 * feat 将 边框提取到 [tim_uikit_conversation.dart](lib%2Fui%2Fviews%2FTIMUIKitConversation%2Ftim_uikit_conversation.dart) 组件中
+* feat 增加 avatarSize 属性，可以自定义会话组件头像区域大小
 
 ### [tim_uikit_conversation.dart](lib%2Fui%2Fviews%2FTIMUIKitConversation%2Ftim_uikit_conversation.dart)
 * feat 将 ListView.builder 修改为 ListView.separated
