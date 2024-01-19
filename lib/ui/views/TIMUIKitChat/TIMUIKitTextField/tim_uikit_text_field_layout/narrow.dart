@@ -409,6 +409,12 @@ class _TIMUIKitTextFieldLayoutNarrowState
       if (widget.onChanged != null) {
         widget.onChanged!(value);
       }
+
+      // iOS 系统键盘在@用户昵称包含空格的情况下会清空@用户昵称并填充拼音
+      if (widget.textEditingController.value.isComposingRangeValid) {
+        return;
+      }
+
       widget.handleAtText(value);
       widget.handleSendEditStatus(value, true);
       final isEmpty = value.isEmpty;
