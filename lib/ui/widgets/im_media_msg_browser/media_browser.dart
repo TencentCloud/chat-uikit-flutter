@@ -15,6 +15,7 @@ class MediaBrowser {
     required String? isFrom,
     ValueChanged<String>? onDownloadFile,
     ValueChanged<V2TimMessage>? onImgLongPress,
+    ValueChanged<V2TimMessage>? onDownloadImage,
   }) {
     Navigator.push(
       context,
@@ -26,6 +27,7 @@ class MediaBrowser {
           isFrom: isFrom,
           onDownloadFile: onDownloadFile,
           onImgLongPress: onImgLongPress,
+          onDownloadImage: onDownloadImage,
         ),
       ),
     );

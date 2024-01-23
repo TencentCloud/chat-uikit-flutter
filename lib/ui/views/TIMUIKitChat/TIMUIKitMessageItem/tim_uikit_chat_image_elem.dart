@@ -80,12 +80,11 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     super.didUpdateWidget(oldWidget);
   }
 
-  String getOriginImgURL() {
+  String getOriginImgURLOf(V2TimMessage message) {
     // 实际拿的是原图
     V2TimImage? img = MessageUtils.getImageFromImgList(
-        widget.message.imageElem!.imageList,
-        HistoryMessageDartConstant.oriImgPrior);
-    return img == null ? widget.message.imageElem!.path! : img.url!;
+        message.imageElem!.imageList, HistoryMessageDartConstant.oriImgPrior);
+    return img == null ? message.imageElem!.path! : img.url!;
   }
 
   Widget errorDisplay(
@@ -132,6 +131,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     String imageUrl, {
     bool isLocalResource = true,
     TUITheme? theme,
+    required V2TimMessage message,
   }) async {
     if (PlatformUtils().isWeb) {
       download(imageUrl) async {
@@ -180,17 +180,16 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     }
 
     if (!isLocalResource) {
-      if (widget.message.msgID == null || widget.message.msgID!.isEmpty) {
+      if (message.msgID == null || message.msgID!.isEmpty) {
         return;
       }
 
-      if (model.getMessageProgress(widget.message.msgID) == 100) {
+      if (model.getMessageProgress(message.msgID) == 100) {
         String savePath;
-        if (widget.message.imageElem!.path != null &&
-            widget.message.imageElem!.path != '') {
-          savePath = widget.message.imageElem!.path!;
+        if (message.imageElem!.path != null && message.imageElem!.path != '') {
+          savePath = message.imageElem!.path!;
         } else {
-          savePath = model.getFileMessageLocation(widget.message.msgID);
+          savePath = model.getFileMessageLocation(message.msgID);
         }
         File f = File(savePath);
         if (f.existsSync()) {
@@ -262,14 +261,17 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     return;
   }
 
-  Future<void> _saveImg(TUITheme theme) async {
+  Future<void> _saveImg(
+    TUITheme theme, {
+    V2TimMessage? cusMsg,
+  }) async {
     try {
       String? imageUrl;
       bool isAssetBool = false;
-      final imageElem = widget.message.imageElem;
+      final imageElem = (cusMsg ?? widget.message).imageElem;
 
       if (imageElem != null) {
-        final originUrl = getOriginImgURL();
+        final originUrl = getOriginImgURLOf(cusMsg ?? widget.message);
         final localUrl = imageElem.imageList?.firstOrNull?.localUrl;
         final filePath = imageElem.path;
         final isWeb = PlatformUtils().isWeb;
@@ -293,6 +295,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
           imageUrl,
           isLocalResource: isAssetBool,
           theme: theme,
+          message: cusMsg ?? widget.message,
         );
       }
     } catch (e) {
@@ -445,11 +448,13 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
             onImgLongPress: (V2TimMessage msg) {
               widget.chatModel.chatConfig.onImageLongPress?.call(msg);
             },
+            onDownloadImage: (msg) {
+              _saveImg(theme, cusMsg: msg);
+            },
           );
           return;
         }
         //////////////// 图片、视频消息连续浏览 ////////////////
-
         Navigator.of(context).push(
           PageRouteBuilder(
               opaque: false,
@@ -491,6 +496,9 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
             isFrom: widget.isFrom,
             onImgLongPress: (V2TimMessage msg) {
               widget.chatModel.chatConfig.onImageLongPress?.call(msg);
+            },
+            onDownloadImage: (msg) {
+              _saveImg(theme, cusMsg: msg);
             },
           );
           return;

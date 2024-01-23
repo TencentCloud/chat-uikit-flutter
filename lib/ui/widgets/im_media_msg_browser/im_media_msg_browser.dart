@@ -32,6 +32,7 @@ class IMMediaMsgBrowser extends StatefulWidget {
     this.isFrom,
     this.userID,
     this.groupID,
+    this.onDownloadImage,
   });
 
   final V2TimMessage curMsg;
@@ -40,6 +41,7 @@ class IMMediaMsgBrowser extends StatefulWidget {
   final String? groupID;
   final ValueChanged<String>? onDownloadFile;
   final ValueChanged<V2TimMessage>? onImgLongPress;
+  final ValueChanged<V2TimMessage>? onDownloadImage;
 
   @override
   IMMediaMsgBrowserState createState() => IMMediaMsgBrowserState();
@@ -213,13 +215,8 @@ class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
                           heroTag: heroTag,
                         );
                       } else if (msg.imageElem != null) {
-                        final imageElement = msg.imageElem;
-                        final smallImg = MessageUtils.getImageFromImgList(
-                          imageElement?.imageList,
-                          HistoryMessageDartConstant.smallImgPrior,
-                        );
                         return ImageItem(
-                          imgUrl: smallImg?.url ?? '',
+                          message: msg,
                           size: size,
                           heroTag: heroTag,
                           slidePagekey: slidePagekey,
@@ -245,9 +242,7 @@ class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
                     child: SafeArea(
                       top: false,
                       child: BottomActions(
-                        onDownload: () async {
-                          return await _saveImg(value.theme);
-                        },
+                        onDownload: _saveImg,
                       ),
                     ),
                   ),
@@ -461,41 +456,44 @@ extension _IMMediaMsgBrowserStatePrivate on IMMediaMsgBrowserState {
 }
 
 extension IMMediaMsgBrowserStateDownloadImg on IMMediaMsgBrowserState {
-  Future<void> _saveImg(TUITheme theme) async {
-    try {
-      String? imageUrl;
-      final msg = _msgs[_currentIndex];
-      final imageElem = msg.imageElem;
+  Future<void> _saveImg() async {
+    final msg = _msgs[_currentIndex];
+    widget.onDownloadImage?.call(msg);
+    return;
+    // try {
+    //   String? imageUrl;
+    //   final msg = _msgs[_currentIndex];
+    //   final imageElem = msg.imageElem;
 
-      if (imageElem != null) {
-        final originUrl = _getOriginImgURLOf(msg);
-        imageUrl = originUrl;
-      }
+    //   if (imageElem != null) {
+    //     final originUrl = _getOriginImgURLOf(msg);
+    //     imageUrl = originUrl;
+    //   }
 
-      debugPrint('_saveImg imageUrl: $imageUrl');
+    //   debugPrint('_saveImg imageUrl: $imageUrl');
 
-      if (imageUrl != null) {
-        return await _saveImageToLocal(
-          context,
-          imageUrl,
-          msg,
-          theme: theme,
-        );
-      }
-    } catch (e) {
-      _isDownloadingImg.value = false;
-      onTIMCallback(
-        TIMCallback(
-          infoCode: 6660414,
-          infoRecommendText: TIM_t("正在下载中"),
-          type: TIMCallbackType.INFO,
-        ),
-      );
-      return;
-    }
+    //   if (imageUrl != null) {
+    //     return await _saveImageToLocal(
+    //       context,
+    //       imageUrl,
+    //       msg,
+    //       theme: theme,
+    //     );
+    //   }
+    // } catch (e) {
+    //   _isDownloadingImg.value = false;
+    //   onTIMCallback(
+    //     TIMCallback(
+    //       infoCode: 6660414,
+    //       infoRecommendText: TIM_t("正在下载中"),
+    //       type: TIMCallbackType.INFO,
+    //     ),
+    //   );
+    //   return;
+    // }
   }
 
-  //保存网络图片到本地
+  // 保存网络图片到本地
   Future<void> _saveImageToLocal(
     context,
     String imageUrl,
