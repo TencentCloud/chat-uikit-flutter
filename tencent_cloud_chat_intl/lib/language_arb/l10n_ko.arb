@@ -1,0 +1,531 @@
+{
+  "album": "앨범",
+  "chat": "채팅",
+  "chats": "채팅",
+  "calls": "통화",
+  "search": "검색",
+  "contacts": "연락처",
+  "settings": "설정",
+  "online": "온라인",
+  "offline": "오프라인",
+  "sendAMessage": "메시지",
+  "done": "완료",
+  "archive": "보관",
+  "read": "읽음",
+  "readAll": "읽음",
+  "delete": "삭제",
+  "newChat": "새 채팅",
+  "newGroup": "새 그룹",
+  "frequentlyContacted": "자주 연락하는 사람",
+  "addParticipants": "멤버 추가",
+  "addMembers": "멤버 추가",
+  "cancel": "취소",
+  "next": "다음",
+  "back": "뒤로",
+  "groupID": "그룹 ID",
+  "groupIDCertificate": "그룹 ID (인증서)",
+  "groupOfType": "그룹 유형",
+  "typeOfGroup": "그룹 유형",
+  "work": "작업",
+  "public": "공개",
+  "meeting": "회의",
+  "avChatRoom": "AV채팅룸",
+  "groupPortrait": "그룹 초상화",
+  "participants": "참가자",
+  "seeDocs": "문서 보기",
+  "you": "당신",
+  "today": "오늘",
+  "yesterday": "어제",
+  "youCreatedGroup": "당신이 그룹 {groupName}을(를) 생성했습니다",
+  "@youCreatedGroup": {
+    "description": "현재 사용자가 그룹을 생성했습니다.",
+    "placeholders": {
+      "groupName": {
+        "type": "String",
+        "example": "새 그룹"
+      }
+    }
+  },
+  "groups": "그룹",
+  "chatRecord": "메시지",
+  "messages": "메시지",
+  "more": "더보기",
+  "noConversationsContactsOrMessagesFound": "대화, 연락처 또는 메시지가 없습니다",
+  "contactInfo": "연락처 정보",
+  "exportChat": "채팅 내보내기",
+  "clearChat": "채팅 지우기",
+  "deleteChat": "채팅 삭제",
+  "video": "비디오",
+  "videoCall": "영상 통화",
+  "missedVideoCall": "부재 중 영상 통화",
+  "voice": "음성",
+  "voiceCall": "음성 통화",
+  "missedVoiceCall": "부재 중 음성 통화",
+  "location": "위치",
+  "youStartedACall": "당신이 통화를 시작했습니다",
+  "star": "별표",
+  "copy": "복사",
+  "forward": "전달",
+  "multiSelect": "선택",
+  "select": "선택",
+  "quote": "인용",
+  "reply": "답장",
+  "all": "모두",
+  "tapToRemove": "제거하려면 탭하세요",
+  "messageInfo": "메시지 정보",
+  "delivered": "전달됨",
+  "readBy": "읽음",
+  "deliveredTo": "전달 대상",
+  "numSelect": "{num, plural, zero {메시지 선택} other {{num} 선택됨}}",
+  "@numSelect": {
+    "description": "선택된 메시지 수",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "numChats": "{num, plural, zero {선택된 채팅 없음} one {1 채팅} other {{num} 채팅}}",
+  "@numChats": {
+    "description": "선택된 채팅 수",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "recentChats": "최근 채팅",
+  "numThreadQuote": "{num, plural, one {{num} 스레드 인용} other {{num} 스레드 인용}}",
+  "@numThreadQuote": {
+    "description": "스레드 인용 수",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "swipeLeftToCancelOrReleaseToSend": "왼쪽으로 스와이프하여 취소하거나 보내기 위해 놓으십시오",
+  "releaseToCancel": "취소하려면 놓으십시오",
+  "camera": "카메라",
+  "document": "문서",
+  "file": "파일",
+  "photos": "사진",
+  "contact": "연락처",
+  "custom": "사용자 정의",
+  "message": "메시지",
+  "doNotDisturb": "무음",
+  "mute": "무음",
+  "topChat": "고정",
+  "pin": "고정",
+  "blackUser": "사용자 차단",
+  "blockUser": "사용자 차단",
+  "saveContact": "연락처 저장",
+  "call": "통화",
+  "clearingChatHistory": "메시지 지우기",
+  "clearMessages": "메시지 지우기",
+  "firstName": "이름",
+  "lastName": "성",
+  "groupNotice": "그룹 공지",
+  "groupOfAnnouncement": "그룹 공지",
+  "groupManagement": "그룹 관리",
+  "groupType": "그룹 유형",
+  "addGroupWay": "그룹 추가 방법",
+  "myAliasInGroup": "그룹에서의 별칭",
+  "myGroupNickName": "그룹에서의 별칭",
+  "groupMembers": "그룹 멤버",
+  "admin": "관리자",
+  "adminNum": "관리자 ({num})",
+  "@adminNum": {
+    "description": "관리자 수",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "info": "정보",
+  "setAsAdmin": "관리자로 설정",
+  "announcement": "그룹 공지",
+  "totalSilence": "전체 무음",
+  "silenceAll": "모두 무음",
+  "addSilencedMember": "무음 멤버 추가",
+  "onlyGroupOwnerAndAdminsCanSendMessages": "활성화하면 그룹 소유자와 관리자만 메시지를 보낼 수 있습니다.",
+  "someoneEnabledSilenceAll": "{name}님이 '모두 무음'을 활성화했습니다",
+  "@someoneEnabledSilenceAll": {
+    "description": "누군가가 모두 무음을 활성화했습니다",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Pony Ma"
+      }
+    }
+  },
+  "someoneDisabledSilenceAll": "{name}님이 '모두 무음'을 비활성화했습니다",
+  "@someoneDisabledSilenceAll": {
+    "description": "누군가가 모두 무음을 비활성화했습니다",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Pony Ma"
+      }
+    }
+  },
+  "newContacts": "새 연락처",
+  "myGroup": "내 그룹",
+  "theBlackList": "차단 목록",
+  "blockList": "차단된 사용자",
+  "groupChatNotifications": "그룹 채팅 알림",
+  "userID": "사용자 ID",
+  "myUserID": "내 사용자 ID: {userID}",
+  "@myUserID": {
+    "description": "내 사용자 ID",
+    "placeholders": {
+      "userID": {
+        "type": "String",
+        "example": "123456"
+      }
+    }
+  },
+  "searchUserID": "사용자ID 검색",
+  "none": "없음",
+  "iDis": "ID: {userID}",
+  "@iDis": {
+    "description": "사용자 ID",
+    "placeholders": {
+      "userID": {
+        "type": "String",
+        "example": "123456"
+      }
+    }
+  },
+  "addToContacts": "연락처에 추가",
+  "addContact": "연락처 추가",
+  "bio": "자기소개",
+  "bioIs": "자기소개: {bio}",
+  "@bioIs": {
+    "description": "자기소개: ",
+    "placeholders": {
+      "bio": {
+        "type": "String",
+        "example": "행복"
+      }
+    }
+  },
+  "fillInTheVerificationInformation": "요청 보내기",
+  "remarkAndGrouping": "비고 및 그룹화",
+  "remark": "비고",
+  "group": "그룹",
+  "send": "보내기",
+  "contactAddedSuccessfully": "연락처가 성공적으로 추가되었습니다",
+  "requestSent": "요청 전송됨",
+  "cannotAddContact": "연락처를 추가할 수 없습니다",
+  "addGroup": "그룹 추가",
+  "typeIs": "유형: {type}",
+  "@typeIs": {
+    "description": "유형: ",
+    "placeholders": {
+      "type": {
+        "type": "String",
+        "example": "작업"
+      }
+    }
+  },
+  "groupNotAcceptingRequests": "그룹이 요청을 수락하지 않음",
+  "joinedGroupSuccessfully": "그룹에 성공적으로 가입",
+  "numNewApplications": "{num, plural, one {{num} 개의 새로운 신청} other {{num} 개의 새로운 신청}}",
+  "@numNewApplications": {
+    "description": "numNewApplications",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "agree": "수락",
+  "accept": "수락",
+  "refuse": "거절",
+  "decline": "거절",
+  "verificationMessage": "인증 메시지",
+  "accepted": "수락됨",
+  "declined": "거부됨",
+  "confirm": "확인",
+  "contactRequest": "연락처 요청",
+  "contactsPermission": "연락처 권한",
+  "allowAnyUserAddYouAsContact": "누구나 연락처로 추가할 수 있도록 허용",
+  "declineContactRequestFromAnyUser": "자동 거절 연락처 요청",
+  "anyoneUponRequest": "수동으로 요청 수락",
+  "theme": "테마",
+  "language": "언어",
+  "aboutTencentCloudChat": "텐센트 클라우드 채팅 정보",
+  "logIn": "로그인",
+  "signIn": "로그인",
+  "signUp": "가입",
+  "signOut": "로그아웃",
+  "logOut": "로그아웃",
+  "signature": "자기소개",
+  "gender": "성별",
+  "birthday": "생일",
+  "male": "남성",
+  "female": "여성",
+  "unspecified": "미지정",
+  "unknown": "알 수 없음",
+  "sdkVersion": "SDK 버전",
+  "privacyPolicy": "개인정보 처리방침",
+  "userAgreement": "사용자 동의",
+  "disclaimer": "면책 조항",
+  "personalInformationCollected": "수집된 개인 정보",
+  "informationSharedWithThirdParties": "제3자와 공유된 정보",
+  "deleteAccount": "계정 삭제",
+  "contactUs": "문의하기",
+  "countryOrRegion": "국가 / 지역",
+  "selectACountry": "국가 또는 지역 선택",
+  "phoneNumber": "전화번호",
+  "email": "이메일",
+  "verificationCode": "인증 코드",
+  "enterSMSCode": "SMS로 전송된 코드 입력",
+  "sendCode": "코드 보내기",
+  "visitOurWebsite": "웹사이트 방문",
+  "english": "English",
+  "simplifiedChinese": "简体中文",
+  "traditionalChinese": "繁體中文",
+  "japanese": "日本語",
+  "korean": "한국어",
+  "style": "스타일",
+  "classic": "클래식",
+  "minimalist": "미니멀리스트",
+  "messageReadStatus": "메시지 읽음 상태",
+  "messageReadStatusDescription": "메시지 읽음 상태를 표시하고 다른 사람이 메시지를 읽었는지 확인할 수 있는지 여부를 제어합니다.",
+  "onlineStatus": "온라인 상태",
+  "onlineStatusDescription": "온라인 상태가 연락처에 표시되는지 여부를 결정합니다.",
+  "noBio": "자기소개 없음",
+  "noConversation": "대화 없음",
+  "sound": "소리",
+  "sticker": "스티커",
+  "image": "이미지",
+  "chatHistory": "채팅 기록",
+  "audio": "오디오",
+  "messageDeleted": "메시지 삭제됨",
+  "messageRecalled": "메시지 회수됨",
+  "unreadCount": "{num, plural, one {{num} 개의 안 읽은 메시지} other {{num} 개의 안 읽은 메시지}}",
+  "@unreadCount": {
+    "description": "읽지 않은 메시지 수",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "newMsgCount": "{num, plural, one {새 메시지} other {{num} 개의 새 메시지}}",
+  "@newMsgCount": {
+    "description": "새로운 메시지 수",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "takeAPhoto": "사진 찍기",
+  "recordAVideo": "비디오 녹화",
+  "pullDownToLoadMoreMessages": "더 많은 메시지를 불러오려면 아래로 당겨주세요",
+  "releaseToLoadMore": "더 불러오려면 놓아주세요",
+  "noMoreMessage": "더 이상 메시지 없음",
+  "pullUpToLoadMoreMessages": "더 많은 메시지를 불러오려면 위로 당겨주세요",
+  "holdToRecordReleaseToSend": "녹음하려면 길게 누르고 보내려면 놓으세요",
+  "forwardIndividually": "개별 전달",
+  "forwardCombined": "결합 전달",
+  "selectConversations": "대화 선택",
+  "recent": "최근",
+  "recall": "회수",
+  "replyTo": "{name}님에게 답장",
+  "@replyTo": {
+    "description": "메시지에 답장.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Runlin Wang"
+      }
+    }
+  },
+  "confirmDeletion": "삭제 확인",
+  "deleteForEveryone": "모두에게 삭제",
+  "deleteForMe": "나만 삭제",
+  "askDeleteThisMessage": "이 메시지를 삭제하시겠습니까?",
+  "deleteMessageCount": "{num, plural, zero {메시지 삭제 없음} one {메시지 삭제하시겠습니까?} other {{num} 개의 메시지 삭제하시겠습니까?}}",
+  "@deleteMessageCount": {
+    "description": "삭제할 메시지 수",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "memberReadCount": "{num, plural, zero {회원이 읽지 않음} one {1 명의 회원이 읽음} other {{num} 명의 회원이 읽음}}",
+  "@memberReadCount": {
+    "description": "메시지를 읽은 회원 수",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "allMembersRead": "모든 회원이 읽었습니다",
+  "allowAny": "모두 허용",
+  "cannotSendApplicationToWorkGroup": "작업 그룹에 신청서를 보낼 수 없습니다",
+  "appearance": "외관",
+  "darkTheme": "어두운 테마",
+  "denyAny": "거부",
+  "edit": "편집",
+  "friendsPermission": "친구 권한",
+  "groupJoined": "그룹 가입됨",
+  "lightTheme": "밝은 테마",
+  "noBlockList": "차단된 사용자 없음",
+  "noContact": "연락처 없음",
+  "noNewApplication": "새로운 신청 없음",
+  "permissionNeeded": "권한 필요",
+  "requireRequest": "요청 필요",
+  "setNickname": "닉네임 설정",
+  "setSignature": "서명 설정",
+  "validationMessages": "유효성 검사 메시지",
+  "getVerification": "인증 받기",
+  "invalidEmail": "잘못된 이메일",
+  "invalidPhoneNumber": "잘못된 전화번호",
+  "invalidVerification": "잘못된 인증",
+  "searchGroupID": "그룹 ID 검색",
+  "callInitiated": "통화 시작됨",
+  "callAccepted": "통화 수락됨",
+  "callDeclined": "통화 거절됨",
+  "noAnswer": "응답 없음",
+  "lineBusy": "통화중",
+  "callHungUp": "통화 끊김",
+  "callInProgress": "통화 진행 중",
+  "callEnded": "통화 종료",
+  "unknownCallStatus": "통화 중",
+  "groupChatCreated": "그룹 채팅이 성공적으로 생성되었습니다!",
+  "vote": "투표",
+  "callCancelled": "통화 취소됨",
+  "unknownGroupTips": "알 수 없는 그룹 팁",
+  "memberJoinedGroup": "{members}님이 그룹에 가입했습니다",
+  "opInvitedToGroup": "{opMember}님이 {members}님을 그룹에 초대했습니다",
+  "memberLeftGroup": "{members}님이 그룹을 떠났습니다",
+  "opRemovedFromGroup": "{opMember}님이 {members}님을 그룹에서 제거했습니다",
+  "opPromotedToAdmin": "{opMember}님이 {members}님을 관리자로 승격시켰습니다",
+  "opRevokedAdmin": "{opMember}님이 {members}님의 관리자 권한을 취소했습니다",
+  "opChangedGroupInfo": "{opMember}님이 {groupInfo}를 변경했습니다",
+  "opChangedMemberInfo": "{opMember}님이 {memberInfo}를 변경했습니다",
+  "changedGroupNameTo": "그룹 이름을 {name}로 변경했습니다",
+  "changedGroupDescriptionTo": "그룹 설명을 {description}로 변경했습니다",
+  "changedGroupAnnouncementTo": "그룹 공지를 {announcement}로 변경했습니다",
+  "changedGroupAvatar": "그룹 아바타 변경",
+  "transferredGroupOwnershipTo": "그룹 소유권을 {owner}님에게 이전했습니다",
+  "changedGroupCustomInfo": "그룹 사용자 정의 정보 변경",
+  "enabledGroupMute": "그룹 전체 음소거 활성화",
+  "disabledGroupMute": "그룹 전체 음소거 비활성화",
+  "changedGroupMessageReceptionTo": "그룹 메시지 수신 설정을 다음으로 변경했습니다: {setting}",
+  "changedApplyToJoinGroupTo": "그룹 가입 신청 설정을 다음으로 변경했습니다: {setting}",
+  "changedInviteToJoinGroupTo": "그룹 초대 가입 설정을 다음으로변경했습니다: {setting}",
+  "opUnmuted": "{user} 음소거 해제",
+  "opMuted": "{user} {duration} 초 동안 음소거",
+  "groupTips": "그룹 팁",
+  "quit": "그룹에서 나가기",
+  "quitAndDelete": "나가기 및 삭제",
+  "setGroupName": "그룹 이름 설정",
+  "groupAddAny": "어떤",
+  "groupAddAuth": "승인 필요",
+  "groupAddForbid": "금지",
+  "groupOwner": "그룹 소유자",
+  "groupMember": "회원",
+  "dismissAdmin": "관리자 해임",
+  "welcomeToTencentCloudChat": "텐센트 클라우드 채팅에 오신 것을 환영합니다",
+  "draft": "초안",
+  "receiveMessages": "메시지 받기",
+  "doNotReceiveMessages": "메시지 받지 않기",
+  "receiveMessagesWhenOnlineOnly": "온라인 상태일 때만 메시지 받기",
+  "disallowJoinGroup": "그룹 가입 신청 거부",
+  "joinGroupNeedApproval": "그룹 가입 신청에 관리자 승인 필요",
+  "joinGroupDirectly": "신청 후 바로 그룹에 가입",
+  "disallowInviting": "그룹 초대 거부",
+  "requireApprovalForInviting": "초대 가입에 관리자 승인 필요",
+  "joinDirectlyBeenInvited": "초대 후 바로 그룹에 가입",
+  "unmuted": "음소거 해제",
+  "muteTime": "{duration} 초 동안 음소거",
+  "poll": "설문 조사",
+  "callDuration": "통화 시간: {duration}",
+  "selectMembers": "멤버 선택",
+  "numSelectMembers": "{num, plural, zero {멤버 선택} other {{num} 선택됨}}",
+  "@numSelectMembers": {
+    "description": "선택된 멤버 수",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "searchMembers": "멤버 검색",
+  "startCall": "통화 시작",
+  "clear": "지우기",
+  "groupSubtitle": "{name} 및 {count} 명의 다른 사람들",
+  "markAsUnread": "읽지 않은 상태로 표시",
+  "hide": "숨기기",
+  "unreadMessagesBelow": "아래에 읽지 않은 메시지",
+  "ar": "اَلْعَرَبِيَّةُ",
+  "tencentCloudChat": "Tencent Cloud Chat",
+  "changeTheme": "외관 변경",
+  "deleteAccountNotification": "계정을 삭제한 후 현재 계정을 사용할 수 없으며 관련 데이터가 삭제되어 복구할 수 없습니다.",
+  "restartAppForLanguage": "언어 변경 사항을 적용하려면 앱을 다시 시작하십시오",
+  "deleteAllMessages": "모든 메시지 삭제",
+  "downloading": "다운로드 중...",
+  "viewFullImage": "전체 이미지 보기",
+  "messageRecall": "메시지 철회",
+  "messageRecallConfirmation": "이 메시지를 철회하시겠습니까?",
+  "openInNewWindow": "새 창에서 열기",
+    "selectAChat": "채팅 선택",
+    "noConversationSelected": "선택된 대화 없음",
+    "unavailableToSendMessage": "메시지를 보낼 수 없습니다",
+    "noSuchGroup": "그런 그룹 없음",
+    "notGroupMember": "그룹 회원이 아닙니다",
+    "userNotFound": "사용자를 찾을 수 없습니다",
+    "userBlockedYou": "사용자가 당신을 차단했습니다",
+    "muted": "음소거",
+    "groupMuted": "그룹 음소거",
+    "cantSendMessage": "메시지를 보낼 수 없습니다",
+    "media": "미디어",
+    "sendToSomeChat": "{name}에게 보내기",
+    "@sendToSomeChat": {
+      "description": "특정 채팅에 보내기",
+      "placeholders": {
+        "name": {
+          "type": "String",
+          "example": "포니 마"
+        }
+      }
+    },
+    "unableToSendWithFolders": "폴더가 포함되어 있어 파일을 보낼 수 없습니다. 개별 파일만 선택해주세요.",
+    "channelSwitch": "채널: ",
+    "weChat": "위챗",
+    "tGWA": "텔레그램 & 왓츠앱",
+    "contactUsIfQuestions": "불분명한 점이나 더 많은 아이디어가 있으면 언제든지 문의하십시오!",
+    "chatNow": "지금 채팅하기",
+    "onlineServiceTimeFrom10To20": "온라인 서비스 시간: 월요일부터 금요일까지 오전 10시부터 오후 8시까지",
+    "officialWebsite": "공식 웹사이트",
+    "allSDKs": "모든 SDKs",
+    "sourceCode": "소스 코드",
+    "personalInformationCollectionList": "개인 정보 수집 목록",
+    "thirdPartyInformationSharingList": "제3자 정보 공유 목록",
+    "version": "버전",
+    "feedback": "피드백",
+    "me": "나",
+    "about": "소개하다",
+    "profile": "프로필",
+    "unpin": "고정 취소",
+    "mentionedMessages": "나에게 {count} 개의 언급"
+}

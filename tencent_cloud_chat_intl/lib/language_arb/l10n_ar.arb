@@ -1,0 +1,531 @@
+{
+  "album": "ألبوم",
+  "chat": "دردشة",
+  "chats": "الدردشات",
+  "calls": "المكالمات",
+  "search": "بحث",
+  "contacts": "جهات الاتصال",
+  "settings": "الإعدادات",
+  "online": "متصل",
+  "offline": "غير متصل",
+  "sendAMessage": "رسالة",
+  "done": "تم",
+  "archive": "أرشيف",
+  "read": "اقرأ",
+  "readAll": "اقرأ",
+  "delete": "حذف",
+  "newChat": "دردشة جديدة",
+  "newGroup": "مجموعة جديدة",
+  "frequentlyContacted": "جهات الاتصال المتكررة",
+  "addParticipants": "إضافة أعضاء",
+  "addMembers": "إضافة أعضاء",
+  "cancel": "إلغاء",
+  "next": "التالى",
+  "back": "عودة",
+  "groupID": "معرف المجموعة",
+  "groupIDCertificate": "معرف المجموعة (شهادة)",
+  "groupOfType": "نوع المجموعة",
+  "typeOfGroup": "نوع المجموعة",
+  "work": "عمل",
+  "public": "عام",
+  "meeting": "اجتماع",
+  "avChatRoom": "غرفة دردشة الفيديو",
+  "groupPortrait": "صورة المجموعة",
+  "participants": "المشاركون",
+  "seeDocs": "انظر المستندات",
+  "you": "أنت",
+  "today": "اليوم",
+  "yesterday": "أمس",
+  "youCreatedGroup": "أنشأت المجموعة {groupName}",
+  "@youCreatedGroup": {
+    "description": "أنشأ المستخدم الحالي مجموعة.",
+    "placeholders": {
+      "groupName": {
+        "type": "String",
+        "example": "مجموعة جديدة"
+      }
+    }
+  },
+  "groups": "المجموعات",
+  "chatRecord": "الرسائل",
+  "messages": "الرسائل",
+  "more": "المزيد",
+  "noConversationsContactsOrMessagesFound": "لم يتم العثور على محادثات أو جهات اتصال أو رسائل",
+  "contactInfo": "معلومات الاتصال",
+  "exportChat": "تصدير الدردشة",
+  "clearChat": "مسح الدردشة",
+  "deleteChat": "حذف الدردشة",
+  "video": "فيديو",
+  "videoCall": "مكالمة فيديو",
+  "missedVideoCall": "مكالمة فيديو فائتة",
+  "voice": "صوت",
+  "voiceCall": "مكالمة صوتية",
+  "missedVoiceCall": "مكالمة صوتية فائتة",
+  "location": "الموقع",
+  "youStartedACall": "بدأت مكالمة",
+  "star": "نجمة",
+  "copy": "نسخ",
+  "forward": "إعادة توجيه",
+  "multiSelect": "تحديد",
+  "select": "تحديد",
+  "quote": "اقتباس",
+  "reply": "الرد",
+  "all": "الكل",
+  "tapToRemove": "اضغط للإزالة",
+  "messageInfo": "معلومات الرسالة",
+  "delivered": "تم التوصيل",
+  "readBy": "قراءة بواسطة",
+  "deliveredTo": "تم التوصيل إلى",
+  "numSelect": "{num, plural, zero {تحديد الرسائل} other {{num} محدد}}",
+  "@numSelect": {
+    "description": "عدد الرسائل المحددة",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "numChats": "{num, plural, zero {لم يتم تحديد دردشة} one {دردشة واحدة} other {{num} دردشات}}",
+  "@numChats": {
+    "description": "عدد الدردشات المحددة",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "recentChats": "الدردشات الأخيرة",
+  "numThreadQuote": "{num, plural, one {{num} اقتباس موضوع} other {{num} اقتباسات موضوع}}",
+  "@numThreadQuote": {
+    "description": "عدد اقتباسات الموضوع",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "swipeLeftToCancelOrReleaseToSend": "اسحب لليسار للإلغاء أو الإفلات للإرسال",
+  "releaseToCancel": "إفلات للإلغاء",
+  "camera": "كاميرا",
+  "document": "مستند",
+  "file": "ملف",
+  "photos": "الصور",
+  "contact": "جهة اتصال",
+  "custom": "مخصص",
+  "message": "رسالة",
+  "doNotDisturb": "كتم",
+  "mute": "كتم",
+  "topChat": "تثبيت",
+  "pin": "تثبيت",
+  "blackUser": "حظر المستخدم",
+  "blockUser": "حظر المستخدم",
+  "saveContact": "حفظ جهة الاتصال",
+  "call": "اتصال",
+  "clearingChatHistory": "مسح الرسائل",
+  "clearMessages": "مسح الرسائل",
+  "firstName": "الاسم الأول",
+  "lastName": "اسم العائلة",
+  "groupNotice": "إشعار المجموعة",
+  "groupOfAnnouncement": "إشعار المجموعة",
+  "groupManagement": "إدارة المجموعة",
+  "groupType": "نوع المجموعة",
+  "addGroupWay": "إضافة طريقة المجموعة",
+  "myAliasInGroup": "لقبي في المجموعة",
+  "myGroupNickName": "لقبي في المجموعة",
+  "groupMembers": "أعضاء المجموعة",
+  "admin": "مشرف",
+  "adminNum": "المشرف ({num})",
+  "@adminNum": {
+    "description": "عدد المشرفين",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "info": "معلومات",
+  "setAsAdmin": "تعيين كمشرف",
+  "announcement": "إشعار المجموعة",
+  "totalSilence": "كتم الصوت الإجمالي",
+  "silenceAll": "كتم الصوت للجميع",
+  "addSilencedMember": "إضافة عضو مكتوم",
+  "onlyGroupOwnerAndAdminsCanSendMessages": "بعد التمكين، يمكن لمالك المجموعة والمشرفين فقط إرسالة.",
+  "someoneEnabledSilenceAll": "{name} قام بتفعيل 'كتم الصوت للجميع'",
+  "@someoneEnabledSilenceAll": {
+    "description": "شخص ما قام بتفعيل كتم الصوت للجميع",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Pony Ma"
+      }
+    }
+  },
+  "someoneDisabledSilenceAll": "{name} قام بتعطيل 'كتم الصوت للجميع'",
+  "@someoneDisabledSilenceAll": {
+    "description": "شخص ما قام بتعطيل كتم الصوت للجميع",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Pony Ma"
+      }
+    }
+  },
+  "newContacts": "جهات اتصال جديدة",
+  "myGroup": "مجموعاتي",
+  "theBlackList": "قائمة الحظر",
+  "blockList": "المستخدمين المحظورين",
+  "groupChatNotifications": "إشعارات دردشة المجموعة",
+  "userID": "معرف المستخدم",
+  "myUserID": "معرف المستخدم الخاص بي: {userID}",
+  "@myUserID": {
+    "description": "معرف المستخدم الخاص بي",
+    "placeholders": {
+      "userID": {
+        "type": "String",
+        "example": "123456"
+      }
+    }
+  },
+  "searchUserID": "بحث عن معرف المستخدم",
+  "none": "لا شيء",
+  "iDis": "المعرف: {userID}",
+  "@iDis": {
+    "description": "معرف المستخدم",
+    "placeholders": {
+      "userID": {
+        "type": "String",
+        "example": "123456"
+      }
+    }
+  },
+  "addToContacts": "إضافة إلى جهات الاتصال",
+  "addContact": "إضافة جهة اتصال",
+  "bio": "نبذة",
+  "bioIs": "النبذة: {bio}",
+  "@bioIs": {
+    "description": "نبذة: ",
+    "placeholders": {
+      "bio": {
+        "type": "String",
+        "example": "سعيد"
+      }
+    }
+  },
+  "fillInTheVerificationInformation": "إرسال الطلب",
+  "remarkAndGrouping": "ملاحظة وتجميع",
+  "remark": "ملاحظة",
+  "group": "مجموعة",
+  "send": "إرسال",
+  "contactAddedSuccessfully": "تمت إضافة جهة الاتصال بنجاح",
+  "requestSent": "تم إرسال الطلب",
+  "cannotAddContact": "لا يمكن إضافة جهة اتصال",
+  "addGroup": "إضافة مجموعة",
+  "typeIs": "النوع: {type}",
+  "@typeIs": {
+    "description": "النوع: ",
+    "placeholders": {
+      "type": {
+        "type": "String",
+        "example": "عمل"
+      }
+    }
+  },
+  "groupNotAcceptingRequests": "المجموعة لا تقبل الطلبات",
+  "joinedGroupSuccessfully": "انضممت إلى المجموعة بنجاح",
+  "numNewApplications": "{num, plural, one {{num} طلب جديد} other {{num} طلبات جديدة}}",
+  "@numNewApplications": {
+    "description": "عدد الطلبات الجديدة",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "agree": "قبول",
+  "accept": "قبول",
+  "refuse": "رفض",
+  "decline": "رفض",
+  "verificationMessage": "رسالة التحقق",
+  "accepted": "مقبول",
+  "declined": "مرفوض",
+  "confirm": "تأكيد",
+  "contactRequest": "طلب جهة اتصال",
+  "contactsPermission": "إذن جهات الاتصال",
+  "allowAnyUserAddYouAsContact": "السماح لأي شخص بإضافتك كجهة اتصال",
+  "declineContactRequestFromAnyUser": "رفض طلبات جهة الاتصال تلقائيًا",
+  "anyoneUponRequest": "قبول الطلبات يدويًا",
+  "theme": "المظهر",
+  "language": "اللغة",
+  "aboutTencentCloudChat": "حول Tencent Cloud Chat",
+  "logIn": "تسجيل الدخول",
+  "signIn": "تسجيل الدخول",
+  "signUp": "إنشاء حساب",
+  "signOut": "تسجيل الخروج",
+  "logOut": "تسجيل الخروج",
+  "signature": "التوقيع",
+  "gender": "الجنس",
+  "birthday": "تاريخ الميلاد",
+  "male": "ذكر",
+  "female": "أنثى",
+  "unspecified": "غير محدد",
+  "unknown": "غير معروف",
+  "sdkVersion": "إصدار SDK",
+  "privacyPolicy": "سياسة الخصوصية",
+  "userAgreement": "اتفاقية المستخدم",
+  "disclaimer": "إخلاء المسؤولية",
+  "personalInformationCollected": "المعلومات الشخصية المجمعة",
+  "informationSharedWithThirdParties": "المعلومات المشتركة مع الأطراف الثالثة",
+  "deleteAccount": "حذف الحساب",
+  "contactUs": "اتصل بنا",
+  "countryOrRegion": "الدولة / المنطقة",
+  "selectACountry": "اختر دولة أو منطقة",
+  "phoneNumber": "رقم الهاتف",
+  "email": "البريد الإلكتروني",
+  "verificationCode": "رمز التحقق",
+  "enterSMSCode": "أدخل الرمز المرسل عبر الرسائل القصيرة",
+  "sendCode": "إرسال الرمز",
+  "visitOurWebsite": "زيارة موقعنا",
+  "english": "English",
+  "simplifiedChinese": "简体中文",
+  "traditionalChinese": "繁體中文",
+  "japanese": "日本語",
+  "korean": "한국어",
+  "style": "النمط",
+  "classic": "كلاسيكي",
+  "minimalist": "مينيمالي",
+  "messageReadStatus": "حالة قراءة الرسالة",
+  "messageReadStatusDescription": "يتحكم فيعرض حالة القراءة لرسائلك ومعرفة ما إذا كان الآخرين يمكنهم رؤية ما إذا كنت قد قرأت رسائلهم.",
+  "onlineStatus": "حالة الاتصال",
+  "onlineStatusDescription": "يحدد ما إذا كانت حالة اتصالك مرئية لجهات اتصالك.",
+  "noBio": "لا نبذة",
+  "noConversation": "لا محادثة",
+  "sound": "الصوت",
+  "sticker": "ملصق",
+  "image": "صورة",
+  "chatHistory": "سجل المحادثة",
+  "audio": "الصوت",
+  "messageDeleted": "تم حذف الرسالة",
+  "messageRecalled": "تم استدعاء الرسالة",
+  "unreadCount": "{num, plural, one {{num} رسالة غير مقروءة} other {{num} رسائل غير مقروءة}}",
+  "@unreadCount": {
+    "description": "عدد الرسائل غير المقروءة",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "newMsgCount": "{num, plural, one {رسالة جديدة} other {{num} رسائل جديدة}}",
+  "@newMsgCount": {
+    "description": "عدد الرسائل الجديدة",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "takeAPhoto": "التقاط صورة",
+  "recordAVideo": "تسجيل فيديو",
+  "pullDownToLoadMoreMessages": "اسحب لأسفل لتحميل المزيد من الرسائل",
+  "releaseToLoadMore": "أفلت لتحميل المزيد",
+  "noMoreMessage": "لا توجد المزيد من الرسائل",
+  "pullUpToLoadMoreMessages": "اسحب لأعلى لتحميل المزيد من الرسائل",
+  "holdToRecordReleaseToSend": "اضغط مع الاستمرار للتسجيل ، وأفلت للإرسال",
+  "forwardIndividually": "إعادة توجيه بشكل فردي",
+  "forwardCombined": "إعادة توجيه مجتمعة",
+  "selectConversations": "اختر المحادثات",
+  "recent": "الأخيرة",
+  "recall": "استدعاء",
+  "replyTo": "الرد على {name}",
+  "@replyTo": {
+    "description": "الرد على رسالة.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "رنلين وانغ"
+      }
+    }
+  },
+  "confirmDeletion": "تأكيد الحذف",
+  "deleteForEveryone": "حذف للجميع",
+  "deleteForMe": "حذف بالنسبة لي",
+  "askDeleteThisMessage": "حذف هذه الرسالة؟",
+  "deleteMessageCount": "{num, plural, zero {لم يتم حذف الرسالة} one {حذف رسالة واحدة؟} other {حذف {num} رسائل؟}}",
+  "@deleteMessageCount": {
+    "description": "عدد رسائل الحذف",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "memberReadCount": "{num, plural, zero {لم يقرأأي عضو} one {عضو واحد قرأ} other {{num} أعضاء قرأوا}}",
+  "@memberReadCount": {
+    "description": "عدد الأعضاء الذين قرأوا الرسالة",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "allMembersRead": "جميع الأعضاء قرأوا",
+  "allowAny": "السماح لأي",
+  "cannotSendApplicationToWorkGroup": "لا يمكن إرسال الطلب إلى مجموعة العمل",
+  "appearance": "المظهر",
+  "darkTheme": "مظلم",
+  "denyAny": "رفض أي",
+  "edit": "تعديل",
+  "friendsPermission": "إذن الأصدقاء",
+  "groupJoined": "انضم إلى المجموعة",
+  "lightTheme": "فاتح",
+  "noBlockList": "لا يوجد مستخدمون محظورون",
+  "noContact": "لا توجد جهات اتصال",
+  "noNewApplication": "لا يوجد تطبيق جديد",
+  "permissionNeeded": "الإذن مطلوب",
+  "requireRequest": "يتطلب طلب",
+  "setNickname": "تعيين اسم مستعار",
+  "setSignature": "تعيين التوقيع",
+  "validationMessages": "رسائل التحقق",
+  "getVerification": "الحصول على التحقق",
+  "invalidEmail": "بريد إلكتروني غير صالح",
+  "invalidPhoneNumber": "رقم هاتف غير صالح",
+  "invalidVerification": "التحقق غير صالح",
+  "searchGroupID": "البحث عن معرف المجموعة",
+  "callInitiated": "تم بدء المكالمة",
+  "callAccepted": "تم قبول المكالمة",
+  "callDeclined": "تم رفض المكالمة",
+  "noAnswer": "لا يوجد إجابة",
+  "lineBusy": "الخط مشغول",
+  "callHungUp": "أنهى المكالمة",
+  "callInProgress": "المكالمة قيد التقدم",
+  "callEnded": "انتهت المكالمة",
+  "unknownCallStatus": "مكالمة",
+  "groupChatCreated": "تم إنشاء محادثة المجموعة بنجاح!",
+  "vote": "تصويت",
+  "callCancelled": "تم إلغاء المكالمة",
+  "unknownGroupTips": "نصائح المجموعة المجهولة",
+  "memberJoinedGroup": "انضم {members} إلى المجموعة",
+  "opInvitedToGroup": "دعا {opMember} {members} إلى المجموعة",
+  "memberLeftGroup": "غادر {members} المجموعة",
+  "opRemovedFromGroup": "أزال {opMember} {members} من المجموعة",
+  "opPromotedToAdmin": "ترقية {opMember} {members} إلى مشرف",
+  "opRevokedAdmin": "أزال {opMember} دور المشرف من {members}",
+  "opChangedGroupInfo": "غير {opMember} {groupInfo}",
+  "opChangedMemberInfo": "غير {opMember} {memberInfo}",
+  "changedGroupNameTo": "تغيير اسم المجموعة إلى {name}",
+  "changedGroupDescriptionTo": "تغيير وصف المجموعة إلى {description}",
+  "changedGroupAnnouncementTo": "تغيير إعلان المجموعة إلى {announcement}",
+  "changedGroupAvatar": "تغيير صورة المجموعة",
+  "transferredGroupOwnershipTo": "نقل ملكية المجموعة إلى {owner}",
+  "changedGroupCustomInfo": "تغيير معلومات المجموعة المخصصة",
+  "enabledGroupMute": "تمكين كتم الصوت للمجموعة",
+  "disabledGroupMute": "تعطيل كتم الصوت للمجموعة",
+  "changedGroupMessageReceptionTo": "تغيير إعداد استقبال رسائل المجموعة إلى: {setting}",
+  "changedApplyToJoinGroupTo": "تغيير إعداد التقدم للانضمام إلى المجموعة إلى: {setting}",
+  "changedInviteToJoinGroupTo": "تغيير إعداد الدعوة للانضمام إلى المجموعة إلى: {setting}",
+  "opUnmuted": "{user} إلغاء كتم الصوت",
+  "opMuted": "{user} كتم الصوت لمدة {duration} ثانية",
+  "groupTips": "نصائح المجموعة",
+  "receiveMessages": "استلام الرسائل",
+  "doNotReceiveMessages": "عدم استلام الرسائل",
+  "receiveMessagesWhenOnlineOnly": "استلام الرسائل عند الاتصال فقط",
+  "disallowJoinGroup": "عدم السماح بالانضمام إلى المجموعة",
+  "joinGroupNeedApproval": "يتطلب الموافقة من المشرف للانضمام إلى المجموعة",
+  "joinGroupDirectly": "الانضمام إلى المجموعة مباشرة بعد التقدم",
+  "disallowInviting": "عدم السماح بالدعوة للانضمام إلى المجموعة",
+  "requireApprovalForInviting": "يتطلب الموافقة من المشرف للدعوة للانضمام إلى المجموعة",
+  "joinDirectlyBeenInvited": "الانضمام إلى المجموعة مباشرة بعد تلقي الدعوة",
+  "unmuted": "إلغاء كتم الصوت",
+  "muteTime": "كتم الصوت لمدة {duration} ثانية",
+  "poll": "استطلاع",
+  "callDuration": "مدة المكالمة: {duration}",
+  "selectMembers": "اختر الأعضاء",
+  "numSelectMembers": "{num, plural, zero {اختر الأعضاء} other {{num} مختار}}",
+  "@numSelectMembers": {
+    "description": "عدد الأعضاء المحددين",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "searchMembers": "البحث عن أعضاء",
+  "startCall": "بدء المكالمة",
+  "clear": "مسح",
+  "groupSubtitle": "{name} و {count} آخرين",
+  "markAsUnread": "وضع علامة كغير مقروء",
+  "hide": "إخفاء",
+  "unreadMessagesBelow": "رسائل غير مقروءة أدناه",
+  "ar": "اَلْعَرَبِيَّةُ",
+  "tencentCloudChat": "Tencent Cloud Chat",
+  "quit": "مغادرة المجموعة",
+  "quitAndDelete": "إنهاء وحذف",
+  "setGroupName": "تعيين اسم المجموعة",
+  "groupAddAny": "أي",
+  "groupAddAuth": "يحتاج إلى الموافقة",
+  "groupAddForbid": "ممنوع",
+  "groupOwner": "مالك المجموعة",
+  "groupMember": "عضو",
+  "dismissAdmin": "فصل المشرف",
+  "welcomeToTencentCloudChat": "مرحبًا بك في Tencent Cloud Chat",
+  "draft": "مسودة",
+  "changeTheme": "تغيير المظهر",
+  "deleteAccountNotification": "بعد حذف الحساب، لن تتمكن من استخدام حسابك الحالي، وسيتم حذف البيانات المتعلقة ولا يمكن استردادها.",
+  "restartAppForLanguage": "يرجى إعادة تشغيل التطبيق لتفعيل تغيير اللغة",
+  "deleteAllMessages": "حذف جميع الرسائل",
+  "downloading": "جارٍ التنزيل...",
+  "viewFullImage": "عرض الصورة بالكامل",
+  "messageRecall": "استرجاع الرسالة",
+  "messageRecallConfirmation": "هل أنت متأكد من أنك تريد استرجاع هذه الرسالة؟",
+  "openInNewWindow": "افتح في نافذة جديدة",
+    "selectAChat": "اختر محادثة",
+    "noConversationSelected": "لم يتم تحديد محادثة",
+    "unavailableToSendMessage": "غير قادر على إرسال رسالة",
+    "noSuchGroup": "لا يوجد مجموعة من هذا النوع",
+    "notGroupMember": "لست عضوًا في المجموعة",
+    "userNotFound": "المستخدم غير موجود",
+    "userBlockedYou": "المستخدم قام بحظرك",
+    "muted": "تم كتم الصوت",
+    "groupMuted": "تم كتم صوت المجموعة",
+    "cantSendMessage": "لا يمكن إرسال الرسالة",
+    "media": "وسائل الإعلام",
+    "sendToSomeChat": "إرسال إلى {name}",
+    "@sendToSomeChat": {
+      "description": "إرسال إلى دردشة محددة",
+      "placeholders": {
+        "name": {
+          "type": "String",
+          "example": "بوني ما"
+        }
+      }
+    },
+    "unableToSendWithFolders": "تعذر إرسال الملفات بسبب تضمين المجلدات. يرجى تحديد الملفات الفردية فقط.",
+    "channelSwitch": "القناة: ",
+    "weChat": "وي تشات",
+    "tGWA": "تيليجرام و واتساب",
+    "contactUsIfQuestions": "في حال وجود أي أسئلة أو أفكار أخرى، لا تتردد في الاتصال بنا!",
+    "chatNow": "دردش الآن",
+    "onlineServiceTimeFrom10To20": "وقت الخدمة عبر الإنترنت: من الساعة 10 صباحًا حتى الساعة 8 مساءً، من الاثنين إلى الجمعة",
+    "officialWebsite": "الموقع الرسمي",
+    "allSDKs": "جميع SDK",
+    "sourceCode": "الكود المصدري",
+    "personalInformationCollectionList": "قائمة جمع المعلومات الشخصية",
+    "thirdPartyInformationSharingList": "قائمة مشاركة المعلومات من طرف ثالث",
+    "version": "الإصدار",
+    "feedback": "تعليق",
+    "me": "أنا",
+    "about": "يقدم",
+    "profile": "الملف الشخصي",
+    "unpin": "إلغاء التثبيت",
+    "mentionedMessages": "{count} رسائل ذكرتني"
+}

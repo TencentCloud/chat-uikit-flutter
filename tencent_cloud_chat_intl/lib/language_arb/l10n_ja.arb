@@ -1,0 +1,531 @@
+{
+  "album": "アルバム",
+  "chat": "チャット",
+  "chats": "チャット",
+  "calls": "通話",
+  "search": "検索",
+  "contacts": "連絡先",
+  "settings": "設定",
+  "online": "オンライン",
+  "offline": "オフライン",
+  "sendAMessage": "メッセージ",
+  "done": "完了",
+  "archive": "アーカイブ",
+  "read": "既読",
+  "readAll": "既読",
+  "delete": "削除",
+  "newChat": "新規チャット",
+  "newGroup": "新規グループ",
+  "frequentlyContacted": "よく連絡する人",
+  "addParticipants": "メンバー追加",
+  "addMembers": "メンバー追加",
+  "cancel": "キャンセル",
+  "next": "次へ",
+  "back": "戻る",
+  "groupID": "グループID",
+  "groupIDCertificate": "グループID（証明書）",
+  "groupOfType": "グループの種類",
+  "typeOfGroup": "グループの種類",
+  "work": "仕事",
+  "public": "公開",
+  "meeting": "会議",
+  "avChatRoom": "AVチャットルーム",
+  "groupPortrait": "グループポートレート",
+  "participants": "参加者",
+  "seeDocs": "ドキュメントを見る",
+  "you": "あなた",
+  "today": "今日",
+  "yesterday": "昨日",
+  "youCreatedGroup": "あなたが作成したグループ {groupName}",
+  "@youCreatedGroup": {
+    "description": "現在のユーザーがグループを作成しました。",
+    "placeholders": {
+      "groupName": {
+        "type": "String",
+        "example": "新規グループ"
+      }
+    }
+  },
+  "groups": "グループ",
+  "chatRecord": "メッセージ",
+  "messages": "メッセージ",
+  "more": "もっと",
+  "noConversationsContactsOrMessagesFound": "会話、連絡先、メッセージが見つかりません",
+  "contactInfo": "連絡先情報",
+  "exportChat": "チャットをエクスポート",
+  "clearChat": "チャットをクリア",
+  "deleteChat": "チャットを削除",
+  "video": "ビデオ",
+  "videoCall": "ビデオ通話",
+  "missedVideoCall": "ビデオ通話を見逃しました",
+  "voice": "音声",
+  "voiceCall": "音声通話",
+  "missedVoiceCall": "音声通話を見逃しました",
+  "location": "場所",
+  "youStartedACall": "あなたが通話を開始しました",
+  "star": "スター",
+  "copy": "コピー",
+  "forward": "転送",
+  "multiSelect": "選択",
+  "select": "選択",
+  "quote": "引用",
+  "reply": "返信",
+  "all": "すべて",
+  "tapToRemove": "タップして削除",
+  "messageInfo": "メッセージ情報",
+  "delivered": "配信済み",
+  "readBy": "既読者",
+  "deliveredTo": "配信先",
+  "numSelect": "{num, plural, zero {メッセージを選択} other {{num} 選択済み}}",
+  "@numSelect": {
+    "description": "選択されたメッセージの数",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "numChats": "{num, plural, zero {チャットが選択されていません} one {1 チャット} other {{num} チャット}}",
+  "@numChats": {
+    "description": "選択されたチャットの数",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "recentChats": "最近のチャット",
+  "numThreadQuote": "{num, plural, one {{num} スレッド引用} other {{num} スレッド引用}}",
+  "@numThreadQuote": {
+    "description": "スレッド引用の数",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "swipeLeftToCancelOrReleaseToSend": "左にスワイプしてキャンセル、または送信するためにリリース",
+  "releaseToCancel": "キャンセルするためにリリース",
+  "camera": "カメラ",
+  "document": "ドキュメント",
+  "file": "ファイル",
+  "photos": "写真",
+  "contact": "連絡先",
+  "custom": "カスタム",
+  "message": "メッセージ",
+  "doNotDisturb": "ミュート",
+  "mute": "ミュート",
+  "topChat": "ピン",
+  "pin": "ピン",
+  "blackUser": "ユーザーをブロック",
+  "blockUser": "ユーザーをブロック",
+  "saveContact": "連絡先を保存",
+  "call": "通話",
+  "clearingChatHistory": "メッセージをクリア",
+  "clearMessages": "メッセージをクリア",
+  "firstName": "名",
+  "lastName": "姓",
+  "groupNotice": "グループ通知",
+  "groupOfAnnouncement": "グループ通知",
+  "groupManagement": "グループ管理",
+  "groupType": "グループタイプ",
+  "addGroupWay": "グループ追加方法",
+  "myAliasInGroup": "グループ内の私のエイリアス",
+  "myGroupNickName": "グループ内の私のエイリアス",
+  "groupMembers": "グループメンバー",
+  "admin": "管理者",
+  "adminNum": "管理者 ({num})",
+  "@adminNum": {
+    "description": "管理者の数",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "info": "情報",
+  "setAsAdmin": "管理者に設定",
+  "announcement": "グループ通知",
+  "totalSilence": "すべてをミュート",
+  "silenceAll": "すべてをミュート",
+  "addSilencedMember": "ミュートされたメンバーを追加",
+  "onlyGroupOwnerAndAdminsCanSendMessages": "有効にすると、グループの所有者と管理者のみがメッセージを送信できます。",
+  "someoneEnabledSilenceAll": "{name} が 'すべてをミュート' を有効にしました",
+  "@someoneEnabledSilenceAll": {
+    "description": "誰かがすべてをミュートにしました",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Pony Ma"
+      }
+    }
+  },
+  "someoneDisabledSilenceAll": "{name} が 'すべてをミュート' を無効にしました",
+  "@someoneDisabledSilenceAll": {
+    "description": "誰かがすべてをミュートを無効にしました",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Pony Ma"
+      }
+    }
+  },
+  "newContacts": "新しい連絡先",
+  "myGroup": "私のグループ",
+  "theBlackList": "ブロックリスト",
+  "blockList": "ブロックされたユーザー",
+  "groupChatNotifications": "グループチャット通知",
+  "userID": "ユーザーID",
+  "myUserID": "私のユーザーID: {userID}",
+  "@myUserID": {
+    "description": "私のユーザーID",
+    "placeholders": {
+      "userID": {
+        "type": "String",
+        "example": "123456"
+      }
+    }
+  },
+  "searchUserID": "SearchUserID",
+  "none": "なし",
+  "iDis": "ID: {userID}",
+  "@iDis": {
+    "description": "ユーザーID",
+    "placeholders": {
+      "userID": {
+        "type": "String",
+        "example": "123456"
+      }
+    }
+  },
+  "addToContacts": "連絡先に追加",
+  "addContact": "連絡先を追加",
+  "bio": "自己紹介",
+  "bioIs": "自己紹介: {bio}",
+  "@bioIs": {
+    "description": "自己紹介: ",
+    "placeholders": {
+      "bio": {
+        "type": "String",
+        "example": "ハッピー"
+      }
+    }
+  },
+  "fillInTheVerificationInformation": "リクエストを送信",
+  "remarkAndGrouping": "備考とグループ化",
+  "remark": "備考",
+  "group": "グループ",
+  "send": "送信",
+  "contactAddedSuccessfully": "連絡先が正常に追加されました",
+  "requestSent": "リクエストが送信されました",
+  "cannotAddContact": "連絡先を追加できません",
+  "addGroup": "グループを追加",
+  "typeIs": "タイプ: {type}",
+  "@typeIs": {
+    "description": "タイプ: ",
+    "placeholders": {
+      "type": {
+        "type": "String",
+        "example": "仕事"
+      }
+    }
+  },
+  "groupNotAcceptingRequests": "グループがリクエストを受け付けていません",
+  "joinedGroupSuccessfully": "グループに正常に参加しました",
+  "numNewApplications": "{num, plural, one {{num} 新しいアプリケーション} other {{num} 新しいアプリケーション}}",
+  "@numNewApplications": {
+    "description": "numNewApplications",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "agree": "承認",
+  "accept": "承認",
+  "refuse": "拒否",
+  "decline": "拒否",
+  "verificationMessage": "確認メッセージ",
+  "accepted": "承認済み",
+  "declined": "拒否済み",
+  "confirm": "確認",
+  "contactRequest": "連絡先リクエスト",
+  "contactsPermission": "連絡先の許可",
+  "allowAnyUserAddYouAsContact": "誰でもあなたを連絡先に追加できるようにする",
+  "declineContactRequestFromAnyUser": "連絡先リクエストを自動的に拒否する",
+  "anyoneUponRequest": "リクエストを手動で承認する",
+  "theme": "テーマ",
+  "language": "言語",
+  "aboutTencentCloudChat": "Tencent Cloud Chatについて",
+  "logIn": "ログイン",
+  "signIn": "サインイン",
+  "signUp": "サインアップ",
+  "signOut": "サインアウト",
+  "logOut": "ログアウト",
+  "signature": "自己紹介",
+  "gender": "性別",
+  "birthday": "誕生日",
+  "male": "男性",
+  "female": "女性",
+  "unspecified": "未指定",
+  "unknown": "不明",
+  "sdkVersion": "SDKバージョン",
+  "privacyPolicy": "プライバシーポリシー",
+  "userAgreement": "ユーザー同意書",
+  "disclaimer": "免責事項",
+  "personalInformationCollected": "収集された個人情報",
+  "informationSharedWithThirdParties": "第三者と共有される情報",
+  "deleteAccount": "アカウントを削除",
+  "contactUs": "お問い合わせ",
+  "countryOrRegion": "国 / 地域",
+  "selectACountry": "国または地域を選択",
+  "phoneNumber": "電話番号",
+  "email": "EMail",
+  "verificationCode": "確認コード",
+  "enterSMSCode": "SMSで送信されたコードを入力",
+  "sendCode": "コードを送信",
+  "visitOurWebsite": "ウェブサイトを訪問",
+  "english": "英語",
+  "simplifiedChinese": "简体中文",
+  "traditionalChinese": "繁體中文",
+  "japanese": "日本語",
+  "korean": "한국어",
+  "style": "スタイル",
+  "classic": "クラシック",
+  "minimalist": "ミニマリスト",
+  "messageReadStatus": "メッセージの既読ステータス",
+  "messageReadStatusDescription": "あなたのメッセージの既読ステータスが表示されるかどうかを制御し、他の人があなたのメッセージを読んだかどうかを確認できるかどうかを制御します。",
+  "onlineStatus": "オンラインステータス",
+  "onlineStatusDescription": "オンラインステータスが連絡先に表示されるかどうかを決定します。",
+  "noBio": "自己紹介がありません",
+  "noConversation": "会話がありません",
+  "sound": "サウンド",
+  "sticker": "ステッカー",
+  "image": "画像",
+  "chatHistory": "チャット履歴",
+  "audio": "オーディオ",
+  "messageDeleted": "メッセージが削除されました",
+  "messageRecalled": "メッセージが取り消されました",
+  "unreadCount": "{num, plural, one {{num} 未読メッセージ} other {{num} 未読メッセージ}}",
+  "@unreadCount": {
+    "description": "未読メッセージの数",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "newMsgCount": "{num, plural, one {新しいメッセージ} other {{num} 新しいメッセージ}}",
+  "@newMsgCount": {
+    "description": "新しいメッセージの数",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "takeAPhoto": "写真を撮る",
+  "recordAVideo": "ビデオを録画する",
+  "pullDownToLoadMoreMessages": "メッセージをさらに読み込むために引き下げる",
+  "releaseToLoadMore": "もっと読み込むためにリリース",
+  "noMoreMessage": "これ以上メッセージはありません",
+  "pullUpToLoadMoreMessages": "メッセージをさらに読み込むために引き上げる",
+  "holdToRecordReleaseToSend": "録音するために押し続け、送信するためにリリース",
+  "forwardIndividually": "個別に転送",
+  "forwardCombined": "まとめて転送",
+  "selectConversations": "会話を選択",
+  "recent": "最近",
+  "recall": "リコール",
+  "replyTo": "{name} に返信",
+  "@replyTo": {
+    "description": "メッセージに返信する。",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Runlin Wang"
+      }
+    }
+  },
+  "confirmDeletion": "削除の確認",
+  "deleteForEveryone": "すべての人に削除",
+  "deleteForMe": "私に削除",
+  "askDeleteThisMessage": "このメッセージを削除しますか？",
+  "deleteMessageCount": "{num, plural, zero {メッセージは削除されていません} one {メッセージを削除しますか？} other {{num}件のメッセージを削除しますか？}}",
+  "@deleteMessageCount": {
+    "description": "削除メッセージの数",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "memberReadCount": "{num, plural, zero {メンバーが読んでいません} one {1人のメンバーが読んだ} other {{num}人のメンバーが読んだ}}",
+  "@memberReadCount": {
+    "description": "メッセージを読んだメンバーの数",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "allMembersRead": "全メンバーが読んだ",
+  "allowAny": "Allow Any",
+  "cannotSendApplicationToWorkGroup": "作業グループにアプリケーションを送信できません",
+  "appearance": "Appearance",
+  "darkTheme": "Dark",
+  "denyAny": "Deny Any",
+  "edit": "編集",
+  "friendsPermission": "友達の許可",
+  "groupJoined": "グループに参加しました",
+  "lightTheme": "Light",
+  "noBlockList": "ブロックされたユーザーはいません",
+  "noContact": "連絡先がありません",
+  "noNewApplication": "新しいアプリケーションはありません",
+  "permissionNeeded": "許可が必要です",
+  "requireRequest": "リクエストが必要です",
+  "setNickname": "ニックネームを設定する",
+  "setSignature": "署名を設定する",
+  "validationMessages": "検証メッセージ",
+  "getVerification": "検証を取得する",
+  "invalidEmail": "無効なメールアドレス",
+  "invalidPhoneNumber": "無効な電話番号",
+  "invalidVerification": "無効な検証",
+  "searchGroupID": "グループIDを検索する",
+  "callInitiated": "通話が開始されました",
+  "callAccepted": "通話が受け入れられました",
+  "callDeclined": "通話が拒否されました",
+  "noAnswer": "応答がありません",
+  "lineBusy": "回線が混んでいます",
+  "callHungUp": "通話が切れました",
+  "callInProgress": "通話中",
+  "callEnded": "通話が終了しました",
+  "unknownCallStatus": "Calling",
+  "groupChatCreated": "グループチャットが正常に作成されました！",
+  "vote": "投票",
+  "callCancelled": "通話がキャンセルされました",
+  "unknownGroupTips": "不明なグループのヒント",
+  "memberJoinedGroup": "{members}がグループに参加しました",
+  "opInvitedToGroup": "{opMember}が{members}をグループに招待しました",
+  "memberLeftGroup": "{members}がグループを退出しました",
+  "opRemovedFromGroup": "{opMember}が{members}をグループから削除しました",
+  "opPromotedToAdmin": "{opMember}が{members}を管理者に昇格させました",
+  "opRevokedAdmin": "{opMember}が{members}から管理者権限を取り消しました",
+  "opChangedGroupInfo": "{opMember}が{groupInfo}を変更しました",
+  "opChangedMemberInfo": "{opMember}が{memberInfo}を変更しました",
+  "changedGroupNameTo": "グループ名を{name}に変更しました",
+  "changedGroupDescriptionTo": "グループの説明を{description}に変更しました",
+  "changedGroupAnnouncementTo": "グループのアナウンスメントを{announcement}に変更しました",
+  "changedGroupAvatar": "グループのアバターを変更しました",
+  "transferredGroupOwnershipTo": "グループの所有権を{owner}に譲渡しました",
+  "changedGroupCustomInfo": "グループのカスタム情報を変更しました",
+  "enabledGroupMute": "グループ全体のミュートを有効にしました",
+  "disabledGroupMute": "グループ全体のミュートを無効にしました",
+  "changedGroupMessageReceptionTo": "グループのメッセージ受信設定を{setting}に変更しました",
+  "changedApplyToJoinGroupTo": "グループへの参加申請設定を{setting}に変更しました",
+  "changedInviteToJoinGroupTo": "グループへの招待設定を{setting}に変更しました",
+  "opUnmuted": "{user}のミュートを解除しました",
+  "opMuted": "{user}を{duration}秒間ミュートしました",
+  "groupTips": "グループのヒント",
+  "receiveMessages": "メッセージを受信する",
+  "doNotReceiveMessages": "メッセージを受信しない",
+  "receiveMessagesWhenOnlineOnly": "オンライン時のみメッセージを受信する",
+  "disallowJoinGroup": "グループへの参加申請を禁止する",
+  "joinGroupNeedApproval": "グループへの参加申請に管理者の承認が必要です",
+  "joinGroupDirectly": "申請後に直接グループに参加する",
+  "disallowInviting": "グループへの招待を禁止する",
+  "requireApprovalForInviting": "グループへの招待に管理者の承認が必要です",
+  "joinDirectlyBeenInvited": "招待された後に直接グループに参加する",
+  "unmuted": "ミュート解除",
+  "muteTime": "{duration}秒間ミュート",
+  "poll": "投票",
+  "callDuration": "通話時間：{duration}",
+  "selectMembers": "メンバーを選択",
+  "numSelectMembers": "{num, plural, zero {メンバーを選択} other {{num}人を選択}}",
+  "@numSelectMembers": {
+    "description": "選択されたメンバーの数",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "searchMembers": "メンバーを検索",
+  "startCall": "通話を開始",
+  "quit": "退出",
+  "quitAndDelete": "退出して削除",
+  "setGroupName": "グループ名の設定",
+  "groupAddAny": "任意",
+  "groupAddAuth": "承認が必要",
+  "groupAddForbid": "禁止",
+  "groupOwner": "グループのオーナー",
+  "groupMember": "メンバー",
+  "dismissAdmin": "管理者を解任",
+  "welcomeToTencentCloudChat": "テンセントクラウドチャットへようこそ",
+  "draft": "下書き",
+  "clear": "クリア",
+  "groupSubtitle": "{name}と{count}人の他のメンバー",
+  "markAsUnread": "未読としてマーク",
+  "hide": "非表示",
+  "unreadMessagesBelow": "未読メッセージが下にあります",
+  "ar": "اَلْعَرَبِيَّةُ",
+  "tencentCloudChat": "Tencent Cloud Chat",
+  "changeTheme": "外観を変更",
+  "deleteAccountNotification": "アカウントを削除すると、現在のアカウントを使用できなくなり、関連データが削除されて復元できなくなります。",
+  "restartAppForLanguage": "言語の変更を適用するには、アプリを再起動してください",
+  "deleteAllMessages": "すべてのメッセージを削除",
+  "downloading": "ダウンロード中...",
+  "viewFullImage": "フル画像を表示",
+  "messageRecall": "メッセージを取り消す",
+  "messageRecallConfirmation": "このメッセージを取り消してもよろしいですか？",
+  "openInNewWindow": "新しいウィンドウで開く",
+    "selectAChat": "チャットを選択",
+    "noConversationSelected": "選択された会話がありません",
+    "unavailableToSendMessage": "メッセージを送信できません",
+    "noSuchGroup": "そのようなグループはありません",
+    "notGroupMember": "グループメンバーではありません",
+    "userNotFound": "ユーザーが見つかりません",
+    "userBlockedYou": "ユーザーにブロックされました",
+    "muted": "ミュート",
+    "groupMuted": "グループがミュートされました",
+    "cantSendMessage": "メッセージを送信できません",
+    "media": "メディア",
+    "sendToSomeChat": "{name}に送信",
+    "@sendToSomeChat": {
+      "description": "特定のチャットに送信",
+      "placeholders": {
+        "name": {
+          "type": "String",
+          "example": "ポニーマ"
+        }
+      }
+    },
+    "unableToSendWithFolders": "フォルダが含まれているため、ファイルを送信できません。個々のファイルのみを選択してください。",
+    "channelSwitch": "チャンネル：",
+    "weChat": "WeChat",
+    "tGWA": "Telegram & WhatsApp",
+    "contactUsIfQuestions": "わからないことやアイデアがあれば、お気軽にお問い合わせください！",
+    "chatNow": "今すぐチャット",
+    "onlineServiceTimeFrom10To20": "オンライン時間：月曜日から金曜日の午前10時から午後8時",
+    "officialWebsite": "公式ウェブサイト",
+    "allSDKs": "すべてのSDK",
+    "sourceCode": "ソースコード",
+    "personalInformationCollectionList": "個人情報収集リスト",
+    "thirdPartyInformationSharingList": "第三者情報共有リスト",
+    "version": "バージョン",
+    "feedback": "フィードバック",
+    "me": "自分",
+    "about": "紹介",
+    "profile": "プロフィール",
+    "unpin": "ピン留めを解除",
+    "mentionedMessages": "私への {count} 件のメンション"
+}

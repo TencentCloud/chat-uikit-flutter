@@ -1,0 +1,8 @@
+arb-dir: lib/language_arb
+template-arb-file: l10n_en.arb
+output-localization-file: tencent_cloud_chat_localizations.dart
+output-class: TencentCloudChatLocalizations
+output-dir: lib/localizations
+synthetic-package: false
+header-file: header.txt
+untranslated-messages-file: desiredFileName.txt

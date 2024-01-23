@@ -1,0 +1,534 @@
+{
+  "album": "Album",
+  "chat": "Chat",
+  "chats": "Chats",
+  "calls": "Calls",
+  "search": "Search",
+  "contacts": "Contacts",
+  "settings": "Settings",
+  "online": "Online",
+  "offline": "Offline",
+  "sendAMessage": "Message",
+  "done": "Done",
+  "archive": "Archive",
+  "read": "Read",
+  "readAll": "Read",
+  "delete": "Delete",
+  "newChat": "New Chat",
+  "newGroup": "New Group",
+  "frequentlyContacted": "Frequently Contacted",
+  "addParticipants": "Add Members",
+  "addMembers": "Add Members",
+  "cancel": "Cancel",
+  "next": "Next",
+  "back": "Back",
+  "groupID": "Group ID",
+  "groupIDCertificate": "Group ID (Certificate)",
+  "groupOfType": "Type of Group",
+  "typeOfGroup": "Type of Group",
+  "work": "Work",
+  "public": "Public",
+  "meeting": "Meeting",
+  "avChatRoom": "AVChatRoom",
+  "groupPortrait": "Group Portrait",
+  "participants": "Participants",
+  "seeDocs": "See Docs",
+  "you": "You",
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "youCreatedGroup": "You Created Group {groupName}",
+  "@youCreatedGroup": {
+    "description": "The current user created a group.",
+    "placeholders": {
+      "groupName": {
+        "type": "String",
+        "example": "New Group"
+      }
+    }
+  },
+  "groups": "Groups",
+  "chatRecord": "Messages",
+  "messages": "Messages",
+  "more": "More",
+  "noConversationsContactsOrMessagesFound": "No Conversations, Contacts or Messages found",
+  "contactInfo": "Contact Info",
+  "exportChat": "Export Chat",
+  "clearChat": "Clear Chat",
+  "deleteChat": "Delete Chat",
+  "video": "Video",
+  "videoCall": "Video Call",
+  "missedVideoCall": "Missed video call",
+  "voice": "Voice",
+  "voiceCall": "Voice Call",
+  "missedVoiceCall": "Missed voice call",
+  "location": "Location",
+  "youStartedACall": "You started a call",
+  "star": "Star",
+  "copy": "Copy",
+  "forward": "Forward",
+  "multiSelect": "Select",
+  "select": "Select",
+  "quote": "Quote",
+  "reply": "Reply",
+  "all": "All",
+  "tapToRemove": "Tap to Remove",
+  "messageInfo": "Message Info",
+  "delivered": "Delivered",
+  "readBy": "Read By",
+  "deliveredTo": "Delivered To",
+  "numSelect": "{num, plural, zero {Select Messages} other {{num} Selected}}",
+  "@numSelect": {
+    "description": "The number of messages select",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "numChats": "{num, plural, zero {No Chat Selected} one {1 Chat} other {{num} Chats}}",
+  "@numChats": {
+    "description": "The number of selected chats",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "recentChats": "Recent Chats",
+  "numThreadQuote": "{num, plural, one {{num} Thread Quote} other {{num} Thread Quotes}}",
+  "@numThreadQuote": {
+    "description": "The number of Thread Quotes",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "swipeLeftToCancelOrReleaseToSend": "Swipe left to cancel or release to send",
+  "releaseToCancel": "Release to Cancel",
+  "camera": "Camera",
+  "document": "Document",
+  "file": "File",
+  "photos": "Photos",
+  "contact": "Contact",
+  "custom": "Custom",
+  "message": "Message",
+  "doNotDisturb": "Mute",
+  "mute": "Mute",
+  "topChat": "Pin",
+  "pin": "Pin",
+  "blackUser": "Block User",
+  "blockUser": "Block User",
+  "saveContact": "Save Contact",
+  "call": "Call",
+  "clearingChatHistory": "Clear Messages",
+  "clearMessages": "Clear Messages",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "groupNotice": "Group Notice",
+  "groupOfAnnouncement": "Group Notice",
+  "groupManagement": "Manage Group",
+  "groupType": "Group Type",
+  "addGroupWay": "Add Group Way",
+  "myAliasInGroup": "My Alias in Group",
+  "myGroupNickName": "My Alias in Group",
+  "groupMembers": "Group Members",
+  "admin": "Admin",
+  "adminNum": "Admin ({num})",
+  "@adminNum": {
+    "description": "The number of Admin",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "info": "Info",
+  "setAsAdmin": "Set as Admin",
+  "announcement": "Group Notice",
+  "totalSilence": "Silence All",
+  "silenceAll": "Silence All",
+  "addSilencedMember": "Add Silenced Member",
+  "onlyGroupOwnerAndAdminsCanSendMessages": "After enabling, only the group owner and admins can send messages.",
+  "someoneEnabledSilenceAll": "{name} enabled 'Silence All'",
+  "@someoneEnabledSilenceAll": {
+    "description": "Someone Enabled Silence All",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Pony Ma"
+      }
+    }
+  },
+  "someoneDisabledSilenceAll": "{name} disabled 'Silence All'",
+  "@someoneDisabledSilenceAll": {
+    "description": "Someone Disabled Silence All",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Pony Ma"
+      }
+    }
+  },
+  "newContacts": "New Contacts",
+  "myGroup": "My Groups",
+  "theBlackList": "Block List",
+  "blockList": "Blocked Users",
+  "groupChatNotifications": "Group Chat Notifications",
+  "userID": "User ID",
+  "myUserID": "My User ID: {userID}",
+  "@myUserID": {
+    "description": "My User ID",
+    "placeholders": {
+      "userID": {
+        "type": "String",
+        "example": "123456"
+      }
+    }
+  },
+  "searchUserID": "SearchUserID",
+  "none": "None",
+  "iDis": "ID: {userID}",
+  "@iDis": {
+    "description": "User ID",
+    "placeholders": {
+      "userID": {
+        "type": "String",
+        "example": "123456"
+      }
+    }
+  },
+  "addToContacts": "Add to Contacts",
+  "addContact": "Add Contact",
+  "bio": "Bio",
+  "bioIs": "Bio: {bio}",
+  "@bioIs": {
+    "description": "Bio: ",
+    "placeholders": {
+      "bio": {
+        "type": "String",
+        "example": "Happy"
+      }
+    }
+  },
+  "fillInTheVerificationInformation": "Send Request",
+  "remarkAndGrouping": "Remark and Grouping",
+  "remark": "Remark",
+  "group": "Group",
+  "send": "Send",
+  "contactAddedSuccessfully": "Contact Added Successfully",
+  "requestSent": "Request Sent",
+  "cannotAddContact": "Cannot Add Contact",
+  "addGroup": "Add Group",
+  "typeIs": "Type: {type}",
+  "@typeIs": {
+    "description": "Type: ",
+    "placeholders": {
+      "type": {
+        "type": "String",
+        "example": "Work"
+      }
+    }
+  },
+  "groupNotAcceptingRequests": "Group Not Accepting Requests",
+  "joinedGroupSuccessfully": "Joined Group Successfully",
+  "numNewApplications": "{num, plural, one {{num} New Application} other {{num} New Applications}}",
+  "@numNewApplications": {
+    "description": "numNewApplications",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "agree": "Accept",
+  "accept": "Accept",
+  "refuse": "Decline",
+  "decline": "Decline",
+  "verificationMessage": "Verification Message",
+  "accepted": "Accepted",
+  "declined": "Declined",
+  "confirm": "Confirm",
+  "contactRequest": "Contact Request",
+  "contactsPermission": "Contacts Permission",
+  "allowAnyUserAddYouAsContact": "Allow Anyone to Add You as a Contact",
+  "declineContactRequestFromAnyUser": "Auto Decline Contact Requests",
+  "anyoneUponRequest": "Accept Requests Manually",
+  "theme": "Theme",
+  "language": "Language",
+  "aboutTencentCloudChat": "About Tencent Cloud Chat",
+  "logIn": "Log In",
+  "signIn": "Sign In",
+  "signUp": "Sign Up",
+  "signOut": "Sign Out",
+  "logOut": "Log Out",
+  "signature": "Bio",
+  "gender": "Gender",
+  "birthday": "Birthday",
+  "male": "Male",
+  "female": "Female",
+  "unspecified": "Unspecified",
+  "unknown": "Unknown",
+  "sdkVersion": "SDK Version",
+  "privacyPolicy": "Privacy Policy",
+  "userAgreement": "User Agreement",
+  "disclaimer": "Disclaimer",
+  "personalInformationCollected": "Personal Information Collected",
+  "informationSharedWithThirdParties": "Information Shared with Third Parties",
+  "deleteAccount": "Delete Account",
+  "contactUs": "Contact Us",
+  "countryOrRegion": "Country / Region",
+  "selectACountry": "Select a Country or Region",
+  "phoneNumber": "Phone Number",
+  "email": "EMail",
+  "verificationCode": "Verification Code",
+  "enterSMSCode": "Enter the code sent via SMS",
+  "sendCode": "Send Code",
+  "visitOurWebsite": "Visit Our Website",
+  "english": "English",
+  "simplifiedChinese": "简体中文",
+  "traditionalChinese": "繁體中文",
+  "japanese": "日本語",
+  "korean": "한국어",
+  "style": "Style",
+  "classic": "Classic",
+  "minimalist": "Minimalist",
+  "messageReadStatus": "Message Read Status",
+  "messageReadStatusDescription": "Controls whether the read status is displayed for your messages and if others can see whether you've read their messages.",
+  "onlineStatus": "Online Status",
+  "onlineStatusDescription": "Determines if your online status is visible to your contacts.",
+  "noBio": "No Bio",
+  "noConversation": "No Conversation",
+  "sound": "Sound",
+  "sticker": "Sticker",
+  "image": "Image",
+  "chatHistory": "Chat History",
+  "audio": "Audio",
+  "messageDeleted": "Message Deleted",
+  "messageRecalled": "Message Recalled",
+  "unreadCount": "{num, plural, one {{num} Unread Message} other {{num} Unread Messages}}",
+  "@unreadCount": {
+    "description": "The number of Unread Messages",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "newMsgCount": "{num, plural, one {A New Message} other {{num} New Messages}}",
+  "@newMsgCount": {
+    "description": "The number of New Messages",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "takeAPhoto": "Take a photo",
+  "recordAVideo": "Record a video",
+  "pullDownToLoadMoreMessages": "Pull down to load more messages",
+  "releaseToLoadMore": "Release to load more",
+  "noMoreMessage": "No more message",
+  "pullUpToLoadMoreMessages": "Pull up to load more messages",
+  "holdToRecordReleaseToSend": "Hold to record, release to send",
+  "forwardIndividually": "Forward Individually",
+  "forwardCombined": "Forward Combined",
+  "selectConversations": "Select Conversations",
+  "recent": "Recent",
+  "recall": "Recall",
+  "replyTo": "Reply to {name}",
+  "@replyTo": {
+    "description": "Reply to a message.",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Runlin Wang"
+      }
+    }
+  },
+  "confirmDeletion": "Confirm Deletion",
+  "deleteForEveryone": "Delete for everyone",
+  "deleteForMe": "Delete for me",
+  "askDeleteThisMessage": "Delete this message?",
+  "deleteMessageCount": "{num, plural, zero {No message been deleted} one {Delete a message?} other {Delete {num} messages?}}",
+  "@deleteMessageCount": {
+    "description": "The number of deletion Messages",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "memberReadCount": "{num, plural, zero {No member read} one {1 member read} other {{num} members read}}",
+  "@memberReadCount": {
+    "description": "The number of message read members",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "allMembersRead": "All members read",
+  "allowAny": "Allow Any",
+  "cannotSendApplicationToWorkGroup": "Cannot send application to work group",
+  "appearance": "Appearance",
+  "darkTheme": "Dark",
+  "denyAny": "Deny Any",
+  "edit": "Edit",
+  "friendsPermission": "Friends Permission",
+  "groupJoined": "Group Joined",
+  "lightTheme": "Light",
+  "noBlockList": "No blocked users",
+  "noContact": "No contacts",
+  "noNewApplication": "No new application",
+  "permissionNeeded": "Permission needed",
+  "requireRequest": "Required request",
+  "setNickname": "Set nickname",
+  "setSignature": "Set signature",
+  "validationMessages": "Validation Messages",
+  "getVerification": "Get verification",
+  "invalidEmail": "Invalid Email",
+  "invalidPhoneNumber": "Invalid phone number",
+  "invalidVerification": "Invalid verification",
+  "searchGroupID": "Search Group ID",
+  "callInitiated": "Call initiated",
+  "callAccepted": "Call accepted",
+  "callDeclined": "Call declined",
+  "noAnswer": "No answer",
+  "lineBusy": "Line busy",
+  "callHungUp": "Call hung up",
+  "callInProgress": "Call in progress",
+  "callEnded": "Call ended",
+  "unknownCallStatus": "Calling",
+  "groupChatCreated": "Group chat created successfully!",
+  "vote": "Vote",
+  "callCancelled": "Call cancelled",
+  "unknownGroupTips": "Unknown group tips",
+  "memberJoinedGroup": "{members} has joined the group",
+  "opInvitedToGroup": "{opMember} invited {members} to the group",
+  "memberLeftGroup": "{members} left the group",
+  "opRemovedFromGroup": "{opMember} removed {members} from the group",
+  "opPromotedToAdmin": "{opMember} promoted {members} to admin",
+  "opRevokedAdmin": "{opMember} revoked admin role from {members}",
+  "opChangedGroupInfo": "{opMember} changed {groupInfo}",
+  "opChangedMemberInfo": "{opMember} changed {memberInfo}",
+  "changedGroupNameTo": "Changed group name to {name}",
+  "changedGroupDescriptionTo": "Changed group description to {description}",
+  "changedGroupAnnouncementTo": "Changed group announcement to {announcement}",
+  "changedGroupAvatar": "Changed group avatar",
+  "transferredGroupOwnershipTo": "Transferred group ownership to {owner}",
+  "changedGroupCustomInfo": "Changed group custom info",
+  "enabledGroupMute": "Enabled group-wide mute",
+  "disabledGroupMute": "Disabled group-wide mute",
+  "changedGroupMessageReceptionTo": "Changed group message reception setting to: {setting}",
+  "changedApplyToJoinGroupTo": "Changed apply to join group setting to: {setting}",
+  "changedInviteToJoinGroupTo": "Changed invite to join group setting to: {setting}",
+  "opUnmuted": "{user} Unmuted",
+  "opMuted": "{user} Muted for {duration} seconds",
+  "groupTips": "Group Tips",
+  "receiveMessages": "Receive messages",
+  "doNotReceiveMessages": "Do not receive messages",
+  "receiveMessagesWhenOnlineOnly": "Receive messages when online only",
+  "disallowJoinGroup": "Disallow applying to join group",
+  "joinGroupNeedApproval": "Require admin approval for applying to join group",
+  "joinGroupDirectly": "Join group directly after applying",
+  "disallowInviting": "Disallow inviting to join group",
+  "requireApprovalForInviting": "Require admin approval for inviting to join group",
+  "joinDirectlyBeenInvited": "Join group directly after being invited",
+  "unmuted": "Unmuted",
+  "muteTime": "Muted for {duration} seconds",
+  "poll": "Poll",
+  "callDuration": "Call duration: {duration}",
+  "selectMembers": "Select Members",
+  "numSelectMembers": "{num, plural, zero {Select Members} other {{num} Selected}}",
+  "@numSelectMembers": {
+    "description": "The number of members select",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "searchMembers": "Search Members",
+  "startCall": "Start Call",
+  "clear": "Clear",
+  "groupSubtitle": "{name} and {count} others",
+  "markAsUnread": "Mark as Unread",
+  "hide": "Hide",
+  "unreadMessagesBelow": "Unread Messages Below",
+  "ar": "اَلْعَرَبِيَّةُ",
+  "tencentCloudChat": "Tencent Cloud Chat",
+  "changeTheme": "Change appearance",
+  "deleteAccountNotification": "After deleted account, you will not be able to use your current account, and related data will be deleted and cannot be retrieved.",
+  "restartAppForLanguage": "Please restart the app for the language change to take effect",
+  "deleteAllMessages": "Delete All Messages",
+  "downloading": "Downloading...",
+  "viewFullImage": "View Full Image",
+  "messageRecall": "Message Recall",
+  "messageRecallConfirmation": "Are you sure you want to recall this message?",
+  "quit": "Quit",
+  "quitAndDelete": "Quit and Delete",
+  "setGroupName": "set Group Name",
+  "groupAddAny": "Any",
+  "groupAddAuth": "Need Approve",
+  "groupAddForbid": "Forbidden",
+  "groupOwner": "Owner",
+  "groupMember": "Member",
+  "dismissAdmin": "Dismiss Admin",
+  "welcomeToTencentCloudChat": "Welcome to Tencent Cloud Chat",
+  "draft": "Draft",
+  "openInNewWindow": "Open in New Window",
+  "@openInNewWindow": {
+    "description": "Label for a button that opens a media resource in a new window"
+  },
+  "selectAChat": "Select a Chat",
+  "noConversationSelected": "No conversation selected",
+  "unavailableToSendMessage": "Unavailable to Send Message",
+  "noSuchGroup": "No such group",
+  "notGroupMember": "Not a group member",
+  "userNotFound": "User not found",
+  "userBlockedYou": "User blocked you",
+  "muted": "Muted",
+  "groupMuted": "Group muted",
+  "cantSendMessage": "Can't send message",
+  "media": "Media",
+  "sendToSomeChat": "Send to {name}",
+  "@sendToSomeChat": {
+    "description": "Send to specific chat",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "Pony Ma"
+      }
+    }
+  },
+  "unableToSendWithFolders": "Unable to send files because folders are included. Please select individual files only.",
+  "channelSwitch": "Channel: ",
+  "weChat": "WeChat",
+  "tGWA": "Telegram & WhatsApp",
+  "contactUsIfQuestions": "If there's anything unclear or you have more ideas, feel free to contact us!",
+  "chatNow": "Chat Now",
+  "onlineServiceTimeFrom10To20": "Online time: 10 AM to 8 PM, Mon through Fri",
+  "officialWebsite": "Official Website",
+  "allSDKs": "All SDKs",
+  "sourceCode": "Source Code",
+  "personalInformationCollectionList": "Personal information collection list",
+  "thirdPartyInformationSharingList": "Third-party information sharing list",
+  "version": "Version",
+  "feedback": "Feedback",
+  "me": "Me",
+  "about": "About",
+  "profile": "Profile",
+  "unpin": "Unpin",
+  "mentionedMessages": "{count, plural, =1 {1 Message Mentioned Me} other {{count} Messages Mentioned Me}}"
+}

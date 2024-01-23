@@ -1,0 +1,522 @@
+{
+  "album": "相册",
+  "chat": "對話",
+  "chats": "對話",
+  "calls": "通話",
+  "search": "搜尋",
+  "contacts": "聯絡人",
+  "settings": "設定",
+  "online": "在線",
+  "offline": "離線",
+  "sendAMessage": "發信息",
+  "done": "完成",
+  "archive": "歸檔",
+  "read": "已讀",
+  "readAll": "全部已讀",
+  "delete": "刪除",
+  "newChat": "新對話",
+  "newGroup": "新群組",
+  "frequentlyContacted": "常聯絡人",
+  "addParticipants": "加成員",
+  "addMembers": "加成員",
+  "cancel": "取消",
+  "next": "下一步",
+  "back": "返回",
+  "groupID": "群組ID",
+  "groupIDCertificate": "群組ID（證書）",
+  "groupOfType": "群組類型",
+  "typeOfGroup": "群組類型",
+  "work": "工作",
+  "public": "公開",
+  "meeting": "會議",
+  "avChatRoom": "視訊聊天室",
+  "groupPortrait": "群組頭像",
+  "participants": "參與者",
+  "seeDocs": "查看文檔",
+  "you": "你",
+  "today": "今日",
+  "yesterday": "昨日",
+  "youCreatedGroup": "你創建咗群組 {groupName}",
+  "@youCreatedGroup": {
+    "description": "你創建咗群組",
+    "placeholders": {
+      "groupName": {
+        "type": "String",
+        "example": "新群組"
+      }
+    }
+  },
+  "groups": "群組",
+  "chatRecord": "訊息",
+  "messages": "訊息",
+  "more": "更多",
+  "noConversationsContactsOrMessagesFound": "冇搜尋到對話、聯絡人或訊息",
+  "contactInfo": "聯絡人信息",
+  "exportChat": "導出對話",
+  "clearChat": "清除對話",
+  "deleteChat": "刪除對話",
+  "video": "視訊",
+  "videoCall": "視像通話",
+  "missedVideoCall": "未接視像通話",
+  "voice": "語音",
+  "voiceCall": "語音通話",
+  "missedVoiceCall": "未接語音通話",
+  "location": "位置",
+  "youStartedACall": "你發起咗個通話",
+  "star": "星標",
+  "copy": "複製",
+  "forward": "轉發",
+  "multiSelect": "揀選",
+  "select": "揀選",
+  "quote": "引用",
+  "reply": "回覆",
+  "all": "全部",
+  "tapToRemove": "點擊移除",
+  "messageInfo": "訊息信息",
+  "delivered": "已送達",
+  "readBy": "已讀",
+  "deliveredTo": "已送達",
+  "numSelect": "{num, plural, zero {揀選訊息} other {{num} 已揀選}}",
+  "@numSelect": {
+    "description": "揀選咗幾條訊息",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "numChats": "{num, plural, zero {冇揀選對話} one {1 個對話} other {{num} 個對話}}",
+  "@numChats": {
+    "description": "揀選咗幾個對話",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "recentChats": "最近對話",
+  "numThreadQuote": "{num, plural, one {{num} 綫程引用} other {{num} 綫程引用}}",
+  "@numThreadQuote": {
+    "description": "綫程引用數量",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "swipeLeftToCancelOrReleaseToSend": "向左滑取消或放開發送",
+  "releaseToCancel": "放開取消",
+  "camera": "相機",
+  "document": "檔案",
+  "file": "文件",
+  "photos": "相片",
+  "contact": "聯絡人",
+  "custom": "自定義",
+  "message": "訊息",
+  "doNotDisturb": "免打擾",
+  "mute": "靜音",
+  "topChat": "置頂",
+  "pin": "置頂",
+  "blackUser": "封鎖用戶",
+  "blockUser": "封鎖用戶",
+  "saveContact": "保存聯絡人",
+  "call": "通話",
+  "clearingChatHistory": "清除訊息",
+  "clearMessages": "清除訊息",
+  "firstName": "名",
+  "lastName": "姓",
+  "groupNotice": "群通知",
+  "groupOfAnnouncement": "群通知",
+  "groupManagement": "管理群組",
+  "groupType": "群組類型",
+  "addGroupWay": "加群方式",
+  "myAliasInGroup": "我在群裡嘅別名",
+  "myGroupNickName": "我在群裡嘅別名",
+  "groupMembers": "群成員",
+  "admin": "管理員",
+  "adminNum": "管理員 ({num})",
+  "@adminNum": {
+    "description": "管理員數量",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "info": "詳情",
+  "setAsAdmin": "設為管理員",
+  "announcement": "群通知",
+  "totalSilence": "全員禁言",
+  "silenceAll": "全員禁言",
+  "addSilencedMember": "加禁言成員",
+  "onlyGroupOwnerAndAdminsCanSendMessages": "開啟後，只有群主同管理員可以發訊息。",
+  "someoneEnabledSilenceAll": "{name} 開啟咗「全員禁言」",
+  "@someoneEnabledSilenceAll": {
+    "description": "某人開啟咗全員禁言",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "馬化腾"
+      }
+    }
+  },
+  "someoneDisabledSilenceAll": "{name} 關閉咗「全員禁言」",
+  "@someoneDisabledSilenceAll": {
+    "description": "某人關閉咗全員禁言",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "馬化腾"
+      }
+    }
+  },
+  "newContacts": "新聯絡人",
+  "myGroup": "群組",
+  "theBlackList": "黑名單",
+  "blockList": "封鎖用戶",
+  "groupChatNotifications": "群對話通知",
+  "userID": "用戶ID",
+  "myUserID": "我嘅用戶ID: {userID}",
+  "@myUserID": {
+    "description": "我嘅用戶ID",
+    "placeholders": {
+      "userID": {
+        "type": "String",
+        "example": "123456"
+      }
+    }
+  },
+  "searchUserID": "搜尋用戶ID",
+  "none": "無",
+  "iDis": "ID: {userID}",
+  "@iDis": {
+    "description": "用戶ID",
+    "placeholders": {
+      "userID": {
+        "type": "String",
+        "example": "123456"
+      }
+    }
+  },
+  "addToContacts": "加到聯絡人",
+  "addContact": "加聯絡人",
+  "bio": "簡介",
+  "bioIs": "簡介: {bio}",
+  "@bioIs": {
+    "description": "簡介: ",
+    "placeholders": {
+      "bio": {
+        "type": "String",
+        "example": "開心"
+      }
+    }
+  },
+  "fillInTheVerificationInformation": "發送請求",
+  "remarkAndGrouping": "備註同分組",
+  "remark": "備註",
+  "group": "分組",
+  "send": "發送",
+  "contactAddedSuccessfully": "成功加聯絡人",
+  "requestSent": "請求已發送",
+  "cannotAddContact": "唔可以加聯絡人",
+  "addGroup": "加群組",
+  "typeIs": "類型: {type}",
+  "@typeIs": {
+    "description": "類型: ",
+    "placeholders": {
+      "type": {
+        "type": "String",
+        "example": "工作"
+      }
+    }
+  },
+  "groupNotAcceptingRequests": "群組唔接受請求",
+  "joinedGroupSuccessfully": "成功加入群組",
+  "numNewApplications": "{num, plural, one {{num} 個新申請} other {{num} 個新申請}}",
+  "@numNewApplications": {
+    "description": "新申請數量",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "agree": "接受",
+  "accept": "接受",
+  "refuse": "拒絕",
+  "decline": "拒絕",
+  "verificationMessage": "驗證訊息",
+  "accepted": "已接受",
+  "declined": "已拒絕",
+  "confirm": "確認",
+  "contactRequest": "聯絡人請求",
+  "contactsPermission": "聯絡人許可",
+  "allowAnyUserAddYouAsContact": "允許任何人將您添加為聯絡人",
+  "declineContactRequestFromAnyUser": "自動拒絕聯絡人請求",
+  "anyoneUponRequest": "手動接受請求",
+  "theme": "主題",
+  "language": "語言",
+  "aboutTencentCloudChat": "關於騰訊雲 IM",
+  "logIn": "登錄",
+  "signIn": "登錄",
+  "signUp": "註冊",
+  "signOut": "登出",
+  "logOut": "登出",
+  "signature": "個性簽名",
+  "gender": "性別",
+  "birthday": "生日",
+  "male": "男",
+  "female": "女",
+  "unspecified": "未指定",
+  "unknown": "未知",
+  "sdkVersion": "SDK版本",
+  "privacyPolicy": "隱私政策",
+  "userAgreement": "用戶協議",
+  "disclaimer": "免責聲明",
+  "personalInformationCollected": "收集的個人信息",
+  "informationSharedWithThirdParties": "與第三方共享的信息",
+  "deleteAccount": "刪除帳戶",
+  "contactUs": "聯絡我們",
+  "countryOrRegion": "國家/地區",
+  "selectACountry": "揀選國家或地區",
+  "phoneNumber": "電話號碼",
+  "email": "電子郵件",
+  "verificationCode": "驗證碼",
+  "enterSMSCode": "輸入短信收到的驗證碼",
+  "sendCode": "發送驗證碼",
+  "visitOurWebsite": "訪問我們的網站",
+  "quit": "退出",
+  "quitAndDelete": "退出並刪除",
+  "setGroupName": "設置群組名稱",
+  "groupAddAny": "任何",
+  "groupAddAuth": "需要批准",
+  "groupAddForbid": "禁止",
+  "groupOwner": "群主",
+  "groupMember": "成員",
+  "dismissAdmin": "撤銷管理員",
+  "welcomeToTencentCloudChat": "歡迎來到騰訊雲 IM",
+  "draft": "草稿",
+  "english": "英文",
+  "simplifiedChinese": "簡體中文",
+  "traditionalChinese": "繁體中文",
+  "japanese": "日本語",
+  "korean": "한국어",
+  "style": "風格",
+  "classic": "經典",
+  "minimalist": "簡約",
+  "messageReadStatus": "訊息已讀狀態",
+  "messageReadStatusDescription": "控制是否顯示您的訊息已讀狀態以及其他人是否可以看到您已讀他們的訊息。",
+  "onlineStatus": "在線狀態",
+  "onlineStatusDescription": "決定您的在線狀態是否對您的聯絡人可見。",
+  "noBio": "無個性簽名",
+  "noConversation": "無對話",
+  "sound": "聲音",
+  "sticker": "貼圖",
+  "image": "圖片",
+  "chatHistory": "聊天記錄",
+  "audio": "音頻",
+  "messageDeleted": "訊息已刪除",
+  "messageRecalled": "訊息已撤回",
+  "unreadCount": "{num, plural, one {{num} 未讀訊息} other {{num} 未讀訊息}}",
+  "@unreadCount": {
+    "description": "未讀訊息數量",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "newMsgCount": "{num, plural, one {一條新訊息} other {{num} 條新訊息}}",
+  "@newMsgCount": {
+    "description": "新訊息數量",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "takeAPhoto": "拍攝照片",
+  "recordAVideo": "錄製影片",
+  "pullDownToLoadMoreMessages": "下拉加載更多訊息",
+  "releaseToLoadMore": "釋放以加載更多",
+  "noMoreMessage": "沒有更多訊息",
+  "pullUpToLoadMoreMessages": "上拉加載更多訊息",
+  "holdToRecordReleaseToSend": "按住錄音，鬆開發送",
+  "forwardIndividually": "單獨轉發",
+  "forwardCombined": "合併轉發",
+  "selectConversations": "揀選對話",
+  "recent": "最近",
+  "recall": "撤回",
+  "replyTo": "回覆 {name}",
+  "@replyTo": {
+    "description": "回覆訊息。",
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "王潤林"
+      }
+    }
+  },
+  "confirmDeletion": "確認刪除",
+  "deleteForEveryone": "為所有人刪除",
+  "deleteForMe": "僅為我刪除",
+  "askDeleteThisMessage": "確定刪除此訊息嗎？",
+  "deleteMessageCount": "{num, plural, zero {未刪除訊息} one {刪除一條訊息？} other {刪除 {num} 條訊息？}}",
+  "@deleteMessageCount": {
+    "description": "刪除訊息數量",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "memberReadCount": "{num, plural, zero {無成員已讀} one {1 位成員已讀} other {{num} 位成員已讀}}",
+  "@memberReadCount": {
+    "description": "訊息已讀成員數量",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "allMembersRead": "所有成員已讀",
+  "allowAny": "允許任何",
+  "cannotSendApplicationToWorkGroup": "無法向工作組發送申請",
+  "appearance": "外觀",
+  "darkTheme": "深色",
+  "denyAny": "拒絕任何",
+  "edit": "編輯",
+  "friendsPermission": "朋友權限",
+  "groupJoined": "已加入群組",
+  "lightTheme": "淺色",
+  "noBlockList": "沒有封鎖用戶",
+  "noContact": "無聯絡人",
+  "noNewApplication": "無新申請",
+  "permissionNeeded": "需要許可",
+  "requireRequest": "需要請求",
+  "setNickname": "設置暱稱",
+  "setSignature": "設置簽名",
+  "validationMessages": "驗證消息",
+  "getVerification": "獲取驗證",
+  "invalidEmail": "無效電子郵件",
+  "invalidPhoneNumber": "無效電話號碼",
+  "invalidVerification": "無效驗證",
+  "searchGroupID": "搜索群組ID",
+  "callInitiated": "呼叫已發起",
+  "callAccepted": "呼叫已接受",
+  "callDeclined": "呼叫已拒絕",
+  "noAnswer": "無回答",
+  "lineBusy": "線路繁忙",
+  "callHungUp": "掛斷電話",
+  "callInProgress": "通話進行中",
+  "callEnded": "通話結束",
+  "unknownCallStatus": "正在通話",
+  "groupChatCreated": "群聊成功創建！",
+  "vote": "投票",
+  "callCancelled": "通話已取消",
+  "unknownGroupTips": "未知群組提示",
+  "memberJoinedGroup": "{members} 已加入群組",
+  "opInvitedToGroup": "{opMember} 邀請 {members} 加入群組",
+  "memberLeftGroup": "{members} 離開了群組",
+  "opRemovedFromGroup": "{opMember} 將 {members} 從群組中移除",
+  "opPromotedToAdmin": "{opMember} 將 {members} 提升為管理員",
+  "opRevokedAdmin": "{opMember} 撤銷了 {members} 的管理員角色",
+  "opChangedGroupInfo": "{opMember} 更改了 {groupInfo}",
+  "opChangedMemberInfo": "{opMember} 更改了 {memberInfo}",
+  "changedGroupNameTo": "將群組名更改為 {name}",
+  "changedGroupDescriptionTo": "將群組描述更改為 {description}",
+  "changedGroupAnnouncementTo": "將群組公告更改為 {announcement}",
+  "changedGroupAvatar": "更改群組頭像",
+  "transferredGroupOwnershipTo": "將群組所有權轉讓給 {owner}",
+  "changedGroupCustomInfo": "更改群組自定義信息",
+  "enabledGroupMute": "啟用群組全員禁言",
+  "disabledGroupMute": "禁用群組全員禁言",
+  "changedGroupMessageReceptionTo": "將群組消息接收設置更改為：{setting}",
+  "changedApplyToJoinGroupTo": "將申請加入群組設置更改為：{setting}",
+  "changedInviteToJoinGroupTo": "將邀請加入群組設置更改為：{setting}",
+  "opUnmuted": "{user} 取消靜音",
+  "opMuted": "{user} 靜音 {duration} 秒",
+  "groupTips": "群組提示",
+  "receiveMessages": "接收消息",
+  "doNotReceiveMessages": "不接收消息",
+  "receiveMessagesWhenOnlineOnly": "僅在線時接收消息",
+  "disallowJoinGroup": "不允許申請加入群組",
+  "joinGroupNeedApproval": "加入群組需要管理員批准",
+  "joinGroupDirectly": "申請後直接加入群組",
+  "disallowInviting": "不允許邀請加入群組",
+  "requireApprovalForInviting": "邀請加入群組需要管理員批准",
+  "joinDirectlyBeenInvited": "被邀請後直接加入群組",
+  "unmuted": "取消靜音",
+  "muteTime": "靜音 {duration} 秒",
+  "poll": "投票",
+  "callDuration": "通話時長：{duration}",
+  "selectMembers": "揀選成員",
+  "numSelectMembers": "{num, plural, zero {揀選成員} other {{num} 已選}}",
+  "@numSelectMembers": {
+    "description": "揀選成員數量",
+    "placeholders": {
+      "num": {
+        "type": "int",
+        "example": "2"
+      }
+    }
+  },
+  "searchMembers": "搜索成員",
+  "startCall": "開始通話",
+  "clear": "清除",
+  "groupSubtitle": "{name} 和其他 {count} 人",
+  "markAsUnread": "標記為未讀",
+  "hide": "隱藏",
+  "unreadMessagesBelow": "下方未讀訊息",
+  "ar": "اَلْعَرَبِيَّةُ",
+  "tencentCloudChat": "騰訊雲 IM",
+  "changeTheme": "改變外觀",
+  "deleteAccountNotification": "帳戶刪除後，您將無法使用目前帳戶，相關資料也將被刪除且無法找回。",
+  "restartAppForLanguage": "請重新啟動應用程式以使語言變更生效",
+  "deleteAllMessages": "刪除所有訊息",
+  "downloading": "下載中...",
+  "viewFullImage": "查看原圖",
+  "messageRecall": "訊息撤回",
+  "messageRecallConfirmation": "您確定要撤回這條訊息嗎？",
+  "openInNewWindow": "在新視窗中開啟",
+  "selectAChat": "選擇一個聊天",
+  "noConversationSelected": "未選擇對話",
+  "unavailableToSendMessage": "無法發送消息",
+  "noSuchGroup": "沒有這個群組",
+  "notGroupMember": "不是群組成員",
+  "userNotFound": "找不到用戶",
+  "userBlockedYou": "用戶已屏蔽你",
+  "muted": "已靜音",
+  "groupMuted": "群組已靜音",
+  "cantSendMessage": "無法發送訊息",
+  "media": "媒體",
+  "sendToSomeChat": "發送給 {name}",
+  "unableToSendWithFolders": "由於包含檔案夾，無法發送檔案。請僅選擇檔案本身。",
+  "channelSwitch": "頻道：",
+  "weChat": "WeChat",
+  "tGWA": "Telegram 和 WhatsApp",
+  "contactUsIfQuestions": "如果有任何不清楚的地方或者您有更多的想法，請隨時聯絡我們！",
+  "chatNow": "立即對話",
+  "onlineServiceTimeFrom10To20": "在線時間：週一至週五上午10點至晚上8點",
+  "officialWebsite": "官方網站",
+  "allSDKs": "所有 SDK",
+  "sourceCode": "源代碼",
+  "personalInformationCollectionList": "個人信息收集列表",
+  "thirdPartyInformationSharingList": "第三方信息分享列表",
+  "version": "版本",
+  "feedback": "反饋",
+  "me": "我",
+  "about": "關於",
+  "profile": "個人資料",
+  "unpin": "取消置頂",
+  "mentionedMessages": "{count} 條訊息提及我"
+}
