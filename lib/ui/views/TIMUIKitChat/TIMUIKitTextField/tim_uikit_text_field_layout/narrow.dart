@@ -167,7 +167,8 @@ class _TIMUIKitTextFieldLayoutNarrowState
 
   void setSendButton() {
     final value = widget.textEditingController.text;
-    if (isWebDevice() || isAndroidDevice()) {
+    ///////////////// iOS 也加上发送 /////////////////
+    if (isIosDevice() || isWebDevice() || isAndroidDevice()) {
       if (value.isEmpty && showMoreButton != true) {
         setState(() {
           showMoreButton = true;
@@ -395,7 +396,8 @@ class _TIMUIKitTextFieldLayoutNarrowState
     }, const Duration(seconds: 1));
 
     final debounceFunc = _debounce((value) {
-      if (isWebDevice() || isAndroidDevice()) {
+      ///////////////// iOS 也加上发送 /////////////////
+      if (isWebDevice() || isAndroidDevice() || isIosDevice()) {
         if (value.isEmpty && showMoreButton != true) {
           setState(() {
             showMoreButton = true;
@@ -527,12 +529,12 @@ class _TIMUIKitTextFieldLayoutNarrowState
                                       if (showKeyboard) {
                                         widget.focusNode.requestFocus();
                                       }
-                                      setState(() {
-                                        if (widget.textEditingController.text
-                                            .isEmpty) {
+                                      if (widget
+                                          .textEditingController.text.isEmpty) {
+                                        setState(() {
                                           showMoreButton = true;
-                                        }
-                                      });
+                                        });
+                                      }
                                     },
                                     textAlignVertical: TextAlignVertical.top,
                                     decoration: InputDecoration(
@@ -629,7 +631,9 @@ class _TIMUIKitTextFieldLayoutNarrowState
                                 width: 28,
                               ),
                       ),
-                    if ((isAndroidDevice() || isWebDevice()) && !showMoreButton)
+                    ///////////////// iOS 也加上发送 /////////////////
+                    if ((isIosDevice() || isAndroidDevice() || isWebDevice()) &&
+                        !showMoreButton)
                       SizedBox(
                         height: 32.0,
                         child: ElevatedButton(
@@ -638,11 +642,11 @@ class _TIMUIKitTextFieldLayoutNarrowState
                             if (showKeyboard) {
                               widget.focusNode.requestFocus();
                             }
-                            setState(() {
-                              if (widget.textEditingController.text.isEmpty) {
+                            if (widget.textEditingController.text.isEmpty) {
+                              setState(() {
                                 showMoreButton = true;
-                              }
-                            });
+                              });
+                            }
                           },
                           child: Text(TIM_t("发送")),
                         ),
