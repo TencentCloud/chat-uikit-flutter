@@ -153,6 +153,8 @@ class _TIMUIKitTextFieldLayoutNarrowState
   @override
   void initState() {
     super.initState();
+
+    showMoreButton = widget.textEditingController.text.isEmpty;
     if (widget.controller != null) {
       widget.controller?.addListener(
         () {
