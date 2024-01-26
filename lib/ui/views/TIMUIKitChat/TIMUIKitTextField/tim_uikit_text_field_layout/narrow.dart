@@ -156,8 +156,7 @@ class _TIMUIKitTextFieldLayoutNarrowState
 
     showMoreButton = widget.textEditingController.text.characters.isEmpty;
 
-    (widget.controller?.textEditingController ?? widget.textEditingController)
-        .addListener(() {
+    widget.textEditingController.addListener(() {
       if (!mounted) return;
       if (!widget.focusNode.hasFocus) {
         widget.focusNode.requestFocus();
