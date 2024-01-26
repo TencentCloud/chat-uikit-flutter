@@ -154,7 +154,17 @@ class _TIMUIKitTextFieldLayoutNarrowState
   void initState() {
     super.initState();
 
-    showMoreButton = widget.textEditingController.text.isEmpty;
+    showMoreButton = widget.textEditingController.text.characters.isEmpty;
+
+    (widget.controller?.textEditingController ?? widget.textEditingController)
+        .addListener(() {
+      if (!mounted) return;
+      if (!widget.focusNode.hasFocus) {
+        widget.focusNode.requestFocus();
+      }
+      setSendButton();
+    });
+
     if (widget.controller != null) {
       widget.controller?.addListener(
         () {
@@ -167,8 +177,14 @@ class _TIMUIKitTextFieldLayoutNarrowState
     }
   }
 
+  @override
+  void didUpdateWidget(covariant TIMUIKitTextFieldLayoutNarrow oldWidget) {
+    setSendButton();
+    super.didUpdateWidget(oldWidget);
+  }
+
   void setSendButton() {
-    final value = widget.textEditingController.text;
+    final value = widget.textEditingController.text.characters;
     ///////////////// iOS 也加上发送 /////////////////
     if (isIosDevice() || isWebDevice() || isAndroidDevice()) {
       if (value.isEmpty && showMoreButton != true) {
