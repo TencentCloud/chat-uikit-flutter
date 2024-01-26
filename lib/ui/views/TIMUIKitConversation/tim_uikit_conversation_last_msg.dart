@@ -44,10 +44,13 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
   @override
   void didUpdateWidget(covariant TIMUIKitLastMsg oldWidget) {
     super.didUpdateWidget(oldWidget);
+    //////////////// 新增 status 比对：处理消息撤回的刷新逻辑 ////////////////
     if ((oldWidget.lastMsg?.msgID != widget.lastMsg?.msgID) ||
-        (oldWidget.lastMsg?.id != widget.lastMsg?.id)) {
+        (oldWidget.lastMsg?.id != widget.lastMsg?.id) ||
+        (oldWidget.lastMsg?.status != widget.lastMsg?.status)) {
       _getMsgElem();
     }
+    //////////////// 新增 status 比对：处理消息撤回的刷新逻辑 ////////////////
   }
 
   (bool isRevoke, bool isRevokeByAdmin) isRevokeMessage(V2TimMessage? message) {
