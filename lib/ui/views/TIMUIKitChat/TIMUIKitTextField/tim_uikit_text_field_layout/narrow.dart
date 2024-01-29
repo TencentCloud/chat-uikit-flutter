@@ -158,6 +158,8 @@ class _TIMUIKitTextFieldLayoutNarrowState
 
     widget.textEditingController.addListener(() {
       if (!mounted) return;
+      // 选择表情的时候不需要
+      if (showEmojiPanel) return;
       if (!widget.focusNode.hasFocus) {
         widget.focusNode.requestFocus();
       }
