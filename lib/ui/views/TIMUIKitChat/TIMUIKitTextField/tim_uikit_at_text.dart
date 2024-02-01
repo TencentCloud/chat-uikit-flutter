@@ -317,6 +317,17 @@ class _AtTextMemberListState extends TIMUIKitState<AtTextMemberList> {
     return showList;
   }
 
+  List<V2TimGroupMemberFullInfo?> get _memberList {
+    if (widget.canAtAll) {
+      return [
+        V2TimGroupMemberFullInfo(
+            userID: "__kImSDK_MesssageAtALL__", nickName: TIM_t("所有人")),
+        ...widget.memberList,
+      ];
+    }
+    return widget.memberList;
+  }
+
   Widget _buildListItem(
       BuildContext context, V2TimGroupMemberFullInfo memberInfo) {
     final theme = Provider.of<TUIThemeViewModel>(context).theme;
@@ -511,7 +522,6 @@ class _AtTextMemberListState extends TIMUIKitState<AtTextMemberList> {
         widget.touchBottomCallBack!();
       }
     }, 300);
-    final showList = _getShowList(widget.memberList);
 
     return Container(
       color: isDesktopScreen ? null : theme.weakBackgroundColor,
@@ -521,14 +531,14 @@ class _AtTextMemberListState extends TIMUIKitState<AtTextMemberList> {
             throteFunction(notification);
             return true;
           },
-          child: showList.isEmpty
+          child: _memberList.isEmpty
               ? Center(
                   child: Text(TIM_t("暂无群成员")),
                 )
               : ListView.builder(
-                  itemCount: widget.memberList.length,
+                  itemCount: _memberList.length,
                   itemBuilder: (BuildContext context, int index) {
-                    final memberInfo = widget.memberList[index];
+                    final memberInfo = _memberList[index];
 
                     return memberInfo == null
                         ? const SizedBox()
@@ -539,39 +549,40 @@ class _AtTextMemberListState extends TIMUIKitState<AtTextMemberList> {
       ),
     );
 
-    return Container(
-      color: isDesktopScreen ? null : theme.weakBackgroundColor,
-      child: SafeArea(
-        child: NotificationListener<ScrollNotification>(
-          onNotification: (ScrollNotification notification) {
-            throteFunction(notification);
-            return true;
-          },
-          child: showList.isEmpty
-              ? Center(
-                  child: Text(TIM_t("暂无群成员")),
-                )
-              : Container(
-                  padding: isDesktopScreen
-                      ? const EdgeInsets.symmetric(horizontal: 16)
-                      : null,
-                  child: AZListViewContainer(
-                    memberList: showList,
-                    susItemBuilder: (context, index) {
-                      final model = showList[index];
-                      return getSusItem(
-                          context, theme, model.getSuspensionTag());
-                    },
-                    itemBuilder: (context, index) {
-                      final memberInfo = showList[index].memberInfo
-                          as V2TimGroupMemberFullInfo;
+    // final showList = _getShowList(_memberList);
+    // return Container(
+    //   color: isDesktopScreen ? null : theme.weakBackgroundColor,
+    //   child: SafeArea(
+    //     child: NotificationListener<ScrollNotification>(
+    //       onNotification: (ScrollNotification notification) {
+    //         throteFunction(notification);
+    //         return true;
+    //       },
+    //       child: showList.isEmpty
+    //           ? Center(
+    //               child: Text(TIM_t("暂无群成员")),
+    //             )
+    //           : Container(
+    //               padding: isDesktopScreen
+    //                   ? const EdgeInsets.symmetric(horizontal: 16)
+    //                   : null,
+    //               child: AZListViewContainer(
+    //                 memberList: showList,
+    //                 susItemBuilder: (context, index) {
+    //                   final model = showList[index];
+    //                   return getSusItem(
+    //                       context, theme, model.getSuspensionTag());
+    //                 },
+    //                 itemBuilder: (context, index) {
+    //                   final memberInfo = showList[index].memberInfo
+    //                       as V2TimGroupMemberFullInfo;
 
-                      return _buildListItem(context, memberInfo);
-                    },
-                  ),
-                ),
-        ),
-      ),
-    );
+    //                   return _buildListItem(context, memberInfo);
+    //                 },
+    //               ),
+    //             ),
+    //     ),
+    //   ),
+    // );
   }
 }
