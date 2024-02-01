@@ -318,7 +318,7 @@ class _AtTextMemberListState extends TIMUIKitState<AtTextMemberList> {
   }
 
   List<V2TimGroupMemberFullInfo?> get _memberList {
-    if (widget.canAtAll) {
+    if (widget.canAtAll && widget.memberList.isNotEmpty) {
       return [
         V2TimGroupMemberFullInfo(
             userID: "__kImSDK_MesssageAtALL__", nickName: TIM_t("所有人")),
