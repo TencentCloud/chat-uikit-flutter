@@ -383,29 +383,45 @@ extension _IMMediaMsgBrowserStateApi on IMMediaMsgBrowserState {
     HistoryMsgGetTypeEnum getType =
         HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
   }) async {
-    final res = await _messageManager.getHistoryMessageListV2(
-      count: 100,
-      userID: widget.userID,
-      groupID: widget.groupID,
-      getType: getType,
-      lastMsgID: lastMsgID,
-      messageTypeList: [
-        MessageElemType.V2TIM_ELEM_TYPE_IMAGE,
-        // MessageElemType.V2TIM_ELEM_TYPE_VIDEO,
-      ],
-    );
-    if (res.code != 0) {
-      debugPrint('getMediaMsgList: code = ${res.code}, desc = ${res.desc}');
+    // merger、reply 两种情况不需要请求更多图片
+    if (widget.isFrom != null && widget.isFrom != '') {
+      debugPrint('_getMediaMsgList isFrom: ${widget.isFrom}');
+      return (true, <V2TimMessage>[]);
+    }
+    // userID 和 groupID 不合法的情况下不需要请求更多图片
+    if ((widget.userID == null || widget.userID == '') &&
+        (widget.groupID == null || widget.groupID == '')) {
+      return (true, <V2TimMessage>[]);
     }
 
-    // 过滤被删除和撤回的消息
-    final msgList = List.of((res.data?.messageList ?? []).where((element) =>
-        element.status != MessageStatus.V2TIM_MSG_STATUS_HAS_DELETED &&
-        element.status != MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED));
-    return (
-      res.data?.isFinished ?? true,
-      msgList,
-    );
+    try {
+      final res = await _messageManager.getHistoryMessageListV2(
+        count: 100,
+        userID: widget.userID,
+        groupID: widget.groupID,
+        getType: getType,
+        lastMsgID: lastMsgID,
+        messageTypeList: [
+          MessageElemType.V2TIM_ELEM_TYPE_IMAGE,
+          // MessageElemType.V2TIM_ELEM_TYPE_VIDEO,
+        ],
+      );
+      if (res.code != 0) {
+        debugPrint('getMediaMsgList: code = ${res.code}, desc = ${res.desc}');
+      }
+
+      // 过滤被删除和撤回的消息
+      final msgList = List.of((res.data?.messageList ?? []).where((element) =>
+          element.status != MessageStatus.V2TIM_MSG_STATUS_HAS_DELETED &&
+          element.status != MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED));
+      return (
+        res.data?.isFinished ?? true,
+        msgList,
+      );
+    } catch (e) {
+      debugPrint('_getMediaMsgList error: $e');
+      return (true, <V2TimMessage>[]);
+    }
   }
 }
 
