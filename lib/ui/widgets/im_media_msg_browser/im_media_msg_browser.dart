@@ -2,26 +2,17 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:chewie_for_us/chewie_for_us.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:extended_image/extended_image.dart';
-import 'package:fijkplayer/fijkplayer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
-import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/im_media_msg_browser/image_item.dart';
 import 'package:video_player/video_player.dart';
 
 import 'bottom_actions.dart';
 import 'video_custom_controls.dart';
-import 'video_item.dart';
 
 class IMMediaMsgBrowser extends StatefulWidget {
   const IMMediaMsgBrowser({
@@ -77,7 +68,7 @@ class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
     return Platform.isAndroid;
   }
 
-  final FijkPlayer fijkPlayer = FijkPlayer();
+  // final FijkPlayer _fijkPlayer = FijkPlayer();
 
   void _safeSetState(void Function() fn) {
     if (mounted) {
@@ -111,18 +102,18 @@ class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
       return;
     }
 
-    switch (state) {
-      case AppLifecycleState.inactive:
-      //
-      case AppLifecycleState.resumed:
-        //在前台
-        fijkPlayer.start();
-      case AppLifecycleState.paused:
-        // 在后台
-        fijkPlayer.pause();
-      default:
-        break;
-    }
+    // switch (state) {
+    //   case AppLifecycleState.inactive:
+    //   //
+    //   case AppLifecycleState.resumed:
+    //     //在前台
+    //     _fijkPlayer.start();
+    //   case AppLifecycleState.paused:
+    //     // 在后台
+    //     _fijkPlayer.pause();
+    //   default:
+    //     break;
+    // }
   }
 
   @override
@@ -131,10 +122,11 @@ class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
       DeviceOrientation.portraitUp,
     ]);
 
-    if (isTest) {
-      fijkPlayer.stop();
-      fijkPlayer.dispose();
-    }
+    // if (isTest) {
+    //   _fijkPlayer.stop();
+    //   _fijkPlayer.dispose();
+    // }
+
     if (isInit) {
       videoPlayerController?.dispose();
       chewieController?.dispose();
@@ -203,17 +195,20 @@ class IMMediaMsgBrowserState extends TIMUIKitState<IMMediaMsgBrowser>
                           "${msg.msgID ?? msg.id ?? msg.timestamp ?? DateTime.now().millisecondsSinceEpoch}${widget.isFrom}";
 
                       if (msg.videoElem != null) {
-                        final videoElement = msg.videoElem;
-                        return VideoItem(
-                          isInit: isInit,
-                          isTest: isTest,
-                          fijkPlayer: fijkPlayer,
-                          chewieController: chewieController,
-                          videoUrl: videoElement?.videoUrl ?? '',
-                          coverUrl: videoElement?.snapshotUrl ?? '',
-                          onDownloadFile: widget.onDownloadFile,
-                          heroTag: heroTag,
+                        return const Center(
+                          child: Text('敬请期待'),
                         );
+                        // final videoElement = msg.videoElem;
+                        // return VideoItem(
+                        //   isInit: isInit,
+                        //   isTest: isTest,
+                        //   fijkPlayer: _fijkPlayer,
+                        //   chewieController: chewieController,
+                        //   videoUrl: videoElement?.videoUrl ?? '',
+                        //   coverUrl: videoElement?.snapshotUrl ?? '',
+                        //   onDownloadFile: widget.onDownloadFile,
+                        //   heroTag: heroTag,
+                        // );
                       } else if (msg.imageElem != null) {
                         return ImageItem(
                           message: msg,
@@ -429,17 +424,17 @@ extension _IMMediaMsgBrowserStatePrivate on IMMediaMsgBrowserState {
   Future<void> _setVideoPlayerController(String url) async {
     if (url.isEmpty) return;
     if (isTest) {
-      fijkPlayer.addListener(
-        () {
-          if (fijkPlayer.state == FijkState.started) {
-            _safeSetState(() {
-              isInit = true;
-            });
-          }
-        },
-      );
+      // _fijkPlayer.addListener(
+      //   () {
+      //     if (_fijkPlayer.state == FijkState.started) {
+      //       _safeSetState(() {
+      //         isInit = true;
+      //       });
+      //     }
+      //   },
+      // );
 
-      fijkPlayer.setDataSource(url, autoPlay: true);
+      // _fijkPlayer.setDataSource(url, autoPlay: true);
       // await fijkPlayer.prepareAsync();
     } else {
       VideoPlayerController player = VideoPlayerController.networkUrl(
@@ -475,136 +470,5 @@ extension IMMediaMsgBrowserStateDownloadImg on IMMediaMsgBrowserState {
   Future<void> _saveImg() async {
     final msg = _msgs[_currentIndex];
     widget.onDownloadImage?.call(msg);
-    return;
-    // try {
-    //   String? imageUrl;
-    //   final msg = _msgs[_currentIndex];
-    //   final imageElem = msg.imageElem;
-
-    //   if (imageElem != null) {
-    //     final originUrl = _getOriginImgURLOf(msg);
-    //     imageUrl = originUrl;
-    //   }
-
-    //   debugPrint('_saveImg imageUrl: $imageUrl');
-
-    //   if (imageUrl != null) {
-    //     return await _saveImageToLocal(
-    //       context,
-    //       imageUrl,
-    //       msg,
-    //       theme: theme,
-    //     );
-    //   }
-    // } catch (e) {
-    //   _isDownloadingImg.value = false;
-    //   onTIMCallback(
-    //     TIMCallback(
-    //       infoCode: 6660414,
-    //       infoRecommendText: TIM_t("正在下载中"),
-    //       type: TIMCallbackType.INFO,
-    //     ),
-    //   );
-    //   return;
-    // }
-  }
-
-  // 保存网络图片到本地
-  Future<void> _saveImageToLocal(
-    context,
-    String imageUrl,
-    V2TimMessage msg, {
-    TUITheme? theme,
-  }) async {
-    try {
-      if (PlatformUtils().isIOS) {
-        if (!await Permissions.checkPermission(
-            context, Permission.photosAddOnly.value, theme!, false)) {
-          return;
-        }
-      } else {
-        final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-        if (PlatformUtils().isMobile) {
-          if ((androidInfo.version.sdkInt) >= 33) {
-            final photos = await Permissions.checkPermission(
-              context,
-              Permission.photos.value,
-              theme,
-            );
-            if (!photos) {
-              return;
-            }
-          } else {
-            final storage = await Permissions.checkPermission(
-              context,
-              Permission.storage.value,
-            );
-            if (!storage) {
-              return;
-            }
-          }
-        }
-      }
-
-      _isDownloadingImg.value = true;
-      final http.Response r = await http.get(Uri.parse(imageUrl));
-      final data = r.bodyBytes;
-      final result = await ImageGallerySaver.saveImage(
-        Uint8List.fromList(data),
-        quality: 100,
-      );
-
-      if (PlatformUtils().isIOS) {
-        if (result['isSuccess']) {
-          onTIMCallback(
-            TIMCallback(
-              type: TIMCallbackType.INFO,
-              infoRecommendText: TIM_t("图片保存成功"),
-              infoCode: 6660406,
-            ),
-          );
-        } else {
-          onTIMCallback(
-            TIMCallback(
-              type: TIMCallbackType.INFO,
-              infoRecommendText: TIM_t("图片保存失败"),
-              infoCode: 6660407,
-            ),
-          );
-        }
-      } else {
-        if (result != null) {
-          onTIMCallback(
-            TIMCallback(
-              type: TIMCallbackType.INFO,
-              infoRecommendText: TIM_t("图片保存成功"),
-              infoCode: 6660406,
-            ),
-          );
-        } else {
-          onTIMCallback(
-            TIMCallback(
-              type: TIMCallbackType.INFO,
-              infoRecommendText: TIM_t("图片保存失败"),
-              infoCode: 6660407,
-            ),
-          );
-        }
-      }
-      _isDownloadingImg.value = false;
-    } catch (e) {
-      _isDownloadingImg.value = false;
-      debugPrint('_saveImageToLocal error: $e');
-    }
-  }
-
-  String _getOriginImgURLOf(V2TimMessage msg) {
-    // 实际拿的是原图
-    V2TimImage? img = MessageUtils.getImageFromImgList(
-      msg.imageElem!.imageList,
-      HistoryMessageDartConstant.oriImgPrior,
-    );
-    return img == null ? msg.imageElem!.path! : img.url!;
   }
 }
