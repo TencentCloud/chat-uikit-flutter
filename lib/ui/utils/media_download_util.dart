@@ -27,6 +27,7 @@ class MediaDownloadUtil {
     TUITheme theme, {
     V2TimMessage? cusMsg,
     V2TimMessage? message,
+    bool showSuccessTip = true,
   }) async {
     try {
       String? imageUrl;
@@ -62,6 +63,7 @@ class MediaDownloadUtil {
           isLocalResource: isAssetBool,
           theme: theme,
           message: msg,
+          showSuccessTip: showSuccessTip,
         );
       }
     } catch (e) {
@@ -80,6 +82,7 @@ class MediaDownloadUtil {
     BuildContext context, {
     required V2TimVideoElem videoElement,
     required V2TimMessage message,
+    bool showSuccessTip = true,
   }) async {
     if (PlatformUtils().isWeb) {
       return await _saveNetworkVideo(
@@ -87,6 +90,7 @@ class MediaDownloadUtil {
         videoElement.videoPath!,
         isAsset: true,
         message: message,
+        showSuccessTip: showSuccessTip,
       );
     }
     if (videoElement.videoPath != '' && videoElement.videoPath != null) {
@@ -97,6 +101,7 @@ class MediaDownloadUtil {
           videoElement.videoPath!,
           isAsset: true,
           message: message,
+          showSuccessTip: showSuccessTip,
         );
       }
     }
@@ -109,6 +114,7 @@ class MediaDownloadUtil {
           videoElement.localVideoUrl!,
           isAsset: true,
           message: message,
+          showSuccessTip: showSuccessTip,
         );
       }
     }
@@ -117,6 +123,7 @@ class MediaDownloadUtil {
       videoElement.videoUrl!,
       isAsset: false,
       message: message,
+      showSuccessTip: showSuccessTip,
     );
   }
 }
@@ -129,6 +136,7 @@ extension _MediaDownloadUtilPrivate on MediaDownloadUtil {
     bool isLocalResource = true,
     TUITheme? theme,
     required V2TimMessage message,
+    bool showSuccessTip = true,
   }) async {
     if (PlatformUtils().isWeb) {
       download(imageUrl) async {
@@ -194,13 +202,15 @@ extension _MediaDownloadUtilPrivate on MediaDownloadUtil {
 
           if (PlatformUtils().isIOS) {
             if (result['isSuccess']) {
-              _coreServices.callOnCallback(
-                TIMCallback(
-                  type: TIMCallbackType.INFO,
-                  infoRecommendText: TIM_t("图片保存成功"),
-                  infoCode: 6660406,
-                ),
-              );
+              if (showSuccessTip) {
+                _coreServices.callOnCallback(
+                  TIMCallback(
+                    type: TIMCallbackType.INFO,
+                    infoRecommendText: TIM_t("图片保存成功"),
+                    infoCode: 6660406,
+                  ),
+                );
+              }
             } else {
               _coreServices.callOnCallback(
                 TIMCallback(
@@ -212,13 +222,15 @@ extension _MediaDownloadUtilPrivate on MediaDownloadUtil {
             }
           } else {
             if (result != null) {
-              _coreServices.callOnCallback(
-                TIMCallback(
-                  type: TIMCallbackType.INFO,
-                  infoRecommendText: TIM_t("图片保存成功"),
-                  infoCode: 6660406,
-                ),
-              );
+              if (showSuccessTip) {
+                _coreServices.callOnCallback(
+                  TIMCallback(
+                    type: TIMCallbackType.INFO,
+                    infoRecommendText: TIM_t("图片保存成功"),
+                    infoCode: 6660406,
+                  ),
+                );
+              }
             } else {
               _coreServices.callOnCallback(
                 TIMCallback(
@@ -247,13 +259,15 @@ extension _MediaDownloadUtilPrivate on MediaDownloadUtil {
 
     if (PlatformUtils().isIOS) {
       if (result['isSuccess']) {
-        _coreServices.callOnCallback(
-          TIMCallback(
-            type: TIMCallbackType.INFO,
-            infoRecommendText: TIM_t("图片保存成功"),
-            infoCode: 6660406,
-          ),
-        );
+        if (showSuccessTip) {
+          _coreServices.callOnCallback(
+            TIMCallback(
+              type: TIMCallbackType.INFO,
+              infoRecommendText: TIM_t("图片保存成功"),
+              infoCode: 6660406,
+            ),
+          );
+        }
       } else {
         _coreServices.callOnCallback(
           TIMCallback(
@@ -265,13 +279,15 @@ extension _MediaDownloadUtilPrivate on MediaDownloadUtil {
       }
     } else {
       if (result != null) {
-        _coreServices.callOnCallback(
-          TIMCallback(
-            type: TIMCallbackType.INFO,
-            infoRecommendText: TIM_t("图片保存成功"),
-            infoCode: 6660406,
-          ),
-        );
+        if (showSuccessTip) {
+          _coreServices.callOnCallback(
+            TIMCallback(
+              type: TIMCallbackType.INFO,
+              infoRecommendText: TIM_t("图片保存成功"),
+              infoCode: 6660406,
+            ),
+          );
+        }
       } else {
         _coreServices.callOnCallback(
           TIMCallback(
@@ -291,6 +307,7 @@ extension _MediaDownloadUtilPrivate on MediaDownloadUtil {
     String videoUrl, {
     bool isAsset = true,
     required V2TimMessage message,
+    bool showSuccessTip = true,
   }) async {
     if (PlatformUtils().isWeb) {
       RegExp exp = RegExp(r"((\.){1}[^?]{2,4})");
@@ -357,13 +374,15 @@ extension _MediaDownloadUtilPrivate on MediaDownloadUtil {
           var result = await ImageGallerySaver.saveFile(savePath);
           if (PlatformUtils().isIOS) {
             if (result['isSuccess']) {
-              _coreServices.callOnCallback(
-                TIMCallback(
-                  type: TIMCallbackType.INFO,
-                  infoRecommendText: TIM_t("视频保存成功"),
-                  infoCode: 6660402,
-                ),
-              );
+              if (showSuccessTip) {
+                _coreServices.callOnCallback(
+                  TIMCallback(
+                    type: TIMCallbackType.INFO,
+                    infoRecommendText: TIM_t("视频保存成功"),
+                    infoCode: 6660402,
+                  ),
+                );
+              }
             } else {
               _coreServices.callOnCallback(
                 TIMCallback(
@@ -375,13 +394,15 @@ extension _MediaDownloadUtilPrivate on MediaDownloadUtil {
             }
           } else {
             if (result != null) {
-              _coreServices.callOnCallback(
-                TIMCallback(
-                  type: TIMCallbackType.INFO,
-                  infoRecommendText: TIM_t("视频保存成功"),
-                  infoCode: 6660402,
-                ),
-              );
+              if (showSuccessTip) {
+                _coreServices.callOnCallback(
+                  TIMCallback(
+                    type: TIMCallbackType.INFO,
+                    infoRecommendText: TIM_t("视频保存成功"),
+                    infoCode: 6660402,
+                  ),
+                );
+              }
             } else {
               _coreServices.callOnCallback(
                 TIMCallback(
@@ -407,13 +428,15 @@ extension _MediaDownloadUtilPrivate on MediaDownloadUtil {
     var result = await ImageGallerySaver.saveFile(savePath);
     if (PlatformUtils().isIOS) {
       if (result['isSuccess']) {
-        _coreServices.callOnCallback(
-          TIMCallback(
-            type: TIMCallbackType.INFO,
-            infoRecommendText: TIM_t("视频保存成功"),
-            infoCode: 6660402,
-          ),
-        );
+        if (showSuccessTip) {
+          _coreServices.callOnCallback(
+            TIMCallback(
+              type: TIMCallbackType.INFO,
+              infoRecommendText: TIM_t("视频保存成功"),
+              infoCode: 6660402,
+            ),
+          );
+        }
       } else {
         _coreServices.callOnCallback(
           TIMCallback(
@@ -425,13 +448,15 @@ extension _MediaDownloadUtilPrivate on MediaDownloadUtil {
       }
     } else {
       if (result != null) {
-        _coreServices.callOnCallback(
-          TIMCallback(
-            type: TIMCallbackType.INFO,
-            infoRecommendText: TIM_t("视频保存成功"),
-            infoCode: 6660402,
-          ),
-        );
+        if (showSuccessTip) {
+          _coreServices.callOnCallback(
+            TIMCallback(
+              type: TIMCallbackType.INFO,
+              infoRecommendText: TIM_t("视频保存成功"),
+              infoCode: 6660402,
+            ),
+          );
+        }
       } else {
         _coreServices.callOnCallback(
           TIMCallback(

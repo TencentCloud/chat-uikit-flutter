@@ -1,17 +1,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/media_download_util.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-
 import 'package:tencent_cloud_chat_uikit/ui/widgets/forward_message_screen.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
 import '../../../data_services/core/core_services_implements.dart';
 import '../../../data_services/services_locatar.dart';
@@ -58,20 +57,91 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
         submitWidget: Text(TIM_t("发送")),
         width: MediaQuery.of(context).size.width * 0.5,
         height: MediaQuery.of(context).size.height * 0.8,
-        onSubmit: (){
+        onSubmit: () {
           forwardMessageScreenKey.currentState?.handleForwardMessage();
         },
         child: (onClose) => Container(
-          padding: const EdgeInsets.symmetric( horizontal: 10),
-          child: ForwardMessageScreen(
-            model: model,
-            key: forwardMessageScreenKey,
-            onClose: onClose,
-            isMergerForward: isMergerForward,
-            conversationType: conversationType,
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: ForwardMessageScreen(
+                model: model,
+                key: forwardMessageScreenKey,
+                onClose: onClose,
+                isMergerForward: isMergerForward,
+                conversationType: conversationType,
+              ),
+            ));
+  }
+
+  Future<void> _downMedia(
+      BuildContext context, TUIChatSeparateViewModel model, theme) async {
+    showDialog(
+      context: context,
+      barrierColor: Colors.transparent,
+      barrierDismissible: false,
+      builder: (context) => UnconstrainedBox(
+        child: Container(
+          width: 100,
+          height: 100,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(10),
           ),
-        )
+          child: const CupertinoActivityIndicator(
+            color: Colors.black,
+            radius: 15,
+          ),
+        ),
+      ),
     );
+
+    final List<V2TimMessage> imgMsgs = List.from(model.multiSelectedMessageList
+        .where((msg) => msg.elemType == MessageElemType.V2TIM_ELEM_TYPE_IMAGE));
+    final List<V2TimMessage> videoMsgs = List.from(model
+        .multiSelectedMessageList
+        .where((msg) => msg.elemType == MessageElemType.V2TIM_ELEM_TYPE_VIDEO));
+    if (imgMsgs.isEmpty && videoMsgs.isEmpty) {
+      onTIMCallback(
+        TIMCallback(
+          type: TIMCallbackType.INFO,
+          infoRecommendText: '只可下载图片及视频',
+        ),
+      );
+      Navigator.of(context).pop();
+      return;
+    }
+
+    try {
+      for (var msg in imgMsgs) {
+        await MediaDownloadUtil.of.saveImg(
+          context,
+          theme,
+          cusMsg: msg,
+          showSuccessTip: false,
+        );
+      }
+
+      for (var msg in videoMsgs) {
+        if (msg.videoElem != null) {
+          await MediaDownloadUtil.of.saveVideo(
+            context,
+            videoElement: msg.videoElem!,
+            message: msg,
+            showSuccessTip: false,
+          );
+        }
+      }
+
+      Navigator.of(context).pop();
+
+      onTIMCallback(
+        TIMCallback(
+          type: TIMCallbackType.INFO,
+          infoRecommendText: TIM_t("下载成功"),
+        ),
+      );
+    } catch (e) {
+      Navigator.of(context).pop();
+    }
   }
 
   @override
@@ -98,7 +168,7 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
           children: [
             Expanded(
                 child: Wrap(
-                  crossAxisAlignment: WrapCrossAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
               alignment: WrapAlignment.center,
               spacing: 64,
               children: [
@@ -131,8 +201,8 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
                     ),
                     Text(
                       TIM_t("合并转发"),
-                      style:
-                          TextStyle(color: theme.selectPanelTextIconColor, fontSize: 12),
+                      style: TextStyle(
+                          color: theme.selectPanelTextIconColor, fontSize: 12),
                     )
                   ],
                 ),
@@ -145,7 +215,8 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
                       iconSize: 30,
                       onPressed: () {
                         TUIKitWidePopup.showSecondaryConfirmDialog(
-                            operationKey: TUIKitWideModalOperationKey.confirmDeleteMessages,
+                            operationKey: TUIKitWideModalOperationKey
+                                .confirmDeleteMessages,
                             context: context,
                             text: TIM_t("确定删除已选消息"),
                             theme: theme,
@@ -158,14 +229,18 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
                     ),
                     Text(TIM_t("删除"),
                         style: TextStyle(
-                            color: theme.selectPanelTextIconColor, fontSize: 12))
+                            color: theme.selectPanelTextIconColor,
+                            fontSize: 12))
                   ],
                 ),
                 InkWell(
-                  onTap: (){
+                  onTap: () {
                     model.updateMultiSelectStatus(false);
                   },
-                  child: Icon(Icons.close, color: theme.darkTextColor,),
+                  child: Icon(
+                    Icons.close,
+                    color: theme.darkTextColor,
+                  ),
                 )
               ],
             ))
@@ -176,8 +251,8 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
         decoration: BoxDecoration(
           border: Border(
               top: BorderSide(
-                  color: theme.weakDividerColor ??
-                      CommonColor.weakDividerColor)),
+                  color:
+                      theme.weakDividerColor ?? CommonColor.weakDividerColor)),
           color: theme.selectPanelBgColor ?? theme.primaryColor,
         ),
         padding: const EdgeInsets.only(top: 12, bottom: 48),
@@ -188,21 +263,24 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
               children: [
                 IconButton(
                   icon: Image.asset('images/forward.png',
-                      package: 'tencent_cloud_chat_uikit', color: theme.selectPanelTextIconColor),
+                      package: 'tencent_cloud_chat_uikit',
+                      color: theme.selectPanelTextIconColor),
                   iconSize: 40,
                   onPressed: () {
                     _handleForwardMessage(context, false, model);
                   },
                 ),
                 Text(TIM_t("逐条转发"),
-                    style: TextStyle(color: theme.selectPanelTextIconColor, fontSize: 12))
+                    style: TextStyle(
+                        color: theme.selectPanelTextIconColor, fontSize: 12))
               ],
             ),
             Column(
               children: [
                 IconButton(
                   icon: Image.asset('images/merge_forward.png',
-                      package: 'tencent_cloud_chat_uikit', color: theme.selectPanelTextIconColor),
+                      package: 'tencent_cloud_chat_uikit',
+                      color: theme.selectPanelTextIconColor),
                   iconSize: 40,
                   onPressed: () {
                     _handleForwardMessage(context, true, model);
@@ -210,7 +288,8 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
                 ),
                 Text(
                   TIM_t("合并转发"),
-                  style: TextStyle(color: theme.selectPanelTextIconColor, fontSize: 12),
+                  style: TextStyle(
+                      color: theme.selectPanelTextIconColor, fontSize: 12),
                 )
               ],
             ),
@@ -218,7 +297,8 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
               children: [
                 IconButton(
                   icon: Image.asset('images/delete.png',
-                      package: 'tencent_cloud_chat_uikit', color: theme.selectPanelTextIconColor),
+                      package: 'tencent_cloud_chat_uikit',
+                      color: theme.selectPanelTextIconColor),
                   iconSize: 40,
                   onPressed: () {
                     showCupertinoModalPopup<String>(
@@ -259,9 +339,30 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
                   },
                 ),
                 Text(TIM_t("删除"),
-                    style: TextStyle(color: theme.selectPanelTextIconColor, fontSize: 12))
+                    style: TextStyle(
+                        color: theme.selectPanelTextIconColor, fontSize: 12))
               ],
-            )
+            ),
+            Column(
+              children: [
+                IconButton(
+                  icon: Image.asset(
+                    'images/multi_select_download.png',
+                    package: 'tencent_cloud_chat_uikit',
+                    color: theme.selectPanelTextIconColor,
+                  ),
+                  iconSize: 40,
+                  onPressed: () {
+                    _downMedia(context, model, theme);
+                  },
+                ),
+                Text(
+                  TIM_t("下载"),
+                  style: TextStyle(
+                      color: theme.selectPanelTextIconColor, fontSize: 12),
+                )
+              ],
+            ),
           ],
         ),
       ),
