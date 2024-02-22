@@ -103,7 +103,7 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
       onTIMCallback(
         TIMCallback(
           type: TIMCallbackType.INFO,
-          infoRecommendText: '只可下载图片及视频',
+          infoRecommendText: 'Only pictures and videos can be downloaded',
         ),
       );
       Navigator.of(context).pop();
@@ -136,7 +136,7 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
       onTIMCallback(
         TIMCallback(
           type: TIMCallbackType.INFO,
-          infoRecommendText: TIM_t("下载成功"),
+          infoRecommendText: TIM_t("Download successfully"),
         ),
       );
     } catch (e) {
