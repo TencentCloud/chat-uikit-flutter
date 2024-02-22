@@ -13,7 +13,7 @@ class MediaBrowser {
     required String? userID,
     required String? groupID,
     required String? isFrom,
-    ValueChanged<String>? onDownloadFile,
+    ValueChanged<String>? onDownloadVideo,
     ValueChanged<V2TimMessage>? onImgLongPress,
     ValueChanged<V2TimMessage>? onDownloadImage,
   }) {
@@ -25,7 +25,7 @@ class MediaBrowser {
           userID: userID,
           groupID: groupID,
           isFrom: isFrom,
-          onDownloadFile: onDownloadFile,
+          onDownloadVideo: onDownloadVideo,
           onImgLongPress: onImgLongPress,
           onDownloadImage: onDownloadImage,
         ),

@@ -25,6 +25,7 @@ import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/media_download_util.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
@@ -125,186 +126,16 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     return res;
   }
 
-  //保存网络图片到本地
-  Future<void> _saveImageToLocal(
-    context,
-    String imageUrl, {
-    bool isLocalResource = true,
-    TUITheme? theme,
-    required V2TimMessage message,
-  }) async {
-    if (PlatformUtils().isWeb) {
-      download(imageUrl) async {
-        final http.Response r = await http.get(Uri.parse(imageUrl));
-        final data = r.bodyBytes;
-        final base64data = base64Encode(data);
-        final a =
-            html.AnchorElement(href: 'data:image/jpeg;base64,$base64data');
-        a.download = md5.convert(utf8.encode(imageUrl)).toString();
-        a.click();
-        a.remove();
-      }
-
-      download(imageUrl);
-      return;
-    }
-
-    if (PlatformUtils().isIOS) {
-      if (!await Permissions.checkPermission(
-          context, Permission.photosAddOnly.value, theme!, false)) {
-        return;
-      }
-    } else {
-      final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      if (PlatformUtils().isMobile) {
-        if ((androidInfo.version.sdkInt) >= 33) {
-          final photos = await Permissions.checkPermission(
-            context,
-            Permission.photos.value,
-            theme,
-          );
-          if (!photos) {
-            return;
-          }
-        } else {
-          final storage = await Permissions.checkPermission(
-            context,
-            Permission.storage.value,
-          );
-          if (!storage) {
-            return;
-          }
-        }
-      }
-    }
-
-    if (!isLocalResource) {
-      if (message.msgID == null || message.msgID!.isEmpty) {
-        return;
-      }
-
-      if (model.getMessageProgress(message.msgID) == 100) {
-        String savePath;
-        if (message.imageElem!.path != null && message.imageElem!.path != '') {
-          savePath = message.imageElem!.path!;
-        } else {
-          savePath = model.getFileMessageLocation(message.msgID);
-        }
-        File f = File(savePath);
-        if (f.existsSync()) {
-          var result = await ImageGallerySaver.saveFile(savePath);
-
-          if (PlatformUtils().isIOS) {
-            if (result['isSuccess']) {
-              onTIMCallback(TIMCallback(
-                  type: TIMCallbackType.INFO,
-                  infoRecommendText: TIM_t("图片保存成功"),
-                  infoCode: 6660406));
-            } else {
-              onTIMCallback(TIMCallback(
-                  type: TIMCallbackType.INFO,
-                  infoRecommendText: TIM_t("图片保存失败"),
-                  infoCode: 6660407));
-            }
-          } else {
-            if (result != null) {
-              onTIMCallback(TIMCallback(
-                  type: TIMCallbackType.INFO,
-                  infoRecommendText: TIM_t("图片保存成功"),
-                  infoCode: 6660406));
-            } else {
-              onTIMCallback(TIMCallback(
-                  type: TIMCallbackType.INFO,
-                  infoRecommendText: TIM_t("图片保存失败"),
-                  infoCode: 6660407));
-            }
-          }
-          return;
-        }
-      } else {
-        onTIMCallback(TIMCallback(
-            type: TIMCallbackType.INFO,
-            infoRecommendText: TIM_t("the message is downloading"),
-            infoCode: -1));
-      }
-      return;
-    }
-
-    var result = await ImageGallerySaver.saveFile(imageUrl);
-
-    if (PlatformUtils().isIOS) {
-      if (result['isSuccess']) {
-        onTIMCallback(TIMCallback(
-            type: TIMCallbackType.INFO,
-            infoRecommendText: TIM_t("图片保存成功"),
-            infoCode: 6660406));
-      } else {
-        onTIMCallback(TIMCallback(
-            type: TIMCallbackType.INFO,
-            infoRecommendText: TIM_t("图片保存失败"),
-            infoCode: 6660407));
-      }
-    } else {
-      if (result != null) {
-        onTIMCallback(TIMCallback(
-            type: TIMCallbackType.INFO,
-            infoRecommendText: TIM_t("图片保存成功"),
-            infoCode: 6660406));
-      } else {
-        onTIMCallback(TIMCallback(
-            type: TIMCallbackType.INFO,
-            infoRecommendText: TIM_t("图片保存失败"),
-            infoCode: 6660407));
-      }
-    }
-    return;
-  }
-
   Future<void> _saveImg(
     TUITheme theme, {
     V2TimMessage? cusMsg,
   }) async {
-    try {
-      String? imageUrl;
-      bool isAssetBool = false;
-      final imageElem = (cusMsg ?? widget.message).imageElem;
-
-      if (imageElem != null) {
-        final originUrl = getOriginImgURLOf(cusMsg ?? widget.message);
-        final localUrl = imageElem.imageList?.firstOrNull?.localUrl;
-        final filePath = imageElem.path;
-        final isWeb = PlatformUtils().isWeb;
-
-        if (!isWeb && filePath != null && File(filePath).existsSync()) {
-          imageUrl = filePath;
-          isAssetBool = true;
-        } else if (localUrl != null &&
-            (!isWeb && File(localUrl).existsSync())) {
-          imageUrl = localUrl;
-          isAssetBool = true;
-        } else {
-          imageUrl = originUrl;
-          isAssetBool = false;
-        }
-      }
-
-      if (imageUrl != null) {
-        return await _saveImageToLocal(
-          context,
-          imageUrl,
-          isLocalResource: isAssetBool,
-          theme: theme,
-          message: cusMsg ?? widget.message,
-        );
-      }
-    } catch (e) {
-      onTIMCallback(TIMCallback(
-          infoCode: 6660414,
-          infoRecommendText: TIM_t("正在下载中"),
-          type: TIMCallbackType.INFO));
-      return;
-    }
+    return MediaDownloadUtil.of.saveImg(
+      context,
+      theme,
+      cusMsg: cusMsg,
+      message: widget.message,
+    );
   }
 
   V2TimImage? getImageFromList(V2TimImageTypesEnum imgType) {

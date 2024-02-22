@@ -17,7 +17,7 @@ import 'video_custom_controls.dart';
 class IMMediaMsgBrowser extends StatefulWidget {
   const IMMediaMsgBrowser({
     super.key,
-    this.onDownloadFile,
+    this.onDownloadVideo,
     this.onImgLongPress,
     required this.curMsg,
     this.isFrom,
@@ -30,7 +30,7 @@ class IMMediaMsgBrowser extends StatefulWidget {
   final String? isFrom;
   final String? userID;
   final String? groupID;
-  final ValueChanged<String>? onDownloadFile;
+  final ValueChanged<String>? onDownloadVideo;
   final ValueChanged<V2TimMessage>? onImgLongPress;
   final ValueChanged<V2TimMessage>? onDownloadImage;
 
@@ -450,7 +450,7 @@ extension _IMMediaMsgBrowserStatePrivate on IMMediaMsgBrowserState {
             showControlsOnInitialize: false,
             allowPlaybackSpeedChanging: false,
             customControls: VideoCustomControls(
-              downloadFn: () async => widget.onDownloadFile?.call(url),
+              downloadFn: () async => widget.onDownloadVideo?.call(url),
             ),
           );
           _safeSetState(
