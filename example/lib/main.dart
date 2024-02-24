@@ -5,10 +5,13 @@ import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'TIMUIKitAddFriendExample.dart';
 import 'TIMUIKitAddGroupExample.dart';
 import 'TIMUIKitBlackListExample.dart';
+import 'TIMUIKitChatExample.dart';
 import 'TIMUIKitContactExample.dart';
+import 'TIMUIKitConversationExample.dart';
 import 'TIMUIKitGroupExample.dart';
 import 'TIMUIKitGroupProfileExample.dart';
 import 'TIMUIKitNewContactExample.dart';
+import 'TIMUIKitProfileExample.dart';
 import 'TIMUIKitSearchExample.dart';
 
 void main() {

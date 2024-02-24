@@ -17,6 +17,9 @@ import 'package:tencent_cloud_chat_uikit/ui/utils/sound_record.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 
+/// 内容构建器
+typedef SoundBuilderCallback = Widget Function(BuildContext context, bool isRecording);
+
 class SendSoundMessage extends StatefulWidget {
   /// conversation ID
   final String conversationID;
@@ -27,11 +30,15 @@ class SendSoundMessage extends StatefulWidget {
   /// the conversation type
   final ConvType conversationType;
 
+  /// 构建器
+  final SoundBuilderCallback? builder;
+
   const SendSoundMessage(
       {required this.conversationID,
       required this.conversationType,
       Key? key,
-      required this.onDownBottom})
+      required this.onDownBottom,
+      this.builder})
       : super(key: key);
 
   @override
@@ -301,7 +308,7 @@ class _SendSoundMessageState extends TIMUIKitState<SendSoundMessage> {
       onLongPressMoveUpdate: onLongPressUpdate,
       onLongPressEnd: onLongPressEnd,
       onLongPressCancel: onLonePressCancel,
-      child: Container(
+      child: widget.builder != null ? widget.builder!(context, isRecording) : Container(
         height: 35,
         color: isRecording ? theme.weakBackgroundColor : Colors.white,
         alignment: Alignment.center,

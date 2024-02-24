@@ -66,6 +66,9 @@ class TIMUIKitConversation extends StatefulWidget {
   /// Control if shows the identifier that the conversation has a draft text, inputted in previous.
   final bool isShowDraft;
 
+  /// 自定义分割线样式
+  final IndexedWidgetBuilder? separatorBuilder;
+
   const TIMUIKitConversation(
       {Key? key,
       this.lifeCycle,
@@ -78,7 +81,8 @@ class TIMUIKitConversation extends StatefulWidget {
       this.conversationCollector,
       this.emptyBuilder,
       this.lastMessageBuilder,
-      this.isShowOnlineStatus = true})
+      this.isShowOnlineStatus = true,
+      this.separatorBuilder})
       : super(key: key);
 
   @override
@@ -335,10 +339,11 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
 
           Widget conversationList() {
             return filteredConversationList.isNotEmpty
-                ? ListView.builder(
+                ? ListView.separated(
                     controller: _autoScrollController,
                     shrinkWrap: true,
                     itemCount: filteredConversationList.length,
+                    separatorBuilder: widget.separatorBuilder ?? (context,index) => Container(height: 1,color: theme.conversationItemBorderColor ?? CommonColor.weakDividerColor),
                     itemBuilder: (context, index) {
                       if (index == filteredConversationList.length - 1) {
                         if (haveMoreData) {
@@ -379,7 +384,7 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
                                 isShowDraft: widget.isShowDraft,
                                 lastMessageBuilder: widget.lastMessageBuilder,
                                 faceUrl: conversationItem.faceUrl ?? "",
-                                nickName: conversationItem.showName ?? "",
+                                nickName: Text(conversationItem.showName ?? ""),
                                 isDisturb: conversationItem.recvOpt != 0,
                                 lastMsg: conversationItem.lastMessage,
                                 isPined: isPined,

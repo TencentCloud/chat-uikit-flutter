@@ -237,10 +237,10 @@ packages:
     dependency: transitive
     description:
       name: dart_internal
-      sha256: "689dccc3d5f62affd339534cca548dce12b3a6b32f0f10861569d3025efc0567"
+      sha256: "04145b91ccec450325fee75692b1ab62eb615e8892c334f0f4d31c696a857873"
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.9"
+    version: "0.2.10"
   desktop_drop:
     dependency: transitive
     description:
@@ -301,10 +301,10 @@ packages:
     dependency: transitive
     description:
       name: extended_text
-      sha256: "7096a1e9a029534257d70f7dafb2798f932d589079e67ef3f58fdf0805f2f627"
+      sha256: "4a7b0338de2a72f690925381ec5f515ca425c011c269971406db1a038fd108fc"
       url: "https://pub.dev"
     source: hosted
-    version: "12.0.0"
+    version: "12.0.1"
   extended_text_field:
     dependency: transitive
     description:
@@ -1581,5 +1581,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.2.0 <3.3.0"
+  dart: ">=3.2.0 <3.4.0"
   flutter: ">=3.16.0"

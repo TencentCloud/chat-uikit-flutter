@@ -94,6 +94,24 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
 
   final List<CustomStickerPackage> stickerPackageList;
 
+  /// 图标颜色
+  final Color? iconColor;
+
+  /// 语音组件构建器
+  final SoundBuilderCallback? soundBuilder;
+
+  /// 自定义输入框的 Decoration
+  final InputDecoration? inputDecoration;
+
+  /// 表情面板背景颜色
+  final Color? stickerPanelBackgroundColor;
+
+  /// 表情面板内边距
+  final EdgeInsetsGeometry? stickerPanelPadding;
+
+  /// 更多面板边框
+  final BoxBorder? morePanelBorder;
+
   const TIMUIKitTextFieldLayoutNarrow(
       {Key? key,
       this.customStickerPanel,
@@ -127,7 +145,13 @@ class TIMUIKitTextFieldLayoutNarrow extends StatefulWidget {
       this.hintText,
       required this.customEmojiStickerList,
       this.controller,
-      required this.stickerPackageList})
+      required this.stickerPackageList,
+      this.iconColor,
+      this.soundBuilder,
+      this.inputDecoration,
+      this.stickerPanelBackgroundColor,
+      this.stickerPanelPadding,
+      this.morePanelBorder})
       : super(key: key);
 
   @override
@@ -217,6 +241,8 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
               }),
               defaultCustomEmojiStickerList: widget.isUseDefaultEmoji ? TUIKitStickerConstData.emojiList : [])
           : StickerPanel(
+              backgroundColor: widget.stickerPanelBackgroundColor,
+              panelPadding: widget.stickerPanelPadding,
               isWideScreen: false,
               sendTextMsg: () {
                 widget.onEmojiSubmitted();
@@ -247,7 +273,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
     }
 
     if (showMore) {
-      return MorePanel(morePanelConfig: widget.morePanelConfig, conversationID: widget.conversationID, conversationType: widget.conversationType);
+      return MorePanel(border: widget.morePanelBorder, morePanelConfig: widget.morePanelConfig, conversationID: widget.conversationID, conversationType: widget.conversationType);
     }
 
     return const SizedBox(height: 0);
@@ -450,7 +476,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                         child: SvgPicture.asset(
                           showSendSoundText ? 'images/keyboard.svg' : 'images/voice.svg',
                           package: 'tencent_cloud_chat_uikit',
-                          color: const Color.fromRGBO(68, 68, 68, 1),
+                          color: widget.iconColor ?? const Color.fromRGBO(68, 68, 68, 1),
                           height: 28,
                           width: 28,
                         ),
@@ -462,7 +488,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                     if (widget.forbiddenText == null)
                       Expanded(
                         child: showSendSoundText
-                            ? SendSoundMessage(onDownBottom: widget.goDownBottom, conversationID: widget.conversationID, conversationType: widget.conversationType)
+                            ? SendSoundMessage(builder:widget.soundBuilder, onDownBottom: widget.goDownBottom, conversationID: widget.conversationID, conversationType: widget.conversationType)
                             : KeyboardVisibility(
                                 child: ExtendedTextField(
                                     maxLines: 4,
@@ -491,7 +517,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                                       });
                                     },
                                     textAlignVertical: TextAlignVertical.top,
-                                    decoration: InputDecoration(
+                                    decoration: widget.inputDecoration ?? InputDecoration(
                                         border: InputBorder.none,
                                         hintStyle: const TextStyle(
                                           // fontSize: 10,
@@ -533,7 +559,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                             : SvgPicture.asset(
                                 showEmojiPanel ? 'images/keyboard.svg' : 'images/face.svg',
                                 package: 'tencent_cloud_chat_uikit',
-                                color: const Color.fromRGBO(68, 68, 68, 1),
+                                color: widget.iconColor ?? const Color.fromRGBO(68, 68, 68, 1),
                                 height: 28,
                                 width: 28,
                               ),
@@ -554,7 +580,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                             : SvgPicture.asset(
                                 'images/add.svg',
                                 package: 'tencent_cloud_chat_uikit',
-                                color: const Color.fromRGBO(68, 68, 68, 1),
+                                color: widget.iconColor ?? const Color.fromRGBO(68, 68, 68, 1),
                                 height: 28,
                                 width: 28,
                               ),
