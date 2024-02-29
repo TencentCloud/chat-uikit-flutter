@@ -752,6 +752,8 @@ class _TIMUIKItHistoryMessageListItemState
   bool isRevocable(int timestamp) =>
       (DateTime.now().millisecondsSinceEpoch / 1000).ceil() - timestamp < 120;
 
+  // TODO : 继续看这里
+
   _onOpenToolTip(
     c,
     V2TimMessage message,
