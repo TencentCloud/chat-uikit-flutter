@@ -239,6 +239,8 @@ class _ImageScreenState extends TIMUIKitState<ImageScreen>
                     icon: Image.asset(
                       'images/close.png',
                       package: 'tencent_cloud_chat_uikit',
+                      width: 30,
+                      height: 30,
                     ),
                     iconSize: 30,
                     onPressed: close,
@@ -251,6 +253,8 @@ class _ImageScreenState extends TIMUIKitState<ImageScreen>
                     icon: Image.asset(
                       'images/download.png',
                       package: 'tencent_cloud_chat_uikit',
+                      width: 30,
+                      height: 30,
                     ),
                     iconSize: 30,
                     onPressed: () async {

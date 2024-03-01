@@ -51,3 +51,12 @@ fork来源：https://github.com/TencentCloud/chat-uikit-flutter
 
 ### [tim_uikit_more_panel.dart](lib%2Fui%2Fviews%2FTIMUIKitChat%2FTIMUIKitTextField%2Ftim_uikit_more_panel.dart)
 * feat 增加参数：`border`，可由用户自定义边框
+
+### [tim_uikit_multi_select_panel.dart](lib%2Fui%2Fviews%2FTIMUIKitChat%2Ftim_uikit_multi_select_panel.dart)
+* fix 修复image图片大小设置不生效的问题：引用: [https://github.com/flutter/flutter/issues/137580](https://github.com/flutter/flutter/issues/137580)
+
+### [image_screen.dart](lib%2Fui%2Fwidgets%2Fimage_screen.dart)
+* fix 修复image图片大小设置不生效的问题：引用: [https://github.com/flutter/flutter/issues/137580](https://github.com/flutter/flutter/issues/137580)
+
+### [center_play_button.dart](lib%2Fui%2Fwidgets%2Fcenter_play_button.dart)[image_screen.dart](lib%2Fui%2Fwidgets%2Fimage_screen.dart)
+* fix 修复image图片大小设置不生效的问题：引用: [https://github.com/flutter/flutter/issues/137580](https://github.com/flutter/flutter/issues/137580)
