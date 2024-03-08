@@ -1,3 +1,9 @@
+# 2.5.1
+
+## Improvements
+
+* Improved memory usage, enhancing performance.
+
 # 2.5.0
 
 ## Breaking Changes

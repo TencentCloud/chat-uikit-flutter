@@ -1,8 +1,6 @@
 // ignore_for_file: unnecessary_getters_setters, avoid_print
 
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/group_profile_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/conversation/conversation_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
@@ -10,15 +8,15 @@ import 'package:tencent_cloud_chat_uikit/data_services/friendShip/friendship_ser
 import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
+import 'package:tencent_im_base/tencent_im_base.dart';
 
 class TUIGroupProfileModel extends ChangeNotifier {
   final CoreServicesImpl _coreServices = serviceLocator<CoreServicesImpl>();
   final GroupServices _groupServices = serviceLocator<GroupServices>();
-  final ConversationService _conversationService =
-      serviceLocator<ConversationService>();
+  final ConversationService _conversationService = serviceLocator<ConversationService>();
   final MessageService _messageService = serviceLocator<MessageService>();
-  final FriendshipServices _friendshipServices =
-      serviceLocator<FriendshipServices>();
+  final FriendshipServices _friendshipServices = serviceLocator<FriendshipServices>();
   GroupProfileLifeCycle? _lifeCycle;
 
   V2TimConversation? _conversation;
@@ -74,8 +72,7 @@ class TUIGroupProfileModel extends ChangeNotifier {
   }
 
   loadGroupInfo(String groupID) async {
-    final groupInfo =
-        await _groupServices.getGroupsInfo(groupIDList: [groupID]);
+    final groupInfo = await _groupServices.getGroupsInfo(groupIDList: [groupID]);
     if (groupInfo != null) {
       final groupRes = groupInfo.first;
       if (groupRes.resultCode == 0) {
@@ -85,34 +82,25 @@ class TUIGroupProfileModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> loadGroupMemberList(
-      {required String groupID, int count = 100, String? seq}) async {
-    final String? nextSeq = await _loadGroupMemberListFunction(
-        groupID: groupID, seq: seq, count: count);
+  Future<void> loadGroupMemberList({required String groupID, int count = 100, String? seq}) async {
+    final String? nextSeq = await _loadGroupMemberListFunction(groupID: groupID, seq: seq, count: count);
     if (nextSeq != null && nextSeq != "0" && nextSeq != "") {
-      return await loadGroupMemberList(
-          groupID: groupID, count: count, seq: nextSeq);
+      return await loadGroupMemberList(groupID: groupID, count: count, seq: nextSeq);
     } else {
       notifyListeners();
     }
   }
 
-  Future<String?> _loadGroupMemberListFunction(
-      {required String groupID, int count = 100, String? seq}) async {
+  Future<String?> _loadGroupMemberListFunction({required String groupID, int count = 100, String? seq}) async {
     if (seq == null || seq == "" || seq == "0") {
       _groupMemberList?.clear();
     }
-    final res = await _groupServices.getGroupMemberList(
-        groupID: groupID,
-        filter: GroupMemberFilterTypeEnum.V2TIM_GROUP_MEMBER_FILTER_ALL,
-        count: count,
-        nextSeq: seq ?? _groupMemberListSeq);
+    final res = await _groupServices.getGroupMemberList(groupID: groupID, filter: GroupMemberFilterTypeEnum.V2TIM_GROUP_MEMBER_FILTER_ALL, count: count, nextSeq: seq ?? _groupMemberListSeq);
     final groupMemberListRes = res.data;
     if (res.code == 0 && groupMemberListRes != null) {
       final groupMemberListTemp = groupMemberListRes.memberInfoList ?? [];
       // TODO
-      outputLogger.i(
-          "loadGroupMemberListfinish,groupMemberListTemp, ${groupMemberListRes.nextSeq},  ${groupMemberListTemp.length}");
+      outputLogger.i("loadGroupMemberListfinish,groupMemberListTemp, ${groupMemberListRes.nextSeq},  ${groupMemberListTemp.length}");
       _groupMemberList = [...?_groupMemberList, ...groupMemberListTemp];
       _groupMemberListSeq = groupMemberListRes.nextSeq ?? "0";
     }
@@ -120,8 +108,7 @@ class TUIGroupProfileModel extends ChangeNotifier {
   }
 
   _loadConversation() async {
-    conversation = await _conversationService.getConversation(
-        conversationID: "group_$_groupID");
+    conversation = await _conversationService.getConversation(conversationID: "group_$_groupID");
   }
 
   _loadContactList() async {
@@ -130,31 +117,21 @@ class TUIGroupProfileModel extends ChangeNotifier {
   }
 
   pinedConversation(bool isPined) async {
-    await _conversationService.pinConversation(
-        conversationID: "group_$_groupID", isPinned: isPined);
+    await _conversationService.pinConversation(conversationID: "group_$_groupID", isPinned: isPined);
     conversation?.isPinned = isPined;
     notifyListeners();
   }
 
   setMessageDisturb(bool value) async {
-    final res = await _messageService.setGroupReceiveMessageOpt(
-        groupID: _groupID,
-        opt: value
-            ? ReceiveMsgOptEnum.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE
-            : ReceiveMsgOptEnum.V2TIM_RECEIVE_MESSAGE);
+    final res = await _messageService.setGroupReceiveMessageOpt(groupID: _groupID, opt: value ? ReceiveMsgOptEnum.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE : ReceiveMsgOptEnum.V2TIM_RECEIVE_MESSAGE);
     if (res.code == 0) {
-      conversation?.recvOpt = (value
-              ? ReceiveMsgOptEnum.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE
-              : ReceiveMsgOptEnum.V2TIM_RECEIVE_MESSAGE)
-          .index;
+      conversation?.recvOpt = (value ? ReceiveMsgOptEnum.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE : ReceiveMsgOptEnum.V2TIM_RECEIVE_MESSAGE).index;
     }
     notifyListeners();
   }
 
-  Future<V2TimValueCallback<V2GroupMemberInfoSearchResult>> searchGroupMember(
-      V2TimGroupMemberSearchParam searchParam) async {
-    final res =
-        await _groupServices.searchGroupMembers(searchParam: searchParam);
+  Future<V2TimValueCallback<V2GroupMemberInfoSearchResult>> searchGroupMember(V2TimGroupMemberSearchParam searchParam) async {
+    final res = await _groupServices.searchGroupMembers(searchParam: searchParam);
 
     if (res.code == 0) {}
     return res;
@@ -164,12 +141,7 @@ class TUIGroupProfileModel extends ChangeNotifier {
     if (_groupInfo != null) {
       String? originalGroupName = _groupInfo?.groupName;
       _groupInfo?.groupName = groupName;
-      final response = await _groupServices.setGroupInfo(
-          info: V2TimGroupInfo.fromJson({
-        "groupID": _groupID,
-        "groupType": _groupInfo!.groupType,
-        "groupName": groupName
-      }));
+      final response = await _groupServices.setGroupInfo(info: V2TimGroupInfo.fromJson({"groupID": _groupID, "groupType": _groupInfo!.groupType, "groupName": groupName}));
       if (response.code != 0) {
         _groupInfo?.groupName = originalGroupName;
       }
@@ -181,12 +153,7 @@ class TUIGroupProfileModel extends ChangeNotifier {
 
   setGroupNotification(String notification) async {
     if (_groupInfo != null) {
-      final response = await _groupServices.setGroupInfo(
-          info: V2TimGroupInfo.fromJson({
-        "groupID": _groupID,
-        "groupType": _groupInfo!.groupType,
-        "notification": notification
-      }));
+      final response = await _groupServices.setGroupInfo(info: V2TimGroupInfo.fromJson({"groupID": _groupID, "groupType": _groupInfo!.groupType, "notification": notification}));
       if (response.code == 0) {
         notifyListeners();
         _groupInfo?.notification = notification;
@@ -199,10 +166,7 @@ class TUIGroupProfileModel extends ChangeNotifier {
       final loginUserID = _coreServices.loginUserInfo?.userID;
       String nameCard = "";
       if (_groupMemberList != null) {
-        nameCard = groupMemberList
-                .firstWhere((element) => element?.userID == loginUserID)
-                ?.nameCard ??
-            "";
+        nameCard = groupMemberList.firstWhere((element) => element?.userID == loginUserID)?.nameCard ?? "";
       }
 
       return nameCard;
@@ -214,11 +178,9 @@ class TUIGroupProfileModel extends ChangeNotifier {
   Future<V2TimCallback?> setNameCard(String nameCard) async {
     final loginUserID = _coreServices.loginUserInfo?.userID;
     if (loginUserID != null) {
-      final res = await _groupServices.setGroupMemberInfo(
-          groupID: _groupID, userID: loginUserID, nameCard: nameCard);
+      final res = await _groupServices.setGroupMemberInfo(groupID: _groupID, userID: loginUserID, nameCard: nameCard);
       if (res.code == 0) {
-        final targetIndex = _groupMemberList
-            ?.indexWhere((element) => element?.userID == loginUserID);
+        final targetIndex = _groupMemberList?.indexWhere((element) => element?.userID == loginUserID);
         if (targetIndex != -1) {
           _groupMemberList![targetIndex!]!.nameCard = nameCard;
           notifyListeners();
@@ -233,12 +195,7 @@ class TUIGroupProfileModel extends ChangeNotifier {
     if (_groupInfo != null) {
       int? originalAddopt = _groupInfo?.groupAddOpt;
       _groupInfo?.groupAddOpt = addOpt;
-      final response = await _groupServices.setGroupInfo(
-          info: V2TimGroupInfo.fromJson({
-        "groupID": _groupID,
-        "groupType": _groupInfo!.groupType,
-        "groupAddOpt": addOpt
-      }));
+      final response = await _groupServices.setGroupInfo(info: V2TimGroupInfo.fromJson({"groupID": _groupID, "groupType": _groupInfo!.groupType, "groupAddOpt": addOpt}));
       if (response.code != 0) {
         _groupInfo?.groupAddOpt = originalAddopt;
       }
@@ -249,13 +206,9 @@ class TUIGroupProfileModel extends ChangeNotifier {
   }
 
   Future<V2TimCallback> setMemberToNormal(String userID) async {
-    final res = await _groupServices.setGroupMemberRole(
-        groupID: _groupID,
-        userID: userID,
-        role: GroupMemberRoleTypeEnum.V2TIM_GROUP_MEMBER_ROLE_MEMBER);
+    final res = await _groupServices.setGroupMemberRole(groupID: _groupID, userID: userID, role: GroupMemberRoleTypeEnum.V2TIM_GROUP_MEMBER_ROLE_MEMBER);
     if (res.code == 0) {
-      final targetIndex =
-          _groupMemberList!.indexWhere((e) => e!.userID == userID);
+      final targetIndex = _groupMemberList!.indexWhere((e) => e!.userID == userID);
       if (targetIndex != -1) {
         final targetElem = _groupMemberList![targetIndex];
         targetElem?.role = GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_MEMBER;
@@ -267,13 +220,9 @@ class TUIGroupProfileModel extends ChangeNotifier {
   }
 
   Future<V2TimCallback> setMemberToAdmin(String userID) async {
-    final res = await _groupServices.setGroupMemberRole(
-        groupID: _groupID,
-        userID: userID,
-        role: GroupMemberRoleTypeEnum.V2TIM_GROUP_MEMBER_ROLE_ADMIN);
+    final res = await _groupServices.setGroupMemberRole(groupID: _groupID, userID: userID, role: GroupMemberRoleTypeEnum.V2TIM_GROUP_MEMBER_ROLE_ADMIN);
     if (res.code == 0) {
-      final targetIndex =
-          _groupMemberList!.indexWhere((e) => e!.userID == userID);
+      final targetIndex = _groupMemberList!.indexWhere((e) => e!.userID == userID);
       if (targetIndex != -1) {
         final targetElem = _groupMemberList![targetIndex];
         targetElem?.role = GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN;
@@ -286,21 +235,18 @@ class TUIGroupProfileModel extends ChangeNotifier {
 
   bool canInviteMember() {
     final groupType = _groupInfo?.groupType;
-    return groupType == GroupType.Work;
+    return groupType == GroupType.Work || groupType == "Private";
   }
 
   bool canKickOffMember() {
-    final isGroupOwner =
-        _groupInfo?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER;
-    final isAdmin =
-        _groupInfo?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN;
+    final isGroupOwner = _groupInfo?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER;
+    final isAdmin = _groupInfo?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN;
     if (_groupInfo?.groupType == GroupType.Work) {
       /// work 群主才能踢人
       return isGroupOwner;
     }
 
-    if (_groupInfo?.groupType == GroupType.Public ||
-        _groupInfo?.groupType == GroupType.Meeting) {
+    if (_groupInfo?.groupType == GroupType.Public || _groupInfo?.groupType == GroupType.Meeting) {
       /// public || meeting 群主和管理员可以踢人
       return isGroupOwner || isAdmin;
     }
@@ -311,12 +257,7 @@ class TUIGroupProfileModel extends ChangeNotifier {
   Future<V2TimCallback?> setMuteAll(bool muteAll) async {
     if (_groupInfo != null) {
       _groupInfo?.isAllMuted = muteAll;
-      final response = await _groupServices.setGroupInfo(
-          info: V2TimGroupInfo.fromJson({
-        "groupID": _groupInfo!.groupID,
-        "groupType": _groupInfo!.groupType,
-        "isAllMuted": muteAll
-      }));
+      final response = await _groupServices.setGroupInfo(info: V2TimGroupInfo.fromJson({"groupID": _groupInfo!.groupID, "groupType": _groupInfo!.groupType, "isAllMuted": muteAll}));
       if (response.code != 0) {
         _groupInfo?.isAllMuted = muteAll;
       }
@@ -326,14 +267,11 @@ class TUIGroupProfileModel extends ChangeNotifier {
     return null;
   }
 
-  Future<V2TimCallback?> muteGroupMember(
-      String userID, bool isMute, int? serverTime) async {
+  Future<V2TimCallback?> muteGroupMember(String userID, bool isMute, int? serverTime) async {
     const muteTime = 315360000;
-    final res = await _groupServices.muteGroupMember(
-        groupID: _groupID, userID: userID, seconds: isMute ? muteTime : 0);
+    final res = await _groupServices.muteGroupMember(groupID: _groupID, userID: userID, seconds: isMute ? muteTime : 0);
     if (res.code == 0) {
-      final targetIndex =
-          _groupMemberList!.indexWhere((e) => e!.userID == userID);
+      final targetIndex = _groupMemberList!.indexWhere((e) => e!.userID == userID);
       if (targetIndex != -1) {
         final targetElem = _groupMemberList![targetIndex];
         targetElem?.muteUntil = isMute ? (serverTime ?? 0) + muteTime : 0;
@@ -345,15 +283,12 @@ class TUIGroupProfileModel extends ChangeNotifier {
   }
 
   Future<V2TimCallback> kickOffMember(List<String> userIDs) async {
-    final res = await _groupServices.kickGroupMember(
-        groupID: _groupID, memberList: userIDs);
+    final res = await _groupServices.kickGroupMember(groupID: _groupID, memberList: userIDs);
     return res;
   }
 
-  Future<V2TimValueCallback<List<V2TimGroupMemberOperationResult>>>
-      inviteUserToGroup(List<String> userIDS) async {
-    final res = await _groupServices.inviteUserToGroup(
-        groupID: _groupID, userList: userIDS);
+  Future<V2TimValueCallback<List<V2TimGroupMemberOperationResult>>> inviteUserToGroup(List<String> userIDS) async {
+    final res = await _groupServices.inviteUserToGroup(groupID: _groupID, userList: userIDS);
     return res;
   }
 }
