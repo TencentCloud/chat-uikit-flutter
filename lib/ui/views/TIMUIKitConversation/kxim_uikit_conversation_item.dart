@@ -130,7 +130,9 @@ class KXIMUIKitConversationItem extends TIMUIKitStatelessWidget {
         image: skinImage,
         color: isPined
             ? theme.conversationItemPinedBgColor
-            : theme.conversationItemBgColor,
+            : (isCurrent && isDesktopScreen)
+                ? theme.conversationItemActiveBgColor
+                : theme.conversationItemBgColor,
         border: Border(
           bottom: BorderSide(
             color: theme.conversationItemBorderColor ??

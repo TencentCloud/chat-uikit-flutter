@@ -388,6 +388,9 @@ class _KXIMUIKitConversationState extends TIMUIKitState<KXIMUIKitConversation> {
                           groupTag: 'conversation-list',
                           child: InkWell(
                             child: KXIMUIKitConversationItem(
+                                isCurrent: model
+                                        .selectedConversation?.conversationID ==
+                                    conversationItem.conversationID,
                                 isShowDraft: widget.isShowDraft,
                                 cusAvatar: widget.avatarBuilder
                                     ?.call(conversationItem),
