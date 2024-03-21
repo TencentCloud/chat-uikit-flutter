@@ -44,6 +44,17 @@ class SoundPlayer {
     await _audioPlayer.setAudioSource(source);
     await _audioPlayer.play();
   }
+
+  ///  播放本地文件
+  static Future<void> playWithAsset({required String asset}) async {
+    _audioPlayer.stop();
+    if (_soundInterruptListener != null) {
+      _soundInterruptListener!();
+    }
+    await _audioPlayer.setAsset(asset);
+    await _audioPlayer.play();
+  }
+
   // 语音消息连续播放新增逻辑 end
 
   static stop() {
