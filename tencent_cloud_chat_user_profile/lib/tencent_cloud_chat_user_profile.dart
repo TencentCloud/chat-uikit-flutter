@@ -17,12 +17,8 @@ import 'package:tencent_cloud_chat_user_profile/tencent_cloud_chat_user_profile_
 import 'package:tencent_cloud_chat_user_profile/tencent_cloud_chat_user_profile_event_handlers.dart';
 import 'package:tencent_cloud_chat_user_profile/widget/tencent_cloud_chat_user_profile_body.dart';
 
-class TencentCloudChatUserProfile extends TencentCloudChatComponent<
-    TencentCloudChatUserProfileOptions,
-    TencentCloudChatUserProfileConfig,
-    TencentCloudChatUserProfileBuilders,
-    TencentCloudChatUserProfileEventHandlers,
-    TencentCloudChatUserProfileController> {
+class TencentCloudChatUserProfile
+    extends TencentCloudChatComponent<TencentCloudChatUserProfileOptions, TencentCloudChatUserProfileConfig, TencentCloudChatUserProfileBuilders, TencentCloudChatUserProfileEventHandlers, TencentCloudChatUserProfileController> {
   const TencentCloudChatUserProfile({
     required TencentCloudChatUserProfileOptions options,
     Key? key,
@@ -43,11 +39,9 @@ class TencentCloudChatUserProfile extends TencentCloudChatComponent<
   State<StatefulWidget> createState() => _TencentCloudChatUserProfileState();
 }
 
-class _TencentCloudChatUserProfileState
-    extends TencentCloudChatState<TencentCloudChatUserProfile> {
+class _TencentCloudChatUserProfileState extends TencentCloudChatState<TencentCloudChatUserProfile> {
   Future<V2TimUserFullInfo> _loadUserFullInfo() async {
-    final res = await TencentCloudChatSDK.manager
-        .getUsersInfo(userIDList: [widget.options!.userID]);
+    final res = await TencentCloudChatSDK.manager.getUsersInfo(userIDList: [widget.options!.userID]);
     if (res.code == 0 && res.data?.first != null) {
       return res.data!.first;
     }
@@ -56,9 +50,7 @@ class _TencentCloudChatUserProfileState
 
   String _getShowName({V2TimUserFullInfo? userFullInfo}) {
     if (userFullInfo != null) {
-      return TencentCloudChatUtils.checkString(userFullInfo.nickName) ??
-          userFullInfo.userID ??
-          widget.options!.userID;
+      return TencentCloudChatUtils.checkString(userFullInfo.nickName) ?? userFullInfo.userID ?? widget.options!.userID;
     }
     return userFullInfo?.userID ?? widget.options!.userID;
   }
@@ -72,8 +64,7 @@ class _TencentCloudChatUserProfileState
       body: FutureBuilder(
         initialData: widget.options?.userFullInfo,
         future: _loadUserFullInfo(),
-        builder:
-            (BuildContext context, AsyncSnapshot<V2TimUserFullInfo> snapshot) {
+        builder: (BuildContext context, AsyncSnapshot<V2TimUserFullInfo> snapshot) {
           final userFullInfo = widget.options?.userFullInfo ?? snapshot.data;
           return userFullInfo != null
               ? TencentCloudChatUserProfileBody(
@@ -94,34 +85,22 @@ class TencentCloudChatUserProfileInstance {
 
   // Factory constructor that returns the singleton instance of TencentCloudChatUserProfileInstance.
   factory TencentCloudChatUserProfileInstance() => _instance;
-  static final TencentCloudChatUserProfileInstance _instance =
-      TencentCloudChatUserProfileInstance._internal();
+  static final TencentCloudChatUserProfileInstance _instance = TencentCloudChatUserProfileInstance._internal();
 
-  static ({
-    TencentCloudChatComponentsEnum componentEnum,
-    TencentCloudChatWidgetBuilder widgetBuilder
-  }) register() {
+  static ({TencentCloudChatComponentsEnum componentEnum, TencentCloudChatWidgetBuilder widgetBuilder}) register() {
     // TencentCloudChat.dataInstance.messageData.init();
 
     TencentCloudChatRouter().registerRouter(
       routeName: TencentCloudChatRouteNames.userProfile,
       builder: (context) => TencentCloudChatUserProfile(
-        options: TencentCloudChatRouter()
-                .getArgumentFromMap<TencentCloudChatUserProfileOptions>(
-                    context, 'options') ??
-            TencentCloudChatUserProfileOptions(userID: ""),
+        options: TencentCloudChatRouter().getArgumentFromMap<TencentCloudChatUserProfileOptions>(context, 'options') ?? TencentCloudChatUserProfileOptions(userID: ""),
       ),
     );
 
     return (
       componentEnum: TencentCloudChatComponentsEnum.userProfile,
-      widgetBuilder: ({required Map<String, dynamic> options}) =>
-          TencentCloudChatUserProfile(
-            options: TencentCloudChatUserProfileOptions(
-                userID: options["userID"],
-                userFullInfo: options["userFullInfo"],
-                startVideoCall: options["startVideoCall"],
-                startVoiceCall: options["startVoiceCall"]),
+      widgetBuilder: ({required Map<String, dynamic> options}) => TencentCloudChatUserProfile(
+            options: TencentCloudChatUserProfileOptions(userID: options["userID"], userFullInfo: options["userFullInfo"], startVideoCall: options["startVideoCall"], startVoiceCall: options["startVoiceCall"]),
           ),
     );
   }

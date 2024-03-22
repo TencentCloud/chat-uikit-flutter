@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:fc_native_video_thumbnail/fc_native_video_thumbnail.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_conversation_sdk.dart';
@@ -214,19 +215,26 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
   }
 
   Future<void> loadToSpecificMessage({
+    bool highLightTargetMessage = true,
     V2TimMessage? message,
     int? timeStamp,
     int? seq,
   }) async {
     assert(message != null || timeStamp != null || seq != null);
 
-    final ({bool haveMoreLatestData, bool haveMorePreviousData}) res =
-        await _messageGlobalData.loadToSpecificMessage(
+    final ({
+      bool haveMoreLatestData,
+      bool haveMorePreviousData,
+      V2TimMessage? targetMessage
+    }) res = await _messageGlobalData.loadToSpecificMessage(
       userID: userID,
       groupID: groupID,
       msgID: message?.msgID,
-      timeStamp: timeStamp,
-      seq: seq,
+      timeStamp: timeStamp ?? message?.timestamp,
+      seq: seq ??
+          (TencentCloudChatUtils.checkString(message?.seq) != null
+              ? int.tryParse(message!.seq!)
+              : null),
     );
 
     final messageListStatus = _messageGlobalData.getMessageListStatus(
@@ -234,6 +242,26 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
     messageListStatus.haveMoreLatestData = res.haveMoreLatestData;
     messageListStatus.haveMorePreviousData = res.haveMorePreviousData;
 
+    Future.delayed(const Duration(milliseconds: 100), () {
+      _messageController?.scrollToSpecificMessage(
+        TencentCloudChatUtils.checkString(res.targetMessage?.msgID) ??
+            message?.msgID,
+      );
+    });
+
+    if (highLightTargetMessage &&
+        (TencentCloudChatUtils.checkString(res.targetMessage?.msgID) != null ||
+            TencentCloudChatUtils.checkString(message?.msgID) != null)) {
+      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+        Future.delayed(const Duration(milliseconds: 300), () {
+          TencentCloudChat.dataInstance.messageData.messageHighlighted =
+              TencentCloudChatUtils.checkString(res.targetMessage?.msgID) !=
+                      null
+                  ? res.targetMessage
+                  : message;
+        });
+      });
+    }
     return;
   }
 
@@ -487,7 +515,7 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
                 .contains(_groupInfo?.groupType);
     final filteredMessageList = messageList
         .where((element) =>
-            (element.isRead ?? false) == false &&
+            // (element.isRead ?? false) == false &&
             (element.isSelf ?? true) == false)
         .toList();
     for (var element in filteredMessageList) {
@@ -506,7 +534,8 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
                   needReceiptMessageList.map((e) => e.msgID ?? "").toList(),
             );
       }
-    } else if (filteredMessageList.isNotEmpty) {
+    }
+    if (filteredMessageList.isNotEmpty) {
       TencentCloudChatSDK.manager
           .getConversationManager()
           .cleanConversationUnreadMessageCount(
@@ -744,7 +773,7 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
           final messageInfoWithAdditionalInfo =
               TencentCloudChatMessageDataTools.setAdditionalInfoForMessage(
             messageInfo: messageInfo,
-            id: messageInfo.id!,
+            id: messageInfo.id ?? forwardMessageInfo?.id,
             groupID: _groupID,
             offlinePushInfo: _config.messageOfflinePushInfo(
                 userID: _userID, groupID: _groupID, message: messageInfo),
@@ -794,7 +823,7 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
         final messageInfoWithAdditionalInfo =
             TencentCloudChatMessageDataTools.setAdditionalInfoForMessage(
           messageInfo: messageInfo,
-          id: messageInfo.id!,
+          id: messageInfo.id ?? forwardMessageInfo?.id,
           groupID: _groupID,
           offlinePushInfo: _config.messageOfflinePushInfo(
               userID: _userID, groupID: _groupID, message: messageInfo),

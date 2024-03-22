@@ -527,5 +527,6 @@
     "about": "소개하다",
     "profile": "프로필",
     "unpin": "고정 취소",
-    "mentionedMessages": "나에게 {count} 개의 언급"
+    "mentionedMessages": "나에게 {count} 개의 언급",
+  "longPressToNavigate": "길게 눌러서 보기"
 }

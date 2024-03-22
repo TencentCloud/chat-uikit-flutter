@@ -1,6 +1,7 @@
 library tencent_cloud_chat_intl;
 
 import 'package:flutter/widgets.dart';
+import 'package:intl/date_symbol_data_file.dart';
 import 'package:intl/intl.dart';
 import 'package:tencent_cloud_chat_intl/localizations/tencent_cloud_chat_localizations.dart';
 
@@ -8,6 +9,8 @@ TencentCloudChatLocalizations tL10n = TencentCloudChatIntl().localization!;
 
 class TencentCloudChatIntl extends ChangeNotifier {
   static TencentCloudChatIntl? _instance;
+
+  static bool hasInitialized = false;
 
   TencentCloudChatIntl._internal(this._currentLocale);
 
@@ -24,8 +27,14 @@ class TencentCloudChatIntl extends ChangeNotifier {
   }
 
   init(BuildContext context) {
+    if (hasInitialized) {
+      return;
+    }
     _currentLocale ??= Localizations.localeOf(context);
     localization = TencentCloudChatLocalizations.of(context);
+    if (localization != null) {
+      hasInitialized = true;
+    }
   }
 
   void setLocale(Locale newLocale) {
@@ -57,7 +66,9 @@ class TencentCloudChatIntl extends ChangeNotifier {
     );
   }
 
-  static String localizedDateString(int timestamp) {
+  static String localizedDateString(int timestamp, BuildContext context) {
+    Locale locale = TencentCloudChatIntl().getCurrentLocale(context);
+
     // Convert the timestamp (seconds) to a DateTime object
     DateTime date = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
 
@@ -65,8 +76,7 @@ class TencentCloudChatIntl extends ChangeNotifier {
     int currentYear = DateTime.now().year;
 
     // Choose the date format based on whether the date is in the current year
-    DateFormat dateFormat =
-        date.year == currentYear ? DateFormat.MMMMd() : DateFormat.yMMMMd();
+    DateFormat dateFormat = date.year == currentYear ? DateFormat.MMMMd(locale.toString()) : DateFormat.yMMMMd(locale.toString());
 
     // Format the date using the selected date format
     String dateString = dateFormat.format(date);

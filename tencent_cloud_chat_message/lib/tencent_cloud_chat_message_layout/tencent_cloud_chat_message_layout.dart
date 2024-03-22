@@ -87,6 +87,7 @@ class _TencentCloudChatMessageLayoutState
   @override
   Widget desktopBuilder(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: widget.header,
       body: DropTarget(
           onDragDone: (detail) {

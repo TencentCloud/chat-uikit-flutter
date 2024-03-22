@@ -5,7 +5,9 @@ import 'dart:convert';
 
 import 'package:collection/collection.dart';
 import 'package:exif/exif.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_message_calling_message/tencent_cloud_chat_message_calling_message.dart';
@@ -197,7 +199,8 @@ class TencentCloudChatUtils {
           }
           break;
         case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
-          text = handleCustomMessage(message);
+          final (String lineOne, String? lineTwo, IconData? icon) = handleCustomMessage(message);
+          text = lineTwo != null ? "$lineOne: $lineTwo" : lineOne;
           break;
         case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
           text = "[${tL10n.audio}]";
@@ -578,11 +581,18 @@ class TencentCloudChatUtils {
   /// all values (messageSender, messageAbstract, and messageID) will be returned as null.
   ///
   /// Returns a tuple containing the messageSender, messageAbstract, and messageID.
-  static ({String? messageSender, String? messageAbstract, String? messageID})
-      parseMessageReply(String? jsonString) {
+  static ({
+    String? messageAbstract,
+    String? messageID,
+    String? messageSender,
+    int? messageSeq,
+    int? messageTimestamp
+  }) parseMessageReply(String? jsonString) {
     String? messageSender;
     String? messageAbstract;
     String? messageID;
+    int? messageSeq;
+    int? messageTimestamp;
 
     if (TencentCloudChatUtils.checkString(jsonString) != null) {
       try {
@@ -593,6 +603,8 @@ class TencentCloudChatUtils {
           messageSender = messageReply["messageSender"] as String?;
           messageAbstract = messageReply["messageAbstract"] as String?;
           messageID = messageReply["messageID"] as String?;
+          messageSeq = messageReply["messageSeq"] as int?;
+          messageTimestamp = messageReply["messageTimestamp"] as int?;
 
           if (TencentCloudChatUtils.checkString(messageAbstract) != null) {
             final tryParseMessageAbstract = json.decode(messageAbstract!);
@@ -609,7 +621,9 @@ class TencentCloudChatUtils {
     return (
       messageSender: messageSender,
       messageAbstract: messageAbstract,
-      messageID: messageID
+      messageID: messageID,
+      messageTimestamp: messageTimestamp,
+      messageSeq: messageSeq,
     );
   }
 
@@ -641,18 +655,20 @@ class TencentCloudChatUtils {
     );
   }
 
-  static String handleCustomMessage(V2TimMessage message) {
+  static (String, String?, IconData?) handleCustomMessage(V2TimMessage message) {
     final customElem = message.customElem;
-    String customLastMsgShow = "[${tL10n.custom}]";
+    String lineOne = "[${tL10n.custom}]";
+    String? lineTwo;
+    IconData? icon;
 
     if (customElem?.data == "group_create") {
-      customLastMsgShow = "Group chat created successfully!";
+      lineOne = "Group chat created successfully!";
     }
     if (isVoteMessage(message)) {
-      customLastMsgShow = "[${tL10n.poll}]";
+      lineOne = "[${tL10n.poll}]";
     }
     if (isRobotMessage(message)) {
-      customLastMsgShow = "[机器人消息]";
+      lineOne = "[机器人消息]";
     }
     final callingMessage = CallingMessage.getCallMessage(customElem);
     if (callingMessage != null) {
@@ -666,18 +682,19 @@ class TencentCloudChatUtils {
         callTime = CallingMessage.getShowTime(callingMessage.callEnd!);
       }
 
-      customLastMsgShow = isCallEnd
+      lineTwo = isCallEnd
           ? tL10n.callDuration(callTime ?? "0")
           : CallingMessage.getActionType(callingMessage);
 
-      customLastMsgShow = isVoiceCall
-          ? "[${tL10n.voiceCall}]: $customLastMsgShow"
-          : "[${tL10n.videoCall}]: $customLastMsgShow";
+      lineOne = isVoiceCall
+          ? tL10n.voiceCall
+          : tL10n.videoCall;
+      icon = isVoiceCall ? Icons.call : Icons.video_call_outlined;
     }
-    if (customLastMsgShow == "[${tL10n.custom}]") {
+    if (lineOne == "[${tL10n.custom}]") {
       debugPrint(message.customElem!.toJson().toString());
     }
-    return customLastMsgShow;
+    return (lineOne, lineTwo, icon);
   }
 
   pertyPath() {

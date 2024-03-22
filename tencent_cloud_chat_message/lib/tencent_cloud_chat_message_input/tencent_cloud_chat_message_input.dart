@@ -90,14 +90,6 @@ class TencentCloudChatMessageInput extends StatefulWidget {
 
 class _TencentCloudChatMessageInputState
     extends TencentCloudChatState<TencentCloudChatMessageInput> {
-  final TextEditingController _textEditingController = TextEditingController();
-  final FocusNode _textEditingFocusNode = FocusNode();
-
-  @override
-  void dispose() {
-    _textEditingController.dispose();
-    super.dispose();
-  }
 
   String? _getMessageInputStatusText() {
     String? result;
@@ -130,6 +122,11 @@ class _TencentCloudChatMessageInputState
   }
 
   @override
+  Widget tabletAppBuilder(BuildContext context) {
+    return defaultBuilder(context);
+  }
+
+  @override
   Widget defaultBuilder(BuildContext context) {
     final String? statusText = _getMessageInputStatusText();
     return TencentCloudChatMessageInputMobile(
@@ -147,9 +144,7 @@ class _TencentCloudChatMessageInputState
       statusText: statusText,
       selectedMessages: widget.selectedMessages,
       repliedMessage: widget.repliedMessage,
-      textEditingController: _textEditingController,
       messageController: widget.controller,
-      focusNode: _textEditingFocusNode,
       onChooseGroupMembers: widget.onChooseGroupMembers,
       attachmentOptions: widget.attachmentOptions,
     );
@@ -175,9 +170,7 @@ class _TencentCloudChatMessageInputState
       statusText: statusText,
       selectedMessages: widget.selectedMessages,
       repliedMessage: widget.repliedMessage,
-      textEditingController: _textEditingController,
       messageController: widget.controller,
-      focusNode: _textEditingFocusNode,
       isGroupAdmin: widget.isGroupAdmin,
       onChooseGroupMembers: widget.onChooseGroupMembers,
       controlBarItems: widget.attachmentOptions,

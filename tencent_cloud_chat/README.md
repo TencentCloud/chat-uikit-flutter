@@ -1,7 +1,7 @@
 
-# Tencent Cloud Chat UIKit
+# Tencent Cloud Chat UIKit V2
 
-Welcome to the brand new Flutter Chat UIKit developed by Tencent Cloud Chat. We're excited to introduce this completely redesigned and redeveloped toolkit, built from the ground up, two years after the release of our previous version, tim_ui_kit.
+Welcome to the brand new Flutter Chat UIKit V2 developed by Tencent Cloud Chat. We're excited to introduce this completely redesigned and redeveloped toolkit, built from the ground up, two years after the release of our previous version, [tencent_cloud_chat_uikit](https://pub.dev/packages/tencent_cloud_chat_uikit) (named [tim_ui_kit](https://pub.dev/packages/tim_ui_kit) previously).
 
 Our new Flutter Chat UIKit is designed to provide developers with a comprehensive set of tools to create feature-rich chat applications with ease. 
 
@@ -9,6 +9,8 @@ It is built with a modular approach, allowing you to pick and choose the compone
 
 The UIKit includes a wide range of capabilities, such as [Conversation List](https://pub.dev/packages/tencent_cloud_chat_conversation), [Message handling](https://pub.dev/packages/tencent_cloud_chat_message), 
 [Contact lists](https://pub.dev/packages/tencent_cloud_chat_contact), [User](https://pub.dev/packages/tencent_cloud_chat_user_profile) and [Group Profiles](https://pub.dev/packages/tencent_cloud_chat_group_profile), Search functionality, and more.
+
+![uikit.png](https://cloudcache.intl.tencent-cloud.com/cms/backend-cms/f28b8842b35211ee9939525400461a83.jpg)
 
 ## Features
 
@@ -25,7 +27,7 @@ The UIKit includes a wide range of capabilities, such as [Conversation List](htt
 6. **New Features**: Enjoy new features like a grid-style avatar, redesigned forwarding panel, group member selector, and a new message long-press menu.
 
 7. **Modular Packages**: Components are broken down into **modular packages**, allowing for on-demand imports and reducing unnecessary bloat. 
-Each modular package supports built-in navigation transitions. For instance, you can automatically navigate from a Conversation to a Message to start a chat, 
+Each modular package supports built-in navigation. For instance, you can automatically navigate from a Conversation to a Message to start a chat, 
 without the need to manually instantiate multiple pages and handle the transitions yourself. This greatly simplifies the complexity of development and integration.
 
 8. **Developer-friendly Design**: We've introduced a more unified, standardized component parameter design, clearer code naming, and more detailed comments to make development easier and more efficient.

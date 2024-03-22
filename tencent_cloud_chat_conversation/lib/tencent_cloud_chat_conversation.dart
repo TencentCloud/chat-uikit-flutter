@@ -46,66 +46,9 @@ class TencentCloudChatConversation extends TencentCloudChatComponent<
 
 class TencentCloudChatConversationState
     extends TencentCloudChatState<TencentCloudChatConversation> {
-  final Stream<TencentCloudChatConversationData<dynamic>>?
-      _conversationDataStream = TencentCloudChat.eventBusInstance
-          .on<TencentCloudChatConversationData<dynamic>>();
-
-  final Stream<TencentCloudChatContactData<dynamic>>? _contactDataStream =
-      TencentCloudChat.eventBusInstance
-          .on<TencentCloudChatContactData<dynamic>>();
-
-  late StreamSubscription<TencentCloudChatConversationData<dynamic>>?
-      _conversationDataSubscription;
-
-  late StreamSubscription<TencentCloudChatContactData<dynamic>>?
-      _contactDataSubscription;
-
-  List<V2TimConversation> _conversationList =
-      TencentCloudChat.dataInstance.conversation.conversationList;
-
-  List<V2TimUserStatus> userStatusList =
-      TencentCloudChat.dataInstance.contact.userStatus;
-
-  bool getDataEnd = TencentCloudChat.dataInstance.conversation.isGetDataEnd;
-
-  conversationDataHandler(TencentCloudChatConversationData data) {
-    if (data.currentUpdatedFields ==
-        TencentCloudChatConversationDataKeys.conversationList) {
-      final conversationList = data.conversationList;
-      safeSetState(() {
-        _conversationList = conversationList;
-      });
-    } else if (data.currentUpdatedFields ==
-        TencentCloudChatConversationDataKeys.getDataEnd) {
-      safeSetState(() {
-        getDataEnd = data.isGetDataEnd;
-      });
-    }
-  }
-
-  contactDataHandler(TencentCloudChatContactData data) {
-    if (data.currentUpdatedFields ==
-        TencentCloudChatContactDataKeys.userStatusList) {
-      safeSetState(() {
-        userStatusList = data.userStatus;
-      });
-    }
-  }
-
-  _addConversationDataListener() {
-    _conversationDataSubscription =
-        _conversationDataStream?.listen(conversationDataHandler);
-  }
-
-  _addContactDataListener() {
-    _contactDataSubscription = _contactDataStream?.listen(contactDataHandler);
-  }
-
   @override
   void initState() {
     super.initState();
-    _addConversationDataListener();
-    _addContactDataListener();
     TencentCloudChat.dataInstance.conversation.conversationConfig =
         widget.config;
   }
@@ -117,43 +60,48 @@ class TencentCloudChatConversationState
 
   @override
   Widget mobileBuilder(BuildContext context) {
-    return TencentCloudChatThemeWidget(
-      build: (context, colorTheme, textStyle) => Scaffold(
-        appBar: AppBar(
-          backgroundColor: colorTheme.contactBackgroundColor,
-          title: const TencentCloudChatConversationAppBar(),
+    final header =
+        TencentCloudChatConversationBuilders.getConversationHeaderBuilder();
+    if (header.$2) {
+      return TencentCloudChatThemeWidget(
+        build: (context, colorTheme, textStyle) => Material(
+          child: Column(
+            children: [
+              Container(
+                color: colorTheme.backgroundColor,
+                child: header.$1,
+              ),
+              const Expanded(
+                child: TencentCloudChatConversationList(),
+              ),
+            ],
+          ),
         ),
-        body: TencentCloudChatConversationList(
-          conversationList: _conversationList,
-          getDataEnd: getDataEnd,
-          userStatusList: userStatusList,
+      );
+    } else {
+      return TencentCloudChatThemeWidget(
+        build: (context, colorTheme, textStyle) => Scaffold(
+          appBar: AppBar(
+            backgroundColor: colorTheme.contactBackgroundColor,
+            title: header.$1,
+          ),
+          body: const TencentCloudChatConversationList(),
         ),
-      ),
-    );
+      );
+    }
   }
 
   @override
   Widget desktopBuilder(BuildContext context) {
     if (widget.config?.useDesktopMode ?? true) {
       return TencentCloudChatThemeWidget(
-        build: (context, colorTheme, textStyle) => Material(
+        build: (context, colorTheme, textStyle) => const Material(
           color: Colors.transparent,
-          child: TencentCloudChatConversationDesktopMode(
-            conversationList: _conversationList,
-            getDataEnd: getDataEnd,
-            userStatusList: userStatusList,
-          ),
+          child: TencentCloudChatConversationDesktopMode(),
         ),
       );
     }
     return mobileBuilder(context);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    _conversationDataSubscription?.cancel();
-    _contactDataSubscription?.cancel();
   }
 }
 

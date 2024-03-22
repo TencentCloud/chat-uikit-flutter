@@ -1,21 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
+import 'package:tencent_cloud_chat/data/contact/tencent_cloud_chat_contact_data.dart';
+import 'package:tencent_cloud_chat/data/conversation/tencent_cloud_chat_conversation_data.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
+import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/widgets/shimmer/tencent_cloud_chat_list_shimmer.dart';
 import 'package:tencent_cloud_chat_conversation/widgets/tencent_cloud_chat_conversation_item.dart';
 
 class TencentCloudChatConversationList extends StatefulWidget {
-  final List<V2TimConversation> conversationList;
-  final List<V2TimUserStatus> userStatusList;
-  final bool getDataEnd;
   final V2TimConversation? currentConversation;
 
   const TencentCloudChatConversationList({
     super.key,
-    required this.conversationList,
-    required this.getDataEnd,
-    required this.userStatusList,
     this.currentConversation,
   });
 
@@ -25,16 +24,84 @@ class TencentCloudChatConversationList extends StatefulWidget {
 }
 
 class TencentCloudChatConversationListState
-    extends State<TencentCloudChatConversationList> {
+    extends TencentCloudChatState<TencentCloudChatConversationList> {
+  final Stream<TencentCloudChatConversationData<dynamic>>?
+      _conversationDataStream = TencentCloudChat.eventBusInstance
+          .on<TencentCloudChatConversationData<dynamic>>();
+  late StreamSubscription<TencentCloudChatConversationData<dynamic>>?
+      _conversationDataSubscription;
+
+  List<V2TimConversation> _conversationList =
+      TencentCloudChat.dataInstance.conversation.conversationList;
+
+  bool _getDataEnd = TencentCloudChat.dataInstance.conversation.isGetDataEnd;
+
+  final Stream<TencentCloudChatContactData<dynamic>>? _contactDataStream =
+      TencentCloudChat.eventBusInstance
+          .on<TencentCloudChatContactData<dynamic>>();
+
+  late StreamSubscription<TencentCloudChatContactData<dynamic>>?
+      _contactDataSubscription;
+
+  List<V2TimUserStatus> _userStatusList =
+      TencentCloudChat.dataInstance.contact.userStatus;
+
+  contactDataHandler(TencentCloudChatContactData data) {
+    if (data.currentUpdatedFields ==
+        TencentCloudChatContactDataKeys.userStatusList) {
+      safeSetState(() {
+        _userStatusList = data.userStatus;
+      });
+    }
+  }
+
+  _addContactDataListener() {
+    _contactDataSubscription = _contactDataStream?.listen(contactDataHandler);
+  }
+
+  conversationDataHandler(TencentCloudChatConversationData data) {
+    if (data.currentUpdatedFields ==
+        TencentCloudChatConversationDataKeys.conversationList) {
+      final conversationList = data.conversationList;
+      safeSetState(() {
+        _conversationList = conversationList;
+      });
+    } else if (data.currentUpdatedFields ==
+        TencentCloudChatConversationDataKeys.getDataEnd) {
+      safeSetState(() {
+        _getDataEnd = data.isGetDataEnd;
+      });
+    }
+  }
+
+  _addConversationDataListener() {
+    _conversationDataSubscription =
+        _conversationDataStream?.listen(conversationDataHandler);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _addConversationDataListener();
+    _addContactDataListener();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _conversationDataSubscription?.cancel();
+    _contactDataSubscription?.cancel();
+  }
+
   bool getIsOnline(V2TimConversation conv) {
     bool res = false;
     if (conv.type == ConversationType.V2TIM_C2C) {
       String userID = conv.userID ?? "";
       if (userID.isNotEmpty) {
-        int index = widget.userStatusList
-            .indexWhere((element) => element.userID == userID);
+        int index =
+            _userStatusList.indexWhere((element) => element.userID == userID);
         if (index > -1) {
-          if (widget.userStatusList[index].statusType == 1) {
+          if (_userStatusList[index].statusType == 1) {
             res = true;
           }
         }
@@ -44,23 +111,27 @@ class TencentCloudChatConversationListState
   }
 
   Widget conversationListWidget() {
-    var conv = widget.conversationList;
-    return ListView.builder(
-      itemCount: conv.length,
-      itemBuilder: (context, index) {
-        var conversation = conv[index];
-        var isOnline = getIsOnline(conversation);
-        return TencentCloudChatConversationItem(
-          conversation: conversation,
-          isOnline: isOnline,
-          isSelected: widget.currentConversation?.conversationID ==
-                  conversation.conversationID &&
-              TencentCloudChatUtils.checkString(
-                      widget.currentConversation?.conversationID) !=
-                  null,
-        );
-      },
-    );
+    var conv = _conversationList;
+    return MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        removeBottom: true,
+        child: ListView.builder(
+          itemCount: conv.length,
+          itemBuilder: (context, index) {
+            var conversation = conv[index];
+            var isOnline = getIsOnline(conversation);
+            return TencentCloudChatConversationItem(
+              conversation: conversation,
+              isOnline: isOnline,
+              isSelected: widget.currentConversation?.conversationID ==
+                      conversation.conversationID &&
+                  TencentCloudChatUtils.checkString(
+                          widget.currentConversation?.conversationID) !=
+                      null,
+            );
+          },
+        ));
   }
 
   Widget noConversationWidget() {
@@ -74,9 +145,9 @@ class TencentCloudChatConversationListState
   }
 
   @override
-  Widget build(BuildContext context) {
-    var conversationList = widget.conversationList;
-    var loaded = widget.getDataEnd;
+  Widget defaultBuilder(BuildContext context) {
+    var conversationList = _conversationList;
+    var loaded = _getDataEnd;
     return TencentCloudChatThemeWidget(build: (ctx, colors, fontSize) {
       if (!loaded) {
         return conversationLoading();

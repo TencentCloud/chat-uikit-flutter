@@ -17,6 +17,15 @@ class TencentCloudChatContactAppBar extends StatefulWidget {
 }
 
 class TencentCloudChatContactAppBarState extends TencentCloudChatState<TencentCloudChatContactAppBar> {
+
+  @override
+  Widget tabletAppBuilder(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top),
+      child: desktopBuilder(context),
+    );
+  }
+
   @override
   Widget defaultBuilder(BuildContext context) {
     return Container(

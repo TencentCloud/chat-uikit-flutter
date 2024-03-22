@@ -21,11 +21,20 @@ class TencentCloudChatMessageRow extends StatefulWidget {
   /// automatically wrapping text messages in a message bubble.
   final double messageRowWidth;
 
+  final String? userID;
+  final String? groupID;
+
   final bool inSelectMode;
   final bool isSelected;
   final ValueChanged<V2TimMessage> onSelectCurrent;
   final SendingMessageData? sendingMessageData;
   final bool isMergeMessage;
+  final Function({
+    required bool highLightTargetMessage,
+    V2TimMessage? message,
+    int? timeStamp,
+    int? seq,
+  }) loadToSpecificMessage;
 
   const TencentCloudChatMessageRow({
     super.key,
@@ -36,6 +45,9 @@ class TencentCloudChatMessageRow extends StatefulWidget {
     required this.onSelectCurrent,
     this.sendingMessageData,
     required this.isMergeMessage,
+    required this.loadToSpecificMessage,
+    required this.userID,
+    required this.groupID,
   });
 
   @override
@@ -51,6 +63,16 @@ class _TencentCloudChatMessageRowState
   void initState() {
     super.initState();
     _message = widget.message;
+  }
+
+  @override
+  void didUpdateWidget(covariant TencentCloudChatMessageRow oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_message != widget.message && widget.message != oldWidget.message) {
+      safeSetState(() {
+        _message = widget.message;
+      });
+    }
   }
 
   @override
@@ -177,6 +199,8 @@ class _TencentCloudChatMessageRowState
                                         .tencentCloudChatMessageItemBuilders
                                         .getMessageItemBuilder(
                                       message: _message,
+                                      userID: widget.userID,
+                                      groupID: widget.groupID,
                                       renderOnMenuPreview: renderOnMenuPreview,
                                       inSelectMode: widget.inSelectMode,
                                       onSelectMessage: () =>
@@ -204,6 +228,21 @@ class _TencentCloudChatMessageRowState
                                       messageAbstract:
                                           messageReply.messageAbstract,
                                       messageID: messageReply.messageID!,
+                                      messageSeq: messageReply.messageSeq,
+                                      messageTimestamp:
+                                          messageReply.messageTimestamp,
+                                      onTriggerNavigation: () {
+                                        widget.loadToSpecificMessage(
+                                            highLightTargetMessage: true,
+                                            message: V2TimMessage(
+                                              msgID: messageReply.messageID,
+                                              elemType: 0,
+                                              timestamp:
+                                                  messageReply.messageTimestamp,
+                                              seq: messageReply.messageSeq
+                                                  ?.toString(),
+                                            ));
+                                      },
                                     )
                                   ],
                                 )
@@ -385,6 +424,8 @@ class _TencentCloudChatMessageRowState
                                         .getMessageItemBuilder(
                                       message: _message,
                                       renderOnMenuPreview: renderOnMenuPreview,
+                                      userID: widget.userID,
+                                      groupID: widget.groupID,
                                       inSelectMode: widget.inSelectMode,
                                       onSelectMessage: () =>
                                           widget.onSelectCurrent(_message),
@@ -411,6 +452,22 @@ class _TencentCloudChatMessageRowState
                                       messageAbstract:
                                           messageReply.messageAbstract,
                                       messageID: messageReply.messageID!,
+                                      messageTimestamp:
+                                          messageReply.messageTimestamp,
+                                      messageSeq: messageReply.messageSeq,
+                                      onTriggerNavigation: () {
+                                        widget.loadToSpecificMessage(
+                                          highLightTargetMessage: true,
+                                          message: V2TimMessage(
+                                            msgID: messageReply.messageID,
+                                            elemType: 0,
+                                            timestamp:
+                                                messageReply.messageTimestamp,
+                                            seq: messageReply.messageSeq
+                                                ?.toString(),
+                                          ),
+                                        );
+                                      },
                                     )
                                   ],
                                 )

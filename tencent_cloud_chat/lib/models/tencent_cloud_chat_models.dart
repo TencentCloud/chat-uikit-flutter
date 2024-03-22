@@ -15,6 +15,12 @@ typedef PlaceHolderBuilder = Widget Function();
 typedef TencentCloudChatWidgetBuilder = Widget Function(
     {required Map<String, dynamic> options});
 
+typedef TencentCloudChatModularUIPackageRegister = ({
+  TencentCloudChatComponentsEnum componentEnum,
+  TencentCloudChatWidgetBuilder widgetBuilder,
+})
+    Function();
+
 /// This class represents the configuration for Tencent Cloud Chat.
 class TencentCloudChatConfig {
   /// The brightness mode of the application (light or dark).
@@ -23,13 +29,23 @@ class TencentCloudChatConfig {
   /// The theme config.
   TencentCloudChatThemeModel? themeConfig;
 
-  /// The list of register functions of used components of the Chat UIKit.
-  List<
-      ({
-        TencentCloudChatComponentsEnum componentEnum,
-        TencentCloudChatWidgetBuilder widgetBuilder
-      })
-          Function()> usedComponentsRegister;
+  /// List of registration functions for the used components of the Chat UIKit.
+  ///
+  /// Each modular UI package component used in the Chat UIKit must have its registration method included here.
+  /// Include the registration methods of the components you are using.
+  ///
+  /// Based on the components you're using in your application, include the corresponding register methods in the list.
+  /// Example usage:
+  /// ```dart
+  /// usedComponentsRegister: [
+  ///   TencentCloudChatConversationInstance.register,  // Conversation component
+  ///   TencentCloudChatMessageInstance.register,       // Message component
+  ///   TencentCloudChatUserProfileInstance.register,   // UserProfile component
+  ///   TencentCloudChatGroupProfileInstance.register,  // GroupProfile component
+  ///   TencentCloudChatContactInstance.register,       // Contact component
+  /// ]
+  /// ```
+  List<TencentCloudChatModularUIPackageRegister> usedComponentsRegister;
 
   /// Preload core data configuration. Optional configuration items include conversation data configuration, joined group data configuration, and contact data configuration.
   TencentCloudChatInitDataConfig? preloadDataConfig;

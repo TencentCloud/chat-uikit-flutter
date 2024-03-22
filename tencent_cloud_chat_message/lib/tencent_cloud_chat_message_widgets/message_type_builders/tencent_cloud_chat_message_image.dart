@@ -57,6 +57,8 @@ class TimImageCurrentRenderInfo {
 class TencentCloudChatMessageImage extends TencentCloudChatMessageItemBase {
   const TencentCloudChatMessageImage({
     super.key,
+    super.userID,
+    super.groupID,
     required super.message,
     required super.shouldBeHighlighted,
     required super.clearHighlightFunc,
@@ -794,7 +796,7 @@ class _TencentCloudChatMessageImageState
           SizedBox(
             width: getWidth(4),
           ),
-        if (sentFromSelf) messageStatus(),
+        if (sentFromSelf) messageStatusIndicator(),
         messageTimeIndicator(
           textColor: Colors.white,
           shadow: [

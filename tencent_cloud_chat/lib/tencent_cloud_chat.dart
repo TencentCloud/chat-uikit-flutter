@@ -6,6 +6,7 @@ import 'package:tencent_cloud_chat/controller/tencent_cloud_chat_controller.dart
 import 'package:tencent_cloud_chat/data/tencent_cloud_chat_data.dart';
 import 'package:tencent_cloud_chat/eventbus/tencent_cloud_chat_eventbus.dart';
 import 'package:tencent_cloud_chat/log/tencent_cloud_chat_log.dart';
+import 'package:tencent_cloud_chat/models/tencent_cloud_chat_callbacks.dart';
 import 'package:tencent_cloud_chat/observer/tencent_cloud_chat_observer.dart';
 
 export 'package:path_provider/path_provider.dart';
@@ -149,25 +150,22 @@ export "package:tencent_cloud_chat_sdk/models/v2_tim_video_elem.dart";
 export 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
 
 class TencentCloudChat {
-  static void refresh() {
+  static void reset() {
     _dataInstance = TencentCloudChatData();
   }
 
   static TencentCloudChatLog get logInstance => TencentCloudChatLog();
 
-  static TencentCloudChatEventBus get eventBusInstance =>
-      TencentCloudChatEventBus();
+  static TencentCloudChatEventBus get eventBusInstance => TencentCloudChatEventBus();
 
   static TencentCloudChatData _dataInstance = TencentCloudChatData();
   static TencentCloudChatData get dataInstance => _dataInstance;
 
   static TencentCloudChatSDK get chatSDKInstance => TencentCloudChatSDK();
 
-  static TencentCloudChatCoreController get controller =>
-      TencentCloudChatCoreController();
+  static TencentCloudChatCoreController get controller => TencentCloudChatCoreController();
 
-  static TencentCloudChatObserver get navigatorObserver =>
-      TencentCloudChatObserver.getInstance();
+  static TencentCloudChatObserver get navigatorObserver => TencentCloudChatObserver.getInstance();
 
   static TencentCloudChatCache get cache => TencentCloudChatCache();
 }

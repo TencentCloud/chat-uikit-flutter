@@ -1,7 +1,9 @@
 name: tencent_cloud_chat_search
 description: A new Flutter package project.
-version: 0.0.1
-homepage:
+version: 1.1.1
+repository: https://github.com/TencentCloud/chat-uikit-flutter/tree/v2/tencent_cloud_chat_search
+homepage: https://trtc.io/products/chat?utm_source=gfs&utm_medium=link&utm_campaign=%E6%B8%A0%E9%81%93&_channel_track_key=k6WgfCKn
+
 
 environment:
   sdk: '>=3.1.0 <4.0.0'
@@ -10,12 +12,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  tencent_cloud_chat:
-    path: ../tencent_cloud_chat
-  tencent_cloud_chat_common:
-    path: ../tencent_cloud_chat_common
-
-
+  tencent_cloud_chat: ^1.1.1
+  tencent_cloud_chat_common: ^1.1.1
 
 dev_dependencies:
   flutter_test:

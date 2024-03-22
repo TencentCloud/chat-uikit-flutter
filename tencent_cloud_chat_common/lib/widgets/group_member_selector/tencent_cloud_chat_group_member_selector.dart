@@ -16,8 +16,7 @@ Future<List<V2TimGroupMemberFullInfo>> showGroupMemberSelector({
   String? title,
   String? onSelectLabel,
 }) async {
-  final Completer<List<V2TimGroupMemberFullInfo>> completer =
-      Completer<List<V2TimGroupMemberFullInfo>>();
+  final Completer<List<V2TimGroupMemberFullInfo>> completer = Completer<List<V2TimGroupMemberFullInfo>>();
 
   showModalBottomSheet<void>(
     context: context,
@@ -27,14 +26,7 @@ Future<List<V2TimGroupMemberFullInfo>> showGroupMemberSelector({
     ),
     builder: (BuildContext _) {
       return TencentCloudChatGroupMemberSelector(
-        groupMemberList: includeSelf
-            ? groupMemberList
-            : groupMemberList
-                .where((element) =>
-                    element.userID !=
-                    (TencentCloudChat.dataInstance.basic.currentUser?.userID ??
-                        ""))
-                .toList(),
+        groupMemberList: includeSelf ? groupMemberList : groupMemberList.where((element) => element.userID != (TencentCloudChat.dataInstance.basic.currentUser?.userID ?? "")).toList(),
         maxSelectionAmount: maxSelectionAmount,
         title: title,
         onSelect: (list) => completer.complete(list),
@@ -66,12 +58,10 @@ class TencentCloudChatGroupMemberSelector extends StatefulWidget {
   });
 
   @override
-  State<TencentCloudChatGroupMemberSelector> createState() =>
-      _TencentCloudChatGroupMemberSelectorState();
+  State<TencentCloudChatGroupMemberSelector> createState() => _TencentCloudChatGroupMemberSelectorState();
 }
 
-class _TencentCloudChatGroupMemberSelectorState
-    extends TencentCloudChatState<TencentCloudChatGroupMemberSelector> {
+class _TencentCloudChatGroupMemberSelectorState extends TencentCloudChatState<TencentCloudChatGroupMemberSelector> {
   final ScrollController _scrollController = ScrollController();
   final FocusNode _focusNode = FocusNode();
 
@@ -94,9 +84,7 @@ class _TencentCloudChatGroupMemberSelectorState
   }
 
   double _updateHeight() {
-    double keyboardHeight = _focusNode.hasPrimaryFocus
-        ? TencentCloudChat.dataInstance.basic.keyboardHeight ?? getHeight(280)
-        : 0;
+    double keyboardHeight = _focusNode.hasPrimaryFocus ? TencentCloudChat.dataInstance.basic.keyboardHeight ?? getHeight(280) : 0;
 
     double headerHeight = getHeight(160);
     double listItemHeight = getHeight(46);
@@ -114,20 +102,15 @@ class _TencentCloudChatGroupMemberSelectorState
   void _updateSearch(String searchText) {
     setState(() {
       _filteredMemberList = widget.groupMemberList.where((member) {
-        final searchStr = (member.friendRemark ?? '') +
-            (member.nameCard ?? '') +
-            (member.nickName ?? '') +
-            member.userID;
+        final searchStr = (member.friendRemark ?? '') + (member.nameCard ?? '') + (member.nickName ?? '') + member.userID;
         return searchStr.toLowerCase().contains(searchText.toLowerCase());
       }).toList();
     });
   }
 
   void _addMember(V2TimGroupMemberFullInfo memberInfo) {
-    if (widget.maxSelectionAmount != null &&
-        _selectMembers.length > widget.maxSelectionAmount! - 1) {
-      _selectMembers.removeRange(
-          0, _selectMembers.length - widget.maxSelectionAmount! + 1);
+    if (widget.maxSelectionAmount != null && _selectMembers.length > widget.maxSelectionAmount! - 1) {
+      _selectMembers.removeRange(0, _selectMembers.length - widget.maxSelectionAmount! + 1);
     }
     _selectMembers.add(memberInfo);
   }
@@ -139,8 +122,7 @@ class _TencentCloudChatGroupMemberSelectorState
             color: colorTheme.backgroundColor,
           ),
           child: Padding(
-            padding: EdgeInsets.only(
-                top: getHeight(8), left: getWidth(4), right: getWidth(4)),
+            padding: EdgeInsets.only(top: getHeight(8), left: getWidth(4), right: getWidth(4)),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -151,17 +133,12 @@ class _TencentCloudChatGroupMemberSelectorState
                   },
                   child: Text(
                     tL10n.cancel,
-                    style: TextStyle(
-                        fontSize: textStyle.fontsize_14,
-                        color: colorTheme.primaryColor),
+                    style: TextStyle(fontSize: textStyle.fontsize_14, color: colorTheme.primaryColor),
                   ),
                 ),
                 const Spacer(),
                 Text(
-                  widget.title ??
-                      (widget.maxSelectionAmount == 1
-                          ? tL10n.selectMembers
-                          : tL10n.numSelectMembers(_selectMembers.length)),
+                  widget.title ?? (widget.maxSelectionAmount == 1 ? tL10n.selectMembers : tL10n.numSelectMembers(_selectMembers.length)),
                   style: TextStyle(fontSize: textStyle.fontsize_16),
                 ),
                 const Spacer(),
@@ -172,9 +149,7 @@ class _TencentCloudChatGroupMemberSelectorState
                   },
                   child: Text(
                     widget.onSelectLabel ?? tL10n.confirm,
-                    style: TextStyle(
-                        fontSize: textStyle.fontsize_14,
-                        color: colorTheme.primaryColor),
+                    style: TextStyle(fontSize: textStyle.fontsize_14, color: colorTheme.primaryColor),
                   ),
                 ),
               ],
@@ -187,14 +162,12 @@ class _TencentCloudChatGroupMemberSelectorState
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Container(
               color: colorTheme.backgroundColor,
-              padding: EdgeInsets.symmetric(
-                  horizontal: getWidth(16), vertical: getHeight(0)),
+              padding: EdgeInsets.symmetric(horizontal: getWidth(16), vertical: getHeight(0)),
               child: TextField(
                 focusNode: _focusNode,
                 decoration: InputDecoration(
                   hintText: tL10n.searchMembers,
-                  contentPadding: EdgeInsets.symmetric(
-                      horizontal: getWidth(12), vertical: getHeight(12)),
+                  contentPadding: EdgeInsets.symmetric(horizontal: getWidth(12), vertical: getHeight(12)),
                   hintStyle: TextStyle(
                     color: colorTheme.secondaryTextColor,
                     fontSize: textStyle.fontsize_14,
@@ -212,23 +185,18 @@ class _TencentCloudChatGroupMemberSelectorState
   }
 
   Widget _memberItem({required V2TimGroupMemberFullInfo member}) {
-    final isSelected =
-        _selectMembers.any((element) => element.userID == member.userID);
+    final isSelected = _selectMembers.any((element) => element.userID == member.userID);
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => AnimatedContainer(
-        padding: EdgeInsets.symmetric(
-            horizontal: getWidth(8), vertical: getHeight(8)),
-        color: isSelected
-            ? colorTheme.messageBeenChosenBackgroundColor
-            : colorTheme.backgroundColor,
+        padding: EdgeInsets.symmetric(horizontal: getWidth(8), vertical: getHeight(8)),
+        color: isSelected ? colorTheme.messageBeenChosenBackgroundColor : colorTheme.backgroundColor,
         duration: const Duration(milliseconds: 300),
         child: InkWell(
             onTap: () {
               if (!isSelected) {
                 _addMember(member);
               } else {
-                _selectMembers
-                    .removeWhere((element) => element.userID == member.userID);
+                _selectMembers.removeWhere((element) => element.userID == member.userID);
               }
               setState(() {});
             },
@@ -236,8 +204,7 @@ class _TencentCloudChatGroupMemberSelectorState
               children: [
                 Checkbox(
                   value: isSelected,
-                  visualDensity:
-                      const VisualDensity(vertical: -4, horizontal: -2),
+                  visualDensity: const VisualDensity(vertical: -4, horizontal: -2),
                   activeColor: colorTheme.primaryColor,
                   checkColor: colorTheme.backgroundColor,
                   shape: RoundedRectangleBorder(
@@ -247,8 +214,7 @@ class _TencentCloudChatGroupMemberSelectorState
                     if (!isSelected) {
                       _addMember(member);
                     } else {
-                      _selectMembers.removeWhere(
-                          (element) => element.userID == member.userID);
+                      _selectMembers.removeWhere((element) => element.userID == member.userID);
                     }
                     setState(() {});
                   },
@@ -261,18 +227,12 @@ class _TencentCloudChatGroupMemberSelectorState
                     width: getHeight(40),
                     height: getHeight(40),
                     borderRadius: getHeight(20),
-                    imageList: [
-                      TencentCloudChatUtils.checkString(member.faceUrl) ??
-                          "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"
-                    ]),
+                    imageList: [TencentCloudChatUtils.checkString(member.faceUrl) ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"]),
                 SizedBox(
                   width: getWidth(8),
                 ),
                 Text(
-                  TencentCloudChatUtils.checkString(member.friendRemark) ??
-                      TencentCloudChatUtils.checkString(member.nameCard) ??
-                      TencentCloudChatUtils.checkString(member.nickName) ??
-                      member.userID,
+                  TencentCloudChatUtils.checkString(member.friendRemark) ?? TencentCloudChatUtils.checkString(member.nameCard) ?? TencentCloudChatUtils.checkString(member.nickName) ?? member.userID,
                 ),
               ],
             )),
@@ -301,9 +261,7 @@ class _TencentCloudChatGroupMemberSelectorState
   @override
   Widget defaultBuilder(BuildContext context) {
     double contentHeight = MediaQuery.of(context).size.height * 0.8;
-    double heightFactor = _actualHeight < contentHeight
-        ? _actualHeight / MediaQuery.of(context).size.height
-        : 0.8;
+    double heightFactor = _actualHeight < contentHeight ? _actualHeight / MediaQuery.of(context).size.height : 0.8;
 
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => ClipRRect(

@@ -42,6 +42,8 @@ public class TencentCloudChatPushPlugin implements FlutterPlugin, MethodCallHand
 
     private Boolean registeredOnNotificationClickEvent = false;
 
+    private Boolean registeredOnAppWakeUpEvent = false;
+
     private Context mContext;
 
     @Override
@@ -83,6 +85,9 @@ public class TencentCloudChatPushPlugin implements FlutterPlugin, MethodCallHand
             case "registerOnNotificationClickedEvent":
                 registerOnNotificationClickedEvent(call, result);
                 break;
+            case "registerOnAppWakeUpEvent":
+                registerOnAppWakeUpEvent(call, result);
+                break;
             case "getAndroidPushToken":
                 getAndroidPushToken(call, result);
                 break;
@@ -104,50 +109,62 @@ public class TencentCloudChatPushPlugin implements FlutterPlugin, MethodCallHand
 
     public void toFlutterMethod(final String methodName, final String data) {
         final Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (attachedToEngine) {
-                    channel.invokeMethod(methodName, data);
-                } else {
-                    // Create a timer that checks if attachedToEngine is true every 500 milliseconds
-                    final Timer timer = new Timer();
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            if (attachedToEngine) {
-                                // If attachedToEngine is true, call invokeMethod and cancel the timer
-                                channel.invokeMethod(methodName, data);
-                                timer.cancel();
-                            }
+        handler.post(() -> {
+            if (attachedToEngine) {
+                channel.invokeMethod(methodName, data);
+            } else {
+                // Create a timer that checks if attachedToEngine is true every 500 milliseconds
+                final Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        if (attachedToEngine) {
+                            // If attachedToEngine is true, call invokeMethod and cancel the timer
+                            channel.invokeMethod(methodName, data);
+                            timer.cancel();
                         }
-                    }, 0, 500);
-                }
+                    }
+                }, 0, 500);
             }
         });
     }
 
-    public void tryNotifyDartOnNotificationClickEvent(final String extString) {
+    private boolean getMethodToBeCalledPrepared(final String action){
+        boolean methodToBeCalledPrepared = false;
+        switch (action){
+            case Extras.ON_NOTIFICATION_CLICKED:
+                methodToBeCalledPrepared = registeredOnNotificationClickEvent;
+                break;
+            case Extras.ON_APP_WAKE_UP:
+                methodToBeCalledPrepared = registeredOnAppWakeUpEvent;
+                break;
+            default:
+                break;
+        }
+        return methodToBeCalledPrepared;
+    }
+
+    public void tryNotifyDartEvent(final String action, final String data) {
         final Handler handler = new Handler(Looper.getMainLooper());
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (registeredOnNotificationClickEvent) {
-                    toFlutterMethod(Extras.ON_NOTIFICATION_CLICKED, extString);
-                } else {
-                    // Create a timer that checks if registeredOnNotificationClickEvent is true every 500 milliseconds
-                    final Timer timer = new Timer();
-                    timer.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            if (registeredOnNotificationClickEvent) {
-                                // If registeredOnNotificationClickEvent is true, call toFlutterMethod and cancel the timer
-                                toFlutterMethod(Extras.ON_NOTIFICATION_CLICKED, extString);
-                                timer.cancel();
-                            }
+        handler.post(() -> {
+            boolean methodToBeCalledPrepared = getMethodToBeCalledPrepared(action);
+
+            if (methodToBeCalledPrepared) {
+                toFlutterMethod(action, data);
+            } else {
+                // Create a timer that checks if method waiting to be called is prepared every 500 milliseconds
+                final Timer timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        boolean methodToBeCalledPrepared = getMethodToBeCalledPrepared(action);
+                        if (methodToBeCalledPrepared) {
+                            // If methodToBeCalledPrepared is true, call toFlutterMethod and cancel the timer
+                            toFlutterMethod(action, data);
+                            timer.cancel();
                         }
-                    }, 0, 500);
-                }
+                    }
+                }, 0, 500);
             }
         });
     }
@@ -157,27 +174,36 @@ public class TencentCloudChatPushPlugin implements FlutterPlugin, MethodCallHand
         result.success("");
     }
 
+    public void registerOnAppWakeUpEvent(@NonNull MethodCall call, @NonNull Result result) {
+        registeredOnAppWakeUpEvent = true;
+        result.success("");
+    }
+
     public void registerPush(@NonNull MethodCall call, @NonNull Result result) {
         Log.d(TAG, "registerPush");
         registeredOnNotificationClickEvent = true;
         Map<String, String> arguments = (Map<String, String>) call.arguments;
         String pushConfigJson = arguments.get(Extras.PUSH_CONFIG_JSON);
 
-        String useMethod = pushConfigJson.isEmpty() ? TUIConstants.TIMPush.METHOD_REGISTER_PUSH : TUIConstants.TIMPush.METHOD_REGISTER_PUSH_WITH_JSON;
+        String useMethod = (pushConfigJson != null && !pushConfigJson.isEmpty()) ? TUIConstants.TIMPush.METHOD_REGISTER_PUSH_WITH_JSON : TUIConstants.TIMPush.METHOD_REGISTER_PUSH;
 
         Map<String, Object> param = new HashMap<>();
         param.put("context", mContext);
-        if (!pushConfigJson.isEmpty()) {
+        if (pushConfigJson != null && !pushConfigJson.isEmpty()) {
             param.put(TUIConstants.TIMPush.REGISTER_PUSH_WITH_JSON_KEY, pushConfigJson);
         }
 
         TUICore.callService(TUIConstants.TIMPush.SERVICE_NAME, useMethod, param, new TUIServiceCallback() {
             @Override
             public void onServiceCallback(int errorCode, String errorMessage, Bundle bundle) {
-                if (errorCode == 0) {
-                    result.success("");
-                } else {
-                    result.error(String.valueOf(errorCode), errorMessage, errorMessage);
+                try {
+                    if (errorCode == 0) {
+                        result.success("");
+                    } else {
+                        result.error(String.valueOf(errorCode), errorMessage, errorMessage);
+                    }
+                }catch (Exception e){
+                    Log.d(TAG, errorMessage);
                 }
             }
         });
@@ -220,7 +246,7 @@ public class TencentCloudChatPushPlugin implements FlutterPlugin, MethodCallHand
         String brandId = arguments.get(Extras.BRAND_ID);
 
         Map<String, Object> param = new HashMap<>();
-        param.put(TUIConstants.TIMPush.PUSH_BRAND_ID_KEY, Integer.parseInt(brandId));
+        param.put(TUIConstants.TIMPush.PUSH_BRAND_ID_KEY, Integer.parseInt(brandId != null ? brandId : "0"));
         TUICore.callService(TUIConstants.TIMPush.SERVICE_NAME, TUIConstants.TIMPush.METHOD_SET_PUSH_BRAND_ID, param);
         result.success("");
     }
@@ -231,7 +257,7 @@ public class TencentCloudChatPushPlugin implements FlutterPlugin, MethodCallHand
     }
 
     private void getAndroidPushToken(MethodCall call, Result result) {
-        TUICore.callService(TUIConstants.TIMPush.SERVICE_NAME, "getPushToken", null, new TUIServiceCallback() {
+        TUICore.callService(TUIConstants.TIMPush.SERVICE_NAME, TUIConstants.TIMPush.METHOD_GET_PUSH_TOKEN, null, new TUIServiceCallback() {
             @Override
             public void onServiceCallback(int errorCode, String errorMessage, Bundle bundle) {
                 if (errorCode == 0 && bundle != null) {
@@ -251,9 +277,9 @@ public class TencentCloudChatPushPlugin implements FlutterPlugin, MethodCallHand
         String pushToken = arguments.get(Extras.PUSH_TOKEN);
 
         Map<String, Object> param = new HashMap<>();
-        param.put("pushBussinessIdKey", Integer.parseInt(businessID));
-        param.put("pushTokenKey", pushToken);
-        TUICore.callService(TUIConstants.TIMPush.SERVICE_NAME, "setPushToken", param, new TUIServiceCallback() {
+        param.put(TUIConstants.TIMPush.METHOD_PUSH_BUSSINESS_ID_KEY, Integer.parseInt(businessID != null ? businessID : "0"));
+        param.put(TUIConstants.TIMPush.METHOD_PUSH_TOKEN_KEY, pushToken);
+        TUICore.callService(TUIConstants.TIMPush.SERVICE_NAME, TUIConstants.TIMPush.METHOD_SET_PUSH_TOKEN, param, new TUIServiceCallback() {
             @Override
             public void onServiceCallback(int errorCode, String errorMessage, Bundle bundle) {
                 if (errorCode == 0) {
@@ -270,8 +296,8 @@ public class TencentCloudChatPushPlugin implements FlutterPlugin, MethodCallHand
         String configs = arguments.get(Extras.ANDROID_CONFIGS);
 
         Map<String, Object> param = new HashMap<>();
-        param.put("customTIMPushConfigsKey", configs);
-        TUICore.callService(TUIConstants.TIMPush.SERVICE_NAME, "customTIMPushConfigs", param, new TUIServiceCallback() {
+        param.put(TUIConstants.TIMPush.CUSTOM_TIMPUSH_CONFINGS_KEY, configs);
+        TUICore.callService(TUIConstants.TIMPush.SERVICE_NAME, TUIConstants.TIMPush.METHOD_CUSTOM_TIMPUSH_CONFINGS, param, new TUIServiceCallback() {
             @Override
             public void onServiceCallback(int errorCode, String errorMessage, Bundle bundle) {
                 if (errorCode == 0) {
@@ -301,7 +327,7 @@ public class TencentCloudChatPushPlugin implements FlutterPlugin, MethodCallHand
                     String res = bundle.getString(TUIConstants.TIMPush.CHECK_PUSH_STATUS_RESULT_LEY);
                     result.success(res);
                 } else {
-                    String errorMsg = "errcode = " + errorCode + ", errorMessage = " + errorMessage;
+                    String errorMsg = "errorCode = " + errorCode + ", errorMessage = " + errorMessage;
                     result.error(String.valueOf(errorCode), errorMsg, errorMsg);
                 }
             }

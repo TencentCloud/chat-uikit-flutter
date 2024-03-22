@@ -357,6 +357,7 @@
     "about",
     "profile",
     "unpin",
-    "mentionedMessages"
+    "mentionedMessages",
+    "longPressToNavigate"
   ]
 }

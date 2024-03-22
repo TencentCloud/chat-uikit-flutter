@@ -139,8 +139,7 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get more => 'More';
 
   @override
-  String get noConversationsContactsOrMessagesFound =>
-      'No Conversations, Contacts or Messages found';
+  String get noConversationsContactsOrMessagesFound => 'No Conversations, Contacts or Messages found';
 
   @override
   String get contactInfo => 'Contact Info';
@@ -255,8 +254,7 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   }
 
   @override
-  String get swipeLeftToCancelOrReleaseToSend =>
-      'Swipe left to cancel or release to send';
+  String get swipeLeftToCancelOrReleaseToSend => 'Swipe left to cancel or release to send';
 
   @override
   String get releaseToCancel => 'Release to Cancel';
@@ -369,8 +367,7 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get addSilencedMember => 'Add Silenced Member';
 
   @override
-  String get onlyGroupOwnerAndAdminsCanSendMessages =>
-      'After enabling, only the group owner and admins can send messages.';
+  String get onlyGroupOwnerAndAdminsCanSendMessages => 'After enabling, only the group owner and admins can send messages.';
 
   @override
   String someoneEnabledSilenceAll(String name) {
@@ -510,12 +507,10 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get contactsPermission => 'Contacts Permission';
 
   @override
-  String get allowAnyUserAddYouAsContact =>
-      'Allow Anyone to Add You as a Contact';
+  String get allowAnyUserAddYouAsContact => 'Allow Anyone to Add You as a Contact';
 
   @override
-  String get declineContactRequestFromAnyUser =>
-      'Auto Decline Contact Requests';
+  String get declineContactRequestFromAnyUser => 'Auto Decline Contact Requests';
 
   @override
   String get anyoneUponRequest => 'Accept Requests Manually';
@@ -581,8 +576,7 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get personalInformationCollected => 'Personal Information Collected';
 
   @override
-  String get informationSharedWithThirdParties =>
-      'Information Shared with Third Parties';
+  String get informationSharedWithThirdParties => 'Information Shared with Third Parties';
 
   @override
   String get deleteAccount => 'Delete Account';
@@ -642,15 +636,13 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get messageReadStatus => 'Message Read Status';
 
   @override
-  String get messageReadStatusDescription =>
-      'Controls whether the read status is displayed for your messages and if others can see whether you\'ve read their messages.';
+  String get messageReadStatusDescription => 'Controls whether the read status is displayed for your messages and if others can see whether you\'ve read their messages.';
 
   @override
   String get onlineStatus => 'Online Status';
 
   @override
-  String get onlineStatusDescription =>
-      'Determines if your online status is visible to your contacts.';
+  String get onlineStatusDescription => 'Determines if your online status is visible to your contacts.';
 
   @override
   String get noBio => 'No Bio';
@@ -785,8 +777,7 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get allowAny => 'Allow Any';
 
   @override
-  String get cannotSendApplicationToWorkGroup =>
-      'Cannot send application to work group';
+  String get cannotSendApplicationToWorkGroup => 'Cannot send application to work group';
 
   @override
   String get appearance => 'Appearance';
@@ -994,15 +985,13 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get doNotReceiveMessages => 'Do not receive messages';
 
   @override
-  String get receiveMessagesWhenOnlineOnly =>
-      'Receive messages when online only';
+  String get receiveMessagesWhenOnlineOnly => 'Receive messages when online only';
 
   @override
   String get disallowJoinGroup => 'Disallow applying to join group';
 
   @override
-  String get joinGroupNeedApproval =>
-      'Require admin approval for applying to join group';
+  String get joinGroupNeedApproval => 'Require admin approval for applying to join group';
 
   @override
   String get joinGroupDirectly => 'Join group directly after applying';
@@ -1011,12 +1000,10 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get disallowInviting => 'Disallow inviting to join group';
 
   @override
-  String get requireApprovalForInviting =>
-      'Require admin approval for inviting to join group';
+  String get requireApprovalForInviting => 'Require admin approval for inviting to join group';
 
   @override
-  String get joinDirectlyBeenInvited =>
-      'Join group directly after being invited';
+  String get joinDirectlyBeenInvited => 'Join group directly after being invited';
 
   @override
   String get unmuted => 'Unmuted';
@@ -1081,12 +1068,10 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get changeTheme => 'Change appearance';
 
   @override
-  String get deleteAccountNotification =>
-      'After deleted account, you will not be able to use your current account, and related data will be deleted and cannot be retrieved.';
+  String get deleteAccountNotification => 'After deleted account, you will not be able to use your current account, and related data will be deleted and cannot be retrieved.';
 
   @override
-  String get restartAppForLanguage =>
-      'Please restart the app for the language change to take effect';
+  String get restartAppForLanguage => 'Please restart the app for the language change to take effect';
 
   @override
   String get deleteAllMessages => 'Delete All Messages';
@@ -1101,8 +1086,7 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get messageRecall => 'Message Recall';
 
   @override
-  String get messageRecallConfirmation =>
-      'Are you sure you want to recall this message?';
+  String get messageRecallConfirmation => 'Are you sure you want to recall this message?';
 
   @override
   String get quit => 'Quit';
@@ -1179,8 +1163,7 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   }
 
   @override
-  String get unableToSendWithFolders =>
-      'Unable to send files because folders are included. Please select individual files only.';
+  String get unableToSendWithFolders => 'Unable to send files because folders are included. Please select individual files only.';
 
   @override
   String get channelSwitch => 'Channel: ';
@@ -1192,15 +1175,13 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get tGWA => 'Telegram & WhatsApp';
 
   @override
-  String get contactUsIfQuestions =>
-      'If there\'s anything unclear or you have more ideas, feel free to contact us!';
+  String get contactUsIfQuestions => 'If there\'s anything unclear or you have more ideas, feel free to contact us!';
 
   @override
   String get chatNow => 'Chat Now';
 
   @override
-  String get onlineServiceTimeFrom10To20 =>
-      'Online time: 10 AM to 8 PM, Mon through Fri';
+  String get onlineServiceTimeFrom10To20 => 'Online time: 10 AM to 8 PM, Mon through Fri';
 
   @override
   String get officialWebsite => 'Official Website';
@@ -1212,12 +1193,10 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get sourceCode => 'Source Code';
 
   @override
-  String get personalInformationCollectionList =>
-      'Personal information collection list';
+  String get personalInformationCollectionList => 'Personal information collection list';
 
   @override
-  String get thirdPartyInformationSharingList =>
-      'Third-party information sharing list';
+  String get thirdPartyInformationSharingList => 'Third-party information sharing list';
 
   @override
   String get version => 'Version';
@@ -1247,4 +1226,7 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get longPressToNavigate => 'Press & hold to view';
 }

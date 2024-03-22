@@ -156,9 +156,11 @@ class TencentCloudChatMessageInputRecordingState
     _timer?.cancel();
     _timer = null;
     _isFingerOverDelete = false;
-    WidgetsBinding.instance.pointerRouter
-        .removeGlobalRoute(_pointerEventListener!);
-    _pointerEventListener = null;
+    if(_pointerEventListener != null){
+      WidgetsBinding.instance.pointerRouter
+          .removeGlobalRoute(_pointerEventListener!);
+      _pointerEventListener = null;
+    }
 
     final recordedFile = await _audioRecorder?.stop();
     if (!cancel && TencentCloudChatUtils.checkString(recordedFile) != null) {

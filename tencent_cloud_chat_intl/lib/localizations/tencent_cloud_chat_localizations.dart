@@ -66,18 +66,15 @@ import 'tencent_cloud_chat_localizations_zh.dart';
 /// be consistent with the languages listed in the TencentCloudChatLocalizations.supportedLocales
 /// property.
 abstract class TencentCloudChatLocalizations {
-  TencentCloudChatLocalizations(String locale)
-      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  TencentCloudChatLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
   static TencentCloudChatLocalizations? of(BuildContext context) {
-    return Localizations.of<TencentCloudChatLocalizations>(
-        context, TencentCloudChatLocalizations);
+    return Localizations.of<TencentCloudChatLocalizations>(context, TencentCloudChatLocalizations);
   }
 
-  static const LocalizationsDelegate<TencentCloudChatLocalizations> delegate =
-      _TencentCloudChatLocalizationsDelegate();
+  static const LocalizationsDelegate<TencentCloudChatLocalizations> delegate = _TencentCloudChatLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -89,8 +86,7 @@ abstract class TencentCloudChatLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
-      <LocalizationsDelegate<dynamic>>[
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
     delegate,
     GlobalMaterialLocalizations.delegate,
     GlobalCupertinoLocalizations.delegate,
@@ -2255,59 +2251,55 @@ abstract class TencentCloudChatLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1 {1 Message Mentioned Me} other {{count} Messages Mentioned Me}}'**
   String mentionedMessages(num count);
+
+  /// No description provided for @longPressToNavigate.
+  ///
+  /// In en, this message translates to:
+  /// **'Press & hold to view'**
+  String get longPressToNavigate;
 }
 
-class _TencentCloudChatLocalizationsDelegate
-    extends LocalizationsDelegate<TencentCloudChatLocalizations> {
+class _TencentCloudChatLocalizationsDelegate extends LocalizationsDelegate<TencentCloudChatLocalizations> {
   const _TencentCloudChatLocalizationsDelegate();
 
   @override
   Future<TencentCloudChatLocalizations> load(Locale locale) {
-    return SynchronousFuture<TencentCloudChatLocalizations>(
-        lookupTencentCloudChatLocalizations(locale));
+    return SynchronousFuture<TencentCloudChatLocalizations>(lookupTencentCloudChatLocalizations(locale));
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['ar', 'en', 'ja', 'ko', 'zh'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['ar', 'en', 'ja', 'ko', 'zh'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_TencentCloudChatLocalizationsDelegate old) => false;
 }
 
-TencentCloudChatLocalizations lookupTencentCloudChatLocalizations(
-    Locale locale) {
+TencentCloudChatLocalizations lookupTencentCloudChatLocalizations(Locale locale) {
+
   // Lookup logic when language+script codes are specified.
   switch (locale.languageCode) {
-    case 'zh':
-      {
-        switch (locale.scriptCode) {
-          case 'Hans':
-            return TencentCloudChatLocalizationsZhHans();
-          case 'Hant':
-            return TencentCloudChatLocalizationsZhHant();
-        }
-        break;
-      }
+    case 'zh': {
+  switch (locale.scriptCode) {
+    case 'Hans': return TencentCloudChatLocalizationsZhHans();
+case 'Hant': return TencentCloudChatLocalizationsZhHant();
+   }
+  break;
+   }
   }
 
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'ar':
-      return TencentCloudChatLocalizationsAr();
-    case 'en':
-      return TencentCloudChatLocalizationsEn();
-    case 'ja':
-      return TencentCloudChatLocalizationsJa();
-    case 'ko':
-      return TencentCloudChatLocalizationsKo();
-    case 'zh':
-      return TencentCloudChatLocalizationsZh();
+    case 'ar': return TencentCloudChatLocalizationsAr();
+    case 'en': return TencentCloudChatLocalizationsEn();
+    case 'ja': return TencentCloudChatLocalizationsJa();
+    case 'ko': return TencentCloudChatLocalizationsKo();
+    case 'zh': return TencentCloudChatLocalizationsZh();
   }
 
   throw FlutterError(
-      'TencentCloudChatLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
-      'an issue with the localizations generation tool. Please file an issue '
-      'on GitHub with a reproducible sample app and the gen-l10n configuration '
-      'that was used.');
+    'TencentCloudChatLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.'
+  );
 }

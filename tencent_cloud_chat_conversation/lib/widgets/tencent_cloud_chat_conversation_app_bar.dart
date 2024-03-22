@@ -14,6 +14,15 @@ class TencentCloudChatConversationAppBar extends StatefulWidget {
 class TencentCloudChatConversationAppBarState
     extends TencentCloudChatState<TencentCloudChatConversationAppBar> {
   @override
+  Widget tabletAppBuilder(BuildContext context) {
+
+    return Padding(
+      padding: EdgeInsets.only(top: MediaQuery.paddingOf(context).top),
+      child: desktopBuilder(context),
+    );
+  }
+
+  @override
   Widget defaultBuilder(BuildContext context) {
     return Container(
       padding: EdgeInsets.only(bottom: getWidth(15)),
@@ -22,6 +31,33 @@ class TencentCloudChatConversationAppBarState
           TencentCloudChatConversationAppBarName(),
           TencentCloudChatAppBarSearchItem()
         ],
+      ),
+    );
+  }
+
+  @override
+  Widget desktopBuilder(BuildContext context) {
+    return TencentCloudChatThemeWidget(
+      build: (context, colorTheme, textStyle) => Container(
+        padding: EdgeInsets.symmetric(
+          vertical: getHeight(11.4),
+          horizontal: getWidth(16),
+        ),
+        decoration: BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              width: 1,
+              color: colorTheme.dividerColor,
+            ),
+          ),
+        ),
+        child: Text(
+          tL10n.chats,
+          style: TextStyle(
+              color: colorTheme.settingTitleColor,
+              fontSize: textStyle.fontsize_24 + 4,
+              fontWeight: FontWeight.w600),
+        ),
       ),
     );
   }

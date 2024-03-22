@@ -41,6 +41,8 @@ class TimFileCurrentRenderInfo {
 class TencentCloudChatMessageFile extends TencentCloudChatMessageItemBase {
   const TencentCloudChatMessageFile({
     super.key,
+    super.userID,
+    super.groupID,
     required super.message,
     required super.shouldBeHighlighted,
     required super.clearHighlightFunc,
@@ -378,7 +380,7 @@ class _TencentCloudChatMessageFileState
       child: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          if (sentFromSelf) messageStatus(),
+          if (sentFromSelf) messageStatusIndicator(),
           messageTimeIndicator(
             textColor: Colors.white,
           ),
@@ -620,7 +622,7 @@ class _TencentCloudChatMessageFileState
                     ],
                   ),
                 ),
-                if (sentFromSelf) messageStatus(),
+                if (sentFromSelf) messageStatusIndicator(),
                 messageTimeIndicator(),
               ],
             )
@@ -692,7 +694,7 @@ class _TencentCloudChatMessageFileState
                       ],
                     ),
                   ),
-                  if (sentFromSelf) messageStatus(),
+                  if (sentFromSelf) messageStatusIndicator(),
                   messageTimeIndicator(),
                 ],
               )

@@ -51,6 +51,8 @@ class TencentCloudChatMessageVideo extends TencentCloudChatMessageItemBase {
   const TencentCloudChatMessageVideo({
     super.key,
     required super.message,
+    super.userID,
+    super.groupID,
     required super.shouldBeHighlighted,
     required super.clearHighlightFunc,
     super.messageReceipt,
@@ -824,7 +826,7 @@ class _TencentCloudChatMessageVideoState
           SizedBox(
             width: getWidth(4),
           ),
-        if (sentFromSelf) messageStatus(),
+        if (sentFromSelf) messageStatusIndicator(),
         messageTimeIndicator(
           textColor: Colors.white,
           shadow: [

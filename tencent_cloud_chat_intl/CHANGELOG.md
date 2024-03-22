@@ -1,3 +1,22 @@
+## 1.1.2
+
+### General
+
+- Further enhanced the integration process.
+- Optimized screen type recognition for better adaptation to different screen types.
+
+### Message *(TencentCloudChatMessage)*
+
+- Enhanced message list with localized date and time indicators, adapting to user's language settings for a localization experience.
+
+## 1.1.1
+
+* Enhanced the integration process by reducing the number of steps, increasing the success rate of one-time integration, and lowering the barrier to entry.
+
+## 1.1.0+1
+
+* Modify the link to GitHub repo.
+
 ## 1.1.0
 
 Introducing the first release of the brand new Tencent Cloud Chat UIKit.

@@ -39,6 +39,7 @@ class _TencentCloudChatMessageListViewContainerState
   List<V2TimMessage>? _messagesMentionedMe;
 
   bool _init = false;
+  Key _messageListKey = UniqueKey();
 
   // This method handles changes in message data.
   void _messageDataHandler(TencentCloudChatMessageData messageData) {
@@ -84,6 +85,8 @@ class _TencentCloudChatMessageListViewContainerState
       case TencentCloudChatMessageDataKeys.sendMessageProgress:
         break;
       case TencentCloudChatMessageDataKeys.currentPlayAudioInfo:
+        break;
+      default:
         break;
     }
   }
@@ -164,9 +167,14 @@ class _TencentCloudChatMessageListViewContainerState
   void dataProviderListener() {
     // Conversation
     if (dataProvider.conversation != _conversation) {
-      setState(() {
+      safeSetState(() {
         _conversation = dataProvider.conversation;
       });
+      if (dataProvider.conversation != null) {
+        setState(() {
+          _messageListKey = UniqueKey();
+        });
+      }
     }
 
     // Mentioned Messages
@@ -206,6 +214,7 @@ class _TencentCloudChatMessageListViewContainerState
   @override
   Widget defaultBuilder(BuildContext context) {
     return TencentCloudChatMessageBuilders.getMessageListViewBuilder(
+      key: _messageListKey,
       loadToLatestMessage: _loadToLatestMessage,
       controller: dataProvider.messageController,
       messageList: messageList,

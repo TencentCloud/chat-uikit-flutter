@@ -81,7 +81,7 @@ If you want to customize the internationalization features, such as adding new s
 or modifying existing translations, follow these steps:
 
 1. Fork the `tencentcloud_chat_uikit_intl` repository
-   on [tool's GitHub repository](https://github.com/RoleWong/tencentcloud_chat_uikit_intl): https://github.com/RoleWong/tencentcloud_chat_uikit_intl
+   on [tool's GitHub repository](https://github.com/RoleWong/tencent_chat_intl_tool): https://github.com/RoleWong/tencent_chat_intl_tool
    . This will create a copy of the repository under your GitHub account.
 
 2. Clone the forked repository to a directory of your choice on your local machine. You can do this
@@ -106,7 +106,7 @@ machine.
 4. Run the following command in your project directory:
 
 ```sh
-dart run tencentcloud_chat_uikit_intl
+dart run tencent_cloud_chat_intl
 ```
 
 This script will guide you through the process of customizing internationalization, including adding
@@ -122,14 +122,14 @@ new language entries and modifying existing translations.
    at https://docs.flutter.dev/ui/accessibility-and-localization/internationalization#adding-your-own-localized-messages
    .
 
-2. Run the `dart run tencentcloud_chat_uikit_intl` command and select option `A` to incorporate the
+2. Run the `dart run tencent_cloud_chat_intl` command and select option `A` to incorporate the
    new entries into the tool's built-in ARB files.
 
 3. After adding new entries, proceed to the next step to translate them.
 
 ### Modifying Existing Translations and Adding Support for New Languages
 
-1. Run the `dart run tencentcloud_chat_uikit_intl` command and select option `B` to copy the
+1. Run the `dart run tencent_cloud_chat_intl` command and select option `B` to copy the
    built-in language entries (ARB files) to your project directory.
 
 2. Modify the ARB files in the `languages` directory as needed.
@@ -146,7 +146,7 @@ new language entries and modifying existing translations.
       file (without the script code or country code).
     - Translate all the entries in the new locale files to the corresponding language.
 
-4. Run the `dart run tencentcloud_chat_uikit_intl` command and select option `C` to apply your
+4. Run the `dart run tencent_cloud_chat_intl` command and select option `C` to apply your
    changes.
 
 ## License

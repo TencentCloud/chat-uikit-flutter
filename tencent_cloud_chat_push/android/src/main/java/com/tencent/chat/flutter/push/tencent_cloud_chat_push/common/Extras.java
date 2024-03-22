@@ -10,4 +10,8 @@ public interface Extras {
     String BRAND_ID = "brand_id";
     String ENABLE_FCM_PRIVATE_RING = "enable_fcm_private_ring";
     String ON_NOTIFICATION_CLICKED = "on_notification_clicked";
+    String ON_APP_WAKE_UP = "on_app_wake_up";
+
+    String FLUTTER_ENGINE = "tencent_cloud_chat_push_flutter_engine";
+    String SHOW_IN_FOREGROUND = "show_in_foreground";
 }

@@ -527,5 +527,6 @@
     "about": "يقدم",
     "profile": "الملف الشخصي",
     "unpin": "إلغاء التثبيت",
-    "mentionedMessages": "{count} رسائل ذكرتني"
+    "mentionedMessages": "{count} رسائل ذكرتني",
+  "longPressToNavigate": "اضغط واستمر لعرض"
 }

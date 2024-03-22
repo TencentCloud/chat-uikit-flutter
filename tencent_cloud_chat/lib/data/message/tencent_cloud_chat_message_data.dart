@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_message_sdk.dart';
 import 'package:tencent_cloud_chat/chat_sdk/tencent_cloud_chat_sdk.dart';
@@ -17,7 +19,8 @@ enum TencentCloudChatMessageDataKeys {
   messageList,
   downloadMessage,
   sendMessageProgress,
-  currentPlayAudioInfo
+  currentPlayAudioInfo,
+  messageNeedUpdate,
 }
 
 /// An enumeration of load direction of message data
@@ -38,7 +41,7 @@ class DownloadMessageQueueData {
   final bool isSnapshot;
 
   /// === message key, could be user ID or group ID ===
-  final String key; // userid or groupid
+  final String key; // userID or groupID
 
   /// === conversation type ===
   final int conversationType;
@@ -144,7 +147,7 @@ class MessageListStatus {
   /// === value for having more previous message data ===
   bool haveMorePreviousData;
 
-  /// === value for having more lates message data ===
+  /// === value for having more latest message data ===
   bool haveMoreLatestData;
 
   MessageListStatus(
@@ -181,23 +184,11 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
   /// === download message queue ===
   static final List<DownloadMessageQueueData> _downloadQueue = [];
 
-  /// === removed dosnload message queue ===
+  /// === removed download message queue ===
   static final List<DownloadMessageQueueData> _removedDownloadQueue = [];
 
   /// === currently downloading message ===
   static DownloadMessageQueueData? _currentDownloadMessage;
-
-  /// === Current Conversation ===
-  static ({String? userID, String? groupID})? _currentConversation;
-
-  static ({String? userID, String? groupID})? get currentConversation =>
-      _currentConversation;
-
-  static set currentConversation(({String? userID, String? groupID})? value) {
-    _currentConversation = value;
-
-    /// TODO
-  }
 
   /// === Is downloading messages ===
   static bool _isDownloading = false;
@@ -217,6 +208,18 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
   /// === audio information ===
   static AudioPlayInfo? _audioPlayInfo;
 
+  /// === Message need update ===
+  static V2TimMessage? _messageNeedUpdate;
+
+  V2TimMessage? get messageNeedUpdate => _messageNeedUpdate;
+
+  set messageNeedUpdate(V2TimMessage? value) {
+    _messageNeedUpdate = value;
+    if (value != null) {
+      notifyListener(TencentCloudChatMessageDataKeys.messageNeedUpdate as T);
+    }
+  }
+
   /// === message SDK ===
   final TencentCloudChatMessageSDK messageSDK = TencentCloudChatMessageSDK();
 
@@ -230,7 +233,8 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
       onRecvNewMessage: onReceiveNewMessage,
       onMessageDownloadProgressCallback: onMessageDownload,
       onSendMessageProgress: onSendMessageProgressFromSDK,
-      onRecvMessageModified: onRecvMessageModified,
+      onRecvMessageModified: onReceiveMessageModified,
+      onRecvMessageRevoked: onReceiveMessageRecalled,
     );
     player.setVolume(1);
     player.onPlayerStateChanged.listen(
@@ -686,9 +690,9 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
     }
   }
 
-  /// Callback for receiving  message was modified
+  /// Callback for receiving message was modified
   /// function(V2TimMessage)
-  void onRecvMessageModified(V2TimMessage newMessage) {
+  void onReceiveMessageModified(V2TimMessage newMessage) {
     String conversationID =
         TencentCloudChatUtils.checkString(newMessage.groupID) ??
             TencentCloudChatUtils.checkString(newMessage.userID) ??
@@ -703,9 +707,45 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
       messageList.replaceRange(index, index + 1, [newMessage]);
       // Update the message list in the data store.
       updateMessageList(
-          userID: newMessage.userID,
-          groupID: newMessage.groupID,
-          messageList: messageList);
+        userID: newMessage.userID,
+        groupID: newMessage.groupID,
+        messageList: messageList,
+        disableNotify: true,
+      );
+      messageNeedUpdate = newMessage;
+    }
+  }
+
+  /// Callback for receiving message was recalled
+  /// function(V2TimMessage)
+  void onReceiveMessageRecalled(String msgID) async {
+    final findRes = await messageSDK.findMessages(msgIds: [msgID]);
+    if (findRes.code == 0 &&
+        findRes.data != null &&
+        findRes.data!.isNotEmpty &&
+        findRes.data?.first != null) {
+      final V2TimMessage targetMessage = findRes.data!.first;
+      targetMessage.status = MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED;
+
+      String conversationID =
+          TencentCloudChatUtils.checkString(targetMessage.groupID) ??
+              TencentCloudChatUtils.checkString(targetMessage.userID) ??
+              "";
+      List<V2TimMessage> messageList = getMessageList(key: conversationID);
+      // Check if the message list already contains the new message.
+      int index = messageList
+          .indexWhere((element) => element.msgID == targetMessage.msgID);
+      if (index > -1) {
+        messageList.replaceRange(index, index + 1, [targetMessage]);
+        // Update the message list in the data store.
+        updateMessageList(
+          userID: targetMessage.userID,
+          groupID: targetMessage.groupID,
+          messageList: messageList,
+          disableNotify: true,
+        );
+        messageNeedUpdate = targetMessage;
+      }
     }
   }
 
@@ -751,8 +791,12 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
   /// [timeStamp] (optional) int
   /// [seq] (optional) int
   /// Returns {[haveMoreLatestData],[haveMorePreviousData]} according to msgID, timestamp and seq
-  Future<({bool haveMoreLatestData, bool haveMorePreviousData})>
-      loadToSpecificMessage({
+  Future<
+      ({
+        bool haveMoreLatestData,
+        bool haveMorePreviousData,
+        V2TimMessage? targetMessage,
+      })> loadToSpecificMessage({
     String? userID,
     String? groupID,
     int count = 20,
@@ -773,11 +817,11 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
 
     final contains = messageList.any((element) =>
             (element.msgID == msgID &&
-                TencentCloudChatUtils.checkString(msgID) != null) ||
-            (element.seq == seq.toString() && seq != null && seq > -1)) ||
+                TencentCloudChatUtils.checkString(msgID) != null)) ||
         (timeStamp != null &&
             timeStamp > 0 &&
-            (messageList.last.timestamp ?? 0) > timeStamp);
+            (messageList.last.timestamp ?? 0) > timeStamp &&
+            (messageList.first.timestamp ?? 0) < timeStamp);
 
     if (!contains) {
       /// latest messages
@@ -825,16 +869,89 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
             userID: userID, groupID: groupID, messageList: finalMessageList);
       }
 
+      V2TimMessage? targetMessage = finalMessageList.firstWhereOrNull(
+          (element) =>
+              (element.msgID == msgID &&
+                  TencentCloudChatUtils.checkString(msgID) != null));
+
+      if (targetMessage == null && (timeStamp != null && timeStamp > 0)) {
+        for (int i = finalMessageList.length - 1; i >= 0; i--) {
+          final currentMessage = finalMessageList[i];
+          if ((currentMessage.timestamp != null &&
+                  currentMessage.timestamp! > 0) &&
+              TencentCloudChatUtils.checkString(currentMessage.msgID) != null) {
+            if (currentMessage.timestamp! <= timeStamp) {
+              continue;
+            } else {
+              targetMessage = finalMessageList[i];
+              break;
+            }
+          }
+        }
+      }
+
+      if (targetMessage == null && (seq != null && seq > 0)) {
+        for (int i = finalMessageList.length - 1; i >= 0; i--) {
+          final currentMessage = finalMessageList[i];
+          if (TencentCloudChatUtils.checkString(currentMessage.seq) != null  &&
+              TencentCloudChatUtils.checkString(currentMessage.msgID) != null) {
+            if (currentMessage.seq! != seq.toString()) {
+              continue;
+            } else {
+              targetMessage = finalMessageList[max(0, i - 1)];
+              break;
+            }
+          }
+        }
+      }
+
       return (
         haveMoreLatestData: messageListStatus.haveMoreLatestData,
         haveMorePreviousData: previousMessageList.isNotEmpty
             ? messageListStatus.haveMorePreviousData
             : false,
+        targetMessage: targetMessage,
       );
     } else {
+      V2TimMessage? targetMessage = messageList.firstWhereOrNull((element) =>
+          (element.msgID == msgID &&
+              TencentCloudChatUtils.checkString(msgID) != null));
+
+      if (targetMessage == null && (timeStamp != null && timeStamp > 0)) {
+        for (int i = messageList.length - 1; i >= 0; i--) {
+          final currentMessage = messageList[i];
+          if ((currentMessage.timestamp != null &&
+              currentMessage.timestamp! > 0) &&
+              currentMessage.msgID != null) {
+            if (currentMessage.timestamp! <= timeStamp) {
+              continue;
+            } else {
+              targetMessage = messageList[max(0, i - 1)];
+              break;
+            }
+          }
+        }
+      }
+
+      if (targetMessage == null && (seq != null && seq > 0)) {
+        for (int i = messageList.length - 1; i >= 0; i--) {
+          final currentMessage = messageList[i];
+          if (TencentCloudChatUtils.checkString(currentMessage.seq) != null  &&
+              TencentCloudChatUtils.checkString(currentMessage.msgID) != null) {
+            if (currentMessage.seq! != seq.toString()) {
+              continue;
+            } else {
+              targetMessage = messageList[max(0, i - 1)];
+              break;
+            }
+          }
+        }
+      }
+
       return (
         haveMoreLatestData: messageListStatus.haveMoreLatestData,
         haveMorePreviousData: messageListStatus.haveMorePreviousData,
+        targetMessage: targetMessage,
       );
     }
   }

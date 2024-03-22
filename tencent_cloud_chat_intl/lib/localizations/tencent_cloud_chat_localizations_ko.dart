@@ -254,8 +254,7 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   }
 
   @override
-  String get swipeLeftToCancelOrReleaseToSend =>
-      '왼쪽으로 스와이프하여 취소하거나 보내기 위해 놓으십시오';
+  String get swipeLeftToCancelOrReleaseToSend => '왼쪽으로 스와이프하여 취소하거나 보내기 위해 놓으십시오';
 
   @override
   String get releaseToCancel => '취소하려면 놓으십시오';
@@ -368,8 +367,7 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   String get addSilencedMember => '무음 멤버 추가';
 
   @override
-  String get onlyGroupOwnerAndAdminsCanSendMessages =>
-      '활성화하면 그룹 소유자와 관리자만 메시지를 보낼 수 있습니다.';
+  String get onlyGroupOwnerAndAdminsCanSendMessages => '활성화하면 그룹 소유자와 관리자만 메시지를 보낼 수 있습니다.';
 
   @override
   String someoneEnabledSilenceAll(String name) {
@@ -638,8 +636,7 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   String get messageReadStatus => '메시지 읽음 상태';
 
   @override
-  String get messageReadStatusDescription =>
-      '메시지 읽음 상태를 표시하고 다른 사람이 메시지를 읽었는지 확인할 수 있는지 여부를 제어합니다.';
+  String get messageReadStatusDescription => '메시지 읽음 상태를 표시하고 다른 사람이 메시지를 읽었는지 확인할 수 있는지 여부를 제어합니다.';
 
   @override
   String get onlineStatus => '온라인 상태';
@@ -1071,8 +1068,7 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   String get changeTheme => '외관 변경';
 
   @override
-  String get deleteAccountNotification =>
-      '계정을 삭제한 후 현재 계정을 사용할 수 없으며 관련 데이터가 삭제되어 복구할 수 없습니다.';
+  String get deleteAccountNotification => '계정을 삭제한 후 현재 계정을 사용할 수 없으며 관련 데이터가 삭제되어 복구할 수 없습니다.';
 
   @override
   String get restartAppForLanguage => '언어 변경 사항을 적용하려면 앱을 다시 시작하십시오';
@@ -1167,8 +1163,7 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   }
 
   @override
-  String get unableToSendWithFolders =>
-      '폴더가 포함되어 있어 파일을 보낼 수 없습니다. 개별 파일만 선택해주세요.';
+  String get unableToSendWithFolders => '폴더가 포함되어 있어 파일을 보낼 수 없습니다. 개별 파일만 선택해주세요.';
 
   @override
   String get channelSwitch => '채널: ';
@@ -1186,8 +1181,7 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   String get chatNow => '지금 채팅하기';
 
   @override
-  String get onlineServiceTimeFrom10To20 =>
-      '온라인 서비스 시간: 월요일부터 금요일까지 오전 10시부터 오후 8시까지';
+  String get onlineServiceTimeFrom10To20 => '온라인 서비스 시간: 월요일부터 금요일까지 오전 10시부터 오후 8시까지';
 
   @override
   String get officialWebsite => '공식 웹사이트';
@@ -1226,4 +1220,7 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   String mentionedMessages(num count) {
     return '나에게 $count 개의 언급';
   }
+
+  @override
+  String get longPressToNavigate => '길게 눌러서 보기';
 }

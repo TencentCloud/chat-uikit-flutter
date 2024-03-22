@@ -17,14 +17,12 @@ import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 ///
 /// All widgets in the Chat UIKit should extend this class to ensure a consistent
 /// appearance and behavior.
-abstract class TencentCloudChatState<T extends StatefulWidget> extends State<T>
-    with WidgetsBindingObserver {
+abstract class TencentCloudChatState<T extends StatefulWidget> extends State<T> with WidgetsBindingObserver {
   // EventBus instance for the Chat UIKit
   TencentCloudChatEventBus eventbus = TencentCloudChat.eventBusInstance;
 
   // Listener for theme data changes
-  Stream<TencentCloudChatTheme>? themeDataListener =
-      TencentCloudChat.eventBusInstance.on<TencentCloudChatTheme>();
+  Stream<TencentCloudChatTheme>? themeDataListener = TencentCloudChat.eventBusInstance.on<TencentCloudChatTheme>();
 
   // Ticker for FPS monitoring
   Ticker? _fpsTicker;
@@ -40,8 +38,7 @@ abstract class TencentCloudChatState<T extends StatefulWidget> extends State<T>
 
   // Constructor for TencentCloudChatState
   // [needFPSMonitor]: Optional parameter to enable or disable FPS monitoring, defaults to false
-  TencentCloudChatState({bool needFPSMonitor = false})
-      : _needFPSMonitor = needFPSMonitor;
+  TencentCloudChatState({bool needFPSMonitor = false}) : _needFPSMonitor = needFPSMonitor;
 
   void safeSetState(VoidCallback fn) {
     try {
@@ -59,6 +56,12 @@ abstract class TencentCloudChatState<T extends StatefulWidget> extends State<T>
     if (_needFPSMonitor && (kDebugMode || kProfileMode)) {
       startFPSMonitor();
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    TencentCloudChat.controller.initGlobalAdapterInBuildPhase(context);
   }
 
   @override
@@ -82,8 +85,7 @@ abstract class TencentCloudChatState<T extends StatefulWidget> extends State<T>
 
       // If one second has passed, calculate and print the FPS
       if (_stopwatch!.elapsedMilliseconds >= 1000) {
-        int fps =
-            (_frameCount / (_stopwatch!.elapsedMilliseconds / 1000)).ceil();
+        int fps = (_frameCount / (_stopwatch!.elapsedMilliseconds / 1000)).ceil();
         if (fps < 40) {
           TencentCloudChat.logInstance.console(
             logs: 'FPS: $fps',
@@ -125,36 +127,31 @@ abstract class TencentCloudChatState<T extends StatefulWidget> extends State<T>
 
   @override
   Widget build(BuildContext context) {
-    final isDesktopScreen = TencentCloudChatScreenAdapter.deviceScreenType ==
-        DeviceScreenType.desktop;
-    final isMobileScreen = TencentCloudChatScreenAdapter.deviceScreenType ==
-        DeviceScreenType.mobile;
+    final isDesktopScreen = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop;
+    final isMobileScreen = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.mobile;
 
     // Select the appropriate builder based on the current platform and screen type
-    if (TencentCloudChatPlatformAdapter().isWeb &&
-        isDesktopScreen &&
-        desktopWebBuilder(context) != null) {
+    if (TencentCloudChatPlatformAdapter().isWeb && isDesktopScreen && desktopWebBuilder(context) != null) {
       return desktopWebBuilder(context)!;
     }
 
-    if (TencentCloudChatPlatformAdapter().isWeb &&
-        isMobileScreen &&
-        mobileWebBuilder(context) != null) {
+    if (TencentCloudChatPlatformAdapter().isWeb && isMobileScreen && mobileWebBuilder(context) != null) {
       return mobileWebBuilder(context)!;
     }
 
-    if (TencentCloudChatPlatformAdapter().isMobile &&
-        mobileAppBuilder(context) != null) {
+    if (TencentCloudChatPlatformAdapter().isMobile && isDesktopScreen && tabletAppBuilder(context) != null) {
+      return tabletAppBuilder(context)!;
+    }
+
+    if (TencentCloudChatPlatformAdapter().isMobile && mobileAppBuilder(context) != null) {
       return mobileAppBuilder(context)!;
     }
 
-    if (TencentCloudChatPlatformAdapter().isDesktop &&
-        desktopAppBuilder(context) != null) {
+    if (TencentCloudChatPlatformAdapter().isDesktop && desktopAppBuilder(context) != null) {
       return desktopAppBuilder(context)!;
     }
 
-    if (TencentCloudChatPlatformAdapter().isWeb &&
-        webBuilder(context) != null) {
+    if (TencentCloudChatPlatformAdapter().isWeb && webBuilder(context) != null) {
       return webBuilder(context)!;
     }
 
@@ -192,6 +189,11 @@ abstract class TencentCloudChatState<T extends StatefulWidget> extends State<T>
   ///
   /// Use this builder to customize the widget appearance and behavior specifically for desktop apps.
   Widget? desktopAppBuilder(BuildContext context) => null;
+
+  /// Builder for tablets app platform (iPad, Android Tablets, etc.).
+  ///
+  /// Use this builder to customize the widget appearance and behavior specifically for tablets apps.
+  Widget? tabletAppBuilder(BuildContext context) => null;
 
   /// Builder for web platform (both desktop and mobile web).
   ///

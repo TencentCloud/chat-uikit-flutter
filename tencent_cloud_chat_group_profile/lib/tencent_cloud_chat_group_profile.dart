@@ -17,12 +17,8 @@ import 'package:tencent_cloud_chat_group_profile/tencent_cloud_chat_group_profil
 import 'package:tencent_cloud_chat_group_profile/tencent_cloud_chat_group_profile_event_handlers.dart';
 import 'package:tencent_cloud_chat_group_profile/widget/tencent_cloud_chat_group_profile_body.dart';
 
-class TencentCloudChatGroupProfile extends TencentCloudChatComponent<
-    TencentCloudChatGroupProfileOptions,
-    TencentCloudChatGroupProfileConfig,
-    TencentCloudChatGroupProfileBuilders,
-    TencentCloudChatGroupProfileEventHandlers,
-    TencentCloudChatGroupProfileController> {
+class TencentCloudChatGroupProfile
+    extends TencentCloudChatComponent<TencentCloudChatGroupProfileOptions, TencentCloudChatGroupProfileConfig, TencentCloudChatGroupProfileBuilders, TencentCloudChatGroupProfileEventHandlers, TencentCloudChatGroupProfileController> {
   const TencentCloudChatGroupProfile({
     required TencentCloudChatGroupProfileOptions options,
     Key? key,
@@ -43,12 +39,9 @@ class TencentCloudChatGroupProfile extends TencentCloudChatComponent<
   State<StatefulWidget> createState() => _TencentCloudChatGroupProfileState();
 }
 
-class _TencentCloudChatGroupProfileState
-    extends TencentCloudChatState<TencentCloudChatGroupProfile> {
+class _TencentCloudChatGroupProfileState extends TencentCloudChatState<TencentCloudChatGroupProfile> {
   Future<V2TimGroupInfo?> _loadGroupInfo() async {
-    final res = await TencentCloudChatSDK.manager
-        .getGroupManager()
-        .getGroupsInfo(groupIDList: [widget.options!.groupID]);
+    final res = await TencentCloudChatSDK.manager.getGroupManager().getGroupsInfo(groupIDList: [widget.options!.groupID]);
     if (res.code == 0 && res.data?.first != null) {
       if (res.data?.first.resultCode == 0) {
         return res.data!.first.groupInfo;
@@ -61,8 +54,7 @@ class _TencentCloudChatGroupProfileState
 
   String _getShowName({V2TimGroupInfo? groupInfo}) {
     if (groupInfo != null) {
-      return TencentCloudChatUtils.checkString(groupInfo.groupName) ??
-          groupInfo.groupID;
+      return TencentCloudChatUtils.checkString(groupInfo.groupName) ?? groupInfo.groupID;
     }
     return groupInfo?.groupID ?? widget.options!.groupID;
   }
@@ -95,19 +87,13 @@ class TencentCloudChatGroupProfileInstance {
   TencentCloudChatGroupProfileInstance._internal();
 
   factory TencentCloudChatGroupProfileInstance() => _instance;
-  static final TencentCloudChatGroupProfileInstance _instance =
-      TencentCloudChatGroupProfileInstance._internal();
+  static final TencentCloudChatGroupProfileInstance _instance = TencentCloudChatGroupProfileInstance._internal();
 
-  static ({
-    TencentCloudChatComponentsEnum componentEnum,
-    TencentCloudChatWidgetBuilder widgetBuilder
-  }) register() {
+  static ({TencentCloudChatComponentsEnum componentEnum, TencentCloudChatWidgetBuilder widgetBuilder}) register() {
     TencentCloudChatRouter().registerRouter(
       routeName: TencentCloudChatRouteNames.groupProfile,
       builder: (context) => TencentCloudChatGroupProfile(
-        options: TencentCloudChatRouter()
-                .getArgumentFromMap<TencentCloudChatGroupProfileOptions>(
-                    context, 'options') ??
+        options: TencentCloudChatRouter().getArgumentFromMap<TencentCloudChatGroupProfileOptions>(context, 'options') ??
             TencentCloudChatGroupProfileOptions(
                 groupID: "",
                 getGroupMembersInfo: () {
@@ -119,13 +105,8 @@ class TencentCloudChatGroupProfileInstance {
     );
     return (
       componentEnum: TencentCloudChatComponentsEnum.groupProfile,
-      widgetBuilder: ({required Map<String, dynamic> options}) =>
-          TencentCloudChatGroupProfile(
-            options: TencentCloudChatGroupProfileOptions(
-                groupID: options["groupID"],
-                getGroupMembersInfo: options["getGroupMembersInfo"],
-                startVideoCall: options["startVideoCall"],
-                startVoiceCall: options["startVoiceCall"]),
+      widgetBuilder: ({required Map<String, dynamic> options}) => TencentCloudChatGroupProfile(
+            options: TencentCloudChatGroupProfileOptions(groupID: options["groupID"], getGroupMembersInfo: options["getGroupMembersInfo"], startVideoCall: options["startVideoCall"], startVoiceCall: options["startVoiceCall"]),
           ),
     );
   }

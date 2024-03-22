@@ -70,26 +70,32 @@ class TencentCloudChatScreenAdapter {
   ///
   /// This method should be called in your app's root widget or the initializing process of this UIKit.
   static void init(BuildContext context) {
-    // Get the current device type
-    deviceScreenType = _getDeviceType(context);
-
-    // Get the screen width
-    double screenWidth = MediaQuery.of(context).size.width;
-
-    // Set the designSize based on the device type and screen width
-    Size designSize;
-    if (deviceScreenType == DeviceScreenType.desktop) {
-      designSize = screenWidth > 960 ? const Size(1024, 768) : const Size(960, 640);
-    } else {
-      designSize = const Size(390, 844);
+    if (hasInitialized) {
+      return;
     }
+    try {
+      // Get the current device type
+      deviceScreenType = _getDeviceType(context);
 
-    ScreenUtil.init(
-      context,
-      designSize: designSize,
-    );
+      // Get the screen width
+      double screenWidth = MediaQuery.of(context).size.width;
 
-    hasInitialized = true;
+      // Set the designSize based on the device type and screen width
+      Size designSize;
+      if (deviceScreenType == DeviceScreenType.desktop) {
+        designSize = screenWidth > 960 ? const Size(1024, 768) : const Size(960, 640);
+      } else {
+        designSize = const Size(390, 844);
+      }
+
+      ScreenUtil.init(
+        context,
+        designSize: designSize,
+      );
+      hasInitialized = true;
+    } catch (e) {
+      hasInitialized = false;
+    }
   }
 
   /// Returns the adapted width based on the current device type and screen size.
@@ -175,7 +181,7 @@ class TencentCloudChatScreenAdapter {
 
       final diagonalInInches = sqrt(pow(screenWidth, 2) + pow(screenHeight, 2)) / 96.0;
 
-      return diagonalInInches < 11.0 ? DeviceScreenType.mobile : DeviceScreenType.desktop;
+      return diagonalInInches < 10 ? DeviceScreenType.mobile : DeviceScreenType.desktop;
     } else {
       double deviceWidth = MediaQuery.of(context).size.width;
       double deviceHeight = MediaQuery.of(context).size.height;

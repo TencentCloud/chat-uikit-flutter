@@ -27,14 +27,17 @@ TencentCloudChatMessageValueConfigWithMessage<T>
 // TencentCloudChatMessageBoolConfig or other function like this, which takes optional named parameters
 // userID and groupID, and returns a value.
 class TencentCloudChatMessageConfig {
-  // A configuration option that determines whether to use group message read receipts.
-  final TencentCloudChatMessageValueConfig<bool> useGroupMessageReadReceipt;
-
   // A configuration option that determines whether to show the avatar of the current user.
   final TencentCloudChatMessageValueConfig<bool> showSelfAvatar;
 
   // A configuration option that determines whether to show the avatar of other users.
   final TencentCloudChatMessageValueConfig<bool> showOthersAvatar;
+
+  // A configuration option that determines whether to show the time indicator for each messages.
+  final TencentCloudChatMessageValueConfig<bool> showMessageTimeIndicator;
+
+  // A configuration option that determines whether to show the status indicator for each messages.
+  final TencentCloudChatMessageValueConfig<bool> showMessageStatusIndicator;
 
   // A configuration option that determines whether allow message sender to delete the message for everyone, this feature only works with Premium Edition.
   final TencentCloudChatMessageValueConfig<bool> enableMessageDeleteForEveryone;
@@ -115,6 +118,8 @@ class TencentCloudChatMessageConfig {
     TencentCloudChatMessageValueConfig<int>? desktopMessageInputLines,
     TencentCloudChatMessageValueConfig<int>? recallTimeLimit,
     TencentCloudChatMessageValueConfig<bool>? showOthersAvatar,
+    TencentCloudChatMessageValueConfig<bool>? showMessageTimeIndicator,
+    TencentCloudChatMessageValueConfig<bool>? showMessageStatusIndicator,
     TencentCloudChatMessageValueConfig<bool>? enableMessageDeleteForEveryone,
     TencentCloudChatMessageValueConfig<bool>? enableDefaultEmojis,
     TencentCloudChatMessageValueConfigWithMessage<OfflinePushInfo>?
@@ -134,10 +139,10 @@ class TencentCloudChatMessageConfig {
         timeDividerConfig,
     TencentCloudChatMessageValueConfig<List<String>>?
         enabledGroupTypesForMessageReadReceipt,
-  })  : useGroupMessageReadReceipt =
-            useGroupMessageReadReceipt ?? createDefaultValue(true),
-        showSelfAvatar = showSelfAvatar ?? createDefaultValue(false),
+  })  : showSelfAvatar = showSelfAvatar ?? createDefaultValue(false),
         showOthersAvatar = showOthersAvatar ?? createDefaultValue(true),
+        showMessageTimeIndicator = showMessageTimeIndicator ?? createDefaultValue(true),
+        showMessageStatusIndicator = showMessageStatusIndicator ?? createDefaultValue(true),
         desktopMessageInputLines =
             desktopMessageInputLines ?? createDefaultValue(5),
         recallTimeLimit = recallTimeLimit ?? createDefaultValue(120),

@@ -1,3 +1,29 @@
+## 1.1.2
+
+### General
+
+- Further enhanced the integration process.
+
+- Optimized screen type recognition for better adaptation to different screen types.
+
+### Conversation *(TencentCloudChatConversation)*
+
+- Added a new `onTap` event, `onTapConversationItem`, to `TencentCloudChatConversationUIEventHandlers` of `TencentCloudChatConversationEventHandlers` on the `eventHandlers`.This allows for custom event handling when a conversation item is clicked. If it returns false, the default navigation will be executed, to the corresponding `TencentCloudChatMessage` widget.
+
+- Introduced a new builder, `conversationHeaderBuilder`, for customizing the header bar.
+
+### Message *(TencentCloudChatMessage)*
+
+- Enhanced message list with localized date and time indicators, adapting to user's language settings for a localization experience.
+
+## 1.1.1
+
+* Enhanced the integration process by reducing the number of steps, increasing the success rate of one-time integration, and lowering the barrier to entry.
+
+## 1.1.0+1
+
+* Open-sourced on [GitHub repo](https://github.com/TencentCloud/chat-uikit-flutter/tree/v2/tencent_cloud_chat).
+
 ## 1.1.0
 
 Introducing the first release of the brand new Tencent Cloud Chat UIKit.

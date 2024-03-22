@@ -636,8 +636,7 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
   String get messageReadStatus => '消息阅读状态';
 
   @override
-  String get messageReadStatusDescription =>
-      '控制是否显示您的消息的已读状态，以及他人是否可以看到您已读他们的消息。';
+  String get messageReadStatusDescription => '控制是否显示您的消息的已读状态，以及他人是否可以看到您已读他们的消息。';
 
   @override
   String get onlineStatus => '在线状态';
@@ -1221,18 +1220,21 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
   String mentionedMessages(num count) {
     return '$count 条消息提到我';
   }
+
+  @override
+  String get longPressToNavigate => '按住查看';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
-class TencentCloudChatLocalizationsZhHans
-    extends TencentCloudChatLocalizationsZh {
-  TencentCloudChatLocalizationsZhHans() : super('zh_Hans');
+class TencentCloudChatLocalizationsZhHans extends TencentCloudChatLocalizationsZh {
+  TencentCloudChatLocalizationsZhHans(): super('zh_Hans');
+
+
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hant`).
-class TencentCloudChatLocalizationsZhHant
-    extends TencentCloudChatLocalizationsZh {
-  TencentCloudChatLocalizationsZhHant() : super('zh_Hant');
+class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZh {
+  TencentCloudChatLocalizationsZhHant(): super('zh_Hant');
 
   @override
   String get album => '相册';
@@ -1860,8 +1862,7 @@ class TencentCloudChatLocalizationsZhHant
   String get messageReadStatus => '訊息已讀狀態';
 
   @override
-  String get messageReadStatusDescription =>
-      '控制是否顯示您的訊息已讀狀態以及其他人是否可以看到您已讀他們的訊息。';
+  String get messageReadStatusDescription => '控制是否顯示您的訊息已讀狀態以及其他人是否可以看到您已讀他們的訊息。';
 
   @override
   String get onlineStatus => '在線狀態';
@@ -2445,4 +2446,7 @@ class TencentCloudChatLocalizationsZhHant
   String mentionedMessages(num count) {
     return '$count 條訊息提及我';
   }
+
+  @override
+  String get longPressToNavigate => '按住查看';
 }

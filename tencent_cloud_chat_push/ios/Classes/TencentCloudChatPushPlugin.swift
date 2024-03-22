@@ -28,6 +28,9 @@ public class TencentCloudChatPushPlugin: NSObject, FlutterPlugin {
         case "registerOnNotificationClickedEvent":
             self.registerOnNotificationClickedEvent(call, result: result)
             break
+        case "registerOnAppWakeUpEvent":
+            self.registerOnAppWakeUpEvent(call, result: result)
+            break
         case "setApplicationGroupID":
             self.setApplicationGroupID(call, result: result)
             break
@@ -118,6 +121,10 @@ public class TencentCloudChatPushPlugin: NSObject, FlutterPlugin {
     }
     
     public func setAndroidCustomTIMPushConfigs(_ call: FlutterMethodCall, result: @escaping FlutterResult){
+        result(nil)
+    }
+    
+    public func registerOnAppWakeUpEvent(_ call: FlutterMethodCall, result: @escaping FlutterResult){
         result(nil)
     }
     

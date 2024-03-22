@@ -27,6 +27,7 @@ class TencentCloudChatMessageListView extends StatefulWidget {
   final int? c2cReadTimestamp;
   final int? groupReadSequence;
   final Function({
+    required bool highLightTargetMessage,
     V2TimMessage? message,
     int? timeStamp,
     int? seq,
@@ -64,8 +65,6 @@ class _TencentCloudChatMessageListViewState
     extends TencentCloudChatState<TencentCloudChatMessageListView> {
   final MessageListController _messageListController = MessageListController();
   late TencentCloudChatMessageController? controller;
-  Key _messageListKey = UniqueKey();
-
   List<V2TimMessage> _messagesMentionedMe = [];
 
   @override
@@ -84,18 +83,25 @@ class _TencentCloudChatMessageListViewState
         _messagesMentionedMe = widget.messagesMentionedMe;
       });
     }
+  }
 
-    if ((widget.userID != oldWidget.userID &&
-            !(TencentCloudChatUtils.checkString(widget.userID) == null &&
-                TencentCloudChatUtils.checkString(oldWidget.userID) == null)) ||
-        (widget.groupID != oldWidget.groupID &&
-            !(TencentCloudChatUtils.checkString(widget.groupID) == null &&
-                TencentCloudChatUtils.checkString(oldWidget.groupID) ==
-                    null))) {
-      setState(() {
-        _messageListKey = UniqueKey();
-      });
+  @override
+  void dispose() {
+    controller?.removeListener(_controllerEventListener);
+    super.dispose();
+  }
+
+  int _findMsgIndex(String? msgID) {
+    if (TencentCloudChatUtils.checkString(msgID) == null) {
+      return -1;
     }
+    final messageList = widget.getMessageList().asMap();
+    final target = messageList.entries.lastWhere((entry) {
+      return (entry.value.msgID == msgID!);
+    }, orElse: () {
+      return MapEntry(-1, V2TimMessage(elemType: 0));
+    });
+    return target.key;
   }
 
   void _controllerEventListener() {
@@ -103,6 +109,18 @@ class _TencentCloudChatMessageListViewState
     switch (event) {
       case EventName.scrollToBottom:
         _messageListController.scrollToBottom();
+        break;
+      case EventName.scrollToSpecificMessage:
+        final int index = _findMsgIndex(controller?.eventValue);
+        if (index > -1) {
+          _messageListController.animateToIndex(
+            index,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.bounceInOut,
+            offset: 100,
+            offsetBasedOnBottom: true,
+          );
+        }
         break;
       default:
         break;
@@ -113,7 +131,6 @@ class _TencentCloudChatMessageListViewState
   Widget defaultBuilder(BuildContext context) {
     return LayoutBuilder(
         builder: (context, constraints) => MessageList(
-              key: _messageListKey,
               haveMorePreviousData: widget.haveMorePreviousData,
               haveMoreLatestData: widget.haveMoreLatestData,
               offsetToTriggerLoadPrevious: 200,
@@ -174,6 +191,7 @@ class _TencentCloudChatMessageListViewState
               onLoadToLatestReadMessage: () async {
                 try {
                   await widget.loadToSpecificMessage(
+                    highLightTargetMessage: false,
                     timeStamp:
                         TencentCloudChatUtils.checkString(widget.userID) != null
                             ? widget.c2cReadTimestamp
@@ -183,63 +201,19 @@ class _TencentCloudChatMessageListViewState
                         ? widget.groupReadSequence
                         : null,
                   );
-
-                  final messageList = widget.getMessageList().asMap();
-
-                  final target = messageList.entries.lastWhere((entry) {
-                    final currentIndex = entry.key;
-                    final message = entry.value;
-                    final messageKey =
-                        TencentCloudChatUtils.checkString(widget.groupID) !=
-                                null
-                            ? int.tryParse(message.seq ?? "")
-                            : message.timestamp;
-                    if (TencentCloudChatUtils.checkString(widget.groupID) !=
-                        null) {
-                      return (messageKey == widget.groupReadSequence &&
-                          widget.groupReadSequence != null);
-                    } else {
-                      final previousMessageKey = messageList[
-                                  min(messageList.length - 1, currentIndex + 1)]
-                              ?.timestamp ??
-                          0;
-                      return ((widget.c2cReadTimestamp != null) &&
-                          ((widget.c2cReadTimestamp ?? 0) <
-                              (messageKey ?? 0)) &&
-                          ((widget.c2cReadTimestamp ?? 0) >
-                              previousMessageKey) &&
-                          (previousMessageKey < (messageKey ?? 0)));
-                    }
-                  });
-                  return target.key;
+                  return;
                 } catch (e) {
-                  return -1;
+                  return;
                 }
               },
               onLoadToLatestMessageMentionedMe: () async {
                 final V2TimMessage latestMessage = _messagesMentionedMe.first;
                 await widget.loadToSpecificMessage(
+                  highLightTargetMessage: true,
                   message: latestMessage,
                 );
                 _messagesMentionedMe.removeAt(0);
-
-                final messageList = widget.getMessageList();
-                final targetIndex = messageList.lastIndexWhere((entry) {
-                  final message = entry;
-                  return (message.msgID == latestMessage.msgID &&
-                          TencentCloudChatUtils.checkString(
-                                  latestMessage.msgID) !=
-                              null) ||
-                      (message.id == latestMessage.id &&
-                          TencentCloudChatUtils.checkString(latestMessage.id) !=
-                              null);
-                });
-                SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-                  Future.delayed(const Duration(milliseconds: 300), () {
-                    widget.highlightMessage(latestMessage);
-                  });
-                });
-                return targetIndex;
+                return;
               },
             ));
   }

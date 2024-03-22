@@ -254,6 +254,11 @@ class _TencentCloudChatMessageHeaderState
   }
 
   @override
+  Widget tabletAppBuilder(BuildContext context) {
+    return defaultBuilder(context);
+  }
+
+  @override
   Widget defaultBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => FutureBuilder(

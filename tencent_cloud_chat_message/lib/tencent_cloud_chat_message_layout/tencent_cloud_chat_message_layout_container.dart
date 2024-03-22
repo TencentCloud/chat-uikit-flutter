@@ -39,20 +39,20 @@ class _TencentCloudChatMessageLayoutContainerState
   void _dataProviderHandler() {
     if (dataProvider.desktopMentionBoxPositionX !=
         _desktopMentionBoxPositionX) {
-      setState(() {
+      safeSetState(() {
         _desktopMentionBoxPositionX = dataProvider.desktopMentionBoxPositionX;
       });
     }
 
     if (dataProvider.desktopMentionBoxPositionY !=
         _desktopMentionBoxPositionY) {
-      setState(() {
+      safeSetState(() {
         _desktopMentionBoxPositionY = dataProvider.desktopMentionBoxPositionY;
       });
     }
 
     if (dataProvider.activeMentionIndex != _activeMentionIndex) {
-      setState(() {
+      safeSetState(() {
         _activeMentionIndex = dataProvider.activeMentionIndex;
       });
     }
@@ -60,7 +60,7 @@ class _TencentCloudChatMessageLayoutContainerState
     if (!TencentCloudChatUtils.deepEqual(
         dataProvider.currentFilteredMembersListForMention,
         _currentFilteredMembersListForMention)) {
-      setState(() {
+      safeSetState(() {
         _currentFilteredMembersListForMention =
             dataProvider.currentFilteredMembersListForMention;
       });

@@ -11,6 +11,8 @@ import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/te
 class TencentCloudChatMessageCustom extends TencentCloudChatMessageItemBase {
   const TencentCloudChatMessageCustom({
     super.key,
+    super.userID,
+    super.groupID,
     required super.message,
     required super.shouldBeHighlighted,
     required super.clearHighlightFunc,
@@ -28,10 +30,11 @@ class TencentCloudChatMessageCustom extends TencentCloudChatMessageItemBase {
 
 class _TencentCloudChatMessageCustomState
     extends TencentCloudChatMessageState<TencentCloudChatMessageCustom> {
-  bool isvotemessage = false;
-  bool isrobotMessage = false;
+  bool isVoteMessage = false;
+  bool isRobotMessage = false;
   Widget? voteWidget;
   Widget? robotWidget;
+
   renderVoteMessage(TencentCloudChatThemeColors colorTheme,
       TencentCloudChatTextStyle textStyle) {
     if (voteWidget == null) {
@@ -49,7 +52,7 @@ class _TencentCloudChatMessageCustomState
   }
 
   getWidgetFromPlugin() async {
-    if (isvotemessage) {
+    if (isVoteMessage) {
       if (TencentCloudChat.dataInstance.basic.hasPlugins('poll')) {
         var plugin = TencentCloudChat.dataInstance.basic.getPlugin('poll');
         if (plugin != null) {
@@ -77,7 +80,7 @@ class _TencentCloudChatMessageCustomState
         }
       }
     }
-    if (isrobotMessage) {
+    if (isRobotMessage) {
       if (TencentCloudChat.dataInstance.basic.hasPlugins('robot')) {
         var plugin = TencentCloudChat.dataInstance.basic.getPlugin('robot');
         if (plugin != null) {
@@ -110,8 +113,8 @@ class _TencentCloudChatMessageCustomState
   @override
   void initState() {
     super.initState();
-    isvotemessage = TencentCloudChatUtils.isVoteMessage(widget.message);
-    isrobotMessage = TencentCloudChatUtils.isRobotMessage(widget.message);
+    isVoteMessage = TencentCloudChatUtils.isVoteMessage(widget.message);
+    isRobotMessage = TencentCloudChatUtils.isRobotMessage(widget.message);
     getWidgetFromPlugin();
   }
 
@@ -123,32 +126,90 @@ class _TencentCloudChatMessageCustomState
 
   Widget getFinalRenderWidget(TencentCloudChatThemeColors colorTheme,
       TencentCloudChatTextStyle textStyle) {
-    if (isvotemessage) {
+    if (isVoteMessage) {
       return renderVoteMessage(colorTheme, textStyle);
     }
-    if (isrobotMessage) {
+    if (isRobotMessage) {
       return renderRobotMessage(colorTheme, textStyle);
     }
-    return Text(
-      TencentCloudChatUtils.handleCustomMessage(widget.message),
-      style: TextStyle(
-          color: sentFromSelf
-              ? colorTheme.selfMessageTextColor
-              : colorTheme.othersMessageTextColor,
-          fontSize: textStyle.messageBody),
-    );
+
+    final (String lineOne, String? lineTwo, IconData? icon) =
+        TencentCloudChatUtils.handleCustomMessage(widget.message);
+    if (lineTwo == null) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null)
+            Icon(
+              icon,
+              size: textStyle.fontsize_18,
+              color: colorTheme.primaryColor,
+            ),
+          if (icon != null)
+            SizedBox(
+              width: getWidth(8),
+            ),
+          Text(
+            lineOne,
+            style: TextStyle(
+                color: sentFromSelf
+                    ? colorTheme.selfMessageTextColor
+                    : colorTheme.othersMessageTextColor,
+                fontSize: textStyle.messageBody),
+          )
+        ],
+      );
+    } else {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null)
+            Icon(
+              icon,
+              size: textStyle.fontsize_18,
+              color: colorTheme.primaryColor,
+            ),
+          if (icon != null)
+            SizedBox(
+              width: getWidth(8),
+            ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                lineOne,
+                style: TextStyle(
+                    color: sentFromSelf
+                        ? colorTheme.selfMessageTextColor
+                        : colorTheme.othersMessageTextColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: textStyle.messageBody),
+              ),
+              Text(
+                lineTwo,
+                style: TextStyle(
+                    color: (sentFromSelf
+                            ? colorTheme.selfMessageTextColor
+                            : colorTheme.othersMessageTextColor)
+                        .withOpacity(0.9),
+                    fontSize: textStyle.messageBody - 1),
+              )
+            ],
+          )
+        ],
+      );
+    }
   }
 
   Widget messageInfo() {
     return Row(
-      mainAxisAlignment:
-          sentFromSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.end,
       children: [
         if (!sentFromSelf)
           SizedBox(
             width: getWidth(0),
           ),
-        if (sentFromSelf) messageStatus(),
+        if (sentFromSelf) messageStatusIndicator(),
         messageTimeIndicator(),
         if (sentFromSelf)
           SizedBox(

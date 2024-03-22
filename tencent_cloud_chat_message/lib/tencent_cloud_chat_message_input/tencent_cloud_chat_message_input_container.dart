@@ -6,6 +6,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_common_defines.dart';
+import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/tuicore/tencent_cloud_chat_core.dart';
@@ -60,10 +61,8 @@ class _TencentCloudChatMessageInputContainerState
   }
 
   void _buildAttachmentOptionsList() {
-    final isDesktopScreen = TencentCloudChatScreenAdapter.deviceScreenType ==
-        DeviceScreenType.desktop;
     final config = dataProvider.config;
-    if (isDesktopScreen) {
+    if (!TencentCloudChatPlatformAdapter().isMobile) {
       final defaultOptions = [
         TencentCloudChatMessageGeneralOptionItem(
             icon: Icons.insert_drive_file_outlined,
@@ -95,10 +94,6 @@ class _TencentCloudChatMessageInputContainerState
             icon: Icons.photo_library,
             label: tL10n.album,
             onTap: _sendMediaFromGallery),
-        TencentCloudChatMessageGeneralOptionItem(
-            icon: Icons.location_on,
-            label: tL10n.location,
-            onTap: ({Offset? offset}) {}),
         if (TencentCloudChat.dataInstance.basic.useCallKit)
           TencentCloudChatMessageGeneralOptionItem(
               icon: Icons.call, label: tL10n.call, onTap: _startCall),

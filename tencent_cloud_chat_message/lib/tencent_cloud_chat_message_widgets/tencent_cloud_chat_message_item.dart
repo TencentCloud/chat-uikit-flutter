@@ -12,6 +12,10 @@ abstract class TencentCloudChatMessageItemBase extends StatefulWidget {
   /// The message itself.
   final V2TimMessage message;
 
+  final String? userID;
+
+  final String? groupID;
+
   /// A flag indicating whether the message should be highlighted.
   final bool shouldBeHighlighted;
 
@@ -44,6 +48,8 @@ abstract class TencentCloudChatMessageItemBase extends StatefulWidget {
     required this.renderOnMenuPreview,
     required this.inSelectMode,
     required this.onSelectMessage,
+    this.userID,
+    this.groupID,
   }) : super(key: key);
 }
 
@@ -108,40 +114,50 @@ abstract class TencentCloudChatMessageState<
     });
   }
 
-  Widget messageStatus() {
-    return TencentCloudChatThemeWidget(
-      build: (context, colorTheme, textStyle) {
-        IconData? iconData;
-        Color? iconColor = colorTheme.messageStatusIconColor;
-        double iconSize = textStyle.standardSmallText;
-
-        switch (widget.message.status) {
-          case MessageStatus.V2TIM_MSG_STATUS_SEND_FAIL:
-            iconData = Icons.error;
-            iconColor = colorTheme.error;
-            break;
-          case MessageStatus.V2TIM_MSG_STATUS_SENDING:
-            iconData = Icons.done;
-            iconColor = colorTheme.secondaryTextColor;
-          case MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC:
-            iconData = showReadByOthersStatus ? Icons.done_all : Icons.done;
-            break;
-          case MessageStatus.V2TIM_MSG_STATUS_HAS_DELETED:
-          case MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED:
-          default:
-            return Container();
-        }
-
-        return Container(
-          margin: const EdgeInsets.only(right: 4),
-          child: Icon(
-            iconData,
-            color: iconColor,
-            size: iconSize,
-          ),
-        );
-      },
+  Widget messageStatusIndicator() {
+    final showMessageStatusIndicator = TencentCloudChat
+        .dataInstance.basic.messageConfig
+        .showMessageStatusIndicator(
+      userID: widget.userID,
+      groupID: widget.groupID,
     );
+
+    return showMessageStatusIndicator
+        ? TencentCloudChatThemeWidget(
+            build: (context, colorTheme, textStyle) {
+              IconData? iconData;
+              Color? iconColor = colorTheme.messageStatusIconColor;
+              double iconSize = textStyle.standardSmallText;
+
+              switch (widget.message.status) {
+                case MessageStatus.V2TIM_MSG_STATUS_SEND_FAIL:
+                  iconData = Icons.error;
+                  iconColor = colorTheme.error;
+                  break;
+                case MessageStatus.V2TIM_MSG_STATUS_SENDING:
+                  iconData = Icons.done;
+                  iconColor = colorTheme.secondaryTextColor;
+                case MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC:
+                  iconData =
+                      showReadByOthersStatus ? Icons.done_all : Icons.done;
+                  break;
+                case MessageStatus.V2TIM_MSG_STATUS_HAS_DELETED:
+                case MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED:
+                default:
+                  return Container();
+              }
+
+              return Container(
+                margin: const EdgeInsets.only(right: 4),
+                child: Icon(
+                  iconData,
+                  color: iconColor,
+                  size: iconSize,
+                ),
+              );
+            },
+          )
+        : Container();
   }
 
   Widget messageTimeIndicator({
@@ -149,17 +165,25 @@ abstract class TencentCloudChatMessageState<
     double? fontSize,
     List<Shadow>? shadow,
   }) {
-    return TencentCloudChatThemeWidget(
-      build: (context, colorTheme, textStyle) => Text(
-        TencentCloudChatIntl.formatTimestampToTime(
-            widget.message.timestamp ?? 0),
-        style: TextStyle(
-          color: textColor ?? colorTheme.secondaryTextColor,
-          fontSize: fontSize ?? textStyle.standardSmallText,
-          shadows: shadow,
-        ),
-      ),
+    final showMessageTimeIndicator = TencentCloudChat
+        .dataInstance.basic.messageConfig
+        .showMessageTimeIndicator(
+      userID: widget.userID,
+      groupID: widget.groupID,
     );
+    return showMessageTimeIndicator
+        ? TencentCloudChatThemeWidget(
+            build: (context, colorTheme, textStyle) => Text(
+              TencentCloudChatIntl.formatTimestampToTime(
+                  widget.message.timestamp ?? 0),
+              style: TextStyle(
+                color: textColor ?? colorTheme.secondaryTextColor,
+                fontSize: fontSize ?? textStyle.standardSmallText,
+                shadows: shadow,
+              ),
+            ),
+          )
+        : Container();
   }
 
   // Initialize the state.

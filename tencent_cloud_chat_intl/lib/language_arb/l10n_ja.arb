@@ -527,5 +527,6 @@
     "about": "紹介",
     "profile": "プロフィール",
     "unpin": "ピン留めを解除",
-    "mentionedMessages": "私への {count} 件のメンション"
+    "mentionedMessages": "私への {count} 件のメンション",
+  "longPressToNavigate": "押し続けて表示"
 }

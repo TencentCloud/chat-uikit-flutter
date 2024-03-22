@@ -2,23 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
+import 'package:tencent_cloud_chat/data/basic/tencent_cloud_chat_basic_data.dart';
 import 'package:tencent_cloud_chat/data/conversation/tencent_cloud_chat_conversation_data.dart';
+import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
+import 'package:tencent_cloud_chat_conversation/tencent_cloud_chat_conversation_builders.dart';
 import 'package:tencent_cloud_chat_conversation/widgets/tencent_cloud_chat_conversation_list.dart';
 
 class TencentCloudChatConversationDesktopMode extends StatefulWidget {
-  final List<V2TimConversation> conversationList;
-  final List<V2TimUserStatus> userStatusList;
-  final bool getDataEnd;
-
-  const TencentCloudChatConversationDesktopMode(
-      {super.key,
-      required this.conversationList,
-      required this.userStatusList,
-      required this.getDataEnd});
+  const TencentCloudChatConversationDesktopMode({super.key});
 
   @override
   State<TencentCloudChatConversationDesktopMode> createState() =>
@@ -30,16 +25,22 @@ class _TencentCloudChatConversationDesktopModeState
   final Stream<TencentCloudChatConversationData<dynamic>>?
       _conversationDataStream = TencentCloudChat.eventBusInstance
           .on<TencentCloudChatConversationData<dynamic>>();
-  final _messageWidget = TencentCloudChat
-      .dataInstance.basic.componentsMap[TencentCloudChatComponentsEnum.message];
 
   V2TimConversation? _currentConversation;
   bool _isShowSearch = false;
   bool _isShowGroupProfile = false;
 
+  TencentCloudChatWidgetBuilder? _messageWidget;
+
+  @override
+  void didUpdateWidget(TencentCloudChatConversationDesktopMode oldWidget) {
+    super.didUpdateWidget(oldWidget);
+  }
+
   _conversationDataHandler(TencentCloudChatConversationData data) {
     /// === Current Conversation ===
-    if (data.currentConversation != _currentConversation) {
+    if (data.currentConversation?.conversationID !=
+        _currentConversation?.conversationID) {
       setState(() {
         _currentConversation = data.currentConversation;
       });
@@ -50,10 +51,31 @@ class _TencentCloudChatConversationDesktopModeState
     _conversationDataStream?.listen(_conversationDataHandler);
   }
 
+  void _addBasicEventListener() {
+    TencentCloudChat.eventBusInstance
+        .on<TencentCloudChatBasicData<TencentCloudChatBasicDataKeys>>()
+        ?.listen((event) {
+      if (event.currentUpdatedFields ==
+          TencentCloudChatBasicDataKeys.addUsedComponent) {
+        final messageWidget = TencentCloudChat.dataInstance.basic
+            .componentsMap[TencentCloudChatComponentsEnum.message];
+        if (messageWidget != _messageWidget) {
+          safeSetState(() {
+            _messageWidget = messageWidget;
+          });
+        }
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    _addBasicEventListener();
     _addConversationDataListener();
+
+    _messageWidget = TencentCloudChat.dataInstance.basic
+        .componentsMap[TencentCloudChatComponentsEnum.message];
   }
 
   @override
@@ -74,36 +96,15 @@ class _TencentCloudChatConversationDesktopModeState
                       Row(
                         children: [
                           Expanded(
-                            child: Container(
-                              padding: EdgeInsets.symmetric(
-                                vertical: getHeight(11.4),
-                                horizontal: getWidth(16),
-                              ),
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    width: 1,
-                                    color: colorTheme.dividerColor,
-                                  ),
-                                ),
-                              ),
-                              child: Text(
-                                tL10n.chats,
-                                style: TextStyle(
-                                    color: colorTheme.settingTitleColor,
-                                    fontSize: textStyle.fontsize_24 + 4,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                            ),
+                            child: TencentCloudChatConversationBuilders
+                                    .getConversationHeaderBuilder()
+                                .$1,
                           ),
                         ],
                       ),
                       // const TencentCloudChatConversationDesktopSearchAndAdd(),
                       Expanded(
                         child: TencentCloudChatConversationList(
-                          conversationList: widget.conversationList,
-                          getDataEnd: widget.getDataEnd,
-                          userStatusList: widget.userStatusList,
                           currentConversation: _currentConversation,
                         ),
                       ),

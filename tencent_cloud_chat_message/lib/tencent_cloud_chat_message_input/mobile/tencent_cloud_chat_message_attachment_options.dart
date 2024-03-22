@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_common_defines.dart';
+import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
@@ -29,9 +30,11 @@ class TencentCloudChatMessageAttachmentOptions {
       {required BoxConstraints constraints,
       required List<TencentCloudChatMessageGeneralOptionItem>
           attachmentOptions}) {
+    final isMobile = TencentCloudChatScreenAdapter.deviceScreenType ==
+        DeviceScreenType.mobile;
     return SlideTransition(
       position: _attachmentOptionsAnimation.drive(Tween<Offset>(
-        begin: const Offset(-1, 0),
+        begin: isMobile ? const Offset(-1, 0) : const Offset(0, 0),
         end: const Offset(0, 0),
       )),
       child: SizeTransition(
@@ -50,6 +53,7 @@ class TencentCloudChatMessageAttachmentOptions {
   void toggleAttachmentOptionsOverlay(
       {required BoxConstraints constraints,
       required BuildContext context,
+      required TapDownDetails tapDownDetails,
       required List<TencentCloudChatMessageGeneralOptionItem>
           attachmentOptions}) {
     if (_overlayEntry == null) {
@@ -58,6 +62,7 @@ class TencentCloudChatMessageAttachmentOptions {
           onTap: () => toggleAttachmentOptionsOverlay(
               constraints: constraints,
               context: context,
+              tapDownDetails: tapDownDetails,
               attachmentOptions: attachmentOptions),
           child: Container(
             color: Colors.transparent,
@@ -65,7 +70,7 @@ class TencentCloudChatMessageAttachmentOptions {
               children: [
                 Positioned(
                   bottom: 80,
-                  left: 16,
+                  left: tapDownDetails.globalPosition.dx,
                   child: GestureDetector(
                     onTap: () {},
                     child: _buildAttachmentOptions(

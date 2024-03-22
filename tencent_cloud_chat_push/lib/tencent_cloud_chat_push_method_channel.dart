@@ -37,6 +37,23 @@ class MethodChannelTencentCloudChatPush extends TencentCloudChatPushPlatform {
   }
 
   @override
+  Future<TencentCloudChatPushResult> registerOnAppWakeUpEvent({
+    required VoidCallback onAppWakeUpEvent,
+  }) async {
+    try {
+      _tencentCloudChatPushModal.onAppWakeUp = onAppWakeUpEvent;
+      _methodChannel.setMethodCallHandler(_tencentCloudChatPushModal.handleMethod);
+      await _methodChannel.invokeMethod("registerOnAppWakeUpEvent");
+      return TencentCloudChatPushResult(code: 0);
+    } on PlatformException catch (e) {
+      return TencentCloudChatPushResult(
+        code: int.tryParse(e.code) ?? -1,
+        errorMessage: e.message,
+      );
+    }
+  }
+
+  @override
   Future<TencentCloudChatPushResult> registerPush({String? configJson}) async {
     try {
       await _methodChannel.invokeMethod("registerPush", {"push_config_json": configJson ?? ""});
@@ -115,7 +132,7 @@ class MethodChannelTencentCloudChatPush extends TencentCloudChatPushPlatform {
   Future<TencentCloudChatPushResult<int>> getPushBrandId() async {
     try {
       final res = await _methodChannel.invokeMethod("getPushBrandId");
-      return TencentCloudChatPushResult(code: 0, data: int.tryParse(res));
+      return TencentCloudChatPushResult(code: 0, data: int.tryParse(res.toString()));
     } on PlatformException catch (e) {
       return TencentCloudChatPushResult(
         code: int.tryParse(e.code) ?? -1,

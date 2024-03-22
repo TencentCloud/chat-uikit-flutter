@@ -1,3 +1,5 @@
+
+import 'package:flutter/foundation.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:tencent_cloud_chat_push/common/common_defines.dart';
 
@@ -32,6 +34,12 @@ abstract class TencentCloudChatPushPlatform extends PlatformInterface {
     required Function({required String ext, String? userID, String? groupID}) onNotificationClicked,
   }) {
     throw UnimplementedError('registerOnNotificationClickedEvent() has not been implemented.');
+  }
+
+  Future<TencentCloudChatPushResult> registerOnAppWakeUpEvent({
+    required VoidCallback onAppWakeUpEvent,
+  }) {
+    throw UnimplementedError('registerOnAppWakeUpEvent() has not been implemented.');
   }
 
   Future<TencentCloudChatPushResult> registerPush({String? configJson}) {

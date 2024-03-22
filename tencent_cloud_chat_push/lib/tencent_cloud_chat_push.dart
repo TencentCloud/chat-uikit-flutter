@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:tencent_cloud_chat_push/common/common_defines.dart';
 import 'package:tencent_cloud_chat_push/common/defines.dart';
 import 'package:tencent_cloud_chat_push/tencent_cloud_chat_push_platform_interface.dart';
@@ -31,6 +32,19 @@ class TencentCloudChatPush {
   }) {
     return TencentCloudChatPushPlatform.instance.registerOnNotificationClickedEvent(
       onNotificationClicked: onNotificationClicked,
+    );
+  }
+
+  /// This method registers a callback function for handling app wake up.
+  /// It's recommended to call this method as soon as the app starts to ensure that
+  /// the Dart layer can receive the app wake up event to login Chat service.
+  ///
+  /// Only works on Android.
+  Future<TencentCloudChatPushResult> registerOnAppWakeUpEvent({
+    required VoidCallback onAppWakeUpEvent,
+  }) {
+    return TencentCloudChatPushPlatform.instance.registerOnAppWakeUpEvent(
+      onAppWakeUpEvent: onAppWakeUpEvent,
     );
   }
 

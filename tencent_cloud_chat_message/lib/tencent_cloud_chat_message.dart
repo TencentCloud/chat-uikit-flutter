@@ -25,12 +25,7 @@ import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_list_view/
 
 import 'data/tencent_cloud_chat_message_separate_data.dart';
 
-class TencentCloudChatMessage extends TencentCloudChatComponent<
-    TencentCloudChatMessageOptions,
-    TencentCloudChatMessageConfig,
-    TencentCloudChatMessageBuilders,
-    TencentCloudChatMessageEventHandlers,
-    TencentCloudChatMessageController> {
+class TencentCloudChatMessage extends TencentCloudChatComponent<TencentCloudChatMessageOptions, TencentCloudChatMessageConfig, TencentCloudChatMessageBuilders, TencentCloudChatMessageEventHandlers, TencentCloudChatMessageController> {
   const TencentCloudChatMessage({
     required TencentCloudChatMessageOptions options,
     Key? key,
@@ -51,11 +46,8 @@ class TencentCloudChatMessage extends TencentCloudChatComponent<
   State<StatefulWidget> createState() => _TencentCloudChatMessageState();
 }
 
-class _TencentCloudChatMessageState
-    extends TencentCloudChatState<TencentCloudChatMessage> {
-  final TencentCloudChatMessageSeparateDataProvider
-      _messageSeparateDataProvider =
-      TencentCloudChatMessageSeparateDataProvider();
+class _TencentCloudChatMessageState extends TencentCloudChatState<TencentCloudChatMessage> {
+  final TencentCloudChatMessageSeparateDataProvider _messageSeparateDataProvider = TencentCloudChatMessageSeparateDataProvider();
 
   @override
   void initState() {
@@ -64,30 +56,20 @@ class _TencentCloudChatMessageState
       userID: widget.options?.userID,
       groupID: widget.options?.groupID,
     );
-    _messageSeparateDataProvider.messageController =
-        widget.controller ?? TencentCloudChatMessageController();
+    _messageSeparateDataProvider.messageController = widget.controller ?? TencentCloudChatMessageController();
   }
 
   @override
   void didUpdateWidget(covariant TencentCloudChatMessage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if ((widget.options?.userID != oldWidget.options?.userID &&
-            !(TencentCloudChatUtils.checkString(widget.options?.userID) ==
-                    null &&
-                TencentCloudChatUtils.checkString(oldWidget.options?.userID) ==
-                    null)) ||
-        (widget.options?.groupID != oldWidget.options?.groupID &&
-            !(TencentCloudChatUtils.checkString(widget.options?.groupID) ==
-                    null &&
-                TencentCloudChatUtils.checkString(oldWidget.options?.groupID) ==
-                    null))) {
+    if ((widget.options?.userID != oldWidget.options?.userID && !(TencentCloudChatUtils.checkString(widget.options?.userID) == null && TencentCloudChatUtils.checkString(oldWidget.options?.userID) == null)) ||
+        (widget.options?.groupID != oldWidget.options?.groupID && !(TencentCloudChatUtils.checkString(widget.options?.groupID) == null && TencentCloudChatUtils.checkString(oldWidget.options?.groupID) == null))) {
       _messageSeparateDataProvider.unInit();
       _messageSeparateDataProvider.init(
         userID: widget.options?.userID,
         groupID: widget.options?.groupID,
       );
-      _messageSeparateDataProvider.messageController =
-          widget.controller ?? TencentCloudChatMessageController();
+      _messageSeparateDataProvider.messageController = widget.controller ?? TencentCloudChatMessageController();
       setState(() {});
     }
   }
@@ -100,10 +82,8 @@ class _TencentCloudChatMessageState
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    final hasChat =
-        (widget.options?.userID == null) != (widget.options?.groupID == null);
-    final isDesktop = TencentCloudChatScreenAdapter.deviceScreenType ==
-        DeviceScreenType.desktop;
+    final hasChat = (widget.options?.userID == null) != (widget.options?.groupID == null);
+    final isDesktop = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop;
     return hasChat
         ? TencentCloudChatMessageDataProviderInherited(
             dataProvider: _messageSeparateDataProvider,
@@ -135,38 +115,28 @@ class TencentCloudChatMessageInstance {
 
   // Factory constructor that returns the singleton instance of TencentCloudChatConversationInstance.
   factory TencentCloudChatMessageInstance() => _instance;
-  static final TencentCloudChatMessageInstance _instance =
-      TencentCloudChatMessageInstance._internal();
+  static final TencentCloudChatMessageInstance _instance = TencentCloudChatMessageInstance._internal();
 
-  static ({
-    TencentCloudChatComponentsEnum componentEnum,
-    TencentCloudChatWidgetBuilder widgetBuilder
-  }) register() {
+  static ({TencentCloudChatComponentsEnum componentEnum, TencentCloudChatWidgetBuilder widgetBuilder}) register() {
     TencentCloudChat.dataInstance.messageData.init();
 
     TencentCloudChatRouter().registerRouter(
       routeName: TencentCloudChatRouteNames.message,
       builder: (context) => TencentCloudChatMessage(
-        options: TencentCloudChatRouter()
-            .getArgumentFromMap<TencentCloudChatMessageOptions>(
-                context, 'options')!,
+        options: TencentCloudChatRouter().getArgumentFromMap<TencentCloudChatMessageOptions>(context, 'options')!,
       ),
     );
 
     TencentCloudChatRouter().registerRouter(
       routeName: TencentCloudChatRouteNames.messageInfo,
       builder: (context) => TencentCloudChatMessageInfo(
-        options: TencentCloudChatRouter()
-                .getArgumentFromMap<TencentCloudChatMessageInfoOptions>(
-                    context, 'data') ??
-            TencentCloudChatMessageInfoOptions(),
+        options: TencentCloudChatRouter().getArgumentFromMap<TencentCloudChatMessageInfoOptions>(context, 'data') ?? TencentCloudChatMessageInfoOptions(),
       ),
     );
 
     return (
       componentEnum: TencentCloudChatComponentsEnum.message,
-      widgetBuilder: ({required Map<String, dynamic> options}) =>
-          TencentCloudChatMessage(
+      widgetBuilder: ({required Map<String, dynamic> options}) => TencentCloudChatMessage(
             options: TencentCloudChatMessageOptions(
               userID: options["userID"],
               groupID: options["groupID"],

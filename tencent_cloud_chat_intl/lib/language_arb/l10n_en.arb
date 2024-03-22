@@ -530,5 +530,6 @@
   "about": "About",
   "profile": "Profile",
   "unpin": "Unpin",
-  "mentionedMessages": "{count, plural, =1 {1 Message Mentioned Me} other {{count} Messages Mentioned Me}}"
+  "mentionedMessages": "{count, plural, =1 {1 Message Mentioned Me} other {{count} Messages Mentioned Me}}",
+  "longPressToNavigate": "Press & hold to view"
 }

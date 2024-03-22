@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:tencent_cloud_chat_push/common/common_defines.dart';
@@ -84,6 +86,12 @@ class MockTencentCloudChatPushPlatform with MockPlatformInterfaceMixin implement
   @override
   Future<TencentCloudChatPushResult> setAndroidPushToken({required String businessID, required String pushToken}) {
     // TODO: implement setAndroidPushToken
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<TencentCloudChatPushResult> registerOnAppWakeUpEvent({required VoidCallback onAppWakeUpEvent}) {
+    // TODO: implement registerOnAppWakeUpEvent
     throw UnimplementedError();
   }
 }

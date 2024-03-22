@@ -38,8 +38,6 @@ class TencentCloudChatMessageInputMobile extends StatefulWidget {
   }) onChooseGroupMembers;
   final List<TencentCloudChatMessageGeneralOptionItem> attachmentOptions;
   final String? statusText;
-  final FocusNode focusNode;
-  final TextEditingController textEditingController;
 
   const TencentCloudChatMessageInputMobile({
     super.key,
@@ -57,8 +55,6 @@ class TencentCloudChatMessageInputMobile extends StatefulWidget {
     required this.onChooseGroupMembers,
     required this.attachmentOptions,
     this.statusText,
-    required this.focusNode,
-    required this.textEditingController,
   });
 
   @override
@@ -76,7 +72,11 @@ class _TencentCloudChatMessageInputMobileState
       _recordingWidgetKey = GlobalKey();
   final List<({String userID, String label})> _mentionedUsers = [];
 
-  late AnimationController _animationController;
+  late AnimationController? _animationController;
+
+
+  final TextEditingController _textEditingController = TextEditingController();
+  final FocusNode _textEditingFocusNode = FocusNode();
 
   bool _showStickerPanel = false;
   bool _showKeyboard = false;
@@ -89,35 +89,55 @@ class _TencentCloudChatMessageInputMobileState
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-        duration: const Duration(milliseconds: 200), vsync: this);
-    _messageAttachmentOptions.init(vsync: this, context: context);
-    widget.textEditingController.addListener(_onTextChanged);
-    widget.focusNode.addListener(() {
-      if (widget.focusNode.hasFocus) {
-        setState(() {
-          _showKeyboard = true;
-          _showStickerPanel = false;
-        });
-      } else {
-        setState(() {
-          _showKeyboard = false;
-        });
-      }
-    });
+    _addTextInputEvent();
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
-    widget.textEditingController.dispose();
-    _messageAttachmentOptions.dispose();
     super.dispose();
+    _removeTextInputEvent();
+  }
+
+  void _addTextInputEvent(){
+    try{
+      _animationController = AnimationController(
+          duration: const Duration(milliseconds: 200), vsync: this);
+      _messageAttachmentOptions.init(vsync: this, context: context);
+      _textEditingController.addListener(_onTextChanged);
+      _textEditingFocusNode.addListener(() {
+        if (_textEditingFocusNode.hasFocus) {
+          safeSetState(() {
+            _showKeyboard = true;
+            _showStickerPanel = false;
+          });
+        } else {
+          safeSetState(() {
+            _showKeyboard = false;
+          });
+        }
+      });
+    }catch(e){
+      debugPrint(e.toString());
+    }
+  }
+
+  void _removeTextInputEvent(){
+    try{
+      _animationController?.dispose();
+      _messageAttachmentOptions.dispose();
+      _animationController = null;
+      _textEditingController.removeListener(_onTextChanged);
+      _textEditingController.clear();
+      _textEditingController.dispose();
+      _textEditingFocusNode.dispose();
+    }catch(e){
+      debugPrint(e.toString());
+    }
   }
 
   Widget _buildInputAreaIcon({
     required IconData icon,
-    required GestureTapCallback onTap,
+    required GestureTapDownCallback onTapDown,
   }) {
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Material(
@@ -125,7 +145,7 @@ class _TencentCloudChatMessageInputMobileState
               shape: const CircleBorder(),
               clipBehavior: Clip.hardEdge,
               child: InkWell(
-                onTap: onTap,
+                onTapDown: onTapDown,
                 child: Container(
                   margin: EdgeInsets.only(bottom: getSquareSize(1.5)),
                   padding: EdgeInsets.all(getSquareSize(8)),
@@ -142,7 +162,7 @@ class _TencentCloudChatMessageInputMobileState
   void _onStartRecording(PointerDownEvent event) {
     _recordingStarter?.cancel();
     _recordingStarter = Timer(const Duration(milliseconds: 100), () {
-      setState(() {
+      safeSetState(() {
         _isRecording = true;
       });
       _recordingWidgetKey.currentState?.startRecording();
@@ -150,17 +170,17 @@ class _TencentCloudChatMessageInputMobileState
   }
 
   void _onTextChanged() async {
-    final newText = widget.textEditingController.text;
+    final newText = _textEditingController.text;
 
     /// Send Button Animation
     if (newText.isNotEmpty != _showSendButton) {
-      setState(() {
+      safeSetState(() {
         _showSendButton = !_showSendButton;
       });
       if (_showSendButton) {
-        _animationController.forward();
+        _animationController?.forward();
       } else {
-        _animationController.reverse();
+        _animationController?.reverse();
       }
     }
 
@@ -188,8 +208,8 @@ class _TencentCloudChatMessageInputMobileState
         /// Insert mentionText after the "@" character
         final updatedText = newText.replaceRange(
             compareResult.index, compareResult.index + 1, mentionText);
-        widget.textEditingController.text = updatedText;
-        widget.textEditingController.selection = TextSelection.collapsed(
+        _textEditingController.text = updatedText;
+        _textEditingController.selection = TextSelection.collapsed(
             offset: compareResult.index + mentionText.length);
       } else if (!compareResult.isAddText) {
         final atIndex =
@@ -221,8 +241,8 @@ class _TencentCloudChatMessageInputMobileState
                 .firstWhere((user) => removedLabelList.contains(user.label));
             final updatedText = newText.replaceRange(
                 atIndex, atIndex + 1 + mentionedUser.label.length, '');
-            widget.textEditingController.text = updatedText;
-            widget.textEditingController.selection =
+            _textEditingController.text = updatedText;
+            _textEditingController.selection =
                 TextSelection.collapsed(offset: atIndex);
             _mentionedUsers
                 .removeWhere((user) => user.label == mentionedUser.label);
@@ -232,7 +252,7 @@ class _TencentCloudChatMessageInputMobileState
     }
 
     /// End
-    _inputText = widget.textEditingController.text;
+    _inputText = _textEditingController.text;
   }
 
   void _onStopRecording(PointerUpEvent event) {
@@ -251,7 +271,7 @@ class _TencentCloudChatMessageInputMobileState
       final boxHitTestResult = BoxHitTestResult();
       bool isOverTrashIcon = trashIconBox.hitTest(boxHitTestResult,
           position: trashIconBox.globalToLocal(event.position));
-      setState(() {
+      safeSetState(() {
         _isRecording = false;
       });
       _recordingWidgetKey.currentState?.stopRecording(cancel: isOverTrashIcon);
@@ -267,17 +287,18 @@ class _TencentCloudChatMessageInputMobileState
                 children: [
                   _buildInputAreaIcon(
                     icon: Icons.add_circle_outline_rounded,
-                    onTap: () {
-                      widget.focusNode.unfocus();
+                    onTapDown: (details) {
+                      _textEditingFocusNode.unfocus();
                       _messageAttachmentOptions.toggleAttachmentOptionsOverlay(
                           constraints: constraints,
                           context: context,
+                          tapDownDetails: details,
                           attachmentOptions: widget.attachmentOptions);
                     },
                   ),
                   _buildInputAreaIcon(
                     icon: Icons.camera_alt_outlined,
-                    onTap: () =>
+                    onTapDown: (_) =>
                         TencentCloudChatMessageCamera.showCameraOptions(
                       context: context,
                       onSendImage: widget.sendImageMessage,
@@ -305,14 +326,14 @@ class _TencentCloudChatMessageInputMobileState
                           child: TextField(
                             onTap: () {
                               widget.messageController.scrollToBottom();
-                              widget.focusNode.requestFocus();
-                              setState(() {
+                              _textEditingFocusNode.requestFocus();
+                              safeSetState(() {
                                 _showStickerPanel = false;
                                 _showKeyboard = true;
                               });
                             },
-                            focusNode: widget.focusNode,
-                            controller: widget.textEditingController,
+                            focusNode: _textEditingFocusNode,
+                            controller: _textEditingController,
                             minLines: 1,
                             maxLines: 4,
                             style: TextStyle(
@@ -329,9 +350,9 @@ class _TencentCloudChatMessageInputMobileState
                         // GestureDetector(
                         //   onTap: () {
                         //     if (!_showStickerPanel) {
-                        //       widget.focusNode.unfocus();
+                        //       _textEditingFocusNode.unfocus();
                         //     }
-                        //     setState(() {
+                        //     safeSetState(() {
                         //       _showStickerPanel = !_showStickerPanel;
                         //     });
                         //   },
@@ -350,16 +371,16 @@ class _TencentCloudChatMessageInputMobileState
                       left: getSquareSize(_showSendButton ? 6 : 8),
                       right: getSquareSize(_showSendButton ? 8 : 2),
                     ),
-                    child: AnimatedBuilder(
-                      animation: _animationController,
+                    child: _animationController != null ? AnimatedBuilder(
+                      animation: _animationController!,
                       builder: (BuildContext context, Widget? child) {
                         return Transform.rotate(
-                          angle: _animationController.value * pi,
+                          angle: _animationController!.value * pi,
                           child: _showSendButton
                               ? InkWell(
                                   onTap: () {
                                     widget.sendTextMessage(
-                                      text: widget.textEditingController.text,
+                                      text: _textEditingController.text,
                                       mentionedUsers: _mentionedUsers
                                           .map(
                                             (e) => e.userID,
@@ -368,7 +389,7 @@ class _TencentCloudChatMessageInputMobileState
                                     );
                                     _inputText = "";
                                     _mentionedUsers.clear();
-                                    widget.textEditingController.clear();
+                                    _textEditingController.clear();
                                   },
                                   child: Container(
                                     decoration: BoxDecoration(
@@ -405,7 +426,7 @@ class _TencentCloudChatMessageInputMobileState
                                 ),
                         );
                       },
-                    ),
+                    ) : Container(),
                   ),
                 ],
               ),
@@ -420,7 +441,7 @@ class _TencentCloudChatMessageInputMobileState
       final currentKeyboardHeight = MediaQuery.of(context).viewInsets.bottom;
       double originHeight =
           TencentCloudChat.dataInstance.basic.keyboardHeight ?? getHeight(280);
-      if (currentKeyboardHeight != 0) {
+      if (currentKeyboardHeight > -1) {
         if (currentKeyboardHeight >= originHeight) {
           originHeight = currentKeyboardHeight;
         }

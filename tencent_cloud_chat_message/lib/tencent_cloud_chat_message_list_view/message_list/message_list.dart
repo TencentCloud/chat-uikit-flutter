@@ -78,8 +78,8 @@ class MessageList extends StatefulWidget {
   final int? unreadMsgCount;
   final Future Function()? onLoadMsgsByLatestReadMsgKey;
   final double offsetFromUnreadTipToTop;
-  final Future<int?> Function() onLoadToLatestReadMessage;
-  final Future<int?> Function() onLoadToLatestMessageMentionedMe;
+  final Future<void> Function() onLoadToLatestReadMessage;
+  final Future<void> Function() onLoadToLatestMessageMentionedMe;
 
   /// [haveMorePreviousData] is used to tell widget there are more messages need load in scroll to end
   /// [offsetToTriggerLoadPrevious] is used to tell widget when scroll offset is reach to end by loadNextMessageOffset,
@@ -438,23 +438,13 @@ class MessageListState extends State<MessageList> {
       loadingLatestReadMessage = true;
     });
 
-    final index = await widget.onLoadToLatestReadMessage();
+    await widget.onLoadToLatestReadMessage();
     await Future.delayed(const Duration(milliseconds: 50));
 
     setState(() {
       loadingLatestReadMessage = false;
     });
     showLastUnreadButton.value = false;
-
-    if (index != null && index > -1) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-        listViewController.sliverController.animateToIndex(index,
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.bounceInOut,
-            offsetBasedOnBottom: true,
-            offset: widget.offsetFromUnreadTipToTop);
-      });
-    }
   }
 
   _scrollToLatestMessageMentionedMe() async {
@@ -462,22 +452,13 @@ class MessageListState extends State<MessageList> {
       loadingMessageMentionedMe = true;
     });
 
-    final index = await widget.onLoadToLatestMessageMentionedMe();
+    await widget.onLoadToLatestMessageMentionedMe();
     await Future.delayed(const Duration(milliseconds: 50));
 
     setState(() {
       loadingMessageMentionedMe = false;
     });
 
-    if (index != null && index > -1) {
-      WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-        listViewController.sliverController.animateToIndex(index,
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.bounceInOut,
-            offsetBasedOnBottom: true,
-            offset: widget.offsetFromUnreadTipToTop);
-      });
-    }
   }
 
   Widget _renderItem(BuildContext context, int index) {

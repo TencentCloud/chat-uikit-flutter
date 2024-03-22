@@ -15,6 +15,7 @@ import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/widgets/desktop_column_menu/tencent_cloud_chat_column_menu.dart';
+import 'package:tencent_cloud_chat_common/widgets/desktop_gesture_detector/tencnet_cloud_chat_desktop_gesture_detector.dart';
 import 'package:vibration/vibration.dart';
 
 class TencentCloudChatMessageItemWithMenu extends StatefulWidget {
@@ -26,16 +27,12 @@ class TencentCloudChatMessageItemWithMenu extends StatefulWidget {
   final VoidCallback onSelectMessage;
   final bool isMergeMessage;
 
-  /// You should close the menu (message actions) once this value changed.
-  final int menuCloser;
-
   const TencentCloudChatMessageItemWithMenu({
     super.key,
     required this.messageItem,
     required this.useMessageReaction,
     required this.message,
     required this.menuOptions,
-    required this.menuCloser,
     required this.inSelectMode,
     required this.onSelectMessage,
     required this.isMergeMessage,
@@ -49,7 +46,7 @@ class TencentCloudChatMessageItemWithMenu extends StatefulWidget {
 class _TencentCloudChatMessageItemWithMenuState
     extends TencentCloudChatState<TencentCloudChatMessageItemWithMenu>
     with TickerProviderStateMixin {
-  final isDesktop = TencentCloudChatScreenAdapter.deviceScreenType ==
+  final isDesktopScreen = TencentCloudChatScreenAdapter.deviceScreenType ==
       DeviceScreenType.desktop;
 
   OverlayEntry? _mobileMenuOverlayEntry;
@@ -75,37 +72,33 @@ class _TencentCloudChatMessageItemWithMenuState
   @override
   void initState() {
     super.initState();
-    if (isDesktop) {
+    if (isDesktopScreen) {
+      if(TencentCloudChatPlatformAdapter().isMobile){
+        _mobileInit();
+      }
     } else {
       _mobileInit();
     }
   }
 
   @override
-  void didUpdateWidget(TencentCloudChatMessageItemWithMenu oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (isDesktop) {
-    } else {
-      if (oldWidget.menuCloser != widget.menuCloser) {
-        _menuAnimationController.reverse();
-        _messageActionsAnimationController.reverse().then((_) {
-          setState(() {
-            _showActions = false;
-          });
-          _mobileMenuOverlayEntry!.remove();
-          _mobileMenuOverlayEntry = null;
-        });
-      }
-    }
-  }
-
-  @override
   void dispose() {
-    if (isDesktop) {
+    if (isDesktopScreen) {
     } else {
       _mobileDispose();
     }
     super.dispose();
+  }
+
+  void _closeMobileMenu(){
+    _menuAnimationController.reverse();
+    _messageActionsAnimationController.reverse().then((_) {
+      safeSetState(() {
+        _showActions = false;
+      });
+      _mobileMenuOverlayEntry!.remove();
+      _mobileMenuOverlayEntry = null;
+    });
   }
 
   void _mobileInit() {
@@ -202,7 +195,12 @@ class _TencentCloudChatMessageItemWithMenuState
             Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: e.onTap,
+                onTap: (){
+                  _closeMobileMenu();
+                  Future.delayed(const Duration(milliseconds: 50),(){
+                    e.onTap();
+                  });
+                },
                 child: Container(
                   decoration: (i < widget.menuOptions.length - 1)
                       ? BoxDecoration(
@@ -355,7 +353,7 @@ class _TencentCloudChatMessageItemWithMenuState
                                   _messageActionsAnimationController
                                       .reverse()
                                       .then((_) {
-                                    setState(() {
+                                    safeSetState(() {
                                       _showActions = false;
                                     });
                                     _mobileMenuOverlayEntry!.remove();
@@ -405,7 +403,7 @@ class _TencentCloudChatMessageItemWithMenuState
                         )));
       });
 
-      setState(() {
+      safeSetState(() {
         _showActions = true;
       });
       Overlay.of(context).insert(_mobileMenuOverlayEntry!);
@@ -413,7 +411,7 @@ class _TencentCloudChatMessageItemWithMenuState
       _overlayMessageScaleAnimationController.forward(from: 0);
     } else {
       _messageActionsAnimationController.reverse().then((_) {
-        setState(() {
+        safeSetState(() {
           _showActions = false;
         });
         _mobileMenuOverlayEntry!.remove();
@@ -494,7 +492,7 @@ class _TencentCloudChatMessageItemWithMenuState
     _desktopMenuOverlayEntry = null;
   }
 
-  void _openDesktopMessageMenu(TapDownDetails tapDownDetails) {
+  void _openDesktopMessageMenu(tapDownDetails) {
     if (_desktopMenuOverlayEntry != null) {
       _removeDesktopMenu();
     }
@@ -513,7 +511,7 @@ class _TencentCloudChatMessageItemWithMenuState
     final double dx =
         min(tapDetails.globalPosition.dx, screenWidth - (_menuWidth ?? 100));
     final double dy =
-        min(tapDetails.globalPosition.dy, screenHeight - (_menuHeight ?? 320))
+        min(tapDetails.globalPosition.dy as double, screenHeight - (_menuHeight ?? 320))
             .toDouble();
 
     _desktopMenuOverlayEntry = OverlayEntry(
@@ -562,7 +560,7 @@ class _TencentCloudChatMessageItemWithMenuState
   Widget desktopBuilder(BuildContext context) {
     return Column(
       children: [
-        GestureDetector(
+        TencentCloudChatDesktopGestureDetector(
           onSecondaryTapDown: _openDesktopMessageMenu,
           child: widget.messageItem(renderOnMenuPreview: false),
         ),
@@ -572,5 +570,10 @@ class _TencentCloudChatMessageItemWithMenuState
         ),
       ],
     );
+  }
+
+  @override
+  Widget tabletAppBuilder(BuildContext context) {
+    return defaultBuilder(context);
   }
 }

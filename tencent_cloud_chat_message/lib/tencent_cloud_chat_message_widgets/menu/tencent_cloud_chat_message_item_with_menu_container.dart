@@ -31,21 +31,15 @@ class TencentCloudChatMessageItemWithMenuContainer extends StatefulWidget {
   });
 
   @override
-  State<TencentCloudChatMessageItemWithMenuContainer> createState() =>
-      _TencentCloudChatMessageItemWithMenuContainerState();
+  State<TencentCloudChatMessageItemWithMenuContainer> createState() => _TencentCloudChatMessageItemWithMenuContainerState();
 }
 
-class _TencentCloudChatMessageItemWithMenuContainerState
-    extends TencentCloudChatState<
-        TencentCloudChatMessageItemWithMenuContainer> {
+class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudChatState<TencentCloudChatMessageItemWithMenuContainer> {
   late TencentCloudChatMessageSeparateDataProvider dataProvider;
-  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream =
-      TencentCloudChat.eventBusInstance.on<TencentCloudChatMessageData>();
-  late StreamSubscription<TencentCloudChatMessageData<dynamic>>?
-      _messageDataSubscription;
+  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.eventBusInstance.on<TencentCloudChatMessageData>();
+  late StreamSubscription<TencentCloudChatMessageData<dynamic>>? _messageDataSubscription;
 
   List<TencentCloudChatMessageGeneralOptionItem> _menuOptions = [];
-  int _menuCloser = 0;
   V2TimMessageReceipt? _messageReceipt;
 
   late V2TimMessage _message;
@@ -53,10 +47,8 @@ class _TencentCloudChatMessageItemWithMenuContainerState
   // This method handles changes in message data.
   void _messageDataHandler(TencentCloudChatMessageData messageData) {
     final msgID = _message.msgID ?? "";
-    final bool isGroup =
-        TencentCloudChatUtils.checkString(_message.groupID) != null;
-    final TencentCloudChatMessageDataKeys messageDataKeys =
-        messageData.currentUpdatedFields;
+    final bool isGroup = TencentCloudChatUtils.checkString(_message.groupID) != null;
+    final TencentCloudChatMessageDataKeys messageDataKeys = messageData.currentUpdatedFields;
 
     switch (messageDataKeys) {
       case TencentCloudChatMessageDataKeys.messageHighlighted:
@@ -69,10 +61,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState
           userID: _message.userID ?? "",
           timestamp: _message.timestamp ?? 0,
         );
-        if (isGroup &&
-            (_messageReceipt == null ||
-                _messageReceipt?.readCount != receipt.readCount ||
-                _messageReceipt?.unreadCount != receipt.unreadCount)) {
+        if (isGroup && (_messageReceipt == null || _messageReceipt?.readCount != receipt.readCount || _messageReceipt?.unreadCount != receipt.unreadCount)) {
           setState(() {
             _messageReceipt = receipt;
           });
@@ -97,6 +86,14 @@ class _TencentCloudChatMessageItemWithMenuContainerState
         break;
       case TencentCloudChatMessageDataKeys.currentPlayAudioInfo:
         break;
+      case TencentCloudChatMessageDataKeys.messageNeedUpdate:
+        if (TencentCloudChat.dataInstance.messageData.messageNeedUpdate != null && msgID == TencentCloudChat.dataInstance.messageData.messageNeedUpdate?.msgID && TencentCloudChatUtils.checkString(msgID) != null) {
+          safeSetState(() {
+            _message = TencentCloudChat.dataInstance.messageData.messageNeedUpdate!;
+          });
+        }
+      default:
+        break;
     }
   }
 
@@ -105,8 +102,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState
     super.initState();
     _message = widget.message;
     _messageDataSubscription = _messageDataStream?.listen(_messageDataHandler);
-    _messageReceipt =
-        TencentCloudChat.dataInstance.messageData.getMessageReadReceipt(
+    _messageReceipt = TencentCloudChat.dataInstance.messageData.getMessageReadReceipt(
       msgID: _message.msgID ?? "",
       userID: _message.userID ?? "",
       timestamp: _message.timestamp ?? 0,
@@ -126,50 +122,35 @@ class _TencentCloudChatMessageItemWithMenuContainerState
     _generateMenuOptions();
   }
 
-  void closeTheMenu() {
-    setState(() {
-      _menuCloser++;
-    });
-  }
-
   bool _showRecallButton() {
     final TencentCloudChatMessageConfig config = dataProvider.config;
-    final recallTimeLimit = config.recallTimeLimit(
-        userID: dataProvider.userID, groupID: dataProvider.groupID);
+    final recallTimeLimit = config.recallTimeLimit(userID: dataProvider.userID, groupID: dataProvider.groupID);
 
-    final timeDiff = (DateTime.now().millisecondsSinceEpoch / 1000).ceil() -
-        (_message.timestamp ?? 0);
-    final enableRecall = (timeDiff < recallTimeLimit) &&
-        (_message.isSelf ?? true) &&
-        _message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC;
+    final timeDiff = (DateTime.now().millisecondsSinceEpoch / 1000).ceil() - (_message.timestamp ?? 0);
+    final enableRecall = (timeDiff < recallTimeLimit) && (_message.isSelf ?? true) && _message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC;
 
     return enableRecall;
   }
 
   void _generateMenuOptions({V2TimMessageReceipt? messageReceipt}) {
-    final isDesktopScreen = TencentCloudChatScreenAdapter.deviceScreenType ==
-        DeviceScreenType.desktop;
+    final isDesktopScreen = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop;
 
     final TencentCloudChatMessageConfig config = dataProvider.config;
 
-    final List<TencentCloudChatMessageGeneralOptionItem> additionalOptions =
-        config.additionalMessageMenuOptions(
+    final List<TencentCloudChatMessageGeneralOptionItem> additionalOptions = config.additionalMessageMenuOptions(
       userID: dataProvider.userID,
       groupID: dataProvider.groupID,
     );
 
     // === Group Message Read Receipt ===
-    final useReadReceipt =
-        TencentCloudChatUtils.checkString(dataProvider.groupID) != null &&
-            TencentCloudChat.dataInstance.basic.messageConfig
-                .enabledGroupTypesForMessageReadReceipt(
-                  userID: dataProvider.userID,
-                  groupID: dataProvider.groupID,
-                )
-                .contains(dataProvider.groupInfo?.groupType);
-    final showReadReceipt = useReadReceipt &&
-        (_message.isSelf ?? true) &&
-        (_message.needReadReceipt ?? false);
+    final useReadReceipt = TencentCloudChatUtils.checkString(dataProvider.groupID) != null &&
+        TencentCloudChat.dataInstance.basic.messageConfig
+            .enabledGroupTypesForMessageReadReceipt(
+              userID: dataProvider.userID,
+              groupID: dataProvider.groupID,
+            )
+            .contains(dataProvider.groupInfo?.groupType);
+    final showReadReceipt = useReadReceipt && (_message.isSelf ?? true) && (_message.needReadReceipt ?? false);
     final receipt = showReadReceipt
         ? messageReceipt ??
             TencentCloudChat.dataInstance.messageData.getMessageReadReceipt(
@@ -187,7 +168,6 @@ class _TencentCloudChatMessageItemWithMenuContainerState
           icon: Icons.copy,
           label: tL10n.copy,
           onTap: ({Offset? offset}) {
-            closeTheMenu();
             final text = _message.textElem?.text ?? "";
             Clipboard.setData(
               ClipboardData(text: text),
@@ -197,14 +177,12 @@ class _TencentCloudChatMessageItemWithMenuContainerState
           icon: Icons.reply_outlined,
           label: tL10n.reply,
           onTap: ({Offset? offset}) {
-            closeTheMenu();
             dataProvider.repliedMessage = _message;
           }),
       TencentCloudChatMessageGeneralOptionItem(
         icon: Icons.check_circle_outline,
         label: tL10n.select,
         onTap: ({Offset? offset}) {
-          closeTheMenu();
           Future.delayed(
             const Duration(milliseconds: 150),
             () {
@@ -218,7 +196,6 @@ class _TencentCloudChatMessageItemWithMenuContainerState
           icon: Icons.forward,
           label: tL10n.forward,
           onTap: ({Offset? offset}) {
-            closeTheMenu();
             if (isDesktopScreen) {
               TencentCloudChatDesktopPopup.showPopupWindow(
                 width: MediaQuery.of(context).size.width * 0.6,
@@ -253,16 +230,12 @@ class _TencentCloudChatMessageItemWithMenuContainerState
           icon: Icons.delete_outline_outlined,
           label: tL10n.delete,
           onTap: ({Offset? offset}) {
-            closeTheMenu();
 
             final TencentCloudChatMessageConfig config = dataProvider.config;
-            final showDeleteForEveryone = (_message.isSelf ?? false) &&
-                config.enableMessageDeleteForEveryone(
-                    userID: dataProvider.userID, groupID: dataProvider.groupID);
+            final showDeleteForEveryone = (_message.isSelf ?? false) && config.enableMessageDeleteForEveryone(userID: dataProvider.userID, groupID: dataProvider.groupID);
             if (isDesktopScreen) {
               TencentCloudChatDesktopPopup.showSecondaryConfirmDialog(
-                operationKey:
-                    TencentCloudChatPopupOperationKey.confirmDeleteMessages,
+                operationKey: TencentCloudChatPopupOperationKey.confirmDeleteMessages,
                 context: context,
                 title: tL10n.confirmDeletion,
                 text: tL10n.askDeleteThisMessage,
@@ -272,18 +245,15 @@ class _TencentCloudChatMessageItemWithMenuContainerState
                   (
                     onTap: () {},
                     label: tL10n.cancel,
-                    type:
-                        TencentCloudChatDesktopPopupActionButtonType.secondary,
+                    type: TencentCloudChatDesktopPopupActionButtonType.secondary,
                   ),
                   if (showDeleteForEveryone)
                     (
                       onTap: () {
-                        dataProvider
-                            .deleteMessagesForEveryone(messages: [_message]);
+                        dataProvider.deleteMessagesForEveryone(messages: [_message]);
                       },
                       label: tL10n.deleteForEveryone,
-                      type:
-                          TencentCloudChatDesktopPopupActionButtonType.primary,
+                      type: TencentCloudChatDesktopPopupActionButtonType.primary,
                     ),
                   (
                     onTap: () {
@@ -305,16 +275,14 @@ class _TencentCloudChatMessageItemWithMenuContainerState
                       if (showDeleteForEveryone)
                         TextButton(
                           onPressed: () {
-                            dataProvider.deleteMessagesForEveryone(
-                                messages: [_message]);
+                            dataProvider.deleteMessagesForEveryone(messages: [_message]);
                             Navigator.pop(context);
                           },
                           child: Text(tL10n.deleteForEveryone),
                         ),
                       TextButton(
                         onPressed: () {
-                          dataProvider
-                              .deleteMessagesForMe(messages: [_message]);
+                          dataProvider.deleteMessagesForMe(messages: [_message]);
                           Navigator.pop(context);
                         },
                         child: Text(tL10n.deleteForMe),
@@ -336,11 +304,9 @@ class _TencentCloudChatMessageItemWithMenuContainerState
             icon: Icons.undo_outlined,
             label: tL10n.recall,
             onTap: ({Offset? offset}) {
-              closeTheMenu();
               if (isDesktopScreen) {
                 TencentCloudChatDesktopPopup.showSecondaryConfirmDialog(
-                    operationKey:
-                        TencentCloudChatPopupOperationKey.confirmDeleteMessages,
+                    operationKey: TencentCloudChatPopupOperationKey.confirmDeleteMessages,
                     context: context,
                     title: tL10n.messageRecall,
                     text: tL10n.messageRecallConfirmation,
@@ -380,11 +346,8 @@ class _TencentCloudChatMessageItemWithMenuContainerState
       if (showReadReceipt)
         TencentCloudChatMessageGeneralOptionItem(
             icon: Icons.visibility,
-            label: isAllRead
-                ? tL10n.allMembersRead
-                : tL10n.memberReadCount(readCount ?? 0),
+            label: isAllRead ? tL10n.allMembersRead : tL10n.memberReadCount(readCount ?? 0),
             onTap: ({Offset? offset}) {
-              closeTheMenu();
             }),
     ];
 
@@ -410,11 +373,9 @@ class _TencentCloudChatMessageItemWithMenuContainerState
       useMessageReaction: widget.useMessageReaction,
       message: _message,
       menuOptions: _menuOptions,
-      menuCloser: _menuCloser,
       isMergeMessage: widget.isMergeMessage,
       inSelectMode: dataProvider.inSelectMode,
-      onSelectMessage: () =>
-          dataProvider.triggerSelectedMessage(message: _message),
+      onSelectMessage: () => dataProvider.triggerSelectedMessage(message: _message),
     );
   }
 }

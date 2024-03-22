@@ -1,3 +1,19 @@
+## 1.1.2
+
+### General
+
+- Further enhanced the integration process.
+
+- Optimized screen type recognition for better adaptation to different screen types.
+
+## 1.1.1
+
+* Enhanced the integration process by reducing the number of steps, increasing the success rate of one-time integration, and lowering the barrier to entry.
+
+## 1.1.0+1
+
+* Open-sourced on [GitHub repo](https://github.com/TencentCloud/chat-uikit-flutter/tree/v2/tencent_cloud_chat_group_profile).
+
 ## 1.1.0
 
 Introducing the first release of the brand new Tencent Cloud Chat UIKit.
@@ -23,4 +39,3 @@ Compared with the old version, this release brings several noteworthy enhancemen
 8. **Developer-friendly Design**: We've introduced a more unified, standardized component parameter design, clearer code naming, and more detailed comments to make development easier and more efficient.
 
 We're excited for you to try out our new Flutter Chat UIKit and look forward to seeing the amazing applications you'll create with it!
-

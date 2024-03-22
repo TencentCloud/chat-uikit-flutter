@@ -9,6 +9,7 @@ class TencentCloudChatPushModal {
   static final TencentCloudChatPushModal _instance = TencentCloudChatPushModal._internal();
 
   Function({required String ext, String? userID, String? groupID})? onNotificationClicked;
+  VoidCallback? onAppWakeUp;
 
   Future<dynamic> handleMethod(MethodCall call) async {
     switch (call.method) {
@@ -21,6 +22,9 @@ class TencentCloudChatPushModal {
           userID: conversationInfo.userID,
           groupID: conversationInfo.groupID,
         );
+        break;
+      case "on_app_wake_up":
+        onAppWakeUp?.call();
       default:
         throw UnsupportedError("Unrecognized Event");
     }

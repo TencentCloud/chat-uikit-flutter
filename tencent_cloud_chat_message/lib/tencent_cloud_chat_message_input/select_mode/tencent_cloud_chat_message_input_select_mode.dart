@@ -210,6 +210,32 @@ class _TencentCloudChatMessageInputSelectModeState
   }
 
   @override
+  Widget tabletAppBuilder(BuildContext context) {
+    return TencentCloudChatThemeWidget(
+      build: (context, colorTheme, textStyle) => Container(
+        color: colorTheme.inputAreaBackground,
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            _buildInputAreaIcon(
+                icon: Icons.delete_outline_rounded, onTap: _showDeletionPopup),
+            _buildInputAreaIcon(
+                icon: Icons.forward_to_inbox_outlined,
+                onTap: () => _showForwardPopup(
+                    type: TencentCloudChatForwardType.individually)),
+            _buildInputAreaIcon(
+                icon: Icons.forward_outlined,
+                onTap: () => _showForwardPopup(
+                    type: TencentCloudChatForwardType.combined)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
   Widget desktopBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => Container(

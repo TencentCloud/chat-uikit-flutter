@@ -45,6 +45,7 @@ typedef MessageLayoutBuilder = Widget? Function(
         onSelectMember});
 
 typedef MessageListViewBuilder = Widget? Function({
+  Key? key,
   String? userID,
   String? groupID,
   required List<V2TimMessage> messageList,
@@ -63,6 +64,7 @@ typedef MessageListViewBuilder = Widget? Function({
   int? c2cReadTimestamp,
   int? groupReadSequence,
   required Function({
+    required bool highLightTargetMessage,
     V2TimMessage? message,
     int? timeStamp,
     int? seq,
@@ -114,6 +116,8 @@ typedef MessageInputBuilder = Widget? Function({
 typedef MessageRowBuilder = Widget? Function({
   Key? key,
   required V2TimMessage message,
+  String? userID,
+  String? groupID,
 
   /// The width of the message row, which represents the available width
   /// for displaying the message on the screen. This is useful for
@@ -122,6 +126,12 @@ typedef MessageRowBuilder = Widget? Function({
   required bool inSelectMode,
   required bool isSelected,
   required ValueChanged<V2TimMessage> onSelectCurrent,
+  required Function({
+    required bool highLightTargetMessage,
+    V2TimMessage? message,
+    int? timeStamp,
+    int? seq,
+  }) loadToSpecificMessage,
 });
 
 typedef MessageAttachmentOptionsBuilder = Widget? Function({
@@ -151,7 +161,6 @@ typedef MessageLongPressBuilder = Widget? Function({
   required bool useMessageReaction,
   required V2TimMessage message,
   required List<TencentCloudChatMessageGeneralOptionItem> menuOptions,
-  required int menuCloser,
   required bool inSelectMode,
   required VoidCallback onSelectMessage,
 });
@@ -324,7 +333,6 @@ class TencentCloudChatMessageBuilders {
     required bool useMessageReaction,
     required V2TimMessage message,
     required List<TencentCloudChatMessageGeneralOptionItem> menuOptions,
-    required int menuCloser,
     required bool inSelectMode,
     required VoidCallback onSelectMessage,
     required bool isMergeMessage,
@@ -339,7 +347,6 @@ class TencentCloudChatMessageBuilders {
         inSelectMode: inSelectMode,
         onSelectMessage: onSelectMessage,
         useMessageReaction: useMessageReaction,
-        menuCloser: menuCloser,
       );
     }
 
@@ -351,7 +358,6 @@ class TencentCloudChatMessageBuilders {
           onSelectMessage: onSelectMessage,
           messageItem: messageItem,
           useMessageReaction: useMessageReaction,
-          menuCloser: menuCloser,
           isMergeMessage: isMergeMessage,
         );
   }
@@ -559,6 +565,14 @@ class TencentCloudChatMessageBuilders {
     required bool isSelected,
     required ValueChanged<V2TimMessage> onSelectCurrent,
     required bool isMergeMessage,
+    String? userID,
+    String? groupID,
+    required Function({
+      required bool highLightTargetMessage,
+      V2TimMessage? message,
+      int? timeStamp,
+      int? seq,
+    }) loadToSpecificMessage,
   }) {
     Widget? widget;
 
@@ -567,9 +581,12 @@ class TencentCloudChatMessageBuilders {
         key: key,
         message: message,
         messageRowWidth: messageRowWidth,
+        userID: userID,
+        groupID: groupID,
         isSelected: isSelected,
         inSelectMode: inSelectMode,
         onSelectCurrent: onSelectCurrent,
+        loadToSpecificMessage: loadToSpecificMessage,
       );
     }
 
@@ -578,10 +595,13 @@ class TencentCloudChatMessageBuilders {
           key: key,
           message: message,
           messageRowWidth: messageRowWidth,
+          userID: userID,
+          groupID: groupID,
           isSelected: isSelected,
           inSelectMode: inSelectMode,
           onSelectCurrent: onSelectCurrent,
           isMergeMessage: isMergeMessage,
+          loadToSpecificMessage: loadToSpecificMessage,
         );
   }
 
@@ -662,6 +682,7 @@ class TencentCloudChatMessageBuilders {
   }
 
   static Widget getMessageListViewBuilder({
+    Key? key,
     String? userID,
     String? groupID,
     required List<V2TimMessage> messageList,
@@ -678,6 +699,7 @@ class TencentCloudChatMessageBuilders {
     int? c2cReadTimestamp,
     int? groupReadSequence,
     required Function({
+      required bool highLightTargetMessage,
       V2TimMessage? message,
       int? timeStamp,
       int? seq,
@@ -691,6 +713,7 @@ class TencentCloudChatMessageBuilders {
 
     if (_messageListViewBuilder != null) {
       widget = _messageListViewBuilder!(
+        key: key,
         loadToLatestMessage: loadToLatestMessage,
         userID: userID,
         groupID: groupID,
@@ -712,6 +735,7 @@ class TencentCloudChatMessageBuilders {
 
     return widget ??
         TencentCloudChatMessageListView(
+          key: key,
           loadToLatestMessage: loadToLatestMessage,
           userID: userID,
           groupID: groupID,

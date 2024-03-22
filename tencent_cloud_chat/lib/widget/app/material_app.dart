@@ -492,26 +492,21 @@ class TencentCloudChatMaterialApp extends StatefulWidget {
   });
 
   @override
-  State<TencentCloudChatMaterialApp> createState() =>
-      _TencentCloudChatMaterialAppState();
+  State<TencentCloudChatMaterialApp> createState() => _TencentCloudChatMaterialAppState();
 }
 
-class _TencentCloudChatMaterialAppState
-    extends State<TencentCloudChatMaterialApp> {
+class _TencentCloudChatMaterialAppState extends State<TencentCloudChatMaterialApp> {
   // Theme instance for the Chat UIKit
   TencentCloudChatTheme theme = TencentCloudChat.dataInstance.theme;
 
   // Color theme based on the current brightness mode
-  TencentCloudChatThemeColors colorTheme =
-      TencentCloudChat.dataInstance.theme.colorTheme;
+  TencentCloudChatThemeColors colorTheme = TencentCloudChat.dataInstance.theme.colorTheme;
 
   // Text styles for the Chat UIKit
-  TencentCloudChatTextStyle textStyle =
-      TencentCloudChat.dataInstance.theme.textStyle;
+  TencentCloudChatTextStyle textStyle = TencentCloudChat.dataInstance.theme.textStyle;
 
   // Listener for theme data changes
-  Stream<TencentCloudChatTheme>? themeDataListener =
-      TencentCloudChat.eventBusInstance.on<TencentCloudChatTheme>();
+  Stream<TencentCloudChatTheme>? themeDataListener = TencentCloudChat.eventBusInstance.on<TencentCloudChatTheme>();
 
   bool isInitIntl = false;
 
@@ -579,37 +574,34 @@ class _TencentCloudChatMaterialAppState
               onGenerateInitialRoutes: widget.onGenerateInitialRoutes,
               onUnknownRoute: widget.onUnknownRoute,
               // onNavigationNotification: widget.onNavigationNotification,
-              navigatorObservers: [
-                ...(widget.navigatorObservers ?? const <NavigatorObserver>[]),
-                TencentCloudChat.navigatorObserver
-              ],
+              navigatorObservers: [...(widget.navigatorObservers ?? const <NavigatorObserver>[]), TencentCloudChat.navigatorObserver],
               builder: widget.builder,
               title: widget.title,
               onGenerateTitle: widget.onGenerateTitle,
               color: widget.color,
               theme: widget.theme ??
-                  theme.getThemeData(brightness: Brightness.light),
+                  theme.getThemeData(
+                    brightness: Brightness.light,
+                    context: context,
+                  ),
               darkTheme: widget.darkTheme ??
-                  theme.getThemeData(brightness: Brightness.dark),
+                  theme.getThemeData(
+                    brightness: Brightness.dark,
+                    context: context,
+                  ),
               highContrastTheme: widget.highContrastTheme,
               highContrastDarkTheme: widget.highContrastDarkTheme,
-              themeMode: widget.themeMode ??
-                  (theme.brightness == Brightness.light
-                      ? ThemeMode.light
-                      : ThemeMode.dark),
+              themeMode: widget.themeMode ?? (theme.brightness != null ? (theme.brightness == Brightness.light ? ThemeMode.light : ThemeMode.dark) : null),
               themeAnimationDuration: widget.themeAnimationDuration,
               themeAnimationCurve: widget.themeAnimationCurve,
               locale: widget.locale ?? snapshot.data,
-              localizationsDelegates: widget.localizationsDelegates ??
-                  TencentCloudChatLocalizations.localizationsDelegates,
+              localizationsDelegates: widget.localizationsDelegates ?? TencentCloudChatLocalizations.localizationsDelegates,
               localeListResolutionCallback: widget.localeListResolutionCallback,
               localeResolutionCallback: widget.localeResolutionCallback,
-              supportedLocales: widget.supportedLocales ??
-                  TencentCloudChatLocalizations.supportedLocales,
+              supportedLocales: widget.supportedLocales ?? TencentCloudChatLocalizations.supportedLocales,
               debugShowMaterialGrid: widget.debugShowMaterialGrid,
               showPerformanceOverlay: widget.showPerformanceOverlay,
-              checkerboardRasterCacheImages:
-                  widget.checkerboardRasterCacheImages,
+              checkerboardRasterCacheImages: widget.checkerboardRasterCacheImages,
               checkerboardOffscreenLayers: widget.checkerboardOffscreenLayers,
               showSemanticsDebugger: widget.showSemanticsDebugger,
               debugShowCheckedModeBanner: widget.debugShowCheckedModeBanner,

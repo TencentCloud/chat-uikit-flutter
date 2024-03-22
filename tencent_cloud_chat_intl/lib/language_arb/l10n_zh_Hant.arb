@@ -518,5 +518,6 @@
   "about": "關於",
   "profile": "個人資料",
   "unpin": "取消置頂",
-  "mentionedMessages": "{count} 條訊息提及我"
+  "mentionedMessages": "{count} 條訊息提及我",
+  "longPressToNavigate": "按住查看"
 }

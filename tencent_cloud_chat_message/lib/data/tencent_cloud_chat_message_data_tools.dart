@@ -54,6 +54,8 @@ class TencentCloudChatMessageDataTools {
       final cloudCustomData = {
         "messageReply": {
           "messageID": repliedMessage.msgID,
+          "messageTimestamp": repliedMessage.timestamp,
+          "messageSeq": int.tryParse(repliedMessage.seq ?? ""),
           "messageAbstract":
               TencentCloudChatUtils.getMessageSummary(message: repliedMessage),
           "messageSender":

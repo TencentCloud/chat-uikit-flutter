@@ -11,6 +11,8 @@ import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/te
 class TencentCloudChatMessageMerge extends TencentCloudChatMessageItemBase {
   const TencentCloudChatMessageMerge({
     super.key,
+    super.userID,
+    super.groupID,
     required super.message,
     required super.shouldBeHighlighted,
     required super.clearHighlightFunc,
@@ -26,8 +28,7 @@ class TencentCloudChatMessageMerge extends TencentCloudChatMessageItemBase {
   State<StatefulWidget> createState() => _TencentCloudChatMessageMergeState();
 }
 
-class _TencentCloudChatMessageMergeState
-    extends TencentCloudChatMessageState<TencentCloudChatMessageMerge> {
+class _TencentCloudChatMessageMergeState extends TencentCloudChatMessageState<TencentCloudChatMessageMerge> {
   final String _tag = "TencentCloudChatMessageMerge";
 
   console(String log) {
@@ -83,9 +84,7 @@ class _TencentCloudChatMessageMergeState
   @override
   Widget defaultBuilder(BuildContext context) {
     final maxBubbleWidth = widget.messageRowWidth * 0.8;
-    String titile =
-        TencentCloudChatUtils.checkString(widget.message.mergerElem!.title) ??
-            tL10n.chatHistory;
+    String title = TencentCloudChatUtils.checkString(widget.message.mergerElem!.title) ?? tL10n.chatHistory;
     List<String> abstractList = widget.message.mergerElem!.abstractList ?? [];
     int displayLen = abstractList.length > 3 ? 3 : abstractList.length;
     return TencentCloudChatThemeWidget(build: (context, colorTheme, textStyle) {
@@ -93,25 +92,17 @@ class _TencentCloudChatMessageMergeState
         onTapDown: onTapDown,
         onTapUp: onTapUp,
         child: Container(
-          padding: EdgeInsets.symmetric(
-              horizontal: getWidth(10), vertical: getHeight(8)),
+          padding: EdgeInsets.symmetric(horizontal: getWidth(10), vertical: getHeight(8)),
           decoration: BoxDecoration(
-            color: showHighlightStatus
-                ? colorTheme.info
-                : (sentFromSelf
-                    ? colorTheme.selfMessageBubbleColor
-                    : colorTheme.othersMessageBubbleColor),
+            color: showHighlightStatus ? colorTheme.info : (sentFromSelf ? colorTheme.selfMessageBubbleColor : colorTheme.othersMessageBubbleColor),
             border: Border.all(
-              color: sentFromSelf
-                  ? colorTheme.selfMessageBubbleBorderColor
-                  : colorTheme.othersMessageBubbleBorderColor,
+              color: sentFromSelf ? colorTheme.selfMessageBubbleBorderColor : colorTheme.othersMessageBubbleBorderColor,
             ),
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(getSquareSize(16)),
               topRight: Radius.circular(getSquareSize(16)),
               bottomLeft: Radius.circular(getSquareSize(sentFromSelf ? 16 : 0)),
-              bottomRight:
-                  Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
+              bottomRight: Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
             ),
           ),
           child: Row(
@@ -119,11 +110,7 @@ class _TencentCloudChatMessageMergeState
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               ConstrainedBox(
-                constraints: BoxConstraints(
-                    maxWidth: min(
-                        maxBubbleWidth * 0.9,
-                        maxBubbleWidth -
-                            getSquareSize(sentFromSelf ? 128 : 102))),
+                constraints: BoxConstraints(maxWidth: min(maxBubbleWidth * 0.9, maxBubbleWidth - getSquareSize(sentFromSelf ? 128 : 102))),
                 child: Row(
                   children: [
                     Expanded(
@@ -131,7 +118,7 @@ class _TencentCloudChatMessageMergeState
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            titile,
+                            title,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -154,8 +141,7 @@ class _TencentCloudChatMessageMergeState
                             children: [
                               Expanded(
                                 child: Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 4),
+                                  padding: const EdgeInsets.symmetric(vertical: 4),
                                   color: Colors.grey,
                                   height: 1,
                                 ),
@@ -175,7 +161,7 @@ class _TencentCloudChatMessageMergeState
               SizedBox(
                 width: getWidth(4),
               ),
-              if (sentFromSelf) messageStatus(),
+              if (sentFromSelf) messageStatusIndicator(),
               messageTimeIndicator(),
             ],
           ),

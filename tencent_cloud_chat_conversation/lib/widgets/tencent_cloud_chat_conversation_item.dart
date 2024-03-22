@@ -22,6 +22,7 @@ import 'package:tencent_cloud_chat_common/widgets/desktop_popup/tencent_cloud_ch
 import 'package:tencent_cloud_chat_common/widgets/gesture/tencent_cloud_chat_gesture.dart';
 import 'package:tencent_cloud_chat_common/widgets/loading/tencent_cloud_chat_loading.dart';
 import 'package:tencent_cloud_chat_conversation/tencent_cloud_chat_conversation_builders.dart';
+import 'package:tencent_cloud_chat_conversation/tencent_cloud_chat_conversation_event_handlers.dart';
 
 class TencentCloudChatConversationItem extends StatefulWidget {
   final V2TimConversation conversation;
@@ -48,7 +49,28 @@ class TencentCloudChatConversationItemState
       (TencentCloudChatScreenAdapter.deviceScreenType ==
           DeviceScreenType.desktop);
 
-  _navigateToMessage() {
+  _navigateToMessage() async {
+    final options = TencentCloudChatMessageOptions(
+      userID: widget.conversation.groupID == null
+          ? widget.conversation.userID
+          : null,
+      groupID: widget.conversation.groupID,
+    );
+
+    if (TencentCloudChatConversationEventHandlers
+            .uiEventHandlers?.onTapConversationItem !=
+        null) {
+      final res = await TencentCloudChatConversationEventHandlers
+          .uiEventHandlers!.onTapConversationItem!(
+        conversation: widget.conversation,
+        messageOptions: options,
+        inDesktopMode: useDesktopMode,
+      );
+      if (res) {
+        return;
+      }
+    }
+
     if (useDesktopMode &&
         TencentCloudChat.dataInstance.basic.usedComponents
             .contains(TencentCloudChatComponentsEnum.message)) {
@@ -60,12 +82,7 @@ class TencentCloudChatConversationItemState
       // Mobile navigator
       navigateToMessage(
         context: context,
-        options: TencentCloudChatMessageOptions(
-          userID: widget.conversation.groupID == null
-              ? widget.conversation.userID
-              : null,
-          groupID: widget.conversation.groupID,
-        ),
+        options: options,
       );
     } else {
       // Custom onTap event
@@ -258,6 +275,11 @@ class TencentCloudChatConversationItemState
     return TencentCloudChatThemeWidget(
       build: (ctx, colors, fontSize) => conversationInner(colors),
     );
+  }
+
+  @override
+  Widget tabletAppBuilder(BuildContext context) {
+    return defaultBuilder(context);
   }
 
   @override

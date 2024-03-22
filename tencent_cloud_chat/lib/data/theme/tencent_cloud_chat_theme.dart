@@ -22,7 +22,7 @@ import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 /// ```
 class TencentCloudChatTheme {
   static TencentCloudChatTheme? _instance;
-  late Brightness _brightness;
+  late Brightness? _brightness;
   late TencentCloudChatThemeModel _themeModel;
 
   /// Private constructor to implement the singleton pattern.
@@ -30,8 +30,7 @@ class TencentCloudChatTheme {
     TencentCloudChatThemeModel? themeModel,
     Brightness? brightness,
   }) {
-    _brightness = brightness ??
-        WidgetsBinding.instance.platformDispatcher.platformBrightness;
+    _brightness = brightness ?? WidgetsBinding.instance.platformDispatcher.platformBrightness;
     _themeModel = themeModel ?? TencentCloudChatThemeModel();
   }
 
@@ -40,8 +39,7 @@ class TencentCloudChatTheme {
     TencentCloudChatThemeModel? themeMode,
     Brightness? brightness,
   }) {
-    _instance ??= TencentCloudChatTheme._internal(
-        themeModel: themeMode, brightness: brightness);
+    _instance ??= TencentCloudChatTheme._internal(themeModel: themeMode, brightness: brightness);
     return _instance!;
   }
 
@@ -51,8 +49,9 @@ class TencentCloudChatTheme {
     Brightness? brightness,
     TencentCloudChatThemeModel? themeModel,
   }) {
-    TencentCloudChatTheme().brightness =
-        brightness ?? Theme.of(context).brightness;
+    if (brightness != null) {
+      TencentCloudChatTheme().brightness = brightness;
+    }
     if (themeModel != null) {
       TencentCloudChatTheme().themeModel = themeModel;
     }
@@ -68,26 +67,23 @@ class TencentCloudChatTheme {
   }
 
   /// Getter for the color theme based on the current brightness.
-  TencentCloudChatThemeColors get colorTheme => _brightness == Brightness.light
-      ? _themeModel.lightTheme
-      : _themeModel.darkTheme;
+  TencentCloudChatThemeColors get colorTheme => _brightness == Brightness.light ? _themeModel.lightTheme : _themeModel.darkTheme;
 
   /// Getter for the text style.
   TencentCloudChatTextStyle get textStyle => _themeModel.textStyle;
 
   /// Getter for the brightness.
-  Brightness get brightness => _brightness;
+  Brightness? get brightness => _brightness;
 
   /// Setter for the brightness.
-  set brightness(Brightness value) {
+  set brightness(Brightness? value) {
     _brightness = value;
     TencentCloudChat.eventBusInstance.fire(this);
   }
 
   /// Toggles the brightness mode between light and dark.
   void toggleBrightnessMode({Brightness? brightness}) {
-    _brightness = brightness ??
-        (_brightness == Brightness.light ? Brightness.dark : Brightness.light);
+    _brightness = brightness ?? (_brightness == Brightness.light ? Brightness.dark : Brightness.light);
     TencentCloudChat.eventBusInstance.fire(this);
   }
 
@@ -112,32 +108,32 @@ class TencentCloudChatTheme {
 
   /// Returns a ThemeData instance based on the current brightness and configuration.
   ThemeData getThemeData({
+    required BuildContext context,
     Brightness? brightness,
     bool needTextTheme = true,
     bool needColorScheme = true,
   }) {
-    final br = brightness ?? _brightness;
-    TencentCloudChatThemeColors colorTheme =
-        br == Brightness.light ? _themeModel.lightTheme : _themeModel.darkTheme;
+    Brightness? br = brightness ?? _brightness;
+    if (br == null) {
+      try {
+        br = Theme.of(context).brightness;
+      } catch (e) {
+        br = Brightness.light;
+      }
+    }
+
+    TencentCloudChatThemeColors colorTheme = (br == Brightness.light ? _themeModel.lightTheme : _themeModel.darkTheme);
 
     return ThemeData(
       useMaterial3: true,
       textTheme: needTextTheme
           ? TextTheme(
-              bodyLarge: TextStyle(
-                  color: colorTheme.primaryTextColor,
-                  fontSize: _themeModel.textStyle.standardLargeText),
-              bodyMedium: TextStyle(
-                  color: colorTheme.primaryTextColor,
-                  fontSize: _themeModel.textStyle.standardText),
-              bodySmall: TextStyle(
-                  color: colorTheme.primaryTextColor,
-                  fontSize: _themeModel.textStyle.standardSmallText),
+              bodyLarge: TextStyle(color: colorTheme.primaryTextColor, fontSize: _themeModel.textStyle.standardLargeText),
+              bodyMedium: TextStyle(color: colorTheme.primaryTextColor, fontSize: _themeModel.textStyle.standardText),
+              bodySmall: TextStyle(color: colorTheme.primaryTextColor, fontSize: _themeModel.textStyle.standardSmallText),
             )
           : null,
-      colorScheme: needColorScheme
-          ? colorTheme.toColorScheme(brightness ?? _brightness)
-          : null,
+      colorScheme: needColorScheme ? colorTheme.toColorScheme(br) : null,
     );
   }
 }

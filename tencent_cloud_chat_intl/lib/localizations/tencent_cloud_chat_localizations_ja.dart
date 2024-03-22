@@ -367,8 +367,7 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   String get addSilencedMember => 'ミュートされたメンバーを追加';
 
   @override
-  String get onlyGroupOwnerAndAdminsCanSendMessages =>
-      '有効にすると、グループの所有者と管理者のみがメッセージを送信できます。';
+  String get onlyGroupOwnerAndAdminsCanSendMessages => '有効にすると、グループの所有者と管理者のみがメッセージを送信できます。';
 
   @override
   String someoneEnabledSilenceAll(String name) {
@@ -637,8 +636,7 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   String get messageReadStatus => 'メッセージの既読ステータス';
 
   @override
-  String get messageReadStatusDescription =>
-      'あなたのメッセージの既読ステータスが表示されるかどうかを制御し、他の人があなたのメッセージを読んだかどうかを確認できるかどうかを制御します。';
+  String get messageReadStatusDescription => 'あなたのメッセージの既読ステータスが表示されるかどうかを制御し、他の人があなたのメッセージを読んだかどうかを確認できるかどうかを制御します。';
 
   @override
   String get onlineStatus => 'オンラインステータス';
@@ -1070,8 +1068,7 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   String get changeTheme => '外観を変更';
 
   @override
-  String get deleteAccountNotification =>
-      'アカウントを削除すると、現在のアカウントを使用できなくなり、関連データが削除されて復元できなくなります。';
+  String get deleteAccountNotification => 'アカウントを削除すると、現在のアカウントを使用できなくなり、関連データが削除されて復元できなくなります。';
 
   @override
   String get restartAppForLanguage => '言語の変更を適用するには、アプリを再起動してください';
@@ -1166,8 +1163,7 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   }
 
   @override
-  String get unableToSendWithFolders =>
-      'フォルダが含まれているため、ファイルを送信できません。個々のファイルのみを選択してください。';
+  String get unableToSendWithFolders => 'フォルダが含まれているため、ファイルを送信できません。個々のファイルのみを選択してください。';
 
   @override
   String get channelSwitch => 'チャンネル：';
@@ -1224,4 +1220,7 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   String mentionedMessages(num count) {
     return '私への $count 件のメンション';
   }
+
+  @override
+  String get longPressToNavigate => '押し続けて表示';
 }

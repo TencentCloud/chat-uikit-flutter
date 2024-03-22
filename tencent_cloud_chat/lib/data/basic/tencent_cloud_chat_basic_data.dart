@@ -11,7 +11,8 @@ enum TencentCloudChatBasicDataKeys {
   hasInitialized,
   usedComponents,
   hasLoggedIn,
-  selfInfo
+  selfInfo,
+  addUsedComponent,
 }
 
 /// A class that manages the basic data for TencentCloudChat Core.
@@ -134,6 +135,7 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> {
 
   /// ==== Current User ====
   static V2TimUserFullInfo? _currentUser;
+
   V2TimUserFullInfo? get currentUser {
     return TencentCloudChat.cache.getCurrentLoginUserInfo() ?? _currentUser;
   }
@@ -146,7 +148,9 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> {
 
   /// ==== version ====
   static String _version = "";
+
   String get version => _version;
+
   void updateVersion({required String version}) {
     _version = version;
   }
@@ -181,6 +185,7 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> {
     _usedComponents.add(component.componentEnum);
     _componentsMap[component.componentEnum] = component.widgetBuilder;
     _usedComponents.toSet().toList();
+    notifyListener(TencentCloudChatBasicDataKeys.addUsedComponent as T);
   }
 
   /// ==== config for components ====

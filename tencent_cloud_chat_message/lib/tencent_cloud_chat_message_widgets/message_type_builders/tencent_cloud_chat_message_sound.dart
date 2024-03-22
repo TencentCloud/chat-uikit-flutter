@@ -41,6 +41,8 @@ class TimSoundCurrentRenderInfo {
 class TencentCloudChatMessageSound extends TencentCloudChatMessageItemBase {
   const TencentCloudChatMessageSound({
     super.key,
+    super.userID,
+    super.groupID,
     required super.message,
     required super.shouldBeHighlighted,
     required super.renderOnMenuPreview,
@@ -600,7 +602,7 @@ class _TencentCloudChatMessageSoundState
                   ? MainAxisAlignment.end
                   : MainAxisAlignment.start,
               children: [
-                if (sentFromSelf) messageStatus(),
+                if (sentFromSelf) messageStatusIndicator(),
                 messageTimeIndicator(),
               ],
             )
@@ -656,7 +658,7 @@ class _TencentCloudChatMessageSoundState
                   ? MainAxisAlignment.end
                   : MainAxisAlignment.start,
               children: [
-                if (sentFromSelf) messageStatus(),
+                if (sentFromSelf) messageStatusIndicator(),
                 messageTimeIndicator(),
               ],
             )
