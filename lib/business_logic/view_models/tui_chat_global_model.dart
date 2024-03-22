@@ -218,7 +218,9 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
     _messageListMap[currentSelectedConv] =
         (_messageListMap[currentSelectedConv] ?? []).sublist(
             max(0, ((_messageListMap[currentSelectedConv] ?? []).length - 20)));
-    _currentConversationList.removeLast();
+    if (_currentConversationList.isNotEmpty) {
+      _currentConversationList.removeLast();
+    }
     // notifyListeners();
   }
 
