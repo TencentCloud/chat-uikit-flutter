@@ -161,26 +161,32 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final TUITheme theme = value.theme;
     final icon = _getIconByMsgStatus(context);
-    return Row(children: [
-      if (icon != null)
-        Container(
-          margin: const EdgeInsets.only(right: 2),
-          child: icon,
-        ),
-      if (widget.groupAtInfoList.isNotEmpty)
-        Text(_getAtMessage(),
-            style: TextStyle(
-                color: theme.cautionColor, fontSize: widget.fontSize)),
-      if (TencentUtils.checkString(groupTipsAbstractText) != null)
-        Expanded(
+    return Row(
+      children: [
+        if (icon != null)
+          Container(
+            margin: const EdgeInsets.only(right: 2),
+            child: icon,
+          ),
+        if (widget.groupAtInfoList.isNotEmpty)
+          Text(_getAtMessage(),
+              style: TextStyle(
+                  color: theme.cautionColor, fontSize: widget.fontSize)),
+        if (TencentUtils.checkString(groupTipsAbstractText) != null)
+          Expanded(
             child: Text(
-          groupTipsAbstractText,
-          softWrap: true,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: TextStyle(
-              height: 1, color: theme.weakTextColor, fontSize: widget.fontSize),
-        )),
-    ]);
+              groupTipsAbstractText,
+              softWrap: true,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              // height: 1,
+              style: TextStyle(
+                color: theme.weakTextColor,
+                fontSize: widget.fontSize,
+              ),
+            ),
+          ),
+      ],
+    );
   }
 }
