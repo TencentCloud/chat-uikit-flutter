@@ -1,6 +1,4 @@
-
-enum TUIKitWideModalOperationKey{
-
+enum TUIKitWideModalOperationKey {
   /// You could use this value for your own Modal usage.
   custom,
 
@@ -39,5 +37,8 @@ enum TUIKitWideModalOperationKey{
   confirmExitGroup,
   confirmDisbandGroup,
   confirmGeneral,
-  unableToSendDueToFolders
+  unableToSendDueToFolders,
+  /////////// 自定义枚举类型 ///////////
+  chatAvatarSecondaryMenu,
+  /////////// 自定义枚举类型 ///////////
 }

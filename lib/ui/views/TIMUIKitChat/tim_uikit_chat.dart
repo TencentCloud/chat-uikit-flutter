@@ -187,6 +187,8 @@ class TIMUIKitChat extends StatefulWidget {
   /// additional network requests to fetch the group member information internally.
   List<V2TimGroupMemberFullInfo?>? groupMemberList;
 
+  final bool isDesktop;
+
   TIMUIKitChat({
     Key? key,
     this.groupID,
@@ -227,9 +229,12 @@ class TIMUIKitChat extends StatefulWidget {
     this.inputTopBuilder,
     this.onSecondaryTapAvatar,
     this.customMessageHoverBarOnDesktop,
+    ////////////// 自定义入参 //////////////
     this.userAvatarImageBuilder,
     this.calculateImgSizeFunc,
     this.calculateVideoSizeFunc,
+    this.isDesktop = false,
+    ////////////// 自定义入参 //////////////
   }) : super(key: key) {
     startTime = DateTime.now().millisecondsSinceEpoch;
   }
@@ -537,6 +542,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                                 child: Listener(
                                   onPointerMove: closePanel,
                                   child: TIMUIKitHistoryMessageListContainer(
+                                    isDesktop: widget.isDesktop,
                                     userAvatarImageBuilder:
                                         widget.userAvatarImageBuilder,
                                     calculateImgSizeFunc:

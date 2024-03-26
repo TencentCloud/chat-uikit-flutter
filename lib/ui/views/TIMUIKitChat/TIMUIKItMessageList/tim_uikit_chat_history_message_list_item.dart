@@ -316,6 +316,8 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
 //  判断某条消息是否可以点击
   final MessageCanLongPres? messageCanLongPres;
 
+  final bool isDesktop;
+
   const TIMUIKitHistoryMessageListItem({
     Key? key,
     required this.message,
@@ -349,10 +351,13 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
     this.onSecondaryTapForOthersPortrait,
     this.groupMemberInfo,
     this.customMessageHoverBarOnDesktop,
+    ////////////// 自定义入参 //////////////
     this.userAvatarImageBuilder,
     this.calculateImgSizeFunc,
     this.calculateVideoSizeFunc,
     this.messageCanLongPres,
+    this.isDesktop = false,
+    ////////////// 自定义入参 //////////////
   }) : super(key: key);
 
   @override
@@ -1279,7 +1284,7 @@ class _TIMUIKItHistoryMessageListItemState
         isGroupMessage && model.chatConfig.isShowSelfNameInGroup;
     final isShowNickNameForOthers =
         isGroupMessage && model.chatConfig.isShowOthersNameInGroup;
-    final isDesktopScreen =
+    final isDesktopScreen = widget.isDesktop ||
         TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     if (isTimeDivider) {
       return _timeDividerBuilder(theme, message.timestamp ?? 0, model);
@@ -1458,6 +1463,33 @@ class _TIMUIKItHistoryMessageListItemState
                                       widget.allowAvatarTap) {
                                     widget.onSecondaryTapForOthersPortrait!(
                                         message.sender ?? "", details);
+                                  } else {
+                                    TUIKitWidePopup.showPopupWindow(
+                                      operationKey: TUIKitWideModalOperationKey
+                                          .chatAvatarSecondaryMenu,
+                                      isDarkBackground: false,
+                                      borderRadius: const BorderRadius.all(
+                                        Radius.circular(4),
+                                      ),
+                                      context: context,
+                                      offset: Offset(
+                                        min(
+                                            details.globalPosition.dx,
+                                            MediaQuery.of(context).size.width -
+                                                80),
+                                        min(
+                                            details.globalPosition.dy,
+                                            MediaQuery.of(context).size.height -
+                                                130),
+                                      ),
+                                      child: (onClose) => InkWell(
+                                        onTap: () {
+                                          debugPrint('@ user');
+                                          onClose();
+                                        },
+                                        child: const Text('@ dddd'),
+                                      ),
+                                    );
                                   }
                                 }
                               : null,

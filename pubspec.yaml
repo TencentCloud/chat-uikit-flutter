@@ -55,7 +55,7 @@ dependencies:
   wechat_camera_picker: ^4.2.0-dev.2
   extended_image: ^8.2.0
   extended_text_field: ^13.0.0
-  extended_text: ^12.0.0
+  extended_text: ^13.0.0
   package_info_plus: ^4.0.1
   flutter_markdown: ^0.6.15
   universal_html: ^2.2.2
@@ -92,7 +92,10 @@ dependency_overrides:
   # intl: ^0.18.0
   tencent_cloud_chat_sdk: ^5.1.5
   win32: 4.0.0
-  system_info2: ^4.0.0
+  # 兼容 tencent_im_sdk_plugin_desktop 中的 Tools.getDyLibNameByPlatform()
+  # 等 tencent_im_sdk_plugin_desktop 升级后需要对应调整版本
+  system_info2: ^2.0.4
+  photo_manager: ^3.0.0
 
 dev_dependencies:
   flutter_lints: ^1.0.0
