@@ -59,6 +59,8 @@ typedef MessageRowBuilder = Widget? Function(
 
 typedef MessageNickNameBuilder = Widget Function(
     BuildContext context, V2TimMessage message, TUIChatSeparateViewModel model);
+
+// 自定义
 typedef MessageElemTypeIsGroupTip = bool Function(V2TimMessage message);
 typedef MessageItemContent = Widget? Function(
   V2TimMessage message,
@@ -313,7 +315,7 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
   /// If provided, the default message action functionality will appear in the right-click context menu instead.
   final Widget? Function(V2TimMessage message)? customMessageHoverBarOnDesktop;
 
-//  判断某条消息是否可以点击
+  // 判断某条消息是否可以点击
   final MessageCanLongPres? messageCanLongPres;
 
   final bool isDesktop;
@@ -744,7 +746,7 @@ class _TIMUIKItHistoryMessageListItemState
       child: Text(
         model.chatConfig.timeDividerConfig?.timestampParser != null
             ? (model.chatConfig.timeDividerConfig?.timestampParser!(timeStamp))!
-            : TimeAgo().getTimeForMessage(timeStamp),
+            : TimeAgo().getTimeForMessage(1709740800),
         style: widget.themeData?.timelineTextStyle ??
             TextStyle(
               fontSize: 12,
@@ -805,6 +807,8 @@ class _TIMUIKItHistoryMessageListItemState
 
   bool isRevocable(int timestamp) =>
       (DateTime.now().millisecondsSinceEpoch / 1000).ceil() - timestamp < 120;
+
+  // TODO : 继续看这里
 
   _onOpenToolTip(
     c,
@@ -1265,10 +1269,13 @@ class _TIMUIKItHistoryMessageListItemState
     final message = widget.message;
     final msgType = message.elemType;
     final isSelf = message.isSelf ?? true;
+
+    //////////////// 增加自定义条件判断 ////////////////
     final isGroupTipsMsg = msgType ==
             MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS ||
         (widget.messageItemBuilder?.messageElemTypeIsGroupTip?.call(message) ??
             false);
+    //////////////// 增加自定义条件判断 ////////////////
 
     final revokeStatus = isRevokeMessage(message, model);
     final isRevokedMsg = revokeStatus.$1;
@@ -1409,14 +1416,7 @@ class _TIMUIKItHistoryMessageListItemState
                       if (!isSelf && widget.showAvatar)
                         GestureDetector(
                           onLongPress: () {
-                            // if (widget.onLongPressForOthersHeadPortrait !=
-                            //     null) {}
-                            // if (model.chatConfig.isAllowLongPressAvatarToAt) {
-                            //   widget.onLongPressForOthersHeadPortrait!(
-                            //       message.sender, message.nickName);
-                            // }
-
-                            //////////////// 自定义长按显示内容 ////////////////
+                            //////////////// 修复长按调用 bug ////////////////
                             if (widget.onLongPressForOthersHeadPortrait !=
                                 null) {
                               if (model.chatConfig.isAllowLongPressAvatarToAt) {
@@ -1426,7 +1426,7 @@ class _TIMUIKItHistoryMessageListItemState
                                 );
                               }
                             }
-                            //////////////// 自定义长按显示内容 ////////////////
+                            //////////////// 修复长按调用 bug ////////////////
                           },
                           onTapDown: isDesktopScreen
                               ? (details) {
@@ -1505,8 +1505,10 @@ class _TIMUIKItHistoryMessageListItemState
                                     height: 40,
                                     child: Avatar(
                                       faceUrl: message.faceUrl ?? "",
+                                      //////////////// 增加自定义头像 ////////////////
                                       cusAvatar: widget.userAvatarImageBuilder
                                           ?.call(context, message),
+                                      //////////////// 增加自定义头像 ////////////////
                                       showName:
                                           MessageUtils.getDisplayName(message),
                                     ),
@@ -1702,8 +1704,10 @@ class _TIMUIKItHistoryMessageListItemState
                                   },
                                   child: Avatar(
                                       faceUrl: message.faceUrl ?? "",
+                                      //////////////// 增加自定义头像 ////////////////
                                       cusAvatar: widget.userAvatarImageBuilder
                                           ?.call(context, message),
+                                      //////////////// 增加自定义头像 ////////////////
                                       showName:
                                           MessageUtils.getDisplayName(message)),
                                 ),

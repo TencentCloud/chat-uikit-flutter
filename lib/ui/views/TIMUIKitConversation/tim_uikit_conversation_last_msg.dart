@@ -16,16 +16,19 @@ class TIMUIKitLastMsg extends StatefulWidget {
   final V2TimMessage? lastMsg;
   final List<V2TimGroupAtInfo?> groupAtInfoList;
   final BuildContext context;
-  final CustomLastMsgBuilder? lastMsgBuilder;
   final double fontSize;
+
+  final CustomLastMsgBuilder? lastMsgBuilder;
 
   const TIMUIKitLastMsg({
     Key? key,
     this.lastMsg,
     required this.groupAtInfoList,
     required this.context,
-    this.lastMsgBuilder,
     this.fontSize = 14.0,
+    ////////////// 自定义入参 //////////////
+    this.lastMsgBuilder,
+    ////////////// 自定义入参 //////////////
   }) : super(key: key);
 
   @override

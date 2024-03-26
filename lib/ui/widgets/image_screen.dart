@@ -238,35 +238,43 @@ class _ImageScreenState extends TIMUIKitState<ImageScreen>
               Positioned(
                   left: 10,
                   bottom: 50,
-                  child: IconButton(
-                    icon: Image.asset(
-                      'images/close.png',
-                      package: 'tencent_cloud_chat_uikit',
+                  child: SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: IconButton(
+                      icon: Image.asset(
+                        'images/close.png',
+                        package: 'tencent_cloud_chat_uikit',
+                      ),
+                      iconSize: 30,
+                      onPressed: close,
                     ),
-                    iconSize: 30,
-                    onPressed: close,
                   )),
               if (widget.downloadFn != null)
                 Positioned(
                   right: 10,
                   bottom: 50,
-                  child: IconButton(
-                    icon: Image.asset(
-                      'images/download.png',
-                      package: 'tencent_cloud_chat_uikit',
-                    ),
-                    iconSize: 30,
-                    onPressed: () async {
-                      setState(() {
-                        isLoading = true;
-                      });
-                      await widget.downloadFn!();
-                      Future.delayed(const Duration(milliseconds: 200),(){
+                  child: SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: IconButton(
+                      icon: Image.asset(
+                        'images/download.png',
+                        package: 'tencent_cloud_chat_uikit',
+                      ),
+                      iconSize: 30,
+                      onPressed: () async {
                         setState(() {
-                          isLoading = false;
+                          isLoading = true;
                         });
-                      });
-                    },
+                        await widget.downloadFn!();
+                        Future.delayed(const Duration(milliseconds: 200),(){
+                          setState(() {
+                            isLoading = false;
+                          });
+                        });
+                      },
+                    ),
                   ),
                 ),
               if (isLoading)

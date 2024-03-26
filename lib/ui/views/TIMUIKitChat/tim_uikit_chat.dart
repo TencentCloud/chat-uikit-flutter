@@ -542,6 +542,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                                 child: Listener(
                                   onPointerMove: closePanel,
                                   child: TIMUIKitHistoryMessageListContainer(
+                                    ////////////// 自定义参数 //////////////
                                     isDesktop: widget.isDesktop,
                                     userAvatarImageBuilder:
                                         widget.userAvatarImageBuilder,
@@ -549,6 +550,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                                         widget.calculateImgSizeFunc,
                                     calculateVideoSizeFunc:
                                         widget.calculateVideoSizeFunc,
+                                    ////////////// 自定义参数 //////////////
                                     customMessageHoverBarOnDesktop:
                                         widget.customMessageHoverBarOnDesktop,
                                     conversation: widget.conversation,

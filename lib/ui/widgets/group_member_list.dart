@@ -2,17 +2,17 @@
 
 import 'package:azlistview_all_platforms/azlistview_all_platforms.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable_for_tencent_im/flutter_slidable.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:lpinyin/lpinyin.dart';
 import 'package:provider/provider.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/optimize_utils.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/az_list_view.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/radio_button.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_im_base/tencent_im_base.dart';
 
 class GroupProfileMemberList extends StatefulWidget {
   final List<V2TimGroupMemberFullInfo?> memberList;
@@ -23,8 +23,7 @@ class GroupProfileMemberList extends StatefulWidget {
 
   // when the @ need filter some group types
   final String? groupType;
-  final Function(List<V2TimGroupMemberFullInfo> selectedMember)?
-      onSelectedMemberChange;
+  final Function(List<V2TimGroupMemberFullInfo> selectedMember)? onSelectedMemberChange;
   // notice: onTapMemberItem and onSelectedMemberChange use together will triger together
   final Function(V2TimGroupMemberFullInfo memberInfo, TapDownDetails? tapDetails)? onTapMemberItem;
   // When sliding to the bottom bar callBack
@@ -53,8 +52,7 @@ class GroupProfileMemberList extends StatefulWidget {
   State<StatefulWidget> createState() => _GroupProfileMemberListState();
 }
 
-class _GroupProfileMemberListState
-    extends TIMUIKitState<GroupProfileMemberList> {
+class _GroupProfileMemberListState extends TIMUIKitState<GroupProfileMemberList> {
   List<V2TimGroupMemberFullInfo> selectedMember = [];
 
   _getShowName(V2TimGroupMemberFullInfo? item) {
@@ -71,14 +69,12 @@ class _GroupProfileMemberListState
                 : userID;
   }
 
-  List<ISuspensionBeanImpl> _getShowList(
-      List<V2TimGroupMemberFullInfo?> memberList) {
+  List<ISuspensionBeanImpl> _getShowList(List<V2TimGroupMemberFullInfo?> memberList) {
     final List<ISuspensionBeanImpl> showList = List.empty(growable: true);
     for (var i = 0; i < memberList.length; i++) {
       final item = memberList[i];
       final showName = _getShowName(item);
-      if (item?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER ||
-          item?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN) {
+      if (item?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER || item?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN) {
         showList.add(ISuspensionBeanImpl(memberInfo: item, tagIndex: "@"));
       } else {
         String pinyin = PinyinHelper.getPinyinE(showName);
@@ -97,25 +93,17 @@ class _GroupProfileMemberListState
     if (widget.canAtAll) {
       final canAtGroupType = ["Work", "Public", "Meeting"];
       if (canAtGroupType.contains(widget.groupType)) {
-        showList.insert(
-            0,
-            ISuspensionBeanImpl(
-                memberInfo: V2TimGroupMemberFullInfo(
-                    userID: "__kImSDK_MesssageAtALL__", nickName: TIM_t("所有人")),
-                tagIndex: ""));
+        showList.insert(0, ISuspensionBeanImpl(memberInfo: V2TimGroupMemberFullInfo(userID: "__kImSDK_MesssageAtALL__", nickName: TIM_t("所有人")), tagIndex: ""));
       }
     }
 
     return showList;
   }
 
-  Widget _buildListItem(
-      BuildContext context, V2TimGroupMemberFullInfo memberInfo) {
+  Widget _buildListItem(BuildContext context, V2TimGroupMemberFullInfo memberInfo) {
     final theme = Provider.of<TUIThemeViewModel>(context).theme;
-    final isDesktopScreen =
-        TUIKitScreenUtils.getFormFactor() == DeviceType.Desktop;
-    final isGroupMember =
-        memberInfo.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_MEMBER;
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor() == DeviceType.Desktop;
+    final isGroupMember = memberInfo.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_MEMBER;
     return Container(
         color: Colors.white,
         child: Slidable(
@@ -128,8 +116,7 @@ class _GroupProfileMemberListState
                         }
                       },
                       flex: 1,
-                      backgroundColor:
-                          theme.cautionColor ?? CommonColor.cautionColor,
+                      backgroundColor: theme.cautionColor ?? CommonColor.cautionColor,
                       autoClose: true,
                       label: TIM_t("删除"),
                     )
@@ -146,9 +133,7 @@ class _GroupProfileMemberListState
                         child: CheckBoxButton(
                             onChanged: (isChecked) {
                               if (isChecked) {
-                                if (widget.maxSelectNum != null &&
-                                    selectedMember.length >=
-                                        widget.maxSelectNum!) {
+                                if (widget.maxSelectNum != null && selectedMember.length >= widget.maxSelectNum!) {
                                   return;
                                 }
                                 selectedMember.add(memberInfo);
@@ -172,30 +157,22 @@ class _GroupProfileMemberListState
                         type: 1,
                       ),
                     ),
-                    Text(_getShowName(memberInfo),
-                        style:  TextStyle(fontSize: isDesktopScreen ? 14 : 16)),
-                    memberInfo.role ==
-                            GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER
+                    Text(_getShowName(memberInfo), style: TextStyle(fontSize: isDesktopScreen ? 14 : 16)),
+                    memberInfo.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER
                         ? Container(
                             margin: const EdgeInsets.only(left: 5),
                             child: Text(TIM_t("群主"),
                                 style: TextStyle(
                                   color: theme.ownerColor,
-                                  fontSize: isDesktopScreen ? 10 :12,
+                                  fontSize: isDesktopScreen ? 10 : 12,
                                 )),
                             padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
                             decoration: BoxDecoration(
-                              border: Border.all(
-                                  color: theme.ownerColor ??
-                                      CommonColor.ownerColor,
-                                  width: 1),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(4.0)),
+                              border: Border.all(color: theme.ownerColor ?? CommonColor.ownerColor, width: 1),
+                              borderRadius: const BorderRadius.all(Radius.circular(4.0)),
                             ),
                           )
-                        : memberInfo.role ==
-                                GroupMemberRoleType
-                                    .V2TIM_GROUP_MEMBER_ROLE_ADMIN
+                        : memberInfo.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN
                             ? Container(
                                 margin: const EdgeInsets.only(left: 5),
                                 child: Text(TIM_t("管理员"),
@@ -205,12 +182,8 @@ class _GroupProfileMemberListState
                                     )),
                                 padding: const EdgeInsets.fromLTRB(5, 0, 5, 0),
                                 decoration: BoxDecoration(
-                                  border: Border.all(
-                                      color: theme.adminColor ??
-                                          CommonColor.adminColor,
-                                      width: 1),
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(4.0)),
+                                  border: Border.all(color: theme.adminColor ?? CommonColor.adminColor, width: 1),
+                                  borderRadius: const BorderRadius.all(Radius.circular(4.0)),
                                 ),
                               )
                             : Container()
@@ -225,8 +198,7 @@ class _GroupProfileMemberListState
                     if (isChecked) {
                       selectedMember.remove(memberInfo);
                     } else {
-                      if (widget.maxSelectNum != null &&
-                          selectedMember.length >= widget.maxSelectNum!) {
+                      if (widget.maxSelectNum != null && selectedMember.length >= widget.maxSelectNum!) {
                         return;
                       }
                       selectedMember.add(memberInfo);
@@ -238,17 +210,11 @@ class _GroupProfileMemberListState
                   }
                 },
               ),
-              Divider(
-                  thickness: 1,
-                  indent: 74,
-                  endIndent: 0,
-                  color: theme.weakBackgroundColor,
-                  height: 0)
+              Divider(thickness: 1, indent: 74, endIndent: 0, color: theme.weakBackgroundColor, height: 0)
             ])));
   }
 
-  static Widget getSusItem(BuildContext context, TUITheme theme, String tag,
-      {double susHeight = 40}) {
+  static Widget getSusItem(BuildContext context, TUITheme theme, String tag, {double susHeight = 40}) {
     if (tag == '@') {
       tag = TIM_t("群主、管理员");
     }
@@ -273,11 +239,9 @@ class _GroupProfileMemberListState
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final TUITheme theme = value.theme;
 
-    final isDesktopScreen =
-        TUIKitScreenUtils.getFormFactor() == DeviceType.Desktop;
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor() == DeviceType.Desktop;
 
-    final throteFunction =
-        OptimizeUtils.throttle((ScrollNotification notification) {
+    final throteFunction = OptimizeUtils.throttle((ScrollNotification notification) {
       final pixels = notification.metrics.pixels;
       // 总像素高度
       final maxScrollExtent = notification.metrics.maxScrollExtent;
@@ -305,21 +269,19 @@ class _GroupProfileMemberListState
                     child: Text(TIM_t("暂无群成员")),
                   )
                 : Container(
-              padding: isDesktopScreen ? const EdgeInsets.symmetric( horizontal: 16) : null,
-              child: AZListViewContainer(
-                  memberList: showList,
-                  susItemBuilder: (context, index) {
-                    final model = showList[index];
-                    return getSusItem(
-                        context, theme, model.getSuspensionTag());
-                  },
-                  itemBuilder: (context, index) {
-                    final memberInfo = showList[index].memberInfo
-                    as V2TimGroupMemberFullInfo;
+                    padding: isDesktopScreen ? const EdgeInsets.symmetric(horizontal: 16) : null,
+                    child: AZListViewContainer(
+                        memberList: showList,
+                        susItemBuilder: (context, index) {
+                          final model = showList[index];
+                          return getSusItem(context, theme, model.getSuspensionTag());
+                        },
+                        itemBuilder: (context, index) {
+                          final memberInfo = showList[index].memberInfo as V2TimGroupMemberFullInfo;
 
-                    return _buildListItem(context, memberInfo);
-                  }),
-            ),
+                          return _buildListItem(context, memberInfo);
+                        }),
+                  ),
           ))
         ],
       )),

@@ -11,7 +11,7 @@ import 'package:tencent_im_base/tencent_im_base.dart';
 
 class MessageServiceImpl extends MessageService {
   final CoreServicesImpl _coreService = serviceLocator<CoreServicesImpl>();
-  final Map<String, List<V2TimMessage>> messgaeListMap = {};
+  final Map<String, List<V2TimMessage>> messageListMap = {};
   final Map<String, List<V2TimMessage>> sendingMessage = {};
 
   @override
@@ -27,28 +27,28 @@ class MessageServiceImpl extends MessageService {
     bool haveMoreData = true;
     final res =
         await TencentImSDKPlugin.v2TIMManager.getMessageManager().getHistoryMessageList(count: count, getType: getType, userID: userID, groupID: groupID, lastMsgID: lastMsgID, lastMsgSeq: lastMsgSeq, messageTypeList: messageTypeList);
-    final List<V2TimMessage> responsedMessageList = res.data ?? [];
+    final List<V2TimMessage> responseMessageList = res.data ?? [];
     final conversationID = userID ?? groupID;
-    final cachedMessageList = messgaeListMap[conversationID];
+    final cachedMessageList = messageListMap[conversationID];
     List<V2TimMessage> combinedMessageList = [];
     // 加载更多
     if (lastMsgID != null && cachedMessageList != null) {
-      combinedMessageList = [...cachedMessageList, ...responsedMessageList];
+      combinedMessageList = [...cachedMessageList, ...responseMessageList];
       // 首次加载
     } else {
       final bool existSendingMessage = sendingMessage[conversationID] != null && sendingMessage[conversationID]!.isNotEmpty;
       // 存在未发送完成的消息
       if (existSendingMessage) {
-        combinedMessageList = [...sendingMessage[conversationID]!, ...responsedMessageList];
+        combinedMessageList = [...sendingMessage[conversationID]!, ...responseMessageList];
       } else {
         sendingMessage.remove(conversationID);
-        combinedMessageList = responsedMessageList;
+        combinedMessageList = responseMessageList;
       }
     }
     if (res.code != 0) {
       _coreService.callOnCallback(TIMCallback(type: TIMCallbackType.API_ERROR, errorMsg: res.desc, errorCode: res.code));
     }
-    if (responsedMessageList.isEmpty || (!PlatformUtils().isWeb && responsedMessageList.length < count) || (PlatformUtils().isWeb && responsedMessageList.length < min(count, 20))) {
+    if (responseMessageList.isEmpty || (!PlatformUtils().isWeb && responseMessageList.length < count) || (PlatformUtils().isWeb && responseMessageList.length < min(count, 20))) {
       haveMoreData = false;
     } else {
       haveMoreData = true;
