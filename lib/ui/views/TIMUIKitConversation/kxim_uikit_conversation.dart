@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_slidable_for_tencent_im/flutter_slidable.dart';
@@ -5,14 +7,15 @@ import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/conversation_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_conversation_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendship_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/controller/tim_uikit_conversation_controller.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
 
 import 'kxim_uikit_conversation_item.dart';
 import 'tim_uikit_conversation_last_msg.dart';
@@ -41,7 +44,7 @@ typedef KXConversationMedalBuilder = Widget? Function(
   V2TimConversation conversationItem,
 );
 
-typedef KXConversationItemSlidableBuilder = List<ConversationItemSlidablePanel>
+typedef KXConversationItemSlideBuilder = List<ConversationItemSlidePanel>
     Function(V2TimConversation conversationItem);
 
 class KXIMUIKitConversation extends StatefulWidget {
@@ -70,10 +73,13 @@ class KXIMUIKitConversation extends StatefulWidget {
   final TIMUIKitConversationController? controller;
 
   /// the builder for conversation item
-  final KXConversationItemBuilder? itembuilder;
+  final KXConversationItemBuilder? itemBuilder;
 
   /// the builder for slidable item for each conversation item
-  final KXConversationItemSlidableBuilder? itemSlidableBuilder;
+  final KXConversationItemSlideBuilder? itemSlideBuilder;
+
+  /// the widget of secondary tap menu for each conversation item, shows on wide screens.
+  final ConversationItemSecondaryMenuBuilder? itemSecondaryMenuBuilder;
 
   /// the widget shows when no conversation exists
   final Widget Function()? emptyBuilder;
@@ -98,14 +104,16 @@ class KXIMUIKitConversation extends StatefulWidget {
 
   final CustomLastMsgBuilder? customLastMsgBuilder;
 
+  final bool isDesktop;
+
   const KXIMUIKitConversation({
     Key? key,
     this.lifeCycle,
     this.onTapItem,
     this.controller,
-    this.itembuilder,
+    this.itemBuilder,
     this.isShowDraft = true,
-    this.itemSlidableBuilder,
+    this.itemSlideBuilder,
     this.conversationCollector,
     this.emptyBuilder,
     this.lastMessageBuilder,
@@ -117,66 +125,13 @@ class KXIMUIKitConversation extends StatefulWidget {
     this.enableEndActionCaller,
     this.cusConversationsFilter,
     this.customLastMsgBuilder,
+    this.itemSecondaryMenuBuilder,
+    this.isDesktop = false,
   }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
     return _KXIMUIKitConversationState();
-  }
-}
-
-class ConversationItemSlidablePanel extends TIMUIKitStatelessWidget {
-  ConversationItemSlidablePanel({
-    Key? key,
-    this.flex = 1,
-    this.backgroundColor = Colors.white,
-    this.foregroundColor,
-    this.autoClose = true,
-    required this.onPressed,
-    this.icon,
-    this.spacing = 4,
-    this.label,
-  })  : assert(flex > 0),
-        assert(icon != null || label != null),
-        super(key: key);
-
-  /// {@macro slidable.actions.flex}
-  final int flex;
-
-  /// {@macro slidable.actions.backgroundColor}
-  final Color backgroundColor;
-
-  /// {@macro slidable.actions.foregroundColor}
-  final Color? foregroundColor;
-
-  /// {@macro slidable.actions.autoClose}
-  final bool autoClose;
-
-  /// {@macro slidable.actions.onPressed}
-  final SlidableActionCallback? onPressed;
-
-  /// An icon to display above the [label].
-  final IconData? icon;
-
-  /// The space between [icon] and [label] if both set.
-  ///
-  /// Defaults to 4.
-  final double spacing;
-
-  /// A label to display below the [icon].
-  final String? label;
-
-  @override
-  Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
-    return SlidableAction(
-      onPressed: onPressed,
-      flex: flex,
-      backgroundColor: backgroundColor,
-      foregroundColor: foregroundColor,
-      autoClose: autoClose,
-      label: label,
-      spacing: spacing,
-    );
   }
 }
 
@@ -225,13 +180,45 @@ class _KXIMUIKitConversationState extends TIMUIKitState<KXIMUIKitConversation> {
         conversationID: conversation.conversationID);
   }
 
-  List<ConversationItemSlidablePanel> _defaultSlidableBuilder(
+  Widget _defaultSecondaryMenu(
+      V2TimConversation conversationItem, VoidCallback onClose) {
+    return TUIKitColumnMenu(data: [
+      if (!PlatformUtils().isWeb)
+        ColumnMenuItem(
+            label: TIM_t("清除消息"),
+            icon: const Icon(Icons.clear_all, size: 16),
+            onClick: () {
+              onClose();
+              _clearHistory(conversationItem);
+            }),
+      ColumnMenuItem(
+          label: conversationItem.isPinned! ? TIM_t("取消置顶") : TIM_t("置顶"),
+          icon: Icon(
+              conversationItem.isPinned!
+                  ? Icons.vertical_align_bottom
+                  : Icons.vertical_align_top,
+              size: 16),
+          onClick: () {
+            onClose();
+            _pinConversation(conversationItem);
+          }),
+      ColumnMenuItem(
+          label: TIM_t("删除会话"),
+          icon: const Icon(Icons.delete_outline, size: 16),
+          onClick: () {
+            onClose();
+            _deleteConversation(conversationItem);
+          }),
+    ]);
+  }
+
+  List<ConversationItemSlidePanel> _defaultSlideBuilder(
     V2TimConversation conversationItem,
   ) {
     final theme = themeViewModel.theme;
     return [
       if (!PlatformUtils().isWeb)
-        ConversationItemSlidablePanel(
+        ConversationItemSlidePanel(
           onPressed: (context) {
             _clearHistory(conversationItem);
           },
@@ -242,7 +229,7 @@ class _KXIMUIKitConversationState extends TIMUIKitState<KXIMUIKitConversation> {
           spacing: 0,
           autoClose: true,
         ),
-      ConversationItemSlidablePanel(
+      ConversationItemSlidePanel(
         onPressed: (context) {
           _pinConversation(conversationItem);
         },
@@ -251,7 +238,7 @@ class _KXIMUIKitConversationState extends TIMUIKitState<KXIMUIKitConversation> {
         foregroundColor: theme.conversationItemSliderTextColor,
         label: conversationItem.isPinned! ? TIM_t("取消置顶") : TIM_t("置顶"),
       ),
-      ConversationItemSlidablePanel(
+      ConversationItemSlidePanel(
         onPressed: (context) {
           _deleteConversation(conversationItem);
         },
@@ -263,8 +250,16 @@ class _KXIMUIKitConversationState extends TIMUIKitState<KXIMUIKitConversation> {
     ];
   }
 
-  KXConversationItemSlidableBuilder _getSlidableBuilder() {
-    return widget.itemSlidableBuilder ?? _defaultSlidableBuilder;
+  Widget _getSecondaryMenu(
+      V2TimConversation conversation, VoidCallback onClose) {
+    if (widget.itemSecondaryMenuBuilder != null) {
+      return widget.itemSecondaryMenuBuilder!(conversation, onClose);
+    }
+    return _defaultSecondaryMenu(conversation, onClose);
+  }
+
+  KXConversationItemSlideBuilder _getSlideBuilder() {
+    return widget.itemSlideBuilder ?? _defaultSlideBuilder;
   }
 
   _onScrollToConversation(String conversationID) {
@@ -368,66 +363,101 @@ class _KXIMUIKitConversationState extends TIMUIKitState<KXIMUIKitConversation> {
                               (item) => item.userID == conversationItem?.userID,
                               orElse: () => V2TimUserStatus(statusType: 0));
 
-                      if (widget.itembuilder != null) {
-                        return widget.itembuilder!(
+                      if (widget.itemBuilder != null) {
+                        return widget.itemBuilder!(
                             conversationItem!, onlineStatus);
                       }
 
                       final slidableChildren =
-                          _getSlidableBuilder()(conversationItem!);
+                          _getSlideBuilder()(conversationItem!);
 
                       // 默认就是 true，表示需要支持侧滑事件，如果需要不支持，请明确返回 false
                       final enableEndAction = widget.enableEndActionCaller
                               ?.call(conversationItem) ??
                           true;
+
+                      Widget conversationLineItem() {
+                        return GestureDetector(
+                          child: KXIMUIKitConversationItem(
+                              isCurrent:
+                                  model.selectedConversation?.conversationID ==
+                                      conversationItem.conversationID,
+                              isShowDraft: widget.isShowDraft,
+                              cusAvatar:
+                                  widget.avatarBuilder?.call(conversationItem),
+                              skinImage:
+                                  widget.skinBuilder?.call(conversationItem),
+                              medal:
+                                  widget.medalBuilder?.call(conversationItem),
+                              lastMessageBuilder: widget.lastMessageBuilder,
+                              customLastMsgBuilder: widget.customLastMsgBuilder,
+                              faceUrl: conversationItem.faceUrl ?? "",
+                              nickName: conversationItem.showName ?? "",
+                              isDisturb: conversationItem.recvOpt != 0,
+                              lastMsg: conversationItem.lastMessage,
+                              isPined: conversationItem.isPinned ?? false,
+                              groupAtInfoList:
+                                  conversationItem.groupAtInfoList ?? [],
+                              unreadCount: conversationItem.unreadCount ?? 0,
+                              draftText: conversationItem.draftText,
+                              onlineStatus: (widget.isShowOnlineStatus &&
+                                      conversationItem.userID != null &&
+                                      conversationItem.userID!.isNotEmpty)
+                                  ? onlineStatus
+                                  : null,
+                              draftTimestamp: conversationItem.draftTimestamp,
+                              convType: conversationItem.type),
+                          onTap: () => onTapConvItem(conversationItem),
+                        );
+                      }
+
                       return AutoScrollTag(
                         key: ValueKey(conversationItem.conversationID),
                         controller: _autoScrollController,
                         index: conversationIndex,
-                        child: Slidable(
-                          groupTag: 'conversation-list',
-                          child: InkWell(
-                            child: KXIMUIKitConversationItem(
-                                isCurrent: model
-                                        .selectedConversation?.conversationID ==
-                                    conversationItem.conversationID,
-                                isShowDraft: widget.isShowDraft,
-                                cusAvatar: widget.avatarBuilder
-                                    ?.call(conversationItem),
-                                skinImage:
-                                    widget.skinBuilder?.call(conversationItem),
-                                medal:
-                                    widget.medalBuilder?.call(conversationItem),
-                                lastMessageBuilder: widget.lastMessageBuilder,
-                                customLastMsgBuilder:
-                                    widget.customLastMsgBuilder,
-                                faceUrl: conversationItem.faceUrl ?? "",
-                                nickName: conversationItem.showName ?? "",
-                                isDisturb: conversationItem.recvOpt != 0,
-                                lastMsg: conversationItem.lastMessage,
-                                isPined: conversationItem.isPinned ?? false,
-                                groupAtInfoList:
-                                    conversationItem.groupAtInfoList ?? [],
-                                unreadCount: conversationItem.unreadCount ?? 0,
-                                draftText: conversationItem.draftText,
-                                onlineStatus: (widget.isShowOnlineStatus &&
-                                        conversationItem.userID != null &&
-                                        conversationItem.userID!.isNotEmpty)
-                                    ? onlineStatus
+                        child: widget.isDesktop
+                            ? InkWell(
+                                onSecondaryTapDown: (details) {
+                                  if (!enableEndAction) return;
+                                  TUIKitWidePopup.showPopupWindow(
+                                    operationKey: TUIKitWideModalOperationKey
+                                        .conversationSecondaryMenu,
+                                    isDarkBackground: false,
+                                    borderRadius: const BorderRadius.all(
+                                      Radius.circular(4),
+                                    ),
+                                    context: context,
+                                    offset: Offset(
+                                      min(
+                                          details.globalPosition.dx,
+                                          MediaQuery.of(context).size.width -
+                                              80),
+                                      min(
+                                          details.globalPosition.dy,
+                                          MediaQuery.of(context).size.height -
+                                              130),
+                                    ),
+                                    child: (onClose) => _getSecondaryMenu(
+                                      conversationItem,
+                                      onClose,
+                                    ),
+                                  );
+                                },
+                                child: conversationLineItem(),
+                              )
+                            : Slidable(
+                                groupTag: 'conversation-list',
+                                child: conversationLineItem(),
+                                endActionPane: enableEndAction
+                                    ? ActionPane(
+                                        extentRatio: slidableChildren.length > 2
+                                            ? 0.77
+                                            : 0.5,
+                                        motion: const DrawerMotion(),
+                                        children: slidableChildren,
+                                      )
                                     : null,
-                                draftTimestamp: conversationItem.draftTimestamp,
-                                convType: conversationItem.type),
-                            onTap: () => onTapConvItem(conversationItem),
-                          ),
-                          endActionPane: enableEndAction
-                              ? ActionPane(
-                                  extentRatio:
-                                      slidableChildren.length > 2 ? 0.77 : 0.5,
-                                  motion: const DrawerMotion(),
-                                  children: slidableChildren,
-                                )
-                              : null,
-                        ),
+                              ),
                       );
                     },
                   )
