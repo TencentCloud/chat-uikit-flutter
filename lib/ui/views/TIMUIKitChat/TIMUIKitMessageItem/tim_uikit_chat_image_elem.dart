@@ -7,6 +7,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:collection/collection.dart';
 import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +61,9 @@ class TIMUIKitImageElem extends StatefulWidget {
     this.isFrom,
     Key? key,
     this.isShowMessageReaction,
+    ////////// 自定义入参 //////////
     this.calculateSizeFunc,
+    ////////// 自定义入参 //////////
   }) : super(key: key);
 
   @override
@@ -130,12 +133,15 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     TUITheme theme, {
     V2TimMessage? cusMsg,
   }) async {
+    ////////////// 整体逻辑已迁移 //////////////
+    /// 去内部进行比对
     return MediaDownloadUtil.of.saveImg(
       context,
       theme,
       cusMsg: cusMsg,
       message: widget.message,
     );
+    ////////////// 整体逻辑已迁移 //////////////
   }
 
   V2TimImage? getImageFromList(V2TimImageTypesEnum imgType) {
@@ -437,9 +443,22 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
   }
 
   void initImages() async {
+    final zeroImageLocal = TencentUtils.checkString(widget
+        .message.imageElem?.imageList
+        ?.firstWhereOrNull((element) => element?.type == 0)
+        ?.localUrl);
+    final oneImageLocal = TencentUtils.checkString(widget
+        .message.imageElem?.imageList
+        ?.firstWhereOrNull((element) => element?.type == 1)
+        ?.localUrl);
+    final twoImageLocal = TencentUtils.checkString(widget
+        .message.imageElem?.imageList
+        ?.firstWhereOrNull((element) => element?.type == 2)
+        ?.localUrl);
+
     if (!PlatformUtils().isWeb &&
         TencentUtils.checkString(widget.message.msgID) != null) {
-      if (widget.message.imageElem?.imageList == null ||
+      if ((widget.message.imageElem?.imageList) == null ||
           widget.message.imageElem!.imageList!.isEmpty) {
         final response = await _messageService.getMessageOnlineUrl(
             msgID: widget.message.msgID!);
@@ -448,46 +467,25 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
           widget.message.imageElem = elem.imageElem;
         }
       }
-      if (widget.message.imageElem?.imageList == null ||
-          widget.message.imageElem!.imageList!.isEmpty ||
-          TencentUtils.checkString(
-                  widget.message.imageElem?.imageList?[0]?.localUrl) ==
-              null ||
-          (widget.message.imageElem!.imageList![1]!.localUrl != null &&
-              !File(widget.message.imageElem!.imageList![0]!.localUrl!)
-                  .existsSync())) {
-        _messageService.downloadMessage(
-            msgID: widget.message.msgID!,
-            messageType: 3,
-            imageType: 0,
-            isSnapshot: false);
-      }
-      if (widget.message.imageElem?.imageList == null ||
-          widget.message.imageElem!.imageList!.length < 2 &&
-              TencentUtils.checkString(
-                      widget.message.imageElem?.imageList?[1]?.localUrl) ==
-                  null ||
-          (widget.message.imageElem!.imageList![1]!.localUrl != null &&
-              !File(widget.message.imageElem!.imageList![1]!.localUrl!)
-                  .existsSync())) {
+      if (oneImageLocal == null || !File(oneImageLocal).existsSync()) {
         _messageService.downloadMessage(
             msgID: widget.message.msgID!,
             messageType: 3,
             imageType: 1,
             isSnapshot: false);
       }
-      if (widget.message.imageElem?.imageList != null ||
-          widget.message.imageElem!.imageList!.length < 3 ||
-          TencentUtils.checkString(
-                  widget.message.imageElem?.imageList?[2]?.localUrl) ==
-              null ||
-          (widget.message.imageElem!.imageList![1]!.localUrl != null &&
-              !File(widget.message.imageElem!.imageList![2]!.localUrl!)
-                  .existsSync())) {
+      if (twoImageLocal == null || !File(twoImageLocal).existsSync()) {
         _messageService.downloadMessage(
             msgID: widget.message.msgID!,
             messageType: 3,
             imageType: 2,
+            isSnapshot: false);
+      }
+      if (zeroImageLocal == null || !File(zeroImageLocal).existsSync()) {
+        _messageService.downloadMessage(
+            msgID: widget.message.msgID!,
+            messageType: 3,
+            imageType: 0,
             isSnapshot: false);
       }
     }

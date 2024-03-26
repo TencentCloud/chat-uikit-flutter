@@ -105,6 +105,8 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
   /// If provided, the default message action functionality will appear in the right-click context menu instead.
   final Widget? Function(V2TimMessage message)? customMessageHoverBarOnDesktop;
 
+  final bool isDeskTop;
+
   const TIMUIKitHistoryMessageListContainer({
     Key? key,
     this.itemBuilder,
@@ -132,9 +134,12 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
     this.onSecondaryTapAvatar,
     this.groupMemberInfo,
     this.customMessageHoverBarOnDesktop,
+    ////////// 自定义入参 //////////
     this.userAvatarImageBuilder,
     this.calculateImgSizeFunc,
     this.calculateVideoSizeFunc,
+    this.isDeskTop = false,
+    ////////// 自定义入参 //////////
   }) : super(key: key);
 
   @override
@@ -196,6 +201,7 @@ class _TIMUIKitHistoryMessageListContainerState
           mainHistoryListConfig: widget.mainHistoryListConfig,
           itemBuilder: (context, message) {
             return TIMUIKitHistoryMessageListItem(
+              isDeskTop: widget.isDeskTop,
               userAvatarImageBuilder: widget.userAvatarImageBuilder,
               calculateImgSizeFunc: widget.calculateImgSizeFunc,
               calculateVideoSizeFunc: widget.calculateVideoSizeFunc,

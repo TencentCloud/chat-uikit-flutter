@@ -43,6 +43,7 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
 
   late VideoPlayerController controller;
   ChewieController? _chewieController;
+
   // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
 
@@ -149,37 +150,50 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
         margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
         child: Row(
           children: <Widget>[
-            IconButton(
-              icon: Image.asset(
-                'images/close.png',
-                package: 'tencent_cloud_chat_uikit',
+            SizedBox(
+              width: 48,
+              height: 48,
+              child: IconButton(
+                icon: Image.asset(
+                  'images/close.png',
+                  package: 'tencent_cloud_chat_uikit',
+                ),
+                iconSize: 30,
+                onPressed: () {
+                  if (_latestValue.isPlaying) {
+                    _playPause();
+                  }
+                  Navigator.of(context).pop();
+                },
               ),
-              iconSize: 30,
-              onPressed: () {
-                if (_latestValue.isPlaying) {
-                  _playPause();
-                }
-                Navigator.of(context).pop();
-              },
             ),
             Expanded(child: Container()),
-            IconButton(
-              icon: Image.asset(
-                'images/download.png',
-                package: 'tencent_cloud_chat_uikit',
-              ),
-              iconSize: 30,
-              onPressed: () async {
-                setState(() {
-                  isLoading = true;
-                });
-                await widget.downloadFn();
-                Future.delayed(const Duration(milliseconds: 200), () {
+            SizedBox(
+              width: 48,
+              height: 48,
+              child: IconButton(
+                icon: Image.asset(
+                  'images/download.png',
+                  package: 'tencent_cloud_chat_uikit',
+                ),
+                iconSize: 30,
+                onPressed: () async {
                   setState(() {
-                    isLoading = false;
+                    isLoading = true;
                   });
-                });
-              },
+                  await widget.downloadFn();
+                  Future.delayed(
+                    const Duration(milliseconds: 200),
+                    () {
+                      setState(
+                        () {
+                          isLoading = false;
+                        },
+                      );
+                    },
+                  );
+                },
+              ),
             )
           ],
         ),
@@ -191,21 +205,26 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
     BuildContext context,
   ) {
     const iconColor = Colors.white;
-    return SizedBox(
-      height: barHeight,
-      child: Row(
-        children: <Widget>[
-          _buildPlayPause(controller, iconColor),
-          if (chewieController.isLive)
-            const Expanded(child: Text('LIVE'))
-          else
-            _buildPositionStart(iconColor),
-          if (chewieController.isLive)
-            const SizedBox()
-          else
-            _buildProgressBar(),
-          if (!chewieController.isLive) _buildPositionEnd(iconColor),
-        ],
+
+    return AnimatedOpacity(
+      opacity: _hideStuff ? 0.0 : 1.0,
+      duration: const Duration(milliseconds: 300),
+      child: SizedBox(
+        height: barHeight,
+        child: Row(
+          children: <Widget>[
+            _buildPlayPause(controller, iconColor),
+            if (chewieController.isLive)
+              const Expanded(child: Text('LIVE'))
+            else
+              _buildPositionStart(iconColor),
+            if (chewieController.isLive)
+              const SizedBox()
+            else
+              _buildProgressBar(),
+            if (!chewieController.isLive) _buildPositionEnd(iconColor),
+          ],
+        ),
       ),
     );
   }

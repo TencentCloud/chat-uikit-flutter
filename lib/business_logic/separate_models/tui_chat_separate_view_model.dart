@@ -233,54 +233,58 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     groupMemberList = null;
     selfMemberInfo = null;
 
-    if (conversationType == ConvType.group) {
-      _groupID = groupID;
-      globalModel.refreshGroupApplicationList();
-      loadGroupInfo(groupID ?? convID);
-      if (preGroupMemberList != null) {
-        groupMemberList = preGroupMemberList;
-        selfMemberInfo = preGroupMemberList
-            .firstWhereOrNull((e) => e?.userID == selfModel.loginInfo?.userID);
-      } else {
-        await loadSelfMemberInfo(groupID: groupID ?? convID);
-        loadGroupMemberList(groupID: groupID ?? convID);
-      }
-      if (selfMemberInfo == null) {
-        await loadSelfMemberInfo(groupID: groupID ?? convID);
-      }
-    } else {
-      notifyListeners();
-    }
-    if (conversationType == ConvType.c2c) {
-      final List<V2TimFriendInfoResult>? friendRes =
-          await _friendshipServices.getFriendsInfo(userIDList: [convID]);
-      if (friendRes != null && friendRes.isNotEmpty) {
-        final V2TimFriendInfoResult friendInfoResult = friendRes[0];
-        currentChatUserInfo = V2TimGroupMemberFullInfo(
-            userID: convID,
-            faceUrl: friendInfoResult.friendInfo?.userProfile?.faceUrl,
-            nickName: friendInfoResult.friendInfo?.userProfile?.nickName,
-            friendRemark: friendInfoResult.friendInfo?.friendRemark);
-      } else {
-        final List<V2TimUserFullInfo>? userRes =
-            await _friendshipServices.getUsersInfo(userIDList: [convID]);
-        if (userRes != null && userRes.isNotEmpty) {
-          final V2TimUserFullInfo userFullInfo = userRes[0];
-          currentChatUserInfo = V2TimGroupMemberFullInfo(
-            userID: convID,
-            faceUrl: userFullInfo.faceUrl,
-            nickName: userFullInfo.nickName,
-          );
-        }
-      }
-    }
-    globalModel.lifeCycle = lifeCycle;
     globalModel.setCurrentConversation(
         CurrentConversation(conversationID, conversationType ?? ConvType.c2c));
+    globalModel.lifeCycle = lifeCycle;
     globalModel.setMessageListPosition(
         conversationID, HistoryMessagePosition.bottom);
     globalModel.setChatConfig(chatConfig);
     globalModel.clearRecivedNewMessageCount();
+
+    if (conversationType == ConvType.group) {
+      _groupID = groupID;
+      notifyListeners();
+      Future.delayed(const Duration(milliseconds: 10), () async {
+        globalModel.refreshGroupApplicationList();
+        loadGroupInfo(groupID ?? convID);
+        if (preGroupMemberList != null) {
+          groupMemberList = preGroupMemberList;
+          selfMemberInfo = preGroupMemberList.firstWhereOrNull(
+              (e) => e?.userID == selfModel.loginInfo?.userID);
+        } else {
+          await loadSelfMemberInfo(groupID: groupID ?? convID);
+          loadGroupMemberList(groupID: groupID ?? convID);
+        }
+        if (selfMemberInfo == null) {
+          await loadSelfMemberInfo(groupID: groupID ?? convID);
+        }
+      });
+    } else {
+      Future.delayed(const Duration(milliseconds: 10), () async {
+        final List<V2TimFriendInfoResult>? friendRes =
+            await _friendshipServices.getFriendsInfo(userIDList: [convID]);
+        if (friendRes != null && friendRes.isNotEmpty) {
+          final V2TimFriendInfoResult friendInfoResult = friendRes[0];
+          currentChatUserInfo = V2TimGroupMemberFullInfo(
+              userID: convID,
+              faceUrl: friendInfoResult.friendInfo?.userProfile?.faceUrl,
+              nickName: friendInfoResult.friendInfo?.userProfile?.nickName,
+              friendRemark: friendInfoResult.friendInfo?.friendRemark);
+        } else {
+          final List<V2TimUserFullInfo>? userRes =
+              await _friendshipServices.getUsersInfo(userIDList: [convID]);
+          if (userRes != null && userRes.isNotEmpty) {
+            final V2TimUserFullInfo userFullInfo = userRes[0];
+            currentChatUserInfo = V2TimGroupMemberFullInfo(
+              userID: convID,
+              faceUrl: userFullInfo.faceUrl,
+              nickName: userFullInfo.nickName,
+            );
+          }
+        }
+        notifyListeners();
+      });
+    }
 
     // 语音消息连续播放新增逻辑 begin
     _setSoundSubscription();
@@ -1718,10 +1722,7 @@ extension TUIChatSeparateViewModelAudioPlay on TUIChatSeparateViewModel {
       );
 
       _messageService.downloadMessage(
-          msgID: msgID,
-          messageType: 4,
-          imageType: 0,
-          isSnapshot: false);
+          msgID: msgID, messageType: 4, imageType: 0, isSnapshot: false);
 
       return;
     }

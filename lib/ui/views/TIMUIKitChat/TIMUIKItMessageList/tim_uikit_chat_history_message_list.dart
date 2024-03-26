@@ -334,7 +334,7 @@ class _TIMUIKitHistoryMessageListState extends TIMUIKitState<TIMUIKitHistoryMess
     }
 
     String getMessageIdentifier(V2TimMessage? message, int index) {
-      return "${message?.msgID} - ${message?.timestamp} - ${message?.seq} -${message?.id}";
+      return "${message?.msgID} - ${message?.timestamp} - ${message?.seq} -${message?.id ?? ""}";
     }
 
     return Stack(
@@ -407,9 +407,9 @@ class _TIMUIKitHistoryMessageListState extends TIMUIKitState<TIMUIKitHistoryMess
                                 if (index == readMessageList.length - 1) {
                                   if (haveMoreData) {
                                     final lastMessage = globalModel.messageListMap[TencentUtils.checkString(widget.conversation.groupID) ?? widget.conversation.userID ?? widget.conversation.conversationID]?.last;
-                                    if(lastMessage != null){
+                                    if (lastMessage != null) {
                                       throttleFunctionWithMsgID(lastMessage.msgID ?? "", LoadDirection.previous);
-                                    }else{
+                                    } else {
                                       throttleFunction(index, messageList);
                                     }
                                     return Column(
