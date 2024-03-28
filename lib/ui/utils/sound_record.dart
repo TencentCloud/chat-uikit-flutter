@@ -35,6 +35,28 @@ class SoundPlayer {
     await _audioPlayer.play();
   }
 
+  // 语音消息连续播放新增逻辑 begin
+  static Future<void> playWith({required AudioSource source}) async {
+    _audioPlayer.stop();
+    if (_soundInterruptListener != null) {
+      _soundInterruptListener!();
+    }
+    await _audioPlayer.setAudioSource(source);
+    await _audioPlayer.play();
+  }
+
+  ///  播放本地文件
+  static Future<void> playWithAsset({required String asset}) async {
+    _audioPlayer.stop();
+    if (_soundInterruptListener != null) {
+      _soundInterruptListener!();
+    }
+    await _audioPlayer.setAsset(asset);
+    await _audioPlayer.play();
+  }
+
+  // 语音消息连续播放新增逻辑 end
+
   static stop() {
     _audioPlayer.stop();
   }
@@ -44,7 +66,9 @@ class SoundPlayer {
     _recorder.dispose();
   }
 
-  static StreamSubscription<PlayerState> playStateListener({required void Function(PlayerState)? listener}) => _audioPlayer.playerStateStream.listen(listener);
+  static StreamSubscription<PlayerState> playStateListener(
+          {required void Function(PlayerState)? listener}) =>
+      _audioPlayer.playerStateStream.listen(listener);
 
   static setSoundInterruptListener(SoundInterruptListener listener) {
     _soundInterruptListener = listener;
@@ -54,9 +78,13 @@ class SoundPlayer {
     _soundInterruptListener = null;
   }
 
-  static StreamSubscription<RecordResponse> responseListener(ResponseListener listener) => _recorder.response.listen(listener);
+  static StreamSubscription<RecordResponse> responseListener(
+          ResponseListener listener) =>
+      _recorder.response.listen(listener);
 
-  static StreamSubscription<RecordResponse> responseFromAmplitudeListener(ResponseListener listener) => _recorder.responseFromAmplitude.listen(listener);
+  static StreamSubscription<RecordResponse> responseFromAmplitudeListener(
+          ResponseListener listener) =>
+      _recorder.responseFromAmplitude.listen(listener);
 
   static startRecord() {
     _recorder.start();

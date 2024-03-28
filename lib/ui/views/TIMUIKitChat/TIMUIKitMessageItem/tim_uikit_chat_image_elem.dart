@@ -26,11 +26,13 @@ import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/media_download_util.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_wrapper.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/im_media_msg_browser/media_browser.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/image_screen.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
 import 'package:transparent_image/transparent_image.dart';
@@ -44,8 +46,25 @@ class TIMUIKitImageElem extends StatefulWidget {
   final String? isFrom;
   final bool? isShowMessageReaction;
   final TUIChatSeparateViewModel chatModel;
+  final Size? Function(
+    double minWidth,
+    double maxWidth,
+    double minHeight,
+    double maxHeight,
+  )? calculateSizeFunc;
 
-  const TIMUIKitImageElem({required this.message, this.isShowJump = false, required this.chatModel, this.clearJump, this.isFrom, Key? key, this.isShowMessageReaction}) : super(key: key);
+  const TIMUIKitImageElem({
+    required this.message,
+    this.isShowJump = false,
+    required this.chatModel,
+    this.clearJump,
+    this.isFrom,
+    Key? key,
+    this.isShowMessageReaction,
+    ////////// 自定义入参 //////////
+    this.calculateSizeFunc,
+    ////////// 自定义入参 //////////
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _TIMUIKitImageElem();
@@ -58,18 +77,26 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
   Widget? imageItem;
   bool isSent = false;
 
+  bool _didRenderWithNet = false;
+
   @override
   didUpdateWidget(oldWidget) {
     super.didUpdateWidget(oldWidget);
   }
 
-  String getOriginImgURL() {
+  String getOriginImgURLOf(V2TimMessage message) {
     // 实际拿的是原图
-    V2TimImage? img = MessageUtils.getImageFromImgList(widget.message.imageElem!.imageList, HistoryMessageDartConstant.oriImgPrior);
-    return img == null ? widget.message.imageElem!.path! : img.url!;
+    V2TimImage? img = MessageUtils.getImageFromImgList(
+        message.imageElem!.imageList, HistoryMessageDartConstant.oriImgPrior);
+    return img == null ? message.imageElem!.path! : img.url!;
   }
 
-  Widget errorDisplay(BuildContext context, TUITheme? theme) {
+  Widget errorDisplay(
+    BuildContext context,
+    TUITheme? theme, {
+    num? height,
+    num? width,
+  }) {
     return Container(
       decoration: BoxDecoration(
           borderRadius: const BorderRadius.all(Radius.circular(5)),
@@ -77,8 +104,8 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
             width: 2,
             color: theme?.weakDividerColor ?? Colors.grey,
           )),
-      height: 170,
-      width: 170,
+      height: height?.toDouble() ?? 170,
+      width: width?.toDouble() ?? 170,
       child: Center(
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -102,152 +129,26 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     return res;
   }
 
-  //保存网络图片到本地
-  Future<void> _saveImageToLocal(
-    context,
-    String imageUrl, {
-    bool isLocalResource = true,
-    TUITheme? theme,
+  Future<void> _saveImg(
+    TUITheme theme, {
+    V2TimMessage? cusMsg,
   }) async {
-    if (PlatformUtils().isWeb) {
-      download(imageUrl) async {
-        final http.Response r = await http.get(Uri.parse(imageUrl));
-        final data = r.bodyBytes;
-        final base64data = base64Encode(data);
-        final a = html.AnchorElement(href: 'data:image/jpeg;base64,$base64data');
-        a.download = md5.convert(utf8.encode(imageUrl)).toString();
-        a.click();
-        a.remove();
-      }
-
-      download(imageUrl);
-      return;
-    }
-
-    if (PlatformUtils().isIOS) {
-      if (!await Permissions.checkPermission(context, Permission.photosAddOnly.value, theme!, false)) {
-        return;
-      }
-    } else {
-      final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      if (PlatformUtils().isMobile) {
-        if ((androidInfo.version.sdkInt) >= 33) {
-          final photos = await Permissions.checkPermission(
-            context,
-            Permission.photos.value,
-            theme,
-          );
-          if (!photos) {
-            return;
-          }
-        } else {
-          final storage = await Permissions.checkPermission(
-            context,
-            Permission.storage.value,
-          );
-          if (!storage) {
-            return;
-          }
-        }
-      }
-    }
-
-    if (!isLocalResource) {
-      if (widget.message.msgID == null || widget.message.msgID!.isEmpty) {
-        return;
-      }
-
-      if (model.getMessageProgress(widget.message.msgID) == 100) {
-        String savePath;
-        if (widget.message.imageElem!.path != null && widget.message.imageElem!.path != '') {
-          savePath = widget.message.imageElem!.path!;
-        } else {
-          savePath = model.getFileMessageLocation(widget.message.msgID);
-        }
-        File f = File(savePath);
-        if (f.existsSync()) {
-          var result = await ImageGallerySaver.saveFile(savePath);
-
-          if (PlatformUtils().isIOS) {
-            if (result['isSuccess']) {
-              onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("图片保存成功"), infoCode: 6660406));
-            } else {
-              onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("图片保存失败"), infoCode: 6660407));
-            }
-          } else {
-            if (result != null) {
-              onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("图片保存成功"), infoCode: 6660406));
-            } else {
-              onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("图片保存失败"), infoCode: 6660407));
-            }
-          }
-          return;
-        }
-      } else {
-        onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("the message is downloading"), infoCode: -1));
-      }
-      return;
-    }
-
-    var result = await ImageGallerySaver.saveFile(imageUrl);
-
-    if (PlatformUtils().isIOS) {
-      if (result['isSuccess']) {
-        onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("图片保存成功"), infoCode: 6660406));
-      } else {
-        onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("图片保存失败"), infoCode: 6660407));
-      }
-    } else {
-      if (result != null) {
-        onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("图片保存成功"), infoCode: 6660406));
-      } else {
-        onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("图片保存失败"), infoCode: 6660407));
-      }
-    }
-    return;
-  }
-
-  Future<void> _saveImg(TUITheme theme) async {
-    try {
-      String? imageUrl;
-      bool isAssetBool = false;
-      final imageElem = widget.message.imageElem;
-
-      if (imageElem != null) {
-        final originUrl = getOriginImgURL();
-        final localUrl = imageElem.imageList?.firstOrNull?.localUrl;
-        final filePath = imageElem.path;
-        final isWeb = PlatformUtils().isWeb;
-
-        if (!isWeb && filePath != null && File(filePath).existsSync()) {
-          imageUrl = filePath;
-          isAssetBool = true;
-        } else if (localUrl != null && (!isWeb && File(localUrl).existsSync())) {
-          imageUrl = localUrl;
-          isAssetBool = true;
-        } else {
-          imageUrl = originUrl;
-          isAssetBool = false;
-        }
-      }
-
-      if (imageUrl != null) {
-        return await _saveImageToLocal(
-          context,
-          imageUrl,
-          isLocalResource: isAssetBool,
-          theme: theme,
-        );
-      }
-    } catch (e) {
-      onTIMCallback(TIMCallback(infoCode: 6660414, infoRecommendText: TIM_t("正在下载中"), type: TIMCallbackType.INFO));
-      return;
-    }
+    ////////////// 整体逻辑已迁移 //////////////
+    /// 去内部进行比对
+    return MediaDownloadUtil.of.saveImg(
+      context,
+      theme,
+      cusMsg: cusMsg,
+      message: widget.message,
+    );
+    ////////////// 整体逻辑已迁移 //////////////
   }
 
   V2TimImage? getImageFromList(V2TimImageTypesEnum imgType) {
-    V2TimImage? img = MessageUtils.getImageFromImgList(widget.message.imageElem!.imageList, HistoryMessageDartConstant.imgPriorMap[imgType] ?? HistoryMessageDartConstant.oriImgPrior);
+    V2TimImage? img = MessageUtils.getImageFromImgList(
+        widget.message.imageElem!.imageList,
+        HistoryMessageDartConstant.imgPriorMap[imgType] ??
+            HistoryMessageDartConstant.oriImgPrior);
 
     return img;
   }
@@ -260,9 +161,9 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     }
   }
 
-  Widget errorPage(theme) => Container(
+  Widget errorPage(theme) => SizedBox(
       height: MediaQuery.of(context).size.height,
-      color: theme.black,
+      // color: theme.black,
       child: GestureDetector(
         onTap: () {
           Navigator.of(context).pop();
@@ -271,18 +172,26 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
       ));
 
   bool checkIfDownloadSuccess() {
-    final localUrl = TencentUtils.checkString(model.getFileMessageLocation(widget.message.msgID)) ?? widget.message.imageElem!.imageList![0]!.localUrl;
-    return TencentUtils.checkString(localUrl) != null && File(localUrl!).existsSync();
+    final localUrl = TencentUtils.checkString(
+            model.getFileMessageLocation(widget.message.msgID)) ??
+        widget.message.imageElem!.imageList![0]!.localUrl;
+    return TencentUtils.checkString(localUrl) != null &&
+        File(localUrl!).existsSync();
   }
 
   _onClickOpenImageInNewWindow() {
-    final localUrl = TencentUtils.checkString(model.getFileMessageLocation(widget.message.msgID)) ?? widget.message.imageElem!.imageList![0]!.localUrl;
+    final localUrl = TencentUtils.checkString(
+            model.getFileMessageLocation(widget.message.msgID)) ??
+        widget.message.imageElem!.imageList![0]!.localUrl;
     Future.delayed(const Duration(milliseconds: 0), () async {
       final isDownloaded = checkIfDownloadSuccess();
       if (isDownloaded) {
         launchDesktopFile(localUrl ?? "");
       } else {
-        onTIMCallback(TIMCallback(infoCode: 6660414, infoRecommendText: TIM_t("正在下载原始资源，请稍候..."), type: TIMCallbackType.INFO));
+        onTIMCallback(TIMCallback(
+            infoCode: 6660414,
+            infoRecommendText: TIM_t("正在下载原始资源，请稍候..."),
+            type: TIMCallbackType.INFO));
       }
     });
   }
@@ -291,14 +200,27 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     double? positionRadio,
     String? originImgUrl,
   }) {
-    final localUrl = TencentUtils.checkString(model.getFileMessageLocation(widget.message.msgID)) ?? widget.message.imageElem!.imageList![0]!.localUrl;
+    final localUrl = TencentUtils.checkString(
+            model.getFileMessageLocation(widget.message.msgID)) ??
+        widget.message.imageElem!.imageList![0]!.localUrl;
     if (checkIfDownloadSuccess()) {
-      TUIKitWidePopup.showMedia(aspectRatio: positionRadio, context: context, mediaLocalPath: localUrl ?? "", onClickOrigin: () => _onClickOpenImageInNewWindow());
+      TUIKitWidePopup.showMedia(
+          aspectRatio: positionRadio,
+          context: context,
+          mediaLocalPath: localUrl ?? "",
+          onClickOrigin: () => _onClickOpenImageInNewWindow());
     } else {
       if (TencentUtils.checkString(originImgUrl) != null) {
-        TUIKitWidePopup.showMedia(aspectRatio: positionRadio, context: context, mediaURL: originImgUrl, onClickOrigin: () => _onClickOpenImageInNewWindow());
+        TUIKitWidePopup.showMedia(
+            aspectRatio: positionRadio,
+            context: context,
+            mediaURL: originImgUrl,
+            onClickOrigin: () => _onClickOpenImageInNewWindow());
       } else {
-        onTIMCallback(TIMCallback(infoCode: 6660414, infoRecommendText: TIM_t("正在下载中"), type: TIMCallbackType.INFO));
+        onTIMCallback(TIMCallback(
+            infoCode: 6660414,
+            infoRecommendText: TIM_t("正在下载中"),
+            type: TIMCallbackType.INFO));
       }
     }
   }
@@ -348,91 +270,223 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
           originImgUrl: imgUrl,
         );
       } else {
+        //////////////// 图片、视频消息连续浏览 ////////////////
+        if (widget.chatModel.chatConfig.useMediaBrowser) {
+          MediaBrowser.showIMMediaMsg(
+            context,
+            curMsg: widget.message,
+            userID: widget.chatModel.conversationType == ConvType.c2c
+                ? widget.chatModel.conversationID
+                : null,
+            groupID: widget.chatModel.conversationType == ConvType.group
+                ? widget.chatModel.conversationID
+                : null,
+            isFrom: widget.isFrom,
+            onImgLongPress: (V2TimMessage msg) {
+              widget.chatModel.chatConfig.onImageLongPress?.call(msg);
+            },
+            onDownloadImage: (msg) {
+              _saveImg(theme, cusMsg: msg);
+            },
+          );
+          return;
+        }
+        //////////////// 图片、视频消息连续浏览 ////////////////
         Navigator.of(context).push(
           PageRouteBuilder(
               opaque: false,
               pageBuilder: (_, __, ___) => ImageScreen(
-                  imageProvider: CachedNetworkImageProvider(
-                    imgUrl ?? "",
-                    cacheKey: widget.message.msgID,
-                  ),
-                  heroTag: heroTag,
-                  messageID: widget.message.msgID,
-                  downloadFn: () async {
-                    return await _saveImg(theme);
-                  })),
+                    imageProvider: CachedNetworkImageProvider(
+                      imgUrl ?? "",
+                      cacheKey: widget.message.msgID,
+                    ),
+                    heroTag: heroTag,
+                    messageID: widget.message.msgID,
+                    downloadFn: () async {
+                      return await _saveImg(theme);
+                    },
+                    onLongPress: () async {
+                      widget.chatModel.chatConfig.onImageLongPress
+                          ?.call(widget.message);
+                    },
+                  )),
         );
       }
     } else {
       if (PlatformUtils().isDesktop) {
-        TUIKitWidePopup.showMedia(mediaLocalPath: imgPath, context: context, onClickOrigin: () => launchDesktopFile(imgPath ?? ""));
+        TUIKitWidePopup.showMedia(
+            mediaLocalPath: imgPath,
+            context: context,
+            onClickOrigin: () => launchDesktopFile(imgPath ?? ""));
       } else {
+        //////////////// 图片、视频消息连续浏览 ////////////////
+        if (widget.chatModel.chatConfig.useMediaBrowser) {
+          MediaBrowser.showIMMediaMsg(
+            context,
+            curMsg: widget.message,
+            userID: widget.chatModel.conversationType == ConvType.c2c
+                ? widget.chatModel.conversationID
+                : null,
+            groupID: widget.chatModel.conversationType == ConvType.group
+                ? widget.chatModel.conversationID
+                : null,
+            isFrom: widget.isFrom,
+            onImgLongPress: (V2TimMessage msg) {
+              widget.chatModel.chatConfig.onImageLongPress?.call(msg);
+            },
+            onDownloadImage: (msg) {
+              _saveImg(theme, cusMsg: msg);
+            },
+          );
+          return;
+        }
+        //////////////// 图片、视频消息连续浏览 ////////////////
+
         Navigator.of(context).push(
           PageRouteBuilder(
             opaque: false, // set to false
             pageBuilder: (_, __, ___) => ImageScreen(
-                imageProvider: FileImage(File(imgPath ?? "")),
-                heroTag: heroTag,
-                messageID: widget.message.msgID,
-                downloadFn: () async {
-                  return await _saveImg(theme);
-                }),
+              imageProvider: FileImage(File(imgPath ?? "")),
+              heroTag: heroTag,
+              messageID: widget.message.msgID,
+              downloadFn: () async {
+                return await _saveImg(theme);
+              },
+              onLongPress: () async {
+                widget.chatModel.chatConfig.onImageLongPress
+                    ?.call(widget.message);
+              },
+            ),
           ),
         );
       }
     }
   }
 
-  Widget _renderAllImage({dynamic heroTag, required TUITheme theme, bool isNetworkImage = false, String? webPath, V2TimImage? originalImg, V2TimImage? smallImg, String? smallLocalPath, String? originLocalPath}) {
+  Widget _renderAllImage({
+    dynamic heroTag,
+    required TUITheme theme,
+    bool isNetworkImage = false,
+    String? webPath,
+    V2TimImage? originalImg,
+    V2TimImage? smallImg,
+    String? smallLocalPath,
+    String? originLocalPath,
+    num? height,
+    num? width,
+  }) {
     Widget getImageWidget() {
-      if (isNetworkImage) {
+      if (isNetworkImage || _didRenderWithNet) {
+        _didRenderWithNet = true;
+        return Hero(
+          tag: heroTag,
+          child: PlatformUtils().isWeb
+              ? Image.network(webPath ?? smallImg?.url ?? originalImg!.url!,
+                  fit: BoxFit.contain)
+              : CachedNetworkImage(
+                  alignment: Alignment.topCenter,
+                  imageUrl: webPath ?? smallImg?.url ?? originalImg!.url!,
+                  errorWidget: (context, error, stackTrace) => errorDisplay(
+                    context,
+                    theme,
+                    width: width,
+                    height: height,
+                  ),
+                  fit: BoxFit.contain,
+                  cacheKey: smallImg?.uuid ?? originalImg!.uuid,
+                  //////////// 调整图片 placeholder ////////////
+                  placeholder: (context, url) => errorDisplay(
+                    context,
+                    theme,
+                    width: width,
+                    height: height,
+                  ),
+                  // Image(image: MemoryImage(kTransparentImage)),
+                  //////////// 调整图片 placeholder ////////////
+
+                  fadeInDuration: const Duration(milliseconds: 100),
+                ),
+        );
+      } else {
+        final imgPath = (TencentUtils.checkString(smallLocalPath) != null
+            ? smallLocalPath
+            : originLocalPath)!;
         return Hero(
             tag: heroTag,
-            child: PlatformUtils().isWeb
-                ? Image.network(webPath ?? smallImg?.url ?? originalImg!.url!, fit: BoxFit.contain)
-                : CachedNetworkImage(
-                    alignment: Alignment.topCenter,
-                    imageUrl: webPath ?? smallImg?.url ?? originalImg!.url!,
-                    errorWidget: (context, error, stackTrace) => errorPage(theme),
-                    fit: BoxFit.contain,
-                    cacheKey: smallImg?.uuid ?? originalImg!.uuid,
-                    placeholder: (context, url) => Image(image: MemoryImage(kTransparentImage)),
-                    fadeInDuration: const Duration(milliseconds: 0),
-                  ));
-      } else {
-        final imgPath = (TencentUtils.checkString(smallLocalPath) != null ? smallLocalPath : originLocalPath)!;
-        return Hero(tag: heroTag, child: Image.file(File(imgPath), fit: BoxFit.contain));
+            child: Image.file(
+              File(imgPath),
+              fit: BoxFit.contain,
+              //////////// 增加图片 errorBuilder ////////////
+              errorBuilder: (context, error, stackTrace) => errorDisplay(
+                context,
+                theme,
+                width: width,
+                height: height,
+              ),
+              //////////// 增加图片 errorBuilder ////////////
+            ));
       }
     }
 
     return GestureDetector(
       onTap: () => onClickImage(
-          theme: theme, heroTag: heroTag, isNetworkImage: isNetworkImage, imgUrl: webPath ?? smallImg?.url ?? originalImg?.url ?? "", imgPath: (TencentUtils.checkString(originLocalPath) != null ? originLocalPath : smallLocalPath) ?? ""),
+          theme: theme,
+          heroTag: heroTag,
+          isNetworkImage: isNetworkImage,
+          imgUrl: webPath ?? smallImg?.url ?? originalImg?.url ?? "",
+          imgPath: (TencentUtils.checkString(originLocalPath) != null
+                  ? originLocalPath
+                  : smallLocalPath) ??
+              ""),
       child: getImageWidget(),
     );
   }
 
   void initImages() async {
-    final zeroImageLocal = TencentUtils.checkString(widget.message.imageElem?.imageList?.firstWhereOrNull((element) => element?.type == 0)?.localUrl);
-    final oneImageLocal = TencentUtils.checkString(widget.message.imageElem?.imageList?.firstWhereOrNull((element) => element?.type == 1)?.localUrl);
-    final twoImageLocal = TencentUtils.checkString(widget.message.imageElem?.imageList?.firstWhereOrNull((element) => element?.type == 2)?.localUrl);
+    final zeroImageLocal = TencentUtils.checkString(widget
+        .message.imageElem?.imageList
+        ?.firstWhereOrNull((element) => element?.type == 0)
+        ?.localUrl);
+    final oneImageLocal = TencentUtils.checkString(widget
+        .message.imageElem?.imageList
+        ?.firstWhereOrNull((element) => element?.type == 1)
+        ?.localUrl);
+    final twoImageLocal = TencentUtils.checkString(widget
+        .message.imageElem?.imageList
+        ?.firstWhereOrNull((element) => element?.type == 2)
+        ?.localUrl);
 
-    if (!PlatformUtils().isWeb && TencentUtils.checkString(widget.message.msgID) != null) {
-      if ((widget.message.imageElem?.imageList) == null || widget.message.imageElem!.imageList!.isEmpty) {
-        final response = await _messageService.getMessageOnlineUrl(msgID: widget.message.msgID!);
+    if (!PlatformUtils().isWeb &&
+        TencentUtils.checkString(widget.message.msgID) != null) {
+      if ((widget.message.imageElem?.imageList) == null ||
+          widget.message.imageElem!.imageList!.isEmpty) {
+        final response = await _messageService.getMessageOnlineUrl(
+            msgID: widget.message.msgID!);
         final elem = response.data;
         if (elem != null && elem.imageElem != null) {
           widget.message.imageElem = elem.imageElem;
         }
       }
       if (oneImageLocal == null || !File(oneImageLocal).existsSync()) {
-        _messageService.downloadMessage(msgID: widget.message.msgID!, messageType: 3, imageType: 1, isSnapshot: false);
+        _messageService.downloadMessage(
+            msgID: widget.message.msgID!,
+            messageType: 3,
+            imageType: 1,
+            isSnapshot: false);
       }
       if (twoImageLocal == null || !File(twoImageLocal).existsSync()) {
-        _messageService.downloadMessage(msgID: widget.message.msgID!, messageType: 3, imageType: 2, isSnapshot: false);
+        _messageService.downloadMessage(
+            msgID: widget.message.msgID!,
+            messageType: 3,
+            imageType: 2,
+            isSnapshot: false);
       }
       if (zeroImageLocal == null || !File(zeroImageLocal).existsSync()) {
-        _messageService.downloadMessage(msgID: widget.message.msgID!, messageType: 3, imageType: 0, isSnapshot: false);
+        _messageService.downloadMessage(
+            msgID: widget.message.msgID!,
+            messageType: 3,
+            imageType: 0,
+            isSnapshot: false);
       }
     }
   }
@@ -446,18 +500,45 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
   bool isNeedShowLocalPath() {
     final current = (DateTime.now().millisecondsSinceEpoch / 1000).ceil();
     final timeStamp = widget.message.timestamp ?? current;
-    return (widget.message.isSelf ?? true) && (isSent || current - timeStamp < 300);
+    return (widget.message.isSelf ?? true) &&
+        (isSent || current - timeStamp < 300);
   }
 
-  Widget? _renderImage(dynamic heroTag, TUITheme theme, {V2TimImage? originalImg, V2TimImage? smallImg}) {
+  Widget? _renderImage(
+    dynamic heroTag,
+    TUITheme theme, {
+    V2TimImage? originalImg,
+    V2TimImage? smallImg,
+    num? height,
+    num? width,
+  }) {
     if (PlatformUtils().isWeb && widget.message.imageElem!.path != null) {
       // Displaying on Web only
-      return _renderAllImage(heroTag: heroTag, theme: theme, isNetworkImage: true, smallImg: smallImg, originalImg: originalImg, webPath: widget.message.imageElem!.path);
+      return _renderAllImage(
+        heroTag: heroTag,
+        theme: theme,
+        isNetworkImage: true,
+        smallImg: smallImg,
+        originalImg: originalImg,
+        webPath: widget.message.imageElem!.path,
+        height: height,
+        width: width,
+      );
     }
 
     try {
-      if ((isNeedShowLocalPath() && widget.message.imageElem!.path != null && widget.message.imageElem!.path!.isNotEmpty && File(widget.message.imageElem!.path!).existsSync())) {
-        return _renderAllImage(smallLocalPath: widget.message.imageElem!.path!, heroTag: heroTag, theme: theme, originLocalPath: widget.message.imageElem!.path!);
+      if ((isNeedShowLocalPath() &&
+          widget.message.imageElem!.path != null &&
+          widget.message.imageElem!.path!.isNotEmpty &&
+          File(widget.message.imageElem!.path!).existsSync())) {
+        return _renderAllImage(
+          smallLocalPath: widget.message.imageElem!.path!,
+          heroTag: heroTag,
+          theme: theme,
+          originLocalPath: widget.message.imageElem!.path!,
+          height: height,
+          width: width,
+        );
       }
     } catch (e) {
       // ignore: avoid_print
@@ -465,20 +546,52 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     }
 
     try {
-      if ((TencentUtils.checkString(smallImg?.localUrl) != null && File((smallImg?.localUrl!)!).existsSync()) || (TencentUtils.checkString(originalImg?.localUrl) != null && File((originalImg?.localUrl!)!).existsSync())) {
-        return _renderAllImage(smallLocalPath: smallImg?.localUrl ?? "", heroTag: heroTag, theme: theme, originLocalPath: originalImg?.localUrl);
+      if ((TencentUtils.checkString(smallImg?.localUrl) != null &&
+              File((smallImg?.localUrl!)!).existsSync()) ||
+          (TencentUtils.checkString(originalImg?.localUrl) != null &&
+              File((originalImg?.localUrl!)!).existsSync())) {
+        return _renderAllImage(
+          smallLocalPath: smallImg?.localUrl ?? "",
+          heroTag: heroTag,
+          theme: theme,
+          originLocalPath: originalImg?.localUrl,
+          height: height,
+          width: width,
+        );
       }
     } catch (e) {
       // ignore: avoid_print
       outputLogger.i(e);
-      return _renderAllImage(heroTag: heroTag, theme: theme, isNetworkImage: true, smallImg: smallImg, originalImg: originalImg);
+      return _renderAllImage(
+        heroTag: heroTag,
+        theme: theme,
+        isNetworkImage: true,
+        smallImg: smallImg,
+        originalImg: originalImg,
+        height: height,
+        width: width,
+      );
     }
 
-    if ((smallImg?.url ?? originalImg?.url) != null && (smallImg?.url ?? originalImg?.url)!.isNotEmpty) {
-      return _renderAllImage(heroTag: heroTag, theme: theme, isNetworkImage: true, smallImg: smallImg, originalImg: originalImg);
+    if ((smallImg?.url ?? originalImg?.url) != null &&
+        (smallImg?.url ?? originalImg?.url)!.isNotEmpty) {
+      return _renderAllImage(
+        heroTag: heroTag,
+        theme: theme,
+        isNetworkImage: true,
+        smallImg: smallImg,
+        originalImg: originalImg,
+        height: height,
+        width: width,
+      );
     }
 
-    return errorDisplay(context, theme);
+    return errorDisplay(
+      context,
+      theme,
+      width: width,
+      height: height,
+    );
   }
 
   @override
@@ -487,8 +600,10 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     if (widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING) {
       isSent = true;
     }
-    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
-    final heroTag = "${widget.message.msgID ?? widget.message.id ?? widget.message.timestamp ?? DateTime.now().millisecondsSinceEpoch}${widget.isFrom}";
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+    final heroTag =
+        "${widget.message.msgID ?? widget.message.id ?? widget.message.timestamp ?? DateTime.now().millisecondsSinceEpoch}${widget.isFrom}";
 
     V2TimImage? originalImg = getImageFromList(V2TimImageTypesEnum.original);
     V2TimImage? smallImg = getImageFromList(V2TimImageTypesEnum.small);
@@ -499,14 +614,45 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
         isFromSelf: widget.message.isSelf ?? true,
         isShowMessageReaction: widget.isShowMessageReaction ?? true,
         message: widget.message,
-        child: LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
+        child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+          double maxWidth = constraints.maxWidth * 0.5;
+          double minWidth = 64;
+          double maxHeight = 256;
+
+          Size? size = widget.calculateSizeFunc?.call(
+            minWidth,
+            maxWidth,
+            0,
+            maxHeight,
+          );
+          if (size != null && size != Size.zero && size != Size.infinite) {
+            return SizedBox(
+              width: size.width,
+              height: size.height,
+              child: _renderImage(
+                heroTag,
+                theme,
+                originalImg: originalImg,
+                smallImg: smallImg,
+                height: size.height,
+                width: size.width,
+              ),
+            );
+          }
+
           return ConstrainedBox(
             constraints: BoxConstraints(
               maxWidth: constraints.maxWidth * (isDesktopScreen ? 0.4 : 0.5),
               minWidth: 64,
               maxHeight: 256,
             ),
-            child: _renderImage(heroTag, theme, originalImg: originalImg, smallImg: smallImg),
+            child: _renderImage(
+              heroTag,
+              theme,
+              originalImg: originalImg,
+              smallImg: smallImg,
+            ),
           );
         }));
   }
@@ -515,7 +661,9 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
 class ImageClipper extends CustomClipper<RRect> {
   @override
   RRect getClip(Size size) {
-    return RRect.fromRectAndRadius(Rect.fromLTWH(0, 0, size.width, min(size.height, 256)), const Radius.circular(5));
+    return RRect.fromRectAndRadius(
+        Rect.fromLTWH(0, 0, size.width, min(size.height, 256)),
+        const Radius.circular(5));
   }
 
   @override

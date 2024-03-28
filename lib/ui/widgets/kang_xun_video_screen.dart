@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'dart:math';
 
-import 'package:chewie_for_us/chewie_for_us.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:fijkplayer/fijkplayer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
@@ -12,11 +12,11 @@ import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/media_download_util.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/video_custom_control.dart';
-import 'package:video_player/video_player.dart';
 
-class VideoScreen extends StatefulWidget {
-  const VideoScreen(
+import 'fijk_panel.dart';
+
+class KangXunVideoScreen extends StatefulWidget {
+  const KangXunVideoScreen(
       {required this.message,
       required this.heroTag,
       required this.videoElement,
@@ -28,12 +28,11 @@ class VideoScreen extends StatefulWidget {
   final V2TimVideoElem videoElement;
 
   @override
-  State<StatefulWidget> createState() => _VideoScreenState();
+  State<StatefulWidget> createState() => _KangXunVideoScreenState();
 }
 
-class _VideoScreenState extends TIMUIKitState<VideoScreen> {
-  late VideoPlayerController videoPlayerController;
-  late ChewieController chewieController;
+class _KangXunVideoScreenState extends TIMUIKitState<KangXunVideoScreen>
+    with WidgetsBindingObserver {
   GlobalKey<ExtendedImageSlidePageState> slidePagekey =
       GlobalKey<ExtendedImageSlidePageState>();
   final TUIChatGlobalModel model = serviceLocator<TUIChatGlobalModel>();
@@ -50,6 +49,7 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
+    WidgetsBinding.instance.addObserver(this); // 注册监听器
   }
 
   Future<void> _saveVideo() async {
@@ -80,62 +80,46 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
     return width;
   }
 
-  setVideoPlayerController() async {
-    if (!PlatformUtils().isWeb) {
-      if (TencentUtils.checkString(widget.message.msgID) != null &&
-          widget.videoElement.localVideoUrl == null) {
-        String savePath = model.getFileMessageLocation(widget.message.msgID);
-        File f = File(savePath);
-        if (f.existsSync()) {
-          widget.videoElement.localVideoUrl = savePath;
-        }
-      }
-    }
+  final FijkPlayer fijkPlayer = FijkPlayer();
 
-    VideoPlayerController player = PlatformUtils().isWeb
+  setVideoPlayerController() async {
+    fijkPlayer.addListener(
+      () {
+        if (fijkPlayer.state == FijkState.started) {
+          setState(() {
+            isInit = true;
+          });
+        }
+      },
+    );
+
+    String videoPath = PlatformUtils().isWeb
         ? ((TencentUtils.checkString(widget.videoElement.videoPath) != null) ||
                 widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING
-            ? VideoPlayerController.networkUrl(
-                Uri.parse(widget.videoElement.videoPath!),
-              )
+            ? widget.videoElement.videoPath!
             : (TencentUtils.checkString(widget.videoElement.localVideoUrl) ==
                     null)
-                ? VideoPlayerController.networkUrl(
-                    Uri.parse(widget.videoElement.videoUrl!),
-                  )
-                : VideoPlayerController.networkUrl(
-                    Uri.parse(widget.videoElement.localVideoUrl!),
-                  ))
+                ? widget.videoElement.videoUrl!
+                : widget.videoElement.localVideoUrl!)
         : (TencentUtils.checkString(widget.videoElement.videoPath) != null ||
                 widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING)
-            ? VideoPlayerController.file(File(widget.videoElement.videoPath!))
+            ? widget.videoElement.videoPath!
             : (TencentUtils.checkString(widget.videoElement.localVideoUrl) ==
                     null)
-                ? VideoPlayerController.networkUrl(
-                    Uri.parse(widget.videoElement.videoUrl!),
-                  )
-                : VideoPlayerController.file(File(
-                    widget.videoElement.localVideoUrl!,
-                  ));
-    await player.initialize();
+                ? widget.videoElement.videoUrl!
+                : widget.videoElement.localVideoUrl!;
+
+    fijkPlayer.setDataSource(
+      videoPath,
+      autoPlay: true,
+    );
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      double w = getVideoWidth();
-      double h = getVideoHeight();
-      ChewieController controller = ChewieController(
-          videoPlayerController: player,
-          autoPlay: true,
-          looping: false,
-          showControlsOnInitialize: false,
-          allowPlaybackSpeedChanging: false,
-          aspectRatio: w == 0 || h == 0 ? null : w / h,
-          customControls: VideoCustomControls(downloadFn: () async {
-            return await _saveVideo();
-          }));
-      setState(() {
-        videoPlayerController = player;
-        chewieController = controller;
-        isInit = true;
-      });
+      // double w = getVideoWidth();
+      // double h = getVideoHeight();
+
+      // setState(() {
+      //   isInit = true;
+      // });
     });
   }
 
@@ -149,13 +133,37 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
   }
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (Platform.isIOS) {
+      return;
+    }
+    switch (state) {
+      case AppLifecycleState.inactive:
+      //
+      case AppLifecycleState.resumed:
+        //在前台
+        fijkPlayer.start();
+      case AppLifecycleState.paused:
+        // 在后台
+        fijkPlayer.pause();
+      default:
+        break;
+    }
+  }
+
+  @override
   void dispose() {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
+    WidgetsBinding.instance.removeObserver(this); // 移除监听器
     if (isInit) {
-      videoPlayerController.dispose();
-      chewieController.dispose();
+      if (fijkPlayer.state == FijkState.started) {
+        fijkPlayer.stop();
+      }
+
+      fijkPlayer.release();
     }
     super.dispose();
   }
@@ -199,8 +207,17 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
                   child: Container(
                       color: Colors.black,
                       child: isInit
-                          ? Chewie(
-                              controller: chewieController,
+                          ? FijkView(
+                              player: fijkPlayer,
+                              color: Colors.black,
+                              panelBuilder: (player, data, context, viewSize,
+                                  texturePos) {
+                                return kangXunFijkPanelBuilder(
+                                    player, data, context, viewSize, texturePos,
+                                    () async {
+                                  return await _saveVideo();
+                                });
+                              },
                             )
                           : const Center(
                               child: CircularProgressIndicator(

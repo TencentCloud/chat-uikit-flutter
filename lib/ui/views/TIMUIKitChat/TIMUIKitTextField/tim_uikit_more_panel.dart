@@ -1,5 +1,6 @@
 // ignore_for_file: unused_field, avoid_print, unused_import
 
+import 'dart:async';
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:fc_native_video_thumbnail/fc_native_video_thumbnail.dart';
@@ -10,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:system_info2/system_info2.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_call_invite_list.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
@@ -42,6 +44,12 @@ class MorePanelConfig {
   final List<MorePanelItem>? extraAction;
   final Widget Function(MorePanelItem item)? actionBuilder;
 
+  final FutureOr<List<V2TimGroupMemberFullInfo>?> Function()?
+      selectCallInviterFn;
+
+  /// 发送文件是所允许的扩展类型
+  final List<String>? allowedFileExtensions;
+
   MorePanelConfig({
     this.showFilePickAction = true,
     this.showGalleryPickAction = true,
@@ -52,6 +60,8 @@ class MorePanelConfig {
     this.showVideoCall = true,
     this.extraAction,
     this.actionBuilder,
+    this.selectCallInviterFn,
+    this.allowedFileExtensions,
   });
 }
 
@@ -503,9 +513,11 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
 
       final convID = widget.conversationID;
       final convType = widget.conversationType;
+      final resolutionPreset = await getResolutionPreset();
       final pickedFile = await CameraPicker.pickFromCamera(context,
           pickerConfig: CameraPickerConfig(
               enableRecording: true,
+              resolutionPreset: resolutionPreset,
               textDelegate: IntlCameraPickerTextDelegate()));
       final originFile = await pickedFile?.originFile;
       if (originFile != null) {
@@ -526,6 +538,23 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
       }
     } catch (error) {
       outputLogger.i("err: $error");
+    }
+  }
+
+  Future<ResolutionPreset> getResolutionPreset() async {
+    if (Platform.isAndroid) {
+      final int totalMemory = SysInfo.getTotalPhysicalMemory();
+      if (totalMemory < 6144000000) {
+        return ResolutionPreset.medium;
+      } else if (totalMemory < 8192000000) {
+        return ResolutionPreset.high;
+      } else if (totalMemory < 12288000000) {
+        return ResolutionPreset.veryHigh;
+      } else {
+        return ResolutionPreset.ultraHigh;
+      }
+    } else {
+      return ResolutionPreset.veryHigh;
     }
   }
 
@@ -596,7 +625,10 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
     try {
       final convID = widget.conversationID;
       final convType = widget.conversationType;
-      FilePickerResult? result = await FilePicker.platform.pickFiles();
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: widget.morePanelConfig?.allowedFileExtensions,
+      );
       if (result != null && result.files.isNotEmpty) {
         if (PlatformUtils().isWeb) {
           html.Node? inputElem;
@@ -685,14 +717,21 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
 
     final isGroup = widget.conversationType == ConvType.group;
     if (isGroup) {
-      List<V2TimGroupMemberFullInfo>? selectedMember = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => SelectCallInviter(
-            groupID: widget.conversationID,
+      List<V2TimGroupMemberFullInfo>? selectedMember;
+
+      if (widget.morePanelConfig?.selectCallInviterFn?.call != null) {
+        selectedMember =
+            await widget.morePanelConfig?.selectCallInviterFn?.call();
+      } else {
+        selectedMember = await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SelectCallInviter(
+              groupID: widget.conversationID,
+            ),
           ),
-        ),
-      );
+        );
+      }
       if (selectedMember != null) {
         final inviteMember = selectedMember.map((e) => e.userID).toList();
         _tUICore.callService(TUICALLKIT_SERVICE_NAME, METHOD_NAME_CALL, {

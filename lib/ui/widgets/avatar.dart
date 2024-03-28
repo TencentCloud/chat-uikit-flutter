@@ -1,13 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/image_screen.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/image_screen.dart';
 
 class Avatar extends TIMUIKitStatelessWidget {
   final String faceUrl;
@@ -18,21 +16,24 @@ class Avatar extends TIMUIKitStatelessWidget {
   final V2TimUserStatus? onlineStatus;
   final int? type; // 1 c2c 2 group
   final bool isShowBigWhenClick;
+  final Widget? cusAvatar;
   final TUISelfInfoViewModel selfInfoViewModel =
       serviceLocator<TUISelfInfoViewModel>();
 
-  Avatar(
-      {Key? key,
-      required this.faceUrl,
-      this.onlineStatus,
-      required this.showName,
-      this.isShowBigWhenClick = false,
-      this.isFromLocalAsset = false,
-      this.borderRadius,
-      this.type = 1})
-      : super(key: key);
+  Avatar({
+    Key? key,
+    required this.faceUrl,
+    this.onlineStatus,
+    this.borderRadius,
+    required this.showName,
+    this.isShowBigWhenClick = false,
+    this.isFromLocalAsset = false,
+    this.type = 1,
+    this.cusAvatar,
+  }) : super(key: key);
 
   Widget getImageWidget(BuildContext context, TUITheme theme) {
+    if (cusAvatar != null) return cusAvatar!;
     Widget defaultAvatar() {
       if (type == 1) {
         return Image.asset(
@@ -67,6 +68,7 @@ class Avatar extends TIMUIKitStatelessWidget {
       }
       return CachedNetworkImage(
         imageUrl: faceUrl,
+        fit: BoxFit.cover,
         fadeInDuration: const Duration(milliseconds: 0),
         errorWidget: (BuildContext context, String c, dynamic s) {
           return defaultAvatar();

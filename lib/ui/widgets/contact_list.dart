@@ -1,17 +1,15 @@
-
 import 'package:azlistview_all_platforms/azlistview_all_platforms.dart';
 import 'package:flutter/material.dart';
 import 'package:lpinyin/lpinyin.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendship_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/az_list_view.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/radio_button.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_im_base/tencent_im_base.dart';
 
 class ContactList extends StatefulWidget {
   final List<V2TimFriendInfo> contactList;
@@ -30,6 +28,21 @@ class ContactList extends StatefulWidget {
 
   /// 顶部列表项构造器
   final Widget? Function(TopListItem item)? topListItemBuilder;
+
+  // 自定义好友 itembuilder
+  final Widget? Function(BuildContext context, V2TimFriendInfo user)?
+      cusItemBuilder;
+
+  // 自定义好友头像
+  final Widget? Function(BuildContext context, V2TimFriendInfo user)?
+      cusAvatarBuilder;
+
+  /// 底部列表
+  final List<BottomListItem>? bottomList;
+
+  /// 底部列表项构造器
+  final Widget? Function(BottomListItem item, int friendCount)?
+      bottomListItemBuilder;
 
   /// Control if shows the online status for each user on its avatar.
   final bool isShowOnlineStatus;
@@ -59,6 +72,10 @@ class ContactList extends StatefulWidget {
     this.groupMemberList,
     this.emptyBuilder,
     this.currentItem,
+    this.cusItemBuilder,
+    this.cusAvatarBuilder,
+    this.bottomList,
+    this.bottomListItemBuilder,
   }) : super(key: key);
 
   @override
@@ -123,7 +140,8 @@ class _ContactListState extends TIMUIKitState<ContactList> {
           -1;
     }
 
-    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
 
     return Container(
       padding: const EdgeInsets.only(top: 8, left: 16, right: 12),
@@ -165,9 +183,11 @@ class _ContactListState extends TIMUIKitState<ContactList> {
               height: isDesktopScreen ? 30 : 40,
               width: isDesktopScreen ? 30 : 40,
               child: Avatar(
-                  onlineStatus: onlineStatus,
-                  faceUrl: faceUrl,
-                  showName: showName),
+                onlineStatus: onlineStatus,
+                faceUrl: faceUrl,
+                showName: showName,
+                cusAvatar: widget.cusAvatarBuilder?.call(context, item),
+              ),
             ),
           ),
           Expanded(
@@ -186,7 +206,8 @@ class _ContactListState extends TIMUIKitState<ContactList> {
   }
 
   Widget generateTopItem(memberInfo) {
-    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     if (widget.topListItemBuilder != null) {
       final customWidget = widget.topListItemBuilder!(memberInfo);
       if (customWidget != null) {
@@ -246,7 +267,8 @@ class _ContactListState extends TIMUIKitState<ContactList> {
     final TUITheme theme = value.theme;
 
     final showList = _getShowList(widget.contactList);
-    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
 
     if (widget.topList != null && widget.topList!.isNotEmpty) {
       final topList = widget.topList!
@@ -255,14 +277,22 @@ class _ContactListState extends TIMUIKitState<ContactList> {
       showList.insertAll(0, topList);
     }
 
+    if (widget.bottomList != null && widget.bottomList!.isNotEmpty) {
+      final bottomList = widget.bottomList!
+          .map((e) => ISuspensionBeanImpl(memberInfo: e, tagIndex: '@'))
+          .toList();
+      showList.addAll(bottomList);
+    }
+
     if (widget.contactList.isEmpty) {
       return Column(
         children: [
           ...showList.map((e) => generateTopItem(e.memberInfo)).toList(),
           Expanded(
-              child: widget.emptyBuilder != null
-                  ? widget.emptyBuilder!(context)
-                  : Container())
+            child: widget.emptyBuilder != null
+                ? widget.emptyBuilder!(context)
+                : Container(),
+          ),
         ],
       );
     }
@@ -273,40 +303,53 @@ class _ContactListState extends TIMUIKitState<ContactList> {
         final memberInfo = showList[index].memberInfo;
         if (memberInfo is TopListItem) {
           return generateTopItem(memberInfo);
-        } else {
-          return Material(
-            color: (isDesktopScreen)
-                ? (widget.currentItem == memberInfo.userProfile.userID
-                    ? theme.conversationItemChooseBgColor
-                    : widget.bgColor)
-                : null,
-            child: InkWell(
-              onTap: () {
-                if (widget.isCanSelectMemberItem) {
-                  if (selectedMember.contains(memberInfo)) {
-                    selectedMember.remove(memberInfo);
-                  } else {
-                    if (selectedMemberIsOverFlow()) {
-                      selectedMember = [memberInfo];
-                      setState(() {});
-                      return;
-                    }
-                    selectedMember.add(memberInfo);
-                  }
-                  if (widget.onSelectedMemberItemChange != null) {
-                    widget.onSelectedMemberItemChange!(selectedMember);
-                  }
-                  setState(() {});
-                  return;
-                }
-                if (widget.onTapItem != null) {
-                  widget.onTapItem!(memberInfo);
-                }
-              },
-              child: _buildItem(theme, memberInfo),
-            ),
-          );
         }
+        if (memberInfo is BottomListItem) {
+          return widget.bottomListItemBuilder?.call(
+                memberInfo,
+                showList.length -
+                    (widget.topList?.length ?? 0) -
+                    (widget.bottomList?.length ?? 0),
+              ) ??
+              const SizedBox();
+        }
+
+        if (widget.cusItemBuilder != null) {
+          final cusItem = widget.cusItemBuilder!(context, memberInfo);
+          if (cusItem != null) return cusItem;
+        }
+        return Material(
+          color: (isDesktopScreen)
+              ? (widget.currentItem == memberInfo.userProfile.userID
+                  ? theme.conversationItemChooseBgColor
+                  : widget.bgColor)
+              : null,
+          child: InkWell(
+            onTap: () {
+              if (widget.isCanSelectMemberItem) {
+                if (selectedMember.contains(memberInfo)) {
+                  selectedMember.remove(memberInfo);
+                } else {
+                  if (selectedMemberIsOverFlow()) {
+                    selectedMember = [memberInfo];
+                    setState(() {});
+                    return;
+                  }
+                  selectedMember.add(memberInfo);
+                }
+                if (widget.onSelectedMemberItemChange != null) {
+                  widget.onSelectedMemberItemChange!(selectedMember);
+                }
+                setState(() {});
+                return;
+              }
+              if (widget.onTapItem != null) {
+                widget.onTapItem!(memberInfo);
+              }
+            },
+            child: _buildItem(theme, memberInfo),
+          ),
+        );
       },
     );
   }
@@ -319,4 +362,13 @@ class TopListItem {
   final Function()? onTap;
 
   TopListItem({required this.name, required this.id, this.icon, this.onTap});
+}
+
+class BottomListItem {
+  final String name;
+  final String id;
+  final Widget? icon;
+  final Function()? onTap;
+
+  BottomListItem({required this.name, required this.id, this.icon, this.onTap});
 }

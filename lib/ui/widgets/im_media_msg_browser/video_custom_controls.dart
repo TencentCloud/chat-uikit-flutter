@@ -1,17 +1,9 @@
-// ignore_for_file: implementation_imports, unused_element
-
 import 'dart:async';
 
 import 'package:chewie_for_us/chewie_for_us.dart';
 import 'package:chewie_for_us/src/animated_play_pause.dart';
-import 'package:chewie_for_us/src/helpers/utils.dart';
 import 'package:chewie_for_us/src/material/material_progress_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:video_player/video_player.dart';
 
 import 'center_play_button.dart';
@@ -27,7 +19,7 @@ class VideoCustomControls extends StatefulWidget {
   }
 }
 
-class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
+class _VideoCustomControlsState extends State<VideoCustomControls>
     with SingleTickerProviderStateMixin {
   late VideoPlayerValue _latestValue;
   bool _hideStuff = true;
@@ -43,12 +35,15 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
 
   late VideoPlayerController controller;
   ChewieController? _chewieController;
-
   // We know that _chewieController is set in didChangeDependencies
   ChewieController get chewieController => _chewieController!;
 
+  void _safeSetState(void Function() fn) {
+    if (mounted) setState(fn);
+  }
+
   @override
-  Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
+  Widget build(BuildContext context) {
     if (_latestValue.hasError) {
       return Container(
         color: Colors.transparent,
@@ -57,10 +52,11 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
               chewieController.videoPlayerController.value.errorDescription!,
             ) ??
             const Center(
-              child: Icon(
-                Icons.error,
-                color: Colors.white,
-                size: 42,
+              child: Text(
+                '视频加载出错，换一个试试',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
               ),
             ),
       );
@@ -96,18 +92,18 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
                   ),
                 ),
               ),
-              if (isLoading)
-                Container(
-                  child: LoadingAnimationWidget.staggeredDotsWave(
-                    size: 35,
-                    color: Colors.white,
-                  ),
-                  padding: const EdgeInsets.all(30),
-                  decoration: const BoxDecoration(
-                    color: Color(0xB22b2b2b),
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                  ),
-                ),
+              // if (isLoading)
+              //   Container(
+              //     padding: const EdgeInsets.all(30),
+              //     decoration: const BoxDecoration(
+              //       color: Color(0xB22b2b2b),
+              //       borderRadius: BorderRadius.all(Radius.circular(20)),
+              //     ),
+              //     child: const CupertinoActivityIndicator(
+              //       radius: 35,
+              //       color: Colors.white,
+              //     ),
+              //   ),
             ],
           ),
         ),
@@ -130,11 +126,11 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
 
   @override
   void didChangeDependencies() {
-    final _oldController = _chewieController;
+    final oldController = _chewieController;
     _chewieController = ChewieController.of(context);
     controller = chewieController.videoPlayerController;
 
-    if (_oldController != chewieController) {
+    if (oldController != chewieController) {
       _dispose();
       _initialize();
     }
@@ -143,60 +139,69 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
   }
 
   Widget _buildBottomBar() {
-    return Material(
-      color: Colors.transparent,
-      child: Container(
-        height: barHeight,
-        margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
-        child: Row(
-          children: <Widget>[
-            SizedBox(
-              width: 48,
-              height: 48,
-              child: IconButton(
-                icon: Image.asset(
-                  'images/close.png',
-                  package: 'tencent_cloud_chat_uikit',
-                ),
-                iconSize: 30,
-                onPressed: () {
-                  if (_latestValue.isPlaying) {
-                    _playPause();
-                  }
-                  Navigator.of(context).pop();
-                },
+    return Container(
+      height: barHeight,
+      margin: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+      child: Row(
+        children: <Widget>[
+          GestureDetector(
+            onTap: () {
+              if (_latestValue.isPlaying) {
+                _playPause();
+              }
+              Navigator.of(context).pop();
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 15),
+              alignment: Alignment.center,
+              decoration: const ShapeDecoration(
+                color: Colors.black12,
+                shape: CircleBorder(),
+              ),
+              width: 44,
+              height: 44,
+              child: const Icon(
+                Icons.close,
+                color: Colors.white,
+                size: 20,
               ),
             ),
-            Expanded(child: Container()),
-            SizedBox(
-              width: 48,
-              height: 48,
-              child: IconButton(
-                icon: Image.asset(
-                  'images/download.png',
-                  package: 'tencent_cloud_chat_uikit',
-                ),
-                iconSize: 30,
-                onPressed: () async {
-                  setState(() {
-                    isLoading = true;
-                  });
-                  await widget.downloadFn();
-                  Future.delayed(
-                    const Duration(milliseconds: 200),
-                    () {
-                      setState(
-                        () {
-                          isLoading = false;
-                        },
-                      );
-                    },
-                  );
-                },
+          ),
+          Expanded(child: Container()),
+          GestureDetector(
+            onTap: () async {
+              // _safeSetState(() {
+              //   isLoading = true;
+              // });
+              await widget.downloadFn();
+              // Future.delayed(
+              //   const Duration(milliseconds: 200),
+              //   () {
+              //     _safeSetState(
+              //       () {
+              //         isLoading = false;
+              //       },
+              //     );
+              //   },
+              // );
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 15),
+              alignment: Alignment.center,
+              decoration: const ShapeDecoration(
+                color: Colors.black26,
+                shape: CircleBorder(),
               ),
-            )
-          ],
-        ),
+              width: 44,
+              height: 44,
+              child: const Icon(
+                Icons.arrow_downward_sharp,
+                color: Colors.white,
+                size: 20,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -205,56 +210,51 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
     BuildContext context,
   ) {
     const iconColor = Colors.white;
-
-    return AnimatedOpacity(
-      opacity: _hideStuff ? 0.0 : 1.0,
-      duration: const Duration(milliseconds: 300),
-      child: SizedBox(
-        height: barHeight,
-        child: Row(
-          children: <Widget>[
-            _buildPlayPause(controller, iconColor),
-            if (chewieController.isLive)
-              const Expanded(child: Text('LIVE'))
-            else
-              _buildPositionStart(iconColor),
-            if (chewieController.isLive)
-              const SizedBox()
-            else
-              _buildProgressBar(),
-            if (!chewieController.isLive) _buildPositionEnd(iconColor),
-          ],
-        ),
+    return SizedBox(
+      height: barHeight,
+      child: Row(
+        children: <Widget>[
+          _buildPlayPause(controller, iconColor),
+          if (chewieController.isLive)
+            const Expanded(child: Text('LIVE'))
+          else
+            _buildPositionStart(iconColor),
+          if (chewieController.isLive)
+            const SizedBox()
+          else
+            _buildProgressBar(),
+          if (!chewieController.isLive) _buildPositionEnd(iconColor),
+        ],
       ),
     );
   }
 
   Widget _buildHitArea() {
     // final bool isFinished = _latestValue.position >= _latestValue.duration;
-
     return GestureDetector(
-        onTap: () {
-          if (_latestValue.isPlaying) {
-            if (_displayTapped) {
-              setState(() {
-                _hideStuff = true;
-              });
-            } else {
-              _cancelAndRestartTimer();
-            }
-          } else {
-            _playPause();
-
-            setState(() {
+      onTap: () {
+        if (_latestValue.isPlaying) {
+          if (_displayTapped) {
+            _safeSetState(() {
               _hideStuff = true;
             });
+          } else {
+            _cancelAndRestartTimer();
           }
-        },
-        child: CenterPlayButton(
-          isPlaying: controller.value.isPlaying,
-          show: !_latestValue.isPlaying && !_dragging,
-          onPressed: _playPause,
-        ));
+        } else {
+          _playPause();
+
+          _safeSetState(() {
+            _hideStuff = true;
+          });
+        }
+      },
+      child: CenterPlayButton(
+        isPlaying: controller.value.isPlaying,
+        show: !_latestValue.isPlaying && !_dragging,
+        onPressed: _playPause,
+      ),
+    );
   }
 
   GestureDetector _buildPlayPause(
@@ -305,7 +305,7 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
     _hideTimer?.cancel();
     _startHideTimer();
 
-    setState(() {
+    _safeSetState(() {
       _hideStuff = false;
       _displayTapped = true;
     });
@@ -322,31 +322,17 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
 
     if (chewieController.showControlsOnInitialize) {
       _initTimer = Timer(const Duration(milliseconds: 200), () {
-        setState(() {
+        _safeSetState(() {
           _hideStuff = false;
         });
       });
     }
   }
 
-  void _onExpandCollapse() {
-    setState(() {
-      _hideStuff = true;
-
-      chewieController.toggleFullScreen();
-      _showAfterExpandCollapseTimer =
-          Timer(const Duration(milliseconds: 300), () {
-        setState(() {
-          _cancelAndRestartTimer();
-        });
-      });
-    });
-  }
-
   void _playPause() {
     final isFinished = _latestValue.position >= _latestValue.duration;
 
-    setState(() {
+    _safeSetState(() {
       if (controller.value.isPlaying) {
         _hideStuff = false;
         _hideTimer?.cancel();
@@ -370,15 +356,14 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
 
   void _startHideTimer() {
     _hideTimer = Timer(const Duration(seconds: 3), () {
-      setState(() {
+      _safeSetState(() {
         _hideStuff = true;
       });
     });
   }
 
   void _updateState() {
-    if (!mounted) return;
-    setState(() {
+    _safeSetState(() {
       _latestValue = controller.value;
     });
   }
@@ -390,14 +375,14 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
         child: MaterialVideoProgressBar(
           controller,
           onDragStart: () {
-            setState(() {
+            _safeSetState(() {
               _dragging = true;
             });
 
             _hideTimer?.cancel();
           },
           onDragEnd: () {
-            setState(() {
+            _safeSetState(() {
               _dragging = false;
             });
 
@@ -405,63 +390,46 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls>
           },
           colors: chewieController.materialProgressColors ??
               ChewieProgressColors(
-                  playedColor: Colors.white,
-                  handleColor: Colors.white,
-                  bufferedColor: Colors.white38,
-                  backgroundColor: Colors.white24),
+                playedColor: Colors.white,
+                handleColor: Colors.white,
+                bufferedColor: Colors.white38,
+                backgroundColor: Colors.white24,
+              ),
         ),
       ),
     );
   }
 }
 
-class _PlaybackSpeedDialog extends TIMUIKitStatelessWidget {
-  _PlaybackSpeedDialog({
-    Key? key,
-    required List<double> speeds,
-    required double selected,
-  })  : _speeds = speeds,
-        _selected = selected,
-        super(key: key);
+String formatDuration(Duration position) {
+  final ms = position.inMilliseconds;
 
-  final List<double> _speeds;
-  final double _selected;
+  int seconds = ms ~/ 1000;
+  final int hours = seconds ~/ 3600;
+  seconds = seconds % 3600;
+  final minutes = seconds ~/ 60;
+  seconds = seconds % 60;
 
-  @override
-  Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
-    final TUITheme theme = value.theme;
+  final hoursString = hours >= 10
+      ? '$hours'
+      : hours == 0
+          ? '00'
+          : '0$hours';
 
-    final Color selectedColor =
-        theme.primaryColor ?? Theme.of(context).primaryColor;
+  final minutesString = minutes >= 10
+      ? '$minutes'
+      : minutes == 0
+          ? '00'
+          : '0$minutes';
 
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const ScrollPhysics(),
-      itemBuilder: (context, index) {
-        final _speed = _speeds[index];
-        return ListTile(
-          dense: true,
-          title: Row(
-            children: [
-              if (_speed == _selected)
-                Icon(
-                  Icons.check,
-                  size: 20.0,
-                  color: selectedColor,
-                )
-              else
-                Container(width: 20.0),
-              const SizedBox(width: 16.0),
-              Text(_speed.toString()),
-            ],
-          ),
-          selected: _speed == _selected,
-          onTap: () {
-            Navigator.of(context).pop(_speed);
-          },
-        );
-      },
-      itemCount: _speeds.length,
-    );
-  }
+  final secondsString = seconds >= 10
+      ? '$seconds'
+      : seconds == 0
+          ? '00'
+          : '0$seconds';
+
+  final formattedTime =
+      '${hoursString == '00' ? '' : '$hoursString:'}$minutesString:$secondsString';
+
+  return formattedTime;
 }

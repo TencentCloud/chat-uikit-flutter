@@ -16,6 +16,7 @@ class ImageScreen extends StatefulWidget {
       {required this.imageProvider,
       required this.heroTag,
       this.downloadFn,
+      this.onLongPress,
       this.messageID,
       Key? key})
       : super(key: key);
@@ -24,6 +25,7 @@ class ImageScreen extends StatefulWidget {
   final String heroTag;
   final String? messageID;
   final Future<void> Function()? downloadFn;
+  final Future<void> Function()? onLongPress;
 
   @override
   State<StatefulWidget> createState() {
@@ -121,6 +123,7 @@ class _ImageScreenState extends TIMUIKitState<ImageScreen>
                   },
                   child: GestureDetector(
                     onTap: close,
+                    onLongPress: widget.onLongPress,
                     child: HeroWidget(
                         tag: widget.heroTag,
                         slidePagekey: slidePagekey,

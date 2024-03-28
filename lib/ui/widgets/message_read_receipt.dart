@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-
 // ignore: unused_import
 import 'package:provider/provider.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/time_ago.dart';
-
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_face_elem.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_file_elem.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_image_elem.dart';
@@ -17,7 +14,7 @@ import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageIt
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_video_elem.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_merger_message_elem.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_im_base/tencent_im_base.dart';
 
 class MessageReadReceipt extends StatefulWidget {
   final V2TimMessage messageItem;
@@ -89,6 +86,14 @@ class _MessageReadReceiptState extends TIMUIKitState<MessageReadReceipt> {
     _getReadMemberList();
     _getUnreadMemberList();
   }
+
+  // 语音消息连续播放新增逻辑 begin
+  @override
+  void dispose() {
+    widget.model.cancelSoundSubscription();
+    super.dispose();
+  }
+  // 语音消息连续播放新增逻辑 end
 
   Widget _getMsgItem(V2TimMessage message) {
     final type = message.elemType;
@@ -186,13 +191,15 @@ class _MessageReadReceiptState extends TIMUIKitState<MessageReadReceipt> {
             Container(
               height: isDesktopScreen ? 30 : 40,
               width: isDesktopScreen ? 30 : 40,
-              margin: EdgeInsets.only(right: 12, bottom: isDesktopScreen ? 6 : 0),
+              margin:
+                  EdgeInsets.only(right: 12, bottom: isDesktopScreen ? 6 : 0),
               child: Avatar(faceUrl: faceUrl, showName: showName),
             ),
             Expanded(
                 child: Container(
               alignment: Alignment.centerLeft,
-              padding: EdgeInsets.only(top: 10, bottom: isDesktopScreen ? 14 : 19, right: 28),
+              padding: EdgeInsets.only(
+                  top: 10, bottom: isDesktopScreen ? 14 : 19, right: 28),
               decoration: BoxDecoration(
                   border: Border(
                       bottom: BorderSide(
@@ -200,7 +207,8 @@ class _MessageReadReceiptState extends TIMUIKitState<MessageReadReceipt> {
                               CommonColor.weakDividerColor))),
               child: Text(
                 showName,
-                style: TextStyle(color: Colors.black, fontSize: isDesktopScreen ? 14 : 18),
+                style: TextStyle(
+                    color: Colors.black, fontSize: isDesktopScreen ? 14 : 18),
               ),
             )),
           ],
@@ -266,7 +274,8 @@ class _MessageReadReceiptState extends TIMUIKitState<MessageReadReceipt> {
                     child: Container(
                       height: isDesktopScreen ? 40 : 50.0,
                       alignment: Alignment.bottomCenter,
-                      padding: EdgeInsets.only(bottom: isDesktopScreen ? 8 : 12),
+                      padding:
+                          EdgeInsets.only(bottom: isDesktopScreen ? 8 : 12),
                       decoration: BoxDecoration(
                           color: Colors.white,
                           border: Border(
@@ -298,7 +307,8 @@ class _MessageReadReceiptState extends TIMUIKitState<MessageReadReceipt> {
                     child: Container(
                       alignment: Alignment.bottomCenter,
                       height: isDesktopScreen ? 40 : 50.0,
-                      padding: EdgeInsets.only(bottom: isDesktopScreen ? 8 : 12),
+                      padding:
+                          EdgeInsets.only(bottom: isDesktopScreen ? 8 : 12),
                       decoration: BoxDecoration(
                           color: Colors.white,
                           border: Border(
@@ -370,11 +380,11 @@ class _MessageReadReceiptState extends TIMUIKitState<MessageReadReceipt> {
               appBar: AppBar(
                   title: Text(
                     TIM_t("消息详情"),
-                    style: TextStyle(color: theme.appbarTextColor, fontSize: 17),
+                    style:
+                        TextStyle(color: theme.appbarTextColor, fontSize: 17),
                   ),
                   shadowColor: theme.weakDividerColor,
-                  backgroundColor: theme.appbarBgColor ??
-                      theme.primaryColor,
+                  backgroundColor: theme.appbarBgColor ?? theme.primaryColor,
                   iconTheme: IconThemeData(
                     color: theme.appbarTextColor,
                   )),

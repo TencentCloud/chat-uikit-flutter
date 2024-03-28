@@ -1,14 +1,15 @@
-class TencentUtils{
-  static bool isTextNotEmpty(String? text){
+class TencentUtils {
+  static bool isTextNotEmpty(String? text) {
     return text != null && text.isNotEmpty;
   }
 
-  static String? checkString(String? text){
+  static String? checkString(String? text) {
     return (text != null && text.isEmpty) ? null : text;
   }
 
-  static String? checkStringWithoutSpace(String? text){
-    if (text == null || text.trim().isEmpty || text.contains(' ')) {
+  static String? checkStringWithoutSpace(String? text) {
+    // 这里带空格的昵称会显示 userId，先屏蔽，不管是否能整体删除
+    if (text == null || text.trim().isEmpty /* || text.contains(' ')*/) {
       return null;
     }
     return text;
@@ -153,6 +154,4 @@ class TencentUtils{
         return "*/*";
     }
   }
-
-
 }

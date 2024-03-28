@@ -14,7 +14,7 @@ import 'package:tencent_im_base/tencent_im_base.dart';
 typedef LastMessageBuilder = Widget? Function(
     V2TimMessage? lastMsg, List<V2TimGroupAtInfo?> groupAtInfoList);
 
-class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
+class KXIMUIKitConversationItem extends TIMUIKitStatelessWidget {
   final String faceUrl;
   final String nickName;
   final V2TimMessage? lastMsg;
@@ -43,7 +43,7 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
   /// to meet the identifier shows here.
   final bool isShowDraft;
 
-  TIMUIKitConversationItem({
+  KXIMUIKitConversationItem({
     Key? key,
     required this.isShowDraft,
     required this.faceUrl,
@@ -101,13 +101,14 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
   Widget _getTimeStringForChatWidget(BuildContext context, TUITheme theme) {
     try {
       if (draftTimestamp != null && draftTimestamp != 0) {
-        return Text(TimeAgo().getTimeStringForChat(draftTimestamp as int) ?? "",
+        return Text(TimeAgo().getTimeStringForChat(draftTimestamp as int) ?? '',
             style: TextStyle(
               fontSize: 12,
               color: theme.conversationItemTitmeTextColor,
             ));
       } else if (lastMsg != null) {
-        return Text(TimeAgo().getTimeStringForChat(lastMsg!.timestamp as int) ?? "",
+        return Text(
+            TimeAgo().getTimeStringForChat(lastMsg!.timestamp as int) ?? '',
             style: TextStyle(
               fontSize: 11,
               color: theme.conversationItemTitmeTextColor,
@@ -129,12 +130,14 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
         image: skinImage,
         color: isPined
             ? theme.conversationItemPinedBgColor
-            : theme.conversationItemBgColor,
+            : (isCurrent && isDesktopScreen)
+                ? theme.conversationItemActiveBgColor
+                : theme.conversationItemBgColor,
         border: Border(
           bottom: BorderSide(
             color: theme.conversationItemBorderColor ??
                 CommonColor.weakDividerColor,
-            width: 1,
+            width: 0.5,
           ),
         ),
       ),
@@ -195,7 +198,7 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
                               style: TextStyle(
-                                height: 1,
+                                // height: 1,
                                 color: theme.conversationItemTitleTextColor,
                                 fontSize: isDesktopScreen ? 14 : 18,
                                 fontWeight: FontWeight.w400,

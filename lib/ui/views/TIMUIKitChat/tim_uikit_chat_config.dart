@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
@@ -232,6 +233,9 @@ class TIMUIKitChatConfig {
   /// [Default]: false
   final bool isGroupAdminRecallEnabled;
 
+  // 判断某条消息是否可以点击
+  final MessageCanLongPres? messageCanLongPres;
+
   /// Defines the height of the sticker panel on desktop platforms.
   /// If the height of the sticker list exceeds this container height,
   /// the sticker list will automatically become scrollable.
@@ -239,52 +243,73 @@ class TIMUIKitChatConfig {
   /// [Default]: 400
   final double desktopStickerPanelHeight;
 
-  const TIMUIKitChatConfig(
-      {this.onTapLink,
-      this.timeDividerConfig,
-      this.desktopStickerPanelHeight = 400,
-      this.stickerPanelConfig,
-      this.isGroupAdminRecallEnabled = false,
-      this.isAutoReportRead = true,
-      this.faceURIPrefix,
-      this.faceURISuffix,
-      this.textHeight = 1.3,
-      this.desktopMessageInputFieldLines = 6,
-      this.isAtWhenReply = true,
-      this.notificationAndroidSound = "",
-      this.isUseMessageHoverBarOnDesktop = true,
-      this.isSupportMarkdownForTextMessage = false,
-      this.notificationExt,
-      this.isUseMessageReaction = true,
-      this.isShowAvatar = true,
-      this.isShowSelfNameInGroup = false,
-      this.offlinePushInfo,
-      @Deprecated("Please use [isShowGroupReadingStatus] instead")
-      this.isShowGroupMessageReadReceipt = true,
-      this.upperRecallTime = 120,
-      this.isShowOthersNameInGroup = true,
-      this.urlPreviewType = UrlPreviewType.onlyHyperlink,
-      this.notificationBody,
-      this.notificationOPPOChannelID = "",
-      this.notificationTitle = "",
-      this.notificationIOSSound = "",
-      this.isAllowSoundMessage = true,
-      @Deprecated("Please use [groupReadReceiptPermissionList] instead")
-      this.groupReadReceiptPermisionList,
-      this.groupReadReceiptPermissionList,
-      this.isAllowEmojiPanel = true,
-      this.isAllowShowMorePanel = true,
-      this.isShowReadingStatus = true,
-      this.desktopControlBarConfig,
-      this.isAllowLongPressMessage = true,
-      this.isUseDraftOnWeb = true,
-      this.isAllowClickAvatar = true,
-      this.isEnableTextSelection,
-      this.additionalDesktopMessageHoverBarItem,
-      this.isShowGroupReadingStatus = true,
-      this.isReportGroupReadingStatus = true,
-      this.showC2cMessageEditStatus = true,
-      this.additionalDesktopControlBarItems,
-      this.isAllowLongPressAvatarToAt = true,
-      this.isUseDefaultEmoji = false});
+  /// 添加 不能转发的会话过滤
+  final List<String> Function()? disableForwardConversions;
+
+  // 添加会话聊天图片浏览长按事件
+  final ValueChanged<V2TimMessage>? onImageLongPress;
+
+  // 因为部分视频格式官网不支持，加一个变量控制
+  final bool useKangXunVideo;
+
+  //////////////// 图片、视频消息连续浏览 ////////////////
+  final bool useMediaBrowser;
+  //////////////// 图片、视频消息连续浏览 ////////////////
+
+  const TIMUIKitChatConfig({
+    this.onTapLink,
+    this.timeDividerConfig,
+    this.desktopStickerPanelHeight = 400,
+    this.stickerPanelConfig,
+    this.isGroupAdminRecallEnabled = false,
+    this.isAutoReportRead = true,
+    this.faceURIPrefix,
+    this.faceURISuffix,
+    this.textHeight = 1.3,
+    this.desktopMessageInputFieldLines = 6,
+    this.isAtWhenReply = true,
+    this.notificationAndroidSound = "",
+    this.isUseMessageHoverBarOnDesktop = true,
+    this.isSupportMarkdownForTextMessage = false,
+    this.notificationExt,
+    this.isUseMessageReaction = true,
+    this.isShowAvatar = true,
+    this.isShowSelfNameInGroup = false,
+    this.offlinePushInfo,
+    @Deprecated("Please use [isShowGroupReadingStatus] instead")
+    this.isShowGroupMessageReadReceipt = true,
+    this.upperRecallTime = 120,
+    this.isShowOthersNameInGroup = true,
+    this.urlPreviewType = UrlPreviewType.onlyHyperlink,
+    this.notificationBody,
+    this.notificationOPPOChannelID = "",
+    this.notificationTitle = "",
+    this.notificationIOSSound = "",
+    this.isAllowSoundMessage = true,
+    @Deprecated("Please use [groupReadReceiptPermissionList] instead")
+    this.groupReadReceiptPermisionList,
+    this.groupReadReceiptPermissionList,
+    this.isAllowEmojiPanel = true,
+    this.isAllowShowMorePanel = true,
+    this.isShowReadingStatus = true,
+    this.desktopControlBarConfig,
+    this.isAllowLongPressMessage = true,
+    this.isUseDraftOnWeb = true,
+    this.isAllowClickAvatar = true,
+    this.isEnableTextSelection,
+    this.additionalDesktopMessageHoverBarItem,
+    this.isShowGroupReadingStatus = true,
+    this.isReportGroupReadingStatus = true,
+    this.showC2cMessageEditStatus = true,
+    this.additionalDesktopControlBarItems,
+    this.isAllowLongPressAvatarToAt = true,
+    this.isUseDefaultEmoji = false,
+    this.messageCanLongPres,
+    this.onImageLongPress,
+    this.disableForwardConversions,
+    this.useKangXunVideo = false,
+    //////////////// 图片、视频消息连续浏览 ////////////////
+    this.useMediaBrowser = false,
+    //////////////// 图片、视频消息连续浏览 ////////////////
+  });
 }

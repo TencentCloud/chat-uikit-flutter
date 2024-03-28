@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/friend_list_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendship_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 
 export 'package:tencent_cloud_chat_uikit/ui/widgets/contact_list.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 
 class TIMUIKitContact extends StatefulWidget {
   /// the callback after clicking contact item
@@ -20,6 +20,21 @@ class TIMUIKitContact extends StatefulWidget {
   /// the builder for the list on top
   final Widget? Function(TopListItem item)? topListItemBuilder;
 
+  // 自定义好友 itembuilder
+  final Widget? Function(BuildContext context, V2TimFriendInfo user)?
+      cusItemBuilder;
+
+  // 自定义好友头像
+  final Widget? Function(BuildContext context, V2TimFriendInfo user)?
+      cusAvatarBuilder;
+
+  /// the list on bottom
+  final List<BottomListItem>? bottomList;
+
+  /// the builder for the list on top
+  final Widget? Function(BottomListItem item, int friendCount)?
+      bottomListItemBuilder;
+
   /// The widget shows when no contacts exists.
   final Widget Function(BuildContext context)? emptyBuilder;
 
@@ -29,15 +44,19 @@ class TIMUIKitContact extends StatefulWidget {
   /// Control if shows the online status for each user on its avatar.
   final bool isShowOnlineStatus;
 
-  const TIMUIKitContact(
-      {Key? key,
-      this.onTapItem,
-      this.lifeCycle,
-      this.topList,
-      this.topListItemBuilder,
-      this.emptyBuilder,
-      this.isShowOnlineStatus = true})
-      : super(key: key);
+  const TIMUIKitContact({
+    Key? key,
+    this.onTapItem,
+    this.lifeCycle,
+    this.topList,
+    this.topListItemBuilder,
+    this.emptyBuilder,
+    this.isShowOnlineStatus = true,
+    this.cusAvatarBuilder,
+    this.cusItemBuilder,
+    this.bottomList,
+    this.bottomListItemBuilder,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _TIMUIKitContactState();
@@ -47,7 +66,6 @@ class _TIMUIKitContactState extends TIMUIKitState<TIMUIKitContact> {
   final TUIFriendShipViewModel model = serviceLocator<TUIFriendShipViewModel>();
   String currentItem = "";
 
-
   @override
   void dispose() {
     super.dispose();
@@ -56,7 +74,8 @@ class _TIMUIKitContactState extends TIMUIKitState<TIMUIKitContact> {
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final theme = value.theme;
-    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     return MultiProvider(
         providers: [
           ChangeNotifierProvider.value(value: model),
@@ -71,19 +90,23 @@ class _TIMUIKitContactState extends TIMUIKitState<TIMUIKitContact> {
             emptyBuilder: widget.emptyBuilder,
             isShowOnlineStatus: widget.isShowOnlineStatus,
             contactList: memberList,
-            onTapItem: (item){
-              if(isDesktopScreen){
+            onTapItem: (item) {
+              if (isDesktopScreen) {
                 setState(() {
                   currentItem = item.userID;
                 });
               }
-              if(widget.onTapItem != null){
+              if (widget.onTapItem != null) {
                 widget.onTapItem!(item);
               }
             },
             bgColor: isDesktopScreen ? theme.wideBackgroundColor : null,
             topList: widget.topList,
             topListItemBuilder: widget.topListItemBuilder,
+            cusItemBuilder: widget.cusItemBuilder,
+            cusAvatarBuilder: widget.cusAvatarBuilder,
+            bottomList: widget.bottomList,
+            bottomListItemBuilder: widget.bottomListItemBuilder,
           );
         });
   }

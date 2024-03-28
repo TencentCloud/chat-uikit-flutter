@@ -1,10 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_wrapper.dart';
+import 'package:tencent_im_base/tencent_im_base.dart';
 
 class TIMUIKitFaceElem extends StatefulWidget {
   final String path;
@@ -29,9 +30,9 @@ class TIMUIKitFaceElem extends StatefulWidget {
 }
 
 class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitFaceElem> {
-
   bool isFromNetwork() {
-    return widget.path.startsWith('http');
+    return widget.path.startsWith('http') ||
+        createPathFromNative(widget.path).startsWith('http');
   }
 
   createPathFromNative(String path) {
@@ -48,9 +49,10 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitFaceElem> {
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
-    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+    final isDesktopScreen =
+        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     return TIMUIKitMessageReactionWrapper(
-      chatModel: widget.model,
+        chatModel: widget.model,
         isShowJump: widget.isShowJump,
         isFromSelf: widget.message.isSelf ?? true,
         clearJump: widget.clearJump,
@@ -58,11 +60,23 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitFaceElem> {
         isShowMessageReaction: widget.isShowMessageReaction ?? true,
         child: Container(
           padding: const EdgeInsets.all(10),
-          constraints:
-              BoxConstraints(maxWidth: MediaQuery.of(context).size.width * (isDesktopScreen ? 0.1 : 0.3)),
+          constraints: BoxConstraints(
+              maxWidth: MediaQuery.of(context).size.width *
+                  (isDesktopScreen ? 0.1 : 0.3)),
           child: isFromNetwork()
-              ? Image.network(widget.path)
-              : Image.asset(createPathFromNative(widget.path)),
+              ? CachedNetworkImage(
+                  imageUrl: createPathFromNative(widget.path),
+                  placeholder: (context, url) =>
+                      const CupertinoActivityIndicator(),
+                  errorWidget: (context, url, error) =>
+                      Text(TIM_t("该版本不支持此消息")),
+                  fadeInDuration: const Duration(milliseconds: 100),
+                )
+              : Image.asset(
+                  createPathFromNative(widget.path),
+                  errorBuilder: (context, error, stackTrace) =>
+                      Text(TIM_t("该版本不支持此消息")),
+                ),
         ));
   }
 }

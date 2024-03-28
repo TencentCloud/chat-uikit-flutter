@@ -51,5 +51,6 @@ void setupServiceLocator() {
     serviceLocator
         .registerSingleton<TUIGroupListenerModel>(TUIGroupListenerModel());
     boolIsInitailized = true;
+    
   }
 }
