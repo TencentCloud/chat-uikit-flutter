@@ -75,9 +75,9 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
 
     switch (messageDataKeys) {
       case TencentCloudChatMessageDataKeys.messageNeedUpdate:
-        if (TencentCloudChat.dataInstance.messageData.messageNeedUpdate != null && msgID == TencentCloudChat.dataInstance.messageData.messageNeedUpdate?.msgID && TencentCloudChatUtils.checkString(msgID) != null) {
+        if (TencentCloudChat().dataInstance.messageData.messageNeedUpdate != null && msgID == TencentCloudChat().dataInstance.messageData.messageNeedUpdate?.msgID && TencentCloudChatUtils.checkString(msgID) != null) {
           safeSetState(() {
-            _message = TencentCloudChat.dataInstance.messageData.messageNeedUpdate!;
+            _message = TencentCloudChat().dataInstance.messageData.messageNeedUpdate!;
           });
         }
       default:

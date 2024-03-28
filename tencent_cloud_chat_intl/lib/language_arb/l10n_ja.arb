@@ -528,5 +528,9 @@
     "profile": "プロフィール",
     "unpin": "ピン留めを解除",
     "mentionedMessages": "私への {count} 件のメンション",
-  "longPressToNavigate": "押し続けて表示"
+  "longPressToNavigate": "押し続けて表示",
+  "permissionDeniedTitle": "アクセス権限が拒否されました",
+  "permissionDeniedContent": "設定に移動して {permissionString} 権限を有効にしてください。",
+  "goToSettingsButtonText": "設定へ",
+  "originalMessageNotFound": "元のメッセージが見つかりません"
 }

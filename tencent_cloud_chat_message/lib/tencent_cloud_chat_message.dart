@@ -55,6 +55,7 @@ class _TencentCloudChatMessageState extends TencentCloudChatState<TencentCloudCh
     _messageSeparateDataProvider.init(
       userID: widget.options?.userID,
       groupID: widget.options?.groupID,
+      config: widget.config,
     );
     _messageSeparateDataProvider.messageController = widget.controller ?? TencentCloudChatMessageController();
   }
@@ -68,6 +69,7 @@ class _TencentCloudChatMessageState extends TencentCloudChatState<TencentCloudCh
       _messageSeparateDataProvider.init(
         userID: widget.options?.userID,
         groupID: widget.options?.groupID,
+        config: widget.config,
       );
       _messageSeparateDataProvider.messageController = widget.controller ?? TencentCloudChatMessageController();
       setState(() {});
@@ -118,7 +120,7 @@ class TencentCloudChatMessageInstance {
   static final TencentCloudChatMessageInstance _instance = TencentCloudChatMessageInstance._internal();
 
   static ({TencentCloudChatComponentsEnum componentEnum, TencentCloudChatWidgetBuilder widgetBuilder}) register() {
-    TencentCloudChat.dataInstance.messageData.init();
+    TencentCloudChat().dataInstance.messageData.init();
 
     TencentCloudChatRouter().registerRouter(
       routeName: TencentCloudChatRouteNames.message,

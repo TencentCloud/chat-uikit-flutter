@@ -89,7 +89,7 @@ class TencentCloudChatContactAddContactBodyState extends TencentCloudChatState<T
   }
 
   Widget beforeSearch() {
-    String userID = TencentCloudChat.dataInstance.basic.currentUser!.userID ?? "";
+    String userID = TencentCloudChat().dataInstance.basic.currentUser!.userID ?? "";
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Column(
               children: [
@@ -201,11 +201,7 @@ class TencentCloudChatContactAddContactSearchBarState extends TencentCloudChatSt
                         onSearchIDChanged(value);
                       },
                       style: TextStyle(color: colorTheme.contactItemFriendNameColor),
-                      decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(vertical: getHeight(6), horizontal: getWidth(12)),
-                          border: InputBorder.none,
-                          hintText: 'Search User ID',
-                          isDense: true),
+                      decoration: InputDecoration(contentPadding: EdgeInsets.symmetric(vertical: getHeight(6), horizontal: getWidth(12)), border: InputBorder.none, hintText: 'Search User ID', isDense: true),
                       cursorColor: colorTheme.contactSearchCursorColor,
                       cursorRadius: Radius.circular(getSquareSize(2)),
                     ),
@@ -295,10 +291,7 @@ class TencentCloudChatContactAddContactListItemState extends TencentCloudChatSta
               color: colorTheme.backgroundColor,
               margin: EdgeInsets.only(top: getHeight(10)),
               padding: EdgeInsets.symmetric(vertical: getHeight(10), horizontal: getWidth(3)),
-              child: Row(children: [
-                TencentCloudChatContactBuilders.getContactAddContactListItemAvatarBuilder(widget.userFullInfo),
-                TencentCloudChatContactBuilders.getContactAddContactListItemContentBuilder(widget.userFullInfo)
-              ]),
+              child: Row(children: [TencentCloudChatContactBuilders.getContactAddContactListItemAvatarBuilder(widget.userFullInfo), TencentCloudChatContactBuilders.getContactAddContactListItemContentBuilder(widget.userFullInfo)]),
             )));
   }
 }

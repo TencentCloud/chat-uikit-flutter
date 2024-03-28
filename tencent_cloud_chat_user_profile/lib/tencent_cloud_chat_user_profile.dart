@@ -88,7 +88,7 @@ class TencentCloudChatUserProfileInstance {
   static final TencentCloudChatUserProfileInstance _instance = TencentCloudChatUserProfileInstance._internal();
 
   static ({TencentCloudChatComponentsEnum componentEnum, TencentCloudChatWidgetBuilder widgetBuilder}) register() {
-    // TencentCloudChat.dataInstance.messageData.init();
+    // TencentCloudChat().dataInstance.messageData.init();
 
     TencentCloudChatRouter().registerRouter(
       routeName: TencentCloudChatRouteNames.userProfile,

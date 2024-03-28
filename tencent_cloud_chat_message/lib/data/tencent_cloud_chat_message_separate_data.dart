@@ -28,11 +28,11 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
     axis: Axis.vertical,
   );
   final TencentCloudChatMessageData _messageGlobalData =
-      TencentCloudChat.dataInstance.messageData;
+      TencentCloudChat().dataInstance.messageData;
   TencentCloudChatMessageController? _messageController;
 
   TencentCloudChatMessageConfig _config =
-      TencentCloudChat.dataInstance.basic.messageConfig;
+      TencentCloudChat().dataInstance.basic.messageConfig;
   TencentCloudChatMessageStickerData? _stickerData;
 
   String? _userID;
@@ -214,7 +214,7 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> loadToSpecificMessage({
+  Future<bool> loadToSpecificMessage({
     bool highLightTargetMessage = true,
     V2TimMessage? message,
     int? timeStamp,
@@ -222,47 +222,63 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
   }) async {
     assert(message != null || timeStamp != null || seq != null);
 
-    final ({
-      bool haveMoreLatestData,
-      bool haveMorePreviousData,
-      V2TimMessage? targetMessage
-    }) res = await _messageGlobalData.loadToSpecificMessage(
-      userID: userID,
-      groupID: groupID,
-      msgID: message?.msgID,
-      timeStamp: timeStamp ?? message?.timestamp,
-      seq: seq ??
-          (TencentCloudChatUtils.checkString(message?.seq) != null
-              ? int.tryParse(message!.seq!)
-              : null),
-    );
-
-    final messageListStatus = _messageGlobalData.getMessageListStatus(
-        userID: userID, groupID: groupID);
-    messageListStatus.haveMoreLatestData = res.haveMoreLatestData;
-    messageListStatus.haveMorePreviousData = res.haveMorePreviousData;
-
-    Future.delayed(const Duration(milliseconds: 100), () {
-      _messageController?.scrollToSpecificMessage(
-        TencentCloudChatUtils.checkString(res.targetMessage?.msgID) ??
-            message?.msgID,
+    try {
+      final ({
+        bool haveMoreLatestData,
+        bool haveMorePreviousData,
+        V2TimMessage? targetMessage
+      }) res = await _messageGlobalData.loadToSpecificMessage(
+        userID: userID,
+        groupID: groupID,
+        msgID: TencentCloudChatUtils.checkString(message?.msgID),
+        timeStamp: timeStamp ?? message?.timestamp,
+        seq: seq ??
+            (TencentCloudChatUtils.checkString(message?.seq) != null
+                ? int.tryParse(message!.seq!)
+                : null),
       );
-    });
 
-    if (highLightTargetMessage &&
-        (TencentCloudChatUtils.checkString(res.targetMessage?.msgID) != null ||
-            TencentCloudChatUtils.checkString(message?.msgID) != null)) {
-      SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-        Future.delayed(const Duration(milliseconds: 300), () {
-          TencentCloudChat.dataInstance.messageData.messageHighlighted =
-              TencentCloudChatUtils.checkString(res.targetMessage?.msgID) !=
-                      null
-                  ? res.targetMessage
-                  : message;
-        });
+      if (res.targetMessage == null) {
+        return false;
+      }
+
+      final messageListStatus = _messageGlobalData.getMessageListStatus(
+          userID: userID, groupID: groupID);
+      messageListStatus.haveMoreLatestData = res.haveMoreLatestData;
+      messageListStatus.haveMorePreviousData = res.haveMorePreviousData;
+
+      Future.delayed(const Duration(milliseconds: 100), () {
+        _messageController?.scrollToSpecificMessage(
+          TencentCloudChatUtils.checkString(res.targetMessage?.msgID) ??
+              message?.msgID,
+        );
       });
+
+      Future.delayed(const Duration(milliseconds: 150), () {
+        _messageController?.scrollToSpecificMessage(
+          TencentCloudChatUtils.checkString(res.targetMessage?.msgID) ??
+              message?.msgID,
+        );
+      });
+
+      if (highLightTargetMessage &&
+          (TencentCloudChatUtils.checkString(res.targetMessage?.msgID) !=
+                  null ||
+              TencentCloudChatUtils.checkString(message?.msgID) != null)) {
+        SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+          Future.delayed(const Duration(milliseconds: 300), () {
+            TencentCloudChat().dataInstance.messageData.messageHighlighted =
+                TencentCloudChatUtils.checkString(res.targetMessage?.msgID) !=
+                        null
+                    ? res.targetMessage
+                    : message;
+          });
+        });
+      }
+      return true;
+    } catch (e) {
+      return false;
     }
-    return;
   }
 
   Future<void> loadMessageList({
@@ -549,8 +565,10 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
   }
 
   _sendMessage({V2TimMsgCreateInfoResult? messageInfoResult}) async {
-    List<V2TimMessage> currentHistoryMsgList =
-        TencentCloudChat.dataInstance.messageData.getMessageList(
+    List<V2TimMessage> currentHistoryMsgList = TencentCloudChat()
+        .dataInstance
+        .messageData
+        .getMessageList(
             key: TencentCloudChatUtils.checkString(_groupID) ?? _userID ?? "");
     final messageInfo = messageInfoResult!.messageInfo;
     bool needSendRotate = false;
@@ -632,7 +650,7 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
       }
 
       currentHistoryMsgList.insert(0, messageInfoWithAdditionalInfo);
-      TencentCloudChat.dataInstance.messageData.updateMessageList(
+      TencentCloudChat().dataInstance.messageData.updateMessageList(
           messageList: currentHistoryMsgList,
           userID: _userID,
           groupID: _groupID);
@@ -754,8 +772,10 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
   // Forward Individually
   sendForwardIndividuallyMessage(List<String> msgIDs,
       List<({String? userID, String? groupID})> chats) async {
-    List<V2TimMessage> currentHistoryMsgList =
-        TencentCloudChat.dataInstance.messageData.getMessageList(
+    List<V2TimMessage> currentHistoryMsgList = TencentCloudChat()
+        .dataInstance
+        .messageData
+        .getMessageList(
             key: TencentCloudChatUtils.checkString(_groupID) ?? _userID ?? "");
 
     if (chats.isEmpty || msgIDs.isEmpty) {
@@ -796,7 +816,7 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
         }
       }
     }
-    TencentCloudChat.dataInstance.messageData.updateMessageList(
+    TencentCloudChat().dataInstance.messageData.updateMessageList(
         messageList: currentHistoryMsgList, userID: _userID, groupID: _groupID);
   }
 
@@ -804,8 +824,10 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
   sendForwardCombinedMessage(List<V2TimMessage> messages,
       List<({String? userID, String? groupID})> chats) async {
     final msgIDs = messages.map((e) => e.msgID ?? "").toList();
-    List<V2TimMessage> currentHistoryMsgList =
-        TencentCloudChat.dataInstance.messageData.getMessageList(
+    List<V2TimMessage> currentHistoryMsgList = TencentCloudChat()
+        .dataInstance
+        .messageData
+        .getMessageList(
             key: TencentCloudChatUtils.checkString(_groupID) ?? _userID ?? "");
     if (chats.isEmpty || msgIDs.isEmpty) {
       return null;
@@ -845,7 +867,7 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
         );
       }
     }
-    TencentCloudChat.dataInstance.messageData.updateMessageList(
+    TencentCloudChat().dataInstance.messageData.updateMessageList(
         messageList: currentHistoryMsgList, userID: _userID, groupID: _groupID);
   }
 
@@ -854,8 +876,10 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
   }) async {
     final deleteRes = await TencentCloudChatMessageSDK()
         .deleteMessagesForEveryone(messages: messages);
-    List<V2TimMessage> currentHistoryMsgList =
-        TencentCloudChat.dataInstance.messageData.getMessageList(
+    List<V2TimMessage> currentHistoryMsgList = TencentCloudChat()
+        .dataInstance
+        .messageData
+        .getMessageList(
             key: TencentCloudChatUtils.checkString(_groupID) ?? _userID ?? "");
 
     for (final targetMessage in deleteRes) {
@@ -866,15 +890,17 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
                   TencentCloudChatUtils.checkString(msg.id) != null)) &&
           TencentCloudChatUtils.checkString(msg.msgID) != null);
     }
-    TencentCloudChat.dataInstance.messageData.updateMessageList(
+    TencentCloudChat().dataInstance.messageData.updateMessageList(
         messageList: currentHistoryMsgList, userID: _userID, groupID: _groupID);
   }
 
   Future deleteMessagesForMe({
     required List<V2TimMessage> messages,
   }) async {
-    List<V2TimMessage> currentHistoryMsgList =
-        TencentCloudChat.dataInstance.messageData.getMessageList(
+    List<V2TimMessage> currentHistoryMsgList = TencentCloudChat()
+        .dataInstance
+        .messageData
+        .getMessageList(
             key: TencentCloudChatUtils.checkString(_groupID) ?? _userID ?? "");
     final deleteRes = await TencentCloudChatMessageSDK().deleteMessagesForMe(
         msgIDs: messages.map((e) => e.msgID ?? "").toList());
@@ -888,15 +914,17 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
             TencentCloudChatUtils.checkString(msg.msgID) != null);
       }
     }
-    TencentCloudChat.dataInstance.messageData.updateMessageList(
+    TencentCloudChat().dataInstance.messageData.updateMessageList(
         messageList: currentHistoryMsgList, userID: _userID, groupID: _groupID);
   }
 
   Future recallMessage({
     required V2TimMessage message,
   }) async {
-    List<V2TimMessage> currentHistoryMsgList =
-        TencentCloudChat.dataInstance.messageData.getMessageList(
+    List<V2TimMessage> currentHistoryMsgList = TencentCloudChat()
+        .dataInstance
+        .messageData
+        .getMessageList(
             key: TencentCloudChatUtils.checkString(_groupID) ?? _userID ?? "");
     final res = await TencentCloudChatSDK.manager
         .getMessageManager()
@@ -906,7 +934,7 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
           element.msgID == message.msgID || element.id == message.id);
       target.status = MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED;
     }
-    TencentCloudChat.dataInstance.messageData.updateMessageList(
+    TencentCloudChat().dataInstance.messageData.updateMessageList(
         messageList: currentHistoryMsgList, userID: _userID, groupID: _groupID);
   }
 }

@@ -11,6 +11,7 @@ import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/widgets/desktop_popup/operation_key.dart';
 import 'package:tencent_cloud_chat_common/widgets/desktop_popup/tencent_cloud_chat_desktop_popup.dart';
+import 'package:tencent_cloud_chat_common/widgets/dialog/tencent_cloud_chat_dialog.dart';
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data.dart';
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data_notifier.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_builders.dart';
@@ -87,10 +88,11 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
       case TencentCloudChatMessageDataKeys.currentPlayAudioInfo:
         break;
       case TencentCloudChatMessageDataKeys.messageNeedUpdate:
-        if (TencentCloudChat.dataInstance.messageData.messageNeedUpdate != null && msgID == TencentCloudChat.dataInstance.messageData.messageNeedUpdate?.msgID && TencentCloudChatUtils.checkString(msgID) != null) {
+        if (TencentCloudChat().dataInstance.messageData.messageNeedUpdate != null && msgID == TencentCloudChat().dataInstance.messageData.messageNeedUpdate?.msgID && TencentCloudChatUtils.checkString(msgID) != null) {
           safeSetState(() {
-            _message = TencentCloudChat.dataInstance.messageData.messageNeedUpdate!;
+            _message = TencentCloudChat().dataInstance.messageData.messageNeedUpdate!;
           });
+          _generateMenuOptions();
         }
       default:
         break;
@@ -102,11 +104,11 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
     super.initState();
     _message = widget.message;
     _messageDataSubscription = _messageDataStream?.listen(_messageDataHandler);
-    _messageReceipt = TencentCloudChat.dataInstance.messageData.getMessageReadReceipt(
-      msgID: _message.msgID ?? "",
-      userID: _message.userID ?? "",
-      timestamp: _message.timestamp ?? 0,
-    );
+    _messageReceipt = TencentCloudChat().dataInstance.messageData.getMessageReadReceipt(
+          msgID: _message.msgID ?? "",
+          userID: _message.userID ?? "",
+          timestamp: _message.timestamp ?? 0,
+        );
   }
 
   @override
@@ -124,6 +126,10 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
 
   bool _showRecallButton() {
     final TencentCloudChatMessageConfig config = dataProvider.config;
+    final defaultMessageMenuConfig = config.defaultMessageMenuConfig(userID: dataProvider.userID, groupID: dataProvider.groupID);
+    if (!defaultMessageMenuConfig.enableMessageRecall) {
+      return false;
+    }
     final recallTimeLimit = config.recallTimeLimit(userID: dataProvider.userID, groupID: dataProvider.groupID);
 
     final timeDiff = (DateTime.now().millisecondsSinceEpoch / 1000).ceil() - (_message.timestamp ?? 0);
@@ -142,9 +148,24 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
       groupID: dataProvider.groupID,
     );
 
+    final defaultMessageMenuConfig = config.defaultMessageMenuConfig(
+      userID: dataProvider.userID,
+      groupID: dataProvider.groupID,
+    );
+
+    // === Message Delete ===
+    final enableMessageDeleteForEveryone = defaultMessageMenuConfig.enableMessageDeleteForEveryone && config.enableMessageDeleteForEveryone(userID: dataProvider.userID, groupID: dataProvider.groupID);
+    final enableMessageDeleteForSelf = defaultMessageMenuConfig.enableMessageDeleteForSelf;
+    final showDeleteForEveryone = (_message.isSelf ?? false) && enableMessageDeleteForEveryone;
+    final showMessageDelete = showDeleteForEveryone || enableMessageDeleteForSelf;
+
     // === Group Message Read Receipt ===
-    final useReadReceipt = TencentCloudChatUtils.checkString(dataProvider.groupID) != null &&
-        TencentCloudChat.dataInstance.basic.messageConfig
+    final useReadReceipt = defaultMessageMenuConfig.enableGroupMessageReceipt &&
+        TencentCloudChatUtils.checkString(dataProvider.groupID) != null &&
+        TencentCloudChat()
+            .dataInstance
+            .basic
+            .messageConfig
             .enabledGroupTypesForMessageReadReceipt(
               userID: dataProvider.userID,
               groupID: dataProvider.groupID,
@@ -153,133 +174,135 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
     final showReadReceipt = useReadReceipt && (_message.isSelf ?? true) && (_message.needReadReceipt ?? false);
     final receipt = showReadReceipt
         ? messageReceipt ??
-            TencentCloudChat.dataInstance.messageData.getMessageReadReceipt(
-              msgID: _message.msgID ?? "",
-              userID: _message.userID ?? "",
-              timestamp: _message.timestamp ?? 0,
-            )
+            TencentCloudChat().dataInstance.messageData.getMessageReadReceipt(
+                  msgID: _message.msgID ?? "",
+                  userID: _message.userID ?? "",
+                  timestamp: _message.timestamp ?? 0,
+                )
         : null;
     final int? readCount = showReadReceipt ? receipt?.readCount : null;
     final int? unreadCount = showReadReceipt ? receipt?.unreadCount : null;
     final bool isAllRead = (readCount ?? 0) > 0 && unreadCount == 0;
 
     final defaultMenuOptions = [
-      TencentCloudChatMessageGeneralOptionItem(
-          icon: Icons.copy,
-          label: tL10n.copy,
-          onTap: ({Offset? offset}) {
-            final text = _message.textElem?.text ?? "";
-            Clipboard.setData(
-              ClipboardData(text: text),
-            );
-          }),
-      TencentCloudChatMessageGeneralOptionItem(
-          icon: Icons.reply_outlined,
-          label: tL10n.reply,
-          onTap: ({Offset? offset}) {
-            dataProvider.repliedMessage = _message;
-          }),
-      TencentCloudChatMessageGeneralOptionItem(
-        icon: Icons.check_circle_outline,
-        label: tL10n.select,
-        onTap: ({Offset? offset}) {
-          Future.delayed(
-            const Duration(milliseconds: 150),
-            () {
-              dataProvider.inSelectMode = true;
-              dataProvider.selectedMessages = [_message];
-            },
-          );
-        },
-      ),
-      TencentCloudChatMessageGeneralOptionItem(
-          icon: Icons.forward,
-          label: tL10n.forward,
-          onTap: ({Offset? offset}) {
-            if (isDesktopScreen) {
-              TencentCloudChatDesktopPopup.showPopupWindow(
-                width: MediaQuery.of(context).size.width * 0.6,
-                height: MediaQuery.of(context).size.height * 0.6,
-                operationKey: TencentCloudChatPopupOperationKey.forward,
-                context: context,
-                child: (closeFunc) => TencentCloudChatMessageForwardContainer(
-                  type: TencentCloudChatForwardType.individually,
-                  onCloseModal: closeFunc,
-                  context: context,
-                  messages: [_message],
-                ),
+      if (defaultMessageMenuConfig.enableMessageCopy)
+        TencentCloudChatMessageGeneralOptionItem(
+            icon: Icons.copy,
+            label: tL10n.copy,
+            onTap: ({Offset? offset}) {
+              final text = _message.textElem?.text ?? "";
+              Clipboard.setData(
+                ClipboardData(text: text),
               );
-            } else {
-              showModalBottomSheet<void>(
-                context: context,
-                isScrollControlled: true,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                ),
-                builder: (BuildContext _) {
-                  return TencentCloudChatMessageForwardContainer(
+            }),
+      if (defaultMessageMenuConfig.enableMessageReply)
+        TencentCloudChatMessageGeneralOptionItem(
+            icon: Icons.reply_outlined,
+            label: tL10n.reply,
+            onTap: ({Offset? offset}) {
+              dataProvider.repliedMessage = _message;
+            }),
+      if (defaultMessageMenuConfig.enableMessageSelect)
+        TencentCloudChatMessageGeneralOptionItem(
+          icon: Icons.check_circle_outline,
+          label: tL10n.select,
+          onTap: ({Offset? offset}) {
+            Future.delayed(
+              const Duration(milliseconds: 150),
+              () {
+                dataProvider.inSelectMode = true;
+                dataProvider.selectedMessages = [_message];
+              },
+            );
+          },
+        ),
+      if (defaultMessageMenuConfig.enableMessageForward)
+        TencentCloudChatMessageGeneralOptionItem(
+            icon: Icons.forward,
+            label: tL10n.forward,
+            onTap: ({Offset? offset}) {
+              if (isDesktopScreen) {
+                TencentCloudChatDesktopPopup.showPopupWindow(
+                  width: MediaQuery.of(context).size.width * 0.6,
+                  height: MediaQuery.of(context).size.height * 0.6,
+                  operationKey: TencentCloudChatPopupOperationKey.forward,
+                  context: context,
+                  child: (closeFunc) => TencentCloudChatMessageForwardContainer(
                     type: TencentCloudChatForwardType.individually,
+                    onCloseModal: closeFunc,
                     context: context,
                     messages: [_message],
-                  );
-                },
-              );
-            }
-          }),
-      TencentCloudChatMessageGeneralOptionItem(
-          icon: Icons.delete_outline_outlined,
-          label: tL10n.delete,
-          onTap: ({Offset? offset}) {
-
-            final TencentCloudChatMessageConfig config = dataProvider.config;
-            final showDeleteForEveryone = (_message.isSelf ?? false) && config.enableMessageDeleteForEveryone(userID: dataProvider.userID, groupID: dataProvider.groupID);
-            if (isDesktopScreen) {
-              TencentCloudChatDesktopPopup.showSecondaryConfirmDialog(
-                operationKey: TencentCloudChatPopupOperationKey.confirmDeleteMessages,
-                context: context,
-                title: tL10n.confirmDeletion,
-                text: tL10n.askDeleteThisMessage,
-                width: showDeleteForEveryone ? 600 : 400,
-                height: 200,
-                actions: [
-                  (
-                    onTap: () {},
-                    label: tL10n.cancel,
-                    type: TencentCloudChatDesktopPopupActionButtonType.secondary,
                   ),
-                  if (showDeleteForEveryone)
+                );
+              } else {
+                showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                  ),
+                  builder: (BuildContext _) {
+                    return TencentCloudChatMessageForwardContainer(
+                      type: TencentCloudChatForwardType.individually,
+                      context: context,
+                      messages: [_message],
+                    );
+                  },
+                );
+              }
+            }),
+      if (showMessageDelete)
+        TencentCloudChatMessageGeneralOptionItem(
+            icon: Icons.delete_outline_outlined,
+            label: tL10n.delete,
+            onTap: ({Offset? offset}) {
+              if (isDesktopScreen) {
+                TencentCloudChatDesktopPopup.showSecondaryConfirmDialog(
+                  operationKey: TencentCloudChatPopupOperationKey.confirmDeleteMessages,
+                  context: context,
+                  title: tL10n.confirmDeletion,
+                  text: tL10n.askDeleteThisMessage,
+                  width: (showDeleteForEveryone && enableMessageDeleteForSelf) ? 600 : 400,
+                  height: 200,
+                  actions: [
                     (
-                      onTap: () {
-                        dataProvider.deleteMessagesForEveryone(messages: [_message]);
-                      },
-                      label: tL10n.deleteForEveryone,
-                      type: TencentCloudChatDesktopPopupActionButtonType.primary,
+                      onTap: () {},
+                      label: tL10n.cancel,
+                      type: TencentCloudChatDesktopPopupActionButtonType.secondary,
                     ),
-                  (
-                    onTap: () {
-                      dataProvider.deleteMessagesForMe(messages: [_message]);
-                    },
-                    label: tL10n.deleteForMe,
-                    type: TencentCloudChatDesktopPopupActionButtonType.primary,
-                  ),
-                ],
-              );
-            } else {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text(tL10n.confirmDeletion),
-                    content: Text(tL10n.askDeleteThisMessage),
-                    actions: [
-                      if (showDeleteForEveryone)
-                        TextButton(
-                          onPressed: () {
-                            dataProvider.deleteMessagesForEveryone(messages: [_message]);
-                            Navigator.pop(context);
-                          },
-                          child: Text(tL10n.deleteForEveryone),
-                        ),
+                    if (showDeleteForEveryone)
+                      (
+                        onTap: () {
+                          dataProvider.deleteMessagesForEveryone(messages: [_message]);
+                        },
+                        label: tL10n.deleteForEveryone,
+                        type: TencentCloudChatDesktopPopupActionButtonType.primary,
+                      ),
+                    if (enableMessageDeleteForSelf)
+                      (
+                        onTap: () {
+                          dataProvider.deleteMessagesForMe(messages: [_message]);
+                        },
+                        label: tL10n.deleteForMe,
+                        type: TencentCloudChatDesktopPopupActionButtonType.primary,
+                      ),
+                  ],
+                );
+              } else {
+                TencentCloudChatDialog.showAdaptiveDialog(
+                  context: context,
+                  title: Text(tL10n.confirmDeletion),
+                  content: Text(tL10n.askDeleteThisMessage),
+                  actions: [
+                    if (showDeleteForEveryone)
+                      TextButton(
+                        onPressed: () {
+                          dataProvider.deleteMessagesForEveryone(messages: [_message]);
+                          Navigator.pop(context);
+                        },
+                        child: Text(tL10n.deleteForEveryone),
+                      ),
+                    if (enableMessageDeleteForSelf)
                       TextButton(
                         onPressed: () {
                           dataProvider.deleteMessagesForMe(messages: [_message]);
@@ -287,18 +310,16 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
                         },
                         child: Text(tL10n.deleteForMe),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text(tL10n.cancel),
-                      ),
-                    ],
-                  );
-                },
-              );
-            }
-          }),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(tL10n.cancel),
+                    ),
+                  ],
+                );
+              }
+            }),
       if (_showRecallButton())
         TencentCloudChatMessageGeneralOptionItem(
             icon: Icons.undo_outlined,
@@ -317,38 +338,29 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
                       dataProvider.recallMessage(message: _message);
                     });
               } else {
-                showDialog(
+                TencentCloudChatDialog.showAdaptiveDialog(
                   context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: Text(tL10n.messageRecall),
-                      content: Text(tL10n.messageRecallConfirmation),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            dataProvider.recallMessage(message: _message);
-                            Navigator.pop(context);
-                          },
-                          child: Text(tL10n.recall),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                          child: Text(tL10n.cancel),
-                        ),
-                      ],
-                    );
-                  },
+                  title: Text(tL10n.messageRecall),
+                  content: Text(tL10n.messageRecallConfirmation),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        dataProvider.recallMessage(message: _message);
+                        Navigator.pop(context);
+                      },
+                      child: Text(tL10n.recall),
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: Text(tL10n.cancel),
+                    ),
+                  ],
                 );
               }
             }),
-      if (showReadReceipt)
-        TencentCloudChatMessageGeneralOptionItem(
-            icon: Icons.visibility,
-            label: isAllRead ? tL10n.allMembersRead : tL10n.memberReadCount(readCount ?? 0),
-            onTap: ({Offset? offset}) {
-            }),
+      if (showReadReceipt) TencentCloudChatMessageGeneralOptionItem(icon: Icons.visibility, label: isAllRead ? tL10n.allMembersRead : tL10n.memberReadCount(readCount ?? 0), onTap: ({Offset? offset}) {}),
     ];
 
     final mergedList = [...defaultMenuOptions, ...additionalOptions];

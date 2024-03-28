@@ -531,5 +531,9 @@
   "profile": "Profile",
   "unpin": "Unpin",
   "mentionedMessages": "{count, plural, =1 {1 Message Mentioned Me} other {{count} Messages Mentioned Me}}",
-  "longPressToNavigate": "Press & hold to view"
+  "longPressToNavigate": "Press & hold to view",
+  "permissionDeniedTitle": "Permission Denied",
+  "permissionDeniedContent": "Please go to settings and enable the {permissionString} permission.",
+  "goToSettingsButtonText": "Go to Settings",
+  "originalMessageNotFound": "Original message not found"
 }

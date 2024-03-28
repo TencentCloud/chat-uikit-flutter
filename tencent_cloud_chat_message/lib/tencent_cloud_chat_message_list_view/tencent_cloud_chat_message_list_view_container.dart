@@ -14,22 +14,16 @@ class TencentCloudChatMessageListViewContainer extends StatefulWidget {
   final String? userID;
   final String? groupID;
 
-  const TencentCloudChatMessageListViewContainer(
-      {super.key, this.userID, this.groupID})
-      : assert((userID == null) != (groupID == null));
+  const TencentCloudChatMessageListViewContainer({super.key, this.userID, this.groupID}) : assert((userID == null) != (groupID == null));
 
   @override
-  State<TencentCloudChatMessageListViewContainer> createState() =>
-      _TencentCloudChatMessageListViewContainerState();
+  State<TencentCloudChatMessageListViewContainer> createState() => _TencentCloudChatMessageListViewContainerState();
 }
 
-class _TencentCloudChatMessageListViewContainerState
-    extends TencentCloudChatState<TencentCloudChatMessageListViewContainer> {
+class _TencentCloudChatMessageListViewContainerState extends TencentCloudChatState<TencentCloudChatMessageListViewContainer> {
   List<V2TimMessage> messageList = [];
-  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream =
-      TencentCloudChat.eventBusInstance.on<TencentCloudChatMessageData>();
-  late StreamSubscription<TencentCloudChatMessageData<dynamic>>?
-      _messageDataSubscription;
+  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.eventBusInstance.on<TencentCloudChatMessageData>();
+  late StreamSubscription<TencentCloudChatMessageData<dynamic>>? _messageDataSubscription;
   late TencentCloudChatMessageSeparateDataProvider dataProvider;
 
   /// Message List Status
@@ -43,15 +37,10 @@ class _TencentCloudChatMessageListViewContainerState
 
   // This method handles changes in message data.
   void _messageDataHandler(TencentCloudChatMessageData messageData) {
-    final TencentCloudChatMessageDataKeys messageDataKeys =
-        messageData.currentUpdatedFields;
-    final updateUserID =
-        TencentCloudChatUtils.checkString(messageData.currentOperateUserID);
-    final updateGroupID =
-        TencentCloudChatUtils.checkString(messageData.currentOperateGroupID);
-    final isCurrentConversation =
-        ((updateUserID == widget.userID) && updateUserID != null) ||
-            ((updateGroupID == widget.groupID) && updateGroupID != null);
+    final TencentCloudChatMessageDataKeys messageDataKeys = messageData.currentUpdatedFields;
+    final updateUserID = TencentCloudChatUtils.checkString(messageData.currentOperateUserID);
+    final updateGroupID = TencentCloudChatUtils.checkString(messageData.currentOperateGroupID);
+    final isCurrentConversation = ((updateUserID == widget.userID) && updateUserID != null) || ((updateGroupID == widget.groupID) && updateGroupID != null);
 
     switch (messageDataKeys) {
       case TencentCloudChatMessageDataKeys.messageHighlighted:
@@ -64,8 +53,7 @@ class _TencentCloudChatMessageListViewContainerState
         if (isCurrentConversation) {
           var previousList = messageList;
           var nextList = dataProvider.getMessageListForRender(
-            messageListKey: TencentCloudChatUtils.checkString(widget.groupID) ??
-                widget.userID,
+            messageListKey: TencentCloudChatUtils.checkString(widget.groupID) ?? widget.userID,
           );
           if (!TencentCloudChatUtils.deepEqual(previousList, nextList)) {
             safeSetState(() {
@@ -99,47 +87,39 @@ class _TencentCloudChatMessageListViewContainerState
       Future.delayed(const Duration(milliseconds: 10), () {
         safeSetState(() {
           messageList = dataProvider.getMessageListForRender(
-            messageListKey: TencentCloudChatUtils.checkString(widget.groupID) ??
-                widget.userID,
+            messageListKey: TencentCloudChatUtils.checkString(widget.groupID) ?? widget.userID,
           );
           _haveMoreLatestData = dataProvider.haveMoreLatestData;
           _haveMorePreviousData = dataProvider.haveMorePreviousData;
         });
-        TencentCloudChat.dataInstance.messageData.loadMessageList(
-          groupID: widget.groupID,
-          userID: widget.userID,
-          direction: TencentCloudChatMessageLoadDirection.previous,
-        );
+        TencentCloudChat().dataInstance.messageData.loadMessageList(
+              groupID: widget.groupID,
+              userID: widget.userID,
+              direction: TencentCloudChatMessageLoadDirection.previous,
+            );
       });
     });
   }
 
   @override
-  void didUpdateWidget(
-      covariant TencentCloudChatMessageListViewContainer oldWidget) {
+  void didUpdateWidget(covariant TencentCloudChatMessageListViewContainer oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if ((widget.userID != oldWidget.userID &&
-            !(TencentCloudChatUtils.checkString(widget.userID) == null &&
-                TencentCloudChatUtils.checkString(oldWidget.userID) == null)) ||
-        (widget.groupID != oldWidget.groupID &&
-            !(TencentCloudChatUtils.checkString(widget.groupID) == null &&
-                TencentCloudChatUtils.checkString(oldWidget.groupID) ==
-                    null))) {
+    if ((widget.userID != oldWidget.userID && !(TencentCloudChatUtils.checkString(widget.userID) == null && TencentCloudChatUtils.checkString(oldWidget.userID) == null)) ||
+        (widget.groupID != oldWidget.groupID && !(TencentCloudChatUtils.checkString(widget.groupID) == null && TencentCloudChatUtils.checkString(oldWidget.groupID) == null))) {
       // SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
       Future.delayed(const Duration(milliseconds: 10), () {
         safeSetState(() {
           messageList = dataProvider.getMessageListForRender(
-            messageListKey: TencentCloudChatUtils.checkString(widget.groupID) ??
-                widget.userID,
+            messageListKey: TencentCloudChatUtils.checkString(widget.groupID) ?? widget.userID,
           );
           _haveMoreLatestData = dataProvider.haveMoreLatestData;
           _haveMorePreviousData = dataProvider.haveMorePreviousData;
         });
-        TencentCloudChat.dataInstance.messageData.loadMessageList(
-          groupID: widget.groupID,
-          userID: widget.userID,
-          direction: TencentCloudChatMessageLoadDirection.previous,
-        );
+        TencentCloudChat().dataInstance.messageData.loadMessageList(
+              groupID: widget.groupID,
+              userID: widget.userID,
+              direction: TencentCloudChatMessageLoadDirection.previous,
+            );
         setState(() {});
       });
       // });
@@ -188,13 +168,10 @@ class _TencentCloudChatMessageListViewContainerState
   Future<void> _loadMoreMessage({
     required TencentCloudChatMessageLoadDirection direction,
   }) {
-    final actualMessageList =
-        TencentCloudChat.dataInstance.messageData.getMessageList(
-      key: dataProvider.groupID ?? dataProvider.userID ?? "",
-    );
-    final lastMsgID = direction == TencentCloudChatMessageLoadDirection.previous
-        ? actualMessageList.last.msgID
-        : actualMessageList.first.msgID;
+    final actualMessageList = TencentCloudChat().dataInstance.messageData.getMessageList(
+          key: dataProvider.groupID ?? dataProvider.userID ?? "",
+        );
+    final lastMsgID = direction == TencentCloudChatMessageLoadDirection.previous ? actualMessageList.last.msgID : actualMessageList.first.msgID;
     return dataProvider.loadMessageList(
       groupID: widget.groupID,
       userID: widget.userID,
@@ -219,8 +196,7 @@ class _TencentCloudChatMessageListViewContainerState
       controller: dataProvider.messageController,
       messageList: messageList,
       messagesMentionedMe: _messagesMentionedMe ?? [],
-      highlightMessage: (message) => TencentCloudChat
-          .dataInstance.messageData.messageHighlighted = message,
+      highlightMessage: (message) => TencentCloudChat().dataInstance.messageData.messageHighlighted = message,
       loadToSpecificMessage: dataProvider.loadToSpecificMessage,
       loadMoreMessages: _loadMoreMessage,
       haveMorePreviousData: _haveMorePreviousData,
@@ -234,16 +210,8 @@ class _TencentCloudChatMessageListViewContainerState
       onSelectMessages: (List<V2TimMessage> value) {
         final selectMessages = dataProvider.selectedMessages;
         for (var msg in value) {
-          if (selectMessages.any((element) =>
-              (TencentCloudChatUtils.checkString(msg.msgID) != null &&
-                  element.msgID == msg.msgID) ||
-              (TencentCloudChatUtils.checkString(msg.id) != null &&
-                  element.id == msg.id))) {
-            selectMessages.removeWhere((element) =>
-                (TencentCloudChatUtils.checkString(msg.msgID) != null &&
-                    element.msgID == msg.msgID) ||
-                (TencentCloudChatUtils.checkString(msg.id) != null &&
-                    element.id == msg.id));
+          if (selectMessages.any((element) => (TencentCloudChatUtils.checkString(msg.msgID) != null && element.msgID == msg.msgID) || (TencentCloudChatUtils.checkString(msg.id) != null && element.id == msg.id))) {
+            selectMessages.removeWhere((element) => (TencentCloudChatUtils.checkString(msg.msgID) != null && element.msgID == msg.msgID) || (TencentCloudChatUtils.checkString(msg.id) != null && element.id == msg.id));
           } else {
             selectMessages.add(msg);
           }

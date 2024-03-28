@@ -7,8 +7,7 @@ import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 
 /// Returns a widget for conversation total unread message count
-typedef TencentCloudChatConversationTotalUnreadCountWrapperBuilder = Widget
-    Function(BuildContext context, int totalUnreadCount);
+typedef TencentCloudChatConversationTotalUnreadCountWrapperBuilder = Widget Function(BuildContext context, int totalUnreadCount);
 
 class TencentCloudChatConversationTotalUnreadCount extends StatefulWidget {
   final TencentCloudChatConversationTotalUnreadCountWrapperBuilder builder;
@@ -18,23 +17,16 @@ class TencentCloudChatConversationTotalUnreadCount extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() =>
-      TencentCloudChatConversationTotalUnreadCountState();
+  State<StatefulWidget> createState() => TencentCloudChatConversationTotalUnreadCountState();
 }
 
-class TencentCloudChatConversationTotalUnreadCountState
-    extends TencentCloudChatState<
-        TencentCloudChatConversationTotalUnreadCount> {
-  final Stream<TencentCloudChatConversationData<dynamic>>?
-      _conversationDataStream = TencentCloudChat.eventBusInstance
-          .on<TencentCloudChatConversationData<dynamic>>();
+class TencentCloudChatConversationTotalUnreadCountState extends TencentCloudChatState<TencentCloudChatConversationTotalUnreadCount> {
+  final Stream<TencentCloudChatConversationData<dynamic>>? _conversationDataStream = TencentCloudChat.eventBusInstance.on<TencentCloudChatConversationData<dynamic>>();
 
   /// get conversation total unread count from TencentCloudChatData
-  int totalUnreadCount =
-      TencentCloudChat.dataInstance.conversation.totalUnreadCount;
+  int totalUnreadCount = TencentCloudChat().dataInstance.conversation.totalUnreadCount;
 
-  late StreamSubscription<TencentCloudChatConversationData<dynamic>>?
-      _conversationDataSubscription;
+  late StreamSubscription<TencentCloudChatConversationData<dynamic>>? _conversationDataSubscription;
   final String _tag = "TencentCloudChatConversationTotalUnreadCount";
   console(String log) {
     TencentCloudChat.logInstance.console(
@@ -49,10 +41,8 @@ class TencentCloudChatConversationTotalUnreadCountState
 
   /// if current conversation total unread count updated, update totalUnreadCount
   conversationDataHandler(TencentCloudChatConversationData data) {
-    if (data.currentUpdatedFields ==
-        TencentCloudChatConversationDataKeys.totalUnreadCount) {
-      console(
-          "conversation total unread count change, current is ${data.totalUnreadCount}");
+    if (data.currentUpdatedFields == TencentCloudChatConversationDataKeys.totalUnreadCount) {
+      console("conversation total unread count change, current is ${data.totalUnreadCount}");
       safeSetState(() {
         totalUnreadCount = data.totalUnreadCount;
       });
@@ -60,8 +50,7 @@ class TencentCloudChatConversationTotalUnreadCountState
   }
 
   _addConversationDataListener() {
-    _conversationDataSubscription =
-        _conversationDataStream?.listen(conversationDataHandler);
+    _conversationDataSubscription = _conversationDataStream?.listen(conversationDataHandler);
   }
 
   @override

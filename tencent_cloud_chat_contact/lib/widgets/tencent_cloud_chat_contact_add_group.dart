@@ -83,7 +83,7 @@ class TencentCloudChatContactAddGroupBodyState extends TencentCloudChatState<Ten
   }
 
   Widget beforeSearch() {
-    // String userID = TencentCloudChat.dataInstance.basic.currentUser!.userID ?? "";
+    // String userID = TencentCloudChat().dataInstance.basic.currentUser!.userID ?? "";
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Column(
               children: [
@@ -152,11 +152,7 @@ class TencentCloudChatContactAddGroupBodyState extends TencentCloudChatState<Ten
                             onSearchIDChanged(value);
                           },
                           style: TextStyle(color: colorTheme.contactItemFriendNameColor),
-                          decoration: InputDecoration(
-                              contentPadding: EdgeInsets.symmetric(vertical: getHeight(6), horizontal: getWidth(12)),
-                              border: InputBorder.none,
-                              hintText: tL10n.searchGroupID,
-                              isDense: true),
+                          decoration: InputDecoration(contentPadding: EdgeInsets.symmetric(vertical: getHeight(6), horizontal: getWidth(12)), border: InputBorder.none, hintText: tL10n.searchGroupID, isDense: true),
                           cursorColor: colorTheme.contactSearchCursorColor,
                           cursorRadius: Radius.circular(getSquareSize(2)),
                         ),

@@ -26,7 +26,7 @@ Future<List<V2TimGroupMemberFullInfo>> showGroupMemberSelector({
     ),
     builder: (BuildContext _) {
       return TencentCloudChatGroupMemberSelector(
-        groupMemberList: includeSelf ? groupMemberList : groupMemberList.where((element) => element.userID != (TencentCloudChat.dataInstance.basic.currentUser?.userID ?? "")).toList(),
+        groupMemberList: includeSelf ? groupMemberList : groupMemberList.where((element) => element.userID != (TencentCloudChat().dataInstance.basic.currentUser?.userID ?? "")).toList(),
         maxSelectionAmount: maxSelectionAmount,
         title: title,
         onSelect: (list) => completer.complete(list),
@@ -84,7 +84,7 @@ class _TencentCloudChatGroupMemberSelectorState extends TencentCloudChatState<Te
   }
 
   double _updateHeight() {
-    double keyboardHeight = _focusNode.hasPrimaryFocus ? TencentCloudChat.dataInstance.basic.keyboardHeight ?? getHeight(280) : 0;
+    double keyboardHeight = _focusNode.hasPrimaryFocus ? TencentCloudChat().dataInstance.basic.keyboardHeight ?? getHeight(280) : 0;
 
     double headerHeight = getHeight(160);
     double listItemHeight = getHeight(46);

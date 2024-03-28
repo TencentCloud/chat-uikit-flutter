@@ -17,8 +17,8 @@ dependencies:
   file_picker: ^6.1.1
   pull_to_refresh: ^2.0.0
   flutter_list_view: ^1.1.18
-  tencent_cloud_chat: ^1.1.2
-  tencent_cloud_chat_common: ^1.1.2
+  tencent_cloud_chat: ^1.2.0
+  tencent_cloud_chat_common: ^1.2.0
   http: ^1.1.0
   card_swiper: ^3.0.1
   photo_view: ^0.14.0
@@ -32,15 +32,6 @@ dependencies:
   desktop_drop: ^0.4.4
   dotted_border: ^2.1.0
   package_info_plus: ^5.0.1
-
-dependency_overrides:
-  tencent_cloud_chat:
-    path: ../tencent_cloud_chat
-  tencent_cloud_chat_common:
-    path: ../tencent_cloud_chat_common
-  tencent_cloud_chat_intl:
-    path: ../tencent_cloud_chat_intl
-
 
 dev_dependencies:
   flutter_test:

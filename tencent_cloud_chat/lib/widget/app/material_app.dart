@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat/cache/tencent_cloud_chat_cache_global.dart';
+import 'package:tencent_cloud_chat/data/tencent_cloud_chat_data.dart';
 import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat/data/theme/tencent_cloud_chat_theme.dart';
 import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
@@ -497,13 +498,13 @@ class TencentCloudChatMaterialApp extends StatefulWidget {
 
 class _TencentCloudChatMaterialAppState extends State<TencentCloudChatMaterialApp> {
   // Theme instance for the Chat UIKit
-  TencentCloudChatTheme theme = TencentCloudChat.dataInstance.theme;
+  TencentCloudChatTheme theme = TencentCloudChatData.theme;
 
   // Color theme based on the current brightness mode
-  TencentCloudChatThemeColors colorTheme = TencentCloudChat.dataInstance.theme.colorTheme;
+  TencentCloudChatThemeColors colorTheme = TencentCloudChatData.theme.colorTheme;
 
   // Text styles for the Chat UIKit
-  TencentCloudChatTextStyle textStyle = TencentCloudChat.dataInstance.theme.textStyle;
+  TencentCloudChatTextStyle textStyle = TencentCloudChatData.theme.textStyle;
 
   // Listener for theme data changes
   Stream<TencentCloudChatTheme>? themeDataListener = TencentCloudChat.eventBusInstance.on<TencentCloudChatTheme>();

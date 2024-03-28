@@ -58,13 +58,9 @@ class TencentCloudChatMessageFile extends TencentCloudChatMessageItemBase {
   State<StatefulWidget> createState() => _TencentCloudChatMessageFileState();
 }
 
-class _TencentCloudChatMessageFileState
-    extends TencentCloudChatMessageState<TencentCloudChatMessageFile> {
-  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream =
-      TencentCloudChat.eventBusInstance
-          .on<TencentCloudChatMessageData<dynamic>>();
-  late StreamSubscription<TencentCloudChatMessageData<dynamic>>?
-      __messageDataSubscription;
+class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<TencentCloudChatMessageFile> {
+  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.eventBusInstance.on<TencentCloudChatMessageData<dynamic>>();
+  late StreamSubscription<TencentCloudChatMessageData<dynamic>>? __messageDataSubscription;
 
   final String _tag = "TencentCloudChatMessageFile";
 
@@ -98,29 +94,24 @@ class _TencentCloudChatMessageFileState
       return;
     }
     if (TencentCloudChatUtils.checkString(msgID) != null) {
-      String key = TencentCloudChatUtils.checkString(widget.message.userID) ??
-          widget.message.groupID ??
-          "";
-      int conversationType =
-          TencentCloudChatUtils.checkString(widget.message.userID) == null
-              ? ConversationType.V2TIM_GROUP
-              : ConversationType.V2TIM_C2C;
+      String key = TencentCloudChatUtils.checkString(widget.message.userID) ?? widget.message.groupID ?? "";
+      int conversationType = TencentCloudChatUtils.checkString(widget.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
       if (key.isEmpty) {
         console("add to download queue error. key is empty.");
         return;
       }
-      TencentCloudChat.dataInstance.messageData.addDownloadMessageToQueue(
-        data: DownloadMessageQueueData(
-          conversationType: conversationType,
-          msgID: widget.message.msgID ?? msgID,
-          messageType: MessageElemType.V2TIM_ELEM_TYPE_FILE,
-          imageType: 0,
-          // file message this param is unuse;
-          isSnapshot: false,
-          key: key,
-        ),
-        isClick: isClick,
-      );
+      TencentCloudChat().dataInstance.messageData.addDownloadMessageToQueue(
+            data: DownloadMessageQueueData(
+              conversationType: conversationType,
+              msgID: widget.message.msgID ?? msgID,
+              messageType: MessageElemType.V2TIM_ELEM_TYPE_FILE,
+              imageType: 0,
+              // file message this param is unuse;
+              isSnapshot: false,
+              key: key,
+            ),
+            isClick: isClick,
+          );
     }
   }
 
@@ -133,8 +124,7 @@ class _TencentCloudChatMessageFileState
 
   bool hasSelfClientPath() {
     if (widget.message.fileElem != null) {
-      if (TencentCloudChatUtils.checkString(widget.message.fileElem!.path) !=
-          null) {
+      if (TencentCloudChatUtils.checkString(widget.message.fileElem!.path) != null) {
         return true;
       }
     }
@@ -156,16 +146,14 @@ class _TencentCloudChatMessageFileState
         res = true;
       }
     }
-    if (currentdownload?.path != null &&
-        currentdownload?.downloadFinish == true) {
+    if (currentdownload?.path != null && currentdownload?.downloadFinish == true) {
       res = true;
     }
     return res;
   }
 
   getLocalUrl() {
-    if (TencentCloudChatUtils.checkString(widget.message.fileElem!.localUrl) ==
-        null) {
+    if (TencentCloudChatUtils.checkString(widget.message.fileElem!.localUrl) == null) {
       if (currentdownload != null) {
         return currentdownload?.path;
       }
@@ -185,21 +173,18 @@ class _TencentCloudChatMessageFileState
       bool hasClientPath = hasSelfClientPath();
       if (hasLocal) {
         safeSetState(() {
-          currentRenderSoundInfo = TimFileCurrentRenderInfo(
-              path: getLocalUrl(), type: TimFileCurrentRenderType.local);
+          currentRenderSoundInfo = TimFileCurrentRenderInfo(path: getLocalUrl(), type: TimFileCurrentRenderType.local);
         });
         return;
       }
 
       if (isSending && hasClientPath) {
         safeSetState(() {
-          currentRenderSoundInfo = TimFileCurrentRenderInfo(
-              path: getLocalPath(), type: TimFileCurrentRenderType.path);
+          currentRenderSoundInfo = TimFileCurrentRenderInfo(path: getLocalPath(), type: TimFileCurrentRenderType.path);
         });
         return;
       }
-      V2TimMessageOnlineUrl? data =
-          await TencentCloudChatMessageSDK.getMessageOnlineUrl(msgID: msgID);
+      V2TimMessageOnlineUrl? data = await TencentCloudChatMessageSDK.getMessageOnlineUrl(msgID: msgID);
       if (data == null) {
         safeSetState(() {
           isErrorMessage = true;
@@ -208,9 +193,7 @@ class _TencentCloudChatMessageFileState
         if (data.fileElem != null) {
           if (TencentCloudChatUtils.checkString(data.fileElem!.url) != null) {
             safeSetState(() {
-              currentRenderSoundInfo = TimFileCurrentRenderInfo(
-                  path: data.fileElem!.url!,
-                  type: TimFileCurrentRenderType.online);
+              currentRenderSoundInfo = TimFileCurrentRenderInfo(path: data.fileElem!.url!, type: TimFileCurrentRenderType.online);
             });
           } else {
             safeSetState(() {
@@ -221,8 +204,7 @@ class _TencentCloudChatMessageFileState
           safeSetState(() {
             isErrorMessage = true;
           });
-          console(
-              "get messame online url return. by no file elem  please check.");
+          console("get messame online url return. by no file elem  please check.");
         }
       }
     } else {
@@ -244,8 +226,7 @@ class _TencentCloudChatMessageFileState
     return ext;
   }
 
-  fileIconWidget(TencentCloudChatThemeColors colorTheme,
-      TencentCloudChatTextStyle textStyle) {
+  fileIconWidget(TencentCloudChatThemeColors colorTheme, TencentCloudChatTextStyle textStyle) {
     String ext = getFileExt();
     return TencentCloudChatFileIcon(
       size: getSquareSize(22),
@@ -254,8 +235,7 @@ class _TencentCloudChatMessageFileState
     );
   }
 
-  fileNameWidget(TencentCloudChatThemeColors colorTheme,
-      TencentCloudChatTextStyle textStyle) {
+  fileNameWidget(TencentCloudChatThemeColors colorTheme, TencentCloudChatTextStyle textStyle) {
     var fileName = '';
     if (widget.message.fileElem != null) {
       fileName = widget.message.fileElem!.fileName ?? "";
@@ -296,11 +276,7 @@ class _TencentCloudChatMessageFileState
     );
   }
 
-  Widget renderFileWidget(
-      TencentCloudChatThemeColors colorTheme,
-      TencentCloudChatTextStyle textStyle,
-      bool isErrpr,
-      TimFileCurrentRenderInfo? renderInfo) {
+  Widget renderFileWidget(TencentCloudChatThemeColors colorTheme, TencentCloudChatTextStyle textStyle, bool isErrpr, TimFileCurrentRenderInfo? renderInfo) {
     return GestureDetector(
       onTapDown: onTapDown,
       onTapUp: onTapUp,
@@ -352,8 +328,7 @@ class _TencentCloudChatMessageFileState
 
   open() async {
     if (widget.message.status == 1) {
-      if (TencentCloudChatUtils.checkString(widget.message.fileElem!.path) !=
-          null) {
+      if (TencentCloudChatUtils.checkString(widget.message.fileElem!.path) != null) {
         if (File(widget.message.fileElem!.path!).existsSync()) {
           return await OpenFile.open(widget.message.fileElem!.path!);
         }
@@ -395,12 +370,9 @@ class _TencentCloudChatMessageFileState
   DownloadMessageQueueData? currentdownload;
 
   downloadCallback(TencentCloudChatMessageData data) {
-    if (data.currentUpdatedFields ==
-        TencentCloudChatMessageDataKeys.downloadMessage) {
-      if (data.currentDownloadMessage?.msgID ==
-          (widget.message.msgID ?? msgID)) {
-        console(
-            "downloading finished:${data.currentDownloadMessage?.downloadFinish}");
+    if (data.currentUpdatedFields == TencentCloudChatMessageDataKeys.downloadMessage) {
+      if (data.currentDownloadMessage?.msgID == (widget.message.msgID ?? msgID)) {
+        console("downloading finished:${data.currentDownloadMessage?.downloadFinish}");
         safeSetState(() {
           currentdownload = data.currentDownloadMessage;
         });
@@ -413,20 +385,17 @@ class _TencentCloudChatMessageFileState
   }
 
   bool isDownloading() {
-    return TencentCloudChat.dataInstance.messageData
-        .isDownloading(msgID: widget.message.msgID ?? msgID);
+    return TencentCloudChat().dataInstance.messageData.isDownloading(msgID: widget.message.msgID ?? msgID);
   }
 
   bool isInDownloadQueue() {
-    return TencentCloudChat.dataInstance.messageData
-        .isInDownloadQueue(msgID: widget.message.msgID ?? msgID);
+    return TencentCloudChat().dataInstance.messageData.isInDownloadQueue(msgID: widget.message.msgID ?? msgID);
   }
 
   removeFromDownloadQueue() {
     bool inQueue = isInDownloadQueue();
     if (inQueue == true) {
-      TencentCloudChat.dataInstance.messageData
-          .removeFromDownloadQueue(msgID: widget.message.msgID ?? msgID);
+      TencentCloudChat().dataInstance.messageData.removeFromDownloadQueue(msgID: widget.message.msgID ?? msgID);
       safeSetState(() {
         renderRandom = Random().nextInt(10000);
       });
@@ -467,8 +436,7 @@ class _TencentCloudChatMessageFileState
     return false;
   }
 
-  Widget downloadStatus(TencentCloudChatThemeColors colorTheme,
-      TencentCloudChatTextStyle textStyle) {
+  Widget downloadStatus(TencentCloudChatThemeColors colorTheme, TencentCloudChatTextStyle textStyle) {
     if (isSendingMessage()) {
       return SizedBox(
         height: getHeight(22),
@@ -503,14 +471,7 @@ class _TencentCloudChatMessageFileState
     } else {
       if (isDownloading()) {
         finalRenderDownloadStatusWidget = getDownloadingWidget(
-          progress: currentdownload == null
-              ? 0
-              : (currentdownload!.downloadFinish
-                  ? 1
-                  : (currentdownload!.currentDownloadSize /
-                      (currentdownload!.totalSize == 0
-                          ? 1
-                          : currentdownload!.totalSize))),
+          progress: currentdownload == null ? 0 : (currentdownload!.downloadFinish ? 1 : (currentdownload!.currentDownloadSize / (currentdownload!.totalSize == 0 ? 1 : currentdownload!.totalSize))),
           colorTheme: colorTheme,
           textStyle: textStyle,
         );
@@ -568,18 +529,11 @@ class _TencentCloudChatMessageFileState
     return TencentCloudChatThemeWidget(build: (context, colorTheme, textStyle) {
       String fileSize = getCurrentFileFileSize();
       return Container(
-        padding: EdgeInsets.symmetric(
-            horizontal: getWidth(10), vertical: getHeight(8)),
+        padding: EdgeInsets.symmetric(horizontal: getWidth(10), vertical: getHeight(8)),
         decoration: BoxDecoration(
-          color: showHighlightStatus
-              ? colorTheme.info
-              : (sentFromSelf
-                  ? colorTheme.selfMessageBubbleColor
-                  : colorTheme.othersMessageBubbleColor),
+          color: showHighlightStatus ? colorTheme.info : (sentFromSelf ? colorTheme.selfMessageBubbleColor : colorTheme.othersMessageBubbleColor),
           border: Border.all(
-            color: sentFromSelf
-                ? colorTheme.selfMessageBubbleBorderColor
-                : colorTheme.othersMessageBubbleBorderColor,
+            color: sentFromSelf ? colorTheme.selfMessageBubbleBorderColor : colorTheme.othersMessageBubbleBorderColor,
           ),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(getSquareSize(16)),
@@ -595,8 +549,7 @@ class _TencentCloudChatMessageFileState
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
-                  child: renderFileWidget(colorTheme, textStyle, isErrorMessage,
-                      currentRenderSoundInfo),
+                  child: renderFileWidget(colorTheme, textStyle, isErrorMessage, currentRenderSoundInfo),
                 )
               ],
             ),
@@ -604,9 +557,7 @@ class _TencentCloudChatMessageFileState
               height: getHeight(8),
             ),
             Row(
-              mainAxisAlignment: sentFromSelf
-                  ? MainAxisAlignment.end
-                  : MainAxisAlignment.start,
+              mainAxisAlignment: sentFromSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
               children: [
                 Expanded(
                   child: Row(
@@ -639,25 +590,17 @@ class _TencentCloudChatMessageFileState
       return ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 250),
         child: Container(
-          padding: EdgeInsets.symmetric(
-              horizontal: getWidth(10), vertical: getHeight(8)),
+          padding: EdgeInsets.symmetric(horizontal: getWidth(10), vertical: getHeight(8)),
           decoration: BoxDecoration(
-            color: showHighlightStatus
-                ? colorTheme.info
-                : (sentFromSelf
-                    ? colorTheme.selfMessageBubbleColor
-                    : colorTheme.othersMessageBubbleColor),
+            color: showHighlightStatus ? colorTheme.info : (sentFromSelf ? colorTheme.selfMessageBubbleColor : colorTheme.othersMessageBubbleColor),
             border: Border.all(
-              color: sentFromSelf
-                  ? colorTheme.selfMessageBubbleBorderColor
-                  : colorTheme.othersMessageBubbleBorderColor,
+              color: sentFromSelf ? colorTheme.selfMessageBubbleBorderColor : colorTheme.othersMessageBubbleBorderColor,
             ),
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(getSquareSize(16)),
               topRight: Radius.circular(getSquareSize(16)),
               bottomLeft: Radius.circular(getSquareSize(sentFromSelf ? 16 : 0)),
-              bottomRight:
-                  Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
+              bottomRight: Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
             ),
           ),
           child: Column(
@@ -667,8 +610,7 @@ class _TencentCloudChatMessageFileState
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Expanded(
-                    child: renderFileWidget(colorTheme, textStyle,
-                        isErrorMessage, currentRenderSoundInfo),
+                    child: renderFileWidget(colorTheme, textStyle, isErrorMessage, currentRenderSoundInfo),
                   )
                 ],
               ),
@@ -676,9 +618,7 @@ class _TencentCloudChatMessageFileState
                 height: getHeight(8),
               ),
               Row(
-                mainAxisAlignment: sentFromSelf
-                    ? MainAxisAlignment.end
-                    : MainAxisAlignment.start,
+                mainAxisAlignment: sentFromSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
                 children: [
                   Expanded(
                     child: Row(

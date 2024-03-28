@@ -1,37 +1,32 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:tencent_cloud_chat/data/tencent_cloud_chat_data.dart';
 import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat/data/theme/tencent_cloud_chat_theme.dart';
 import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 
 class TencentCloudChatThemeWidget extends StatefulWidget {
-  final Widget Function(BuildContext, TencentCloudChatThemeColors colorTheme,
-      TencentCloudChatTextStyle textStyle) build;
+  final Widget Function(BuildContext, TencentCloudChatThemeColors colorTheme, TencentCloudChatTextStyle textStyle) build;
 
   const TencentCloudChatThemeWidget({super.key, required this.build});
 
   @override
-  State<TencentCloudChatThemeWidget> createState() =>
-      _TencentCloudChatThemeWidgetState();
+  State<TencentCloudChatThemeWidget> createState() => _TencentCloudChatThemeWidgetState();
 }
 
-class _TencentCloudChatThemeWidgetState
-    extends State<TencentCloudChatThemeWidget> {
+class _TencentCloudChatThemeWidgetState extends State<TencentCloudChatThemeWidget> {
   // Theme instance for the Chat UIKit
 
   // Color theme based on the current brightness mode
-  TencentCloudChatThemeColors _colorTheme =
-      TencentCloudChat.dataInstance.theme.colorTheme;
+  TencentCloudChatThemeColors _colorTheme = TencentCloudChatData.theme.colorTheme;
 
   // Text styles for the Chat UIKit
-  TencentCloudChatTextStyle _textStyle =
-      TencentCloudChat.dataInstance.theme.textStyle;
+  TencentCloudChatTextStyle _textStyle = TencentCloudChatData.theme.textStyle;
 
   // Listener for theme data changes
-  final Stream<TencentCloudChatTheme>? _themeDataStream =
-      TencentCloudChat.eventBusInstance.on<TencentCloudChatTheme>();
+  final Stream<TencentCloudChatTheme>? _themeDataStream = TencentCloudChat.eventBusInstance.on<TencentCloudChatTheme>();
 
   late StreamSubscription<TencentCloudChatTheme>? _themeDataSubscription;
 

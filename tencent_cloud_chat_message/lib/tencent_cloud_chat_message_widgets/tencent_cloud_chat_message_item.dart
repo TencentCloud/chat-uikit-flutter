@@ -55,9 +55,7 @@ abstract class TencentCloudChatMessageItemBase extends StatefulWidget {
 
 // This is the state class for TencentCloudChatMessageWidget.
 // It manages the message highlighting animation and listens for changes in message data.
-abstract class TencentCloudChatMessageState<
-        T extends TencentCloudChatMessageItemBase>
-    extends TencentCloudChatState<T> {
+abstract class TencentCloudChatMessageState<T extends TencentCloudChatMessageItemBase> extends TencentCloudChatState<T> {
   // The unique ID of the message.
   String msgID = "";
 
@@ -115,12 +113,10 @@ abstract class TencentCloudChatMessageState<
   }
 
   Widget messageStatusIndicator() {
-    final showMessageStatusIndicator = TencentCloudChat
-        .dataInstance.basic.messageConfig
-        .showMessageStatusIndicator(
-      userID: widget.userID,
-      groupID: widget.groupID,
-    );
+    final showMessageStatusIndicator = TencentCloudChat().dataInstance.basic.messageConfig.showMessageStatusIndicator(
+          userID: widget.userID,
+          groupID: widget.groupID,
+        );
 
     return showMessageStatusIndicator
         ? TencentCloudChatThemeWidget(
@@ -138,8 +134,7 @@ abstract class TencentCloudChatMessageState<
                   iconData = Icons.done;
                   iconColor = colorTheme.secondaryTextColor;
                 case MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC:
-                  iconData =
-                      showReadByOthersStatus ? Icons.done_all : Icons.done;
+                  iconData = showReadByOthersStatus ? Icons.done_all : Icons.done;
                   break;
                 case MessageStatus.V2TIM_MSG_STATUS_HAS_DELETED:
                 case MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED:
@@ -165,17 +160,14 @@ abstract class TencentCloudChatMessageState<
     double? fontSize,
     List<Shadow>? shadow,
   }) {
-    final showMessageTimeIndicator = TencentCloudChat
-        .dataInstance.basic.messageConfig
-        .showMessageTimeIndicator(
-      userID: widget.userID,
-      groupID: widget.groupID,
-    );
+    final showMessageTimeIndicator = TencentCloudChat().dataInstance.basic.messageConfig.showMessageTimeIndicator(
+          userID: widget.userID,
+          groupID: widget.groupID,
+        );
     return showMessageTimeIndicator
         ? TencentCloudChatThemeWidget(
             build: (context, colorTheme, textStyle) => Text(
-              TencentCloudChatIntl.formatTimestampToTime(
-                  widget.message.timestamp ?? 0),
+              TencentCloudChatIntl.formatTimestampToTime(widget.message.timestamp ?? 0),
               style: TextStyle(
                 color: textColor ?? colorTheme.secondaryTextColor,
                 fontSize: fontSize ?? textStyle.standardSmallText,
@@ -192,12 +184,8 @@ abstract class TencentCloudChatMessageState<
     super.initState();
     msgID = widget.message.msgID ?? "";
     sentFromSelf = widget.message.isSelf ?? false;
-    isGroupMessage =
-        TencentCloudChatUtils.checkString(widget.message.groupID) != null;
-    showReadByOthersStatus = isGroupMessage
-        ? (widget.messageReceipt != null &&
-            (widget.messageReceipt!.readCount ?? 0) > 0)
-        : (widget.message.isPeerRead ?? false);
+    isGroupMessage = TencentCloudChatUtils.checkString(widget.message.groupID) != null;
+    showReadByOthersStatus = isGroupMessage ? (widget.messageReceipt != null && (widget.messageReceipt!.readCount ?? 0) > 0) : (widget.message.isPeerRead ?? false);
 
     // Start the message highlighting animation if the message should be highlighted.
     if (widget.shouldBeHighlighted) {
@@ -216,11 +204,7 @@ abstract class TencentCloudChatMessageState<
     }
 
     sentFromSelf = widget.message.isSelf ?? false;
-    isGroupMessage =
-        TencentCloudChatUtils.checkString(widget.message.groupID) != null;
-    showReadByOthersStatus = isGroupMessage
-        ? (widget.messageReceipt != null &&
-            (widget.messageReceipt!.readCount ?? 0) > 0)
-        : (widget.message.isPeerRead ?? false);
+    isGroupMessage = TencentCloudChatUtils.checkString(widget.message.groupID) != null;
+    showReadByOthersStatus = isGroupMessage ? (widget.messageReceipt != null && (widget.messageReceipt!.readCount ?? 0) > 0) : (widget.message.isPeerRead ?? false);
   }
 }

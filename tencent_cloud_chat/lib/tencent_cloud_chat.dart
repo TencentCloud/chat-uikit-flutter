@@ -150,16 +150,28 @@ export "package:tencent_cloud_chat_sdk/models/v2_tim_video_elem.dart";
 export 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
 
 class TencentCloudChat {
-  static void reset() {
+  static final TencentCloudChat _instance = TencentCloudChat._internal();
+
+  factory TencentCloudChat() {
+    return _instance;
+  }
+
+  TencentCloudChat._internal();
+
+  TencentCloudChatData _dataInstance = TencentCloudChatData();
+
+  TencentCloudChatData get dataInstance => _dataInstance;
+
+  TencentCloudChatCallbacks? callbacks;
+
+  void reset() {
     _dataInstance = TencentCloudChatData();
+    callbacks = null;
   }
 
   static TencentCloudChatLog get logInstance => TencentCloudChatLog();
 
   static TencentCloudChatEventBus get eventBusInstance => TencentCloudChatEventBus();
-
-  static TencentCloudChatData _dataInstance = TencentCloudChatData();
-  static TencentCloudChatData get dataInstance => _dataInstance;
 
   static TencentCloudChatSDK get chatSDKInstance => TencentCloudChatSDK();
 

@@ -20,45 +20,42 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
   TencentCloudChatConversationData(super.currentUpdatedFields);
 
   /// === Conversation Config ===
-  static TencentCloudChatConversationConfig? _conversationConfig;
+  TencentCloudChatConversationConfig? _conversationConfig;
 
-  TencentCloudChatConversationConfig? get conversationConfig =>
-      _conversationConfig;
+  TencentCloudChatConversationConfig? get conversationConfig => _conversationConfig;
 
   set conversationConfig(TencentCloudChatConversationConfig? value) {
     _conversationConfig = value;
-    notifyListener(
-        TencentCloudChatConversationDataKeys.conversationConfig as T);
+    notifyListener(TencentCloudChatConversationDataKeys.conversationConfig as T);
   }
 
   /// === Current Conversation ===
-  static V2TimConversation? _currentConversation;
+  V2TimConversation? _currentConversation;
 
   V2TimConversation? get currentConversation => _currentConversation;
 
   set currentConversation(V2TimConversation? value) {
     _currentConversation = value;
-    notifyListener(
-        TencentCloudChatConversationDataKeys.currentConversation as T);
+    notifyListener(TencentCloudChatConversationDataKeys.currentConversation as T);
   }
 
-  /// === conversation list ===
-  static List<V2TimConversation> _conversationList = [];
+  /// === Conversation list ===
+  List<V2TimConversation> _conversationList = [];
 
-  /// === current conversation list sequence when getting conversation list ===
-  static String currentGetConversationListSeq = "0";
+  /// === Current conversation list sequence when getting conversation list ===
+  String currentGetConversationListSeq = "0";
 
-  /// === conversation count when getting conversation list ===
-  static int getConversationListCount = 20;
+  /// === Conversation count when getting conversation list ===
+  int getConversationListCount = 20;
 
-  /// === value to check if the conversation list is finished when getting conversation list ==
-  static bool isGetConversationFinished = false;
+  /// === Value to check if the conversation list is finished when getting conversation list ==
+  bool isGetConversationFinished = false;
 
-  /// === convesation total unread count ==
-  static int _totalUnreadCount = 0;
+  /// === Conversation total unread count ==
+  int _totalUnreadCount = 0;
 
-  /// === value that all data is got ===
-  static bool _isGetDataEnd = false;
+  /// === Value that all data is got ===
+  bool _isGetDataEnd = false;
 
   setTotalUnreadCount(int count) {
     _totalUnreadCount = count;
@@ -82,8 +79,7 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
 
   void buildConversationList(List<V2TimConversation> convList, String action) {
     for (var element in convList) {
-      var index = _conversationList
-          .indexWhere((ele) => element.conversationID == ele.conversationID);
+      var index = _conversationList.indexWhere((ele) => element.conversationID == ele.conversationID);
       if (index > -1) {
         _conversationList[index] = element;
       } else {
@@ -98,9 +94,7 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
         return bR.compareTo(aR);
       },
     );
-    console(
-        logs:
-            "$action buildConversationList ${convList.length} conv changed. total conv length is ${_conversationList.length}");
+    console(logs: "$action buildConversationList ${convList.length} conv changed. total conv length is ${_conversationList.length}");
     TencentCloudChat.cache.cacheConversationList(_conversationList);
     notifyListener(TencentCloudChatConversationDataKeys.conversationList as T);
   }
@@ -108,11 +102,8 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
   void removeConversation(List<String> convIds) {
     for (var i = 0; i < convIds.length; i++) {
       String convID = convIds[i];
-      _conversationList
-          .removeWhere((element) => element.conversationID == convID);
-      console(
-          logs:
-              "removeConversation $convID conv changed. total conv length is ${_conversationList.length}");
+      _conversationList.removeWhere((element) => element.conversationID == convID);
+      console(logs: "removeConversation $convID conv changed. total conv length is ${_conversationList.length}");
     }
     notifyListener(TencentCloudChatConversationDataKeys.conversationList as T);
   }

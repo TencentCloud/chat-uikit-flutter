@@ -2257,6 +2257,30 @@ abstract class TencentCloudChatLocalizations {
   /// In en, this message translates to:
   /// **'Press & hold to view'**
   String get longPressToNavigate;
+
+  /// No description provided for @permissionDeniedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission Denied'**
+  String get permissionDeniedTitle;
+
+  /// No description provided for @permissionDeniedContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Please go to settings and enable the {permissionString} permission.'**
+  String permissionDeniedContent(Object permissionString);
+
+  /// No description provided for @goToSettingsButtonText.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Settings'**
+  String get goToSettingsButtonText;
+
+  /// No description provided for @originalMessageNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Original message not found'**
+  String get originalMessageNotFound;
 }
 
 class _TencentCloudChatLocalizationsDelegate extends LocalizationsDelegate<TencentCloudChatLocalizations> {

@@ -12,10 +12,10 @@ dependencies:
   flutter:
     sdk: flutter
   path_provider: ^2.1.1
-  tencent_cloud_uikit_core: ^1.5.2
-  tencent_cloud_chat_intl: ^1.1.2
+  tencent_cloud_uikit_core: ^1.5.3
+  tencent_cloud_chat_intl: ^1.2.0
   flutter_screenutil: ^5.9.0
-  tencent_cloud_chat_sdk: ^7.7.5317
+  tencent_cloud_chat_sdk: ^7.8.5506
   hive: ^2.2.3
   collection: ^1.17.2
   exif: ^3.3.0

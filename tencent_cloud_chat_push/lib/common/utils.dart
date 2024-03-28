@@ -31,7 +31,7 @@ class TencentCloudChatPushUtils {
   static ({String? userID, String? groupID}) parseExtInfo(String ext) {
     String? userID;
     String? groupID;
-
+    // ext = "{\"ext\":{\"entity\":{\"version\":1,\"action\":1,\"chatType\":1,\"sender\":\"@im_agent#online_shopping_mall\",\"nickname\":\"线上商城 Demo\"}}}";
     try {
       Map<String, dynamic> extJson = json.decode(ext);
       String? conversationID = extJson["conversationID"] as String?;

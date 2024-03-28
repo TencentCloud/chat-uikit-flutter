@@ -17,15 +17,13 @@ class ZoomPageRoute<T> extends PageRouteBuilder<T> {
   ZoomPageRoute({
     required this.builder,
   }) : super(
-          pageBuilder: (context, animation, secondaryAnimation) =>
-              builder(context),
+          pageBuilder: (context, animation, secondaryAnimation) => builder(context),
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             var begin = 0.0;
             var end = 1.0;
             var curve = Curves.ease;
 
-            var tween =
-                Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+            var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
             return ScaleTransition(
               scale: animation.drive(tween),
@@ -53,8 +51,7 @@ class TencentCloudChatMessageViewer extends StatefulWidget {
   State<StatefulWidget> createState() => TencentCloudChatMessageViewerState();
 }
 
-class TencentCloudChatMessageViewerState
-    extends State<TencentCloudChatMessageViewer> {
+class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageViewer> {
   final String _tag = "TencentCloudChatMessageViewer";
   List<V2TimMessage> messages = [];
   bool isLoading = true;
@@ -104,8 +101,7 @@ class TencentCloudChatMessageViewerState
       isLoading = false;
       if (msgs.isNotEmpty) {
         messages = msgs;
-        int currentIndex = msgs.indexWhere(
-            (element) => element.msgID == (widget.message.msgID ?? ""));
+        int currentIndex = msgs.indexWhere((element) => element.msgID == (widget.message.msgID ?? ""));
         if (currentIndex > -1) {
           index = currentIndex;
         }
@@ -149,9 +145,7 @@ class TencentCloudChatMessageViewerState
 
   getImageOnlineStumbUrl(V2TimImageElem imageElem) {
     List<V2TimImage?> imageList = imageElem.imageList ?? [];
-    return imageList
-        .firstWhere((element) => element?.type == TimImageType.thumb.index)
-        ?.url;
+    return imageList.firstWhere((element) => element?.type == TimImageType.thumb.index)?.url;
   }
 
   console(String log) {
@@ -178,18 +172,18 @@ class TencentCloudChatMessageViewerState
     }
     int type = TimImageType.origin.index;
 
-    TencentCloudChat.dataInstance.messageData.addDownloadMessageToQueue(
-      data: DownloadMessageQueueData(
-        conversationType: conversationType,
-        msgID: widget.message.msgID ?? "",
-        messageType: MessageElemType.V2TIM_ELEM_TYPE_IMAGE,
-        imageType: type,
-        // download origin image
-        isSnapshot: false,
-        key: key,
-      ),
-      isClick: isClick,
-    );
+    TencentCloudChat().dataInstance.messageData.addDownloadMessageToQueue(
+          data: DownloadMessageQueueData(
+            conversationType: conversationType,
+            msgID: widget.message.msgID ?? "",
+            messageType: MessageElemType.V2TIM_ELEM_TYPE_IMAGE,
+            imageType: type,
+            // download origin image
+            isSnapshot: false,
+            key: key,
+          ),
+          isClick: isClick,
+        );
   }
 
   bool hasOriginLocalUrl() {
@@ -201,9 +195,7 @@ class TencentCloudChatMessageViewerState
     if (message.elemType == MessageElemType.V2TIM_ELEM_TYPE_IMAGE) {
       if (message.imageElem != null) {
         var imageList = message.imageElem!.imageList ?? [];
-        var image = imageList.firstWhere(
-            (element) => element?.type == TimImageType.origin.index,
-            orElse: () => null);
+        var image = imageList.firstWhere((element) => element?.type == TimImageType.origin.index, orElse: () => null);
         if (image != null) {
           if (TencentCloudChatUtils.checkString(image.localUrl) != null) {
             res = true;
@@ -213,9 +205,7 @@ class TencentCloudChatMessageViewerState
     }
     if (message.elemType == MessageElemType.V2TIM_ELEM_TYPE_VIDEO) {
       if (message.videoElem != null) {
-        if (TencentCloudChatUtils.checkString(
-                message.videoElem!.localVideoUrl) !=
-            null) {
+        if (TencentCloudChatUtils.checkString(message.videoElem!.localVideoUrl) != null) {
           res = true;
         }
       }
@@ -241,8 +231,7 @@ class TencentCloudChatMessageViewerState
     }
     var message = messages[index];
 
-    return TencentCloudChat.dataInstance.messageData
-        .isDownloading(msgID: message.msgID);
+    return TencentCloudChat().dataInstance.messageData.isDownloading(msgID: message.msgID);
   }
 
   @override
@@ -271,8 +260,7 @@ class TencentCloudChatMessageViewerState
                           controller: controller,
                           itemBuilder: (BuildContext context, int index) {
                             V2TimMessage message = messages[index];
-                            if (message.elemType ==
-                                MessageElemType.V2TIM_ELEM_TYPE_IMAGE) {
+                            if (message.elemType == MessageElemType.V2TIM_ELEM_TYPE_IMAGE) {
                               if (message.imageElem != null) {
                                 if (widget.isSending) {
                                   var lp = message.imageElem!.path ?? "";
@@ -284,10 +272,8 @@ class TencentCloudChatMessageViewerState
                                     );
                                   }
                                 }
-                                var (_, local) =
-                                    getImageLocalurl(message.imageElem!);
-                                var thumbUrl =
-                                    getImageOnlineStumbUrl(message.imageElem!);
+                                var (_, local) = getImageLocalurl(message.imageElem!);
+                                var thumbUrl = getImageOnlineStumbUrl(message.imageElem!);
                                 if (local.isNotEmpty) {
                                   return PhotoView(
                                     imageProvider: Image.file(
@@ -296,9 +282,7 @@ class TencentCloudChatMessageViewerState
                                   );
                                 }
 
-                                if (TencentCloudChatUtils.checkString(
-                                        thumbUrl) !=
-                                    null) {
+                                if (TencentCloudChatUtils.checkString(thumbUrl) != null) {
                                   return PhotoView(
                                     imageProvider: Image.network(
                                       thumbUrl,
@@ -306,8 +290,7 @@ class TencentCloudChatMessageViewerState
                                   );
                                 }
                               }
-                            } else if (message.elemType ==
-                                MessageElemType.V2TIM_ELEM_TYPE_VIDEO) {
+                            } else if (message.elemType == MessageElemType.V2TIM_ELEM_TYPE_VIDEO) {
                               return TencentCloudChatMessageVideoPlayer(
                                 message: message,
                                 controller: true,
@@ -336,18 +319,17 @@ class TencentCloudChatMessageViewerState
                           },
                         ),
                       ),
-                      if (!haslocalurl && !videomessage)
-                        Positioned(
-                          bottom: 0,
-                          left: 0,
-                          child: TextButton(
-                              onPressed: () {
-                                addDownloadMessageToQueue(isClick: true);
-                              },
-                              child: Text(isdownloading
-                                  ? tL10n.downloading
-                                  : tL10n.viewFullImage)),
-                        ),
+                      // if (!haslocalurl && !videomessage)
+                      //   Positioned(
+                      //     bottom: 0,
+                      //     left: 0,
+                      //     child: TextButton(
+                      //       onPressed: () {
+                      //         addDownloadMessageToQueue(isClick: true);
+                      //       },
+                      //       child: Text(isdownloading ? tL10n.downloading : tL10n.viewFullImage),
+                      //     ),
+                      //   ),
                     ],
                   ),
           ),

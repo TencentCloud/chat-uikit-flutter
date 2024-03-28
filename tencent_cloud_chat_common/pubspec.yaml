@@ -12,14 +12,16 @@ dependencies:
   flutter:
     sdk: flutter
   cached_network_image: ^3.2.3
-  tencent_cloud_chat: ^1.1.2
-  tencent_cloud_chat_intl: ^1.1.2
+  tencent_cloud_chat: ^1.2.0
+  tencent_cloud_chat_intl: ^1.2.0
   pull_to_refresh_flutter3: ^2.0.2
   shimmer: ^3.0.0
   extended_image: ^8.1.1
   chewie_for_us: ^1.5.0
   video_player: ^2.8.1
   flutter_svg: ^2.0.10+1
+  permission_handler: ^11.3.0
+  device_info_plus: ^9.1.2
 
 dev_dependencies:
   flutter_test:

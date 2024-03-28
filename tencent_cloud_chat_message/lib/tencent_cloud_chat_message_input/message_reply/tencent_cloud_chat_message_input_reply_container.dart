@@ -8,15 +8,12 @@ import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_builders.d
 class TencentCloudChatMessageInputReplyContainer extends StatefulWidget {
   final V2TimMessage? repliedMessage;
 
-  const TencentCloudChatMessageInputReplyContainer(
-      {super.key, this.repliedMessage});
+  const TencentCloudChatMessageInputReplyContainer({super.key, this.repliedMessage});
   @override
-  State<TencentCloudChatMessageInputReplyContainer> createState() =>
-      _TencentCloudChatMessageInputReplyContainerState();
+  State<TencentCloudChatMessageInputReplyContainer> createState() => _TencentCloudChatMessageInputReplyContainerState();
 }
 
-class _TencentCloudChatMessageInputReplyContainerState
-    extends TencentCloudChatState<TencentCloudChatMessageInputReplyContainer> {
+class _TencentCloudChatMessageInputReplyContainerState extends TencentCloudChatState<TencentCloudChatMessageInputReplyContainer> {
   late TencentCloudChatMessageSeparateDataProvider dataProvider;
 
   @override
@@ -30,8 +27,7 @@ class _TencentCloudChatMessageInputReplyContainerState
     return TencentCloudChatMessageBuilders.getMessageInputReplyBuilder(
       repliedMessage: widget.repliedMessage,
       onCancel: () => dataProvider.repliedMessage = null,
-      onClickReply: () => TencentCloudChat
-          .dataInstance.messageData.messageHighlighted = widget.repliedMessage,
+      onClickReply: () => TencentCloudChat().dataInstance.messageData.messageHighlighted = widget.repliedMessage,
     );
   }
 }

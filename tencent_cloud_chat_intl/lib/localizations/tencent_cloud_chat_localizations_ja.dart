@@ -1,5 +1,5 @@
-// Copyright (c) 1998-2024 Tencent, Inc. All rights reserved.
-// Use of this source code is governed by a MIT license that can be
+// Copyright (c) 1998-2024 Tencent, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
 import 'package:intl/intl.dart' as intl;
@@ -1223,4 +1223,18 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
 
   @override
   String get longPressToNavigate => '押し続けて表示';
+
+  @override
+  String get permissionDeniedTitle => 'アクセス権限が拒否されました';
+
+  @override
+  String permissionDeniedContent(Object permissionString) {
+    return '設定に移動して $permissionString 権限を有効にしてください。';
+  }
+
+  @override
+  String get goToSettingsButtonText => '設定へ';
+
+  @override
+  String get originalMessageNotFound => '元のメッセージが見つかりません';
 }

@@ -124,62 +124,68 @@ class _TencentCloudChatMessageReplyViewState
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => Container(
         margin: const EdgeInsets.only(top: 4),
-        padding: const EdgeInsets.all(8.0),
-        decoration: BoxDecoration(
-          color: colorTheme.messageTipsBackgroundColor,
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(right: 4.0),
-              child: Icon(
-                Icons.reply,
-                color: colorTheme.secondaryTextColor,
-                size: textStyle.standardLargeText,
-              ),
+        child: InkWell(
+          onTap: widget.onTriggerNavigation,
+          child:
+          Container(
+            padding: const EdgeInsets.all(8.0),
+            decoration: BoxDecoration(
+              color: colorTheme.messageTipsBackgroundColor,
+              borderRadius: BorderRadius.circular(8.0),
             ),
-            Column(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (showMessageDetail)
-                  ConstrainedBox(
-                      constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.4),
-                      child: Text(
-                        widget.messageSender!,
+                Padding(
+                  padding: const EdgeInsets.only(right: 4.0),
+                  child: Icon(
+                    Icons.reply,
+                    color: colorTheme.secondaryTextColor,
+                    size: textStyle.standardLargeText,
+                  ),
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (showMessageDetail)
+                      ConstrainedBox(
+                          constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context).size.width * 0.4),
+                          child: Text(
+                            widget.messageSender!,
+                            style: TextStyle(
+                              color: colorTheme.secondaryTextColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: textStyle.standardSmallText,
+                            ),
+                          )),
+                    if (showMessageDetail)
+                      ConstrainedBox(
+                          constraints: BoxConstraints(
+                              maxWidth: MediaQuery.of(context).size.width * 0.4),
+                          child: Text(
+                            widget.messageAbstract!,
+                            maxLines: 5,
+                            style: TextStyle(
+                              overflow: TextOverflow.ellipsis,
+                              color: colorTheme.secondaryTextColor,
+                              fontSize: textStyle.standardSmallText,
+                            ),
+                          )),
+                    if (!showMessageDetail)
+                      Text(
+                        "Reply to a message",
                         style: TextStyle(
                           color: colorTheme.secondaryTextColor,
                           fontWeight: FontWeight.bold,
                           fontSize: textStyle.standardSmallText,
                         ),
-                      )),
-                if (showMessageDetail)
-                  ConstrainedBox(
-                      constraints: BoxConstraints(
-                          maxWidth: MediaQuery.of(context).size.width * 0.4),
-                      child: Text(
-                        widget.messageAbstract!,
-                        maxLines: 5,
-                        style: TextStyle(
-                          overflow: TextOverflow.ellipsis,
-                          color: colorTheme.secondaryTextColor,
-                          fontSize: textStyle.standardSmallText,
-                        ),
-                      )),
-                if (!showMessageDetail)
-                  Text(
-                    "Reply to a message",
-                    style: TextStyle(
-                      color: colorTheme.secondaryTextColor,
-                      fontWeight: FontWeight.bold,
-                      fontSize: textStyle.standardSmallText,
-                    ),
-                  )
+                      )
+                  ],
+                ),
               ],
             ),
-          ],
+          ),
         ),
       ),
     );

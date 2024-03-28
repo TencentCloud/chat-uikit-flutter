@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_message_sdk.dart';
 import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
 import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
@@ -14,7 +15,6 @@ import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.d
 import 'package:tencent_cloud_chat_common/widgets/cacheImage/tencent_cloud_chat_cache_image.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_viewer/tencent_cloud_chat_message_viewer.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/tencent_cloud_chat_message_item.dart';
-import 'package:http/http.dart' as http;
 
 enum TimVideoCurrentRenderType {
   online,
@@ -68,13 +68,9 @@ class TencentCloudChatMessageVideo extends TencentCloudChatMessageItemBase {
   State<StatefulWidget> createState() => _TencentCloudChatMessageVideoState();
 }
 
-class _TencentCloudChatMessageVideoState
-    extends TencentCloudChatMessageState<TencentCloudChatMessageVideo> {
-  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream =
-      TencentCloudChat.eventBusInstance
-          .on<TencentCloudChatMessageData<dynamic>>();
-  late StreamSubscription<TencentCloudChatMessageData<dynamic>>?
-      __messageDataSubscription;
+class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<TencentCloudChatMessageVideo> {
+  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.eventBusInstance.on<TencentCloudChatMessageData<dynamic>>();
+  late StreamSubscription<TencentCloudChatMessageData<dynamic>>? __messageDataSubscription;
 
   final String _tag = "TencentCloudChatMessageVideo";
 
@@ -106,8 +102,7 @@ class _TencentCloudChatMessageVideoState
   void didUpdateWidget(covariant TencentCloudChatMessageVideo oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.sendingMessageData != null) {
-      if (setLocalDelayData != null &&
-          widget.sendingMessageData!.isSendComplete) {
+      if (setLocalDelayData != null && widget.sendingMessageData!.isSendComplete) {
         Future.delayed(const Duration(seconds: 1), () {
           setLocalCustomData(
             messageid: widget.sendingMessageData!.sdkID,
@@ -126,8 +121,7 @@ class _TencentCloudChatMessageVideoState
     double h = 266;
     double w = 200;
     bool isRotate = false;
-    if (TencentCloudChatUtils.checkString(widget.message.localCustomData) !=
-        null) {
+    if (TencentCloudChatUtils.checkString(widget.message.localCustomData) != null) {
       String local = widget.message.localCustomData!;
       try {
         console("local url $local");
@@ -199,13 +193,8 @@ class _TencentCloudChatMessageVideoState
       console("message has both thumb and play url. download break .");
       return;
     }
-    String key = TencentCloudChatUtils.checkString(widget.message.userID) ??
-        widget.message.groupID ??
-        "";
-    int conversationType =
-        TencentCloudChatUtils.checkString(widget.message.userID) == null
-            ? ConversationType.V2TIM_GROUP
-            : ConversationType.V2TIM_C2C;
+    String key = TencentCloudChatUtils.checkString(widget.message.userID) ?? widget.message.groupID ?? "";
+    int conversationType = TencentCloudChatUtils.checkString(widget.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
     if (key.isEmpty) {
       console("add to download queue error. key is empty.");
       return;
@@ -217,18 +206,18 @@ class _TencentCloudChatMessageVideoState
 
     if (!hasLocalSnapShot()) {
       // no snapshot download
-      TencentCloudChat.dataInstance.messageData.addDownloadMessageToQueue(
-        data: DownloadMessageQueueData(
-          conversationType: conversationType,
-          msgID: widget.message.msgID ?? msgID,
-          messageType: MessageElemType.V2TIM_ELEM_TYPE_VIDEO,
-          imageType: 0,
-          // video message this param is unuse;
-          isSnapshot: isSnapshot,
-          key: key,
-        ),
-        isClick: isClick,
-      );
+      TencentCloudChat().dataInstance.messageData.addDownloadMessageToQueue(
+            data: DownloadMessageQueueData(
+              conversationType: conversationType,
+              msgID: widget.message.msgID ?? msgID,
+              messageType: MessageElemType.V2TIM_ELEM_TYPE_VIDEO,
+              imageType: 0,
+              // video message this param is unuse;
+              isSnapshot: isSnapshot,
+              key: key,
+            ),
+            isClick: isClick,
+          );
     }
   }
 
@@ -242,9 +231,7 @@ class _TencentCloudChatMessageVideoState
   bool hasSelfClientPath() {
     bool hasSPath = false;
     if (widget.message.videoElem != null) {
-      if (TencentCloudChatUtils.checkString(
-              widget.message.videoElem!.snapshotPath) !=
-          null) {
+      if (TencentCloudChatUtils.checkString(widget.message.videoElem!.snapshotPath) != null) {
         if (File(widget.message.videoElem!.snapshotPath!).existsSync()) {
           hasSPath = true;
         }
@@ -258,8 +245,7 @@ class _TencentCloudChatMessageVideoState
     if (widget.message.videoElem != null) {
       V2TimVideoElem videoElement = widget.message.videoElem!;
       String localVideoUrl = "";
-      if (TencentCloudChatUtils.checkString(videoElement.localVideoUrl) !=
-          null) {
+      if (TencentCloudChatUtils.checkString(videoElement.localVideoUrl) != null) {
         localVideoUrl = videoElement.localVideoUrl!;
       }
 
@@ -267,8 +253,7 @@ class _TencentCloudChatMessageVideoState
         resVideo = true;
       }
     }
-    if (currentdownload?.path != null &&
-        currentdownload?.downloadFinish == true) {
+    if (currentdownload?.path != null && currentdownload?.downloadFinish == true) {
       resVideo = true;
     }
 
@@ -279,9 +264,7 @@ class _TencentCloudChatMessageVideoState
     if (widget.message.videoElem == null) {
       return false;
     }
-    return TencentCloudChatUtils.checkString(
-            widget.message.videoElem!.localSnapshotUrl) !=
-        null;
+    return TencentCloudChatUtils.checkString(widget.message.videoElem!.localSnapshotUrl) != null;
   }
 
   getLocalSnapUrl() {
@@ -300,13 +283,8 @@ class _TencentCloudChatMessageVideoState
     required String setType,
     bool? delay,
   }) {
-    String convkey = TencentCloudChatUtils.checkString(widget.message.userID) ??
-        widget.message.groupID ??
-        "";
-    int conversationType =
-        TencentCloudChatUtils.checkString(widget.message.userID) == null
-            ? ConversationType.V2TIM_GROUP
-            : ConversationType.V2TIM_C2C;
+    String convkey = TencentCloudChatUtils.checkString(widget.message.userID) ?? widget.message.groupID ?? "";
+    int conversationType = TencentCloudChatUtils.checkString(widget.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
 
     if (delay == true) {
       setLocalDelayData = {
@@ -316,8 +294,7 @@ class _TencentCloudChatMessageVideoState
         "currentValue": currentValue,
         "setType": setType,
       };
-      console(
-          "render local path. generate wh success. bug message not sended. delay to setCloudCustonData");
+      console("render local path. generate wh success. bug message not sended. delay to setCloudCustonData");
       return;
     }
     TencentCloudChatMessageSDK.setLocalCustomData(
@@ -342,11 +319,7 @@ class _TencentCloudChatMessageVideoState
         String localSnapUrl = getLocalSnapUrl();
 
         safeSetState(() {
-          currentRenderVideoInfo = TimVideoCurrentRenderInfo(
-              height: localDefaultHeight,
-              path: localSnapUrl,
-              width: localDefaultWidth,
-              type: TimVideoCurrentRenderType.local);
+          currentRenderVideoInfo = TimVideoCurrentRenderInfo(height: localDefaultHeight, path: localSnapUrl, width: localDefaultWidth, type: TimVideoCurrentRenderType.local);
         });
         return;
       }
@@ -371,24 +344,20 @@ class _TencentCloudChatMessageVideoState
           var renderInfo = obj["renderInfo"];
 
           if (renderInfo == null) {
-            ImageExifInfo imageExifInfo =
-                await TencentCloudChatUtils.getImageExifInfoByBuffer(
-                    fileBuffer: fileBytes);
+            ImageExifInfo imageExifInfo = await TencentCloudChatUtils.getImageExifInfoByBuffer(fileBuffer: fileBytes);
 
             owidth = imageExifInfo.width;
             oheight = imageExifInfo.height;
             isRotate = imageExifInfo.isRotate;
           } else {
             try {
-              var renderInfoObj =
-                  Map<String, dynamic>.from(json.decode(renderInfo));
+              var renderInfoObj = Map<String, dynamic>.from(json.decode(renderInfo));
               owidth = renderInfoObj['w'] as double;
               oheight = renderInfoObj['h'] as double;
               isRotate = renderInfoObj['rotate'] == '1' ? true : false;
               from = renderInfoObj["from"] ?? "";
             } catch (err) {
-              console(
-                  "set info to local custom data error . client path render . ${err.toString()}");
+              console("set info to local custom data error . client path render . ${err.toString()}");
             }
           }
 
@@ -411,41 +380,32 @@ class _TencentCloudChatMessageVideoState
         }
 
         safeSetState(() {
-          currentRenderVideoInfo = TimVideoCurrentRenderInfo(
-              height: oheight,
-              path: getLocalSnapPath(),
-              width: owidth,
-              type: TimVideoCurrentRenderType.path);
+          currentRenderVideoInfo = TimVideoCurrentRenderInfo(height: oheight, path: getLocalSnapPath(), width: owidth, type: TimVideoCurrentRenderType.path);
         });
         return;
       }
 
-      V2TimMessageOnlineUrl? data =
-          await TencentCloudChatMessageSDK.getMessageOnlineUrl(msgID: msgID);
+      V2TimMessageOnlineUrl? data = await TencentCloudChatMessageSDK.getMessageOnlineUrl(msgID: msgID);
       if (data == null) {
         safeSetState(() {
           isErrorMessage = true;
         });
       } else {
         if (data.videoElem != null) {
-          if (TencentCloudChatUtils.checkString(data.videoElem!.snapshotUrl) !=
-              null) {
+          if (TencentCloudChatUtils.checkString(data.videoElem!.snapshotUrl) != null) {
             bool isRotate = false;
             var thumbUrl = data.videoElem!.snapshotUrl!;
 
             double owidth = 200;
             double oheight = 266;
 
-            String currentLocalCustomData =
-                widget.message.localCustomData ?? "";
+            String currentLocalCustomData = widget.message.localCustomData ?? "";
             if (thumbUrl.isNotEmpty) {
               var response = await http.get(Uri.parse(thumbUrl));
               if (response.statusCode == 200) {
                 var imageBytes = response.bodyBytes;
 
-                ImageExifInfo imageExifInfo =
-                    await TencentCloudChatUtils.getImageExifInfoByBuffer(
-                        fileBuffer: imageBytes);
+                ImageExifInfo imageExifInfo = await TencentCloudChatUtils.getImageExifInfoByBuffer(fileBuffer: imageBytes);
 
                 owidth = imageExifInfo.width;
                 oheight = imageExifInfo.height;
@@ -481,15 +441,10 @@ class _TencentCloudChatMessageVideoState
               }
             }
             safeSetState(() {
-              currentRenderVideoInfo = TimVideoCurrentRenderInfo(
-                  height: oheight,
-                  path: data.videoElem!.snapshotUrl!,
-                  width: owidth,
-                  type: TimVideoCurrentRenderType.online);
+              currentRenderVideoInfo = TimVideoCurrentRenderInfo(height: oheight, path: data.videoElem!.snapshotUrl!, width: owidth, type: TimVideoCurrentRenderType.online);
             });
           } else {
-            console(
-                "get messame online url return. by no snapshotUrl please check.");
+            console("get messame online url return. by no snapshotUrl please check.");
             safeSetState(() {
               isErrorMessage = true;
             });
@@ -498,8 +453,7 @@ class _TencentCloudChatMessageVideoState
           safeSetState(() {
             isErrorMessage = true;
           });
-          console(
-              "get messame online url return. by no video elem  please check.");
+          console("get messame online url return. by no video elem  please check.");
         }
       }
     } else {
@@ -510,8 +464,7 @@ class _TencentCloudChatMessageVideoState
     }
   }
 
-  videoNameWidget(TencentCloudChatThemeColors colorTheme,
-      TencentCloudChatTextStyle textStyle) {
+  videoNameWidget(TencentCloudChatThemeColors colorTheme, TencentCloudChatTextStyle textStyle) {
     var videoName = '';
 
     return Expanded(
@@ -532,8 +485,7 @@ class _TencentCloudChatMessageVideoState
     );
   }
 
-  Widget renderOnlineVideo(TencentCloudChatThemeColors colorTheme,
-      TencentCloudChatTextStyle textStyle, String url) {
+  Widget renderOnlineVideo(TencentCloudChatThemeColors colorTheme, TencentCloudChatTextStyle textStyle, String url) {
     console("render online video snapshot $url");
     var loading = getLoadingWidget(localDefaultWidth, localDefaultHeight);
     return Stack(
@@ -541,36 +493,25 @@ class _TencentCloudChatMessageVideoState
       children: [
         Positioned(
           child: Container(
-            padding: EdgeInsets.symmetric(
-                horizontal: getWidth(4), vertical: getHeight(4)),
+            padding: EdgeInsets.symmetric(horizontal: getWidth(4), vertical: getHeight(4)),
             decoration: BoxDecoration(
-              color: showHighlightStatus
-                  ? colorTheme.info
-                  : (sentFromSelf
-                      ? colorTheme.selfMessageBubbleColor
-                      : colorTheme.othersMessageBubbleColor),
+              color: showHighlightStatus ? colorTheme.info : (sentFromSelf ? colorTheme.selfMessageBubbleColor : colorTheme.othersMessageBubbleColor),
               border: Border.all(
-                color: sentFromSelf
-                    ? colorTheme.selfMessageBubbleBorderColor
-                    : colorTheme.othersMessageBubbleBorderColor,
+                color: sentFromSelf ? colorTheme.selfMessageBubbleBorderColor : colorTheme.othersMessageBubbleBorderColor,
               ),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(getSquareSize(16)),
                 topRight: Radius.circular(getSquareSize(16)),
-                bottomLeft:
-                    Radius.circular(getSquareSize(sentFromSelf ? 16 : 0)),
-                bottomRight:
-                    Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
+                bottomLeft: Radius.circular(getSquareSize(sentFromSelf ? 16 : 0)),
+                bottomRight: Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
               ),
             ),
             child: ClipRRect(
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(getSquareSize(16)),
                 topRight: Radius.circular(getSquareSize(16)),
-                bottomLeft:
-                    Radius.circular(getSquareSize(sentFromSelf ? 16 : 0)),
-                bottomRight:
-                    Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
+                bottomLeft: Radius.circular(getSquareSize(sentFromSelf ? 16 : 0)),
+                bottomRight: Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
               ),
               child: TencentCloudChatCacheImage(
                 width: getWidth(localDefaultWidth),
@@ -578,8 +519,7 @@ class _TencentCloudChatMessageVideoState
                 url: url,
                 fit: BoxFit.cover,
                 errorWidget: (context, error, stackTrace) {
-                  console(
-                      "network video render failed. please check the path is right . path: $url");
+                  console("network video render failed. please check the path is right . path: $url");
                   return getErrorWidget(localDefaultWidth, localDefaultHeight);
                 },
                 progressIndicatorBuilder: (context, child, loadingProgress) {
@@ -603,8 +543,7 @@ class _TencentCloudChatMessageVideoState
     );
   }
 
-  Widget renderLocalVideo(TencentCloudChatThemeColors colorTheme,
-      TencentCloudChatTextStyle textStyle, String p) {
+  Widget renderLocalVideo(TencentCloudChatThemeColors colorTheme, TencentCloudChatTextStyle textStyle, String p) {
     console("render local video snapshot $p");
     var fw = getWidth(localDefaultWidth);
     var fh = getHeight(localDefaultHeight);
@@ -614,36 +553,25 @@ class _TencentCloudChatMessageVideoState
         children: [
           Positioned(
             child: Container(
-              padding: EdgeInsets.symmetric(
-                  horizontal: getWidth(4), vertical: getHeight(4)),
+              padding: EdgeInsets.symmetric(horizontal: getWidth(4), vertical: getHeight(4)),
               decoration: BoxDecoration(
-                color: showHighlightStatus
-                    ? colorTheme.info
-                    : (sentFromSelf
-                        ? colorTheme.selfMessageBubbleColor
-                        : colorTheme.othersMessageBubbleColor),
+                color: showHighlightStatus ? colorTheme.info : (sentFromSelf ? colorTheme.selfMessageBubbleColor : colorTheme.othersMessageBubbleColor),
                 border: Border.all(
-                  color: sentFromSelf
-                      ? colorTheme.selfMessageBubbleBorderColor
-                      : colorTheme.othersMessageBubbleBorderColor,
+                  color: sentFromSelf ? colorTheme.selfMessageBubbleBorderColor : colorTheme.othersMessageBubbleBorderColor,
                 ),
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(getSquareSize(16)),
                   topRight: Radius.circular(getSquareSize(16)),
-                  bottomLeft:
-                      Radius.circular(getSquareSize(sentFromSelf ? 16 : 0)),
-                  bottomRight:
-                      Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
+                  bottomLeft: Radius.circular(getSquareSize(sentFromSelf ? 16 : 0)),
+                  bottomRight: Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
                 ),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(getSquareSize(16)),
                   topRight: Radius.circular(getSquareSize(16)),
-                  bottomLeft:
-                      Radius.circular(getSquareSize(sentFromSelf ? 16 : 0)),
-                  bottomRight:
-                      Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
+                  bottomLeft: Radius.circular(getSquareSize(sentFromSelf ? 16 : 0)),
+                  bottomRight: Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
                 ),
                 child: Image.file(
                   fit: BoxFit.cover,
@@ -653,10 +581,8 @@ class _TencentCloudChatMessageVideoState
                   cacheHeight: fh.toInt(),
                   File(p),
                   errorBuilder: (context, error, stackTrace) {
-                    console(
-                        "local video render failed. please check the path is right . path: $p");
-                    return getErrorWidget(
-                        localDefaultWidth, localDefaultHeight);
+                    console("local video render failed. please check the path is right . path: $p");
+                    return getErrorWidget(localDefaultWidth, localDefaultHeight);
                   },
                 ),
               ),
@@ -678,16 +604,12 @@ class _TencentCloudChatMessageVideoState
 
   openVideo() {}
 
-  Widget renderVideo(TencentCloudChatThemeColors colorTheme,
-      TencentCloudChatTextStyle textStyle) {
+  Widget renderVideo(TencentCloudChatThemeColors colorTheme, TencentCloudChatTextStyle textStyle) {
     console("render video start");
-    if (currentRenderVideoInfo?.type == TimVideoCurrentRenderType.path ||
-        currentRenderVideoInfo?.type == TimVideoCurrentRenderType.local) {
-      return renderLocalVideo(
-          colorTheme, textStyle, currentRenderVideoInfo!.path);
+    if (currentRenderVideoInfo?.type == TimVideoCurrentRenderType.path || currentRenderVideoInfo?.type == TimVideoCurrentRenderType.local) {
+      return renderLocalVideo(colorTheme, textStyle, currentRenderVideoInfo!.path);
     } else {
-      return renderOnlineVideo(
-          colorTheme, textStyle, currentRenderVideoInfo!.path);
+      return renderOnlineVideo(colorTheme, textStyle, currentRenderVideoInfo!.path);
     }
   }
 
@@ -757,19 +679,9 @@ class _TencentCloudChatMessageVideoState
     Navigator.push(
       context,
       ZoomPageRoute(builder: (BuildContext context) {
-        String convkey =
-            TencentCloudChatUtils.checkString(widget.message.userID) ??
-                widget.message.groupID ??
-                "";
-        int conversationType =
-            TencentCloudChatUtils.checkString(widget.message.userID) == null
-                ? ConversationType.V2TIM_GROUP
-                : ConversationType.V2TIM_C2C;
-        return TencentCloudChatMessageViewer(
-            convKey: convkey,
-            message: widget.message,
-            convType: conversationType,
-            isSending: widget.message.status == 1);
+        String convkey = TencentCloudChatUtils.checkString(widget.message.userID) ?? widget.message.groupID ?? "";
+        int conversationType = TencentCloudChatUtils.checkString(widget.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
+        return TencentCloudChatMessageViewer(convKey: convkey, message: widget.message, convType: conversationType, isSending: widget.message.status == 1);
       }),
     );
   }
@@ -801,8 +713,7 @@ class _TencentCloudChatMessageVideoState
     showVideo();
   }
 
-  Widget videoLayout(TencentCloudChatThemeColors colorTheme,
-      TencentCloudChatTextStyle textStyle) {
+  Widget videoLayout(TencentCloudChatThemeColors colorTheme, TencentCloudChatTextStyle textStyle) {
     if (currentRenderVideoInfo == null) {
       return getLoadingWidget(localDefaultWidth, localDefaultHeight);
     }
@@ -819,8 +730,7 @@ class _TencentCloudChatMessageVideoState
 
   Widget messageInfo() {
     return Row(
-      mainAxisAlignment:
-          sentFromSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
+      mainAxisAlignment: sentFromSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: [
         if (!sentFromSelf)
           SizedBox(
@@ -848,12 +758,9 @@ class _TencentCloudChatMessageVideoState
   DownloadMessageQueueData? currentdownload;
 
   downloadCallback(TencentCloudChatMessageData data) {
-    if (data.currentUpdatedFields ==
-        TencentCloudChatMessageDataKeys.downloadMessage) {
-      if (data.currentDownloadMessage?.msgID.replaceAll("-snap", "") ==
-          (widget.message.msgID ?? msgID)) {
-        console(
-            "downloading finished:${data.currentDownloadMessage?.downloadFinish}");
+    if (data.currentUpdatedFields == TencentCloudChatMessageDataKeys.downloadMessage) {
+      if (data.currentDownloadMessage?.msgID.replaceAll("-snap", "") == (widget.message.msgID ?? msgID)) {
+        console("downloading finished:${data.currentDownloadMessage?.downloadFinish}");
         safeSetState(() {
           currentdownload = data.currentDownloadMessage;
         });
@@ -866,20 +773,17 @@ class _TencentCloudChatMessageVideoState
   }
 
   bool isDownloading() {
-    return TencentCloudChat.dataInstance.messageData
-        .isDownloading(msgID: (widget.message.msgID ?? msgID));
+    return TencentCloudChat().dataInstance.messageData.isDownloading(msgID: (widget.message.msgID ?? msgID));
   }
 
   bool isInDownloadQueue() {
-    return TencentCloudChat.dataInstance.messageData
-        .isInDownloadQueue(msgID: (widget.message.msgID ?? msgID));
+    return TencentCloudChat().dataInstance.messageData.isInDownloadQueue(msgID: (widget.message.msgID ?? msgID));
   }
 
   removeFromDownloadQueue() {
     bool inQueue = isInDownloadQueue();
     if (inQueue == true) {
-      TencentCloudChat.dataInstance.messageData
-          .removeFromDownloadQueue(msgID: (widget.message.msgID ?? msgID));
+      TencentCloudChat().dataInstance.messageData.removeFromDownloadQueue(msgID: (widget.message.msgID ?? msgID));
       safeSetState(() {
         renderRandom = Random().nextInt(10000);
       });
@@ -918,8 +822,7 @@ class _TencentCloudChatMessageVideoState
     return false;
   }
 
-  Widget downloadStatus(TencentCloudChatThemeColors colorTheme,
-      TencentCloudChatTextStyle textStyle) {
+  Widget downloadStatus(TencentCloudChatThemeColors colorTheme, TencentCloudChatTextStyle textStyle) {
     return Container(
       width: getSquareSize(36),
       height: getSquareSize(36),

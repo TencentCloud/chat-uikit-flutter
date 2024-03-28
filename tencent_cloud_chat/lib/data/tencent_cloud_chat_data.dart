@@ -13,29 +13,22 @@ import 'package:tencent_cloud_chat/data/user_profile/tencent_cloud_chat_user_pro
 /// such as basic data, conversation data, message data, theme data,
 /// group profile data, UI data, and user profile data.
 class TencentCloudChatData {
-  TencentCloudChatBasicData get basic =>
-      TencentCloudChatBasicData<TencentCloudChatBasicDataKeys>(
-          TencentCloudChatBasicDataKeys.none);
+  static TencentCloudChatTheme theme = TencentCloudChatTheme();
+  static TencentCloudChatUIData ui = TencentCloudChatUIData(TencentCloudChatUIDataKeys.none);
 
-  TencentCloudChatConversationData get conversation =>
-      TencentCloudChatConversationData(
-          TencentCloudChatConversationDataKeys.none);
+  late TencentCloudChatBasicData basic;
+  late TencentCloudChatConversationData conversation;
+  late TencentCloudChatMessageData messageData;
+  late TencentCloudChatGroupProfileData groupProfile;
+  late TencentCloudChatUserProfileData user;
+  late TencentCloudChatContactData contact;
 
-  TencentCloudChatMessageData get messageData =>
-      TencentCloudChatMessageData(TencentCloudChatMessageDataKeys.none);
-
-  TencentCloudChatTheme get theme => TencentCloudChatTheme();
-
-  TencentCloudChatGroupProfileData get groupProfile =>
-      TencentCloudChatGroupProfileData(
-          TencentCloudChatGroupProfileDataKeys.none);
-
-  TencentCloudChatUIData get ui =>
-      TencentCloudChatUIData(TencentCloudChatUIDataKeys.none);
-
-  TencentCloudChatUserProfileData get user =>
-      TencentCloudChatUserProfileData(TencentCloudChatUserProfileDataKeys.none);
-
-  TencentCloudChatContactData get contact =>
-      TencentCloudChatContactData(TencentCloudChatContactDataKeys.none);
+  TencentCloudChatData() {
+    basic = TencentCloudChatBasicData<TencentCloudChatBasicDataKeys>(TencentCloudChatBasicDataKeys.none);
+    conversation = TencentCloudChatConversationData(TencentCloudChatConversationDataKeys.none);
+    messageData = TencentCloudChatMessageData(TencentCloudChatMessageDataKeys.none);
+    groupProfile = TencentCloudChatGroupProfileData(TencentCloudChatGroupProfileDataKeys.none);
+    user = TencentCloudChatUserProfileData(TencentCloudChatUserProfileDataKeys.none);
+    contact = TencentCloudChatContactData(TencentCloudChatContactDataKeys.none);
+  }
 }

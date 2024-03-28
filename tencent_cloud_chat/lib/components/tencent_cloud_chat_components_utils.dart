@@ -1,19 +1,9 @@
 enum TencentCloudChatComponentsEnum {
+  global,
   message,
   conversation,
   contact,
   search,
   userProfile,
   groupProfile,
-  applicationList,
-  applicationDetail,
-  groupList,
-  blockList,
-  friendInfo,
-  groupApplicationList,
-  settings,
-  settingsInfo,
-  settingsAbout,
-  homepage,
-  loginPage
 }

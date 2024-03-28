@@ -1,5 +1,5 @@
-// Copyright (c) 1998-2024 Tencent, Inc. All rights reserved.
-// Use of this source code is governed by a MIT license that can be
+// Copyright (c) 1998-2024 Tencent, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
 import 'package:intl/intl.dart' as intl;
@@ -1223,6 +1223,20 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
 
   @override
   String get longPressToNavigate => '按住查看';
+
+  @override
+  String get permissionDeniedTitle => '权限被拒绝';
+
+  @override
+  String permissionDeniedContent(Object permissionString) {
+    return '请前往设置并启用 $permissionString 权限。';
+  }
+
+  @override
+  String get goToSettingsButtonText => '前往设置';
+
+  @override
+  String get originalMessageNotFound => '未找到原始消息';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2449,4 +2463,18 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
 
   @override
   String get longPressToNavigate => '按住查看';
+
+  @override
+  String get permissionDeniedTitle => '權限被禁止';
+
+  @override
+  String permissionDeniedContent(Object permissionString) {
+    return '請前往設定並允許 $permissionString 權限。';
+  }
+
+  @override
+  String get goToSettingsButtonText => '前往設定';
+
+  @override
+  String get originalMessageNotFound => '未找到原始訊息';
 }

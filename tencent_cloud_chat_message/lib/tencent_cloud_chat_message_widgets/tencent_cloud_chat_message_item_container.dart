@@ -99,11 +99,11 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
   void initState() {
     super.initState();
     _messageDataSubscription = _messageDataStream?.listen(_messageDataHandler);
-    _messageReceipt = TencentCloudChat.dataInstance.messageData.getMessageReadReceipt(
-      msgID: widget.message.msgID ?? "",
-      userID: widget.message.userID ?? "",
-      timestamp: widget.message.timestamp ?? 0,
-    );
+    _messageReceipt = TencentCloudChat().dataInstance.messageData.getMessageReadReceipt(
+          msgID: widget.message.msgID ?? "",
+          userID: widget.message.userID ?? "",
+          timestamp: widget.message.timestamp ?? 0,
+        );
   }
 
   @override
@@ -115,7 +115,7 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
   // This method clears the message highlight.
   void _clearHighlight() {
     _shouldBeHighlighted = false;
-    TencentCloudChat.dataInstance.messageData.messageHighlighted = null;
+    TencentCloudChat().dataInstance.messageData.messageHighlighted = null;
   }
 
   @override

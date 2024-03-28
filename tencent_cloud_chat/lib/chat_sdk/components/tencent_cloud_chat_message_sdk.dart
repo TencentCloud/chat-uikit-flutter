@@ -90,7 +90,7 @@ class TencentCloudChatMessageSDK {
       }
     }
 
-    return response ?? V2TimMessageListResult(isFinished: true, messageList: []);
+    return (res.code == 0 && response != null) ? response : V2TimMessageListResult(isFinished: true, messageList: []);
   }
 
   Future<V2TimMsgCreateInfoResult?> createTextMessage({
@@ -406,12 +406,12 @@ class TencentCloudChatMessageSDK {
           localCustomData: local,
         )
         .then((res) {
-      TencentCloudChat.dataInstance.messageData.updateLocalCustomDataInMemory(
-        msgID: currentMemoreyMsgId,
-        data: local,
-        key: convKey,
-        convType: convType,
-      );
+      TencentCloudChat().dataInstance.messageData.updateLocalCustomDataInMemory(
+            msgID: currentMemoreyMsgId,
+            data: local,
+            key: convKey,
+            convType: convType,
+          );
       TencentCloudChat.logInstance.console(
         componentName: _tag,
         logs: "$msgID set localCustomData finish key:$key value:$value setType:$setType all data is ${json.encode(data)}",

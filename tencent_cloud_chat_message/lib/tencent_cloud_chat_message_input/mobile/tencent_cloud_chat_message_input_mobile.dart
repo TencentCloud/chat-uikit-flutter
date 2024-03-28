@@ -4,10 +4,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_common_defines.dart';
+import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_permission_handlers.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_controller.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/message_reply/tencent_cloud_chat_message_input_reply_container.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/mobile/tencent_cloud_chat_message_attachment_options.dart';
@@ -25,8 +27,7 @@ class TencentCloudChatMessageInputMobile extends StatefulWidget {
   final Function({required String imagePath}) sendImageMessage;
   final Function({required String videoPath}) sendVideoMessage;
   final Function({required String filePath}) sendFileMessage;
-  final Function({required String voicePath, required int duration})
-      sendVoiceMessage;
+  final Function({required String voicePath, required int duration}) sendVoiceMessage;
   final bool inSelectMode;
   final List<V2TimMessage> selectedMessages;
   final V2TimMessage? repliedMessage;
@@ -58,22 +59,16 @@ class TencentCloudChatMessageInputMobile extends StatefulWidget {
   });
 
   @override
-  State<TencentCloudChatMessageInputMobile> createState() =>
-      _TencentCloudChatMessageInputMobileState();
+  State<TencentCloudChatMessageInputMobile> createState() => _TencentCloudChatMessageInputMobileState();
 }
 
-class _TencentCloudChatMessageInputMobileState
-    extends TencentCloudChatState<TencentCloudChatMessageInputMobile>
-    with TickerProviderStateMixin {
+class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<TencentCloudChatMessageInputMobile> with TickerProviderStateMixin {
   final GlobalKey<TooltipState> micTooltipKey = GlobalKey<TooltipState>();
-  final TencentCloudChatMessageAttachmentOptions _messageAttachmentOptions =
-      TencentCloudChatMessageAttachmentOptions();
-  final GlobalKey<TencentCloudChatMessageInputRecordingState>
-      _recordingWidgetKey = GlobalKey();
+  final TencentCloudChatMessageAttachmentOptions _messageAttachmentOptions = TencentCloudChatMessageAttachmentOptions();
+  final GlobalKey<TencentCloudChatMessageInputRecordingState> _recordingWidgetKey = GlobalKey();
   final List<({String userID, String label})> _mentionedUsers = [];
 
   late AnimationController? _animationController;
-
 
   final TextEditingController _textEditingController = TextEditingController();
   final FocusNode _textEditingFocusNode = FocusNode();
@@ -98,10 +93,9 @@ class _TencentCloudChatMessageInputMobileState
     _removeTextInputEvent();
   }
 
-  void _addTextInputEvent(){
-    try{
-      _animationController = AnimationController(
-          duration: const Duration(milliseconds: 200), vsync: this);
+  void _addTextInputEvent() {
+    try {
+      _animationController = AnimationController(duration: const Duration(milliseconds: 200), vsync: this);
       _messageAttachmentOptions.init(vsync: this, context: context);
       _textEditingController.addListener(_onTextChanged);
       _textEditingFocusNode.addListener(() {
@@ -116,13 +110,13 @@ class _TencentCloudChatMessageInputMobileState
           });
         }
       });
-    }catch(e){
+    } catch (e) {
       debugPrint(e.toString());
     }
   }
 
-  void _removeTextInputEvent(){
-    try{
+  void _removeTextInputEvent() {
+    try {
       _animationController?.dispose();
       _messageAttachmentOptions.dispose();
       _animationController = null;
@@ -130,7 +124,7 @@ class _TencentCloudChatMessageInputMobileState
       _textEditingController.clear();
       _textEditingController.dispose();
       _textEditingFocusNode.dispose();
-    }catch(e){
+    } catch (e) {
       debugPrint(e.toString());
     }
   }
@@ -159,14 +153,16 @@ class _TencentCloudChatMessageInputMobileState
             ));
   }
 
-  void _onStartRecording(PointerDownEvent event) {
-    _recordingStarter?.cancel();
-    _recordingStarter = Timer(const Duration(milliseconds: 100), () {
-      safeSetState(() {
-        _isRecording = true;
+  void _onStartRecording(PointerDownEvent event) async {
+    if (TencentCloudChatPlatformAdapter().isMobile && await TencentCloudChatPermissionHandler.checkPermission("microphone", context)) {
+      _recordingStarter?.cancel();
+      _recordingStarter = Timer(const Duration(milliseconds: 100), () {
+        safeSetState(() {
+          _isRecording = true;
+        });
+        _recordingWidgetKey.currentState?.startRecording();
       });
-      _recordingWidgetKey.currentState?.startRecording();
-    });
+    }
   }
 
   void _onTextChanged() async {
@@ -186,38 +182,28 @@ class _TencentCloudChatMessageInputMobileState
 
     /// Dealing with mentioning member in group
     if (TencentCloudChatUtils.checkString(widget.groupID) != null) {
-      final compareResult =
-          TencentCloudChatUtils.compareString(_inputText, newText);
+      final compareResult = TencentCloudChatUtils.compareString(_inputText, newText);
       if (compareResult.isAddText && compareResult.character == "@") {
         /// Add "@" mentioned member tag
-        final List<V2TimGroupMemberFullInfo> memberList =
-            await widget.onChooseGroupMembers();
+        final List<V2TimGroupMemberFullInfo> memberList = await widget.onChooseGroupMembers();
 
         final mentionTextList = memberList.map((targetMember) {
-          final String targetMemberLabel =
-              TencentCloudChatUtils.checkString(targetMember.nameCard) ??
-                  TencentCloudChatUtils.checkString(targetMember.nickName) ??
-                  targetMember.userID;
+          final String targetMemberLabel = TencentCloudChatUtils.checkString(targetMember.nameCard) ?? TencentCloudChatUtils.checkString(targetMember.nickName) ?? targetMember.userID;
 
-          _mentionedUsers
-              .add((label: targetMemberLabel, userID: targetMember.userID));
+          _mentionedUsers.add((label: targetMemberLabel, userID: targetMember.userID));
           return "@$targetMemberLabel ";
         }).toList();
         final mentionText = mentionTextList.join();
 
         /// Insert mentionText after the "@" character
-        final updatedText = newText.replaceRange(
-            compareResult.index, compareResult.index + 1, mentionText);
+        final updatedText = newText.replaceRange(compareResult.index, compareResult.index + 1, mentionText);
         _textEditingController.text = updatedText;
-        _textEditingController.selection = TextSelection.collapsed(
-            offset: compareResult.index + mentionText.length);
+        _textEditingController.selection = TextSelection.collapsed(offset: compareResult.index + mentionText.length);
       } else if (!compareResult.isAddText) {
-        final atIndex =
-            _inputText.lastIndexOf('@', max(0, compareResult.index - 1));
+        final atIndex = _inputText.lastIndexOf('@', max(0, compareResult.index - 1));
         final removedLabelList = [];
         if (atIndex != -1) {
-          removedLabelList
-              .add(_inputText.substring(atIndex + 1, compareResult.index));
+          removedLabelList.add(_inputText.substring(atIndex + 1, compareResult.index));
 
           int spaceIndex = compareResult.index;
           int count = 0;
@@ -225,27 +211,21 @@ class _TencentCloudChatMessageInputMobileState
           while (spaceIndex != -1 && count < 5) {
             spaceIndex = _inputText.indexOf(' ', spaceIndex + 1);
             if (spaceIndex != -1) {
-              removedLabelList
-                  .add(_inputText.substring(atIndex + 1, spaceIndex));
+              removedLabelList.add(_inputText.substring(atIndex + 1, spaceIndex));
               count++;
             } else {
               removedLabelList.add(_inputText.substring(atIndex + 1));
             }
           }
 
-          final mentionedUserExist = _mentionedUsers
-              .any((user) => removedLabelList.contains(user.label));
+          final mentionedUserExist = _mentionedUsers.any((user) => removedLabelList.contains(user.label));
 
           if (mentionedUserExist) {
-            final mentionedUser = _mentionedUsers
-                .firstWhere((user) => removedLabelList.contains(user.label));
-            final updatedText = newText.replaceRange(
-                atIndex, atIndex + 1 + mentionedUser.label.length, '');
+            final mentionedUser = _mentionedUsers.firstWhere((user) => removedLabelList.contains(user.label));
+            final updatedText = newText.replaceRange(atIndex, atIndex + 1 + mentionedUser.label.length, '');
             _textEditingController.text = updatedText;
-            _textEditingController.selection =
-                TextSelection.collapsed(offset: atIndex);
-            _mentionedUsers
-                .removeWhere((user) => user.label == mentionedUser.label);
+            _textEditingController.selection = TextSelection.collapsed(offset: atIndex);
+            _mentionedUsers.removeWhere((user) => user.label == mentionedUser.label);
           }
         }
       }
@@ -266,11 +246,9 @@ class _TencentCloudChatMessageInputMobileState
         Tooltip.dismissAllToolTips();
       });
     } else {
-      RenderBox trashIconBox =
-          trashIconKey.currentContext?.findRenderObject() as RenderBox;
+      RenderBox trashIconBox = trashIconKey.currentContext?.findRenderObject() as RenderBox;
       final boxHitTestResult = BoxHitTestResult();
-      bool isOverTrashIcon = trashIconBox.hitTest(boxHitTestResult,
-          position: trashIconBox.globalToLocal(event.position));
+      bool isOverTrashIcon = trashIconBox.hitTest(boxHitTestResult, position: trashIconBox.globalToLocal(event.position));
       safeSetState(() {
         _isRecording = false;
       });
@@ -289,17 +267,12 @@ class _TencentCloudChatMessageInputMobileState
                     icon: Icons.add_circle_outline_rounded,
                     onTapDown: (details) {
                       _textEditingFocusNode.unfocus();
-                      _messageAttachmentOptions.toggleAttachmentOptionsOverlay(
-                          constraints: constraints,
-                          context: context,
-                          tapDownDetails: details,
-                          attachmentOptions: widget.attachmentOptions);
+                      _messageAttachmentOptions.toggleAttachmentOptionsOverlay(constraints: constraints, context: context, tapDownDetails: details, attachmentOptions: widget.attachmentOptions);
                     },
                   ),
                   _buildInputAreaIcon(
                     icon: Icons.camera_alt_outlined,
-                    onTapDown: (_) =>
-                        TencentCloudChatMessageCamera.showCameraOptions(
+                    onTapDown: (_) => TencentCloudChatMessageCamera.showCameraOptions(
                       context: context,
                       onSendImage: widget.sendImageMessage,
                       onSendVideo: widget.sendVideoMessage,
@@ -310,12 +283,10 @@ class _TencentCloudChatMessageInputMobileState
                   ),
                   Expanded(
                       child: Container(
-                    padding: EdgeInsets.symmetric(
-                        vertical: getWidth(10), horizontal: getHeight(16)),
+                    padding: EdgeInsets.symmetric(vertical: getWidth(10), horizontal: getHeight(16)),
                     decoration: BoxDecoration(
                       color: colorTheme.backgroundColor,
-                      border:
-                          Border.all(color: colorTheme.inputFieldBorderColor),
+                      border: Border.all(color: colorTheme.inputFieldBorderColor),
                       borderRadius: BorderRadius.circular(25),
                     ),
                     child: Row(
@@ -371,62 +342,61 @@ class _TencentCloudChatMessageInputMobileState
                       left: getSquareSize(_showSendButton ? 6 : 8),
                       right: getSquareSize(_showSendButton ? 8 : 2),
                     ),
-                    child: _animationController != null ? AnimatedBuilder(
-                      animation: _animationController!,
-                      builder: (BuildContext context, Widget? child) {
-                        return Transform.rotate(
-                          angle: _animationController!.value * pi,
-                          child: _showSendButton
-                              ? InkWell(
-                                  onTap: () {
-                                    widget.sendTextMessage(
-                                      text: _textEditingController.text,
-                                      mentionedUsers: _mentionedUsers
-                                          .map(
-                                            (e) => e.userID,
-                                          )
-                                          .toList(),
-                                    );
-                                    _inputText = "";
-                                    _mentionedUsers.clear();
-                                    _textEditingController.clear();
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                        color: colorTheme.primaryColor,
-                                        borderRadius:
-                                            BorderRadius.circular(25)),
-                                    padding: EdgeInsets.all(getSquareSize(4)),
-                                    child: Icon(
-                                      Icons.arrow_downward,
-                                      size: textStyle.inputAreaIcon,
-                                      color: colorTheme.backgroundColor,
-                                    ),
-                                  ),
-                                )
-                              : Tooltip(
-                                  key: micTooltipKey,
-                                  preferBelow: false,
-                                  verticalOffset: getSquareSize(36),
-                                  triggerMode: TooltipTriggerMode.manual,
-                                  showDuration: const Duration(seconds: 1),
-                                  message: tL10n.holdToRecordReleaseToSend,
-                                  child: Listener(
-                                    onPointerDown: _onStartRecording,
-                                    onPointerUp: _onStopRecording,
-                                    child: Container(
-                                      padding: EdgeInsets.all(getSquareSize(6)),
-                                      child: Icon(
-                                        Icons.mic,
-                                        size: textStyle.inputAreaIcon,
-                                        color: colorTheme.inputAreaIconColor,
+                    child: _animationController != null
+                        ? AnimatedBuilder(
+                            animation: _animationController!,
+                            builder: (BuildContext context, Widget? child) {
+                              return Transform.rotate(
+                                angle: _animationController!.value * pi,
+                                child: _showSendButton
+                                    ? InkWell(
+                                        onTap: () {
+                                          widget.sendTextMessage(
+                                            text: _textEditingController.text,
+                                            mentionedUsers: _mentionedUsers
+                                                .map(
+                                                  (e) => e.userID,
+                                                )
+                                                .toList(),
+                                          );
+                                          _inputText = "";
+                                          _mentionedUsers.clear();
+                                          _textEditingController.clear();
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(color: colorTheme.primaryColor, borderRadius: BorderRadius.circular(25)),
+                                          padding: EdgeInsets.all(getSquareSize(4)),
+                                          child: Icon(
+                                            Icons.arrow_downward,
+                                            size: textStyle.inputAreaIcon,
+                                            color: colorTheme.backgroundColor,
+                                          ),
+                                        ),
+                                      )
+                                    : Tooltip(
+                                        key: micTooltipKey,
+                                        preferBelow: false,
+                                        verticalOffset: getSquareSize(36),
+                                        triggerMode: TooltipTriggerMode.manual,
+                                        showDuration: const Duration(seconds: 1),
+                                        message: tL10n.holdToRecordReleaseToSend,
+                                        child: Listener(
+                                          onPointerDown: _onStartRecording,
+                                          onPointerUp: _onStopRecording,
+                                          child: Container(
+                                            padding: EdgeInsets.all(getSquareSize(6)),
+                                            child: Icon(
+                                              Icons.mic,
+                                              size: textStyle.inputAreaIcon,
+                                              color: colorTheme.inputAreaIconColor,
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                    ),
-                                  ),
-                                ),
-                        );
-                      },
-                    ) : Container(),
+                              );
+                            },
+                          )
+                        : Container(),
                   ),
                 ],
               ),
@@ -439,20 +409,17 @@ class _TencentCloudChatMessageInputMobileState
     }
     if (_showKeyboard) {
       final currentKeyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-      double originHeight =
-          TencentCloudChat.dataInstance.basic.keyboardHeight ?? getHeight(280);
+      double originHeight = TencentCloudChat().dataInstance.basic.keyboardHeight ?? getHeight(280);
       if (currentKeyboardHeight > -1) {
         if (currentKeyboardHeight >= originHeight) {
           originHeight = currentKeyboardHeight;
         }
         TencentCloudChatUtils.debounce("setCurrentKeyboardHeight", () {
-          TencentCloudChat.dataInstance.basic.keyboardHeight =
-              currentKeyboardHeight;
+          TencentCloudChat().dataInstance.basic.keyboardHeight = currentKeyboardHeight;
         });
       }
       final height = originHeight != 0 ? originHeight : currentKeyboardHeight;
-      final actualHeight =
-          height + (_bottomPadding! > 8 ? getSquareSize(16) : getSquareSize(0));
+      final actualHeight = height + (_bottomPadding! > 8 ? getSquareSize(16) : getSquareSize(0));
 
       return actualHeight;
     }
@@ -463,19 +430,15 @@ class _TencentCloudChatMessageInputMobileState
   Widget defaultBuilder(BuildContext context) {
     _bottomPadding ??= MediaQuery.of(context).padding.bottom;
     return LayoutBuilder(
-      builder: (BuildContext context, BoxConstraints constraints) =>
-          TencentCloudChatThemeWidget(
+      builder: (BuildContext context, BoxConstraints constraints) => TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) {
           return Container(
             color: colorTheme.inputAreaBackground,
             padding: EdgeInsets.only(
-              bottom:
-                  _bottomPadding! > 8 ? getSquareSize(0) : getSquareSize(16),
+              bottom: _bottomPadding! > 8 ? getSquareSize(0) : getSquareSize(16),
               left: getSquareSize(16),
               right: getSquareSize(16),
-              top: widget.repliedMessage != null
-                  ? getSquareSize(8)
-                  : getSquareSize(16),
+              top: widget.repliedMessage != null ? getSquareSize(8) : getSquareSize(16),
             ),
             child: Column(
               children: [
@@ -490,8 +453,7 @@ class _TencentCloudChatMessageInputMobileState
                       switchInCurve: Curves.ease,
                       switchOutCurve: Curves.ease,
                       duration: const Duration(milliseconds: 500),
-                      transitionBuilder:
-                          (Widget child, Animation<double> animation) {
+                      transitionBuilder: (Widget child, Animation<double> animation) {
                         return SlideTransition(
                           position: Tween<Offset>(
                             begin: const Offset(1, 0),
@@ -500,14 +462,10 @@ class _TencentCloudChatMessageInputMobileState
                           child: child,
                         );
                       },
-                      child: widget.inSelectMode
-                          ? const TencentCloudChatMessageInputSelectModeContainer()
-                          : _buildInputWidget(constraints),
+                      child: widget.inSelectMode ? const TencentCloudChatMessageInputSelectModeContainer() : _buildInputWidget(constraints),
                     ),
                     TencentCloudChatMessageInputRecording(
-                      onRecordFinish: (recordInfo) => widget.sendVoiceMessage(
-                          voicePath: recordInfo.path,
-                          duration: recordInfo.duration),
+                      onRecordFinish: (recordInfo) => widget.sendVoiceMessage(voicePath: recordInfo.path, duration: recordInfo.duration),
                       isRecording: _isRecording,
                       key: _recordingWidgetKey,
                     ),
@@ -529,8 +487,7 @@ class _TencentCloudChatMessageInputMobileState
                               ),
                               Text(
                                 "表情面板 - 开发中",
-                                style: TextStyle(
-                                    fontSize: textStyle.standardLargeText),
+                                style: TextStyle(fontSize: textStyle.standardLargeText),
                               )
                             ],
                           ),

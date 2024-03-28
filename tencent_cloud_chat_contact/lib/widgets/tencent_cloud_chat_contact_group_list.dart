@@ -146,7 +146,7 @@ class TencentCloudChatContactGroupItem extends StatefulWidget {
 class TencentCloudChatContactGroupItemState extends TencentCloudChatState<TencentCloudChatContactGroupItem> {
   final isDesktop = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop;
   navigateToChat() {
-    if (TencentCloudChat.dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.message)) {
+    if (TencentCloudChat().dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.message)) {
       if (isDesktop) {
         TencentImSDKPlugin.v2TIMManager.emitUIKitEvent(
           UIKitEvent(
@@ -158,7 +158,7 @@ class TencentCloudChatContactGroupItemState extends TencentCloudChatState<Tencen
           ),
         );
       } else {
-        if (TencentCloudChat.dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.message)) {
+        if (TencentCloudChat().dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.message)) {
           navigateToMessage(
             context: context,
             options: TencentCloudChatMessageOptions(

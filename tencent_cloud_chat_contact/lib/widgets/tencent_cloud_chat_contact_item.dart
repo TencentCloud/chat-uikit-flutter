@@ -20,14 +20,11 @@ class TencentCloudChatContactItem extends StatefulWidget {
 }
 
 // only avatar and text for now
-class TencentCloudChatContactItemState
-    extends TencentCloudChatState<TencentCloudChatContactItem> {
-  final isDesktop = TencentCloudChatScreenAdapter.deviceScreenType ==
-      DeviceScreenType.desktop;
+class TencentCloudChatContactItemState extends TencentCloudChatState<TencentCloudChatContactItem> {
+  final isDesktop = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop;
 
   navigateToChat() {
-    if (TencentCloudChat.dataInstance.basic.usedComponents
-        .contains(TencentCloudChatComponentsEnum.message)) {
+    if (TencentCloudChat().dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.message)) {
       if (isDesktop) {
         TencentImSDKPlugin.v2TIMManager.emitUIKitEvent(
           UIKitEvent(
@@ -64,12 +61,9 @@ class TencentCloudChatContactItemState
               horizontal: getWidth(3),
             ),
             child: Row(children: [
-              TencentCloudChatContactBuilders.getContactItemAvatarBuilder(
-                  widget.friend),
-              TencentCloudChatContactBuilders.getContactItemContentBuilder(
-                  widget.friend),
-              TencentCloudChatContactBuilders.getContactItemElseBuilder(
-                  widget.friend),
+              TencentCloudChatContactBuilders.getContactItemAvatarBuilder(widget.friend),
+              TencentCloudChatContactBuilders.getContactItemContentBuilder(widget.friend),
+              TencentCloudChatContactBuilders.getContactItemElseBuilder(widget.friend),
             ]),
           ),
         ),
@@ -85,12 +79,10 @@ class TencentCloudChatContactItemAvatar extends StatefulWidget {
   const TencentCloudChatContactItemAvatar({super.key, required this.friend});
 
   @override
-  State<StatefulWidget> createState() =>
-      TencentCloudChatContactItemAvatarState();
+  State<StatefulWidget> createState() => TencentCloudChatContactItemAvatarState();
 }
 
-class TencentCloudChatContactItemAvatarState
-    extends TencentCloudChatState<TencentCloudChatContactItemAvatar> {
+class TencentCloudChatContactItemAvatarState extends TencentCloudChatState<TencentCloudChatContactItemAvatar> {
   @override
   Widget defaultBuilder(BuildContext context) {
     return Padding(
@@ -99,10 +91,7 @@ class TencentCloudChatContactItemAvatarState
         ),
         child: TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
           scene: TencentCloudChatAvatarScene.contacts,
-          imageList: [
-            widget.friend.userProfile?.faceUrl ??
-                "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"
-          ],
+          imageList: [widget.friend.userProfile?.faceUrl ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"],
           width: getSquareSize(40),
           height: getSquareSize(40),
           borderRadius: getSquareSize(34),
@@ -116,12 +105,10 @@ class TencentCloudChatContactItemContent extends StatefulWidget {
   const TencentCloudChatContactItemContent({super.key, required this.friend});
 
   @override
-  State<StatefulWidget> createState() =>
-      TencentCloudChatContactItemContentState();
+  State<StatefulWidget> createState() => TencentCloudChatContactItemContentState();
 }
 
-class TencentCloudChatContactItemContentState
-    extends TencentCloudChatState<TencentCloudChatContactItemContent> {
+class TencentCloudChatContactItemContentState extends TencentCloudChatState<TencentCloudChatContactItemContent> {
   _getShowName(V2TimFriendInfo item) {
     final friendRemark = item.friendRemark ?? "";
     final nickName = item.userProfile?.nickName ?? "";
@@ -164,8 +151,7 @@ class TencentCloudChatContactItemElse extends StatefulWidget {
   State<StatefulWidget> createState() => TencentCloudChatContactItemElseState();
 }
 
-class TencentCloudChatContactItemElseState
-    extends TencentCloudChatState<TencentCloudChatContactItemElse> {
+class TencentCloudChatContactItemElseState extends TencentCloudChatState<TencentCloudChatContactItemElse> {
   @override
   Widget defaultBuilder(BuildContext context) {
     return Container();
@@ -187,8 +173,7 @@ class TencentCloudChatContactListTag extends StatefulWidget {
   State<StatefulWidget> createState() => TencentCloudChatContactListTagState();
 }
 
-class TencentCloudChatContactListTagState
-    extends TencentCloudChatState<TencentCloudChatContactListTag> {
+class TencentCloudChatContactListTagState extends TencentCloudChatState<TencentCloudChatContactListTag> {
   @override
   Widget defaultBuilder(BuildContext context) {
     return Container(

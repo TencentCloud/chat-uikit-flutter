@@ -3,11 +3,9 @@
 import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_common_defines.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 
-typedef TencentCloudChatMessageValueConfig<T> = T Function(
-    {String? userID, String? groupID});
+typedef TencentCloudChatMessageValueConfig<T> = T Function({String? userID, String? groupID});
 
-typedef TencentCloudChatMessageValueConfigWithMessage<T> = T Function(
-    {String? userID, String? groupID, V2TimMessage? message});
+typedef TencentCloudChatMessageValueConfigWithMessage<T> = T Function({String? userID, String? groupID, V2TimMessage? message});
 
 // A factory function that creates a default TencentCloudChatMessageBoolConfig function.
 // The created function returns the specified boolean [value] when called.
@@ -15,8 +13,7 @@ TencentCloudChatMessageValueConfig<T> createDefaultValue<T>(T value) {
   return ({userID, groupID}) => value;
 }
 
-TencentCloudChatMessageValueConfigWithMessage<T>
-    createDefaultValueWithMessage<T>(T value) {
+TencentCloudChatMessageValueConfigWithMessage<T> createDefaultValueWithMessage<T>(T value) {
   return ({userID, groupID, message}) => value;
 }
 
@@ -27,39 +24,43 @@ TencentCloudChatMessageValueConfigWithMessage<T>
 // TencentCloudChatMessageBoolConfig or other function like this, which takes optional named parameters
 // userID and groupID, and returns a value.
 class TencentCloudChatMessageConfig {
-  // A configuration option that determines whether to show the avatar of the current user.
+  /// A configuration option that determines whether to show the avatar of the current user.
   final TencentCloudChatMessageValueConfig<bool> showSelfAvatar;
 
-  // A configuration option that determines whether to show the avatar of other users.
+  /// A configuration option that determines whether to show the avatar of other users.
   final TencentCloudChatMessageValueConfig<bool> showOthersAvatar;
 
-  // A configuration option that determines whether to show the time indicator for each messages.
+  /// A configuration option that determines whether to show the time indicator for each messages.
   final TencentCloudChatMessageValueConfig<bool> showMessageTimeIndicator;
 
-  // A configuration option that determines whether to show the status indicator for each messages.
+  /// A configuration option that determines whether to show the status indicator for each messages.
   final TencentCloudChatMessageValueConfig<bool> showMessageStatusIndicator;
 
-  // A configuration option that determines whether allow message sender to delete the message for everyone, this feature only works with Premium Edition.
+  /// A configuration option that determines whether allow message sender to delete the message for everyone, this feature only works with Premium Edition.
   final TencentCloudChatMessageValueConfig<bool> enableMessageDeleteForEveryone;
 
-  // The offline push info for sending message, fields with null specify will use default configurations.
-  final TencentCloudChatMessageValueConfigWithMessage<OfflinePushInfo>
-      messageOfflinePushInfo;
+  /// The offline push info for sending message, fields with null specify will use default configurations.
+  final TencentCloudChatMessageValueConfigWithMessage<OfflinePushInfo> messageOfflinePushInfo;
 
-  final TencentCloudChatMessageValueConfig<TencentCloudChatTimeDividerConfig>
-      timeDividerConfig;
+  final TencentCloudChatMessageValueConfig<TencentCloudChatTimeDividerConfig> timeDividerConfig;
 
-  final TencentCloudChatMessageValueConfig<
-          List<TencentCloudChatMessageGeneralOptionItem>>
-      additionalAttachmentOptionsForMobile;
+  final TencentCloudChatMessageValueConfig<List<TencentCloudChatMessageGeneralOptionItem>> additionalAttachmentOptionsForMobile;
 
-  final TencentCloudChatMessageValueConfig<
-          List<TencentCloudChatMessageGeneralOptionItem>>
-      additionalInputControlBarOptionsForDesktop;
+  final TencentCloudChatMessageValueConfig<List<TencentCloudChatMessageGeneralOptionItem>> additionalInputControlBarOptionsForDesktop;
 
-  final TencentCloudChatMessageValueConfig<
-          List<TencentCloudChatMessageGeneralOptionItem>>
-      additionalMessageMenuOptions;
+  /// Determines whether to enable specific or all options in the default message selection operation menu.
+  /// This configuration class can be used to customize the selection menu.
+  final TencentCloudChatMessageValueConfig<TencentCloudChatMessageDefaultMessageSelectionOptionsConfig> defaultMessageSelectionOperationsConfig;
+
+  /// Determines whether to enable specific or all options in the default message menu.
+  /// This configuration class can be used
+  /// in conjunction with `defaultMessageMenuConfig` to customize the message menu.
+  final TencentCloudChatMessageValueConfig<TencentCloudChatMessageDefaultMessageMenuConfig> defaultMessageMenuConfig;
+
+  /// Allows adding additional message menu options through this list.
+  /// This can be used in conjunction with
+  /// `defaultMessageMenuConfig` to further customize the message menu.
+  final TencentCloudChatMessageValueConfig<List<TencentCloudChatMessageGeneralOptionItem>> additionalMessageMenuOptions;
 
   /// A list of `GroupType` enums specifying which group types should have
   /// the message read receipt feature enabled.
@@ -78,8 +79,7 @@ class TencentCloudChatMessageConfig {
   ///   GroupType.Public,
   /// ]);
   /// ```
-  final TencentCloudChatMessageValueConfig<List<String>>
-      enabledGroupTypesForMessageReadReceipt;
+  final TencentCloudChatMessageValueConfig<List<String>> enabledGroupTypesForMessageReadReceipt;
 
   /// Determines whether to use the built-in QQ-style emoji set.
   ///
@@ -96,8 +96,7 @@ class TencentCloudChatMessageConfig {
   /// `TencentCloudChatStickerSet` class. These additional sticker sets
   /// allow users to further personalize their chat experience and use
   /// their favorite stickers for expressive communication.
-  final TencentCloudChatMessageValueConfig<List<TencentCloudChatStickerSet>>
-      additionalStickerSets;
+  final TencentCloudChatMessageValueConfig<List<TencentCloudChatStickerSet>> additionalStickerSets;
 
   /// The number of lines for the message input box on the desktop platform.
   /// This value determines the height of the message input box.
@@ -120,55 +119,32 @@ class TencentCloudChatMessageConfig {
     TencentCloudChatMessageValueConfig<bool>? showOthersAvatar,
     TencentCloudChatMessageValueConfig<bool>? showMessageTimeIndicator,
     TencentCloudChatMessageValueConfig<bool>? showMessageStatusIndicator,
-    TencentCloudChatMessageValueConfig<bool>? enableMessageDeleteForEveryone,
+    enableMessageDeleteForEveryone,
     TencentCloudChatMessageValueConfig<bool>? enableDefaultEmojis,
-    TencentCloudChatMessageValueConfigWithMessage<OfflinePushInfo>?
-        messageOfflinePushInfo,
-    TencentCloudChatMessageValueConfig<List<TencentCloudChatStickerSet>>?
-        additionalStickerSets,
-    TencentCloudChatMessageValueConfig<
-            List<TencentCloudChatMessageGeneralOptionItem>>?
-        additionalAttachmentOptionsForMobile,
-    TencentCloudChatMessageValueConfig<
-            List<TencentCloudChatMessageGeneralOptionItem>>?
-        additionalInputControlBarOptionsForDesktop,
-    TencentCloudChatMessageValueConfig<
-            List<TencentCloudChatMessageGeneralOptionItem>>?
-        additionalMessageMenuOptions,
-    TencentCloudChatMessageValueConfig<TencentCloudChatTimeDividerConfig>?
-        timeDividerConfig,
-    TencentCloudChatMessageValueConfig<List<String>>?
-        enabledGroupTypesForMessageReadReceipt,
+    TencentCloudChatMessageValueConfigWithMessage<OfflinePushInfo>? messageOfflinePushInfo,
+    TencentCloudChatMessageValueConfig<List<TencentCloudChatStickerSet>>? additionalStickerSets,
+    TencentCloudChatMessageValueConfig<List<TencentCloudChatMessageGeneralOptionItem>>? additionalAttachmentOptionsForMobile,
+    TencentCloudChatMessageValueConfig<List<TencentCloudChatMessageGeneralOptionItem>>? additionalInputControlBarOptionsForDesktop,
+    TencentCloudChatMessageValueConfig<TencentCloudChatMessageDefaultMessageSelectionOptionsConfig>? defaultMessageSelectionOperationsConfig,
+    TencentCloudChatMessageValueConfig<TencentCloudChatMessageDefaultMessageMenuConfig>? defaultMessageMenuConfig,
+    TencentCloudChatMessageValueConfig<List<TencentCloudChatMessageGeneralOptionItem>>? additionalMessageMenuOptions,
+    TencentCloudChatMessageValueConfig<TencentCloudChatTimeDividerConfig>? timeDividerConfig,
+    TencentCloudChatMessageValueConfig<List<String>>? enabledGroupTypesForMessageReadReceipt,
   })  : showSelfAvatar = showSelfAvatar ?? createDefaultValue(false),
         showOthersAvatar = showOthersAvatar ?? createDefaultValue(true),
         showMessageTimeIndicator = showMessageTimeIndicator ?? createDefaultValue(true),
         showMessageStatusIndicator = showMessageStatusIndicator ?? createDefaultValue(true),
-        desktopMessageInputLines =
-            desktopMessageInputLines ?? createDefaultValue(5),
+        desktopMessageInputLines = desktopMessageInputLines ?? createDefaultValue(5),
         recallTimeLimit = recallTimeLimit ?? createDefaultValue(120),
-        enableMessageDeleteForEveryone =
-            enableMessageDeleteForEveryone ?? createDefaultValue(true),
+        enableMessageDeleteForEveryone = enableMessageDeleteForEveryone ?? createDefaultValue(true),
         enableDefaultEmojis = enableDefaultEmojis ?? createDefaultValue(true),
-        messageOfflinePushInfo = messageOfflinePushInfo ??
-            createDefaultValueWithMessage(OfflinePushInfo()),
-        additionalStickerSets = additionalStickerSets ??
-            createDefaultValue<List<TencentCloudChatStickerSet>>([]),
-        additionalMessageMenuOptions = additionalMessageMenuOptions ??
-            createDefaultValue<List<TencentCloudChatMessageGeneralOptionItem>>(
-                []),
-        timeDividerConfig = timeDividerConfig ??
-            createDefaultValue<TencentCloudChatTimeDividerConfig>(
-                TencentCloudChatTimeDividerConfig()),
-        enabledGroupTypesForMessageReadReceipt =
-            enabledGroupTypesForMessageReadReceipt ??
-                createDefaultValue<List<String>>(
-                    [GroupType.Work, GroupType.Public, GroupType.Meeting]),
-        additionalInputControlBarOptionsForDesktop =
-            additionalInputControlBarOptionsForDesktop ??
-                createDefaultValue<
-                    List<TencentCloudChatMessageGeneralOptionItem>>([]),
-        additionalAttachmentOptionsForMobile =
-            additionalAttachmentOptionsForMobile ??
-                createDefaultValue<
-                    List<TencentCloudChatMessageGeneralOptionItem>>([]);
+        messageOfflinePushInfo = messageOfflinePushInfo ?? createDefaultValueWithMessage(OfflinePushInfo()),
+        additionalStickerSets = additionalStickerSets ?? createDefaultValue<List<TencentCloudChatStickerSet>>([]),
+        defaultMessageSelectionOperationsConfig = defaultMessageSelectionOperationsConfig ?? createDefaultValue<TencentCloudChatMessageDefaultMessageSelectionOptionsConfig>(TencentCloudChatMessageDefaultMessageSelectionOptionsConfig()),
+        defaultMessageMenuConfig = defaultMessageMenuConfig ?? createDefaultValue<TencentCloudChatMessageDefaultMessageMenuConfig>(TencentCloudChatMessageDefaultMessageMenuConfig()),
+        additionalMessageMenuOptions = additionalMessageMenuOptions ?? createDefaultValue<List<TencentCloudChatMessageGeneralOptionItem>>([]),
+        timeDividerConfig = timeDividerConfig ?? createDefaultValue<TencentCloudChatTimeDividerConfig>(TencentCloudChatTimeDividerConfig()),
+        enabledGroupTypesForMessageReadReceipt = enabledGroupTypesForMessageReadReceipt ?? createDefaultValue<List<String>>([GroupType.Work, GroupType.Public, GroupType.Meeting]),
+        additionalInputControlBarOptionsForDesktop = additionalInputControlBarOptionsForDesktop ?? createDefaultValue<List<TencentCloudChatMessageGeneralOptionItem>>([]),
+        additionalAttachmentOptionsForMobile = additionalAttachmentOptionsForMobile ?? createDefaultValue<List<TencentCloudChatMessageGeneralOptionItem>>([]);
 }

@@ -1,4 +1,8 @@
 {
+  "ko": [
+    "originalMessageNotFound"
+  ],
+
   "zh_Hans": [
     "album",
     "chat",
@@ -358,6 +362,10 @@
     "profile",
     "unpin",
     "mentionedMessages",
-    "longPressToNavigate"
+    "longPressToNavigate",
+    "permissionDeniedTitle",
+    "permissionDeniedContent",
+    "goToSettingsButtonText",
+    "originalMessageNotFound"
   ]
 }

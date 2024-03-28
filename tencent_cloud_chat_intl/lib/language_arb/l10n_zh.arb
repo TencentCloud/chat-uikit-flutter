@@ -519,5 +519,9 @@
     "profile": "个人资料",
     "unpin": "取消置顶",
   "mentionedMessages": "{count} 条消息提到我",
-  "longPressToNavigate": "按住查看"
+  "longPressToNavigate": "按住查看",
+  "permissionDeniedTitle": "权限被拒绝",
+  "permissionDeniedContent": "请前往设置并启用 {permissionString} 权限。",
+  "goToSettingsButtonText": "前往设置",
+  "originalMessageNotFound": "未找到原始消息"
 }

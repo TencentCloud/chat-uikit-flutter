@@ -1,5 +1,5 @@
-// Copyright (c) 1998-2024 Tencent, Inc. All rights reserved.
-// Use of this source code is governed by a MIT license that can be
+// Copyright (c) 1998-2024 Tencent, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
 import 'package:intl/intl.dart' as intl;
@@ -1223,4 +1223,18 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
 
   @override
   String get longPressToNavigate => '길게 눌러서 보기';
+
+  @override
+  String get permissionDeniedTitle => '권한 거부됨';
+
+  @override
+  String permissionDeniedContent(Object permissionString) {
+    return '설정으로 이동하여 $permissionString 권한을 활성화하세요.';
+  }
+
+  @override
+  String get goToSettingsButtonText => '설정으로 이동';
+
+  @override
+  String get originalMessageNotFound => 'Original message not found';
 }

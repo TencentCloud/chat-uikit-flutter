@@ -29,12 +29,10 @@ class TencentCloudChatGroupProfileMemberList extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() =>
-      TencentCloudChatGroupProfileMemberListState();
+  State<StatefulWidget> createState() => TencentCloudChatGroupProfileMemberListState();
 }
 
-class TencentCloudChatGroupProfileMemberListState
-    extends TencentCloudChatState<TencentCloudChatGroupProfileMemberList> {
+class TencentCloudChatGroupProfileMemberListState extends TencentCloudChatState<TencentCloudChatGroupProfileMemberList> {
   @override
   Widget defaultBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(
@@ -82,13 +80,10 @@ class TencentCloudChatGroupProfileMemberListAzList extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() =>
-      TencentCloudChatGroupProfileMemberListAzListState();
+  State<StatefulWidget> createState() => TencentCloudChatGroupProfileMemberListAzListState();
 }
 
-class TencentCloudChatGroupProfileMemberListAzListState
-    extends TencentCloudChatState<
-        TencentCloudChatGroupProfileMemberListAzList> {
+class TencentCloudChatGroupProfileMemberListAzListState extends TencentCloudChatState<TencentCloudChatGroupProfileMemberListAzList> {
   Map tagCount = {};
   List<ISuspensionBeanImpl> list = [];
   int myRole = 0;
@@ -97,11 +92,8 @@ class TencentCloudChatGroupProfileMemberListAzListState
     super.initState();
     tagCount = {};
     list = _getListTag();
-    final loginID = TencentCloudChat.dataInstance.basic.currentUser!.userID;
-    myRole = widget.memberInfoList
-            .firstWhere((element) => element.userID == loginID)
-            .role ??
-        0;
+    final loginID = TencentCloudChat().dataInstance.basic.currentUser!.userID;
+    myRole = widget.memberInfoList.firstWhere((element) => element.userID == loginID).role ?? 0;
   }
 
   List<ISuspensionBeanImpl> _getListTag() {
@@ -109,22 +101,16 @@ class TencentCloudChatGroupProfileMemberListAzListState
     final List<ISuspensionBeanImpl> adminAndOwner = List.empty(growable: true);
     for (var i = 0; i < widget.memberInfoList.length; i++) {
       final item = widget.memberInfoList[i];
-      final name = TencentCloudChatUtils.checkString(
-              widget.memberInfoList[i].nameCard) ??
-          widget.memberInfoList[i].userID;
+      final name = TencentCloudChatUtils.checkString(widget.memberInfoList[i].nameCard) ?? widget.memberInfoList[i].userID;
       print("widget.name ${item.toJson()}");
       String tag = name.substring(0, 1).toUpperCase();
       final role = item.role;
-      if (role != null &&
-          role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN) {
-        adminAndOwner.add(
-            ISuspensionBeanImpl(friendInfo: item, tagIndex: "Administrator"));
+      if (role != null && role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN) {
+        adminAndOwner.add(ISuspensionBeanImpl(friendInfo: item, tagIndex: "Administrator"));
         tag = "Administrator";
-      } else if (role != null &&
-          role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER) {
+      } else if (role != null && role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER) {
         tag = "Owner";
-        adminAndOwner
-            .add(ISuspensionBeanImpl(friendInfo: item, tagIndex: "Owner"));
+        adminAndOwner.add(ISuspensionBeanImpl(friendInfo: item, tagIndex: "Owner"));
       } else if (RegExp("[A-Z]").hasMatch(tag)) {
         showList.add(ISuspensionBeanImpl(friendInfo: item, tagIndex: tag));
       } else {
@@ -163,11 +149,8 @@ class TencentCloudChatGroupProfileMemberListAzListState
           groupInfo: widget.groupInfo,
         );
       },
-      indexBarData: SuspensionUtil.getTagIndexList(list)
-          .where((element) => element != "@")
-          .toList(),
-      physics:
-          const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
+      indexBarData: SuspensionUtil.getTagIndexList(list).where((element) => element != "@").toList(),
+      physics: const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()),
       susItemBuilder: (context, index) {
         ISuspensionBeanImpl tag = list[index];
         return TencentCloudChatGroupProfileMemberListTag(
@@ -184,26 +167,18 @@ class TencentCloudChatGroupProfileMemberListItem extends StatefulWidget {
   final V2TimGroupInfo groupInfo;
   final V2TimGroupMemberFullInfo memberFullInfo;
   final int myRole;
-  const TencentCloudChatGroupProfileMemberListItem(
-      {super.key,
-      required this.memberFullInfo,
-      required this.myRole,
-      required this.groupInfo});
+  const TencentCloudChatGroupProfileMemberListItem({super.key, required this.memberFullInfo, required this.myRole, required this.groupInfo});
 
   @override
-  State<StatefulWidget> createState() =>
-      TencentCloudChatGroupProfileMemberListItemState();
+  State<StatefulWidget> createState() => TencentCloudChatGroupProfileMemberListItemState();
 }
 
-class TencentCloudChatGroupProfileMemberListItemState
-    extends TencentCloudChatState<TencentCloudChatGroupProfileMemberListItem> {
+class TencentCloudChatGroupProfileMemberListItemState extends TencentCloudChatState<TencentCloudChatGroupProfileMemberListItem> {
   bool canSetAdmin() {
-    if (widget.memberFullInfo.role ==
-        GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER) {
+    if (widget.memberFullInfo.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER) {
       return false;
     }
-    if (widget.groupInfo.groupType == GroupType.AVChatRoom ||
-        widget.groupInfo.groupType == GroupType.Work) {
+    if (widget.groupInfo.groupType == GroupType.AVChatRoom || widget.groupInfo.groupType == GroupType.Work) {
       return false;
     }
     if (widget.myRole != GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN) {
@@ -213,8 +188,7 @@ class TencentCloudChatGroupProfileMemberListItemState
   }
 
   bool canDeleteMember() {
-    if (widget.memberFullInfo.role ==
-        GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER) {
+    if (widget.memberFullInfo.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER) {
       return false;
     }
     if (widget.groupInfo.groupType == GroupType.AVChatRoom) {
@@ -229,19 +203,14 @@ class TencentCloudChatGroupProfileMemberListItemState
     if (widget.myRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER) {
       return true;
     }
-    if (widget.myRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN &&
-        widget.memberFullInfo.role ==
-            GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_MEMBER) {
+    if (widget.myRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN && widget.memberFullInfo.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_MEMBER) {
       return true;
     }
     return false;
   }
 
   _onSetMemberRole(GroupMemberRoleTypeEnum roleType) async {
-    await TencentCloudChatGroupSDK.setGroupMemberRole(
-        groupID: widget.groupInfo.groupID,
-        userID: widget.memberFullInfo.userID,
-        role: roleType);
+    await TencentCloudChatGroupSDK.setGroupMemberRole(groupID: widget.groupInfo.groupID, userID: widget.memberFullInfo.userID, role: roleType);
   }
 
   onManageMember() {
@@ -267,17 +236,13 @@ class TencentCloudChatGroupProfileMemberListItemState
         CupertinoActionSheetAction(
           onPressed: () {
             if (role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_MEMBER) {
-              _onSetMemberRole(
-                  GroupMemberRoleTypeEnum.V2TIM_GROUP_MEMBER_ROLE_ADMIN);
+              _onSetMemberRole(GroupMemberRoleTypeEnum.V2TIM_GROUP_MEMBER_ROLE_ADMIN);
             } else {
-              _onSetMemberRole(
-                  GroupMemberRoleTypeEnum.V2TIM_GROUP_MEMBER_ROLE_ADMIN);
+              _onSetMemberRole(GroupMemberRoleTypeEnum.V2TIM_GROUP_MEMBER_ROLE_ADMIN);
             }
             Navigator.pop(context);
           },
-          child: Text(role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_MEMBER
-              ? tL10n.setAsAdmin
-              : tL10n.dismissAdmin),
+          child: Text(role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_MEMBER ? tL10n.setAsAdmin : tL10n.dismissAdmin),
         ),
       );
     }
@@ -322,11 +287,7 @@ class TencentCloudChatGroupProfileMemberListItemState
                         Padding(
                             padding: EdgeInsets.only(right: getWidth(16)),
                             child: TencentCloudChatAvatar(
-                              imageList: [
-                                TencentCloudChatUtils.checkString(
-                                        widget.memberFullInfo.faceUrl) ??
-                                    "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"
-                              ],
+                              imageList: [TencentCloudChatUtils.checkString(widget.memberFullInfo.faceUrl) ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"],
                               width: getSquareSize(40),
                               height: getSquareSize(40),
                               borderRadius: getSquareSize(48),
@@ -334,12 +295,8 @@ class TencentCloudChatGroupProfileMemberListItemState
                             )),
                         Expanded(
                             child: Text(
-                          TencentCloudChatUtils.checkString(
-                                  widget.memberFullInfo.nameCard) ??
-                              widget.memberFullInfo.userID,
-                          style: TextStyle(
-                              color: colorTheme.groupProfileTextColor,
-                              fontSize: textStyle.fontsize_14),
+                          TencentCloudChatUtils.checkString(widget.memberFullInfo.nameCard) ?? widget.memberFullInfo.userID,
+                          style: TextStyle(color: colorTheme.groupProfileTextColor, fontSize: textStyle.fontsize_14),
                         )),
                         Icon(
                           Icons.arrow_forward_ios_rounded,
@@ -362,12 +319,10 @@ class TencentCloudChatGroupProfileMemberListTag extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() =>
-      TencentCloudChatGroupProfileMemberListTagState();
+  State<StatefulWidget> createState() => TencentCloudChatGroupProfileMemberListTagState();
 }
 
-class TencentCloudChatGroupProfileMemberListTagState
-    extends TencentCloudChatState<TencentCloudChatGroupProfileMemberListTag> {
+class TencentCloudChatGroupProfileMemberListTagState extends TencentCloudChatState<TencentCloudChatGroupProfileMemberListTag> {
   @override
   Widget defaultBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(

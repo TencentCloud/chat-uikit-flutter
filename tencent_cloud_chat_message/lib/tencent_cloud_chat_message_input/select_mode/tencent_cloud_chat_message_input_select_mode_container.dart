@@ -21,12 +21,26 @@ class _TencentCloudChatMessageInputSelectModeContainerState
         TencentCloudChatMessageDataProviderInherited.of(context);
     final TencentCloudChatMessageConfig config = dataProvider.config;
 
+    final defaultMessageSelectionOperationsConfig =
+        dataProvider.config.defaultMessageSelectionOperationsConfig(
+      userID: dataProvider.userID,
+      groupID: dataProvider.groupID,
+    );
+
     return TencentCloudChatMessageBuilders.getMessageInputSelectBuilder(
       messages: dataProvider.selectedMessages,
-      useDeleteForEveryone: config.enableMessageDeleteForEveryone(
-        userID: dataProvider.userID,
-        groupID: dataProvider.groupID,
-      ),
+      enableMessageDeleteForEveryone: config.enableMessageDeleteForEveryone(
+            userID: dataProvider.userID,
+            groupID: dataProvider.groupID,
+          ) &&
+          defaultMessageSelectionOperationsConfig
+              .enableMessageDeleteForEveryone,
+      enableMessageForwardIndividually: defaultMessageSelectionOperationsConfig
+          .enableMessageForwardIndividually,
+      enableMessageForwardCombined:
+          defaultMessageSelectionOperationsConfig.enableMessageForwardCombined,
+      enableMessageDeleteForSelf:
+          defaultMessageSelectionOperationsConfig.enableMessageDeleteForSelf,
       onDeleteForMe: (messages) {
         dataProvider.inSelectMode = false;
         Future.delayed(const Duration(milliseconds: 10), () {

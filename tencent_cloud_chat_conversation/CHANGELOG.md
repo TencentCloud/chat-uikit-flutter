@@ -1,3 +1,20 @@
+## 1.2.0
+
+### General
+
+- Added support for tablet devices, including adaptive UI for iPad and various Android tablets. Now you can deploy to all platforms (mobile, pad, desktop, web) with a single codebase and code once.
+- Introduced callback functionality, allowing handling of SDK API errors and specific UIKit events that require user attention with `eventCode` and `text` by default, on a global scale. Developers can initialize UIKit with `TencentCloudChatCoreController.initUIKit()` and set up the callbacks accordingly.
+- Enhanced global dialog style for Apple devices with a more native-looking Cupertino style.
+- Optimized global data storage structure and improved underlying performance.
+- Ensured that all data from the previous account is removed from memory after logging out, and no data remains when logging in with a new account.
+  Replaced the original `logout` method with the `resetUIKit({bool shouldLogout = false})` method in `TencentCloudChatCoreController` to ensure no data residue in UIKit after logging out and avoid logout twice after been kicked off. For specific usage, refer to the comment.
+- Added SVG support for avatars.
+
+### Conversation (TencentCloudChatConversation)
+
+- Optimized time display in conversation items for better readability.
+- Fixed the issue where the conversation unread count could not be updated dynamically.
+
 ## 1.1.2
 
 ### General

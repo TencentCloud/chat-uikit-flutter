@@ -26,13 +26,11 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
   TencentCloudChatContactData(super.currentUpdatedFields);
 
   /// === friend application list ===
-  static final List<V2TimFriendApplication> _applicationList = [];
+  final List<V2TimFriendApplication> _applicationList = [];
 
-  void buildApplicationList(
-      List<V2TimFriendApplication> applicationList, String action) {
+  void buildApplicationList(List<V2TimFriendApplication> applicationList, String action) {
     for (var element in applicationList) {
-      var index =
-          _applicationList.indexWhere((ele) => element.userID == ele.userID);
+      var index = _applicationList.indexWhere((ele) => element.userID == ele.userID);
       if (index > -1) {
         _applicationList[index] = element;
       } else {
@@ -40,38 +38,33 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
       }
     }
     console(
-      logs:
-          "$action buildApplicationList ${applicationList.length} changed. total application length is ${_applicationList.length}",
+      logs: "$action buildApplicationList ${applicationList.length} changed. total application length is ${_applicationList.length}",
     );
     notifyListener(TencentCloudChatContactDataKeys.applicationList as T);
   }
 
   void deleteApplicationList(List<String> applicationList, String action) {
     for (String id in applicationList) {
-      var index =
-          _applicationList.indexWhere((element) => element.userID == id);
+      var index = _applicationList.indexWhere((element) => element.userID == id);
       if (index > -1) {
         _applicationList.removeAt(index);
       }
     }
     console(
-      logs:
-          "$action buildApplicationList ${applicationList.length} changed. total application length is ${_applicationList.length}",
+      logs: "$action buildApplicationList ${applicationList.length} changed. total application length is ${_applicationList.length}",
     );
     notifyListener(TencentCloudChatContactDataKeys.applicationList as T);
   }
 
   /// === friend response type ===
-  static FriendResponseTypeEnum responseType =
-      FriendResponseTypeEnum.V2TIM_FRIEND_ACCEPT_AGREE_AND_ADD;
+  FriendResponseTypeEnum responseType = FriendResponseTypeEnum.V2TIM_FRIEND_ACCEPT_AGREE_AND_ADD;
 
   /// === friend application type ===
-  static FriendApplicationTypeEnum applicationType =
-      FriendApplicationTypeEnum.V2TIM_FRIEND_APPLICATION_COME_IN;
+  FriendApplicationTypeEnum applicationType = FriendApplicationTypeEnum.V2TIM_FRIEND_APPLICATION_COME_IN;
 
   /// === handle application code and userID===
-  static int _applicationCode = 0;
-  static String _applicationUserID = "";
+  int _applicationCode = 0;
+  String _applicationUserID = "";
 
   void setApplicationCode(int code, String userID) {
     _applicationCode = code;
@@ -80,12 +73,11 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
   }
 
   /// === joined group list ===
-  static final List<V2TimGroupInfo> _groupList = [];
+  final List<V2TimGroupInfo> _groupList = [];
 
   void buildGroupList(List<V2TimGroupInfo> groupList, String action) {
     for (var element in groupList) {
-      var index =
-          _groupList.indexWhere((ele) => element.groupID == ele.groupID);
+      var index = _groupList.indexWhere((ele) => element.groupID == ele.groupID);
       if (index > -1) {
         _groupList[index] = element;
       } else {
@@ -96,7 +88,7 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
   }
 
   /// === block list ===
-  static final List<V2TimFriendInfo> _blockList = [];
+  final List<V2TimFriendInfo> _blockList = [];
 
   void buildBlockList(List<V2TimFriendInfo> blockList, String action) {
     for (var element in blockList) {
@@ -121,12 +113,11 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
   }
 
   /// === friend list ===
-  static final List<V2TimFriendInfo> _contactList = [];
+  final List<V2TimFriendInfo> _contactList = [];
 
   void buildFriendList(List<V2TimFriendInfo> contactList, String action) {
     for (var element in contactList) {
-      var index =
-          _contactList.indexWhere((ele) => element.userID == ele.userID);
+      var index = _contactList.indexWhere((ele) => element.userID == ele.userID);
       if (index > -1) {
         _contactList[index] = element;
       } else {
@@ -134,8 +125,7 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
       }
     }
     console(
-      logs:
-          "$action buildFriendList ${contactList.length} changed. total contactList length is ${_contactList.length}",
+      logs: "$action buildFriendList ${contactList.length} changed. total contactList length is ${_contactList.length}",
     );
     notifyListener(TencentCloudChatContactDataKeys.contactList as T);
   }
@@ -151,26 +141,26 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
   }
 
   /// === user online status ===
-  static final List<V2TimUserStatus> _userStatus = [];
+  final List<V2TimUserStatus> _userStatus = [];
 
   /// ===  friend group list ===
-  static final List<V2TimFriendGroup> _friendGroup = [];
+  final List<V2TimFriendGroup> _friendGroup = [];
 
   /// === group application list ===
-  static final List<V2TimGroupApplication> _groupApplicationList = [];
+  final List<V2TimGroupApplication> _groupApplicationList = [];
 
   /// === searched user list ===
-  static final List<V2TimUserFullInfo> _searchUserList = [];
+  final List<V2TimUserFullInfo> _searchUserList = [];
 
   /// === total application unread count ===
-  static int _applicationUnreadCount = 0;
+  int _applicationUnreadCount = 0;
 
   /// === add friend result code and friend ID ===
-  static int _addFriendCode = 0;
-  static String _addFriendID = "";
+  int _addFriendCode = 0;
+  String _addFriendID = "";
 
   /// === delete conversation result code ===
-  static int _deleteConversationCode = 0;
+  int _deleteConversationCode = 0;
 
   void setApplicationUnreadCount(int count) {
     _applicationUnreadCount = count;
@@ -222,8 +212,7 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
       }
     }
     console(
-      logs:
-          "$action buildUserStatusList ${_userStatus.length} changed. total userStatus length is ${_userStatus.length}",
+      logs: "$action buildUserStatusList ${_userStatus.length} changed. total userStatus length is ${_userStatus.length}",
     );
     notifyListener(TencentCloudChatContactDataKeys.userStatusList as T);
   }
@@ -251,11 +240,9 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
     notifyListener(TencentCloudChatContactDataKeys.blockList as T);
   }
 
-  void buildGroupApplicationList(
-      List<V2TimGroupApplication> groupApplicationList, String action) {
+  void buildGroupApplicationList(List<V2TimGroupApplication> groupApplicationList, String action) {
     for (var element in groupApplicationList) {
-      var index = _groupApplicationList.indexWhere((ele) =>
-          element.groupID == ele.groupID && element.fromUser == ele.fromUser);
+      var index = _groupApplicationList.indexWhere((ele) => element.groupID == ele.groupID && element.fromUser == ele.fromUser);
       if (index > -1) {
         _groupApplicationList[index] = element;
       } else {

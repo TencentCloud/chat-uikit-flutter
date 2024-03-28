@@ -90,14 +90,14 @@ class TencentCloudChatContactState extends TencentCloudChatState<TencentCloudCha
   void initState() {
     super.initState();
     _addContactDataListener();
-    if (TencentCloudChat.dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.contact)) {
+    if (TencentCloudChat().dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.contact)) {
       if (_contactsList.isEmpty) {
-        _contactsList = TencentCloudChat.dataInstance.contact.contactList;
-        applicationList = TencentCloudChat.dataInstance.contact.applicationList;
+        _contactsList = TencentCloudChat().dataInstance.contact.contactList;
+        applicationList = TencentCloudChat().dataInstance.contact.applicationList;
         _applicationUnreadCount = applicationList.length;
-        _groupApplicationList = TencentCloudChat.dataInstance.contact.groupApplicationList;
-        _groupList = TencentCloudChat.dataInstance.contact.groupList;
-        _blockList = TencentCloudChat.dataInstance.contact.blockList;
+        _groupApplicationList = TencentCloudChat().dataInstance.contact.groupApplicationList;
+        _groupList = TencentCloudChat().dataInstance.contact.groupList;
+        _blockList = TencentCloudChat().dataInstance.contact.blockList;
       }
     }
   }

@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:tencent_cloud_chat/chat_sdk/tencent_cloud_chat_sdk.dart';
-import 'package:tencent_cloud_chat/data/conversation/tencent_cloud_chat_conversation_data.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation_filter.dart';
@@ -18,7 +17,7 @@ class TencentCloudChatConversationSDK {
 
   static final V2TimConversationListener conversationListener = V2TimConversationListener(
     onConversationChanged: (conversationList) {
-      TencentCloudChat.dataInstance.conversation.buildConversationList(conversationList, 'onConversationChanged');
+      TencentCloudChat().dataInstance.conversation.buildConversationList(conversationList, 'onConversationChanged');
     },
     onConversationGroupCreated: (groupName, conversationList) {},
     onConversationGroupDeleted: (groupName) {},
@@ -26,7 +25,7 @@ class TencentCloudChatConversationSDK {
     onConversationsAddedToGroup: (groupName, conversationList) {},
     onConversationsDeletedFromGroup: (groupName, conversationList) {},
     onNewConversation: (conversationList) {
-      TencentCloudChat.dataInstance.conversation.buildConversationList(conversationList, 'onNewConversation');
+      TencentCloudChat().dataInstance.conversation.buildConversationList(conversationList, 'onNewConversation');
     },
     onSyncServerFailed: () {},
     onSyncServerFinish: () {
@@ -37,12 +36,12 @@ class TencentCloudChatConversationSDK {
     },
     onSyncServerStart: () {},
     onTotalUnreadMessageCountChanged: (totalUnreadCount) {
-      TencentCloudChat.dataInstance.conversation.setTotalUnreadCount(totalUnreadCount);
+      TencentCloudChat().dataInstance.conversation.setTotalUnreadCount(totalUnreadCount);
     },
     onConversationDeleted: (conversationIDList) {
       console("onConversationDeleted exec. ids is ${conversationIDList.join(",")}");
       // used in mutil client sync
-      TencentCloudChat.dataInstance.conversation.removeConversation(conversationIDList);
+      TencentCloudChat().dataInstance.conversation.removeConversation(conversationIDList);
     },
     onUnreadMessageCountChangedByFilter: (filter, totalUnreadCount) {
       console("onUnreadMessageCountChangedByFilter exec");
@@ -131,12 +130,13 @@ class TencentCloudChatConversationSDK {
     String? seq,
     int? count,
   }) async {
+    final conversationData = TencentCloudChat().dataInstance.conversation;
     if (seq == "0") {
-      TencentCloudChatConversationData.currentGetConversationListSeq = seq!;
-      TencentCloudChat.dataInstance.conversation.conversationList.clear();
+      conversationData.currentGetConversationListSeq = seq!;
+      conversationData.conversationList.clear();
     }
-    String paramSeq = seq ?? TencentCloudChatConversationData.currentGetConversationListSeq;
-    int paramCount = count ?? TencentCloudChatConversationData.getConversationListCount;
+    String paramSeq = seq ?? conversationData.currentGetConversationListSeq;
+    int paramCount = count ?? conversationData.getConversationListCount;
 
     console("GetConversationList api exec. And seq is $paramSeq. count is $paramCount");
     V2TimValueCallback<V2TimConversationResult> conListRes = await TencentCloudChatSDK.manager.getConversationManager().getConversationList(
@@ -147,13 +147,13 @@ class TencentCloudChatConversationSDK {
       if (conListRes.data != null) {
         if (conListRes.data!.isFinished != null) {
           if (!conListRes.data!.isFinished!) {
-            TencentCloudChatConversationData.currentGetConversationListSeq = conListRes.data!.nextSeq!;
+            conversationData.currentGetConversationListSeq = conListRes.data!.nextSeq!;
           } else {
             console("GetConversationList finished");
-            TencentCloudChatConversationData.currentGetConversationListSeq = "";
+            conversationData.currentGetConversationListSeq = "";
             getTotalUnreadCount();
           }
-          TencentCloudChatConversationData.isGetConversationFinished = conListRes.data!.isFinished!;
+          conversationData.isGetConversationFinished = conListRes.data!.isFinished!;
         }
 
         if (conListRes.data!.conversationList != null) {
@@ -167,22 +167,22 @@ class TencentCloudChatConversationSDK {
               }
             }
 
-            TencentCloudChat.dataInstance.conversation.buildConversationList(conListFormat, 'getConversationList');
+            conversationData.buildConversationList(conListFormat, 'getConversationList');
           }
         }
       }
       _getOtherConversation();
     }
-    TencentCloudChat.dataInstance.conversation.updateIsGetDataEnd(true);
+    conversationData.updateIsGetDataEnd(true);
   }
 
   static _getOtherConversation() async {
-    console("Get complete conversationList asynchronously ${TencentCloudChatConversationData.isGetConversationFinished}");
-    if (!TencentCloudChatConversationData.isGetConversationFinished) {
+    console("Get complete conversationList asynchronously ${TencentCloudChat().dataInstance.conversation.isGetConversationFinished}");
+    if (!TencentCloudChat().dataInstance.conversation.isGetConversationFinished) {
       await TencentCloudChatConversationSDK.getConversationList(
         count: 100,
       );
-      if (!TencentCloudChatConversationData.isGetConversationFinished) {
+      if (!TencentCloudChat().dataInstance.conversation.isGetConversationFinished) {
         _getOtherConversation();
       }
     }
@@ -192,7 +192,7 @@ class TencentCloudChatConversationSDK {
     V2TimValueCallback<int> totalRes = await TencentCloudChatSDK.manager.getConversationManager().getTotalUnreadMessageCount();
     if (totalRes.code == 0) {
       if (totalRes.data != null) {
-        TencentCloudChat.dataInstance.conversation.setTotalUnreadCount(totalRes.data!);
+        TencentCloudChat().dataInstance.conversation.setTotalUnreadCount(totalRes.data!);
       }
     }
   }

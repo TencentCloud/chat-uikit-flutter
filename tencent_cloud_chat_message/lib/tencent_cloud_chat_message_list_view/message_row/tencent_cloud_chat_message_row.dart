@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat/components/components_options/tencent_cloud_chat_user_profile_options.dart';
+import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
 import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
 import 'package:tencent_cloud_chat/router/tencent_cloud_chat_navigator.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_code_info.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/builders/tencent_cloud_chat_common_builders.dart';
@@ -29,7 +31,7 @@ class TencentCloudChatMessageRow extends StatefulWidget {
   final ValueChanged<V2TimMessage> onSelectCurrent;
   final SendingMessageData? sendingMessageData;
   final bool isMergeMessage;
-  final Function({
+  final Future<bool> Function({
     required bool highLightTargetMessage,
     V2TimMessage? message,
     int? timeStamp,
@@ -51,12 +53,10 @@ class TencentCloudChatMessageRow extends StatefulWidget {
   });
 
   @override
-  State<TencentCloudChatMessageRow> createState() =>
-      _TencentCloudChatMessageRowState();
+  State<TencentCloudChatMessageRow> createState() => _TencentCloudChatMessageRowState();
 }
 
-class _TencentCloudChatMessageRowState
-    extends TencentCloudChatState<TencentCloudChatMessageRow> {
+class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentCloudChatMessageRow> {
   late V2TimMessage _message;
 
   @override
@@ -77,24 +77,16 @@ class _TencentCloudChatMessageRowState
 
   @override
   Widget desktopBuilder(BuildContext context) {
-    final tipsItem = widget.message.elemType == 101 ||
-        widget.message.elemType == MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS;
-    final isRecalled =
-        widget.message.status == MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED;
+    final tipsItem = widget.message.elemType == 101 || widget.message.elemType == MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS;
+    final isRecalled = widget.message.status == MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED;
 
-    final messageReply = TencentCloudChatUtils.parseMessageReply(
-        TencentCloudChatUtils.checkString(widget.message.cloudCustomData));
-    final isDesktopScreen = TencentCloudChatScreenAdapter.deviceScreenType ==
-        DeviceScreenType.desktop;
+    final messageReply = TencentCloudChatUtils.parseMessageReply(TencentCloudChatUtils.checkString(widget.message.cloudCustomData));
+    final isDesktopScreen = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop;
 
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => Container(
-        padding: EdgeInsets.symmetric(
-            vertical: getSquareSize(6),
-            horizontal: isDesktopScreen ? getSquareSize(8) : 0),
-        color: (widget.isSelected && widget.inSelectMode)
-            ? colorTheme.messageBeenChosenBackgroundColor
-            : Colors.transparent,
+        padding: EdgeInsets.symmetric(vertical: getSquareSize(6), horizontal: isDesktopScreen ? getSquareSize(8) : 0),
+        color: (widget.isSelected && widget.inSelectMode) ? colorTheme.messageBeenChosenBackgroundColor : Colors.transparent,
         child: (tipsItem || isRecalled)
             ? Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -112,9 +104,7 @@ class _TencentCloudChatMessageRowState
                       String? text,
                       SendingMessageData? sendingMessageData,
                     ) {
-                      return TencentCloudChatMessageBuilders
-                          .tencentCloudChatMessageItemBuilders
-                          .getMessageTipsBuilder(
+                      return TencentCloudChatMessageBuilders.tencentCloudChatMessageItemBuilders.getMessageTipsBuilder(
                         message: widget.message,
                         text: text ?? "",
                       );
@@ -137,33 +127,19 @@ class _TencentCloudChatMessageRowState
                       Expanded(
                           child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: (widget.message.isSelf ?? true)
-                            ? MainAxisAlignment.end
-                            : MainAxisAlignment.start,
+                        mainAxisAlignment: (widget.message.isSelf ?? true) ? MainAxisAlignment.end : MainAxisAlignment.start,
                         children: [
                           if ((!(widget.message.isSelf ?? true)) &&
-                              TencentCloudChat.dataInstance.basic.messageConfig
-                                  .showOthersAvatar(
-                                groupID: widget.message.groupID,
-                                userID: widget.message.userID,
-                              ))
+                              TencentCloudChat().dataInstance.basic.messageConfig.showOthersAvatar(
+                                    groupID: widget.message.groupID,
+                                    userID: widget.message.userID,
+                                  ))
                             GestureDetector(
-                              onTap: TencentCloudChatUtils.checkString(
-                                          widget.message.sender) !=
-                                      null
-                                  ? () => navigateToUserProfile(
-                                      context: context,
-                                      options:
-                                          TencentCloudChatUserProfileOptions(
-                                              userID: widget.message.sender!))
-                                  : null,
+                              onTap: TencentCloudChatUtils.checkString(widget.message.sender) != null ? () => navigateToUserProfile(context: context, options: TencentCloudChatUserProfileOptions(userID: widget.message.sender!)) : null,
                               child: Container(
-                                margin: EdgeInsets.symmetric(
-                                    horizontal: getSquareSize(10)),
-                                child: TencentCloudChatCommonBuilders
-                                    .getCommonAvatarBuilder(
-                                  scene: TencentCloudChatAvatarScene
-                                      .messageListForOthers,
+                                margin: EdgeInsets.symmetric(horizontal: getSquareSize(10)),
+                                child: TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
+                                  scene: TencentCloudChatAvatarScene.messageListForOthers,
                                   imageList: [widget.message.faceUrl ?? ""],
                                   width: getSquareSize(36),
                                   height: getSquareSize(36),
@@ -172,15 +148,11 @@ class _TencentCloudChatMessageRowState
                               ),
                             ),
                           Column(
-                            crossAxisAlignment: (widget.message.isSelf ?? true)
-                                ? CrossAxisAlignment.end
-                                : CrossAxisAlignment.start,
+                            crossAxisAlignment: (widget.message.isSelf ?? true) ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                             children: [
                               TencentCloudChatMessageItemWithMenuContainer(
                                 isMergeMessage: widget.isMergeMessage,
-                                messageItem: (
-                                        {required bool renderOnMenuPreview}) =>
-                                    TencentCloudChatMessageItemContainer(
+                                messageItem: ({required bool renderOnMenuPreview}) => TencentCloudChatMessageItemContainer(
                                   message: widget.message,
                                   messageRowWidth: widget.messageRowWidth,
                                   isMergeMessage: widget.isMergeMessage,
@@ -195,16 +167,13 @@ class _TencentCloudChatMessageRowState
                                     if (sendingMessageData?.message != null) {
                                       _message = sendingMessageData!.message;
                                     }
-                                    return TencentCloudChatMessageBuilders
-                                        .tencentCloudChatMessageItemBuilders
-                                        .getMessageItemBuilder(
+                                    return TencentCloudChatMessageBuilders.tencentCloudChatMessageItemBuilders.getMessageItemBuilder(
                                       message: _message,
                                       userID: widget.userID,
                                       groupID: widget.groupID,
                                       renderOnMenuPreview: renderOnMenuPreview,
                                       inSelectMode: widget.inSelectMode,
-                                      onSelectMessage: () =>
-                                          widget.onSelectCurrent(_message),
+                                      onSelectMessage: () => widget.onSelectCurrent(_message),
                                       shouldBeHighlighted: shouldBeHighlighted,
                                       clearHighlightFunc: clearHighlightFunc,
                                       messageReceipt: messageReceipt,
@@ -217,31 +186,31 @@ class _TencentCloudChatMessageRowState
                                 useMessageReaction: true,
                                 message: widget.message,
                               ),
-                              if (TencentCloudChatUtils.checkString(
-                                      messageReply.messageID) !=
-                                  null)
+                              if (TencentCloudChatUtils.checkString(messageReply.messageID) != null)
                                 Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     TencentCloudChatMessageReplyView(
                                       messageSender: messageReply.messageSender,
-                                      messageAbstract:
-                                          messageReply.messageAbstract,
+                                      messageAbstract: messageReply.messageAbstract,
                                       messageID: messageReply.messageID!,
                                       messageSeq: messageReply.messageSeq,
-                                      messageTimestamp:
-                                          messageReply.messageTimestamp,
-                                      onTriggerNavigation: () {
-                                        widget.loadToSpecificMessage(
+                                      messageTimestamp: messageReply.messageTimestamp,
+                                      onTriggerNavigation: () async {
+                                        final res = await widget.loadToSpecificMessage(
                                             highLightTargetMessage: true,
                                             message: V2TimMessage(
                                               msgID: messageReply.messageID,
                                               elemType: 0,
-                                              timestamp:
-                                                  messageReply.messageTimestamp,
-                                              seq: messageReply.messageSeq
-                                                  ?.toString(),
+                                              timestamp: messageReply.messageTimestamp,
+                                              seq: messageReply.messageSeq?.toString(),
                                             ));
+                                        if (!res) {
+                                          TencentCloudChat().callbacks?.onUserNotificationEvent?.call(
+                                                TencentCloudChatComponentsEnum.message,
+                                                TencentCloudChatCodeInfo.originalMessageNotFound,
+                                              );
+                                        }
                                       },
                                     )
                                   ],
@@ -249,18 +218,14 @@ class _TencentCloudChatMessageRowState
                             ],
                           ),
                           if ((widget.message.isSelf ?? true) &&
-                              TencentCloudChat.dataInstance.basic.messageConfig
-                                  .showSelfAvatar(
-                                groupID: widget.message.groupID,
-                                userID: widget.message.userID,
-                              ))
+                              TencentCloudChat().dataInstance.basic.messageConfig.showSelfAvatar(
+                                    groupID: widget.message.groupID,
+                                    userID: widget.message.userID,
+                                  ))
                             Container(
-                              margin: EdgeInsets.symmetric(
-                                  horizontal: getSquareSize(10)),
-                              child: TencentCloudChatCommonBuilders
-                                  .getCommonAvatarBuilder(
-                                scene: TencentCloudChatAvatarScene
-                                    .messageListForSelf,
+                              margin: EdgeInsets.symmetric(horizontal: getSquareSize(10)),
+                              child: TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
+                                scene: TencentCloudChatAvatarScene.messageListForSelf,
                                 imageList: [widget.message.faceUrl ?? ""],
                                 width: getSquareSize(36),
                                 height: getSquareSize(36),
@@ -268,11 +233,10 @@ class _TencentCloudChatMessageRowState
                               ),
                             ),
                           if ((widget.message.isSelf ?? true) &&
-                              !TencentCloudChat.dataInstance.basic.messageConfig
-                                  .showSelfAvatar(
-                                groupID: widget.message.groupID,
-                                userID: widget.message.userID,
-                              ))
+                              !TencentCloudChat().dataInstance.basic.messageConfig.showSelfAvatar(
+                                    groupID: widget.message.groupID,
+                                    userID: widget.message.userID,
+                                  ))
                             const SizedBox(
                               width: 10,
                             ),
@@ -288,20 +252,15 @@ class _TencentCloudChatMessageRowState
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    final tipsItem = widget.message.elemType == 101 ||
-        widget.message.elemType == MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS;
-    final isRecalled =
-        widget.message.status == MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED;
+    final tipsItem = widget.message.elemType == 101 || widget.message.elemType == MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS;
+    final isRecalled = widget.message.status == MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED;
 
-    final messageReply = TencentCloudChatUtils.parseMessageReply(
-        TencentCloudChatUtils.checkString(widget.message.cloudCustomData));
+    final messageReply = TencentCloudChatUtils.parseMessageReply(TencentCloudChatUtils.checkString(widget.message.cloudCustomData));
 
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => AnimatedContainer(
         padding: EdgeInsets.symmetric(vertical: getSquareSize(6)),
-        color: (widget.isSelected && widget.inSelectMode)
-            ? colorTheme.messageBeenChosenBackgroundColor
-            : Colors.transparent,
+        color: (widget.isSelected && widget.inSelectMode) ? colorTheme.messageBeenChosenBackgroundColor : Colors.transparent,
         duration: const Duration(milliseconds: 300),
         child: (tipsItem || isRecalled)
             ? Row(
@@ -320,9 +279,7 @@ class _TencentCloudChatMessageRowState
                       String? text,
                       SendingMessageData? sendingMessageData,
                     ) {
-                      return TencentCloudChatMessageBuilders
-                          .tencentCloudChatMessageItemBuilders
-                          .getMessageTipsBuilder(
+                      return TencentCloudChatMessageBuilders.tencentCloudChatMessageItemBuilders.getMessageTipsBuilder(
                         message: widget.message,
                         text: text ?? "",
                       );
@@ -346,8 +303,7 @@ class _TencentCloudChatMessageRowState
                         offstage: !widget.inSelectMode,
                         child: Checkbox(
                           value: widget.isSelected,
-                          visualDensity:
-                              const VisualDensity(vertical: -4, horizontal: 0),
+                          visualDensity: const VisualDensity(vertical: -4, horizontal: 0),
                           activeColor: colorTheme.primaryColor,
                           checkColor: colorTheme.backgroundColor,
                           shape: RoundedRectangleBorder(
@@ -361,33 +317,19 @@ class _TencentCloudChatMessageRowState
                       Expanded(
                           child: Row(
                         crossAxisAlignment: CrossAxisAlignment.end,
-                        mainAxisAlignment: (widget.message.isSelf ?? true)
-                            ? MainAxisAlignment.end
-                            : MainAxisAlignment.start,
+                        mainAxisAlignment: (widget.message.isSelf ?? true) ? MainAxisAlignment.end : MainAxisAlignment.start,
                         children: [
                           if ((!(widget.message.isSelf ?? true)) &&
-                              TencentCloudChat.dataInstance.basic.messageConfig
-                                  .showOthersAvatar(
-                                groupID: widget.message.groupID,
-                                userID: widget.message.userID,
-                              ))
+                              TencentCloudChat().dataInstance.basic.messageConfig.showOthersAvatar(
+                                    groupID: widget.message.groupID,
+                                    userID: widget.message.userID,
+                                  ))
                             GestureDetector(
-                              onTap: TencentCloudChatUtils.checkString(
-                                          widget.message.sender) !=
-                                      null
-                                  ? () => navigateToUserProfile(
-                                      context: context,
-                                      options:
-                                          TencentCloudChatUserProfileOptions(
-                                              userID: widget.message.sender!))
-                                  : null,
+                              onTap: TencentCloudChatUtils.checkString(widget.message.sender) != null ? () => navigateToUserProfile(context: context, options: TencentCloudChatUserProfileOptions(userID: widget.message.sender!)) : null,
                               child: Container(
-                                margin: EdgeInsets.symmetric(
-                                    horizontal: getSquareSize(10)),
-                                child: TencentCloudChatCommonBuilders
-                                    .getCommonAvatarBuilder(
-                                  scene: TencentCloudChatAvatarScene
-                                      .messageListForOthers,
+                                margin: EdgeInsets.symmetric(horizontal: getSquareSize(10)),
+                                child: TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
+                                  scene: TencentCloudChatAvatarScene.messageListForOthers,
                                   imageList: [widget.message.faceUrl ?? ""],
                                   width: getSquareSize(36),
                                   height: getSquareSize(36),
@@ -396,15 +338,11 @@ class _TencentCloudChatMessageRowState
                               ),
                             ),
                           Column(
-                            crossAxisAlignment: (widget.message.isSelf ?? true)
-                                ? CrossAxisAlignment.end
-                                : CrossAxisAlignment.start,
+                            crossAxisAlignment: (widget.message.isSelf ?? true) ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                             children: [
                               TencentCloudChatMessageItemWithMenuContainer(
                                 isMergeMessage: widget.isMergeMessage,
-                                messageItem: (
-                                        {required bool renderOnMenuPreview}) =>
-                                    TencentCloudChatMessageItemContainer(
+                                messageItem: ({required bool renderOnMenuPreview}) => TencentCloudChatMessageItemContainer(
                                   message: widget.message,
                                   messageRowWidth: widget.messageRowWidth,
                                   isMergeMessage: widget.isMergeMessage,
@@ -419,16 +357,13 @@ class _TencentCloudChatMessageRowState
                                     if (sendingMessageData?.message != null) {
                                       _message = sendingMessageData!.message;
                                     }
-                                    return TencentCloudChatMessageBuilders
-                                        .tencentCloudChatMessageItemBuilders
-                                        .getMessageItemBuilder(
+                                    return TencentCloudChatMessageBuilders.tencentCloudChatMessageItemBuilders.getMessageItemBuilder(
                                       message: _message,
                                       renderOnMenuPreview: renderOnMenuPreview,
                                       userID: widget.userID,
                                       groupID: widget.groupID,
                                       inSelectMode: widget.inSelectMode,
-                                      onSelectMessage: () =>
-                                          widget.onSelectCurrent(_message),
+                                      onSelectMessage: () => widget.onSelectCurrent(_message),
                                       shouldBeHighlighted: shouldBeHighlighted,
                                       clearHighlightFunc: clearHighlightFunc,
                                       messageReceipt: messageReceipt,
@@ -441,32 +376,31 @@ class _TencentCloudChatMessageRowState
                                 useMessageReaction: true,
                                 message: widget.message,
                               ),
-                              if (TencentCloudChatUtils.checkString(
-                                      messageReply.messageID) !=
-                                  null)
+                              if (TencentCloudChatUtils.checkString(messageReply.messageID) != null)
                                 Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     TencentCloudChatMessageReplyView(
                                       messageSender: messageReply.messageSender,
-                                      messageAbstract:
-                                          messageReply.messageAbstract,
+                                      messageAbstract: messageReply.messageAbstract,
                                       messageID: messageReply.messageID!,
-                                      messageTimestamp:
-                                          messageReply.messageTimestamp,
+                                      messageTimestamp: messageReply.messageTimestamp,
                                       messageSeq: messageReply.messageSeq,
-                                      onTriggerNavigation: () {
-                                        widget.loadToSpecificMessage(
-                                          highLightTargetMessage: true,
-                                          message: V2TimMessage(
-                                            msgID: messageReply.messageID,
-                                            elemType: 0,
-                                            timestamp:
-                                                messageReply.messageTimestamp,
-                                            seq: messageReply.messageSeq
-                                                ?.toString(),
-                                          ),
-                                        );
+                                      onTriggerNavigation: () async {
+                                        final res = await widget.loadToSpecificMessage(
+                                            highLightTargetMessage: true,
+                                            message: V2TimMessage(
+                                              msgID: messageReply.messageID,
+                                              elemType: 0,
+                                              timestamp: messageReply.messageTimestamp,
+                                              seq: messageReply.messageSeq?.toString(),
+                                            ));
+                                        if (!res) {
+                                          TencentCloudChat().callbacks?.onUserNotificationEvent?.call(
+                                                TencentCloudChatComponentsEnum.message,
+                                                TencentCloudChatCodeInfo.originalMessageNotFound,
+                                              );
+                                        }
                                       },
                                     )
                                   ],
@@ -474,18 +408,14 @@ class _TencentCloudChatMessageRowState
                             ],
                           ),
                           if ((widget.message.isSelf ?? true) &&
-                              TencentCloudChat.dataInstance.basic.messageConfig
-                                  .showSelfAvatar(
-                                groupID: widget.message.groupID,
-                                userID: widget.message.userID,
-                              ))
+                              TencentCloudChat().dataInstance.basic.messageConfig.showSelfAvatar(
+                                    groupID: widget.message.groupID,
+                                    userID: widget.message.userID,
+                                  ))
                             Container(
-                              margin: EdgeInsets.symmetric(
-                                  horizontal: getSquareSize(10)),
-                              child: TencentCloudChatCommonBuilders
-                                  .getCommonAvatarBuilder(
-                                scene: TencentCloudChatAvatarScene
-                                    .messageListForSelf,
+                              margin: EdgeInsets.symmetric(horizontal: getSquareSize(10)),
+                              child: TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
+                                scene: TencentCloudChatAvatarScene.messageListForSelf,
                                 imageList: [widget.message.faceUrl ?? ""],
                                 width: getSquareSize(36),
                                 height: getSquareSize(36),
@@ -493,11 +423,10 @@ class _TencentCloudChatMessageRowState
                               ),
                             ),
                           if ((widget.message.isSelf ?? true) &&
-                              !TencentCloudChat.dataInstance.basic.messageConfig
-                                  .showSelfAvatar(
-                                groupID: widget.message.groupID,
-                                userID: widget.message.userID,
-                              ))
+                              !TencentCloudChat().dataInstance.basic.messageConfig.showSelfAvatar(
+                                    groupID: widget.message.groupID,
+                                    userID: widget.message.userID,
+                                  ))
                             const SizedBox(
                               width: 10,
                             ),

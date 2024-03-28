@@ -528,5 +528,9 @@
     "profile": "الملف الشخصي",
     "unpin": "إلغاء التثبيت",
     "mentionedMessages": "{count} رسائل ذكرتني",
-  "longPressToNavigate": "اضغط واستمر لعرض"
+  "longPressToNavigate": "اضغط واستمر لعرض",
+  "permissionDeniedTitle": "تم رفض الإذن",
+  "permissionDeniedContent": "يرجى الانتقال إلى الإعدادات وتمكين إذن {permissionString}.",
+  "goToSettingsButtonText": "الانتقال إلى الإعدادات",
+  "originalMessageNotFound": "لم يتم العثور على الرسالة الأصلية"
 }

@@ -21,28 +21,23 @@ class TencentCloudChatMessageForwardContainer extends StatefulWidget {
   });
 
   @override
-  State<TencentCloudChatMessageForwardContainer> createState() =>
-      _TencentCloudChatMessageForwardContainerState();
+  State<TencentCloudChatMessageForwardContainer> createState() => _TencentCloudChatMessageForwardContainerState();
 }
 
-class _TencentCloudChatMessageForwardContainerState
-    extends TencentCloudChatState<TencentCloudChatMessageForwardContainer> {
+class _TencentCloudChatMessageForwardContainerState extends TencentCloudChatState<TencentCloudChatMessageForwardContainer> {
   @override
   Widget defaultBuilder(BuildContext context) {
-    final conversationList =
-        TencentCloudChat.dataInstance.conversation.conversationList;
-    final contactList = TencentCloudChat.dataInstance.contact.contactList;
-    final groupList = TencentCloudChat.dataInstance.contact.groupList;
+    final conversationList = TencentCloudChat().dataInstance.conversation.conversationList;
+    final contactList = TencentCloudChat().dataInstance.contact.contactList;
+    final groupList = TencentCloudChat().dataInstance.contact.groupList;
 
     return TencentCloudChatMessageBuilders.getMessageForwardBuilder(
       type: widget.type,
       conversationList: conversationList.toList(),
       onSelectConversations: (chatList) {
-        final messageModal =
-            TencentCloudChatMessageDataProviderInherited.of(widget.context);
+        final messageModal = TencentCloudChatMessageDataProviderInherited.of(widget.context);
         if (widget.type == TencentCloudChatForwardType.individually) {
-          messageModal.sendForwardIndividuallyMessage(
-              widget.messages.map((e) => e.msgID ?? "").toList(), chatList);
+          messageModal.sendForwardIndividuallyMessage(widget.messages.map((e) => e.msgID ?? "").toList(), chatList);
         } else {
           messageModal.sendForwardCombinedMessage(widget.messages, chatList);
         }

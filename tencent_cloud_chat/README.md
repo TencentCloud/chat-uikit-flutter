@@ -36,13 +36,13 @@ We're excited for you to try out our new Flutter Chat UIKit and look forward to 
 
 ## Compatibility
 
-Our UIKit supports both mobile and desktop UI styles, and is compatible with Android, iOS, macOS, Windows, and Web _(support coming in future versions)_.
+This UIKit supports mobile, tablet, and desktop UI styles, and is compatible with Android, iOS, macOS, Windows, and Web *(support coming in future versions)*.
 
 It comes with built-in support for English, Simplified Chinese, Traditional Chinese, Japanese, Korean, and Arabic languages (with support for Arabic RTL interface), and light and dark appearance styles.
 
 ## Requirements
 
-- Flutter version: 3.10 or above
+- Flutter version: 3.16 or above
 - Dart version: 3.0 or above
 
 ## Getting Started
@@ -66,20 +66,16 @@ The architecture of our UIKit is shown below:
 
 Before you start using each Modular Package UI component, there are some initial setup steps you need to follow in your project.
 
-1. Prepare the necessary Tencent Cloud Chat configuration information, such as sdkappid, test userID, userSig, etc. You can refer to this document: https://www.tencentcloud.com/document/product/1047/45907#.E5.89.8D.E5.BA.8F.E5.B7.A5.E4.BD.9C
-
-2. In your Flutter project, install the main package and the optional Modular Packages mentioned in the Getting Started section above.
-
-3. Import `TencentCloudChatMaterialApp`:
-
-Replace your project's `MaterialApp` with `TencentCloudChatMaterialApp`. This will automatically manage and configure the language, theme _(with material3)_, themeMode, and other settings, ensuring that the UIKit's interface parameters are consistent with your project.
-
-This step will take over the language, theme, and themeMode configuration of your project. If you do not want us to automatically manage all these configurations for your project, you can open `TencentCloudChatMaterialApp`, check its source code and implementation, and manually import the necessary capabilities in your project's `MaterialApp`.
-
-4. Initialization and Login:
+1. Prepare the necessary Tencent Cloud Chat configuration information, such as sdkappid, test userID, userSig, etc. You can refer to this document: [https://www.tencentcloud.com/document/product/1047/45907#.E5.89.8D.E5.BA.8F.E5.B7.A5.E4.BD.9C](https://www.tencentcloud.com/document/product/1047/45907#.E5.89.8D.E5.BA.8F.E5.B7.A5.E4.BD.9C)
+2. **Packages installing:**
+  In your Flutter project, install the main package and the optional modular packages mentioned in the Getting Started section.
+3. **Global configuration:**
+  Import `TencentCloudChatMaterialApp`: Replace your project's `MaterialApp` with `TencentCloudChatMaterialApp`. This enables automatic management and configuration of the language, theme *(with material3)*, theme mode, and other settings, ensuring that the UIKit's interface parameters are consistent with your project.
+  This step will take over the language, theme, and theme mode configuration of your project. 
+  If you do not want the automatic management of the configuration for your project, you can manually import the features you need into your project according to the **[this guide](https://www.tencentcloud.com/document/product/1047/58585#ab6bd508-218a-4002-9b76-0ee081e8929a)**.
+4. **Initialization and Login**:
 
 Call the `TencentCloudChat.controller.initUIKit` method to initialize and log in. The call instructions and reference code are as follows:
-
 ```dart
     await TencentCloudChat.controller.initUIKit(
       context: context,
@@ -104,6 +100,14 @@ Call the `TencentCloudChat.controller.initUIKit` method to initialize and log in
         userSig: , /// The userSig of the logged-in user
         sdkListener: V2TimSDKListener(),  /// Event listener registered with the Chat SDK
       ),
+
+      /// **[Critical]**: It's strongly advised to incorporate the following callback listeners for effectively managing SDK API errors and specific UIKit events that demand user attention.
+      /// For detailed usage, please refer to the 'Introducing Callbacks for UIKit' section at the end of this README.
+      callbacks: TencentCloudChatCallbacks(
+        onTencentCloudChatSDKFailCallback: (apiName, code, desc) {}, /// Handles SDK API errors.
+        onTencentCloudChatUIKitUserNotificationEvent: (TencentCloudChatComponentsEnum component, TencentCloudChatUserNotificationEvent event) {}, /// Handles specific UIKit events that require user attention on a global scale.
+      ),
+      
       plugins: [],  /// Used plugins, such as tencent_cloud_chat_robot, etc. For specific usage, please refer to the README of each plugin.
     );
 ```
@@ -173,6 +177,55 @@ Simply change the `State` your component inherits from to `TencentCloudChatState
 You can override different builders for different platform environments, such as `defaultBuilder`, `desktopBuilder`, `webBuilder`, etc. Use them as needed based on the provided prompts.
 
 Additionally, this class provides screen adaptation methods like `getWidth`, `getHeight`, `getSquareSize`, `getFontSize`, etc., which you can use directly.
+
+## Introducing Callbacks for UIKit
+
+To enhance the user experience, we have added callback functionality to UIKit. Initialize UIKit with `TencentCloudChatCoreController.initUIKit()` and set up the `callbacks` accordingly.
+
+These callbacks serve to notify users about SDK API errors and specific UIKit events that require user attention.
+
+The `onTencentCloudChatSDKFailedCallback` is employed to handle SDK API error returns, while the `onTencentCloudChatUIKitUserNotificationEvent` manages UIKit events that may necessitate displaying a dialog or toast to the user.
+
+### Handling SDK Failures with `onTencentCloudChatSDKFailedCallback`
+
+The callback is defined as `typedef OnTencentCloudChatSDKFailedCallback = void Function(String apiName, int code, String desc);`
+
+In this definition, 
+- `apiName` refers to the invoked SDK method, 
+- `code` denotes the SDK error code (further information can be found in [SDK Error Codes Doc](https://www.tencentcloud.com/document/product/1047/34348)).
+- `desc` provides an explanation of the error.
+
+### Handling UIKit Events with `onTencentCloudChatUIKitUserNotificationEvent`
+
+This callback is responsible for addressing all UIKit component events that warrant user notification, such as navigation issues with origin messages.
+
+It is defined as `typedef OnTencentCloudChatUIKitUserNotificationEvent = void Function(TencentCloudChatComponentsEnum component, TencentCloudChatUserNotificationEvent event);`
+
+- The `component` parameter, represented by `TencentCloudChatComponentsEnum`, indicates the source component of the event. Specifically, `TencentCloudChatComponentsEnum.global` refers to global events that are not associated with any particular child component, such as being disconnected.
+- The `TencentCloudChatUserNotificationEvent` consists of two parameters, `eventCode` and `text`.
+    - The `eventCode` is unique to the UIKit and consists of five digits in negative starting with `-1`. The first three digits identify the associated component, while the last two digits represent the event. A comprehensive list of event codes is provided below.
+    - The `text` parameter contains a predefined, localized message that can be displayed to users via a dialog or toast. Developers can either display the `text` content directly or create custom messages based on the `eventCode`.
+
+#### Event Code Structure
+
+| Start of `eventCode` | Component                      |
+|----------------------|--------------------------------|
+| -101                 | Global                         |
+| -102                 | `TencentCloudChatConversation` |
+| -103                 | `TencentCloudChatMessage`      |
+| -104                 | `TencentCloudChatContact`      |
+| -105                 | `TencentCloudChatUserProfile`  |
+| -106                 | `TencentCloudChatGroupProfile` |
+| -107                 | `TencentCloudChatSearch`       |
+| -108                 | `TencentCloudChatSearch`       |
+| -108                 | Others...                      |
+
+#### Comprehensive List of Event Codes
+
+| `eventCode` | `text` by default (Localized to Supported Languages) | Description (Not included in event, for documentation purposes only)                                 |
+|-------------|------------------------------------------------------|------------------------------------------------------------------------------------------------------|
+| -10101      | You have been kicked off                             | The current user has been kicked off from the online session.                                        |
+| -10301      | Original message not found                           | The original message for a replied message cannot be found when the user attempts to navigate to it. |
 
 ## Conclusion
 

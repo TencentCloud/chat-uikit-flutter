@@ -1,12 +1,8 @@
 library tencent_cloud_chat_conversation;
 
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_conversation_config.dart';
 import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
-import 'package:tencent_cloud_chat/data/contact/tencent_cloud_chat_contact_data.dart';
-import 'package:tencent_cloud_chat/data/conversation/tencent_cloud_chat_conversation_data.dart';
 import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
 import 'package:tencent_cloud_chat/router/tencent_cloud_chat_route_names.dart';
 import 'package:tencent_cloud_chat/router/tencent_cloud_chat_router.dart';
@@ -18,18 +14,13 @@ import 'package:tencent_cloud_chat_conversation/tencent_cloud_chat_conversation_
 import 'package:tencent_cloud_chat_conversation/tencent_cloud_chat_conversation_controller.dart';
 import 'package:tencent_cloud_chat_conversation/tencent_cloud_chat_conversation_event_handlers.dart';
 import 'package:tencent_cloud_chat_conversation/tencent_cloud_chat_conversation_options.dart';
-import 'package:tencent_cloud_chat_conversation/widgets/tencent_cloud_chat_conversation_app_bar.dart';
 import 'package:tencent_cloud_chat_conversation/widgets/tencent_cloud_chat_conversation_list.dart';
 
 import 'desktop/tencent_cloud_chat_conversation_desktop_mode.dart';
 
 ///
-class TencentCloudChatConversation extends TencentCloudChatComponent<
-    TencentCloudChatConversationOptions,
-    TencentCloudChatConversationConfig,
-    TencentCloudChatConversationBuilders,
-    TencentCloudChatConversationEventHandlers,
-    TencentCloudChatConversationController> {
+class TencentCloudChatConversation
+    extends TencentCloudChatComponent<TencentCloudChatConversationOptions, TencentCloudChatConversationConfig, TencentCloudChatConversationBuilders, TencentCloudChatConversationEventHandlers, TencentCloudChatConversationController> {
   const TencentCloudChatConversation({
     super.key,
     super.options,
@@ -40,17 +31,14 @@ class TencentCloudChatConversation extends TencentCloudChatComponent<
   });
 
   @override
-  TencentCloudChatConversationState createState() =>
-      TencentCloudChatConversationState();
+  TencentCloudChatConversationState createState() => TencentCloudChatConversationState();
 }
 
-class TencentCloudChatConversationState
-    extends TencentCloudChatState<TencentCloudChatConversation> {
+class TencentCloudChatConversationState extends TencentCloudChatState<TencentCloudChatConversation> {
   @override
   void initState() {
     super.initState();
-    TencentCloudChat.dataInstance.conversation.conversationConfig =
-        widget.config;
+    TencentCloudChat().dataInstance.conversation.conversationConfig = widget.config;
   }
 
   @override
@@ -60,8 +48,7 @@ class TencentCloudChatConversationState
 
   @override
   Widget mobileBuilder(BuildContext context) {
-    final header =
-        TencentCloudChatConversationBuilders.getConversationHeaderBuilder();
+    final header = TencentCloudChatConversationBuilders.getConversationHeaderBuilder();
     if (header.$2) {
       return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Material(
@@ -111,26 +98,19 @@ class TencentCloudChatConversationInstance {
 
   // Factory constructor that returns the singleton instance of TencentCloudChatConversationInstance.
   factory TencentCloudChatConversationInstance() => _instance;
-  static final TencentCloudChatConversationInstance _instance =
-      TencentCloudChatConversationInstance._internal();
+  static final TencentCloudChatConversationInstance _instance = TencentCloudChatConversationInstance._internal();
 
-  static ({
-    TencentCloudChatComponentsEnum componentEnum,
-    TencentCloudChatWidgetBuilder widgetBuilder
-  }) register() {
+  static ({TencentCloudChatComponentsEnum componentEnum, TencentCloudChatWidgetBuilder widgetBuilder}) register() {
     TencentCloudChatRouter().registerRouter(
       routeName: TencentCloudChatRouteNames.conversation,
       builder: (context) => TencentCloudChatConversation(
-        options: TencentCloudChatRouter()
-            .getArgumentFromMap<TencentCloudChatConversationOptions>(
-                context, 'data'),
+        options: TencentCloudChatRouter().getArgumentFromMap<TencentCloudChatConversationOptions>(context, 'data'),
       ),
     );
 
     return (
       componentEnum: TencentCloudChatComponentsEnum.conversation,
-      widgetBuilder: ({required Map<String, dynamic> options}) =>
-          const TencentCloudChatConversation(),
+      widgetBuilder: ({required Map<String, dynamic> options}) => const TencentCloudChatConversation(),
     );
   }
 }

@@ -5,8 +5,7 @@ enum TencentCloudChatGroupProfileDataKeys {
 }
 
 class TencentCloudChatGroupProfileData<T> extends TencentCloudChatDataAB<T> {
-  static final Map<String, List<String>> _groupNineSquareAvatarCache =
-      Map.from({});
+  final Map<String, List<String>> _groupNineSquareAvatarCache = Map.from({});
 
   TencentCloudChatGroupProfileData(super.currentUpdatedFields);
 

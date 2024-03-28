@@ -102,7 +102,7 @@ class _TencentCloudChatMessageHeaderContainerState extends TencentCloudChatState
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    final useCallKit = TencentCloudChat.dataInstance.basic.useCallKit;
+    final useCallKit = TencentCloudChat().dataInstance.basic.useCallKit;
 
     return TencentCloudChatMessageBuilders.getMessageHeader(
       controller: dataProvider.messageController,
@@ -162,9 +162,9 @@ class _TencentCloudChatMessageHeaderContainerState extends TencentCloudChatState
               }
             }
           : null,
-      showUserOnlineStatus: TencentCloudChat.dataInstance.basic.userConfig.useUserOnlineStatus ?? true,
+      showUserOnlineStatus: TencentCloudChat().dataInstance.basic.userConfig.useUserOnlineStatus ?? true,
       getUserOnlineStatus: ({required String userID}) {
-        return TencentCloudChat.dataInstance.contact.getOnlineStatusByUserId(userID: userID);
+        return TencentCloudChat().dataInstance.contact.getOnlineStatusByUserId(userID: userID);
       },
       getGroupMembersInfo: () {
         var list = _groupMemberInfo;

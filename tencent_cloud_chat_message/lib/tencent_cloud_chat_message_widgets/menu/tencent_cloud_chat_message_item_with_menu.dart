@@ -39,15 +39,11 @@ class TencentCloudChatMessageItemWithMenu extends StatefulWidget {
   });
 
   @override
-  State<TencentCloudChatMessageItemWithMenu> createState() =>
-      _TencentCloudChatMessageItemWithMenuState();
+  State<TencentCloudChatMessageItemWithMenu> createState() => _TencentCloudChatMessageItemWithMenuState();
 }
 
-class _TencentCloudChatMessageItemWithMenuState
-    extends TencentCloudChatState<TencentCloudChatMessageItemWithMenu>
-    with TickerProviderStateMixin {
-  final isDesktopScreen = TencentCloudChatScreenAdapter.deviceScreenType ==
-      DeviceScreenType.desktop;
+class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<TencentCloudChatMessageItemWithMenu> with TickerProviderStateMixin {
+  final isDesktopScreen = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop;
 
   OverlayEntry? _mobileMenuOverlayEntry;
   OverlayEntry? _desktopMenuOverlayEntry;
@@ -57,8 +53,7 @@ class _TencentCloudChatMessageItemWithMenuState
   bool _showActions = false;
   double? _menuHeight; // Store the actual menu height
   double? _menuWidth;
-  final bool _reactionBarExpanded =
-      false; // Whether the Message Reaction bar is expanded
+  final bool _reactionBarExpanded = false; // Whether the Message Reaction bar is expanded
   late AnimationController _messageActionsAnimationController;
   late AnimationController _listMessageScaleAnimationController;
   late AnimationController _overlayMessageScaleAnimationController;
@@ -73,7 +68,7 @@ class _TencentCloudChatMessageItemWithMenuState
   void initState() {
     super.initState();
     if (isDesktopScreen) {
-      if(TencentCloudChatPlatformAdapter().isMobile){
+      if (TencentCloudChatPlatformAdapter().isMobile) {
         _mobileInit();
       }
     } else {
@@ -90,7 +85,16 @@ class _TencentCloudChatMessageItemWithMenuState
     super.dispose();
   }
 
-  void _closeMobileMenu(){
+  @override
+  void didUpdateWidget(covariant TencentCloudChatMessageItemWithMenu oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.menuOptions.length != widget.menuOptions.length && _menuHeight != null) {
+      _menuHeight = null;
+    }
+  }
+
+  void _closeMobileMenu() {
     _menuAnimationController.reverse();
     _messageActionsAnimationController.reverse().then((_) {
       safeSetState(() {
@@ -127,13 +131,10 @@ class _TencentCloudChatMessageItemWithMenuState
       }
     });
 
-    final menuCurve =
-        CurvedAnimation(parent: _menuAnimationController, curve: Curves.ease);
+    final menuCurve = CurvedAnimation(parent: _menuAnimationController, curve: Curves.ease);
     _menuAnimation = Tween<double>(begin: 0, end: 1).animate(menuCurve);
-    _listMessageScaleAnimation = Tween<double>(begin: 1.0, end: 0.9)
-        .animate(_listMessageScaleAnimationController);
-    _overlayMessageScaleAnimation = Tween<double>(begin: 0.9, end: 1)
-        .animate(_overlayMessageScaleAnimationController);
+    _listMessageScaleAnimation = Tween<double>(begin: 1.0, end: 0.9).animate(_listMessageScaleAnimationController);
+    _overlayMessageScaleAnimation = Tween<double>(begin: 0.9, end: 1).animate(_overlayMessageScaleAnimationController);
   }
 
   void _mobileDispose() {
@@ -147,9 +148,7 @@ class _TencentCloudChatMessageItemWithMenuState
   Widget _buildReactionBar() {
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Container(
-              height: _reactionBarExpanded
-                  ? 200
-                  : 50, // Adjust height based on _reactionBarExpanded
+              height: _reactionBarExpanded ? 200 : 50, // Adjust height based on _reactionBarExpanded
               color: colorTheme.backgroundColor,
               child: _reactionBarExpanded
                   ? const Column(
@@ -195,9 +194,9 @@ class _TencentCloudChatMessageItemWithMenuState
             Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: (){
+                onTap: () {
                   _closeMobileMenu();
-                  Future.delayed(const Duration(milliseconds: 50),(){
+                  Future.delayed(const Duration(milliseconds: 301), () {
                     e.onTap();
                   });
                 },
@@ -205,8 +204,7 @@ class _TencentCloudChatMessageItemWithMenuState
                   decoration: (i < widget.menuOptions.length - 1)
                       ? BoxDecoration(
                           border: Border(
-                            bottom: BorderSide(
-                                color: colorTheme.dividerColor, width: 0.5),
+                            bottom: BorderSide(color: colorTheme.dividerColor, width: 0.5),
                           ),
                         )
                       : null,
@@ -268,8 +266,7 @@ class _TencentCloudChatMessageItemWithMenuState
                     columnWidths: const <int, TableColumnWidth>{
                       0: IntrinsicColumnWidth(),
                     },
-                    children: _buildMobileMenuItems(
-                        colorTheme: colorTheme, textStyle: textStyle),
+                    children: _buildMobileMenuItems(colorTheme: colorTheme, textStyle: textStyle),
                   ),
                 ),
               ),
@@ -280,8 +277,7 @@ class _TencentCloudChatMessageItemWithMenuState
     if (_mobileMenuOverlayEntry == null) {
       if (_menuHeight == null || _menuWidth == null) {
         // Get the menu height using GlobalKey
-        final RenderBox menuBox =
-            _menuKey.currentContext!.findRenderObject() as RenderBox;
+        final RenderBox menuBox = _menuKey.currentContext!.findRenderObject() as RenderBox;
         _menuHeight = menuBox.size.height;
         _menuWidth = menuBox.size.width;
       }
@@ -293,8 +289,7 @@ class _TencentCloudChatMessageItemWithMenuState
 
       RenderBox messageBox = context.findRenderObject() as RenderBox;
       Offset messagePosition = messageBox.localToGlobal(Offset.zero);
-      double availableSpace =
-          screenHeight - messagePosition.dy - messageBox.size.height - 32;
+      double availableSpace = screenHeight - messagePosition.dy - messageBox.size.height - 32;
 
       double messageOffset = 0;
 
@@ -319,88 +314,95 @@ class _TencentCloudChatMessageItemWithMenuState
       //
       // double reactionBarTop = showReactionBarAbove ? messagePosition.dy - messageOffset - 16 - reactionBarHeight : messagePosition.dy + messageBox.size.height - messageOffset + 32 + _menuHeight!;
 
-      double menuTop =
-          messagePosition.dy + messageBox.size.height + 16 - messageOffset;
+      double menuTop = messagePosition.dy + messageBox.size.height + 16 - messageOffset;
 
       double menuLeft = textDirection == TextDirection.ltr
-          ? ((widget.message.isSelf ?? true)
-              ? messagePosition.dx + messageBox.size.width - _menuWidth!
-              : messagePosition.dx)
-          : ((widget.message.isSelf ?? true)
-              ? messagePosition.dx
-              : messagePosition.dx + messageBox.size.width - _menuWidth!);
+          ? ((widget.message.isSelf ?? true) ? messagePosition.dx + messageBox.size.width - _menuWidth! : messagePosition.dx)
+          : ((widget.message.isSelf ?? true) ? messagePosition.dx : messagePosition.dx + messageBox.size.width - _menuWidth!);
 
       Animation<double> messageTopTween = Tween<double>(
         begin: messagePosition.dy,
         end: messagePosition.dy - messageOffset,
-      ).animate(CurvedAnimation(
-          parent: _messageActionsAnimationController, curve: Curves.easeOut));
+      ).animate(CurvedAnimation(parent: _messageActionsAnimationController, curve: Curves.easeOut));
 
       _mobileMenuOverlayEntry = OverlayEntry(builder: (BuildContext context) {
         return AnimatedBuilder(
             animation: _messageActionsAnimationController,
-            builder: (BuildContext context, Widget? child) =>
-                TencentCloudChatThemeWidget(
-                    build: (context, colorTheme, textStyle) => Stack(
-                          children: [
-                            AnimatedOpacity(
-                              opacity: _messageActionsAnimationController.value,
-                              duration:
-                                  _messageActionsAnimationController.duration!,
-                              child: GestureDetector(
-                                onTap: () {
-                                  _menuAnimationController.reverse();
-                                  _messageActionsAnimationController
-                                      .reverse()
-                                      .then((_) {
+            builder: (BuildContext context, Widget? child) => TencentCloudChatThemeWidget(
+                build: (context, colorTheme, textStyle) => Stack(
+                      children: [
+                        AnimatedOpacity(
+                          opacity: _messageActionsAnimationController.value,
+                          duration: _messageActionsAnimationController.duration!,
+                          child: GestureDetector(
+                            onTap: () {
+                              try {
+                                _menuAnimationController.reverse();
+                                _messageActionsAnimationController.reverse().then((_) {
+                                  safeSetState(() {
+                                    _showActions = false;
+                                  });
+                                  _mobileMenuOverlayEntry!.remove();
+                                  _mobileMenuOverlayEntry = null;
+                                });
+                              } catch (e) {
+                                try {
+                                  _messageActionsAnimationController.reverse().then((_) {
                                     safeSetState(() {
                                       _showActions = false;
                                     });
                                     _mobileMenuOverlayEntry!.remove();
                                     _mobileMenuOverlayEntry = null;
                                   });
-                                },
-                                child: BackdropFilter(
-                                  filter:
-                                      ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                                  child: Container(
-                                    color: Colors.black.withOpacity(0.3),
+                                } catch (e) {
+                                  safeSetState(() {
+                                    _showActions = false;
+                                  });
+                                  _mobileMenuOverlayEntry!.remove();
+                                  _mobileMenuOverlayEntry = null;
+                                }
+                              }
+                            },
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                              child: Container(
+                                color: Colors.black.withOpacity(0.3),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          left: messagePosition.dx,
+                          top: messageTopTween.value,
+                          child: ScaleTransition(
+                            alignment: Alignment.topCenter,
+                            scale: _overlayMessageScaleAnimation,
+                            child: Material(
+                                color: Colors.transparent,
+                                child: SelectionArea(
+                                  child: widget.messageItem(
+                                    renderOnMenuPreview: true,
                                   ),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              left: messagePosition.dx,
-                              top: messageTopTween.value,
-                              child: ScaleTransition(
-                                alignment: Alignment.topCenter,
-                                scale: _overlayMessageScaleAnimation,
-                                child: Material(
-                                    color: Colors.transparent,
-                                    child: SelectionArea(
-                                      child: widget.messageItem(
-                                        renderOnMenuPreview: true,
-                                      ),
-                                    )),
-                              ),
-                            ),
-                            Positioned(
-                                left: menuLeft,
-                                top: menuTop,
-                                child: ScaleTransition(
-                                  scale: _menuAnimation,
-                                  child: _buildMobileMenuWidget(),
                                 )),
-                            // Positioned(
-                            //   left: messagePosition.dx,
-                            //   top: reactionBarTop,
-                            //   child: ScaleTransition(
-                            //     scale: _menuAnimation,
-                            //     child: _buildReactionBar(),
-                            //   ),
-                            // ),
-                          ],
-                        )));
+                          ),
+                        ),
+                        Positioned(
+                            left: menuLeft,
+                            top: menuTop,
+                            child: ScaleTransition(
+                              scale: _menuAnimation,
+                              child: _buildMobileMenuWidget(),
+                            )),
+                        // Positioned(
+                        //   left: messagePosition.dx,
+                        //   top: reactionBarTop,
+                        //   child: ScaleTransition(
+                        //     scale: _menuAnimation,
+                        //     child: _buildReactionBar(),
+                        //   ),
+                        // ),
+                      ],
+                    )));
       });
 
       safeSetState(() {
@@ -429,9 +431,7 @@ class _TencentCloudChatMessageItemWithMenuState
       return true;
     } else {
       _listMessageScaleAnimationController.forward();
-      _messageTapDownTimer = Timer(
-          _listMessageScaleAnimationController.duration ??
-              const Duration(milliseconds: 500), () async {
+      _messageTapDownTimer = Timer(_listMessageScaleAnimationController.duration ?? const Duration(milliseconds: 500), () async {
         if (TencentCloudChatPlatformAdapter().isIOS) {
           final canVibrate = await Haptics.canVibrate();
           if (canVibrate) {
@@ -498,8 +498,7 @@ class _TencentCloudChatMessageItemWithMenuState
     }
     if (_menuHeight == null || _menuWidth == null) {
       // Get the menu height using GlobalKey
-      final RenderBox menuBox =
-          _menuKey.currentContext!.findRenderObject() as RenderBox;
+      final RenderBox menuBox = _menuKey.currentContext!.findRenderObject() as RenderBox;
       _menuHeight = menuBox.size.height;
       _menuWidth = menuBox.size.width;
     }
@@ -508,11 +507,8 @@ class _TencentCloudChatMessageItemWithMenuState
     final screenWidth = MediaQuery.of(context).size.width;
 
     final tapDetails = tapDownDetails;
-    final double dx =
-        min(tapDetails.globalPosition.dx, screenWidth - (_menuWidth ?? 100));
-    final double dy =
-        min(tapDetails.globalPosition.dy as double, screenHeight - (_menuHeight ?? 320))
-            .toDouble();
+    final double dx = min(tapDetails.globalPosition.dx, screenWidth - (_menuWidth ?? 100));
+    final double dy = min(tapDetails.globalPosition.dy as double, screenHeight - (_menuHeight ?? 320)).toDouble();
 
     _desktopMenuOverlayEntry = OverlayEntry(
         builder: (context) => TencentCloudChatThemeWidget(

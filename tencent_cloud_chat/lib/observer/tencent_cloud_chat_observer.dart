@@ -12,7 +12,7 @@ class TencentCloudChatObserver extends RouteObserver<PageRoute<dynamic>> {
 
   /// function handles audio in message when route changed
   void _handleRouteChanged(PageRoute<dynamic> route) {
-    TencentCloudChat.dataInstance.messageData.stopPlayAudio();
+    TencentCloudChat().dataInstance.messageData.stopPlayAudio();
   }
 
   /// function for cheking and handling routes `Push` behavior and stop playing audio.

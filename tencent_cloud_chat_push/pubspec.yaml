@@ -12,10 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.0.2
-  tencent_cloud_uikit_core: ^1.5.1
-  tencent_cloud_chat_sdk: 
-    path: /Users/xingchenhe/Documents/work/test_flutter_desktop/tencent_cloud_chat_sdk
-
+  tencent_cloud_uikit_core: ^1.5.3
 
 dev_dependencies:
   flutter_test:

@@ -32,8 +32,7 @@ class TencentCloudChatGroupProfileBodyState extends TencentCloudChatState<Tencen
   void initState() {
     super.initState();
     groupMemberList = widget.getGroupMembersInfo();
-    contactList = TencentCloudChat.dataInstance.contact.contactList;
-    print("groupMemberList ${groupMemberList.toString()}");
+    contactList = TencentCloudChat().dataInstance.contact.contactList;
   }
 
   @override
@@ -324,9 +323,9 @@ class TencentCloudChatGroupProfileStateButtonState extends TencentCloudChatState
       disturb = true;
     }
 
-    int index = TencentCloudChat.dataInstance.conversation.conversationList.indexWhere((element) => element.conversationID == "group_${widget.groupInfo.groupID}");
+    int index = TencentCloudChat().dataInstance.conversation.conversationList.indexWhere((element) => element.conversationID == "group_${widget.groupInfo.groupID}");
     if (index > -1) {
-      pinChat = TencentCloudChat.dataInstance.conversation.conversationList[index].isPinned!;
+      pinChat = TencentCloudChat().dataInstance.conversation.conversationList[index].isPinned!;
     }
   }
 
@@ -666,10 +665,11 @@ class TencentCloudChatGroupProfileNickName extends StatefulWidget {
 class TencentCloudChatGroupProfileNickNameState extends TencentCloudChatState<TencentCloudChatGroupProfileNickName> {
   String myNickname = "";
   String? loginID;
+  String currentUserId = TencentCloudChat().dataInstance.basic.currentUser!.userID ?? "";
   @override
   initState() {
     super.initState();
-    loginID = TencentCloudChat.dataInstance.basic.currentUser!.userID;
+    loginID = currentUserId;
 
     myNickname = TencentCloudChatUtils.checkString(widget.groupMembersInfo.firstWhere((element) => element.userID == loginID).nameCard) ?? loginID ?? "";
   }
@@ -781,10 +781,10 @@ class TencentCloudChatGroupProfileGroupMemberState extends TencentCloudChatState
 
   String loginID = "";
   List<V2TimGroupMemberFullInfo> top3 = [];
-
+  String currentUserId = TencentCloudChat().dataInstance.basic.currentUser!.userID ?? "";
   getTop3GroupMember() {
     top3 = widget.groupMembersInfo.sublist(0, 3);
-    loginID = TencentCloudChat.dataInstance.basic.currentUser!.userID!;
+    loginID = currentUserId;
     final myInfo = widget.groupMembersInfo.firstWhere((element) => element.userID == loginID);
     int index = top3.indexWhere((element) => element.userID == loginID);
     if (index > -1) {

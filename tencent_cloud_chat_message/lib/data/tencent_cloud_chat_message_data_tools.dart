@@ -13,30 +13,22 @@ class TencentCloudChatMessageDataTools {
     String? groupID,
     required OfflinePushInfo offlinePushInfo,
   }) {
-    final loginUserInfo = TencentCloudChat.dataInstance.basic.currentUser;
+    final loginUserInfo = TencentCloudChat().dataInstance.basic.currentUser;
     if (loginUserInfo != null) {
       messageInfo.faceUrl = loginUserInfo.faceUrl;
       messageInfo.nickName = loginUserInfo.nickName;
       messageInfo.sender = loginUserInfo.userID;
     }
-    messageInfo.timestamp =
-        (DateTime.now().millisecondsSinceEpoch / 1000).ceil();
+    messageInfo.timestamp = (DateTime.now().millisecondsSinceEpoch / 1000).ceil();
     messageInfo.isSelf = true;
     messageInfo.status = MessageStatus.V2TIM_MSG_STATUS_SENDING;
     messageInfo.id = id;
     messageInfo.msgID = id;
 
     messageInfo.offlinePushInfo = OfflinePushInfo(
-      ext: offlinePushInfo.ext ??
-          (TencentCloudChatUtils.checkString(groupID) != null
-              ? "{\"conversationID\": \"group_$groupID\"}"
-              : "{\"conversationID\": \"c2c_${loginUserInfo?.userID ?? ""}\"}"),
-      title: offlinePushInfo.title ??
-          (groupInfo != null
-              ? (groupInfo.groupName ?? groupInfo.groupID)
-              : (loginUserInfo?.nickName ?? loginUserInfo?.userID)),
-      desc: offlinePushInfo.desc ??
-          (TencentCloudChatUtils.getMessageSummary(message: messageInfo)),
+      ext: offlinePushInfo.ext ?? (TencentCloudChatUtils.checkString(groupID) != null ? "{\"conversationID\": \"group_$groupID\"}" : "{\"conversationID\": \"c2c_${loginUserInfo?.userID ?? ""}\"}"),
+      title: offlinePushInfo.title ?? (groupInfo != null ? (groupInfo.groupName ?? groupInfo.groupID) : (loginUserInfo?.nickName ?? loginUserInfo?.userID)),
+      desc: offlinePushInfo.desc ?? (TencentCloudChatUtils.getMessageSummary(message: messageInfo)),
       disablePush: offlinePushInfo.disablePush,
       ignoreIOSBadge: offlinePushInfo.ignoreIOSBadge,
       iOSPushType: offlinePushInfo.iOSPushType,
@@ -56,11 +48,8 @@ class TencentCloudChatMessageDataTools {
           "messageID": repliedMessage.msgID,
           "messageTimestamp": repliedMessage.timestamp,
           "messageSeq": int.tryParse(repliedMessage.seq ?? ""),
-          "messageAbstract":
-              TencentCloudChatUtils.getMessageSummary(message: repliedMessage),
-          "messageSender":
-              TencentCloudChatUtils.checkString(repliedMessage.nickName) ??
-                  repliedMessage.sender,
+          "messageAbstract": TencentCloudChatUtils.getMessageSummary(message: repliedMessage),
+          "messageSender": TencentCloudChatUtils.checkString(repliedMessage.nickName) ?? repliedMessage.sender,
           "messageType": repliedMessage.elemType,
           "version": 1
         }
@@ -100,9 +89,7 @@ class TencentCloudChatMessageDataTools {
     );
 
     if (sendMsgRes.data != null && isCurrentConversation) {
-      List<V2TimMessage> currentHistoryMsgList =
-          TencentCloudChat.dataInstance.messageData.getMessageList(
-              key: TencentCloudChatUtils.checkString(groupID) ?? userID ?? "");
+      List<V2TimMessage> currentHistoryMsgList = TencentCloudChat().dataInstance.messageData.getMessageList(key: TencentCloudChatUtils.checkString(groupID) ?? userID ?? "");
 
       // Update the message in the currentHistoryMsgList with the same id.
       currentHistoryMsgList = currentHistoryMsgList.map((message) {
@@ -112,24 +99,21 @@ class TencentCloudChatMessageDataTools {
         return message;
       }).toList();
 
-      TencentCloudChat.dataInstance.messageData.updateMessageList(
-        messageList: currentHistoryMsgList,
-        userID: userID,
-        groupID: groupID,
-        disableNotify: true,
-      );
+      TencentCloudChat().dataInstance.messageData.updateMessageList(
+            messageList: currentHistoryMsgList,
+            userID: userID,
+            groupID: groupID,
+            disableNotify: true,
+          );
 
-      TencentCloudChat.dataInstance.messageData
-          .onSendMessageProgress(sendMsgRes.data!, 100, true);
+      TencentCloudChat().dataInstance.messageData.onSendMessageProgress(sendMsgRes.data!, 100, true);
     }
     return sendMsgRes;
   }
 
   static List<String> getAbstractList(List<V2TimMessage> selectedMessageList) {
     return selectedMessageList.map((e) {
-      final sender = (e.nickName != null && e.nickName!.isNotEmpty)
-          ? e.nickName
-          : e.sender;
+      final sender = (e.nickName != null && e.nickName!.isNotEmpty) ? e.nickName : e.sender;
       return "$sender: ${TencentCloudChatUtils.getMessageSummary(message: e)}";
     }).toList();
   }

@@ -25,6 +25,75 @@ class TencentCloudChatTimeDividerConfig {
   TencentCloudChatTimeDividerConfig({this.timeInterval, this.timestampParser});
 }
 
+/// Configuration options for default message menu settings in Tencent Cloud Chat Message.
+///
+/// The default value for all configurations is `true`.
+class TencentCloudChatMessageDefaultMessageMenuConfig {
+  /// Determines whether to enable the option to copy text messages within the message menu.
+  final bool enableMessageCopy;
+
+  /// Determines whether to enable the message reply option in the message menu.
+  final bool enableMessageReply;
+
+  /// Determines whether to enable the message select option in the message menu.
+  final bool enableMessageSelect;
+
+  /// Determines whether to enable the message forward option in the message menu.
+  final bool enableMessageForward;
+
+  /// Determines whether to enable the option to recall messages that were sent within the specific `recallTimeLimit`
+  /// (from `TencentCloudChatMessageConfig`) within the message menu.
+  final bool enableMessageRecall;
+
+  /// Determines whether to enable the message delete for self option in the message menu.
+  final bool enableMessageDeleteForSelf;
+
+  /// Determines whether to enable the message delete for everyone option in the message menu.
+  ///
+  /// This feature works with Premium Edition only.
+  final bool enableMessageDeleteForEveryone;
+
+  /// Determines whether to enable group message receipt option.
+  final bool enableGroupMessageReceipt;
+
+  TencentCloudChatMessageDefaultMessageMenuConfig({
+    this.enableMessageCopy = true,
+    this.enableMessageReply = true,
+    this.enableMessageSelect = true,
+    this.enableMessageForward = true,
+    this.enableMessageRecall = true,
+    this.enableMessageDeleteForSelf = true,
+    this.enableMessageDeleteForEveryone = true,
+    this.enableGroupMessageReceipt = true,
+  });
+}
+
+/// Configuration options for default operations on message selection mode in Tencent Cloud Chat Message.
+///
+/// The default value for all configurations is `true`.
+class TencentCloudChatMessageDefaultMessageSelectionOptionsConfig {
+  /// Determines whether to enable the message forward individually option in the message menu.
+  final bool enableMessageForwardIndividually;
+
+  /// Determines whether to enable the message forward combined option in the message menu.
+  final bool enableMessageForwardCombined;
+
+  /// Determines whether to enable the message delete for self option in the message menu.
+  final bool enableMessageDeleteForSelf;
+
+  /// Determines whether to enable the message delete for everyone option in the message menu.
+  ///
+  /// This feature works with Premium Edition only.
+  final bool enableMessageDeleteForEveryone;
+
+  TencentCloudChatMessageDefaultMessageSelectionOptionsConfig({
+    this.enableMessageForwardIndividually = true,
+    this.enableMessageForwardCombined = true,
+    this.enableMessageDeleteForSelf = true,
+    this.enableMessageDeleteForEveryone = true,
+  });
+}
+
 /// Represents a sticker set in the Tencent Cloud Chat.
 ///
 /// A sticker set contains multiple stickers that can be used in chat

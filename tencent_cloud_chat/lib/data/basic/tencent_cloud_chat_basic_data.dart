@@ -28,7 +28,7 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> {
   }
 
   /// ==== useCallKit ====
-  static bool _useCallKit = false;
+  bool _useCallKit = false;
 
   // ignore: unnecessary_getters_setters
   bool get useCallKit => _useCallKit;
@@ -49,13 +49,13 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> {
 
   /// ==== hasInitialized ====
 
-  static bool _hasInitialized = false;
+  bool _hasInitialized = false;
 
-  static bool _hasLoggedIn = false;
+  bool _hasLoggedIn = false;
 
-  static int _sdkappid = 0;
+  int _sdkappid = 0;
 
-  static List<TencentCloudChatPluginItem> plugins = [];
+  List<TencentCloudChatPluginItem> plugins = [];
 
   int get sdkappid => _sdkappid;
 
@@ -63,8 +63,7 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> {
 
   bool get hasInitialized => _hasInitialized;
 
-  static final TencentCloudChatUserConfig _userConfig =
-      TencentCloudChatUserConfig(
+  final TencentCloudChatUserConfig _userConfig = TencentCloudChatUserConfig(
     useUserOnlineStatus: true,
     autoDownloadMultimediaMessage: false,
   );
@@ -91,8 +90,7 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> {
 
   updateUseUserOnlineStatus(TencentCloudChatUserConfig config) {
     if (config.autoDownloadMultimediaMessage != null) {
-      _userConfig.autoDownloadMultimediaMessage =
-          config.autoDownloadMultimediaMessage;
+      _userConfig.autoDownloadMultimediaMessage = config.autoDownloadMultimediaMessage;
     }
     if (config.useUserOnlineStatus != null) {
       _userConfig.useUserOnlineStatus = config.useUserOnlineStatus;
@@ -134,7 +132,7 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> {
   }
 
   /// ==== Current User ====
-  static V2TimUserFullInfo? _currentUser;
+  V2TimUserFullInfo? _currentUser;
 
   V2TimUserFullInfo? get currentUser {
     return TencentCloudChat.cache.getCurrentLoginUserInfo() ?? _currentUser;
@@ -147,7 +145,7 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> {
   }
 
   /// ==== version ====
-  static String _version = "";
+  String _version = "";
 
   String get version => _version;
 
@@ -157,31 +155,23 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> {
 
   /// ==== usedComponents ====
 
-  static List<TencentCloudChatComponentsEnum> _usedComponents = [];
+  List<TencentCloudChatComponentsEnum> _usedComponents = [];
 
-  static final Map<TencentCloudChatComponentsEnum,
-      TencentCloudChatWidgetBuilder> _componentsMap = {};
+  final Map<TencentCloudChatComponentsEnum, TencentCloudChatWidgetBuilder> _componentsMap = {};
 
-  Map<TencentCloudChatComponentsEnum, TencentCloudChatWidgetBuilder>
-      get componentsMap => _componentsMap;
+  Map<TencentCloudChatComponentsEnum, TencentCloudChatWidgetBuilder> get componentsMap => _componentsMap;
 
   List<TencentCloudChatComponentsEnum> get usedComponents => _usedComponents;
 
   set usedComponents(List<TencentCloudChatComponentsEnum> value) {
     _usedComponents = value;
 
-    console(
-        logs:
-            "`usedComponents` Status Changed. Current `usedComponents` Is $_usedComponents");
+    console(logs: "`usedComponents` Status Changed. Current `usedComponents` Is $_usedComponents");
 
     notifyListener(TencentCloudChatBasicDataKeys.usedComponents as T);
   }
 
-  void addUsedComponent(
-      ({
-        TencentCloudChatComponentsEnum componentEnum,
-        TencentCloudChatWidgetBuilder widgetBuilder
-      }) component) {
+  void addUsedComponent(({TencentCloudChatComponentsEnum componentEnum, TencentCloudChatWidgetBuilder widgetBuilder}) component) {
     _usedComponents.add(component.componentEnum);
     _componentsMap[component.componentEnum] = component.widgetBuilder;
     _usedComponents.toSet().toList();
@@ -189,10 +179,9 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> {
   }
 
   /// ==== config for components ====
-  static TencentCloudChatMessageConfig? _messageConfig;
+  TencentCloudChatMessageConfig? _messageConfig;
 
-  TencentCloudChatMessageConfig get messageConfig =>
-      _messageConfig ?? TencentCloudChatMessageConfig();
+  TencentCloudChatMessageConfig get messageConfig => _messageConfig ?? TencentCloudChatMessageConfig();
 
   set messageConfig(TencentCloudChatMessageConfig value) {
     _messageConfig = value;

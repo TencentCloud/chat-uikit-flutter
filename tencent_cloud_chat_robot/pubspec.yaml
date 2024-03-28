@@ -1,6 +1,6 @@
 name: tencent_cloud_chat_robot
 description: A component for Tencent clout chat robot message
-version: 1.0.2
+version: 1.1.0
 homepage: https://trtc.io/products/chat?utm_source=gfs&utm_medium=link&utm_campaign=%E6%B8%A0%E9%81%93&_channel_track_key=k6WgfCKn
 platforms:
   android:
@@ -8,6 +8,7 @@ platforms:
   web:
   windows:
   macos:
+
 environment:
   sdk: '>=3.1.0 <4.0.0'
   flutter: ">=1.17.0"
@@ -15,13 +16,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  tencent_cloud_chat_sdk: 
-    path: /Users/xingchenhe/Documents/work/test_flutter_desktop/tencent_cloud_chat_sdk
+  tencent_cloud_chat_sdk: ^7.8.5506
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.0
-
 
 
 # For information on the generic Dart part of this file, see the

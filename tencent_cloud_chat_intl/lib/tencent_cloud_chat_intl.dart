@@ -1,7 +1,6 @@
 library tencent_cloud_chat_intl;
 
-import 'package:flutter/widgets.dart';
-import 'package:intl/date_symbol_data_file.dart';
+import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tencent_cloud_chat_intl/localizations/tencent_cloud_chat_localizations.dart';
 
@@ -139,4 +138,61 @@ class TencentCloudChatIntl extends ChangeNotifier {
 
     return timeFormat.format(dateTime);
   }
+
+  /// Formats a given timestamp (in seconds) into a human-readable string based on different scenarios.
+  ///
+  /// This method takes an integer [timestamp] representing the number of seconds since the Unix epoch
+  /// (January 1, 1970 at 00:00:00 UTC) and returns a human-readable string based on different scenarios:
+  /// - If the timestamp and current time are on the same day, it returns the time in the current format (e.g., "11:00 AM").
+  /// - If the timestamp is from yesterday, it returns "Yesterday".
+  /// - If the timestamp is from before yesterday but in the same week, it returns the day of the week (e.g., "Monday").
+  /// - If the timestamp is from before the current week but in the same year, it returns the date string without the year.
+  /// - Otherwise, it returns the date string with the year.
+  ///
+  /// Example:
+  /// ```
+  /// int timestamp = 1635504600; // Represents "2021-10-29 11:00:00"
+  /// String formattedTime = formatTimestampToHumanReadable(timestamp);
+  /// print(formattedTime); // Output: "11:00 AM"
+  /// ```
+  static String formatTimestampToHumanReadable(int timestamp, BuildContext context) {
+    Locale locale = TencentCloudChatIntl().getCurrentLocale(context);
+
+    final now = DateTime.now();
+    final dateTime = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
+    final timeFormat = DateFormat.jm(locale.toString());
+    final dateFormat = DateFormat.yMMMMd(locale.toString());
+
+    // Check if timestamp and now are on the same day
+    if (dateTime.year == now.year &&
+        dateTime.month == now.month &&
+        dateTime.day == now.day) {
+      return timeFormat.format(dateTime);
+    }
+
+    // Check if timestamp is from yesterday
+    final yesterday = now.subtract(const Duration(days: 1));
+    if (dateTime.year == yesterday.year &&
+        dateTime.month == yesterday.month &&
+        dateTime.day == yesterday.day) {
+      return tL10n.yesterday;
+    }
+
+    // Check if timestamp is from before yesterday but in the same week
+    if (dateTime.isAfter(now.subtract(const Duration(days: 6)))) {
+      if(locale.languageCode == "en"){
+        return DateFormat.E(locale.toString()).format(dateTime);
+      }
+      return DateFormat.EEEE(locale.toString()).format(dateTime);
+    }
+
+    // Check if timestamp is from before the current week but in the same year
+    if (dateTime.year == now.year) {
+      return DateFormat('MM/dd', locale.toString()).format(dateTime);
+    }
+
+    // Return the date string with the year for other cases
+    return MaterialLocalizations.of(context).formatCompactDate(dateTime);
+  }
+
 }

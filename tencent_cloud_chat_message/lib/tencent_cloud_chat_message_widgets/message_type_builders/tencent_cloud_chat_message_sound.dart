@@ -58,13 +58,9 @@ class TencentCloudChatMessageSound extends TencentCloudChatMessageItemBase {
   State<StatefulWidget> createState() => _TencentCloudChatMessageSoundState();
 }
 
-class _TencentCloudChatMessageSoundState
-    extends TencentCloudChatMessageState<TencentCloudChatMessageSound> {
-  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream =
-      TencentCloudChat.eventBusInstance
-          .on<TencentCloudChatMessageData<dynamic>>();
-  late StreamSubscription<TencentCloudChatMessageData<dynamic>>?
-      __messageDataSubscription;
+class _TencentCloudChatMessageSoundState extends TencentCloudChatMessageState<TencentCloudChatMessageSound> {
+  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.eventBusInstance.on<TencentCloudChatMessageData<dynamic>>();
+  late StreamSubscription<TencentCloudChatMessageData<dynamic>>? __messageDataSubscription;
 
   final String _tag = "TencentCloudChatMessageSound";
 
@@ -84,29 +80,24 @@ class _TencentCloudChatMessageSoundState
       return;
     }
     if (TencentCloudChatUtils.checkString(msgID) != null) {
-      String key = TencentCloudChatUtils.checkString(widget.message.userID) ??
-          widget.message.groupID ??
-          "";
-      int conversationType =
-          TencentCloudChatUtils.checkString(widget.message.userID) == null
-              ? ConversationType.V2TIM_GROUP
-              : ConversationType.V2TIM_C2C;
+      String key = TencentCloudChatUtils.checkString(widget.message.userID) ?? widget.message.groupID ?? "";
+      int conversationType = TencentCloudChatUtils.checkString(widget.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
       if (key.isEmpty) {
         console("add to download queue error. key is empty.");
         return;
       }
-      TencentCloudChat.dataInstance.messageData.addDownloadMessageToQueue(
-        data: DownloadMessageQueueData(
-          conversationType: conversationType,
-          msgID: widget.message.msgID ?? msgID,
-          messageType: MessageElemType.V2TIM_ELEM_TYPE_SOUND,
-          imageType: 0,
-          // sound message this param is unuse;
-          isSnapshot: false,
-          key: key,
-        ),
-        isClick: isClick,
-      );
+      TencentCloudChat().dataInstance.messageData.addDownloadMessageToQueue(
+            data: DownloadMessageQueueData(
+              conversationType: conversationType,
+              msgID: widget.message.msgID ?? msgID,
+              messageType: MessageElemType.V2TIM_ELEM_TYPE_SOUND,
+              imageType: 0,
+              // sound message this param is unuse;
+              isSnapshot: false,
+              key: key,
+            ),
+            isClick: isClick,
+          );
     }
   }
 
@@ -131,8 +122,7 @@ class _TencentCloudChatMessageSoundState
 
   bool hasSelfClientPath() {
     if (widget.message.soundElem != null) {
-      if (TencentCloudChatUtils.checkString(widget.message.soundElem!.path) !=
-          null) {
+      if (TencentCloudChatUtils.checkString(widget.message.soundElem!.path) != null) {
         return true;
       }
     }
@@ -153,16 +143,14 @@ class _TencentCloudChatMessageSoundState
         res = true;
       }
     }
-    if (currentdownload?.path != null &&
-        currentdownload?.downloadFinish == true) {
+    if (currentdownload?.path != null && currentdownload?.downloadFinish == true) {
       res = true;
     }
     return res;
   }
 
   String getLocalUrl() {
-    if (TencentCloudChatUtils.checkString(widget.message.soundElem!.localUrl) !=
-        null) {
+    if (TencentCloudChatUtils.checkString(widget.message.soundElem!.localUrl) != null) {
       return widget.message.soundElem!.localUrl!;
     }
     if (TencentCloudChatUtils.checkString(currentdownload?.path) != null) {
@@ -182,8 +170,7 @@ class _TencentCloudChatMessageSoundState
         String localData = widget.message.localCustomData!;
         Map<String, dynamic> localCustomDataObj;
         try {
-          localCustomDataObj =
-              Map<String, dynamic>.from(json.decode(localData));
+          localCustomDataObj = Map<String, dynamic>.from(json.decode(localData));
         } catch (err) {
           localCustomDataObj = Map<String, dynamic>.from({});
         }
@@ -224,8 +211,7 @@ class _TencentCloudChatMessageSoundState
         });
         return;
       }
-      V2TimMessageOnlineUrl? data =
-          await TencentCloudChatMessageSDK.getMessageOnlineUrl(msgID: msgID);
+      V2TimMessageOnlineUrl? data = await TencentCloudChatMessageSDK.getMessageOnlineUrl(msgID: msgID);
       if (data == null) {
         safeSetState(() {
           isErrorMessage = true;
@@ -249,8 +235,7 @@ class _TencentCloudChatMessageSoundState
           safeSetState(() {
             isErrorMessage = true;
           });
-          console(
-              "get messame online url return. by no sound elem  please check.");
+          console("get messame online url return. by no sound elem  please check.");
         }
       }
     } else {
@@ -288,21 +273,14 @@ class _TencentCloudChatMessageSoundState
     playSound();
   }
 
-  Widget renderSoundWidget(
-      double maxBubbleWidth,
-      int duration,
-      TencentCloudChatThemeColors colorTheme,
-      TencentCloudChatTextStyle textStyle,
-      bool isError,
-      TimSoundCurrentRenderInfo? currentRenderInfo) {
+  Widget renderSoundWidget(double maxBubbleWidth, int duration, TencentCloudChatThemeColors colorTheme, TencentCloudChatTextStyle textStyle, bool isError, TimSoundCurrentRenderInfo? currentRenderInfo) {
     return GestureDetector(
       onTapDown: onTapDown,
       onTapUp: onTapUp,
       child: Container(
         // width: generateSoundUILength(duration, maxBubbleWidth),
         height: getHeight(34),
-        padding: EdgeInsets.symmetric(
-            horizontal: getWidth(4), vertical: getHeight(4)),
+        padding: EdgeInsets.symmetric(horizontal: getWidth(4), vertical: getHeight(4)),
         decoration: BoxDecoration(
           color: colorTheme.dividerColor,
           borderRadius: BorderRadius.all(Radius.circular(getSquareSize(16))),
@@ -316,8 +294,7 @@ class _TencentCloudChatMessageSoundState
                 child: LinearProgressIndicator(
                   value: getProgress(),
                   backgroundColor: colorTheme.appBarBackgroundColor,
-                  valueColor:
-                      AlwaysStoppedAnimation<Color>(colorTheme.primaryColor),
+                  valueColor: AlwaysStoppedAnimation<Color>(colorTheme.primaryColor),
                 ),
               ),
             ),
@@ -336,60 +313,53 @@ class _TencentCloudChatMessageSoundState
   }
 
   playSound() async {
-    String key = TencentCloudChatUtils.checkString(widget.message.userID) ??
-        widget.message.groupID ??
-        "";
-    int conversationType =
-        TencentCloudChatUtils.checkString(widget.message.userID) == null
-            ? ConversationType.V2TIM_GROUP
-            : ConversationType.V2TIM_C2C;
-    bool isPlaying = TencentCloudChat.dataInstance.messageData
-        .isPlaying(msgID: (widget.message.msgID ?? msgID));
-    bool isPause = TencentCloudChat.dataInstance.messageData
-        .isPlaying(msgID: (widget.message.msgID ?? msgID));
+    String key = TencentCloudChatUtils.checkString(widget.message.userID) ?? widget.message.groupID ?? "";
+    int conversationType = TencentCloudChatUtils.checkString(widget.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
+    bool isPlaying = TencentCloudChat().dataInstance.messageData.isPlaying(msgID: (widget.message.msgID ?? msgID));
+    bool isPause = TencentCloudChat().dataInstance.messageData.isPlaying(msgID: (widget.message.msgID ?? msgID));
     if (isPlaying) {
-      return await TencentCloudChat.dataInstance.messageData.pauseAudio();
+      return await TencentCloudChat().dataInstance.messageData.pauseAudio();
     }
 
     if (isPause) {
-      return await TencentCloudChat.dataInstance.messageData.resumeAudio();
+      return await TencentCloudChat().dataInstance.messageData.resumeAudio();
     }
     if (hasLocalSound()) {
       var localu = getLocalUrl();
-      return await TencentCloudChat.dataInstance.messageData.playAudio(
-          source: AudioPlayInfo(
-        type: AudioPlayType.path,
-        path: localu,
-        msgID: (widget.message.msgID ?? msgID),
-        totalSecond: widget.message.soundElem!.duration ?? 0,
-        convKey: key,
-        convType: conversationType,
-      ));
+      return await TencentCloudChat().dataInstance.messageData.playAudio(
+              source: AudioPlayInfo(
+            type: AudioPlayType.path,
+            path: localu,
+            msgID: (widget.message.msgID ?? msgID),
+            totalSecond: widget.message.soundElem!.duration ?? 0,
+            convKey: key,
+            convType: conversationType,
+          ));
     }
     if (hasSelfClientPath()) {
       var localp = getLocalPath();
 
-      return await TencentCloudChat.dataInstance.messageData.playAudio(
-          source: AudioPlayInfo(
-        type: AudioPlayType.path,
-        path: localp,
-        msgID: (widget.message.msgID ?? msgID),
-        totalSecond: widget.message.soundElem!.duration ?? 0,
-        convKey: key,
-        convType: conversationType,
-      ));
+      return await TencentCloudChat().dataInstance.messageData.playAudio(
+              source: AudioPlayInfo(
+            type: AudioPlayType.path,
+            path: localp,
+            msgID: (widget.message.msgID ?? msgID),
+            totalSecond: widget.message.soundElem!.duration ?? 0,
+            convKey: key,
+            convType: conversationType,
+          ));
     }
 
     if (currentRenderSoundInfo?.type == TimSoundCurrentRenderType.online) {
-      return await TencentCloudChat.dataInstance.messageData.playAudio(
-          source: AudioPlayInfo(
-        type: AudioPlayType.online,
-        path: currentRenderSoundInfo?.path ?? "",
-        msgID: (widget.message.msgID ?? msgID),
-        totalSecond: widget.message.soundElem!.duration ?? 0,
-        convKey: key,
-        convType: conversationType,
-      ));
+      return await TencentCloudChat().dataInstance.messageData.playAudio(
+              source: AudioPlayInfo(
+            type: AudioPlayType.online,
+            path: currentRenderSoundInfo?.path ?? "",
+            msgID: (widget.message.msgID ?? msgID),
+            totalSecond: widget.message.soundElem!.duration ?? 0,
+            convKey: key,
+            convType: conversationType,
+          ));
     }
     console("play error. ${currentRenderSoundInfo?.toJson()}");
   }
@@ -398,23 +368,17 @@ class _TencentCloudChatMessageSoundState
   CurrentPlayAudioInfo? currentPlayAudioInfo;
 
   messageDataChange(TencentCloudChatMessageData data) {
-    if (data.currentUpdatedFields ==
-        TencentCloudChatMessageDataKeys.downloadMessage) {
-      if (data.currentDownloadMessage?.msgID ==
-          (widget.message.msgID ?? msgID)) {
-        console(
-            "downloading, finished:${data.currentDownloadMessage?.downloadFinish}");
+    if (data.currentUpdatedFields == TencentCloudChatMessageDataKeys.downloadMessage) {
+      if (data.currentDownloadMessage?.msgID == (widget.message.msgID ?? msgID)) {
+        console("downloading, finished:${data.currentDownloadMessage?.downloadFinish}");
         safeSetState(() {
           currentdownload = data.currentDownloadMessage;
         });
       }
-    } else if (data.currentUpdatedFields ==
-        TencentCloudChatMessageDataKeys.currentPlayAudioInfo) {
+    } else if (data.currentUpdatedFields == TencentCloudChatMessageDataKeys.currentPlayAudioInfo) {
       if (data.currentPlayAudioInfo != null) {
-        if (data.currentPlayAudioInfo!.playInfo.msgID ==
-            (widget.message.msgID ?? msgID)) {
-          console(
-              "current video playing  progress :${data.currentPlayAudioInfo!.progress} isCompleted:${data.currentPlayAudioInfo!.isCompleted}isPaused: ${data.currentPlayAudioInfo!.isPaused}");
+        if (data.currentPlayAudioInfo!.playInfo.msgID == (widget.message.msgID ?? msgID)) {
+          console("current video playing  progress :${data.currentPlayAudioInfo!.progress} isCompleted:${data.currentPlayAudioInfo!.isCompleted}isPaused: ${data.currentPlayAudioInfo!.isPaused}");
           safeSetState(() {
             currentPlayAudioInfo = data.currentPlayAudioInfo;
           });
@@ -428,20 +392,17 @@ class _TencentCloudChatMessageSoundState
   }
 
   bool isDownloading() {
-    return TencentCloudChat.dataInstance.messageData
-        .isDownloading(msgID: (widget.message.msgID ?? msgID));
+    return TencentCloudChat().dataInstance.messageData.isDownloading(msgID: (widget.message.msgID ?? msgID));
   }
 
   bool isInDownloadQueue() {
-    return TencentCloudChat.dataInstance.messageData
-        .isInDownloadQueue(msgID: (widget.message.msgID ?? msgID));
+    return TencentCloudChat().dataInstance.messageData.isInDownloadQueue(msgID: (widget.message.msgID ?? msgID));
   }
 
   removeFromDownloadQueue() {
     bool inQueue = isInDownloadQueue();
     if (inQueue == true) {
-      TencentCloudChat.dataInstance.messageData
-          .removeFromDownloadQueue(msgID: (widget.message.msgID ?? msgID));
+      TencentCloudChat().dataInstance.messageData.removeFromDownloadQueue(msgID: (widget.message.msgID ?? msgID));
       safeSetState(() {
         renderRandom = Random().nextInt(10000);
       });
@@ -490,8 +451,7 @@ class _TencentCloudChatMessageSoundState
     return false;
   }
 
-  Widget downloadStatus(TencentCloudChatThemeColors colorTheme,
-      TencentCloudChatTextStyle textStyle) {
+  Widget downloadStatus(TencentCloudChatThemeColors colorTheme, TencentCloudChatTextStyle textStyle) {
     return isCurrentSoundPlaying()
         ? GestureDetector(
             child: Icon(
@@ -562,18 +522,11 @@ class _TencentCloudChatMessageSoundState
     return TencentCloudChatThemeWidget(build: (context, colorTheme, textStyle) {
       int duration = getCurrentSoundDuration();
       return Container(
-        padding: EdgeInsets.symmetric(
-            horizontal: getWidth(10), vertical: getHeight(8)),
+        padding: EdgeInsets.symmetric(horizontal: getWidth(10), vertical: getHeight(8)),
         decoration: BoxDecoration(
-          color: showHighlightStatus
-              ? colorTheme.info
-              : (sentFromSelf
-                  ? colorTheme.selfMessageBubbleColor
-                  : colorTheme.othersMessageBubbleColor),
+          color: showHighlightStatus ? colorTheme.info : (sentFromSelf ? colorTheme.selfMessageBubbleColor : colorTheme.othersMessageBubbleColor),
           border: Border.all(
-            color: sentFromSelf
-                ? colorTheme.selfMessageBubbleBorderColor
-                : colorTheme.othersMessageBubbleBorderColor,
+            color: sentFromSelf ? colorTheme.selfMessageBubbleBorderColor : colorTheme.othersMessageBubbleBorderColor,
           ),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(getSquareSize(16)),
@@ -589,8 +542,7 @@ class _TencentCloudChatMessageSoundState
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
-                  child: renderSoundWidget(maxBubbleWidth, duration, colorTheme,
-                      textStyle, isErrorMessage, currentRenderSoundInfo),
+                  child: renderSoundWidget(maxBubbleWidth, duration, colorTheme, textStyle, isErrorMessage, currentRenderSoundInfo),
                 )
               ],
             ),
@@ -598,9 +550,7 @@ class _TencentCloudChatMessageSoundState
               height: getHeight(4),
             ),
             Row(
-              mainAxisAlignment: sentFromSelf
-                  ? MainAxisAlignment.end
-                  : MainAxisAlignment.start,
+              mainAxisAlignment: sentFromSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
               children: [
                 if (sentFromSelf) messageStatusIndicator(),
                 messageTimeIndicator(),
@@ -618,18 +568,11 @@ class _TencentCloudChatMessageSoundState
     return TencentCloudChatThemeWidget(build: (context, colorTheme, textStyle) {
       int duration = getCurrentSoundDuration();
       return Container(
-        padding: EdgeInsets.symmetric(
-            horizontal: getWidth(10), vertical: getHeight(8)),
+        padding: EdgeInsets.symmetric(horizontal: getWidth(10), vertical: getHeight(8)),
         decoration: BoxDecoration(
-          color: showHighlightStatus
-              ? colorTheme.info
-              : (sentFromSelf
-                  ? colorTheme.selfMessageBubbleColor
-                  : colorTheme.othersMessageBubbleColor),
+          color: showHighlightStatus ? colorTheme.info : (sentFromSelf ? colorTheme.selfMessageBubbleColor : colorTheme.othersMessageBubbleColor),
           border: Border.all(
-            color: sentFromSelf
-                ? colorTheme.selfMessageBubbleBorderColor
-                : colorTheme.othersMessageBubbleBorderColor,
+            color: sentFromSelf ? colorTheme.selfMessageBubbleBorderColor : colorTheme.othersMessageBubbleBorderColor,
           ),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(getSquareSize(16)),
@@ -645,8 +588,7 @@ class _TencentCloudChatMessageSoundState
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Expanded(
-                  child: renderSoundWidget(maxBubbleWidth, duration, colorTheme,
-                      textStyle, isErrorMessage, currentRenderSoundInfo),
+                  child: renderSoundWidget(maxBubbleWidth, duration, colorTheme, textStyle, isErrorMessage, currentRenderSoundInfo),
                 )
               ],
             ),
@@ -654,9 +596,7 @@ class _TencentCloudChatMessageSoundState
               height: getHeight(4),
             ),
             Row(
-              mainAxisAlignment: sentFromSelf
-                  ? MainAxisAlignment.end
-                  : MainAxisAlignment.start,
+              mainAxisAlignment: sentFromSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
               children: [
                 if (sentFromSelf) messageStatusIndicator(),
                 messageTimeIndicator(),

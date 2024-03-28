@@ -5,6 +5,7 @@ import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.d
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/widgets/desktop_popup/operation_key.dart';
 import 'package:tencent_cloud_chat_common/widgets/desktop_popup/tencent_cloud_chat_desktop_popup.dart';
+import 'package:tencent_cloud_chat_common/widgets/dialog/tencent_cloud_chat_dialog.dart';
 
 import '../forward/tencent_cloud_chat_message_forward_container.dart';
 
@@ -12,14 +13,20 @@ class TencentCloudChatMessageInputSelectMode extends StatefulWidget {
   final List<V2TimMessage> messages;
   final ValueChanged<List<V2TimMessage>> onDeleteForMe;
   final ValueChanged<List<V2TimMessage>> onDeleteForEveryone;
-  final bool useDeleteForEveryone;
+  final bool enableMessageDeleteForEveryone;
+  final bool enableMessageForwardIndividually;
+  final bool enableMessageForwardCombined;
+  final bool enableMessageDeleteForSelf;
 
   const TencentCloudChatMessageInputSelectMode({
     super.key,
     required this.messages,
     required this.onDeleteForMe,
     required this.onDeleteForEveryone,
-    required this.useDeleteForEveryone,
+    required this.enableMessageDeleteForEveryone,
+    required this.enableMessageForwardIndividually,
+    required this.enableMessageForwardCombined,
+    required this.enableMessageDeleteForSelf,
   });
 
   @override
@@ -62,48 +69,50 @@ class _TencentCloudChatMessageInputSelectModeState
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      ListTile(
-                        leading: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: colorTheme.primaryColor,
-                            border: Border.all(
-                                color: colorTheme.primaryColor, width: 8),
+                      if (widget.enableMessageForwardIndividually)
+                        ListTile(
+                          leading: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: colorTheme.primaryColor,
+                              border: Border.all(
+                                  color: colorTheme.primaryColor, width: 8),
+                            ),
+                            child: Icon(
+                              Icons.forward_to_inbox_outlined,
+                              color: colorTheme.backgroundColor,
+                              size: textStyle.standardLargeText,
+                            ),
                           ),
-                          child: Icon(
-                            Icons.forward_to_inbox_outlined,
-                            color: colorTheme.backgroundColor,
-                            size: textStyle.standardLargeText,
-                          ),
+                          title: Text(tL10n.forwardIndividually),
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showForwardPopup(
+                                type: TencentCloudChatForwardType.individually);
+                          },
                         ),
-                        title: Text(tL10n.forwardIndividually),
-                        onTap: () {
-                          Navigator.pop(context);
-                          _showForwardPopup(
-                              type: TencentCloudChatForwardType.individually);
-                        },
-                      ),
-                      ListTile(
-                        leading: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: colorTheme.primaryColor,
-                            border: Border.all(
-                                color: colorTheme.primaryColor, width: 8),
+                      if (widget.enableMessageForwardCombined)
+                        ListTile(
+                          leading: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: colorTheme.primaryColor,
+                              border: Border.all(
+                                  color: colorTheme.primaryColor, width: 8),
+                            ),
+                            child: Icon(
+                              Icons.forward_outlined,
+                              color: colorTheme.backgroundColor,
+                              size: textStyle.standardLargeText,
+                            ),
                           ),
-                          child: Icon(
-                            Icons.forward_outlined,
-                            color: colorTheme.backgroundColor,
-                            size: textStyle.standardLargeText,
-                          ),
+                          title: Text(tL10n.forwardCombined),
+                          onTap: () {
+                            Navigator.pop(context);
+                            _showForwardPopup(
+                                type: TencentCloudChatForwardType.combined);
+                          },
                         ),
-                        title: Text(tL10n.forwardCombined),
-                        onTap: () {
-                          Navigator.pop(context);
-                          _showForwardPopup(
-                              type: TencentCloudChatForwardType.combined);
-                        },
-                      ),
                     ],
                   ),
                 ));
@@ -146,50 +155,50 @@ class _TencentCloudChatMessageInputSelectModeState
   }
 
   void _showDeletionPopup() {
-    showDialog(
+    bool isSelf = true;
+    for (var element in widget.messages) {
+      if (element.isSelf == false) {
+        isSelf = false;
+        break;
+      }
+    }
+    final showDeleteForEveryone =
+        isSelf && widget.enableMessageDeleteForEveryone;
+    TencentCloudChatDialog.showAdaptiveDialog(
       context: context,
-      builder: (BuildContext context) {
-        bool isSelf = true;
-        for (var element in widget.messages) {
-          if (element.isSelf == false) {
-            isSelf = false;
-            break;
-          }
-        }
-        final showDeleteForEveryone = isSelf && widget.useDeleteForEveryone;
-        return AlertDialog(
-          title: Text(tL10n.confirmDeletion),
-          content: Text(tL10n.deleteMessageCount(widget.messages.length)),
-          actions: [
-            if (showDeleteForEveryone)
-              TextButton(
-                onPressed: () {
-                  widget.onDeleteForEveryone(widget.messages);
-                  Navigator.pop(context);
-                },
-                child: Text(tL10n.deleteForEveryone),
-              ),
-            TextButton(
-              onPressed: () {
-                widget.onDeleteForMe(widget.messages);
-                Navigator.pop(context);
-              },
-              child: Text(tL10n.deleteForMe),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text(tL10n.cancel),
-            ),
-          ],
-        );
-      },
+      title: Text(tL10n.confirmDeletion),
+      content: Text(tL10n.deleteMessageCount(widget.messages.length)),
+      actions: [
+        if (showDeleteForEveryone)
+          TextButton(
+            onPressed: () {
+              widget.onDeleteForEveryone(widget.messages);
+              Navigator.pop(context);
+            },
+            child: Text(tL10n.deleteForEveryone),
+          ),
+        if (widget.enableMessageDeleteForSelf)
+          TextButton(
+            onPressed: () {
+              widget.onDeleteForMe(widget.messages);
+              Navigator.pop(context);
+            },
+            child: Text(tL10n.deleteForMe),
+          ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: Text(tL10n.cancel),
+        ),
+      ],
     );
   }
 
   @override
   Widget defaultBuilder(BuildContext context) {
+    final showDeletion = widget.enableMessageDeleteForSelf ||
+        widget.enableMessageDeleteForEveryone;
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => Container(
         color: colorTheme.inputAreaBackground,
@@ -198,11 +207,16 @@ class _TencentCloudChatMessageInputSelectModeState
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
           children: [
-            _buildInputAreaIcon(
-                icon: Icons.delete_outline_rounded, onTap: _showDeletionPopup),
+            if (showDeletion)
+              _buildInputAreaIcon(
+                  icon: Icons.delete_outline_rounded,
+                  onTap: _showDeletionPopup),
             // _buildInputAreaIcon(icon: Icons.info_outline_rounded, onTap: () {}),
-            _buildInputAreaIcon(
-                icon: Icons.arrow_forward_outlined, onTap: _showForwardOptions),
+            if (widget.enableMessageForwardCombined ||
+                widget.enableMessageForwardIndividually)
+              _buildInputAreaIcon(
+                  icon: Icons.arrow_forward_outlined,
+                  onTap: _showForwardOptions),
           ],
         ),
       ),
@@ -211,6 +225,8 @@ class _TencentCloudChatMessageInputSelectModeState
 
   @override
   Widget tabletAppBuilder(BuildContext context) {
+    final showDeletion = widget.enableMessageDeleteForSelf ||
+        widget.enableMessageDeleteForEveryone;
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => Container(
         color: colorTheme.inputAreaBackground,
@@ -219,16 +235,20 @@ class _TencentCloudChatMessageInputSelectModeState
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
           children: [
-            _buildInputAreaIcon(
-                icon: Icons.delete_outline_rounded, onTap: _showDeletionPopup),
-            _buildInputAreaIcon(
-                icon: Icons.forward_to_inbox_outlined,
-                onTap: () => _showForwardPopup(
-                    type: TencentCloudChatForwardType.individually)),
-            _buildInputAreaIcon(
-                icon: Icons.forward_outlined,
-                onTap: () => _showForwardPopup(
-                    type: TencentCloudChatForwardType.combined)),
+            if (showDeletion)
+              _buildInputAreaIcon(
+                  icon: Icons.delete_outline_rounded,
+                  onTap: _showDeletionPopup),
+            if (widget.enableMessageForwardIndividually)
+              _buildInputAreaIcon(
+                  icon: Icons.forward_to_inbox_outlined,
+                  onTap: () => _showForwardPopup(
+                      type: TencentCloudChatForwardType.individually)),
+            if (widget.enableMessageForwardCombined)
+              _buildInputAreaIcon(
+                  icon: Icons.forward_outlined,
+                  onTap: () => _showForwardPopup(
+                      type: TencentCloudChatForwardType.combined)),
           ],
         ),
       ),
@@ -237,6 +257,8 @@ class _TencentCloudChatMessageInputSelectModeState
 
   @override
   Widget desktopBuilder(BuildContext context) {
+    final showDeletion = widget.enableMessageDeleteForSelf ||
+        widget.enableMessageDeleteForEveryone;
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => Container(
         color: colorTheme.inputAreaBackground,
@@ -247,29 +269,32 @@ class _TencentCloudChatMessageInputSelectModeState
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           mainAxisSize: MainAxisSize.max,
           children: [
-            Tooltip(
-              message: tL10n.delete,
-              preferBelow: false,
-              child: _buildInputAreaIcon(
-                  icon: Icons.delete_outline_rounded,
-                  onTap: _showDeletionPopup),
-            ),
-            Tooltip(
-              message: tL10n.forwardIndividually,
-              preferBelow: false,
-              child: _buildInputAreaIcon(
-                  icon: Icons.forward_to_inbox_outlined,
-                  onTap: () => _showForwardPopup(
-                      type: TencentCloudChatForwardType.individually)),
-            ),
-            Tooltip(
-              message: tL10n.forwardCombined,
-              preferBelow: false,
-              child: _buildInputAreaIcon(
-                  icon: Icons.forward_outlined,
-                  onTap: () => _showForwardPopup(
-                      type: TencentCloudChatForwardType.combined)),
-            ),
+            if (showDeletion)
+              Tooltip(
+                message: tL10n.delete,
+                preferBelow: false,
+                child: _buildInputAreaIcon(
+                    icon: Icons.delete_outline_rounded,
+                    onTap: _showDeletionPopup),
+              ),
+            if (widget.enableMessageForwardIndividually)
+              Tooltip(
+                message: tL10n.forwardIndividually,
+                preferBelow: false,
+                child: _buildInputAreaIcon(
+                    icon: Icons.forward_to_inbox_outlined,
+                    onTap: () => _showForwardPopup(
+                        type: TencentCloudChatForwardType.individually)),
+              ),
+            if (widget.enableMessageForwardCombined)
+              Tooltip(
+                message: tL10n.forwardCombined,
+                preferBelow: false,
+                child: _buildInputAreaIcon(
+                    icon: Icons.forward_outlined,
+                    onTap: () => _showForwardPopup(
+                        type: TencentCloudChatForwardType.combined)),
+              ),
           ],
         ),
       ),

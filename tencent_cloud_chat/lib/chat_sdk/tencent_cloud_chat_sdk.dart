@@ -7,8 +7,7 @@ class TencentCloudChatSDK {
 
   static const String _tag = "TencentCloudChatUIKitCoreSDK";
 
-  static V2TimSDKListener getInitSDKListener(V2TimSDKListener? sdkListener) =>
-      V2TimSDKListener(
+  static V2TimSDKListener getInitSDKListener(V2TimSDKListener? sdkListener) => V2TimSDKListener(
         onConnectFailed: (code, error) {
           sdkListener?.onConnectFailed(code, error);
         },
@@ -19,28 +18,26 @@ class TencentCloudChatSDK {
           sdkListener?.onConnecting();
         },
         onKickedOffline: () {
-          TencentCloudChat.dataInstance.basic.updateLoginStatus(
-            status: false,
-          );
+          TencentCloudChat().dataInstance.basic.updateLoginStatus(
+                status: false,
+              );
 
           sdkListener?.onKickedOffline();
         },
         onSelfInfoUpdated: (info) {
-          TencentCloudChat.dataInstance.basic
-              .updateCurrentUserInfo(userFullInfo: info);
+          TencentCloudChat().dataInstance.basic.updateCurrentUserInfo(userFullInfo: info);
 
           sdkListener?.onSelfInfoUpdated(info);
         },
         onUserSigExpired: () {
-          TencentCloudChat.dataInstance.basic.updateLoginStatus(
-            status: false,
-          );
+          TencentCloudChat().dataInstance.basic.updateLoginStatus(
+                status: false,
+              );
 
           sdkListener?.onUserSigExpired();
         },
         onUserStatusChanged: (userStatusList) {
-          TencentCloudChat.dataInstance.contact
-              .buildUserStatusList(userStatusList, "onUserStatusChanged");
+          TencentCloudChat().dataInstance.contact.buildUserStatusList(userStatusList, "onUserStatusChanged");
 
           sdkListener?.onUserStatusChanged(userStatusList);
         },
@@ -48,11 +45,9 @@ class TencentCloudChatSDK {
           // Handle TencentCloudChatRobot Plugin sendMessage
           if (event.pluginName == "TencentCloudChatRobotPlugin") {
             if (event.type == "onSendMessageToRobotSuccess") {
-              Map<String, dynamic> messageMap =
-                  json.decode(event.detail["data"] ?? "{}");
+              Map<String, dynamic> messageMap = json.decode(event.detail["data"] ?? "{}");
               var message = V2TimMessage.fromJson(messageMap);
-              TencentCloudChat.dataInstance.messageData
-                  .onReceiveNewMessage(message);
+              TencentCloudChat().dataInstance.messageData.onReceiveNewMessage(message);
             }
           }
 
@@ -81,12 +76,12 @@ class TencentCloudChatSDK {
     bool res = initRes.data ?? false;
 
     if (res) {
-      TencentCloudChat.dataInstance.basic.updateInitializedStatus(
-        status: true,
-      );
-      TencentCloudChat.dataInstance.basic.updateSDKAppID(
-        sdkappid: sdkAppID,
-      );
+      TencentCloudChat().dataInstance.basic.updateInitializedStatus(
+            status: true,
+          );
+      TencentCloudChat().dataInstance.basic.updateSDKAppID(
+            sdkappid: sdkAppID,
+          );
     }
 
     TencentCloudChat.logInstance.console(
@@ -111,29 +106,28 @@ class TencentCloudChatSDK {
     }
     TencentCloudChat.logInstance.console(
       componentName: _tag,
-      logs:
-          "login Is Called. Res Is $res. Desc Is ${loginRes.desc} Code is ${loginRes.code}",
+      logs: "login Is Called. Res Is $res. Desc Is ${loginRes.desc} Code is ${loginRes.code}",
     );
-    TencentCloudChat.dataInstance.basic.updateLoginStatus(
-      status: loginRes.code == 0,
-    );
+    TencentCloudChat().dataInstance.basic.updateLoginStatus(
+          status: loginRes.code == 0,
+        );
     return res;
   }
 
   static Future<bool> logout() async {
     V2TimCallback logoutRes = await _manager.logout();
-    bool res = true;
+    bool res = false;
     if (logoutRes.code == 0) {
-      res = false;
+      _manager.unInitSDK();
+      res = true;
     }
     TencentCloudChat.logInstance.console(
       componentName: _tag,
-      logs:
-          "logout Is Called. Res Is $res. Desc Is ${logoutRes.desc} Code is ${logoutRes.code}",
+      logs: "logout Is Called. Res Is $res. Desc Is ${logoutRes.desc} Code is ${logoutRes.code}",
     );
-    TencentCloudChat.dataInstance.basic.updateLoginStatus(
-      status: res,
-    );
+    TencentCloudChat().dataInstance.basic.updateLoginStatus(
+          status: res,
+        );
     return res;
   }
 
@@ -145,26 +139,8 @@ class TencentCloudChatSDK {
     );
   }
 
-  static Future<void> setSelfInfo(
-      {String? userID,
-      String? nickName,
-      String? faceUrl,
-      String? signature,
-      int? gender,
-      int? allowType,
-      int? role,
-      int? level,
-      int? birthday}) async {
-    V2TimUserFullInfo info = V2TimUserFullInfo(
-        userID: userID,
-        nickName: nickName,
-        faceUrl: faceUrl,
-        selfSignature: signature,
-        gender: gender,
-        allowType: allowType,
-        role: role,
-        level: level,
-        birthday: birthday);
+  static Future<void> setSelfInfo({String? userID, String? nickName, String? faceUrl, String? signature, int? gender, int? allowType, int? role, int? level, int? birthday}) async {
+    V2TimUserFullInfo info = V2TimUserFullInfo(userID: userID, nickName: nickName, faceUrl: faceUrl, selfSignature: signature, gender: gender, allowType: allowType, role: role, level: level, birthday: birthday);
     V2TimCallback res = await _manager.setSelfInfo(userFullInfo: info);
     if (res.code == 0) {}
   }

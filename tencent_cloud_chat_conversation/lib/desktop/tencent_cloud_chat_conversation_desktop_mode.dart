@@ -16,15 +16,11 @@ class TencentCloudChatConversationDesktopMode extends StatefulWidget {
   const TencentCloudChatConversationDesktopMode({super.key});
 
   @override
-  State<TencentCloudChatConversationDesktopMode> createState() =>
-      _TencentCloudChatConversationDesktopModeState();
+  State<TencentCloudChatConversationDesktopMode> createState() => _TencentCloudChatConversationDesktopModeState();
 }
 
-class _TencentCloudChatConversationDesktopModeState
-    extends TencentCloudChatState<TencentCloudChatConversationDesktopMode> {
-  final Stream<TencentCloudChatConversationData<dynamic>>?
-      _conversationDataStream = TencentCloudChat.eventBusInstance
-          .on<TencentCloudChatConversationData<dynamic>>();
+class _TencentCloudChatConversationDesktopModeState extends TencentCloudChatState<TencentCloudChatConversationDesktopMode> {
+  final Stream<TencentCloudChatConversationData<dynamic>>? _conversationDataStream = TencentCloudChat.eventBusInstance.on<TencentCloudChatConversationData<dynamic>>();
 
   V2TimConversation? _currentConversation;
   bool _isShowSearch = false;
@@ -39,8 +35,7 @@ class _TencentCloudChatConversationDesktopModeState
 
   _conversationDataHandler(TencentCloudChatConversationData data) {
     /// === Current Conversation ===
-    if (data.currentConversation?.conversationID !=
-        _currentConversation?.conversationID) {
+    if (data.currentConversation?.conversationID != _currentConversation?.conversationID) {
       setState(() {
         _currentConversation = data.currentConversation;
       });
@@ -52,13 +47,9 @@ class _TencentCloudChatConversationDesktopModeState
   }
 
   void _addBasicEventListener() {
-    TencentCloudChat.eventBusInstance
-        .on<TencentCloudChatBasicData<TencentCloudChatBasicDataKeys>>()
-        ?.listen((event) {
-      if (event.currentUpdatedFields ==
-          TencentCloudChatBasicDataKeys.addUsedComponent) {
-        final messageWidget = TencentCloudChat.dataInstance.basic
-            .componentsMap[TencentCloudChatComponentsEnum.message];
+    TencentCloudChat.eventBusInstance.on<TencentCloudChatBasicData<TencentCloudChatBasicDataKeys>>()?.listen((event) {
+      if (event.currentUpdatedFields == TencentCloudChatBasicDataKeys.addUsedComponent) {
+        final messageWidget = TencentCloudChat().dataInstance.basic.componentsMap[TencentCloudChatComponentsEnum.message];
         if (messageWidget != _messageWidget) {
           safeSetState(() {
             _messageWidget = messageWidget;
@@ -74,8 +65,7 @@ class _TencentCloudChatConversationDesktopModeState
     _addBasicEventListener();
     _addConversationDataListener();
 
-    _messageWidget = TencentCloudChat.dataInstance.basic
-        .componentsMap[TencentCloudChatComponentsEnum.message];
+    _messageWidget = TencentCloudChat().dataInstance.basic.componentsMap[TencentCloudChatComponentsEnum.message];
   }
 
   @override
@@ -96,9 +86,7 @@ class _TencentCloudChatConversationDesktopModeState
                       Row(
                         children: [
                           Expanded(
-                            child: TencentCloudChatConversationBuilders
-                                    .getConversationHeaderBuilder()
-                                .$1,
+                            child: TencentCloudChatConversationBuilders.getConversationHeaderBuilder().$1,
                           ),
                         ],
                       ),
@@ -121,10 +109,8 @@ class _TencentCloudChatConversationDesktopModeState
                   Expanded(
                     child: _messageWidget!(
                       options: {
-                        "userID": TencentCloudChatUtils.checkString(
-                            _currentConversation?.userID),
-                        "groupID": TencentCloudChatUtils.checkString(
-                            _currentConversation?.groupID),
+                        "userID": TencentCloudChatUtils.checkString(_currentConversation?.userID),
+                        "groupID": TencentCloudChatUtils.checkString(_currentConversation?.groupID),
                       },
                     ),
                   ),

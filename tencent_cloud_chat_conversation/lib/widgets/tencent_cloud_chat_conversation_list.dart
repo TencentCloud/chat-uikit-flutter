@@ -19,36 +19,25 @@ class TencentCloudChatConversationList extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() =>
-      TencentCloudChatConversationListState();
+  State<StatefulWidget> createState() => TencentCloudChatConversationListState();
 }
 
-class TencentCloudChatConversationListState
-    extends TencentCloudChatState<TencentCloudChatConversationList> {
-  final Stream<TencentCloudChatConversationData<dynamic>>?
-      _conversationDataStream = TencentCloudChat.eventBusInstance
-          .on<TencentCloudChatConversationData<dynamic>>();
-  late StreamSubscription<TencentCloudChatConversationData<dynamic>>?
-      _conversationDataSubscription;
+class TencentCloudChatConversationListState extends TencentCloudChatState<TencentCloudChatConversationList> {
+  final Stream<TencentCloudChatConversationData<dynamic>>? _conversationDataStream = TencentCloudChat.eventBusInstance.on<TencentCloudChatConversationData<dynamic>>();
+  late StreamSubscription<TencentCloudChatConversationData<dynamic>>? _conversationDataSubscription;
 
-  List<V2TimConversation> _conversationList =
-      TencentCloudChat.dataInstance.conversation.conversationList;
+  List<V2TimConversation> _conversationList = TencentCloudChat().dataInstance.conversation.conversationList;
 
-  bool _getDataEnd = TencentCloudChat.dataInstance.conversation.isGetDataEnd;
+  bool _getDataEnd = TencentCloudChat().dataInstance.conversation.isGetDataEnd;
 
-  final Stream<TencentCloudChatContactData<dynamic>>? _contactDataStream =
-      TencentCloudChat.eventBusInstance
-          .on<TencentCloudChatContactData<dynamic>>();
+  final Stream<TencentCloudChatContactData<dynamic>>? _contactDataStream = TencentCloudChat.eventBusInstance.on<TencentCloudChatContactData<dynamic>>();
 
-  late StreamSubscription<TencentCloudChatContactData<dynamic>>?
-      _contactDataSubscription;
+  late StreamSubscription<TencentCloudChatContactData<dynamic>>? _contactDataSubscription;
 
-  List<V2TimUserStatus> _userStatusList =
-      TencentCloudChat.dataInstance.contact.userStatus;
+  List<V2TimUserStatus> _userStatusList = TencentCloudChat().dataInstance.contact.userStatus;
 
   contactDataHandler(TencentCloudChatContactData data) {
-    if (data.currentUpdatedFields ==
-        TencentCloudChatContactDataKeys.userStatusList) {
+    if (data.currentUpdatedFields == TencentCloudChatContactDataKeys.userStatusList) {
       safeSetState(() {
         _userStatusList = data.userStatus;
       });
@@ -60,14 +49,12 @@ class TencentCloudChatConversationListState
   }
 
   conversationDataHandler(TencentCloudChatConversationData data) {
-    if (data.currentUpdatedFields ==
-        TencentCloudChatConversationDataKeys.conversationList) {
+    if (data.currentUpdatedFields == TencentCloudChatConversationDataKeys.conversationList) {
       final conversationList = data.conversationList;
       safeSetState(() {
         _conversationList = conversationList;
       });
-    } else if (data.currentUpdatedFields ==
-        TencentCloudChatConversationDataKeys.getDataEnd) {
+    } else if (data.currentUpdatedFields == TencentCloudChatConversationDataKeys.getDataEnd) {
       safeSetState(() {
         _getDataEnd = data.isGetDataEnd;
       });
@@ -75,8 +62,7 @@ class TencentCloudChatConversationListState
   }
 
   _addConversationDataListener() {
-    _conversationDataSubscription =
-        _conversationDataStream?.listen(conversationDataHandler);
+    _conversationDataSubscription = _conversationDataStream?.listen(conversationDataHandler);
   }
 
   @override
@@ -98,8 +84,7 @@ class TencentCloudChatConversationListState
     if (conv.type == ConversationType.V2TIM_C2C) {
       String userID = conv.userID ?? "";
       if (userID.isNotEmpty) {
-        int index =
-            _userStatusList.indexWhere((element) => element.userID == userID);
+        int index = _userStatusList.indexWhere((element) => element.userID == userID);
         if (index > -1) {
           if (_userStatusList[index].statusType == 1) {
             res = true;
@@ -124,11 +109,7 @@ class TencentCloudChatConversationListState
             return TencentCloudChatConversationItem(
               conversation: conversation,
               isOnline: isOnline,
-              isSelected: widget.currentConversation?.conversationID ==
-                      conversation.conversationID &&
-                  TencentCloudChatUtils.checkString(
-                          widget.currentConversation?.conversationID) !=
-                      null,
+              isSelected: widget.currentConversation?.conversationID == conversation.conversationID && TencentCloudChatUtils.checkString(widget.currentConversation?.conversationID) != null,
             );
           },
         ));
@@ -152,9 +133,7 @@ class TencentCloudChatConversationListState
       if (!loaded) {
         return conversationLoading();
       }
-      return conversationList.isNotEmpty
-          ? conversationListWidget()
-          : noConversationWidget();
+      return conversationList.isNotEmpty ? conversationListWidget() : noConversationWidget();
     });
   }
 }
