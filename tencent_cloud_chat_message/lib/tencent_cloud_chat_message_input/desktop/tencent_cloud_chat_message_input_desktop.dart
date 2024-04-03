@@ -212,7 +212,6 @@ class _TencentCloudChatMessageInputDesktopState extends TencentCloudChatState<Te
         List<V2TimGroupMemberFullInfo> showAtMemberList = widget.groupMemberList
             .where((element) {
               final showName = (_getShowName(element)).toLowerCase();
-              keyword ??= "";
               return showName.contains(keyword.toLowerCase()) && TencentCloudChatUtils.checkString(showName) != null;
             })
             .whereType<V2TimGroupMemberFullInfo>()

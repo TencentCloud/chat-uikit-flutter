@@ -162,10 +162,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
     // === Group Message Read Receipt ===
     final useReadReceipt = defaultMessageMenuConfig.enableGroupMessageReceipt &&
         TencentCloudChatUtils.checkString(dataProvider.groupID) != null &&
-        TencentCloudChat()
-            .dataInstance
-            .basic
-            .messageConfig
+        dataProvider.config
             .enabledGroupTypesForMessageReadReceipt(
               userID: dataProvider.userID,
               groupID: dataProvider.groupID,

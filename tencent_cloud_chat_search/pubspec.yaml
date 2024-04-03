@@ -12,8 +12,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  tencent_cloud_chat: ^1.1.1
-  tencent_cloud_chat_common: ^1.1.1
+  tencent_cloud_chat: ^1.2.0
+  tencent_cloud_chat_common: ^1.2.0
 
 dev_dependencies:
   flutter_test:

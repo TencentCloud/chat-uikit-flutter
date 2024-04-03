@@ -20,13 +20,26 @@ class TencentCloudChatConversationDesktopMode extends StatefulWidget {
 }
 
 class _TencentCloudChatConversationDesktopModeState extends TencentCloudChatState<TencentCloudChatConversationDesktopMode> {
-  final Stream<TencentCloudChatConversationData<dynamic>>? _conversationDataStream = TencentCloudChat.eventBusInstance.on<TencentCloudChatConversationData<dynamic>>();
+  final Stream<TencentCloudChatConversationData<dynamic>>? _conversationDataStream =
+  TencentCloudChat.eventBusInstance.on<TencentCloudChatConversationData<dynamic>>();
+  StreamSubscription<TencentCloudChatConversationData<dynamic>>? _conversationDataSubscription;
+
+  final Stream<TencentCloudChatBasicData<dynamic>>? _basicDataStream =
+  TencentCloudChat.eventBusInstance.on<TencentCloudChatBasicData<dynamic>>();
+  StreamSubscription<TencentCloudChatBasicData<dynamic>>? _basicDataSubscription;
 
   V2TimConversation? _currentConversation;
   bool _isShowSearch = false;
   bool _isShowGroupProfile = false;
 
   TencentCloudChatWidgetBuilder? _messageWidget;
+
+  @override
+  void dispose() {
+    _conversationDataSubscription?.cancel();
+    _basicDataSubscription?.cancel();
+    super.dispose();
+  }
 
   @override
   void didUpdateWidget(TencentCloudChatConversationDesktopMode oldWidget) {
@@ -43,11 +56,11 @@ class _TencentCloudChatConversationDesktopModeState extends TencentCloudChatStat
   }
 
   _addConversationDataListener() {
-    _conversationDataStream?.listen(_conversationDataHandler);
+    _conversationDataSubscription = _conversationDataStream?.listen(_conversationDataHandler);
   }
 
   void _addBasicEventListener() {
-    TencentCloudChat.eventBusInstance.on<TencentCloudChatBasicData<TencentCloudChatBasicDataKeys>>()?.listen((event) {
+    _basicDataSubscription = _basicDataStream?.listen((event) {
       if (event.currentUpdatedFields == TencentCloudChatBasicDataKeys.addUsedComponent) {
         final messageWidget = TencentCloudChat().dataInstance.basic.componentsMap[TencentCloudChatComponentsEnum.message];
         if (messageWidget != _messageWidget) {

@@ -1,6 +1,6 @@
 name: tencent_cloud_chat_user_profile
 description: Tencent Cloud Chat UIKit User Profile component offers a detailed and customizable user profile page, featuring seamless integration with the Message component and support for voice/video calls.
-version: 1.2.0
+version: 1.2.1
 repository: https://github.com/TencentCloud/chat-uikit-flutter/tree/v2/tencent_cloud_chat_user_profile
 homepage: https://trtc.io/products/chat?utm_source=gfs&utm_medium=link&utm_campaign=%E6%B8%A0%E9%81%93&_channel_track_key=k6WgfCKn
 
@@ -11,8 +11,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  tencent_cloud_chat: ^1.2.0
-  tencent_cloud_chat_common: ^1.2.0
+  tencent_cloud_chat: ^1.2.1
+  tencent_cloud_chat_common: ^1.2.1
+
+dependency_overrides:
+  tencent_cloud_chat_intl:
+    path: ../tencent_cloud_chat_intl
+  tencent_cloud_chat:
+    path: ../tencent_cloud_chat
+  tencent_cloud_chat_common:
+    path: ../tencent_cloud_chat_common
 
 dev_dependencies:
   flutter_test:

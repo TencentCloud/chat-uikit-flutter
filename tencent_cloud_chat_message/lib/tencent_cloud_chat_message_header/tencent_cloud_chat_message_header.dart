@@ -99,15 +99,13 @@ class _TencentCloudChatMessageHeaderState
   }
 
   List<String> getConversationFaceURL(V2TimConversation? conversation) {
-    var defaultUrl =
-        "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png";
     if (conversation == null) {
-      return [defaultUrl];
+      return [""];
     }
     if (conversation.type == ConversationType.V2TIM_C2C) {
       return [
         TencentCloudChatUtils.checkString(conversation.faceUrl) == null
-            ? defaultUrl
+            ? ""
             : conversation.faceUrl!
       ];
     } else {
@@ -126,7 +124,7 @@ class _TencentCloudChatMessageHeaderState
         }
         return list.map((e) => e.faceUrl!).toList();
       }
-      return [defaultUrl];
+      return [""];
     }
   }
 

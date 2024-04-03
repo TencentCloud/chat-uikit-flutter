@@ -45,6 +45,8 @@ class TencentCloudChatMessageSound extends TencentCloudChatMessageItemBase {
     super.groupID,
     required super.message,
     required super.shouldBeHighlighted,
+    required super.showMessageStatusIndicator,
+    required super.showMessageTimeIndicator,
     required super.renderOnMenuPreview,
     required super.clearHighlightFunc,
     super.messageReceipt,

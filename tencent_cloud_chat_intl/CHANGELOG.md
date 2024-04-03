@@ -1,3 +1,20 @@
+## 1.2.1
+
+### Conversation (TencentCloudChatConversation)
+
+- Fixed an issue where the main widget was being disposed on desktop after switching login accounts.
+- Changed the button `Mark as Unread` to `Mark as Read` and its functionality has been implemented.
+
+### Message (TencentCloudChatMessage)
+
+- Fixed an issue where some configurations from `TencentCloudChatMessageConfig` were not working.
+- Fixed a permission request failure on both iOS and Android devices when the app is installed for the first time. Also resolved an issue where permissions could not be manually enabled in settings.
+- Improved the message locating for the original message of a replied message.
+- Fixed an issue where messages could not be received and displayed on the message list dynamically in some cases, especially after login account switching.
+- Fixed issues related to voice message playback.
+- Displayed a default avatar for users without a profile picture.
+
+
 ## 1.2.0
 
 ### General

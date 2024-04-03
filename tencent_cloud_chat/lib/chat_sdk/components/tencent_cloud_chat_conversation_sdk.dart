@@ -105,7 +105,7 @@ class TencentCloudChatConversationSDK {
       return V2TimConversation(
         conversationID: conversationID,
         userID: TencentCloudChatUtils.checkString(userID),
-        faceUrl: TencentCloudChatUtils.checkString(userProfile?.faceUrl) ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png",
+        faceUrl: TencentCloudChatUtils.checkString(userProfile?.faceUrl),
         showName: TencentCloudChatUtils.checkString(userProfile?.nickName) ?? TencentCloudChatUtils.checkString(userProfile?.userID) ?? TencentCloudChatUtils.checkString(userID) ?? tL10n.chat,
         type: 1,
       );
@@ -119,7 +119,7 @@ class TencentCloudChatConversationSDK {
         conversationID: conversationID,
         groupID: groupID,
         groupType: groupInfo?.groupType,
-        faceUrl: TencentCloudChatUtils.checkString(groupInfo?.faceUrl) ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png",
+        faceUrl: TencentCloudChatUtils.checkString(groupInfo?.faceUrl),
         showName: TencentCloudChatUtils.checkString(groupInfo?.groupName) ?? TencentCloudChatUtils.checkString(groupID) ?? tL10n.chat,
         type: 2,
       );

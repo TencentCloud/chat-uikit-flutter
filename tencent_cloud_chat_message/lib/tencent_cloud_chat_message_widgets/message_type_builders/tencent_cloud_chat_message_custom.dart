@@ -13,6 +13,8 @@ class TencentCloudChatMessageCustom extends TencentCloudChatMessageItemBase {
     super.key,
     super.userID,
     super.groupID,
+    required super.showMessageStatusIndicator,
+    required super.showMessageTimeIndicator,
     required super.message,
     required super.shouldBeHighlighted,
     required super.clearHighlightFunc,

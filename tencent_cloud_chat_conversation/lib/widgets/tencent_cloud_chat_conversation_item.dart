@@ -87,7 +87,7 @@ class TencentCloudChatConversationItemState extends TencentCloudChatState<Tencen
         onClick: _pinConversation,
       ),
       ColumnMenuItem(
-        label: tL10n.markAsUnread,
+        label: tL10n.markAsRead,
         onClick: _markAsRead,
       ),
       ColumnMenuItem(
@@ -141,7 +141,7 @@ class TencentCloudChatConversationItemState extends TencentCloudChatState<Tencen
       actions: <BottomSheetAction>[
         BottomSheetAction(
             title: Text(
-              tL10n.markAsUnread,
+              tL10n.markAsRead,
               style: style,
             ),
             onPressed: (context) {
@@ -313,18 +313,17 @@ class TencentCloudChatConversationItemAvatar extends StatefulWidget {
 }
 
 class TencentCloudChatConversationItemAvatarState extends TencentCloudChatState<TencentCloudChatConversationItemAvatar> {
-  List<String> getAvatar() {
-    var defaultUrl = "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png";
+  List<String?> getAvatar() {
     var conversation = widget.conversation;
 
     if (conversation.type == ConversationType.V2TIM_C2C) {
-      return [TencentCloudChatUtils.checkString(conversation.faceUrl) == null ? defaultUrl : conversation.faceUrl!];
+      return [conversation.faceUrl];
     } else {
       if (TencentCloudChatUtils.checkString(conversation.faceUrl) != null) {
         return [conversation.faceUrl!];
       }
       if (TencentCloudChatUtils.checkString(conversation.groupID) == null) {
-        return [defaultUrl];
+        return [""];
       }
       List<V2TimGroupMemberFullInfo> groupMemberList = TencentCloudChat.cache.getGroupMemberListFromCache(conversation.groupID!);
       var list = groupMemberList.takeWhile((value) => TencentCloudChatUtils.checkString(value.faceUrl) != null).toList();
@@ -334,7 +333,7 @@ class TencentCloudChatConversationItemAvatarState extends TencentCloudChatState<
         }
         return list.map((e) => e.faceUrl!).toList();
       }
-      return [defaultUrl];
+      return [""];
     }
   }
 

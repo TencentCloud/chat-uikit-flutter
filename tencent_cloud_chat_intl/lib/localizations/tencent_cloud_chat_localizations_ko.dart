@@ -1,5 +1,5 @@
-// Copyright (c) 1998-2024 Tencent, Inc. All rights reserved.
-// Use of this source code is governed by a MIT license that can be
+// Copyright (c) 1998-2024 Tencent, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
 import 'package:intl/intl.dart' as intl;
@@ -1237,4 +1237,7 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
 
   @override
   String get originalMessageNotFound => 'Original message not found';
+
+  @override
+  String get markAsRead => '읽음으로 표시';
 }

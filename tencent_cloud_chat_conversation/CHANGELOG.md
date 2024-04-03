@@ -1,3 +1,10 @@
+## 1.2.1
+
+### Conversation (TencentCloudChatConversation)
+
+- Fixed an issue where the main widget was being disposed on desktop after switching login accounts.
+- Changed the button `Mark as Unread` to `Mark as Read` and its functionality has been implemented.
+
 ## 1.2.0
 
 ### General

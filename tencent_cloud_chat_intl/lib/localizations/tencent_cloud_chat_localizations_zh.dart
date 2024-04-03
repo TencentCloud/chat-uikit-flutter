@@ -1,5 +1,5 @@
-// Copyright (c) 1998-2024 Tencent, Inc. All rights reserved.
-// Use of this source code is governed by a MIT license that can be
+// Copyright (c) 1998-2024 Tencent, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
 import 'package:intl/intl.dart' as intl;
@@ -1237,6 +1237,9 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
 
   @override
   String get originalMessageNotFound => '未找到原始消息';
+
+  @override
+  String get markAsRead => '标为已读';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2477,4 +2480,7 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
 
   @override
   String get originalMessageNotFound => '未找到原始訊息';
+
+  @override
+  String get markAsRead => '標為已讀';
 }

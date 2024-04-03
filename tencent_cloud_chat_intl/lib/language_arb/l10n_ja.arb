@@ -474,7 +474,7 @@
   "draft": "下書き",
   "clear": "クリア",
   "groupSubtitle": "{name}と{count}人の他のメンバー",
-  "markAsUnread": "未読としてマーク",
+  "markAsUnread": "未読にする",
   "hide": "非表示",
   "unreadMessagesBelow": "未読メッセージが下にあります",
   "ar": "اَلْعَرَبِيَّةُ",
@@ -532,5 +532,6 @@
   "permissionDeniedTitle": "アクセス権限が拒否されました",
   "permissionDeniedContent": "設定に移動して {permissionString} 権限を有効にしてください。",
   "goToSettingsButtonText": "設定へ",
-  "originalMessageNotFound": "元のメッセージが見つかりません"
+  "originalMessageNotFound": "元のメッセージが見つかりません",
+  "markAsRead": "既読にする"
 }

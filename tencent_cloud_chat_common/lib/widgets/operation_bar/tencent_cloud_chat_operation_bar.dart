@@ -27,7 +27,7 @@ class _TencentCloudChatOperationBarState<T>
     extends TencentCloudChatState<TencentCloudChatOperationBar<T>> {
   @override
   Widget defaultBuilder(BuildContext context) {
-    MaterialStateProperty<Color?> _getTrackColor(colorTheme) {
+    MaterialStateProperty<Color?> getTrackColor(colorTheme) {
       final MaterialStateProperty<Color?> trackColor =
           MaterialStateProperty.resolveWith<Color?>(
         (Set<MaterialState> states) {
@@ -73,7 +73,7 @@ class _TencentCloudChatOperationBarState<T>
                       value: widget.value as bool,
                       onChanged: (bool newValue) =>
                           widget.onChange?.call(newValue as T),
-                      trackColor: _getTrackColor(colorTheme),
+                      trackColor: getTrackColor(colorTheme),
                       thumbColor: MaterialStatePropertyAll<Color>(
                           colorTheme.backgroundColor),
                       trackOutlineColor: MaterialStatePropertyAll<Color>(colorTheme

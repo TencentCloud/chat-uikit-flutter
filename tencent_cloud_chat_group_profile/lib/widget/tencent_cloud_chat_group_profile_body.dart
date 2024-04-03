@@ -1,4 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// ignore_for_file: public_member_api_docs, sort_constructors_first, unused_local_variable
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_conversation_sdk.dart';
@@ -78,7 +78,7 @@ class TencentCloudChatGroupProfileAvatar extends StatefulWidget {
 }
 
 class TencentCloudChatGroupProfileAvatarState extends TencentCloudChatState<TencentCloudChatGroupProfileAvatar> {
-  List<String> _getAvatarList() {
+  List<String?> _getAvatarList() {
     var list = widget.groupMemberList.takeWhile((value) => TencentCloudChatUtils.checkString(value.faceUrl) != null).toList();
     if (list.isNotEmpty) {
       if (list.length > 9) {
@@ -87,7 +87,7 @@ class TencentCloudChatGroupProfileAvatarState extends TencentCloudChatState<Tenc
       return list.map((e) => e.faceUrl!).toList();
     }
     return [
-      TencentCloudChatUtils.checkString(widget.groupInfo.faceUrl) ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png",
+      widget.groupInfo.faceUrl,
     ];
   }
 
@@ -815,7 +815,7 @@ class TencentCloudChatGroupProfileGroupMemberState extends TencentCloudChatState
         padding: EdgeInsets.symmetric(horizontal: getWidth(4)),
         child: TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
           scene: TencentCloudChatAvatarScene.groupProfile,
-          imageList: [info.faceUrl ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"],
+          imageList: [info.faceUrl],
           width: getWidth(24),
           height: getHeight(24),
           borderRadius: getSquareSize(24),
@@ -829,7 +829,6 @@ class TencentCloudChatGroupProfileGroupMemberState extends TencentCloudChatState
   }
 
   Widget buildGroupMemberItem(V2TimGroupMemberFullInfo info) {
-    print("builditem ${info.userID}");
     // build 1 item
     if (info.userID == loginID) {
       return TencentCloudChatThemeWidget(

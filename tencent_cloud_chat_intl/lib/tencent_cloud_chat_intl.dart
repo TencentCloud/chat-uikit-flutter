@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable
+
 library tencent_cloud_chat_intl;
 
 import 'package:flutter/material.dart';

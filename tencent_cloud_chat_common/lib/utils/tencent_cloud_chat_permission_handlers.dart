@@ -32,32 +32,46 @@ class TencentCloudChatPermissionHandler {
   static Future<bool> checkPermission(String permissionString, BuildContext context) async {
     final permission = await getPermissionEnum(permissionString);
     if (permission != null) {
-      PermissionStatus status = await permission.status;
-      if (status.isDenied || status.isPermanentlyDenied) {
-        TencentCloudChatDialog.showAdaptiveDialog(
-          context: context,
-          title: Text(tL10n.permissionDeniedTitle),
-          content: Text(tL10n.permissionDeniedContent(permissionString)),
-          actions: [
-            TextButton(
-              child: Text(tL10n.goToSettingsButtonText),
-              onPressed: () async {
-                Navigator.pop(context);
-                await openAppSettings();
-              },
-            ),
-            TextButton(
-              child: Text(tL10n.cancel),
-              onPressed: () async {
-                Navigator.pop(context);
-              },
-            ),
-          ],
-        );
+      PermissionStatus prevStatus = await permission.status;
+      PermissionStatus requestResult = await permission.request();
+      if (requestResult.isDenied || requestResult.isPermanentlyDenied) {
+        final permission = TencentCloudChat.cache.getPermission();
+        final exist = permission.contains(permissionString);
+        if( !exist ){
+          TencentCloudChat.cache.cachePermission(permissionString);
+          return false;
+        }else{
+          TencentCloudChatDialog.showAdaptiveDialog(
+            context: context,
+            title: Text(tL10n.permissionDeniedTitle),
+            content: Text(tL10n.permissionDeniedContent(permissionString)),
+            actions: [
+              TextButton(
+                child: Text(tL10n.goToSettingsButtonText),
+                onPressed: () async {
+                  Navigator.pop(context);
+                  await openAppSettings();
+                },
+              ),
+              TextButton(
+                child: Text(tL10n.cancel),
+                onPressed: () async {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+          return false;
+        }
+
+      }
+
+      /// Special case for `microphone`
+      if(permission == Permission.microphone && (prevStatus.isDenied || prevStatus.isPermanentlyDenied) ){
         return false;
       }
 
-      if (status.isGranted || status.isLimited || status.isRestricted) {
+      if (requestResult.isGranted || requestResult.isLimited || requestResult.isRestricted) {
         return true;
       } else {
         PermissionStatus newStatus = await permission.request();

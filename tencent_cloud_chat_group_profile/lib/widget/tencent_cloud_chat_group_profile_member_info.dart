@@ -84,7 +84,7 @@ class TencentCloudChatGroupProfileMemberInfoBodyState extends TencentCloudChatSt
                     children: [
                       TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
                         scene: TencentCloudChatAvatarScene.groupProfile,
-                        imageList: [TencentCloudChatUtils.checkString(widget.memberFullInfo.faceUrl) ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"],
+                        imageList: [TencentCloudChatUtils.checkString(widget.memberFullInfo.faceUrl)],
                         width: getSquareSize(94),
                         height: getSquareSize(94),
                         borderRadius: getSquareSize(48),

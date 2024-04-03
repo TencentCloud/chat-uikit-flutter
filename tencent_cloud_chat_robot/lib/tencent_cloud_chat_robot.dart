@@ -64,7 +64,9 @@ class TencentCloudChatRobotPlugin extends TencentCloudChatPlugin {
         }
         res = await sendHelloMsgToRobot(
             receiver: receiver as String, isTextMsg: isTextMsg ?? false);
-      } catch (err) {}
+      } catch (err) {
+        debugPrint(err.toString());
+      }
       return Map<String, dynamic>.from({
         "sendHelloMsgToRobotResult": json.encode(res?.toJson() ?? {}),
       });

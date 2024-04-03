@@ -1,3 +1,7 @@
+## 1.2.1
+
+- _Please note that changes in this version only apply to the Conversation (TencentCloudChatConversation) and Message (TencentCloudChatMessage) components._
+
 ## 1.2.0
 
 ### General

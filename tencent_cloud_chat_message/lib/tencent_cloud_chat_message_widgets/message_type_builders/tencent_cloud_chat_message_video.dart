@@ -56,6 +56,8 @@ class TencentCloudChatMessageVideo extends TencentCloudChatMessageItemBase {
     required super.shouldBeHighlighted,
     required super.clearHighlightFunc,
     super.messageReceipt,
+    required super.showMessageStatusIndicator,
+    required super.showMessageTimeIndicator,
     required super.messageRowWidth,
     super.sendingMessageData,
     this.renderByMenu = false,

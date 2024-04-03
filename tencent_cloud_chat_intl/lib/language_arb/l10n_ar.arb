@@ -532,5 +532,6 @@
   "permissionDeniedTitle": "تم رفض الإذن",
   "permissionDeniedContent": "يرجى الانتقال إلى الإعدادات وتمكين إذن {permissionString}.",
   "goToSettingsButtonText": "الانتقال إلى الإعدادات",
-  "originalMessageNotFound": "لم يتم العثور على الرسالة الأصلية"
+  "originalMessageNotFound": "لم يتم العثور على الرسالة الأصلية",
+   "markAsRead": "وضع علامة مقروء"
 }

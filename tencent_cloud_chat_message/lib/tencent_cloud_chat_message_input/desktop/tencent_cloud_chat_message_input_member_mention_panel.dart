@@ -109,8 +109,7 @@ class _TencentCloudChatDesktopMemberMentionPanelState
                               TencentCloudChatAvatar(
                                 imageList: [
                                   TencentCloudChatUtils.checkString(
-                                          memberItem.faceUrl) ??
-                                      "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"
+                                          memberItem.faceUrl)
                                 ],
                                 height: 24,
                                 width: 24,

@@ -102,7 +102,6 @@ class TencentCloudChatGroupProfileMemberListAzListState extends TencentCloudChat
     for (var i = 0; i < widget.memberInfoList.length; i++) {
       final item = widget.memberInfoList[i];
       final name = TencentCloudChatUtils.checkString(widget.memberInfoList[i].nameCard) ?? widget.memberInfoList[i].userID;
-      print("widget.name ${item.toJson()}");
       String tag = name.substring(0, 1).toUpperCase();
       final role = item.role;
       if (role != null && role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN) {
@@ -287,7 +286,7 @@ class TencentCloudChatGroupProfileMemberListItemState extends TencentCloudChatSt
                         Padding(
                             padding: EdgeInsets.only(right: getWidth(16)),
                             child: TencentCloudChatAvatar(
-                              imageList: [TencentCloudChatUtils.checkString(widget.memberFullInfo.faceUrl) ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"],
+                              imageList: [TencentCloudChatUtils.checkString(widget.memberFullInfo.faceUrl)],
                               width: getSquareSize(40),
                               height: getSquareSize(40),
                               borderRadius: getSquareSize(48),

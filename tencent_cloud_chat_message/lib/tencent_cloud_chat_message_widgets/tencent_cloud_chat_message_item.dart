@@ -37,6 +37,9 @@ abstract class TencentCloudChatMessageItemBase extends StatefulWidget {
   final bool inSelectMode;
   final VoidCallback onSelectMessage;
 
+  final bool showMessageStatusIndicator;
+  final bool showMessageTimeIndicator;
+
   const TencentCloudChatMessageItemBase({
     Key? key,
     required this.message,
@@ -50,12 +53,16 @@ abstract class TencentCloudChatMessageItemBase extends StatefulWidget {
     required this.onSelectMessage,
     this.userID,
     this.groupID,
+    required this.showMessageStatusIndicator,
+    required this.showMessageTimeIndicator,
   }) : super(key: key);
 }
 
 // This is the state class for TencentCloudChatMessageWidget.
 // It manages the message highlighting animation and listens for changes in message data.
-abstract class TencentCloudChatMessageState<T extends TencentCloudChatMessageItemBase> extends TencentCloudChatState<T> {
+abstract class TencentCloudChatMessageState<
+        T extends TencentCloudChatMessageItemBase>
+    extends TencentCloudChatState<T> {
   // The unique ID of the message.
   String msgID = "";
 
@@ -113,12 +120,7 @@ abstract class TencentCloudChatMessageState<T extends TencentCloudChatMessageIte
   }
 
   Widget messageStatusIndicator() {
-    final showMessageStatusIndicator = TencentCloudChat().dataInstance.basic.messageConfig.showMessageStatusIndicator(
-          userID: widget.userID,
-          groupID: widget.groupID,
-        );
-
-    return showMessageStatusIndicator
+    return widget.showMessageStatusIndicator
         ? TencentCloudChatThemeWidget(
             build: (context, colorTheme, textStyle) {
               IconData? iconData;
@@ -134,7 +136,8 @@ abstract class TencentCloudChatMessageState<T extends TencentCloudChatMessageIte
                   iconData = Icons.done;
                   iconColor = colorTheme.secondaryTextColor;
                 case MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC:
-                  iconData = showReadByOthersStatus ? Icons.done_all : Icons.done;
+                  iconData =
+                      showReadByOthersStatus ? Icons.done_all : Icons.done;
                   break;
                 case MessageStatus.V2TIM_MSG_STATUS_HAS_DELETED:
                 case MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED:
@@ -160,14 +163,11 @@ abstract class TencentCloudChatMessageState<T extends TencentCloudChatMessageIte
     double? fontSize,
     List<Shadow>? shadow,
   }) {
-    final showMessageTimeIndicator = TencentCloudChat().dataInstance.basic.messageConfig.showMessageTimeIndicator(
-          userID: widget.userID,
-          groupID: widget.groupID,
-        );
-    return showMessageTimeIndicator
+    return widget.showMessageTimeIndicator
         ? TencentCloudChatThemeWidget(
             build: (context, colorTheme, textStyle) => Text(
-              TencentCloudChatIntl.formatTimestampToTime(widget.message.timestamp ?? 0),
+              TencentCloudChatIntl.formatTimestampToTime(
+                  widget.message.timestamp ?? 0),
               style: TextStyle(
                 color: textColor ?? colorTheme.secondaryTextColor,
                 fontSize: fontSize ?? textStyle.standardSmallText,
@@ -184,8 +184,12 @@ abstract class TencentCloudChatMessageState<T extends TencentCloudChatMessageIte
     super.initState();
     msgID = widget.message.msgID ?? "";
     sentFromSelf = widget.message.isSelf ?? false;
-    isGroupMessage = TencentCloudChatUtils.checkString(widget.message.groupID) != null;
-    showReadByOthersStatus = isGroupMessage ? (widget.messageReceipt != null && (widget.messageReceipt!.readCount ?? 0) > 0) : (widget.message.isPeerRead ?? false);
+    isGroupMessage =
+        TencentCloudChatUtils.checkString(widget.message.groupID) != null;
+    showReadByOthersStatus = isGroupMessage
+        ? (widget.messageReceipt != null &&
+            (widget.messageReceipt!.readCount ?? 0) > 0)
+        : (widget.message.isPeerRead ?? false);
 
     // Start the message highlighting animation if the message should be highlighted.
     if (widget.shouldBeHighlighted) {
@@ -204,7 +208,11 @@ abstract class TencentCloudChatMessageState<T extends TencentCloudChatMessageIte
     }
 
     sentFromSelf = widget.message.isSelf ?? false;
-    isGroupMessage = TencentCloudChatUtils.checkString(widget.message.groupID) != null;
-    showReadByOthersStatus = isGroupMessage ? (widget.messageReceipt != null && (widget.messageReceipt!.readCount ?? 0) > 0) : (widget.message.isPeerRead ?? false);
+    isGroupMessage =
+        TencentCloudChatUtils.checkString(widget.message.groupID) != null;
+    showReadByOthersStatus = isGroupMessage
+        ? (widget.messageReceipt != null &&
+            (widget.messageReceipt!.readCount ?? 0) > 0)
+        : (widget.message.isPeerRead ?? false);
   }
 }

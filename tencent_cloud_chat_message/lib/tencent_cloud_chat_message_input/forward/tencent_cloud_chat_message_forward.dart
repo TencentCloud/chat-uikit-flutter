@@ -141,8 +141,7 @@ class _TencentCloudChatMessageForwardState
                     height: getHeight(40),
                     borderRadius: getHeight(20),
                     imageList: [
-                      TencentCloudChatUtils.checkString(faceUrl) ??
-                          "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"
+                      faceUrl
                     ]),
                 SizedBox(
                   width: getWidth(8),

@@ -48,6 +48,8 @@ class TencentCloudChatMessageFile extends TencentCloudChatMessageItemBase {
     required super.clearHighlightFunc,
     super.messageReceipt,
     required super.renderOnMenuPreview,
+    required super.showMessageStatusIndicator,
+    required super.showMessageTimeIndicator,
     required super.messageRowWidth,
     super.sendingMessageData,
     required super.inSelectMode,

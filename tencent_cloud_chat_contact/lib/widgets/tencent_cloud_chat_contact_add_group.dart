@@ -281,7 +281,7 @@ class TencentCloudChatContactAddGroupListItemAvatarState extends TencentCloudCha
         ),
         child: TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
           scene: TencentCloudChatAvatarScene.contacts,
-          imageList: [TencentCloudChatUtils.checkString(widget.groupInfo.faceUrl) ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"],
+          imageList: [TencentCloudChatUtils.checkString(widget.groupInfo.faceUrl)],
           width: getSquareSize(50),
           height: getSquareSize(50),
           borderRadius: getSquareSize(48),

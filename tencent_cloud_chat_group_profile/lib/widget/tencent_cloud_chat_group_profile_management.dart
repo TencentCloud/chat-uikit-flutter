@@ -125,7 +125,7 @@ class TencentCloudChatGroupProfileAddMuteMemberState extends TencentCloudChatSta
       margin: EdgeInsets.only(bottom: getHeight(1)),
       child: Row(children: [
         TencentCloudChatAvatar(
-          imageList: [TencentCloudChatUtils.checkString(info.faceUrl) ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"],
+          imageList: [TencentCloudChatUtils.checkString(info.faceUrl)],
           scene: TencentCloudChatAvatarScene.groupProfile,
           width: getWidth(40),
           height: getHeight(40),

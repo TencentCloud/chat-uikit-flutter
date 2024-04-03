@@ -227,7 +227,7 @@ class _TencentCloudChatGroupMemberSelectorState extends TencentCloudChatState<Te
                     width: getHeight(40),
                     height: getHeight(40),
                     borderRadius: getHeight(20),
-                    imageList: [TencentCloudChatUtils.checkString(member.faceUrl) ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"]),
+                    imageList: [TencentCloudChatUtils.checkString(member.faceUrl)]),
                 SizedBox(
                   width: getWidth(8),
                 ),

@@ -138,7 +138,7 @@ class TencentCloudChatContactApplicationInfoAvatarState extends TencentCloudChat
           padding: EdgeInsets.symmetric(horizontal: getWidth(13)),
           child: TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
             scene: TencentCloudChatAvatarScene.contacts,
-            imageList: const ["https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"],
+            imageList: [widget.application.faceUrl],
             width: getSquareSize(43),
             height: getSquareSize(43),
             borderRadius: getSquareSize(38),
@@ -148,7 +148,7 @@ class TencentCloudChatContactApplicationInfoAvatarState extends TencentCloudChat
         padding: EdgeInsets.symmetric(horizontal: getWidth(13)),
         child: TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
           scene: TencentCloudChatAvatarScene.contacts,
-          imageList: [widget.application.faceUrl ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"],
+          imageList: [widget.application.faceUrl],
           width: getSquareSize(43),
           height: getSquareSize(43),
           borderRadius: getSquareSize(38),

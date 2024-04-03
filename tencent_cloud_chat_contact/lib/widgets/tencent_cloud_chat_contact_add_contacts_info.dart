@@ -236,7 +236,7 @@ class TencentCloudChatContactAddContactsInfoAvatarState extends TencentCloudChat
         padding: EdgeInsets.only(right: getWidth(18)),
         child: TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
           scene: TencentCloudChatAvatarScene.contacts,
-          imageList: [widget.userFullInfo.faceUrl ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"],
+          imageList: [widget.userFullInfo.faceUrl],
           width: getSquareSize(60),
           height: getSquareSize(60),
           borderRadius: getSquareSize(4),

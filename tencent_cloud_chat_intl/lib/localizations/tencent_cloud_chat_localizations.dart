@@ -2281,6 +2281,12 @@ abstract class TencentCloudChatLocalizations {
   /// In en, this message translates to:
   /// **'Original message not found'**
   String get originalMessageNotFound;
+
+  /// No description provided for @markAsRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Read'**
+  String get markAsRead;
 }
 
 class _TencentCloudChatLocalizationsDelegate extends LocalizationsDelegate<TencentCloudChatLocalizations> {

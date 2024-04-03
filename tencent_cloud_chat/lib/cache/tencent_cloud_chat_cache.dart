@@ -11,6 +11,7 @@ enum TencentCloudChatCacheKey {
   currentDeviceKeyboardHeight,
   currentLoginUserInfo,
   locale,
+  permission,
 }
 
 class TencentCloudChatCache {
@@ -190,6 +191,43 @@ class TencentCloudChatCache {
 
     List<Map<String, dynamic>> data = origindata.map((e) => json.decode(e.toString())).toList().cast<Map<String, dynamic>>();
     return data.map((e) => V2TimGroupMemberFullInfo.fromJson(e)).toList();
+  }
+
+  Future<void> cachePermission(String permission) async {
+    if (_box == null || !_inited) {
+      console("cachePermission _box is null or _inited is false");
+      return;
+    }
+    if (!_box!.isOpen) {
+      console("box is not open");
+      return;
+    }
+    String key = TencentCloudChatCacheKey.permission.name;
+    String hivekey = "$_perfix$key";
+
+    final currentPermission = getPermission();
+    final newPermission = "$currentPermission $permission";
+    await _box!.put(hivekey, newPermission);
+    console("set $key to hive. $newPermission}");
+  }
+
+  String getPermission() {
+    if (_box == null || !_inited) {
+      console("getPermission _box is null or _inited is false");
+      return "";
+    }
+    if (!_box!.isOpen) {
+      console("box is not open");
+      return "";
+    }
+    String key = TencentCloudChatCacheKey.permission.name;
+
+    String hivekey = "$_perfix$key";
+
+    String origindata = _box!.get(hivekey, defaultValue: "");
+
+    console("getCurrentDeviceKeyBordHeight length $origindata");
+    return origindata;
   }
 
   Future<void> cacheCurrentDeviceKeyBordHeight(double height) async {

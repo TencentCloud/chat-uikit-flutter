@@ -314,7 +314,7 @@ class TencentCloudChatContactAddContactListItemAvatarState extends TencentCloudC
         ),
         child: TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
           scene: TencentCloudChatAvatarScene.contacts,
-          imageList: [TencentCloudChatUtils.checkString(widget.userFullInfo.faceUrl) ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"],
+          imageList: [TencentCloudChatUtils.checkString(widget.userFullInfo.faceUrl)],
           width: getSquareSize(43),
           height: getSquareSize(43),
           borderRadius: getSquareSize(41),

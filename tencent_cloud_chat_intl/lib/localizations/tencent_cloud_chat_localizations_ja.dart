@@ -1,5 +1,5 @@
-// Copyright (c) 1998-2024 Tencent, Inc. All rights reserved.
-// Use of this source code is governed by a MIT license that can be
+// Copyright (c) 1998-2024 Tencent, Inc. All rights reserved.
+// Use of this source code is governed by a MIT license that can be
 // found in the LICENSE file.
 
 import 'package:intl/intl.dart' as intl;
@@ -1050,7 +1050,7 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   }
 
   @override
-  String get markAsUnread => '未読としてマーク';
+  String get markAsUnread => '未読にする';
 
   @override
   String get hide => '非表示';
@@ -1237,4 +1237,7 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
 
   @override
   String get originalMessageNotFound => '元のメッセージが見つかりません';
+
+  @override
+  String get markAsRead => '既読にする';
 }

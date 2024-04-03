@@ -29,7 +29,11 @@ class TencentCloudChatMessageSDK {
     OnRecvMessageExtensionsDeleted? onRecvMessageExtensionsDeleted,
     OnMessageDownloadProgressCallback? onMessageDownloadProgressCallback,
   }) {
-    advancedMsgListener ??= V2TimAdvancedMsgListener(
+    if(advancedMsgListener != null){
+      TencentImSDKPlugin.v2TIMManager.getMessageManager().removeAdvancedMsgListener(listener: advancedMsgListener!);
+      advancedMsgListener = null;
+    }
+    advancedMsgListener = V2TimAdvancedMsgListener(
       onRecvMessageReadReceipts: onRecvMessageReadReceipts,
       onRecvNewMessage: onRecvNewMessage,
       onMessageDownloadProgressCallback: onMessageDownloadProgressCallback,

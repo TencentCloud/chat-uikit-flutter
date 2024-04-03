@@ -523,5 +523,6 @@
   "permissionDeniedTitle": "权限被拒绝",
   "permissionDeniedContent": "请前往设置并启用 {permissionString} 权限。",
   "goToSettingsButtonText": "前往设置",
-  "originalMessageNotFound": "未找到原始消息"
+  "originalMessageNotFound": "未找到原始消息",
+    "markAsRead": "标为已读"
 }

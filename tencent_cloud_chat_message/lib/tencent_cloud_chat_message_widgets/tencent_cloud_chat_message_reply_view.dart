@@ -125,7 +125,7 @@ class _TencentCloudChatMessageReplyViewState
       build: (context, colorTheme, textStyle) => Container(
         margin: const EdgeInsets.only(top: 4),
         child: InkWell(
-          onTap: widget.onTriggerNavigation,
+          onTap: supportNavigation ? widget.onTriggerNavigation : null,
           child:
           Container(
             padding: const EdgeInsets.all(8.0),

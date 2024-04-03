@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/tencent_cloud_chat_message_item.dart';
 
@@ -15,6 +14,8 @@ class TencentCloudChatMessageText extends TencentCloudChatMessageItemBase {
     required super.clearHighlightFunc,
     super.messageReceipt,
     required super.messageRowWidth,
+    required super.showMessageStatusIndicator,
+    required super.showMessageTimeIndicator,
     super.sendingMessageData,
     required super.renderOnMenuPreview,
     required super.inSelectMode,
@@ -34,14 +35,7 @@ class _TencentCloudChatMessageTextState extends TencentCloudChatMessageState<Ten
   @override
   Widget defaultBuilder(BuildContext context) {
     final maxBubbleWidth = widget.messageRowWidth * 0.8;
-    final showIndicators = TencentCloudChat().dataInstance.basic.messageConfig.showMessageTimeIndicator(
-              userID: widget.userID,
-              groupID: widget.groupID,
-            ) ||
-        TencentCloudChat().dataInstance.basic.messageConfig.showMessageTimeIndicator(
-              userID: widget.userID,
-              groupID: widget.groupID,
-            );
+    final showIndicators = (widget.showMessageStatusIndicator && sentFromSelf) || widget.showMessageTimeIndicator;
     return TencentCloudChatThemeWidget(build: (context, colorTheme, textStyle) {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: getWidth(10), vertical: getHeight(8)),
@@ -95,14 +89,7 @@ class _TencentCloudChatMessageTextState extends TencentCloudChatMessageState<Ten
   @override
   Widget desktopBuilder(BuildContext context) {
     final maxBubbleWidth = widget.messageRowWidth * 0.8;
-    final showIndicators = TencentCloudChat().dataInstance.basic.messageConfig.showMessageTimeIndicator(
-              userID: widget.userID,
-              groupID: widget.groupID,
-            ) ||
-        TencentCloudChat().dataInstance.basic.messageConfig.showMessageTimeIndicator(
-              userID: widget.userID,
-              groupID: widget.groupID,
-            );
+    final showIndicators = (widget.showMessageStatusIndicator && sentFromSelf) || widget.showMessageTimeIndicator;
     return TencentCloudChatThemeWidget(build: (context, colorTheme, textStyle) {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: getWidth(10), vertical: getHeight(8)),

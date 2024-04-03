@@ -8,7 +8,7 @@ typedef CommonAvatarBuilder = Widget? Function({
   double? width,
   double? height,
   double? borderRadius,
-  required List<String> imageList,
+  required List<String?> imageList,
   Decoration? decoration,
 });
 
@@ -96,7 +96,7 @@ class TencentCloudChatCommonBuilders {
     double? width,
     double? height,
     double? borderRadius,
-    required List<String> imageList,
+    required List<String?> imageList,
     Decoration? decoration,
   }) {
     Widget? widget;

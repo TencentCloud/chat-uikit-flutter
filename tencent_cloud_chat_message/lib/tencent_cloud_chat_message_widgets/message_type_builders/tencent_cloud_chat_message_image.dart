@@ -60,6 +60,8 @@ class TencentCloudChatMessageImage extends TencentCloudChatMessageItemBase {
     super.userID,
     super.groupID,
     required super.message,
+    required super.showMessageStatusIndicator,
+    required super.showMessageTimeIndicator,
     required super.shouldBeHighlighted,
     required super.clearHighlightFunc,
     super.messageReceipt,

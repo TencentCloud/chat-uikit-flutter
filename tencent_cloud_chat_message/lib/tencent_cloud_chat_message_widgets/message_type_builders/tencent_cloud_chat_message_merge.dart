@@ -19,6 +19,8 @@ class TencentCloudChatMessageMerge extends TencentCloudChatMessageItemBase {
     required super.renderOnMenuPreview,
     super.messageReceipt,
     required super.messageRowWidth,
+    required super.showMessageStatusIndicator,
+    required super.showMessageTimeIndicator,
     super.sendingMessageData,
     required super.inSelectMode,
     required super.onSelectMessage,

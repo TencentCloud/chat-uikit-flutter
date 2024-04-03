@@ -37,6 +37,10 @@ class TencentCloudChatMessageRow extends StatefulWidget {
     int? timeStamp,
     int? seq,
   }) loadToSpecificMessage;
+  final bool showMessageStatusIndicator;
+  final bool showMessageTimeIndicator;
+  final bool showSelfAvatar;
+  final bool showOthersAvatar;
 
   const TencentCloudChatMessageRow({
     super.key,
@@ -50,6 +54,10 @@ class TencentCloudChatMessageRow extends StatefulWidget {
     required this.loadToSpecificMessage,
     required this.userID,
     required this.groupID,
+    required this.showMessageStatusIndicator,
+    required this.showMessageTimeIndicator,
+    required this.showSelfAvatar,
+    required this.showOthersAvatar,
   });
 
   @override
@@ -129,11 +137,7 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisAlignment: (widget.message.isSelf ?? true) ? MainAxisAlignment.end : MainAxisAlignment.start,
                         children: [
-                          if ((!(widget.message.isSelf ?? true)) &&
-                              TencentCloudChat().dataInstance.basic.messageConfig.showOthersAvatar(
-                                    groupID: widget.message.groupID,
-                                    userID: widget.message.userID,
-                                  ))
+                          if ((!(widget.message.isSelf ?? true)) && widget.showOthersAvatar)
                             GestureDetector(
                               onTap: TencentCloudChatUtils.checkString(widget.message.sender) != null ? () => navigateToUserProfile(context: context, options: TencentCloudChatUserProfileOptions(userID: widget.message.sender!)) : null,
                               child: Container(
@@ -175,6 +179,8 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
                                       inSelectMode: widget.inSelectMode,
                                       onSelectMessage: () => widget.onSelectCurrent(_message),
                                       shouldBeHighlighted: shouldBeHighlighted,
+                                      showMessageStatusIndicator: widget.showMessageStatusIndicator,
+                                      showMessageTimeIndicator: widget.showMessageTimeIndicator,
                                       clearHighlightFunc: clearHighlightFunc,
                                       messageReceipt: messageReceipt,
                                       messageRowWidth: widget.messageRowWidth,
@@ -217,11 +223,7 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
                                 )
                             ],
                           ),
-                          if ((widget.message.isSelf ?? true) &&
-                              TencentCloudChat().dataInstance.basic.messageConfig.showSelfAvatar(
-                                    groupID: widget.message.groupID,
-                                    userID: widget.message.userID,
-                                  ))
+                          if ((widget.message.isSelf ?? true) && widget.showSelfAvatar)
                             Container(
                               margin: EdgeInsets.symmetric(horizontal: getSquareSize(10)),
                               child: TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
@@ -232,11 +234,7 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
                                 borderRadius: getSquareSize(18),
                               ),
                             ),
-                          if ((widget.message.isSelf ?? true) &&
-                              !TencentCloudChat().dataInstance.basic.messageConfig.showSelfAvatar(
-                                    groupID: widget.message.groupID,
-                                    userID: widget.message.userID,
-                                  ))
+                          if ((widget.message.isSelf ?? true) && !widget.showSelfAvatar)
                             const SizedBox(
                               width: 10,
                             ),
@@ -319,11 +317,7 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisAlignment: (widget.message.isSelf ?? true) ? MainAxisAlignment.end : MainAxisAlignment.start,
                         children: [
-                          if ((!(widget.message.isSelf ?? true)) &&
-                              TencentCloudChat().dataInstance.basic.messageConfig.showOthersAvatar(
-                                    groupID: widget.message.groupID,
-                                    userID: widget.message.userID,
-                                  ))
+                          if ((!(widget.message.isSelf ?? true)) && widget.showOthersAvatar)
                             GestureDetector(
                               onTap: TencentCloudChatUtils.checkString(widget.message.sender) != null ? () => navigateToUserProfile(context: context, options: TencentCloudChatUserProfileOptions(userID: widget.message.sender!)) : null,
                               child: Container(
@@ -363,6 +357,8 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
                                       userID: widget.userID,
                                       groupID: widget.groupID,
                                       inSelectMode: widget.inSelectMode,
+                                      showMessageStatusIndicator: widget.showMessageStatusIndicator,
+                                      showMessageTimeIndicator: widget.showMessageTimeIndicator,
                                       onSelectMessage: () => widget.onSelectCurrent(_message),
                                       shouldBeHighlighted: shouldBeHighlighted,
                                       clearHighlightFunc: clearHighlightFunc,
@@ -407,11 +403,7 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
                                 )
                             ],
                           ),
-                          if ((widget.message.isSelf ?? true) &&
-                              TencentCloudChat().dataInstance.basic.messageConfig.showSelfAvatar(
-                                    groupID: widget.message.groupID,
-                                    userID: widget.message.userID,
-                                  ))
+                          if ((widget.message.isSelf ?? true) && widget.showSelfAvatar)
                             Container(
                               margin: EdgeInsets.symmetric(horizontal: getSquareSize(10)),
                               child: TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
@@ -422,11 +414,7 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
                                 borderRadius: getSquareSize(18),
                               ),
                             ),
-                          if ((widget.message.isSelf ?? true) &&
-                              !TencentCloudChat().dataInstance.basic.messageConfig.showSelfAvatar(
-                                    groupID: widget.message.groupID,
-                                    userID: widget.message.userID,
-                                  ))
+                          if ((widget.message.isSelf ?? true) && !widget.showSelfAvatar)
                             const SizedBox(
                               width: 10,
                             ),

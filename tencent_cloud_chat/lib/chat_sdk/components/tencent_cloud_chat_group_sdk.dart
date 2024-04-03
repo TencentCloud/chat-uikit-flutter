@@ -1,3 +1,5 @@
+// ignore_for_file: unnecessary_brace_in_string_interps
+
 import 'package:tencent_cloud_chat/chat_sdk/tencent_cloud_chat_sdk.dart';
 import 'package:tencent_cloud_chat/log/tencent_cloud_chat_log.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
@@ -58,10 +60,8 @@ class TencentCloudChatGroupSDK {
     onGroupInfoChanged: (groupID, changeInfos) {
       List<V2TimConversation> conversationList = TencentCloudChat().dataInstance.conversation.conversationList;
       int index = conversationList.indexWhere((element) => element.conversationID == "group_${groupID}");
-      print("onGroupInfoChanged");
       if (index > -1) {
         V2TimConversation conversation = conversationList[index];
-        print("onGroupInfoChanged ${conversation}");
         for (int i = 0; i < changeInfos.length; i++) {
           switch (changeInfos[i].type) {
             case 1:

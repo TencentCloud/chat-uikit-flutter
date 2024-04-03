@@ -116,6 +116,22 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
       messageRowWidth: widget.messageRowWidth,
       inSelectMode: _inSelectMode,
       loadToSpecificMessage: dataProvider.loadToSpecificMessage,
+      showSelfAvatar: dataProvider.config.showSelfAvatar(
+        userID: dataProvider.userID,
+        groupID: dataProvider.groupID,
+      ),
+      showOthersAvatar: dataProvider.config.showOthersAvatar(
+        userID: dataProvider.userID,
+        groupID: dataProvider.groupID,
+      ),
+      showMessageTimeIndicator: dataProvider.config.showMessageTimeIndicator(
+        userID: dataProvider.userID,
+        groupID: dataProvider.groupID,
+      ),
+      showMessageStatusIndicator: dataProvider.config.showMessageStatusIndicator(
+        userID: dataProvider.userID,
+        groupID: dataProvider.groupID,
+      ),
       isSelected: _isSelected,
       isMergeMessage: widget.isMergeMessage,
       onSelectCurrent: (msg) {

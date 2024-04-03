@@ -91,7 +91,7 @@ class TencentCloudChatContactItemAvatarState extends TencentCloudChatState<Tence
         ),
         child: TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
           scene: TencentCloudChatAvatarScene.contacts,
-          imageList: [widget.friend.userProfile?.faceUrl ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"],
+          imageList: [widget.friend.userProfile?.faceUrl],
           width: getSquareSize(40),
           height: getSquareSize(40),
           borderRadius: getSquareSize(34),

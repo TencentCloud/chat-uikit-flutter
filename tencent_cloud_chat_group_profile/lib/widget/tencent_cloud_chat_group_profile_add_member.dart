@@ -1,4 +1,4 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// ignore_for_file: public_member_api_docs, sort_constructors_first, unnecessary_null_comparison
 import 'package:azlistview_all_platforms/azlistview_all_platforms.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_group_sdk.dart';
@@ -135,8 +135,8 @@ class TencentCloudChatGroupProfilAddMemberListState extends TencentCloudChatStat
     final faceUrl = item.userProfile?.faceUrl ?? "";
 
     bool disabled = false;
-    if (widget.memberList != null && widget.memberList!.isNotEmpty) {
-      disabled = ((widget.memberList?.indexWhere((element) => element?.userID == item.userID)) ?? -1) > -1;
+    if (widget.memberList != null && widget.memberList.isNotEmpty) {
+      disabled = ((widget.memberList.indexWhere((element) => element.userID == item.userID))) > -1;
     }
 
     return TencentCloudChatThemeWidget(
@@ -160,7 +160,7 @@ class TencentCloudChatGroupProfilAddMemberListState extends TencentCloudChatStat
                           selectedMember.remove(item);
                         }
                         if (widget.onSelectedMemberItemChange != null) {
-                          widget.onSelectedMemberItemChange!(selectedMember);
+                          widget.onSelectedMemberItemChange(selectedMember);
                         }
                         setState(() {});
                       },
@@ -170,7 +170,7 @@ class TencentCloudChatGroupProfilAddMemberListState extends TencentCloudChatStat
                     padding: const EdgeInsets.only(bottom: 12),
                     margin: const EdgeInsets.only(right: 12),
                     child: TencentCloudChatAvatar(
-                      imageList: [TencentCloudChatUtils.checkString(faceUrl) ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"],
+                      imageList: [TencentCloudChatUtils.checkString(faceUrl)],
                       scene: TencentCloudChatAvatarScene.groupProfile,
                     ),
                   ),
@@ -214,7 +214,7 @@ class TencentCloudChatGroupProfilAddMemberListState extends TencentCloudChatStat
                           selectedSilencedMember.remove(item);
                         }
                         if (widget.onSelectedMemberItemChange != null) {
-                          widget.onSelectedMemberItemChange!(selectedSilencedMember);
+                          widget.onSelectedMemberItemChange(selectedSilencedMember);
                         }
                         setState(() {});
                       },
@@ -224,7 +224,7 @@ class TencentCloudChatGroupProfilAddMemberListState extends TencentCloudChatStat
                     padding: const EdgeInsets.only(bottom: 12),
                     margin: const EdgeInsets.only(right: 12),
                     child: TencentCloudChatAvatar(
-                      imageList: [TencentCloudChatUtils.checkString(item.faceUrl) ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png"],
+                      imageList: [TencentCloudChatUtils.checkString(item.faceUrl)],
                       scene: TencentCloudChatAvatarScene.groupProfile,
                     ),
                   ),
@@ -277,7 +277,7 @@ class TencentCloudChatGroupProfilAddMemberListState extends TencentCloudChatStat
                 selectedMember.add(item);
               }
               if (widget.onSelectedMemberItemChange != null) {
-                widget.onSelectedMemberItemChange!(selectedMember);
+                widget.onSelectedMemberItemChange(selectedMember);
               }
               setState(() {});
               return;
@@ -310,10 +310,8 @@ class TencentCloudChatGroupProfilAddMemberListState extends TencentCloudChatStat
             } else {
               selectedSilencedMember.add(item);
             }
-            if (widget.onSelectedMemberItemChange != null) {
-              widget.onSelectedMemberItemChange!(selectedSilencedMember);
-            }
-            setState(() {});
+            widget.onSelectedMemberItemChange(selectedSilencedMember);
+                      setState(() {});
             return;
           },
           child: _buildMemberSilencedItem(item),

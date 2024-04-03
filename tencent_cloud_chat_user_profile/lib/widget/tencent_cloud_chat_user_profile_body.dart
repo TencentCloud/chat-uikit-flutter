@@ -72,7 +72,7 @@ class TencentCloudChatUserProfileAvatarState extends TencentCloudChatState<Tence
         TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
           scene: TencentCloudChatAvatarScene.userProfile,
           imageList: [
-            TencentCloudChatUtils.checkString(widget.userFullInfo.faceUrl) ?? "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png",
+            TencentCloudChatUtils.checkString(widget.userFullInfo.faceUrl),
           ],
           width: getSquareSize(94),
           height: getSquareSize(94),
@@ -205,7 +205,7 @@ class TencentCloudChatUserProfileChatButtonState extends TencentCloudChatState<T
                   boxShadow: [
                     BoxShadow(
                       color: colorTheme.profileChatButtonBoxShadow,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                       blurRadius: 6,
                     ),
                   ],
