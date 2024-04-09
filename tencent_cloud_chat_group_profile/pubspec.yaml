@@ -11,8 +11,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  tencent_cloud_chat: ^1.2.1
-  tencent_cloud_chat_common: ^1.2.1
+#  tencent_cloud_chat: ^1.2.1
+#  tencent_cloud_chat_common: ^1.2.1
   azlistview_all_platforms: ^2.1.2
 
 dependency_overrides:
