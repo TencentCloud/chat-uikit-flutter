@@ -22,8 +22,13 @@ extension Wbfileext on String {
     } else {
       fileFormat = ".jpg";
     }
-    String lastdierName = this.split("/")[max(this
-        .split("/")
+    var str = "/";
+    if (PlatformUtils().isWindows) {
+      str = "\\";
+    }
+
+    String lastdierName = this.split(str)[max(this
+        .split(str)
         .length - 1, 0)];
     String saveDirec = this.replaceAll(lastdierName, "");
 

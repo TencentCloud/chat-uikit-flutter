@@ -25,7 +25,7 @@ dependencies:
   path: ^1.8.3
   wb_flutter_tool:
     git:
-      url: http://192.168.4.209:8081/ios/wb_flutter_tool.git
+      url: http://jarvis:apple123@192.168.4.209:8081/ios/wb_flutter_tool.git
 
 dev_dependencies:
   flutter_test:

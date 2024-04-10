@@ -17,7 +17,7 @@ dependencies:
 #  tencent_cloud_chat_common: ^1.2.1
   wb_flutter_tool:
     git:
-      url: http://192.168.4.209:8081/ios/wb_flutter_tool.git
+      url: http://jarvis:apple123@192.168.4.209:8081/ios/wb_flutter_tool.git
 
 dependency_overrides:
   tencent_cloud_chat_intl:
