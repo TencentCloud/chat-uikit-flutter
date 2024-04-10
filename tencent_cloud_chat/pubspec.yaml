@@ -23,6 +23,9 @@ dependencies:
   flutter_ringtone_player: ^3.2.0
   hive_flutter: ^1.1.0
   path: ^1.8.3
+  wb_flutter_tool:
+    git:
+      url: http://192.168.4.209:8081/ios/wb_flutter_tool.git
 
 dev_dependencies:
   flutter_test:

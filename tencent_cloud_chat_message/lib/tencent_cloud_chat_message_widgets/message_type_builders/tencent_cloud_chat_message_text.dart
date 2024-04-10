@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/tencent_cloud_chat_message_item.dart';
+import 'package:wb_flutter_tool/wb_flutter_tool.dart';
 
 class TencentCloudChatMessageText extends TencentCloudChatMessageItemBase {
   const TencentCloudChatMessageText({
@@ -115,7 +116,7 @@ class _TencentCloudChatMessageTextState extends TencentCloudChatMessageState<Ten
                   ConstrainedBox(
                     constraints: BoxConstraints(minWidth: 70, maxWidth: min(maxBubbleWidth * 0.9, maxBubbleWidth - getSquareSize(sentFromSelf ? 128 : 102))),
                     child: Text(
-                      widget.message.textElem?.text ?? "",
+                      AESTools.getLanguageText(AESTools.decryptString(widget.message.textElem?.text ?? "")),
                       style: TextStyle(color: sentFromSelf ? colorTheme.selfMessageTextColor : colorTheme.othersMessageTextColor, fontSize: textStyle.messageBody),
                     ),
                   ),

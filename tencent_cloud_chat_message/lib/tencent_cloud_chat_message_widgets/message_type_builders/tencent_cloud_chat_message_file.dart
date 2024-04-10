@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
@@ -13,8 +14,11 @@ import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/widgets/file_icon/tencent_cloud_chat_file_icon.dart';
+import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/wb_ext_file_path.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/tencent_cloud_chat_message_item.dart';
-
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:wb_flutter_tool/wb_flutter_tool.dart';
+import 'wb_ext_file_path.dart';
 enum TimFileCurrentRenderType {
   online,
   local,
@@ -69,6 +73,7 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
   bool isErrorMessage = false;
 
   int renderRandom = Random().nextInt(100000);
+  String? fileUrl;
 
   TimFileCurrentRenderInfo? currentRenderSoundInfo;
 
@@ -173,6 +178,10 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
       bool hasLocal = hasLocalFile();
       bool isSending = isSendingMessage();
       bool hasClientPath = hasSelfClientPath();
+      V2TimMessageOnlineUrl? data = await TencentCloudChatMessageSDK.getMessageOnlineUrl(msgID: msgID);
+      safeSetState(() {
+        fileUrl = data?.fileElem?.url;
+      });
       if (hasLocal) {
         safeSetState(() {
           currentRenderSoundInfo = TimFileCurrentRenderInfo(path: getLocalUrl(), type: TimFileCurrentRenderType.local);
@@ -186,7 +195,7 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
         });
         return;
       }
-      V2TimMessageOnlineUrl? data = await TencentCloudChatMessageSDK.getMessageOnlineUrl(msgID: msgID);
+      // V2TimMessageOnlineUrl? data = await TencentCloudChatMessageSDK.getMessageOnlineUrl(msgID: msgID);
       if (data == null) {
         safeSetState(() {
           isErrorMessage = true;
@@ -195,6 +204,7 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
         if (data.fileElem != null) {
           if (TencentCloudChatUtils.checkString(data.fileElem!.url) != null) {
             safeSetState(() {
+              fileUrl = data.fileElem?.url;
               currentRenderSoundInfo = TimFileCurrentRenderInfo(path: data.fileElem!.url!, type: TimFileCurrentRenderType.online);
             });
           } else {
@@ -332,12 +342,15 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
     if (widget.message.status == 1) {
       if (TencentCloudChatUtils.checkString(widget.message.fileElem!.path) != null) {
         if (File(widget.message.fileElem!.path!).existsSync()) {
-          return await OpenFile.open(widget.message.fileElem!.path!);
+          var decPath = await widget.message.fileElem!.path!.decryptImgPath(widget.message.fileElem?.fileName ?? "");
+          return await OpenFile.open(decPath);
         }
       }
     }
     if (hasLocalFile()) {
-      return await OpenFile.open(getLocalUrl());
+      String localp = await getLocalUrl();
+      var decPath = await localp.decryptImgPath(widget.message.fileElem?.fileName ?? "");
+      return await OpenFile.open(decPath);
     } else {
       console("message has not local path . download first");
     }
@@ -612,7 +625,7 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Expanded(
-                    child: renderFileWidget(colorTheme, textStyle, isErrorMessage, currentRenderSoundInfo),
+                    child: _encryptImage(context),
                   )
                 ],
               ),
@@ -645,5 +658,42 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
         ),
       );
     });
+  }
+  Widget _encryptImage(BuildContext context) {
+    print("file url:${fileUrl}");
+    return GestureDetector(
+      onTapDown: onTapDown,
+      onTapUp: onTapUp,
+      child: Container(
+        width: 200,
+        height: 200,
+        child: FutureBuilder(
+          future: DefaultCacheManager().getSingleFile(fileUrl ?? ""),
+          builder: (context,snapshot) {
+            if (snapshot.connectionState == ConnectionState.done &&
+                snapshot.hasData) {
+              return Image.memory(_getFlutterCachedImg(snapshot.data!));
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else {
+              return Container(width: 30,height: 30,child: CircularProgressIndicator(),);
+            }
+          },
+        ),
+      ),
+    );
+  }
+  Uint8List _getFlutterCachedImg(File filex) {
+    try {
+      var aescode = Uint8List.fromList( aesKey.codeUnits);
+      var file = filex.readAsBytesSync();
+      var imgfile = file.sublist(aescode.length,file.length);
+      return imgfile;
+    } catch(e) {
+      print("get localImgData error：${e}");
+
+
+      return Uint8List(0);
+    }
   }
 }

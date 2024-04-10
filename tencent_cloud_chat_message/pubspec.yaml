@@ -32,6 +32,10 @@ dependencies:
   desktop_drop: ^0.4.4
   dotted_border: ^2.1.0
   package_info_plus: ^5.0.1
+  cached_network_image: ^3.3.1
+  wb_flutter_tool:
+    git:
+      url: http://192.168.4.209:8081/ios/wb_flutter_tool.git
 
 dependency_overrides:
   tencent_cloud_chat_intl:

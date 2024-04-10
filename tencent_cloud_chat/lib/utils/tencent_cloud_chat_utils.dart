@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_message_calling_message/tencent_cloud_chat_message_calling_message.dart';
+import 'package:wb_flutter_tool/wb_flutter_tool.dart';
 
 class ImageExifInfo {
   final double width;
@@ -194,7 +195,7 @@ class TencentCloudChatUtils {
       switch (message.elemType) {
         case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
           if (message.textElem != null) {
-            text = message.textElem!.text ?? "";
+            text = AESTools.getLanguageText(AESTools.decryptString(message.textElem!.text ?? ""));
           }
           break;
         case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
