@@ -74,6 +74,7 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
 
   int renderRandom = Random().nextInt(100000);
   String? fileUrl;
+  String? localDecryptUrl;
 
   TimFileCurrentRenderInfo? currentRenderSoundInfo;
 
@@ -190,7 +191,10 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
       }
 
       if (isSending && hasClientPath) {
+        String lcoal = getLocalPath();
+        var str = await lcoal.decryptPath(fileName: widget.message.fileElem?.fileName ?? "");
         safeSetState(() {
+          localDecryptUrl = str;
           currentRenderSoundInfo = TimFileCurrentRenderInfo(path: getLocalPath(), type: TimFileCurrentRenderType.path);
         });
         return;
@@ -342,14 +346,14 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
     if (widget.message.status == 1) {
       if (TencentCloudChatUtils.checkString(widget.message.fileElem!.path) != null) {
         if (File(widget.message.fileElem!.path!).existsSync()) {
-          var decPath = await widget.message.fileElem!.path!.decryptImgPath(widget.message.fileElem?.fileName ?? "");
+          var decPath = await widget.message.fileElem!.path!.decryptPath(fileName:widget.message.fileElem?.fileName ?? "");
           return await OpenFile.open(decPath);
         }
       }
     }
     if (hasLocalFile()) {
       String localp = await getLocalUrl();
-      var decPath = await localp.decryptImgPath(widget.message.fileElem?.fileName ?? "");
+      var decPath = await localp.decryptPath(fileName:widget.message.fileElem?.fileName ?? "");
       return await OpenFile.open(decPath);
     } else {
       console("message has not local path . download first");
@@ -661,13 +665,14 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
   }
   Widget _encryptImage(BuildContext context) {
     print("file url:${fileUrl}");
+
     return GestureDetector(
       onTapDown: onTapDown,
       onTapUp: onTapUp,
       child: Container(
         width: 200,
         height: 200,
-        child: FutureBuilder(
+        child: (fileUrl != null && fileUrl != "") ? FutureBuilder(
           future: DefaultCacheManager().getSingleFile(fileUrl ?? ""),
           builder: (context,snapshot) {
             if (snapshot.connectionState == ConnectionState.done &&
@@ -679,6 +684,9 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
               return Container(width: 30,height: 30,child: CircularProgressIndicator(),);
             }
           },
+        ): Container(
+          child: localDecryptUrl != null ? Image.file(File(localDecryptUrl ?? "")):
+          Container(child: Text("下载中.....${widget.message.fileElem?.path}"),),
         ),
       ),
     );

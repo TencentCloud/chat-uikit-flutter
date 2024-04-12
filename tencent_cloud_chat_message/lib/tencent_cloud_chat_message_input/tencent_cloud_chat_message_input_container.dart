@@ -17,7 +17,7 @@ import 'package:tencent_cloud_chat_common/widgets/modal/bottom_modal.dart';
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data.dart';
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data_notifier.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_builders.dart';
-
+import '../tencent_cloud_chat_message_widgets/message_type_builders/wb_ext_file_path.dart';
 class TencentCloudChatMessageInputContainer extends StatefulWidget {
   final String? userID;
   final String? groupID;
@@ -59,9 +59,9 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
     final config = dataProvider.config;
     if (!TencentCloudChatPlatformAdapter().isMobile) {
       final defaultOptions = [
-        TencentCloudChatMessageGeneralOptionItem(icon: Icons.insert_drive_file_outlined, label: tL10n.file, onTap: _sendFileFromExplorer),
-        TencentCloudChatMessageGeneralOptionItem(icon: Icons.image_outlined, label: tL10n.image, onTap: _sendImage),
-        TencentCloudChatMessageGeneralOptionItem(icon: Icons.perm_media_outlined, label: tL10n.media, onTap: _sendMediaFromGallery),
+        // TencentCloudChatMessageGeneralOptionItem(icon: Icons.insert_drive_file_outlined, label: tL10n.file, onTap: _sendFileFromExplorer),
+        TencentCloudChatMessageGeneralOptionItem(icon: Icons.image_outlined, label: tL10n.image, onTap: _sendSingleImage),
+        TencentCloudChatMessageGeneralOptionItem(icon: Icons.video_collection, label: tL10n.video, onTap: _sendSingleVideo),
       ];
       final additionalAttachmentOptionsForDesktop = config.additionalInputControlBarOptionsForDesktop(
         userID: dataProvider.userID,
@@ -124,6 +124,40 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
           debugPrint('Unsupported file type: $fileExtension');
         }
       }
+    }
+  }
+  void _sendSingleImage({Offset? offset}) async {
+    final ImagePicker picker = ImagePicker();
+    XFile? file = await picker.pickImage(source: ImageSource.gallery);
+    if (file != null) {
+      final String fileExtension = file.path.split('.').last.toLowerCase();
+      if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'tiff', 'webp'].contains(fileExtension)) {
+      var compressStr = await Wbfileext.compressImage(file.path!, 0.6);
+      if (compressStr == null || compressStr == "") {
+        return;
+      }
+     var sendPath = await compressStr.encrypyPath(fileExtension);
+        _sendFileMessage(filePath: sendPath);
+      } else if (['mp4', 'mov', 'avi', 'mkv', 'flv', 'wmv', 'mpeg', 'webm', '3gp'].contains(fileExtension)) {
+        _sendVideoMessage(videoPath: file.path);
+      } else {
+        // Unsupported file type
+        debugPrint('Unsupported file type: $fileExtension');
+      }
+    }
+
+  }
+  void _sendSingleVideo({Offset? offset}) async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.video);
+    if (result != null && result.files.isNotEmpty) {
+      File file = File(result.files.single.path!);
+
+     if (['mp4', 'mov', 'avi', 'mkv', 'flv', 'wmv', 'mpeg', 'webm', '3gp',"MP4"].contains(result.files.single.extension)) {
+       var encPath = await file.path.encryptVideo(result.files.single.name);
+       _sendVideoMessage(videoPath: encPath);
+     }else {
+       debugPrint('Unsupported video type: ${result.files.single.name}');
+     }
     }
   }
 

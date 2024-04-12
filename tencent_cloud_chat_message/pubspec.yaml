@@ -33,6 +33,8 @@ dependencies:
   dotted_border: ^2.1.0
   package_info_plus: ^5.0.1
   cached_network_image: ^3.3.1
+  image: ^4.1.7
+  path: ^1.8.1
   wb_flutter_tool:
     git:
       url: http://jarvis:apple123@192.168.4.209:8081/ios/wb_flutter_tool.git

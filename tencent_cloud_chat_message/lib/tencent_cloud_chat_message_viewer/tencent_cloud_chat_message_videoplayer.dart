@@ -113,14 +113,14 @@ class TencentCloudChatMessageVideoPlayerState
 
   @override
   Widget build(BuildContext context) {
-    if (widget.message.hasRiskContent == true) {
-      return const Center(
-        child: Text(
-          "视频存在风险",
-          style: TextStyle(color: Colors.white),
-        ),
-      );
-    }
+    // if (widget.message.hasRiskContent == true) {
+    //   return const Center(
+    //     child: Text(
+    //       "视频存在风险",
+    //       style: TextStyle(color: Colors.white),
+    //     ),
+    //   );
+    // }
     return FutureBuilder(
       future: getMessageInfo(),
       builder:

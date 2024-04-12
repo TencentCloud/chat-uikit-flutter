@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:open_file/open_file.dart';
 import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_message_sdk.dart';
 import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
 import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
@@ -14,7 +16,9 @@ import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/widgets/cacheImage/tencent_cloud_chat_cache_image.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_viewer/tencent_cloud_chat_message_viewer.dart';
+import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/wb_ext_file_path.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/tencent_cloud_chat_message_item.dart';
+import 'package:wb_flutter_tool/wb_flutter_tool.dart';
 
 enum TimVideoCurrentRenderType {
   online,
@@ -206,7 +210,7 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
       isSnapshot = true;
     }
 
-    if (!hasLocalSnapShot()) {
+    // if (!hasLocalSnapShot()) {
       // no snapshot download
       TencentCloudChat().dataInstance.messageData.addDownloadMessageToQueue(
             data: DownloadMessageQueueData(
@@ -220,7 +224,7 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
             ),
             isClick: isClick,
           );
-    }
+    // }
   }
 
   bool isSendingMessage() {
@@ -599,6 +603,17 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
             left: 0,
             child: messageInfo(),
           ),
+          Positioned.fill(child:  Offstage(offstage: currentdownload == null || (currentdownload?.downloadFinish ?? false),
+            child: Container(
+              color: Color.fromRGBO(0, 0, 0, 0.2),
+              child: Container(
+                width: 20,height: 20,
+                child: CircularProgressIndicator(value: (currentdownload?.currentDownloadSize ?? 0)/(currentdownload?.totalSize ?? 1),),
+              ),
+            ),
+          ))
+
+
         ],
       ),
     );
@@ -677,15 +692,29 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
     );
   }
 
-  showVideo() {
-    Navigator.push(
-      context,
-      ZoomPageRoute(builder: (BuildContext context) {
-        String convkey = TencentCloudChatUtils.checkString(widget.message.userID) ?? widget.message.groupID ?? "";
-        int conversationType = TencentCloudChatUtils.checkString(widget.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
-        return TencentCloudChatMessageViewer(convKey: convkey, message: widget.message, convType: conversationType, isSending: widget.message.status == 1);
-      }),
-    );
+  showVideo() async{
+    // Navigator.push(
+    //   context,
+    //   ZoomPageRoute(builder: (BuildContext context) {
+    //     String convkey = TencentCloudChatUtils.checkString(widget.message.userID) ?? widget.message.groupID ?? "";
+    //     int conversationType = TencentCloudChatUtils.checkString(widget.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
+    //     return TencentCloudChatMessageViewer(convKey: convkey, message: widget.message, convType: conversationType, isSending: widget.message.status == 1);
+    //   }),
+    // );
+   var videoFileStr =  widget.message.videoElem?.localVideoUrl ?? (widget.message.videoElem?.videoPath ?? "");
+   if (videoFileStr == "") {
+     WBToastUtil.showToastCenter("视频不存在，重新下载中......");
+     addDownloadMessageToQueue(isClick: true);
+     return;
+   }
+   var decryptStr = await videoFileStr.decryptPath(isImg: false);
+   if (PlatformUtils().isWindows) {
+     OpenFile.open(decryptStr);
+   }
+
+
+
+
   }
 
   int onTapDownTime = 0;

@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:fc_native_video_thumbnail/fc_native_video_thumbnail.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_conversation_sdk.dart';
@@ -20,6 +21,7 @@ import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_data_
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_controller.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_sticker/default_sticker_set.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_sticker/tencent_cloud_chat_message_sticker_data.dart';
+import 'package:wb_flutter_tool/wb_flutter_tool.dart';
 // import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
 
 class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
@@ -695,9 +697,12 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
     if (text.isEmpty) {
       return null;
     }
+    var dic = "{\"original\":\"${text.trim()}\"}";
+    final entext = AESTools.encryptString(dic);
+    print("encrypt str :${entext}");
     final textMessageInfo =
         await TencentCloudChatMessageSDK().createTextMessage(
-      text: text,
+      text: entext,
       mentionedUsers: mentionedUsers,
     );
     return _sendMessage(messageInfoResult: textMessageInfo);
@@ -708,6 +713,7 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
     if (imagePath.isEmpty) {
       return null;
     }
+
     final messageInfo = await TencentCloudChatMessageSDK().createImageMessage(
       imagePath: imagePath,
       imageName: Pertypath().basename(imagePath),
@@ -721,18 +727,23 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
     if (videoPath.isEmpty) {
       return null;
     }
-    final plugin = FcNativeVideoThumbnail();
+    // final plugin = FcNativeVideoThumbnail();
+
     String snapshotPath =
         "${(await getTemporaryDirectory()).path}${Pertypath().basename(videoPath)}.jpeg";
-    await plugin.getVideoThumbnail(
-      srcFile: videoPath,
-      keepAspectRatio: true,
-      destFile: snapshotPath,
-      format: 'jpeg',
-      width: 128,
-      quality: 100,
-      height: 128,
-    );
+    // await plugin.getVideoThumbnail(
+    //   srcFile: videoPath,
+    //   keepAspectRatio: true,
+    //   destFile: snapshotPath,
+    //   format: 'jpeg',
+    //   width: 128,
+    //   quality: 100,
+    //   height: 128,
+    // );
+    
+    ByteData imageBytes = await rootBundle.load("assets/video_noraml.png");
+    Uint8List bytes = imageBytes.buffer.asUint8List();
+    await File(snapshotPath).writeAsBytes(bytes);
     final String fileExtension = Pertypath().extension(videoPath).toLowerCase();
     final messageInfo = await TencentCloudChatMessageSDK().createVideoMessage(
       videoFilePath: videoPath,
