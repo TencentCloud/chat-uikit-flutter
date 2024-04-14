@@ -56,7 +56,9 @@ extension Wbfileext on String {
     return Future.value("${saveDirec}/${saveNewName}");
   }
 
-
+  String splitAllExJson() {
+    return this.trim().replaceAll('\n', '').replaceAll("\r", "").replaceAll("\r\n", "");
+  }
 
   static Future<String?> compressImage(String imagePath, double scale) {
     // 替换为你的图像文件路径

@@ -749,7 +749,7 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
       videoFilePath: videoPath,
       snapshotPath: snapshotPath,
       type: fileExtension,
-      duration: 150,
+      duration: 1,
     );
 
     return _sendMessage(messageInfoResult: messageInfo);

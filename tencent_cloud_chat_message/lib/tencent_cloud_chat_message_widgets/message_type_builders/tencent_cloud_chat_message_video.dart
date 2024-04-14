@@ -794,6 +794,9 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
         console("downloading finished:${data.currentDownloadMessage?.downloadFinish}");
         safeSetState(() {
           currentdownload = data.currentDownloadMessage;
+          if (data.currentDownloadMessage?.downloadFinish ?? false) {
+            widget.message.videoElem?.localVideoUrl = data.currentDownloadMessage?.path;
+          }
         });
       }
     }

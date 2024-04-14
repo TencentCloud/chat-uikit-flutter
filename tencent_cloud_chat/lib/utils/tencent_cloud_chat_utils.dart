@@ -12,6 +12,7 @@ import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_message_calling_message/tencent_cloud_chat_message_calling_message.dart';
 import 'package:wb_flutter_tool/wb_flutter_tool.dart';
 
+
 class ImageExifInfo {
   final double width;
   final double height;
@@ -660,9 +661,28 @@ class TencentCloudChatUtils {
     String lineOne = "[${tL10n.custom}]";
     String? lineTwo;
     IconData? icon;
+    final customMessage = jsonDecode(customElem!.data!.splitAllExJson());
+    String businessID = customMessage["businessID"];
 
     if (customElem?.data == "group_create") {
       lineOne = "Group chat created successfully!";
+    }
+    if (businessID == "dgg_group_businessId") {
+      lineOne = "[群名片]";
+    } else if (businessID == "dgg_businessId") {
+      lineOne = "[名片]";
+    } else if (businessID == "red_packet_tips") {
+      //红包领取
+      lineOne = "[红包变动]";
+    } else if (businessID == "red_packet") {
+      //红包
+      lineOne = "[红包]";
+    } else if (businessID == "dgg_clearGroupMsg") {
+      //FIXME:清屏
+
+    } else if (businessID == "transfer_c2c") {
+      //转账
+      lineOne = "[转账]";
     }
     if (isVoteMessage(message)) {
       lineOne = "[${tL10n.poll}]";
