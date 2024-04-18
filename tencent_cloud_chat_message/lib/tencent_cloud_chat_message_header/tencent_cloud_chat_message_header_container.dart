@@ -8,7 +8,6 @@ import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.d
 import 'package:tencent_cloud_chat_common/widgets/group_member_selector/tencent_cloud_chat_group_member_selector.dart';
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data.dart';
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data_notifier.dart';
-import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_builders.dart';
 
 class _PreferredAppBarSize extends Size {
   _PreferredAppBarSize(this.toolbarHeight, this.bottomHeight) : super.fromHeight((toolbarHeight ?? kToolbarHeight) + (bottomHeight ?? 0));
@@ -102,9 +101,9 @@ class _TencentCloudChatMessageHeaderContainerState extends TencentCloudChatState
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    final useCallKit = TencentCloudChat().dataInstance.basic.useCallKit;
+    final useCallKit = TencentCloudChat.instance.dataInstance.basic.useCallKit;
 
-    return TencentCloudChatMessageBuilders.getMessageHeader(
+    return dataProvider.messageBuilders?.getMessageHeader(
       controller: dataProvider.messageController,
       onCancelSelect: () => dataProvider.inSelectMode = false,
       onClearSelect: () => dataProvider.selectedMessages = [],
@@ -162,9 +161,9 @@ class _TencentCloudChatMessageHeaderContainerState extends TencentCloudChatState
               }
             }
           : null,
-      showUserOnlineStatus: TencentCloudChat().dataInstance.basic.userConfig.useUserOnlineStatus ?? true,
+      showUserOnlineStatus: TencentCloudChat.instance.dataInstance.basic.userConfig.useUserOnlineStatus ?? true,
       getUserOnlineStatus: ({required String userID}) {
-        return TencentCloudChat().dataInstance.contact.getOnlineStatusByUserId(userID: userID);
+        return TencentCloudChat.instance.dataInstance.contact.getOnlineStatusByUserId(userID: userID);
       },
       getGroupMembersInfo: () {
         var list = _groupMemberInfo;
@@ -176,6 +175,6 @@ class _TencentCloudChatMessageHeaderContainerState extends TencentCloudChatState
         }
         return res;
       },
-    );
+    ) ?? Container();
   }
 }

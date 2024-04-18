@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 /// This abstract class serves as the foundation for all primary components in Tencent Cloud Chat,
 /// such as Message, Conversation, etc. By extending this class, external developers can benefit
 /// from consistent parameter naming and a clear understanding of how to use these components effectively.
-abstract class TencentCloudChatComponent<T, U, K, H, L> extends StatefulWidget {
+abstract class TencentCloudChatComponent<T, U, K, H> extends StatefulWidget {
   /// The options for the component, such as conversation ID, message type, etc.
   final T? options;
 
@@ -23,11 +23,6 @@ abstract class TencentCloudChatComponent<T, U, K, H, L> extends StatefulWidget {
   /// interactive events (e.g., onTapAvatar), and more.
   final H? eventHandlers;
 
-  /// The controller for the component, which provides various functions
-  /// depending on the component type. For example, the MessageController
-  /// includes functions like sending a message and scrolling to a specific message.
-  final L? controller;
-
   /// Constructor for TencentCloudChatComponent.
   const TencentCloudChatComponent({
     Key? key,
@@ -35,6 +30,5 @@ abstract class TencentCloudChatComponent<T, U, K, H, L> extends StatefulWidget {
     this.config,
     this.builders,
     this.eventHandlers,
-    this.controller,
   }) : super(key: key);
 }

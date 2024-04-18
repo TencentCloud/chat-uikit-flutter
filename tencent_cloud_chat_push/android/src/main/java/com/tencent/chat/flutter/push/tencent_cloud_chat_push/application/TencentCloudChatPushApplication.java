@@ -9,7 +9,6 @@ import com.tencent.chat.flutter.push.tencent_cloud_chat_push.TencentCloudChatPus
 import com.tencent.chat.flutter.push.tencent_cloud_chat_push.common.Extras;
 import com.tencent.qcloud.tuicore.TUIConstants;
 import com.tencent.qcloud.tuicore.TUICore;
-import com.tencent.qcloud.tuicore.interfaces.ITUINotification;
 
 import java.util.Map;
 import java.util.Timer;

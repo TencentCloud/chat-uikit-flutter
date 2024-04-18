@@ -37,7 +37,7 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
   bool _shouldBeHighlighted = false;
   V2TimMessageReceipt? _messageReceipt;
   SendingMessageData? _sendingMessageData;
-  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.eventBusInstance.on<TencentCloudChatMessageData>();
+  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatMessageData>();
   late StreamSubscription<TencentCloudChatMessageData<dynamic>>? _messageDataSubscription;
 
   // This method handles changes in message data.
@@ -99,7 +99,7 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
   void initState() {
     super.initState();
     _messageDataSubscription = _messageDataStream?.listen(_messageDataHandler);
-    _messageReceipt = TencentCloudChat().dataInstance.messageData.getMessageReadReceipt(
+    _messageReceipt = TencentCloudChat.instance.dataInstance.messageData.getMessageReadReceipt(
           msgID: widget.message.msgID ?? "",
           userID: widget.message.userID ?? "",
           timestamp: widget.message.timestamp ?? 0,
@@ -115,14 +115,14 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
   // This method clears the message highlight.
   void _clearHighlight() {
     _shouldBeHighlighted = false;
-    TencentCloudChat().dataInstance.messageData.messageHighlighted = null;
+    TencentCloudChat.instance.dataInstance.messageData.messageHighlighted = null;
   }
 
   @override
   Widget build(BuildContext context) {
     String? messageText;
     if (widget.message.status == MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED) {
-      messageText = "消息被撤回";
+      messageText = tL10n.messageRecalled;
     } else {
       switch (widget.message.elemType) {
         case 101:

@@ -8,7 +8,7 @@ import 'package:tencent_cloud_chat/eventbus/tencent_cloud_chat_eventbus.dart';
 import 'package:tencent_cloud_chat/log/tencent_cloud_chat_log.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 
-/// An abstract base class for the state of StatefulWidget in TencentCloudChat.
+/// An abstract base class for the state of StatefulWidget in TencentCloudChat.instance.
 ///
 /// This class extends the Flutter [State] class and provides a foundation for
 /// managing theme data and screen types for the Chat UIKit widgets. It includes
@@ -19,10 +19,10 @@ import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 /// appearance and behavior.
 abstract class TencentCloudChatState<T extends StatefulWidget> extends State<T> with WidgetsBindingObserver {
   // EventBus instance for the Chat UIKit
-  TencentCloudChatEventBus eventbus = TencentCloudChat.eventBusInstance;
+  TencentCloudChatEventBus eventbus = TencentCloudChat.instance.eventBusInstance;
 
   // Listener for theme data changes
-  Stream<TencentCloudChatTheme>? themeDataListener = TencentCloudChat.eventBusInstance.on<TencentCloudChatTheme>();
+  Stream<TencentCloudChatTheme>? themeDataListener = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatTheme>();
 
   // Ticker for FPS monitoring
   Ticker? _fpsTicker;
@@ -61,7 +61,7 @@ abstract class TencentCloudChatState<T extends StatefulWidget> extends State<T> 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    TencentCloudChat.controller.initGlobalAdapterInBuildPhase(context);
+    TencentCloudChat.instance.chatController.initGlobalAdapterInBuildPhase(context);
   }
 
   @override
@@ -87,7 +87,7 @@ abstract class TencentCloudChatState<T extends StatefulWidget> extends State<T> 
       if (_stopwatch!.elapsedMilliseconds >= 1000) {
         int fps = (_frameCount / (_stopwatch!.elapsedMilliseconds / 1000)).ceil();
         if (fps < 40) {
-          TencentCloudChat.logInstance.console(
+          TencentCloudChat.instance.logInstance.console(
             logs: 'FPS: $fps',
             componentName: runtimeType.toString(),
             logLevel: TencentCloudChatLogLevel.error,

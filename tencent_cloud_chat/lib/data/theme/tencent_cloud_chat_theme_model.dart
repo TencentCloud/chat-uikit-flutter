@@ -5,7 +5,7 @@ import 'package:tencent_cloud_chat/data/theme/color/dark.dart';
 import 'package:tencent_cloud_chat/data/theme/color/light.dart';
 import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
 
-/// A class that contains the core theme model for TencentCloudChat.
+/// A class that contains the core theme model for TencentCloudChat .
 class TencentCloudChatThemeModel {
   TencentCloudChatThemeColors _lightTheme;
   TencentCloudChatThemeColors _darkTheme;

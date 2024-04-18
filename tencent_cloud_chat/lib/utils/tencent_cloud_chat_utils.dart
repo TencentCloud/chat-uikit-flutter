@@ -198,7 +198,8 @@ class TencentCloudChatUtils {
           }
           break;
         case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
-          final (String lineOne, String? lineTwo, IconData? icon) = handleCustomMessage(message);
+          final (String lineOne, String? lineTwo, IconData? _) =
+              handleCustomMessage(message);
           text = lineTwo != null ? "$lineOne: $lineTwo" : lineOne;
           break;
         case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
@@ -654,7 +655,8 @@ class TencentCloudChatUtils {
     );
   }
 
-  static (String, String?, IconData?) handleCustomMessage(V2TimMessage message) {
+  static (String, String?, IconData?) handleCustomMessage(
+      V2TimMessage message) {
     final customElem = message.customElem;
     String lineOne = "[${tL10n.custom}]";
     String? lineTwo;
@@ -685,9 +687,7 @@ class TencentCloudChatUtils {
           ? tL10n.callDuration(callTime ?? "0")
           : CallingMessage.getActionType(callingMessage);
 
-      lineOne = isVoiceCall
-          ? tL10n.voiceCall
-          : tL10n.videoCall;
+      lineOne = isVoiceCall ? tL10n.voiceCall : tL10n.videoCall;
       icon = isVoiceCall ? Icons.call : Icons.video_call_outlined;
     }
     if (lineOne == "[${tL10n.custom}]") {

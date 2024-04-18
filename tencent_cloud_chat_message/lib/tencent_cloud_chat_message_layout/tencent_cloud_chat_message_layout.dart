@@ -1,4 +1,5 @@
-import 'package:desktop_drop/desktop_drop.dart';
+
+import 'package:desktop_drop_for_t/desktop_drop_for_t.dart';
 import 'package:flutter/material.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';

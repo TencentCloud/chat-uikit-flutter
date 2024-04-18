@@ -1,8 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_contact_sdk.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_conversation_sdk.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_message_sdk.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
@@ -10,7 +7,6 @@ import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.d
 import 'package:tencent_cloud_chat_common/builders/tencent_cloud_chat_common_builders.dart';
 import 'package:tencent_cloud_chat_common/widgets/avatar/tencent_cloud_chat_avatar.dart';
 import 'package:tencent_cloud_chat_common/widgets/operation_bar/tencent_cloud_chat_operation_bar.dart';
-import 'package:tencent_cloud_chat_user_profile/tencent_cloud_chat_user_profile_builders.dart';
 
 class TencentCloudChatUserProfileBody extends StatefulWidget {
   final V2TimUserFullInfo userFullInfo;
@@ -32,19 +28,19 @@ class TencentCloudChatUserProfileBodyState extends TencentCloudChatState<Tencent
                   SizedBox(
                     height: getHeight(40),
                   ),
-                  TencentCloudChatUserProfileBuilders.getUserProfileAvatarBuilder(
+                   TencentCloudChat.instance.dataInstance.userProfile.userProfileBuilder?.getUserProfileAvatarBuilder(
                     userFullInfo: widget.userFullInfo,
                   ),
-                  TencentCloudChatUserProfileBuilders.getUserProfileContentBuilder(
+                   TencentCloudChat.instance.dataInstance.userProfile.userProfileBuilder?.getUserProfileContentBuilder(
                     userFullInfo: widget.userFullInfo,
                   ),
-                  TencentCloudChatUserProfileBuilders.getUserProfileChatButtonBuilder(
+                   TencentCloudChat.instance.dataInstance.userProfile.userProfileBuilder?.getUserProfileChatButtonBuilder(
                     userFullInfo: widget.userFullInfo,
                     startVideoCall: widget.startVideoCall,
                     startVoiceCall: widget.startVoiceCall,
                   ),
-                  TencentCloudChatUserProfileBuilders.getUserProfileStateButtonBuilder(userFullInfo: widget.userFullInfo),
-                  TencentCloudChatUserProfileBuilders.getUserProfileDeleteButtonBuilder(
+                   TencentCloudChat.instance.dataInstance.userProfile.userProfileBuilder?.getUserProfileStateButtonBuilder(userFullInfo: widget.userFullInfo),
+                   TencentCloudChat.instance.dataInstance.userProfile.userProfileBuilder?.getUserProfileDeleteButtonBuilder(
                     userFullInfo: widget.userFullInfo,
                   )
                 ],
@@ -102,7 +98,7 @@ class TencentCloudChatUserProfileContentState extends TencentCloudChatState<Tenc
   }
 
   _onChangeGroupName(String value) async {
-    final res = await TencentCloudChatContactSDK.setFriendInfo(userID: widget.userFullInfo.userID!, friendRemark: value);
+    final res = await TencentCloudChat.instance.chatSDKInstance.contactSDK.setFriendInfo(userID: widget.userFullInfo.userID!, friendRemark: value);
     if (res.code == 0) {
       safeSetState(() {
         friendRemark = value;
@@ -292,27 +288,27 @@ class TencentCloudChatUserProfileStateButtonState extends TencentCloudChatState<
     if (_getC2CReceiveOpt() == 2) {
       disturb = true;
     }
-    int index = TencentCloudChat().dataInstance.conversation.conversationList.indexWhere((element) => element.conversationID == "c2c_${widget.userFullInfo.userID}");
+    int index = TencentCloudChat.instance.dataInstance.conversation.conversationList.indexWhere((element) => element.conversationID == "c2c_${widget.userFullInfo.userID}");
     if (index > -1) {
-      pinChat = TencentCloudChat().dataInstance.conversation.conversationList[index].isPinned!;
+      pinChat = TencentCloudChat.instance.dataInstance.conversation.conversationList[index].isPinned!;
     }
-    int indexBlock = TencentCloudChat().dataInstance.contact.blockList.indexWhere((element) => element.userID == "c2c_${widget.userFullInfo.userID}");
+    int indexBlock = TencentCloudChat.instance.dataInstance.contact.blockList.indexWhere((element) => element.userID == "c2c_${widget.userFullInfo.userID}");
     if (indexBlock > -1) {
       blockList = true;
     }
   }
 
   _getC2CReceiveOpt() async {
-    int opt = await TencentCloudChatContactSDK.getC2CReceiveMessageOpt(userIDList: [widget.userFullInfo.userID!]);
+    int opt = await TencentCloudChat.instance.chatSDKInstance.contactSDK.getC2CReceiveMessageOpt(userIDList: [widget.userFullInfo.userID!]);
     return opt;
   }
 
   _setC2CReceiveOpt() async {
-    await TencentCloudChatContactSDK.setC2CReceiveMessageOpt(userIDList: [widget.userFullInfo.userID!], opt: disturb ? ReceiveMsgOptEnum.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE : ReceiveMsgOptEnum.V2TIM_RECEIVE_MESSAGE);
+    await TencentCloudChat.instance.chatSDKInstance.contactSDK.setC2CReceiveMessageOpt(userIDList: [widget.userFullInfo.userID!], opt: disturb ? ReceiveMsgOptEnum.V2TIM_RECEIVE_NOT_NOTIFY_MESSAGE : ReceiveMsgOptEnum.V2TIM_RECEIVE_MESSAGE);
   }
 
   _setPinConversation(bool value) async {
-    await TencentCloudChatConversationSDK.pinConversation(conversationID: "c2c_${widget.userFullInfo.userID}", isPinned: value);
+    await TencentCloudChat.instance.chatSDKInstance.conversationSDK.pinConversation(conversationID: "c2c_${widget.userFullInfo.userID}", isPinned: value);
     safeSetState(() {
       pinChat = value;
     });
@@ -320,9 +316,9 @@ class TencentCloudChatUserProfileStateButtonState extends TencentCloudChatState<
 
   _addToBlockList(bool value) async {
     if (value) {
-      await TencentCloudChatContactSDK.addToBlackList(userIDList: [widget.userFullInfo.userID!]);
+      await TencentCloudChat.instance.chatSDKInstance.contactSDK.addToBlackList(userIDList: [widget.userFullInfo.userID!]);
     } else {
-      await TencentCloudChatContactSDK.deleteFromBlackList(userIDList: [widget.userFullInfo.userID!]);
+      await TencentCloudChat.instance.chatSDKInstance.contactSDK.deleteFromBlackList(userIDList: [widget.userFullInfo.userID!]);
     }
   }
 
@@ -382,11 +378,11 @@ class TencentCloudChatUserProfileDeleteButtonState extends TencentCloudChatState
   @override
   Widget defaultBuilder(BuildContext context) {
     onClearChatHistory() async {
-      await TencentCloudChatMessageSDK.clearC2CHistoryMessage(userID: widget.userFullInfo.userID!);
+      await TencentCloudChat.instance.chatSDKInstance.messageSDK.clearC2CHistoryMessage(userID: widget.userFullInfo.userID!);
     }
 
     onDeleteContact() async {
-      await TencentCloudChatContactSDK.deleteFromFriendList([widget.userFullInfo.userID!], FriendTypeEnum.V2TIM_FRIEND_TYPE_BOTH);
+      await TencentCloudChat.instance.chatSDKInstance.contactSDK.deleteFromFriendList([widget.userFullInfo.userID!], FriendTypeEnum.V2TIM_FRIEND_TYPE_BOTH);
     }
 
     return TencentCloudChatThemeWidget(

@@ -6,6 +6,7 @@ import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_cha
 import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_config.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
 import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
+import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
@@ -14,7 +15,6 @@ import 'package:tencent_cloud_chat_common/widgets/desktop_popup/tencent_cloud_ch
 import 'package:tencent_cloud_chat_common/widgets/dialog/tencent_cloud_chat_dialog.dart';
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data.dart';
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data_notifier.dart';
-import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_builders.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/forward/tencent_cloud_chat_message_forward_container.dart';
 
 class TencentCloudChatMessageItemWithMenuContainer extends StatefulWidget {
@@ -37,7 +37,7 @@ class TencentCloudChatMessageItemWithMenuContainer extends StatefulWidget {
 
 class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudChatState<TencentCloudChatMessageItemWithMenuContainer> {
   late TencentCloudChatMessageSeparateDataProvider dataProvider;
-  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.eventBusInstance.on<TencentCloudChatMessageData>();
+  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatMessageData>();
   late StreamSubscription<TencentCloudChatMessageData<dynamic>>? _messageDataSubscription;
 
   List<TencentCloudChatMessageGeneralOptionItem> _menuOptions = [];
@@ -88,9 +88,9 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
       case TencentCloudChatMessageDataKeys.currentPlayAudioInfo:
         break;
       case TencentCloudChatMessageDataKeys.messageNeedUpdate:
-        if (TencentCloudChat().dataInstance.messageData.messageNeedUpdate != null && msgID == TencentCloudChat().dataInstance.messageData.messageNeedUpdate?.msgID && TencentCloudChatUtils.checkString(msgID) != null) {
+        if (TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate != null && msgID == TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate?.msgID && TencentCloudChatUtils.checkString(msgID) != null) {
           safeSetState(() {
-            _message = TencentCloudChat().dataInstance.messageData.messageNeedUpdate!;
+            _message = TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate!;
           });
           _generateMenuOptions();
         }
@@ -104,11 +104,11 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
     super.initState();
     _message = widget.message;
     _messageDataSubscription = _messageDataStream?.listen(_messageDataHandler);
-    _messageReceipt = TencentCloudChat().dataInstance.messageData.getMessageReadReceipt(
-          msgID: _message.msgID ?? "",
-          userID: _message.userID ?? "",
-          timestamp: _message.timestamp ?? 0,
-        );
+    _messageReceipt = TencentCloudChat.instance.dataInstance.messageData.getMessageReadReceipt(
+      msgID: _message.msgID ?? "",
+      userID: _message.userID ?? "",
+      timestamp: _message.timestamp ?? 0,
+    );
   }
 
   @override
@@ -171,11 +171,11 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
     final showReadReceipt = useReadReceipt && (_message.isSelf ?? true) && (_message.needReadReceipt ?? false);
     final receipt = showReadReceipt
         ? messageReceipt ??
-            TencentCloudChat().dataInstance.messageData.getMessageReadReceipt(
-                  msgID: _message.msgID ?? "",
-                  userID: _message.userID ?? "",
-                  timestamp: _message.timestamp ?? 0,
-                )
+            TencentCloudChat.instance.dataInstance.messageData.getMessageReadReceipt(
+              msgID: _message.msgID ?? "",
+              userID: _message.userID ?? "",
+              timestamp: _message.timestamp ?? 0,
+            )
         : null;
     final int? readCount = showReadReceipt ? receipt?.readCount : null;
     final int? unreadCount = showReadReceipt ? receipt?.unreadCount : null;
@@ -229,6 +229,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
                     onCloseModal: closeFunc,
                     context: context,
                     messages: [_message],
+                    messageForwardBuilder: TencentCloudChatMessageDataProviderInherited.of(context).messageBuilders?.getMessageForwardBuilder,
                   ),
                 );
               } else {
@@ -241,6 +242,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
                   builder: (BuildContext _) {
                     return TencentCloudChatMessageForwardContainer(
                       type: TencentCloudChatForwardType.individually,
+                      messageForwardBuilder: TencentCloudChatMessageDataProviderInherited.of(context).messageBuilders?.getMessageForwardBuilder,
                       context: context,
                       messages: [_message],
                     );
@@ -377,14 +379,15 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    return TencentCloudChatMessageBuilders.getMessageLongPressBuilder(
-      messageItem: widget.messageItem,
-      useMessageReaction: widget.useMessageReaction,
-      message: _message,
-      menuOptions: _menuOptions,
-      isMergeMessage: widget.isMergeMessage,
-      inSelectMode: dataProvider.inSelectMode,
-      onSelectMessage: () => dataProvider.triggerSelectedMessage(message: _message),
-    );
+    return TencentCloudChatMessageDataProviderInherited.of(context).messageBuilders?.getMessageLongPressBuilder(
+              messageItem: widget.messageItem,
+              useMessageReaction: widget.useMessageReaction,
+              message: _message,
+              menuOptions: _menuOptions,
+              isMergeMessage: widget.isMergeMessage,
+              inSelectMode: dataProvider.inSelectMode,
+              onSelectMessage: () => dataProvider.triggerSelectedMessage(message: _message),
+            ) ??
+        Container();
   }
 }

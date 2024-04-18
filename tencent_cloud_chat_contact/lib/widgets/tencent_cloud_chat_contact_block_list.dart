@@ -5,7 +5,6 @@ import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/builders/tencent_cloud_chat_common_builders.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat_common.dart';
-import 'package:tencent_cloud_chat_contact/tencent_cloud_chat_contact_builders.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_item.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_leading.dart';
 
@@ -112,7 +111,7 @@ class TencentCloudChatContactBlockListItemState extends TencentCloudChatState<Te
     return Container(
         padding: EdgeInsets.symmetric(vertical: getHeight(5), horizontal: getWidth(3)),
         child: Row(
-          children: [TencentCloudChatContactBuilders.getContactBlockListItemAvatarBuilder(widget.friend), TencentCloudChatContactBuilders.getContactBlockListItemContentBuilder(widget.friend)],
+          children: [TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactBlockListItemAvatarBuilder(widget.friend), TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactBlockListItemContentBuilder(widget.friend)],
         ));
   }
 }

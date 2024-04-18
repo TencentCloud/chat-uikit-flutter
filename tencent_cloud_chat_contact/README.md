@@ -12,13 +12,13 @@ When used in conjunction with the [tencent_cloud_chat_message](https://pub.dev/p
 
 To begin, add the [tencent_cloud_chat_conversation](https://pub.dev/packages/tencent_cloud_chat_conversation) UI module to your project.
 
-Once installed, you'll need to register this UI component within the `usedComponentsRegister` parameter of the `TencentCloudChat.controller.initUIKit` method's `config`. Here's an example:
+Once installed, you'll need to register this UI component within the `usedComponentsRegister` parameter of the `TencentCloudChat.controller.initUIKit` method's `components`. Here's an example:
 
 ```dart
     await TencentCloudChat.controller.initUIKit(
-      config: TencentCloudChatConfig(
+      components: TencentCloudChatInitComponentsRelated(
         usedComponentsRegister: [
-          TencentCloudChatContactInstance.register, /// Add this line
+          TencentCloudChatContactManager.register, /// Add this line
           /// ...
         ],
       /// ...

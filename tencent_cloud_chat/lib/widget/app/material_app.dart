@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat/cache/tencent_cloud_chat_cache_global.dart';
-import 'package:tencent_cloud_chat/data/tencent_cloud_chat_data.dart';
 import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat/data/theme/tencent_cloud_chat_theme.dart';
 import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
@@ -493,21 +492,26 @@ class TencentCloudChatMaterialApp extends StatefulWidget {
   });
 
   @override
-  State<TencentCloudChatMaterialApp> createState() => _TencentCloudChatMaterialAppState();
+  State<TencentCloudChatMaterialApp> createState() =>
+      _TencentCloudChatMaterialAppState();
 }
 
-class _TencentCloudChatMaterialAppState extends State<TencentCloudChatMaterialApp> {
+class _TencentCloudChatMaterialAppState
+    extends State<TencentCloudChatMaterialApp> {
   // Theme instance for the Chat UIKit
-  TencentCloudChatTheme theme = TencentCloudChatData.theme;
+  TencentCloudChatTheme theme = TencentCloudChat.instance.dataInstance.theme;
 
   // Color theme based on the current brightness mode
-  TencentCloudChatThemeColors colorTheme = TencentCloudChatData.theme.colorTheme;
+  TencentCloudChatThemeColors colorTheme =
+      TencentCloudChat.instance.dataInstance.theme.colorTheme;
 
   // Text styles for the Chat UIKit
-  TencentCloudChatTextStyle textStyle = TencentCloudChatData.theme.textStyle;
+  TencentCloudChatTextStyle textStyle =
+      TencentCloudChat.instance.dataInstance.theme.textStyle;
 
   // Listener for theme data changes
-  Stream<TencentCloudChatTheme>? themeDataListener = TencentCloudChat.eventBusInstance.on<TencentCloudChatTheme>();
+  Stream<TencentCloudChatTheme>? themeDataListener =
+      TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatTheme>();
 
   bool isInitIntl = false;
 
@@ -575,7 +579,10 @@ class _TencentCloudChatMaterialAppState extends State<TencentCloudChatMaterialAp
               onGenerateInitialRoutes: widget.onGenerateInitialRoutes,
               onUnknownRoute: widget.onUnknownRoute,
               // onNavigationNotification: widget.onNavigationNotification,
-              navigatorObservers: [...(widget.navigatorObservers ?? const <NavigatorObserver>[]), TencentCloudChat.navigatorObserver],
+              navigatorObservers: [
+                ...(widget.navigatorObservers ?? const <NavigatorObserver>[]),
+                TencentCloudChat.instance.navigatorObserver
+              ],
               builder: widget.builder,
               title: widget.title,
               onGenerateTitle: widget.onGenerateTitle,
@@ -592,17 +599,25 @@ class _TencentCloudChatMaterialAppState extends State<TencentCloudChatMaterialAp
                   ),
               highContrastTheme: widget.highContrastTheme,
               highContrastDarkTheme: widget.highContrastDarkTheme,
-              themeMode: widget.themeMode ?? (theme.brightness != null ? (theme.brightness == Brightness.light ? ThemeMode.light : ThemeMode.dark) : null),
+              themeMode: widget.themeMode ??
+                  (theme.brightness != null
+                      ? (theme.brightness == Brightness.light
+                          ? ThemeMode.light
+                          : ThemeMode.dark)
+                      : null),
               themeAnimationDuration: widget.themeAnimationDuration,
               themeAnimationCurve: widget.themeAnimationCurve,
               locale: widget.locale ?? snapshot.data,
-              localizationsDelegates: widget.localizationsDelegates ?? TencentCloudChatLocalizations.localizationsDelegates,
+              localizationsDelegates: widget.localizationsDelegates ??
+                  TencentCloudChatLocalizations.localizationsDelegates,
               localeListResolutionCallback: widget.localeListResolutionCallback,
               localeResolutionCallback: widget.localeResolutionCallback,
-              supportedLocales: widget.supportedLocales ?? TencentCloudChatLocalizations.supportedLocales,
+              supportedLocales: widget.supportedLocales ??
+                  TencentCloudChatLocalizations.supportedLocales,
               debugShowMaterialGrid: widget.debugShowMaterialGrid,
               showPerformanceOverlay: widget.showPerformanceOverlay,
-              checkerboardRasterCacheImages: widget.checkerboardRasterCacheImages,
+              checkerboardRasterCacheImages:
+                  widget.checkerboardRasterCacheImages,
               checkerboardOffscreenLayers: widget.checkerboardOffscreenLayers,
               showSemanticsDebugger: widget.showSemanticsDebugger,
               debugShowCheckedModeBanner: widget.debugShowCheckedModeBanner,

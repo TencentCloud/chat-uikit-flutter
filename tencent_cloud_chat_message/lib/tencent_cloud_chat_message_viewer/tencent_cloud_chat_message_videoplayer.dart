@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:better_player_plus/better_player_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_message_sdk.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 
@@ -19,8 +18,7 @@ class TencentCloudChatMessageVideoPlayer extends StatefulWidget {
   });
 
   @override
-  State<StatefulWidget> createState() =>
-      TencentCloudChatMessageVideoPlayerState();
+  State<StatefulWidget> createState() => TencentCloudChatMessageVideoPlayerState();
 }
 
 enum CurrentVideoType {
@@ -40,8 +38,7 @@ class CurrentVideoInfo {
   });
 }
 
-class TencentCloudChatMessageVideoPlayerState
-    extends State<TencentCloudChatMessageVideoPlayer> {
+class TencentCloudChatMessageVideoPlayerState extends State<TencentCloudChatMessageVideoPlayer> {
   @override
   void dispose() {
     super.dispose();
@@ -55,49 +52,32 @@ class TencentCloudChatMessageVideoPlayerState
         var lp = widget.message.videoElem!.videoPath ?? "";
         if (lp.isNotEmpty) {
           if (File(lp).existsSync()) {
-            return CurrentVideoInfo(
-                path: lp,
-                type: CurrentVideoType.local,
-                aspectRatio: aspectRatio);
+            return CurrentVideoInfo(path: lp, type: CurrentVideoType.local, aspectRatio: aspectRatio);
           }
         }
       }
 
-      if (widget.message.videoElem!.snapshotWidth != null &&
-          widget.message.videoElem!.snapshotHeight != null) {
+      if (widget.message.videoElem!.snapshotWidth != null && widget.message.videoElem!.snapshotHeight != null) {
         if (widget.message.videoElem!.snapshotHeight != 0) {
-          aspectRatio = (widget.message.videoElem!.snapshotWidth!) /
-              (widget.message.videoElem!.snapshotHeight!);
+          aspectRatio = (widget.message.videoElem!.snapshotWidth!) / (widget.message.videoElem!.snapshotHeight!);
         }
       }
-      if (TencentCloudChatUtils.checkString(
-              widget.message.videoElem!.localVideoUrl) !=
-          null) {
+      if (TencentCloudChatUtils.checkString(widget.message.videoElem!.localVideoUrl) != null) {
         if (File(widget.message.videoElem!.localVideoUrl!).existsSync()) {
-          return CurrentVideoInfo(
-              path: widget.message.videoElem!.localVideoUrl!,
-              type: CurrentVideoType.local,
-              aspectRatio: aspectRatio);
+          return CurrentVideoInfo(path: widget.message.videoElem!.localVideoUrl!, type: CurrentVideoType.local, aspectRatio: aspectRatio);
         }
       } else {
-        V2TimMessageOnlineUrl? urlres =
-            await TencentCloudChatMessageSDK.getMessageOnlineUrl(
-                msgID: widget.message.msgID ?? "");
+        V2TimMessageOnlineUrl? urlres = await TencentCloudChat.instance.chatSDKInstance.messageSDK.getMessageOnlineUrl(msgID: widget.message.msgID ?? "");
         if (urlres != null) {
           if (urlres.videoElem != null) {
-            if (TencentCloudChatUtils.checkString(urlres.videoElem!.videoUrl) !=
-                null) {
-              return CurrentVideoInfo(
-                  path: urlres.videoElem!.videoUrl!,
-                  type: CurrentVideoType.online,
-                  aspectRatio: aspectRatio);
+            if (TencentCloudChatUtils.checkString(urlres.videoElem!.videoUrl) != null) {
+              return CurrentVideoInfo(path: urlres.videoElem!.videoUrl!, type: CurrentVideoType.online, aspectRatio: aspectRatio);
             }
           }
         }
       }
     } else {
-      debugPrint(
-          "The component received a non-video message parameter. please check");
+      debugPrint("The component received a non-video message parameter. please check");
     }
     return null;
   }
@@ -116,19 +96,18 @@ class TencentCloudChatMessageVideoPlayerState
     if (widget.message.hasRiskContent == true) {
       return const Center(
         child: Text(
-          "视频存在风险",
+          "Risk Video",
           style: TextStyle(color: Colors.white),
         ),
       );
     }
     return FutureBuilder(
       future: getMessageInfo(),
-      builder:
-          (BuildContext context, AsyncSnapshot<CurrentVideoInfo?> snapshot) {
+      builder: (BuildContext context, AsyncSnapshot<CurrentVideoInfo?> snapshot) {
         if (snapshot.data == null) {
           return const Center(
             child: Text(
-              "加载中...",
+              "Loading...",
               style: TextStyle(color: Colors.white),
             ),
           );

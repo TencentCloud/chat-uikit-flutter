@@ -1,4 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder.dart';
+import 'package:tencent_cloud_chat/data/user_profile/tencent_cloud_chat_user_profile_data.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_user_profile/widget/tencent_cloud_chat_user_profile_body.dart';
 
@@ -19,12 +21,13 @@ typedef UserProfileStateButtonBuilder = Widget? Function(
 typedef UserProfileDeleteButtonBuilder = Widget? Function(
     {required V2TimUserFullInfo userFullInfo});
 
-class TencentCloudChatUserProfileBuilders {
-  static UserProfileAvatarBuilder? _userProfileAvatarBuilder;
-  static UserProfileContentBuilder? _userProfileContentBuilder;
-  static UserProfileChatButtonBuilder? _userProfileChatButtonBuilder;
-  static UserProfileStateButtonBuilder? _userProfileStateButtonBuilder;
-  static UserProfileDeleteButtonBuilder? _userProfileDeleteButtonBuilder;
+class TencentCloudChatUserProfileBuilders
+    extends TencentCloudChatComponentBuilder {
+  UserProfileAvatarBuilder? _userProfileAvatarBuilder;
+  UserProfileContentBuilder? _userProfileContentBuilder;
+  UserProfileChatButtonBuilder? _userProfileChatButtonBuilder;
+  UserProfileStateButtonBuilder? _userProfileStateButtonBuilder;
+  UserProfileDeleteButtonBuilder? _userProfileDeleteButtonBuilder;
 
   TencentCloudChatUserProfileBuilders(
       {UserProfileAvatarBuilder? userProfileAvatarBuilder,
@@ -39,7 +42,23 @@ class TencentCloudChatUserProfileBuilders {
     _userProfileDeleteButtonBuilder = userProfileDeleteButtonBuilder;
   }
 
-  static Widget getUserProfileAvatarBuilder(
+  void setBuilders(
+      {UserProfileAvatarBuilder? userProfileAvatarBuilder,
+      UserProfileContentBuilder? userProfileContentBuilder,
+      UserProfileChatButtonBuilder? userProfileChatButtonBuilder,
+      UserProfileStateButtonBuilder? userProfileStateButtonBuilder,
+      UserProfileDeleteButtonBuilder? userProfileDeleteButtonBuilder}) {
+    _userProfileAvatarBuilder = userProfileAvatarBuilder;
+    _userProfileContentBuilder = userProfileContentBuilder;
+    _userProfileChatButtonBuilder = userProfileChatButtonBuilder;
+    _userProfileStateButtonBuilder = userProfileStateButtonBuilder;
+    _userProfileDeleteButtonBuilder = userProfileDeleteButtonBuilder;
+    TencentCloudChat.instance.dataInstance.userProfile
+        .notifyListener(TencentCloudChatUserProfileDataKeys.builder);
+  }
+
+  @override
+  Widget getUserProfileAvatarBuilder(
       {required V2TimUserFullInfo userFullInfo}) {
     Widget? widget;
     if (_userProfileAvatarBuilder != null) {
@@ -49,7 +68,8 @@ class TencentCloudChatUserProfileBuilders {
         TencentCloudChatUserProfileAvatar(userFullInfo: userFullInfo);
   }
 
-  static Widget getUserProfileContentBuilder(
+  @override
+  Widget getUserProfileContentBuilder(
       {required V2TimUserFullInfo userFullInfo}) {
     Widget? widget;
     if (_userProfileContentBuilder != null) {
@@ -59,7 +79,8 @@ class TencentCloudChatUserProfileBuilders {
         TencentCloudChatUserProfileContent(userFullInfo: userFullInfo);
   }
 
-  static Widget getUserProfileChatButtonBuilder(
+  @override
+  Widget getUserProfileChatButtonBuilder(
       {required V2TimUserFullInfo userFullInfo,
       VoidCallback? startVideoCall,
       VoidCallback? startVoiceCall}) {
@@ -78,7 +99,8 @@ class TencentCloudChatUserProfileBuilders {
         );
   }
 
-  static Widget getUserProfileStateButtonBuilder(
+  @override
+  Widget getUserProfileStateButtonBuilder(
       {required V2TimUserFullInfo userFullInfo}) {
     Widget? widget;
     if (_userProfileStateButtonBuilder != null) {
@@ -88,7 +110,8 @@ class TencentCloudChatUserProfileBuilders {
         TencentCloudChatUserProfileStateButton(userFullInfo: userFullInfo);
   }
 
-  static Widget getUserProfileDeleteButtonBuilder(
+  @override
+  Widget getUserProfileDeleteButtonBuilder(
       {required V2TimUserFullInfo userFullInfo}) {
     Widget? widget;
     if (_userProfileDeleteButtonBuilder != null) {

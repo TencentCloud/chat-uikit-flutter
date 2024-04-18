@@ -2,7 +2,6 @@
 import 'package:azlistview_all_platforms/azlistview_all_platforms.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_group_sdk.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
@@ -92,7 +91,7 @@ class TencentCloudChatGroupProfileMemberListAzListState extends TencentCloudChat
     super.initState();
     tagCount = {};
     list = _getListTag();
-    final loginID = TencentCloudChat().dataInstance.basic.currentUser!.userID;
+    final loginID = TencentCloudChat.instance.dataInstance.basic.currentUser!.userID;
     myRole = widget.memberInfoList.firstWhere((element) => element.userID == loginID).role ?? 0;
   }
 
@@ -209,7 +208,7 @@ class TencentCloudChatGroupProfileMemberListItemState extends TencentCloudChatSt
   }
 
   _onSetMemberRole(GroupMemberRoleTypeEnum roleType) async {
-    await TencentCloudChatGroupSDK.setGroupMemberRole(groupID: widget.groupInfo.groupID, userID: widget.memberFullInfo.userID, role: roleType);
+    await TencentCloudChat.instance.chatSDKInstance.groupSDK.setGroupMemberRole(groupID: widget.groupInfo.groupID, userID: widget.memberFullInfo.userID, role: roleType);
   }
 
   onManageMember() {

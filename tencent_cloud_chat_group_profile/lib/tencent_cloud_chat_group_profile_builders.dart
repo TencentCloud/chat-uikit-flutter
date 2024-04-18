@@ -1,4 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder.dart';
+import 'package:tencent_cloud_chat/data/group_profile/tencent_cloud_chat_group_profile_data.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_group_profile/widget/tencent_cloud_chat_group_profile_add_member.dart';
 import 'package:tencent_cloud_chat_group_profile/widget/tencent_cloud_chat_group_profile_body.dart';
@@ -56,20 +58,20 @@ typedef GroupProfileAddMemberPageBuilder = Widget? Function(
     required List<V2TimGroupMemberFullInfo> groupMember,
     required List<V2TimFriendInfo> contactList});
 
-class TencentCloudChatGroupProfileBuilders {
-  static GroupProfileAvatarBuilder? _groupProfileAvatarBuilder;
-  static GroupProfileContentBuilder? _groupProfileContentBuilder;
-  static GroupProfileChatButtonBuilder? _groupProfileChatButtonBuilder;
-  static GroupProfileStateButtonBuilder? _groupProfileStateButtonBuilder;
-  static GroupProfileMuteMemberBuilder? _groupProfileMuteMemberBuilder;
-  static GroupProfileSetNameCardBuilder? _groupProfileSetNameCardBuilder;
-  static GroupProfileMemberBuilder? _groupProfileMemberBuilder;
-  static GroupProfileDeleteButtonBuilder? _groupProfileDeleteButtonBuilder;
-  static GroupProfileNotificationPageBuilder?
+class TencentCloudChatGroupProfileBuilders extends TencentCloudChatComponentBuilder {
+  GroupProfileAvatarBuilder? _groupProfileAvatarBuilder;
+  GroupProfileContentBuilder? _groupProfileContentBuilder;
+  GroupProfileChatButtonBuilder? _groupProfileChatButtonBuilder;
+  GroupProfileStateButtonBuilder? _groupProfileStateButtonBuilder;
+  GroupProfileMuteMemberBuilder? _groupProfileMuteMemberBuilder;
+  GroupProfileSetNameCardBuilder? _groupProfileSetNameCardBuilder;
+  GroupProfileMemberBuilder? _groupProfileMemberBuilder;
+  GroupProfileDeleteButtonBuilder? _groupProfileDeleteButtonBuilder;
+  GroupProfileNotificationPageBuilder?
       _groupProfileNotificationPageBuilder;
-  static GroupProfileMemberListPageBuilder? _groupProfileMemberListPageBuilder;
-  static GroupProfileMutePageBuilder? _groupProfileMutePageBuilder;
-  static GroupProfileAddMemberPageBuilder? _groupProfileAddMemberPageBuilder;
+  GroupProfileMemberListPageBuilder? _groupProfileMemberListPageBuilder;
+  GroupProfileMutePageBuilder? _groupProfileMutePageBuilder;
+  GroupProfileAddMemberPageBuilder? _groupProfileAddMemberPageBuilder;
 
   TencentCloudChatGroupProfileBuilders({
     GroupProfileAvatarBuilder? groupProfileAvatarBuilder,
@@ -99,7 +101,37 @@ class TencentCloudChatGroupProfileBuilders {
     _groupProfileAddMemberPageBuilder = groupProfileAddMemberPageBuilder;
   }
 
-  static Widget getGroupProfileAvatarBuilder(
+  void setBuilders({
+    GroupProfileAvatarBuilder? groupProfileAvatarBuilder,
+    GroupProfileContentBuilder? groupProfileContentBuilder,
+    GroupProfileChatButtonBuilder? groupProfileChatButtonBuilder,
+    GroupProfileStateButtonBuilder? groupProfileStateButtonBuilder,
+    GroupProfileMuteMemberBuilder? groupProfileMuteMemberBuilder,
+    GroupProfileSetNameCardBuilder? groupProfileSetNameCardBuilder,
+    GroupProfileMemberBuilder? groupProfileMemberBuilder,
+    GroupProfileDeleteButtonBuilder? groupProfileDeleteButtonBuilder,
+    GroupProfileNotificationPageBuilder? groupProfileNotificationPageBuilder,
+    GroupProfileMemberListPageBuilder? groupProfileMemberListPageBuilder,
+    GroupProfileMutePageBuilder? groupProfileMutePageBuilder,
+    GroupProfileAddMemberPageBuilder? groupProfileAddMemberPageBuilder,
+  }) {
+    _groupProfileAvatarBuilder = groupProfileAvatarBuilder;
+    _groupProfileContentBuilder = groupProfileContentBuilder;
+    _groupProfileChatButtonBuilder = groupProfileChatButtonBuilder;
+    _groupProfileStateButtonBuilder = groupProfileStateButtonBuilder;
+    _groupProfileMuteMemberBuilder = groupProfileMuteMemberBuilder;
+    _groupProfileSetNameCardBuilder = groupProfileSetNameCardBuilder;
+    _groupProfileMemberBuilder = groupProfileMemberBuilder;
+    _groupProfileDeleteButtonBuilder = groupProfileDeleteButtonBuilder;
+    _groupProfileNotificationPageBuilder = groupProfileNotificationPageBuilder;
+    _groupProfileMemberListPageBuilder = groupProfileMemberListPageBuilder;
+    _groupProfileMutePageBuilder = groupProfileMutePageBuilder;
+    _groupProfileAddMemberPageBuilder = groupProfileAddMemberPageBuilder;
+    TencentCloudChat.instance.dataInstance.groupProfile.notifyListener(TencentCloudChatGroupProfileDataKeys.builder);
+  }
+
+  @override
+  Widget getGroupProfileAvatarBuilder(
       {required V2TimGroupInfo groupInfo,
       required List<V2TimGroupMemberFullInfo> groupMember}) {
     Widget? widget;
@@ -114,7 +146,8 @@ class TencentCloudChatGroupProfileBuilders {
         );
   }
 
-  static Widget getGroupProfileContentBuilder(
+  @override
+  Widget getGroupProfileContentBuilder(
       {required V2TimGroupInfo groupInfo}) {
     Widget? widget;
     if (_groupProfileContentBuilder != null) {
@@ -123,7 +156,8 @@ class TencentCloudChatGroupProfileBuilders {
     return widget ?? TencentCloudChatGroupProfileContent(groupInfo: groupInfo);
   }
 
-  static Widget getGroupProfileChatButtonBuilder(
+  @override
+  Widget getGroupProfileChatButtonBuilder(
       {required V2TimGroupInfo groupInfo,
       VoidCallback? startVideoCall,
       VoidCallback? startVoiceCall}) {
@@ -142,7 +176,8 @@ class TencentCloudChatGroupProfileBuilders {
         );
   }
 
-  static Widget getGroupProfileStateButtonBuilder(
+  @override
+  Widget getGroupProfileStateButtonBuilder(
       {required V2TimGroupInfo groupInfo}) {
     Widget? widget;
     if (_groupProfileStateButtonBuilder != null) {
@@ -152,7 +187,8 @@ class TencentCloudChatGroupProfileBuilders {
         TencentCloudChatGroupProfileStateButton(groupInfo: groupInfo);
   }
 
-  static Widget getGroupProfileMuteMemberBuilder({
+  @override
+  Widget getGroupProfileMuteMemberBuilder({
     required V2TimGroupInfo groupInfo,
     required List<V2TimGroupMemberFullInfo> groupMember,
   }) {
@@ -168,7 +204,8 @@ class TencentCloudChatGroupProfileBuilders {
         );
   }
 
-  static Widget getGroupProfileSetNameCardBuilder(
+  @override
+  Widget getGroupProfileSetNameCardBuilder(
       {required V2TimGroupInfo groupInfo,
       required List<V2TimGroupMemberFullInfo> groupMember}) {
     Widget? widget;
@@ -183,7 +220,8 @@ class TencentCloudChatGroupProfileBuilders {
         );
   }
 
-  static Widget getGroupProfileMemberBuilder(
+  @override
+  Widget getGroupProfileMemberBuilder(
       {required V2TimGroupInfo groupInfo,
       required List<V2TimGroupMemberFullInfo> groupMember,
       required List<V2TimFriendInfo> contactList}) {
@@ -202,7 +240,8 @@ class TencentCloudChatGroupProfileBuilders {
         );
   }
 
-  static Widget getGroupProfileDeleteButtonBuilder(
+  @override
+  Widget getGroupProfileDeleteButtonBuilder(
       {required V2TimGroupInfo groupInfo}) {
     Widget? widget;
     if (_groupProfileDeleteButtonBuilder != null) {
@@ -212,7 +251,8 @@ class TencentCloudChatGroupProfileBuilders {
         TencentCloudChatGroupProfileDeleteButton(groupInfo: groupInfo);
   }
 
-  static Widget getGroupProfileNotificationPageBuilder(
+  @override
+  Widget getGroupProfileNotificationPageBuilder(
       {required V2TimGroupInfo groupInfo}) {
     Widget? widget;
     if (_groupProfileNotificationPageBuilder != null) {
@@ -222,7 +262,7 @@ class TencentCloudChatGroupProfileBuilders {
         TencentCloudChatGroupProfileNotification(groupInfo: groupInfo);
   }
 
-  static Widget getGroupProfileMemberListPageBuilder(
+  Widget getGroupProfileMemberListPageBuilder(
       {required V2TimGroupInfo groupInfo,
       required List<V2TimGroupMemberFullInfo> groupMember}) {
     Widget? widget;
@@ -237,7 +277,8 @@ class TencentCloudChatGroupProfileBuilders {
         );
   }
 
-  static Widget getGroupProfileMutePageBuilder({
+  @override
+  Widget getGroupProfileMutePageBuilder({
     required V2TimGroupInfo groupInfo,
     required List<V2TimGroupMemberFullInfo> groupMember,
   }) {
@@ -253,7 +294,8 @@ class TencentCloudChatGroupProfileBuilders {
         );
   }
 
-  static Widget getGroupProfileAddMemberPageBuilder(
+  @override
+  Widget getGroupProfileAddMemberPageBuilder(
       {required V2TimGroupInfo groupInfo,
       required List<V2TimGroupMemberFullInfo> groupMember,
       required List<V2TimFriendInfo> contactList}) {

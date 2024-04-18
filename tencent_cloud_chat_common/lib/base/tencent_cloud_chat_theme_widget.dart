@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_cloud_chat/data/tencent_cloud_chat_data.dart';
 import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat/data/theme/tencent_cloud_chat_theme.dart';
 import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
@@ -20,13 +19,13 @@ class _TencentCloudChatThemeWidgetState extends State<TencentCloudChatThemeWidge
   // Theme instance for the Chat UIKit
 
   // Color theme based on the current brightness mode
-  TencentCloudChatThemeColors _colorTheme = TencentCloudChatData.theme.colorTheme;
+  TencentCloudChatThemeColors _colorTheme = TencentCloudChat.instance.dataInstance.theme.colorTheme;
 
   // Text styles for the Chat UIKit
-  TencentCloudChatTextStyle _textStyle = TencentCloudChatData.theme.textStyle;
+  TencentCloudChatTextStyle _textStyle = TencentCloudChat.instance.dataInstance.theme.textStyle;
 
   // Listener for theme data changes
-  final Stream<TencentCloudChatTheme>? _themeDataStream = TencentCloudChat.eventBusInstance.on<TencentCloudChatTheme>();
+  final Stream<TencentCloudChatTheme>? _themeDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatTheme>();
 
   late StreamSubscription<TencentCloudChatTheme>? _themeDataSubscription;
 

@@ -3,9 +3,7 @@ import 'dart:math';
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_conversation_sdk.dart';
-import 'package:tencent_cloud_chat/chat_sdk/tencent_cloud_chat_sdk.dart';
-import 'package:tencent_cloud_chat/components/components_options/tencent_cloud_chat_message_options.dart';
+import 'package:tencent_cloud_chat/components/component_options/tencent_cloud_chat_message_options.dart';
 import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
 import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
@@ -21,8 +19,6 @@ import 'package:tencent_cloud_chat_common/widgets/desktop_column_menu/tencent_cl
 import 'package:tencent_cloud_chat_common/widgets/desktop_popup/tencent_cloud_chat_desktop_popup.dart';
 import 'package:tencent_cloud_chat_common/widgets/gesture/tencent_cloud_chat_gesture.dart';
 import 'package:tencent_cloud_chat_common/widgets/loading/tencent_cloud_chat_loading.dart';
-import 'package:tencent_cloud_chat_conversation/tencent_cloud_chat_conversation_builders.dart';
-import 'package:tencent_cloud_chat_conversation/tencent_cloud_chat_conversation_event_handlers.dart';
 
 class TencentCloudChatConversationItem extends StatefulWidget {
   final V2TimConversation conversation;
@@ -41,7 +37,7 @@ class TencentCloudChatConversationItem extends StatefulWidget {
 }
 
 class TencentCloudChatConversationItemState extends TencentCloudChatState<TencentCloudChatConversationItem> {
-  final bool useDesktopMode = (TencentCloudChat().dataInstance.conversation.conversationConfig?.useDesktopMode ?? true) && (TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop);
+  final bool useDesktopMode = (TencentCloudChat.instance.dataInstance.conversation.conversationConfig.useDesktopMode) && (TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop);
 
   _navigateToMessage() async {
     final options = TencentCloudChatMessageOptions(
@@ -49,21 +45,19 @@ class TencentCloudChatConversationItemState extends TencentCloudChatState<Tencen
       groupID: widget.conversation.groupID,
     );
 
-    if (TencentCloudChatConversationEventHandlers.uiEventHandlers?.onTapConversationItem != null) {
-      final res = await TencentCloudChatConversationEventHandlers.uiEventHandlers!.onTapConversationItem!(
-        conversation: widget.conversation,
-        messageOptions: options,
-        inDesktopMode: useDesktopMode,
-      );
-      if (res) {
-        return;
-      }
+    final res = await TencentCloudChat.instance.dataInstance.conversation.conversationEventHandlers?.uiEventHandlers.onTapConversationItem?.call(
+      conversation: widget.conversation,
+      messageOptions: options,
+      inDesktopMode: useDesktopMode,
+    ) ?? false;
+    if (res) {
+      return;
     }
 
-    if (useDesktopMode && TencentCloudChat().dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.message)) {
+    if (useDesktopMode && TencentCloudChat.instance.dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.message)) {
       // Desktop combined navigator
-      TencentCloudChat().dataInstance.conversation.currentConversation = widget.conversation;
-    } else if (TencentCloudChat().dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.message)) {
+      TencentCloudChat.instance.dataInstance.conversation.currentConversation = widget.conversation;
+    } else if (TencentCloudChat.instance.dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.message)) {
       // Mobile navigator
       navigateToMessage(
         context: context,
@@ -111,7 +105,7 @@ class TencentCloudChatConversationItemState extends TencentCloudChatState<Tencen
   }
 
   _markAsRead() {
-    TencentCloudChatSDK.manager.getConversationManager().cleanConversationUnreadMessageCount(
+    TencentCloudChat.instance.chatSDKInstance.manager.getConversationManager().cleanConversationUnreadMessageCount(
           conversationID: widget.conversation.conversationID,
           cleanTimestamp: 0,
           cleanSequence: 0,
@@ -200,14 +194,14 @@ class TencentCloudChatConversationItemState extends TencentCloudChatState<Tencen
           ),
           child: Row(
             children: [
-              TencentCloudChatConversationBuilders.getConversationItemAvatarBuilder(
+              TencentCloudChat.instance.dataInstance.conversation.conversationBuilder?.getConversationItemAvatarBuilder(
                 widget.conversation,
                 widget.isOnline,
               ),
-              TencentCloudChatConversationBuilders.getConversationItemContentBuilder(
+              TencentCloudChat.instance.dataInstance.conversation.conversationBuilder?.getConversationItemContentBuilder(
                 widget.conversation,
               ),
-              TencentCloudChatConversationBuilders.getConversationItemInfoBuilder(
+              TencentCloudChat.instance.dataInstance.conversation.conversationBuilder?.getConversationItemInfoBuilder(
                 widget.conversation,
               ),
             ],
@@ -222,21 +216,21 @@ class TencentCloudChatConversationItemState extends TencentCloudChatState<Tencen
   }
 
   _cleanConversation() async {
-    await TencentCloudChatConversationSDK.cleanConversation(
+    await TencentCloudChat.instance.chatSDKInstance.conversationSDK.cleanConversation(
       conversationIDList: [widget.conversation.conversationID],
       clearMessage: false,
     );
   }
 
   _cleanConversationAndHistoryMessageList() async {
-    await TencentCloudChatConversationSDK.cleanConversation(
+    await TencentCloudChat.instance.chatSDKInstance.conversationSDK.cleanConversation(
       conversationIDList: [widget.conversation.conversationID],
       clearMessage: true,
     );
   }
 
   _pinConversation() async {
-    await TencentCloudChatConversationSDK.pinConversation(
+    await TencentCloudChat.instance.chatSDKInstance.conversationSDK.pinConversation(
       conversationID: widget.conversation.conversationID,
       isPinned: isPin() ? false : true,
     );
@@ -325,7 +319,7 @@ class TencentCloudChatConversationItemAvatarState extends TencentCloudChatState<
       if (TencentCloudChatUtils.checkString(conversation.groupID) == null) {
         return [""];
       }
-      List<V2TimGroupMemberFullInfo> groupMemberList = TencentCloudChat.cache.getGroupMemberListFromCache(conversation.groupID!);
+      List<V2TimGroupMemberFullInfo> groupMemberList = TencentCloudChat.instance.cache.getGroupMemberListFromCache(conversation.groupID!);
       var list = groupMemberList.takeWhile((value) => TencentCloudChatUtils.checkString(value.faceUrl) != null).toList();
       if (list.isNotEmpty) {
         if (list.length > 9) {

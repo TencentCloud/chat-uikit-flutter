@@ -6,6 +6,7 @@ import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_cha
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
+import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_builders.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_controller.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/desktop/tencent_cloud_chat_message_input_desktop.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/mobile/tencent_cloud_chat_message_input_mobile.dart';
@@ -36,6 +37,7 @@ class TencentCloudChatMessageInput extends StatefulWidget {
   final TencentCloudChatMessageInputStatus status;
   final bool isGroupAdmin;
   final String currentConversationShowName;
+  final MessageAttachmentOptionsBuilder? messageAttachmentOptionsBuilder;
 
   /// Desktop mentioning members
   final AutoScrollController desktopInputMemberSelectionPanelScroll;
@@ -81,6 +83,7 @@ class TencentCloudChatMessageInput extends StatefulWidget {
     required this.isGroupAdmin,
     required this.memberNeedToMention,
     required this.currentConversationShowName,
+    this.messageAttachmentOptionsBuilder,
   }) : assert((userID == null) != (groupID == null));
 
   @override
@@ -90,7 +93,6 @@ class TencentCloudChatMessageInput extends StatefulWidget {
 
 class _TencentCloudChatMessageInputState
     extends TencentCloudChatState<TencentCloudChatMessageInput> {
-
   String? _getMessageInputStatusText() {
     String? result;
     switch (widget.status) {
@@ -136,6 +138,7 @@ class _TencentCloudChatMessageInputState
       userID: widget.userID,
       groupID: widget.groupID,
       sendFileMessage: widget.sendFileMessage,
+      messageAttachmentOptionsBuilder: widget.messageAttachmentOptionsBuilder,
       sendImageMessage: widget.sendImageMessage,
       sendTextMessage: widget.sendTextMessage,
       sendVideoMessage: widget.sendVideoMessage,

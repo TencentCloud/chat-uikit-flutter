@@ -1,4 +1,6 @@
 import 'package:flutter/widgets.dart';
+import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder.dart';
+import 'package:tencent_cloud_chat/data/conversation/tencent_cloud_chat_conversation_data.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_conversation/widgets/tencent_cloud_chat_conversation_app_bar.dart';
 import 'package:tencent_cloud_chat_conversation/widgets/tencent_cloud_chat_conversation_item.dart';
@@ -17,11 +19,12 @@ typedef ConversationItemInfoBuilder = Widget? Function(
 
 typedef ConversationHeaderBuilder = Widget? Function();
 
-class TencentCloudChatConversationBuilders {
-  static ConversationItemAvatarBuilder? _conversationItemAvatarBuilder;
-  static ConversationItemContentBuilder? _conversationItemContentBuilder;
-  static ConversationItemInfoBuilder? _conversationItemInfoBuilder;
-  static ConversationHeaderBuilder? _conversationHeaderBuilder;
+class TencentCloudChatConversationBuilders
+    extends TencentCloudChatComponentBuilder {
+  ConversationItemAvatarBuilder? _conversationItemAvatarBuilder;
+  ConversationItemContentBuilder? _conversationItemContentBuilder;
+  ConversationItemInfoBuilder? _conversationItemInfoBuilder;
+  ConversationHeaderBuilder? _conversationHeaderBuilder;
 
   TencentCloudChatConversationBuilders({
     ConversationItemAvatarBuilder? conversationItemAvatarBuilder,
@@ -35,7 +38,21 @@ class TencentCloudChatConversationBuilders {
     _conversationHeaderBuilder = conversationHeaderBuilder;
   }
 
-  static (Widget, bool) getConversationHeaderBuilder() {
+  void setBuilders({
+    ConversationItemAvatarBuilder? conversationItemAvatarBuilder,
+    ConversationItemContentBuilder? conversationItemContentBuilder,
+    ConversationItemInfoBuilder? conversationItemInfoBuilder,
+    ConversationHeaderBuilder? conversationHeaderBuilder,
+  }) {
+    _conversationItemAvatarBuilder = conversationItemAvatarBuilder;
+    _conversationItemContentBuilder = conversationItemContentBuilder;
+    _conversationItemInfoBuilder = conversationItemInfoBuilder;
+    _conversationHeaderBuilder = conversationHeaderBuilder;
+    TencentCloudChat.instance.dataInstance.conversation.notifyListener(TencentCloudChatConversationDataKeys.conversationBuilder);
+  }
+
+  @override
+  (Widget, bool) getConversationHeaderBuilder() {
     Widget? widget;
 
     if (_conversationHeaderBuilder != null) {
@@ -48,7 +65,8 @@ class TencentCloudChatConversationBuilders {
     );
   }
 
-  static Widget getConversationItemAvatarBuilder(
+  @override
+  Widget getConversationItemAvatarBuilder(
       V2TimConversation conversation, bool isOnline) {
     Widget? widget;
 
@@ -63,8 +81,8 @@ class TencentCloudChatConversationBuilders {
         );
   }
 
-  static Widget getConversationItemContentBuilder(
-      V2TimConversation conversation) {
+  @override
+  Widget getConversationItemContentBuilder(V2TimConversation conversation) {
     Widget? widget;
 
     if (_conversationItemContentBuilder != null) {
@@ -76,7 +94,8 @@ class TencentCloudChatConversationBuilders {
         );
   }
 
-  static Widget getConversationItemInfoBuilder(V2TimConversation conversation) {
+  @override
+  Widget getConversationItemInfoBuilder(V2TimConversation conversation) {
     Widget? widget;
 
     if (_conversationItemInfoBuilder != null) {

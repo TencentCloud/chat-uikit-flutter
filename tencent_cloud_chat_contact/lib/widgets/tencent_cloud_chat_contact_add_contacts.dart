@@ -1,13 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_contact_sdk.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/builders/tencent_cloud_chat_common_builders.dart';
 import 'package:tencent_cloud_chat_common/widgets/avatar/tencent_cloud_chat_avatar.dart';
-import 'package:tencent_cloud_chat_contact/tencent_cloud_chat_contact_builders.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_add_contacts_info.dart';
 
 class TencentCloudChatContactAddContacts extends StatefulWidget {
@@ -89,7 +87,7 @@ class TencentCloudChatContactAddContactBodyState extends TencentCloudChatState<T
   }
 
   Widget beforeSearch() {
-    String userID = TencentCloudChat().dataInstance.basic.currentUser!.userID ?? "";
+    String userID = TencentCloudChat.instance.dataInstance.basic.currentUser!.userID ?? "";
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Column(
               children: [
@@ -133,7 +131,7 @@ class TencentCloudChatContactAddContactBodyState extends TencentCloudChatState<T
   List<V2TimUserFullInfo> userList = [];
 
   _onSearchUser(String searchID) async {
-    List<V2TimUserFullInfo> list = await TencentCloudChatContactSDK.getUsersInfo([searchID]);
+    List<V2TimUserFullInfo> list = await TencentCloudChat.instance.chatSDKInstance.contactSDK.getUsersInfo([searchID]);
     safeSetState(() {
       userList = list;
     });
@@ -291,7 +289,7 @@ class TencentCloudChatContactAddContactListItemState extends TencentCloudChatSta
               color: colorTheme.backgroundColor,
               margin: EdgeInsets.only(top: getHeight(10)),
               padding: EdgeInsets.symmetric(vertical: getHeight(10), horizontal: getWidth(3)),
-              child: Row(children: [TencentCloudChatContactBuilders.getContactAddContactListItemAvatarBuilder(widget.userFullInfo), TencentCloudChatContactBuilders.getContactAddContactListItemContentBuilder(widget.userFullInfo)]),
+              child: Row(children: [TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAddContactListItemAvatarBuilder(widget.userFullInfo), TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAddContactListItemContentBuilder(widget.userFullInfo)]),
             )));
   }
 }

@@ -1,104 +1,138 @@
 import 'dart:convert';
 
-import 'package:tencent_cloud_chat/chat_sdk/tencent_cloud_chat_sdk.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation_filter.dart';
 
+class TencentCloudChatConversationSDKGenerator {
+  static TencentCloudChatConversationSDK getInstance() {
+    return TencentCloudChatConversationSDK._();
+  }
+}
+
 class TencentCloudChatConversationSDK {
   static const String _tag = "TencentCloudChatUIKitConversationSDK";
 
-  static console(String log) {
-    TencentCloudChat.logInstance.console(
+  TencentCloudChatConversationSDK._() {
+    conversationListener = V2TimConversationListener(
+      onConversationChanged: (conversationList) {
+        TencentCloudChat.instance.dataInstance.conversation
+            .buildConversationList(conversationList, 'onConversationChanged');
+      },
+      onConversationGroupCreated: (groupName, conversationList) {},
+      onConversationGroupDeleted: (groupName) {},
+      onConversationGroupNameChanged: (oldName, newName) {},
+      onConversationsAddedToGroup: (groupName, conversationList) {},
+      onConversationsDeletedFromGroup: (groupName, conversationList) {},
+      onNewConversation: (conversationList) {
+        TencentCloudChat.instance.dataInstance.conversation
+            .buildConversationList(conversationList, 'onNewConversation');
+      },
+      onSyncServerFailed: () {},
+      onSyncServerFinish: () {
+        Future.delayed(const Duration(seconds: 2), () {
+          console("onSyncServerFinish exec, get all conversation from serve.");
+          getConversationList(seq: "0");
+        });
+      },
+      onSyncServerStart: () {},
+      onTotalUnreadMessageCountChanged: (totalUnreadCount) {
+        TencentCloudChat.instance.dataInstance.conversation
+            .setTotalUnreadCount(totalUnreadCount);
+      },
+      onConversationDeleted: (conversationIDList) {
+        console(
+            "onConversationDeleted exec. ids is ${conversationIDList.join(",")}");
+        // used in util client sync
+        TencentCloudChat.instance.dataInstance.conversation
+            .removeConversation(conversationIDList);
+      },
+      onUnreadMessageCountChangedByFilter: (filter, totalUnreadCount) {
+        console("onUnreadMessageCountChangedByFilter exec");
+        console(json.encode(filter.toJson()));
+        console("$totalUnreadCount");
+      },
+    );
+  }
+
+  console(String log) {
+    TencentCloudChat.instance.logInstance.console(
       componentName: _tag,
       logs: log,
     );
   }
 
-  static final V2TimConversationListener conversationListener = V2TimConversationListener(
-    onConversationChanged: (conversationList) {
-      TencentCloudChat().dataInstance.conversation.buildConversationList(conversationList, 'onConversationChanged');
-    },
-    onConversationGroupCreated: (groupName, conversationList) {},
-    onConversationGroupDeleted: (groupName) {},
-    onConversationGroupNameChanged: (oldName, newName) {},
-    onConversationsAddedToGroup: (groupName, conversationList) {},
-    onConversationsDeletedFromGroup: (groupName, conversationList) {},
-    onNewConversation: (conversationList) {
-      TencentCloudChat().dataInstance.conversation.buildConversationList(conversationList, 'onNewConversation');
-    },
-    onSyncServerFailed: () {},
-    onSyncServerFinish: () {
-      Future.delayed(const Duration(seconds: 2), () {
-        console("onSyncServerFinish exec, get all conversation from serve.");
-        getConversationList(seq: "0");
-      });
-    },
-    onSyncServerStart: () {},
-    onTotalUnreadMessageCountChanged: (totalUnreadCount) {
-      TencentCloudChat().dataInstance.conversation.setTotalUnreadCount(totalUnreadCount);
-    },
-    onConversationDeleted: (conversationIDList) {
-      console("onConversationDeleted exec. ids is ${conversationIDList.join(",")}");
-      // used in mutil client sync
-      TencentCloudChat().dataInstance.conversation.removeConversation(conversationIDList);
-    },
-    onUnreadMessageCountChangedByFilter: (filter, totalUnreadCount) {
-      console("onUnreadMessageCountChangedByFilter exec");
-      console(json.encode(filter.toJson()));
-      console("$totalUnreadCount");
-      console("wwww");
-    },
-  );
+  late final V2TimConversationListener conversationListener;
 
-  static pinConversation({
+  pinConversation({
     required String conversationID,
     required bool isPinned,
   }) async {
-    V2TimCallback pinRes = await TencentCloudChatSDK.manager.getConversationManager().pinConversation(
+    V2TimCallback pinRes = await TencentCloudChat
+        .instance.chatSDKInstance.manager
+        .getConversationManager()
+        .pinConversation(
           conversationID: conversationID,
           isPinned: isPinned,
         );
 
-    console("pinConversation exec, conversationID is $conversationID res is ${pinRes.code} desc is ${pinRes.desc}");
+    console(
+        "pinConversation exec, conversationID is $conversationID res is ${pinRes.code} desc is ${pinRes.desc}");
   }
 
-  static cleanConversation({
+  cleanConversation({
     required List<String> conversationIDList,
     required bool clearMessage,
   }) async {
-    V2TimValueCallback<List<V2TimConversationOperationResult>> deleteRes = await TencentCloudChatSDK.manager.getConversationManager().deleteConversationList(
-          conversationIDList: conversationIDList,
-          clearMessage: clearMessage,
-        );
+    V2TimValueCallback<List<V2TimConversationOperationResult>> deleteRes =
+        await TencentCloudChat.instance.chatSDKInstance.manager
+            .getConversationManager()
+            .deleteConversationList(
+              conversationIDList: conversationIDList,
+              clearMessage: clearMessage,
+            );
 
-    console("deleteConversationList exec, conversationID is ${conversationIDList.join(',')} res is ${deleteRes.code} desc is ${deleteRes.desc}");
+    console(
+        "deleteConversationList exec, conversationID is ${conversationIDList.join(',')} res is ${deleteRes.code} desc is ${deleteRes.desc}");
   }
 
-  static subscribeUnreadMessageCountByFilter() async {
-    await TencentCloudChatSDK.manager.getConversationManager().subscribeUnreadMessageCountByFilter(
+  subscribeUnreadMessageCountByFilter() async {
+    await TencentCloudChat.instance.chatSDKInstance.manager
+        .getConversationManager()
+        .subscribeUnreadMessageCountByFilter(
           filter: V2TimConversationFilter(
             conversationGroup: "test-group",
           ),
         );
   }
 
-  static addConversationListener() async {
-    await TencentCloudChatSDK.manager.getConversationManager().removeConversationListener(listener: conversationListener);
-    await TencentCloudChatSDK.manager.getConversationManager().addConversationListener(listener: conversationListener);
+  addConversationListener() async {
+    await TencentCloudChat.instance.chatSDKInstance.manager
+        .getConversationManager()
+        .removeConversationListener(listener: conversationListener);
+    await TencentCloudChat.instance.chatSDKInstance.manager
+        .getConversationManager()
+        .addConversationListener(listener: conversationListener);
   }
 
-  static Future<V2TimConversation> getConversation({String? userID, String? groupID}) async {
+  Future<V2TimConversation> getConversation(
+      {String? userID, String? groupID}) async {
     assert((userID == null) != (groupID == null));
 
-    final conversationID = TencentCloudChatUtils.checkString(userID) != null ? "c2c_$userID" : "group_$groupID";
-    final res = await TencentCloudChatSDK.manager.getConversationManager().getConversation(conversationID: conversationID);
+    final conversationID = TencentCloudChatUtils.checkString(userID) != null
+        ? "c2c_$userID"
+        : "group_$groupID";
+    final res = await TencentCloudChat.instance.chatSDKInstance.manager
+        .getConversationManager()
+        .getConversation(conversationID: conversationID);
     if (res.code == 0 && res.data != null) {
       return res.data!;
     }
     if (TencentCloudChatUtils.checkString(userID) != null) {
       V2TimUserFullInfo? userProfile;
-      final userProfileRes = await TencentCloudChatSDK.manager.getUsersInfo(userIDList: [userID ?? ""]);
+      final userProfileRes = await TencentCloudChat
+          .instance.chatSDKInstance.manager
+          .getUsersInfo(userIDList: [userID ?? ""]);
       if (userProfileRes.data != null && userProfileRes.data!.isNotEmpty) {
         userProfile = userProfileRes.data!.first;
       }
@@ -106,12 +140,18 @@ class TencentCloudChatConversationSDK {
         conversationID: conversationID,
         userID: TencentCloudChatUtils.checkString(userID),
         faceUrl: TencentCloudChatUtils.checkString(userProfile?.faceUrl),
-        showName: TencentCloudChatUtils.checkString(userProfile?.nickName) ?? TencentCloudChatUtils.checkString(userProfile?.userID) ?? TencentCloudChatUtils.checkString(userID) ?? tL10n.chat,
+        showName: TencentCloudChatUtils.checkString(userProfile?.nickName) ??
+            TencentCloudChatUtils.checkString(userProfile?.userID) ??
+            TencentCloudChatUtils.checkString(userID) ??
+            tL10n.chat,
         type: 1,
       );
     } else {
       V2TimGroupInfo? groupInfo;
-      final groupInfoRes = await TencentCloudChatSDK.manager.getGroupManager().getGroupsInfo(groupIDList: [groupID ?? ""]);
+      final groupInfoRes = await TencentCloudChat
+          .instance.chatSDKInstance.manager
+          .getGroupManager()
+          .getGroupsInfo(groupIDList: [groupID ?? ""]);
       if (groupInfoRes.data != null && groupInfoRes.data!.isNotEmpty) {
         groupInfo = groupInfoRes.data!.first.groupInfo;
       }
@@ -120,17 +160,20 @@ class TencentCloudChatConversationSDK {
         groupID: groupID,
         groupType: groupInfo?.groupType,
         faceUrl: TencentCloudChatUtils.checkString(groupInfo?.faceUrl),
-        showName: TencentCloudChatUtils.checkString(groupInfo?.groupName) ?? TencentCloudChatUtils.checkString(groupID) ?? tL10n.chat,
+        showName: TencentCloudChatUtils.checkString(groupInfo?.groupName) ??
+            TencentCloudChatUtils.checkString(groupID) ??
+            tL10n.chat,
         type: 2,
       );
     }
   }
 
-  static Future<void> getConversationList({
+  Future<void> getConversationList({
     String? seq,
     int? count,
   }) async {
-    final conversationData = TencentCloudChat().dataInstance.conversation;
+    final conversationData =
+        TencentCloudChat.instance.dataInstance.conversation;
     if (seq == "0") {
       conversationData.currentGetConversationListSeq = seq!;
       conversationData.conversationList.clear();
@@ -138,27 +181,34 @@ class TencentCloudChatConversationSDK {
     String paramSeq = seq ?? conversationData.currentGetConversationListSeq;
     int paramCount = count ?? conversationData.getConversationListCount;
 
-    console("GetConversationList api exec. And seq is $paramSeq. count is $paramCount");
-    V2TimValueCallback<V2TimConversationResult> conListRes = await TencentCloudChatSDK.manager.getConversationManager().getConversationList(
-          nextSeq: paramSeq,
-          count: paramCount,
-        );
+    console(
+        "GetConversationList api exec. And seq is $paramSeq. count is $paramCount");
+    V2TimValueCallback<V2TimConversationResult> conListRes =
+        await TencentCloudChat.instance.chatSDKInstance.manager
+            .getConversationManager()
+            .getConversationList(
+              nextSeq: paramSeq,
+              count: paramCount,
+            );
     if (conListRes.code == 0) {
       if (conListRes.data != null) {
         if (conListRes.data!.isFinished != null) {
           if (!conListRes.data!.isFinished!) {
-            conversationData.currentGetConversationListSeq = conListRes.data!.nextSeq!;
+            conversationData.currentGetConversationListSeq =
+                conListRes.data!.nextSeq!;
           } else {
             console("GetConversationList finished");
             conversationData.currentGetConversationListSeq = "";
             getTotalUnreadCount();
           }
-          conversationData.isGetConversationFinished = conListRes.data!.isFinished!;
+          conversationData.isGetConversationFinished =
+              conListRes.data!.isFinished!;
         }
 
         if (conListRes.data!.conversationList != null) {
           if (conListRes.data!.conversationList!.isNotEmpty) {
-            List<V2TimConversation?> conList = conListRes.data!.conversationList!;
+            List<V2TimConversation?> conList =
+                conListRes.data!.conversationList!;
 
             List<V2TimConversation> conListFormat = [];
             for (var element in conList) {
@@ -167,7 +217,8 @@ class TencentCloudChatConversationSDK {
               }
             }
 
-            conversationData.buildConversationList(conListFormat, 'getConversationList');
+            conversationData.buildConversationList(
+                conListFormat, 'getConversationList');
           }
         }
       }
@@ -176,23 +227,30 @@ class TencentCloudChatConversationSDK {
     conversationData.updateIsGetDataEnd(true);
   }
 
-  static _getOtherConversation() async {
-    console("Get complete conversationList asynchronously ${TencentCloudChat().dataInstance.conversation.isGetConversationFinished}");
-    if (!TencentCloudChat().dataInstance.conversation.isGetConversationFinished) {
-      await TencentCloudChatConversationSDK.getConversationList(
+  _getOtherConversation() async {
+    console(
+        "Get complete conversationList asynchronously ${TencentCloudChat.instance.dataInstance.conversation.isGetConversationFinished}");
+    if (!TencentCloudChat
+        .instance.dataInstance.conversation.isGetConversationFinished) {
+      await getConversationList(
         count: 100,
       );
-      if (!TencentCloudChat().dataInstance.conversation.isGetConversationFinished) {
+      if (!TencentCloudChat
+          .instance.dataInstance.conversation.isGetConversationFinished) {
         _getOtherConversation();
       }
     }
   }
 
-  static getTotalUnreadCount() async {
-    V2TimValueCallback<int> totalRes = await TencentCloudChatSDK.manager.getConversationManager().getTotalUnreadMessageCount();
+  getTotalUnreadCount() async {
+    V2TimValueCallback<int> totalRes = await TencentCloudChat
+        .instance.chatSDKInstance.manager
+        .getConversationManager()
+        .getTotalUnreadMessageCount();
     if (totalRes.code == 0) {
       if (totalRes.data != null) {
-        TencentCloudChat().dataInstance.conversation.setTotalUnreadCount(totalRes.data!);
+        TencentCloudChat.instance.dataInstance.conversation
+            .setTotalUnreadCount(totalRes.data!);
       }
     }
   }

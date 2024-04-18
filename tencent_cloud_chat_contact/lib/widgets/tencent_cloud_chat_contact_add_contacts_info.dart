@@ -1,12 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_contact_sdk.dart';
+import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_code_info.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/builders/tencent_cloud_chat_common_builders.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat_common.dart';
-import 'package:tencent_cloud_chat_contact/tencent_cloud_chat_contact_builders.dart';
 
 class TencentCloudChatContactAddContactsInfo extends StatefulWidget {
   final V2TimUserFullInfo userFullInfo;
@@ -85,14 +84,7 @@ class TencentCloudChatContactAddContactsInfoBody extends StatefulWidget {
 
 class TencentCloudChatContactAddContactsInfoBodyState extends TencentCloudChatState<TencentCloudChatContactAddContactsInfoBody> {
   bool showDetailAddInfo = false;
-  late FToast toast;
 
-  @override
-  void initState() {
-    super.initState();
-    toast = FToast();
-    toast.init(context);
-  }
 
   _getToastIcon(bool check) {
     if (check) {
@@ -111,31 +103,6 @@ class TencentCloudChatContactAddContactsInfoBodyState extends TencentCloudChatSt
             ));
   }
 
-  _showToast(bool check, String text) {
-    Widget t = TencentCloudChatThemeWidget(
-        build: (context, colorTheme, textStyle) => Container(
-              padding: EdgeInsets.symmetric(vertical: getHeight(8), horizontal: getWidth(12)),
-              decoration: BoxDecoration(color: colorTheme.contactBackgroundColor, borderRadius: BorderRadius.circular(getWidth(4)), boxShadow: [BoxShadow(color: colorTheme.contactAddContactFriendInfoButtonShadowColor)]),
-              child: Row(
-                children: [
-                  _getToastIcon(check),
-                  SizedBox(
-                    width: getWidth(8),
-                  ),
-                  Text(
-                    text,
-                    style: TextStyle(fontSize: textStyle.fontsize_14),
-                  )
-                ],
-              ),
-            ));
-    toast.showToast(
-      child: t,
-      gravity: ToastGravity.BOTTOM,
-      toastDuration: const Duration(seconds: 2),
-    );
-  }
-
   openContactsDetailInfo() {
     safeSetState(() {
       showDetailAddInfo = true;
@@ -150,14 +117,23 @@ class TencentCloudChatContactAddContactsInfoBodyState extends TencentCloudChatSt
     if (friendGroup.isEmpty || friendGroup == tL10n.none) {
       friendGroup = "";
     }
-    TencentCloudChatContactSDK.addFriend(widget.userFullInfo.userID ?? "", remark, friendGroup, verification, "flutter", FriendTypeEnum.V2TIM_FRIEND_TYPE_BOTH);
-    int code = TencentCloudChat().dataInstance.contact.addFriendCode;
+    TencentCloudChat.instance.chatSDKInstance.contactSDK.addFriend(widget.userFullInfo.userID ?? "", remark, friendGroup, verification, "flutter", FriendTypeEnum.V2TIM_FRIEND_TYPE_BOTH);
+    int code = TencentCloudChat.instance.dataInstance.contact.addFriendCode;
     if (code == 0) {
-      _showToast(true, tL10n.contactAddedSuccessfully);
+      TencentCloudChat.instance.callbacks?.onUserNotificationEvent?.call(
+        TencentCloudChatComponentsEnum.contact,
+        TencentCloudChatCodeInfo.contactAddedSuccessfully,
+      );
     } else if (code == 30539) {
-      _showToast(true, tL10n.requestSent);
+      TencentCloudChat.instance.callbacks?.onUserNotificationEvent?.call(
+        TencentCloudChatComponentsEnum.contact,
+        TencentCloudChatCodeInfo.contactRequestSent,
+      );
     } else {
-      _showToast(false, tL10n.cannotAddContact);
+      TencentCloudChat.instance.callbacks?.onUserNotificationEvent?.call(
+        TencentCloudChatComponentsEnum.contact,
+        TencentCloudChatCodeInfo.cannotAddContact,
+      );
     }
   }
 
@@ -182,13 +158,13 @@ class TencentCloudChatContactAddContactsInfoBodyState extends TencentCloudChatSt
   Widget getAddFriendInfoWidget() {
     if (showDetailAddInfo == false) {
       return Row(
-        children: [TencentCloudChatContactBuilders.getContactAddContactInfoButtonBuilder(widget.userFullInfo, openContactsDetailInfo)],
+        children: [TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAddContactInfoButtonBuilder(widget.userFullInfo, openContactsDetailInfo)],
       );
     } else {
       return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        TencentCloudChatContactBuilders.getContactAddContactsInfoVerificationBuilder(getVerification),
-        TencentCloudChatContactBuilders.getContactAddContactsInfoRemarksAndGroupBuilder(getRemarks, getFriendGroup),
-        TencentCloudChatContactBuilders.getContactAddContactsDetailInfoSendButton(sendAddFriendApplication)
+        TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAddContactsInfoVerificationBuilder(getVerification),
+        TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAddContactsInfoRemarksAndGroupBuilder(getRemarks, getFriendGroup),
+        TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAddContactsDetailInfoSendButton(sendAddFriendApplication)
       ]);
     }
   }
@@ -206,8 +182,8 @@ class TencentCloudChatContactAddContactsInfoBodyState extends TencentCloudChatSt
                         padding: EdgeInsets.symmetric(vertical: getHeight(10), horizontal: getWidth(16)),
                         color: colorTheme.contactBackgroundColor,
                         child: Row(children: [
-                          TencentCloudChatContactBuilders.getContactAddContactInfoAvatarBuilder(widget.userFullInfo),
-                          TencentCloudChatContactBuilders.getContactAddContactInfoContentBuilder(widget.userFullInfo),
+                          TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAddContactInfoAvatarBuilder(widget.userFullInfo),
+                          TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAddContactInfoContentBuilder(widget.userFullInfo),
                         ]),
                       ),
                       getAddFriendInfoWidget()
@@ -380,8 +356,8 @@ class TencentCloudChatContactAddContactsInfoRemarksAndGroupState extends Tencent
   @override
   void initState() {
     super.initState();
-    TencentCloudChatContactSDK.getFriendGroup(null);
-    List<V2TimFriendGroup> list = TencentCloudChat().dataInstance.contact.friendGroup;
+    TencentCloudChat.instance.chatSDKInstance.contactSDK.getFriendGroup(null);
+    List<V2TimFriendGroup> list = TencentCloudChat.instance.dataInstance.contact.friendGroup;
     for (final element in list) {
       if (element.name != null && element.name != "") {
         friendGroup.add(element.name ?? "");

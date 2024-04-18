@@ -1,6 +1,6 @@
 name: tencent_cloud_chat_push
 description: Notification push for Tencent Cloud Chat. Support offline push on APNs, Google FCM, multiple Android OEM manufactures.
-version: 7.8.5484
+version: 7.9.5668
 repository: https://github.com/RoleWong/tencent_cloud_chat_push
 homepage: https://trtc.io/products/chat?utm_source=gfs&utm_medium=link&utm_campaign=%E6%B8%A0%E9%81%93&_channel_track_key=k6WgfCKn
 
@@ -12,7 +12,8 @@ dependencies:
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.0.2
-  tencent_cloud_uikit_core: ^1.5.3
+  tencent_cloud_uikit_core: ^1.6.0
+  tencent_cloud_chat_sdk: ^7.9.5672
 
 dev_dependencies:
   flutter_test:

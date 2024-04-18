@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_message_sdk.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data.dart';
@@ -26,7 +25,7 @@ class TencentCloudChatMessageMergeDetailState
   final String _tag = "TencentCloudChatMessageMergeDetail";
 
   console(String log) {
-    TencentCloudChat.logInstance.console(
+    TencentCloudChat.instance.logInstance.console(
       componentName: _tag,
       logs: json.encode(
         {
@@ -40,7 +39,7 @@ class TencentCloudChatMessageMergeDetailState
   List<V2TimMessage> messages = [];
 
   getAllMergeMessage() async {
-    var msgs = await TencentCloudChatMessageSDK.getMergeMessages(
+    var msgs = await TencentCloudChat.instance.chatSDKInstance.messageSDK.getMergeMessages(
         msgID: widget.message.msgID ?? widget.message.id ?? "");
     console("download merge message success. length ${msgs.length}");
     if (msgs.isNotEmpty) {

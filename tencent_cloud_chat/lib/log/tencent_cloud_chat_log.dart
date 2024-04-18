@@ -16,17 +16,23 @@ enum TencentCloudChatLogLevel {
   all, // All logs will be displayed
 }
 
+class TencentCloudChatLogGenerator {
+  static TencentCloudChatLog getInstance() {
+    return TencentCloudChatLog._();
+  }
+}
+
 /// Class for logging messages
 class TencentCloudChatLog {
   static const String _tag = "TencentCloudChatLog";
 
   /// List to cache log messages
-  static List<String> _cachedLogList = List.from([]);
+  List<String> _cachedLogList = List.from([]);
 
   /// Timer to periodically write logs
-  static Timer? _timer;
+  Timer? _timer;
 
-  TencentCloudChatLog() {
+  TencentCloudChatLog._() {
     if (_timer == null) {
       // Start a timer to periodically write logs
       _timer = Timer.periodic(const Duration(seconds: 10), (Timer timer) {
@@ -85,7 +91,7 @@ class TencentCloudChatLog {
       return;
     }
 
-    TencentCloudChat.chatSDKInstance
+    TencentCloudChat.instance.chatSDKInstance
         .uikitTrace(trace: _cachedLogList.join("\n"));
 
     /// Log a message indicating that the timer executed and the number of logs written

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/components/components_options/tencent_cloud_chat_group_profile_options.dart';
-import 'package:tencent_cloud_chat/components/components_options/tencent_cloud_chat_user_profile_options.dart';
+import 'package:tencent_cloud_chat/components/component_options/tencent_cloud_chat_group_profile_options.dart';
+import 'package:tencent_cloud_chat/components/component_options/tencent_cloud_chat_user_profile_options.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
 import 'package:tencent_cloud_chat/router/tencent_cloud_chat_navigator.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';

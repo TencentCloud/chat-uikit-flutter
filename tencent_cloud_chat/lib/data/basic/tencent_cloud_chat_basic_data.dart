@@ -1,4 +1,3 @@
-import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_config.dart';
 import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_user_config.dart';
 import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
 import 'package:tencent_cloud_chat/data/tencent_cloud_chat_data_abstract.dart';
@@ -38,12 +37,12 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> {
   }
 
   double? get keyboardHeight {
-    return TencentCloudChat.cache.getCurrentDeviceKeyBordHeight();
+    return TencentCloudChat.instance.cache.getCurrentDeviceKeyBordHeight();
   }
 
   set keyboardHeight(double? value) {
     if (value != null) {
-      TencentCloudChat.cache.cacheCurrentDeviceKeyBordHeight(value);
+      TencentCloudChat.instance.cache.cacheCurrentDeviceKeyBordHeight(value);
     }
   }
 
@@ -90,7 +89,8 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> {
 
   updateUseUserOnlineStatus(TencentCloudChatUserConfig config) {
     if (config.autoDownloadMultimediaMessage != null) {
-      _userConfig.autoDownloadMultimediaMessage = config.autoDownloadMultimediaMessage;
+      _userConfig.autoDownloadMultimediaMessage =
+          config.autoDownloadMultimediaMessage;
     }
     if (config.useUserOnlineStatus != null) {
       _userConfig.useUserOnlineStatus = config.useUserOnlineStatus;
@@ -135,12 +135,13 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> {
   V2TimUserFullInfo? _currentUser;
 
   V2TimUserFullInfo? get currentUser {
-    return TencentCloudChat.cache.getCurrentLoginUserInfo() ?? _currentUser;
+    return TencentCloudChat.instance.cache.getCurrentLoginUserInfo() ??
+        _currentUser;
   }
 
   void updateCurrentUserInfo({required V2TimUserFullInfo userFullInfo}) {
     _currentUser = userFullInfo;
-    TencentCloudChat.cache.cacheCurrentLoginUserInfo(userFullInfo);
+    TencentCloudChat.instance.cache.cacheCurrentLoginUserInfo(userFullInfo);
     notifyListener(TencentCloudChatBasicDataKeys.selfInfo as T);
   }
 
@@ -157,34 +158,33 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> {
 
   List<TencentCloudChatComponentsEnum> _usedComponents = [];
 
-  final Map<TencentCloudChatComponentsEnum, TencentCloudChatWidgetBuilder> _componentsMap = {};
+  final Map<TencentCloudChatComponentsEnum, TencentCloudChatWidgetBuilder>
+      _componentsMap = {};
 
-  Map<TencentCloudChatComponentsEnum, TencentCloudChatWidgetBuilder> get componentsMap => _componentsMap;
+  Map<TencentCloudChatComponentsEnum, TencentCloudChatWidgetBuilder>
+      get componentsMap => _componentsMap;
 
   List<TencentCloudChatComponentsEnum> get usedComponents => _usedComponents;
 
   set usedComponents(List<TencentCloudChatComponentsEnum> value) {
     _usedComponents = value;
 
-    console(logs: "`usedComponents` Status Changed. Current `usedComponents` Is $_usedComponents");
+    console(
+        logs:
+            "`usedComponents` Status Changed. Current `usedComponents` Is $_usedComponents");
 
     notifyListener(TencentCloudChatBasicDataKeys.usedComponents as T);
   }
 
-  void addUsedComponent(({TencentCloudChatComponentsEnum componentEnum, TencentCloudChatWidgetBuilder widgetBuilder}) component) {
+  void addUsedComponent(
+      ({
+        TencentCloudChatComponentsEnum componentEnum,
+        TencentCloudChatWidgetBuilder widgetBuilder
+      }) component) {
     _usedComponents.add(component.componentEnum);
     _componentsMap[component.componentEnum] = component.widgetBuilder;
     _usedComponents.toSet().toList();
     notifyListener(TencentCloudChatBasicDataKeys.addUsedComponent as T);
-  }
-
-  /// ==== config for components ====
-  TencentCloudChatMessageConfig? _messageConfig;
-
-  TencentCloudChatMessageConfig get messageConfig => _messageConfig ?? TencentCloudChatMessageConfig();
-
-  set messageConfig(TencentCloudChatMessageConfig value) {
-    _messageConfig = value;
   }
 
   @override
@@ -197,6 +197,6 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> {
   @override
   void notifyListener(T key) {
     currentUpdatedFields = key;
-    TencentCloudChat.eventBusInstance.fire(this);
+    TencentCloudChat.instance.eventBusInstance.fire(this);
   }
 }

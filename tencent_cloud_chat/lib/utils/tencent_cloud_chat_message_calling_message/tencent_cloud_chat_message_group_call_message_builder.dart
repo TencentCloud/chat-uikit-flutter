@@ -121,8 +121,9 @@ class _GroupCallMessageItemState extends State<GroupCallMessageItem> {
     // 1发起通话
     if (actionType == 1 && groupId != null) {
       String nameStr = "";
-      var infoList = TencentCloudChat.cache.getGroupMemberInfoFromCache(
-          groupID: groupId, members: [callingMessage.inviter!]);
+      var infoList = TencentCloudChat.instance.cache
+          .getGroupMemberInfoFromCache(
+              groupID: groupId, members: [callingMessage.inviter!]);
       // TencentImSDKPlugin.v2TIMManager.getGroupManager().getGroupMembersInfo(groupID: groupId, memberList: [callingMessage.inviter!]).then((V2TimValueCallback<List<V2TimGroupMemberFullInfo>> res) {
       //   List<V2TimGroupMemberFullInfo>? infoList = res.data ?? [];
 
@@ -145,7 +146,7 @@ class _GroupCallMessageItemState extends State<GroupCallMessageItem> {
     if (actionType == 3 && groupId != null) {
       List<String> inviteeShowNameList = [];
 
-      var infos = TencentCloudChat.cache.getGroupMemberInfoFromCache(
+      var infos = TencentCloudChat.instance.cache.getGroupMemberInfoFromCache(
           groupID: groupId, members: callingMessage.inviteeList ?? []);
       for (var element in infos) {
         inviteeShowNameList.add(getShowName(element));
@@ -157,7 +158,7 @@ class _GroupCallMessageItemState extends State<GroupCallMessageItem> {
     if (actionType == 4 && groupId != null) {
       List<String> inviteeShowNameList = [];
 
-      var infos = TencentCloudChat.cache.getGroupMemberInfoFromCache(
+      var infos = TencentCloudChat.instance.cache.getGroupMemberInfoFromCache(
           groupID: groupId, members: callingMessage.inviteeList ?? []);
       for (var element in infos) {
         inviteeShowNameList.add(getShowName(element));
@@ -169,7 +170,7 @@ class _GroupCallMessageItemState extends State<GroupCallMessageItem> {
     if (actionType == 5 && groupId != null) {
       String nameStr = "";
 
-      var infos = TencentCloudChat.cache.getGroupMemberInfoFromCache(
+      var infos = TencentCloudChat.instance.cache.getGroupMemberInfoFromCache(
           groupID: groupId, members: callingMessage.inviteeList ?? []);
       for (var element in infos) {
         final showName = getShowName(element);

@@ -1,3 +1,7 @@
+## 7.9.5668
+* Implemented additional enhancements to our Native Push Plugin in version 7.9.5668.
+* Fixed several bugs.
+
 ## 7.8.5484
 
 * Introduced `registerOnAppWakeUpEvent` function to enable registering a listener when the app is activated due to a Google FCM high-priority background message, ensuring efficient handling of critical notifications.

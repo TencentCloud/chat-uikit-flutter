@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
-import 'package:tencent_cloud_chat_contact/tencent_cloud_chat_contact_builders.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_add_contacts.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_add_group.dart';
 
@@ -33,7 +32,7 @@ class TencentCloudChatContactAppBarState extends TencentCloudChatState<TencentCl
         bottom: getHeight(14),
       ),
       child: Column(
-        children: [TencentCloudChatContactBuilders.getContactAppBarNameBuilder(), const TencentCloudChatAppBarSearchItem()],
+        children: [TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAppBarNameBuilder(), const TencentCloudChatAppBarSearchItem()],
       ),
     );
   }
@@ -55,7 +54,7 @@ class TencentCloudChatContactAppBarState extends TencentCloudChatState<TencentCl
         ),
         child: Column(
           children: [
-            TencentCloudChatContactBuilders.getContactAppBarNameBuilder(
+            TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAppBarNameBuilder(
               title: widget.title,
             ),
             const TencentCloudChatAppBarSearchItem()

@@ -10,23 +10,32 @@ enum LogicLogLevel {
   info,
 }
 
-typedef OnTencentCloudChatSDKFailedCallback = void Function(String apiName, int code, String desc);
+typedef OnTencentCloudChatSDKFailedCallback = void Function(
+    String apiName, int code, String desc);
 
-typedef OnTencentCloudChatUIKitUserNotificationEvent = void Function(TencentCloudChatComponentsEnum component, TencentCloudChatUserNotificationEvent event);
+typedef OnTencentCloudChatUIKitUserNotificationEvent = void Function(
+    TencentCloudChatComponentsEnum component,
+    TencentCloudChatUserNotificationEvent event);
 
-typedef OnTencentCloudChatUIKitLogicExecCallback = void Function(String fileName, LogicLogLevel logLevel, String data);
+typedef OnTencentCloudChatUIKitLogicExecCallback = void Function(
+    String fileName, LogicLogLevel logLevel, String data);
 
 class TencentCloudChatCallbacks {
   static String componentName = "TencentCloudChatCallbacks";
 
-  final OnTencentCloudChatSDKFailedCallback? _onTencentCloudChatSDKFailedCallback;
-  final OnTencentCloudChatUIKitUserNotificationEvent? _onTencentCloudChatUIKitUserNotificationEvent;
+  final OnTencentCloudChatSDKFailedCallback?
+      _onTencentCloudChatSDKFailedCallback;
+  final OnTencentCloudChatUIKitUserNotificationEvent?
+      _onTencentCloudChatUIKitUserNotificationEvent;
 
+  final V2TimSDKListener? onSDKEvent;
   OnTencentCloudChatSDKFailedCallback? onSDKFailed;
   OnTencentCloudChatUIKitUserNotificationEvent? onUserNotificationEvent;
 
-  static OnTencentCloudChatUIKitLogicExecCallback onTencentCloudChatUIKitLogicCallback = (String fileName, LogicLogLevel logLevel, String data) {
-    TencentCloudChat.logInstance.console(
+  static OnTencentCloudChatUIKitLogicExecCallback
+      onTencentCloudChatUIKitLogicCallback =
+      (String fileName, LogicLogLevel logLevel, String data) {
+    TencentCloudChat.instance.logInstance.console(
       componentName: componentName,
       logs: json.encode({
         "fileName": fileName,
@@ -38,13 +47,18 @@ class TencentCloudChatCallbacks {
 
   TencentCloudChatCallbacks({
     OnTencentCloudChatSDKFailedCallback? onTencentCloudChatSDKFailedCallback,
-    OnTencentCloudChatUIKitUserNotificationEvent? onTencentCloudChatUIKitUserNotificationEvent,
-  })  : _onTencentCloudChatUIKitUserNotificationEvent = onTencentCloudChatUIKitUserNotificationEvent,
-        _onTencentCloudChatSDKFailedCallback = onTencentCloudChatSDKFailedCallback;
+    OnTencentCloudChatUIKitUserNotificationEvent?
+        onTencentCloudChatUIKitUserNotificationEvent,
+    V2TimSDKListener? onTencentCloudChatSDKEvent,
+  })  : _onTencentCloudChatUIKitUserNotificationEvent =
+            onTencentCloudChatUIKitUserNotificationEvent,
+        onSDKEvent = onTencentCloudChatSDKEvent,
+        _onTencentCloudChatSDKFailedCallback =
+            onTencentCloudChatSDKFailedCallback;
 
   activateCallbackModule() {
     onSDKFailed = (String apiName, int code, String desc) {
-      TencentCloudChat.logInstance.console(
+      TencentCloudChat.instance.logInstance.console(
         componentName: componentName,
         logs: json.encode({
           "apiName": apiName,
@@ -57,8 +71,9 @@ class TencentCloudChatCallbacks {
       }
     };
 
-    onUserNotificationEvent = (TencentCloudChatComponentsEnum component, TencentCloudChatUserNotificationEvent event) {
-      TencentCloudChat.logInstance.console(
+    onUserNotificationEvent = (TencentCloudChatComponentsEnum component,
+        TencentCloudChatUserNotificationEvent event) {
+      TencentCloudChat.instance.logInstance.console(
         componentName: componentName,
         logs: json.encode({
           "component": component.toString(),

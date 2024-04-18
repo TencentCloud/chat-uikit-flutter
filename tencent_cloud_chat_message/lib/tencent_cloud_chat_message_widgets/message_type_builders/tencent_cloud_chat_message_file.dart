@@ -5,7 +5,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:open_file/open_file.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_message_sdk.dart';
 import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
 import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
@@ -61,7 +60,7 @@ class TencentCloudChatMessageFile extends TencentCloudChatMessageItemBase {
 }
 
 class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<TencentCloudChatMessageFile> {
-  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.eventBusInstance.on<TencentCloudChatMessageData<dynamic>>();
+  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatMessageData<dynamic>>();
   late StreamSubscription<TencentCloudChatMessageData<dynamic>>? __messageDataSubscription;
 
   final String _tag = "TencentCloudChatMessageFile";
@@ -73,7 +72,7 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
   TimFileCurrentRenderInfo? currentRenderSoundInfo;
 
   console(String log) {
-    TencentCloudChat.logInstance.console(
+    TencentCloudChat.instance.logInstance.console(
       componentName: _tag,
       logs: json.encode(
         {
@@ -102,18 +101,18 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
         console("add to download queue error. key is empty.");
         return;
       }
-      TencentCloudChat().dataInstance.messageData.addDownloadMessageToQueue(
-            data: DownloadMessageQueueData(
-              conversationType: conversationType,
-              msgID: widget.message.msgID ?? msgID,
-              messageType: MessageElemType.V2TIM_ELEM_TYPE_FILE,
-              imageType: 0,
-              // file message this param is unuse;
-              isSnapshot: false,
-              key: key,
-            ),
-            isClick: isClick,
-          );
+      TencentCloudChat.instance.dataInstance.messageData.addDownloadMessageToQueue(
+        data: DownloadMessageQueueData(
+          conversationType: conversationType,
+          msgID: widget.message.msgID ?? msgID,
+          messageType: MessageElemType.V2TIM_ELEM_TYPE_FILE,
+          imageType: 0,
+          // file message this param is unuse;
+          isSnapshot: false,
+          key: key,
+        ),
+        isClick: isClick,
+      );
     }
   }
 
@@ -186,7 +185,7 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
         });
         return;
       }
-      V2TimMessageOnlineUrl? data = await TencentCloudChatMessageSDK.getMessageOnlineUrl(msgID: msgID);
+      V2TimMessageOnlineUrl? data = await TencentCloudChat.instance.chatSDKInstance.messageSDK.getMessageOnlineUrl(msgID: msgID);
       if (data == null) {
         safeSetState(() {
           isErrorMessage = true;
@@ -387,17 +386,17 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
   }
 
   bool isDownloading() {
-    return TencentCloudChat().dataInstance.messageData.isDownloading(msgID: widget.message.msgID ?? msgID);
+    return TencentCloudChat.instance.dataInstance.messageData.isDownloading(msgID: widget.message.msgID ?? msgID);
   }
 
   bool isInDownloadQueue() {
-    return TencentCloudChat().dataInstance.messageData.isInDownloadQueue(msgID: widget.message.msgID ?? msgID);
+    return TencentCloudChat.instance.dataInstance.messageData.isInDownloadQueue(msgID: widget.message.msgID ?? msgID);
   }
 
   removeFromDownloadQueue() {
     bool inQueue = isInDownloadQueue();
     if (inQueue == true) {
-      TencentCloudChat().dataInstance.messageData.removeFromDownloadQueue(msgID: widget.message.msgID ?? msgID);
+      TencentCloudChat.instance.dataInstance.messageData.removeFromDownloadQueue(msgID: widget.message.msgID ?? msgID);
       safeSetState(() {
         renderRandom = Random().nextInt(10000);
       });

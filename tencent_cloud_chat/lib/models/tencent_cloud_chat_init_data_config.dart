@@ -1,5 +1,5 @@
 class TencentCloudChatInitDataConfig {
-  bool? getConversationDataAfterInit = false;
+  bool? getConversationDataAfterInit = true;
   bool? getJoinedGroupListDataAfterInit = false;
   bool? getContactsDataAfterInit = false;
 

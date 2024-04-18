@@ -1,7 +1,6 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, unnecessary_null_comparison
 import 'package:azlistview_all_platforms/azlistview_all_platforms.dart';
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_group_sdk.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
@@ -24,7 +23,7 @@ class TencentCloudChatGroupProfileAddMemberState extends TencentCloudChatState<T
     for (int i = 0; i < selectedContacts.length; i++) {
       userIDList.add(selectedContacts[i].userID);
     }
-    await TencentCloudChatGroupSDK().inviteUserToGroup(groupID: widget.groupInfo.groupID, userList: userIDList);
+    await TencentCloudChat.instance.chatSDKInstance.groupSDK.inviteUserToGroup(groupID: widget.groupInfo.groupID, userList: userIDList);
   }
 
   List<V2TimFriendInfo> selectedContacts = [];

@@ -1,7 +1,7 @@
 import 'package:tencent_cloud_chat/log/tencent_cloud_chat_log.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 
-/// An abstract class for handling core data in TencentCloudChat.
+/// An abstract class for handling core data in TencentCloudChat .
 ///
 /// This class provides a base for managing the core data in the Chat UIKit,
 /// including methods for converting data to JSON and notifying listeners.
@@ -24,7 +24,7 @@ abstract class TencentCloudChatDataAB<T> {
   }) {
     var componentName =
         runtimeType.toString().replaceAll("TencentCloudChat", "");
-    TencentCloudChat.logInstance.console(
+    TencentCloudChat.instance.logInstance.console(
       componentName: componentName,
       logs: logs,
       logLevel: logLevel,

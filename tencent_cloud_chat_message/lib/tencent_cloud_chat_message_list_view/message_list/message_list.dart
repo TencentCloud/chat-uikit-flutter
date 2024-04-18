@@ -87,8 +87,7 @@ class MessageList extends StatefulWidget {
   final bool haveMorePreviousData;
   final double? offsetToTriggerLoadPrevious;
   final Future Function()? onLoadPreviousMsgs;
-  final Widget Function(BuildContext context, LoadStatus? status)?
-      loadPreviousProgressBuilder;
+  final Widget Function(BuildContext context, LoadStatus? status)? loadPreviousProgressBuilder;
 
   final List<V2TimMessage> messagesMentionedMe;
 
@@ -99,15 +98,13 @@ class MessageList extends StatefulWidget {
   final bool haveMoreLatestData;
   final double? offsetToTriggerLoadLatest;
   final Future Function()? onLoadPrevMsgs;
-  final Widget Function(BuildContext context, RefreshStatus? status)?
-      loadLatestProgressBuilder;
+  final Widget Function(BuildContext context, RefreshStatus? status)? loadLatestProgressBuilder;
 
   /// The scroll is not in top while user read messages, in this time, new message coming, Does it need should new message coming button
   /// [onIsReceiveMessage] Does it is received message, not send or tip message
   final bool showReceivedMsgButton;
   final Position receivedMsgButtonPosition;
-  final Widget Function(BuildContext context, int newCount)?
-      receivedMsgButtonBuilder;
+  final Widget Function(BuildContext context, int newCount)? receivedMsgButtonBuilder;
   final bool Function(int index)? onIsReceiveMessage;
 
   /// [showScrollToTopButton] is true will determine show the scroll to top button
@@ -166,10 +163,8 @@ class MessageListState extends State<MessageList> {
 
   @override
   void initState() {
-    listViewController =
-        widget.listViewController ?? FlutterListViewController();
-    listViewController.sliverController.onPaintItemPositionsCallback =
-        (widgetHeight, positions) {
+    listViewController = widget.listViewController ?? FlutterListViewController();
+    listViewController.sliverController.onPaintItemPositionsCallback = (widgetHeight, positions) {
       itemPositions = positions;
       SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
         _determineShowNewMsgCount();
@@ -219,8 +214,7 @@ class MessageListState extends State<MessageList> {
 
   _determineShowLatestUnreadMsgButton() {
     if (widget.showUnreadMsgButton && itemPositions.isNotEmpty) {
-      if (latestUnreadMessageIndex == null ||
-          itemPositions.last.index >= latestUnreadMessageIndex!) {
+      if (latestUnreadMessageIndex == null || itemPositions.last.index >= latestUnreadMessageIndex!) {
         lastReadMessageKey = null;
         latestUnreadMessageIndex = null;
 
@@ -260,8 +254,7 @@ class MessageListState extends State<MessageList> {
           } else {
             firstNewMessageIndex = null;
             for (var i = 0; i < widget.msgCount; i++) {
-              if (widget.onIsReceiveMessage == null ||
-                  widget.onIsReceiveMessage!(i)) {
+              if (widget.onIsReceiveMessage == null || widget.onIsReceiveMessage!(i)) {
                 newMsgCount++;
 
                 if (widget.onMsgKey(i) == firstNewMessageKey) {
@@ -287,8 +280,7 @@ class MessageListState extends State<MessageList> {
 
   _determineShowNewMsgCount() {
     if (widget.showReceivedMsgButton && itemPositions.isNotEmpty) {
-      if (firstNewMessageIndex == null ||
-          itemPositions[0].index <= firstNewMessageIndex!) {
+      if (firstNewMessageIndex == null || itemPositions[0].index <= firstNewMessageIndex!) {
         if (newMessageCount.value != 0) {
           newMessageCount.value = 0;
         }
@@ -307,8 +299,7 @@ class MessageListState extends State<MessageList> {
     var targetNextOffset = maxScrollExtent - loadNextMessageOffset;
 
     if (widget.haveMorePreviousData && loadNextMessageOffset > 0.0) {
-      if (offset >= targetNextOffset &&
-          nextBottomScrollOffset < targetNextOffset) {
+      if (offset >= targetNextOffset && nextBottomScrollOffset < targetNextOffset) {
         SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
           if (!refreshController.isLoading) {
             await refreshController.requestLoading(needMove: false);
@@ -424,12 +415,8 @@ class MessageListState extends State<MessageList> {
     });
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      listViewController.animateTo(0,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.bounceInOut);
-      listViewController.animateTo(0,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.bounceInOut);
+      listViewController.animateTo(0, duration: const Duration(milliseconds: 200), curve: Curves.bounceInOut);
+      listViewController.animateTo(0, duration: const Duration(milliseconds: 200), curve: Curves.bounceInOut);
     });
   }
 
@@ -458,12 +445,10 @@ class MessageListState extends State<MessageList> {
     setState(() {
       loadingMessageMentionedMe = false;
     });
-
   }
 
   Widget _renderItem(BuildContext context, int index) {
-    final (showUnreadTag, direction) =
-        widget.determineIsLatestReadMessage(index);
+    final (showUnreadTag, direction) = widget.determineIsLatestReadMessage(index);
     if (widget.unreadMsgCount != null && showUnreadTag) {
       return Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -501,14 +486,13 @@ class MessageListState extends State<MessageList> {
           enablePullUp: true,
           footer: CustomFooter(
             height: widget.haveMorePreviousData ? 60 : 16,
-            builder: (context, mode) =>
-                widget.loadPreviousProgressBuilder != null
-                    ? widget.loadPreviousProgressBuilder!(context, mode)
-                    : defaultLoadPreviousProgressBuilder(
-                        context,
-                        mode,
-                        widget.haveMorePreviousData,
-                      ),
+            builder: (context, mode) => widget.loadPreviousProgressBuilder != null
+                ? widget.loadPreviousProgressBuilder!(context, mode)
+                : defaultLoadPreviousProgressBuilder(
+                    context,
+                    mode,
+                    widget.haveMorePreviousData,
+                  ),
           ),
           controller: refreshController,
           onRefresh: _onLoadLatestMessages,
@@ -539,13 +523,10 @@ class MessageListState extends State<MessageList> {
     return ValueListenableBuilder(
         valueListenable: showLastUnreadButton,
         builder: (context, bool showButton, child) {
-          if (widget.showUnreadMsgButton &&
-              showButton &&
-              widget.unreadMsgCount != null) {
+          if (widget.showUnreadMsgButton && showButton && widget.unreadMsgCount != null) {
             return GestureDetector(
               onTap: _scrollToLatestReadMessage,
-              child: defaultUnreadMsgButtonBuilder(
-                  context, widget.unreadMsgCount!, loadingLatestReadMessage),
+              child: defaultUnreadMsgButtonBuilder(context, widget.unreadMsgCount!, loadingLatestReadMessage),
             );
           }
           return Container();
@@ -556,8 +537,7 @@ class MessageListState extends State<MessageList> {
     if (widget.messagesMentionedMe.isNotEmpty) {
       return GestureDetector(
         onTap: _scrollToLatestMessageMentionedMe,
-        child: defaultMessageMentionedMeBuilder(context,
-            widget.messagesMentionedMe.length, loadingMessageMentionedMe),
+        child: defaultMessageMentionedMeBuilder(context, widget.messagesMentionedMe.length, loadingMessageMentionedMe),
       );
     }
     return Container();
@@ -593,18 +573,14 @@ class MessageListState extends State<MessageList> {
   Widget _renderNewMessagesButton(int newMsgCount) {
     return GestureDetector(
       onTap: scrollToLatestMessage,
-      child: widget.receivedMsgButtonBuilder != null
-          ? widget.receivedMsgButtonBuilder!(context, newMsgCount)
-          : defaultReceivedMsgButtonBuilder(context, newMsgCount),
+      child: widget.receivedMsgButtonBuilder != null ? widget.receivedMsgButtonBuilder!(context, newMsgCount) : defaultReceivedMsgButtonBuilder(context, newMsgCount),
     );
   }
 
   Widget _renderScrollToTop() {
     return GestureDetector(
       onTap: scrollToLatestMessage,
-      child: widget.scrollToTopButtonBuilder != null
-          ? widget.scrollToTopButtonBuilder!(context)
-          : defaultScrollToTopButtonBuilder(context, loadingMessagesOnButton),
+      child: widget.scrollToTopButtonBuilder != null ? widget.scrollToTopButtonBuilder!(context) : defaultScrollToTopButtonBuilder(context, loadingMessagesOnButton),
     );
   }
 

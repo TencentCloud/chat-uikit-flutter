@@ -83,7 +83,8 @@ class TencentCloudChatScreenAdapter {
       // Set the designSize based on the device type and screen width
       Size designSize;
       if (deviceScreenType == DeviceScreenType.desktop) {
-        designSize = screenWidth > 960 ? const Size(1024, 768) : const Size(960, 640);
+        designSize =
+            screenWidth > 960 ? const Size(1024, 768) : const Size(960, 640);
       } else {
         designSize = const Size(390, 844);
       }
@@ -179,9 +180,12 @@ class TencentCloudChatScreenAdapter {
       final screenWidth = size.width / win.devicePixelRatio;
       final screenHeight = size.height / win.devicePixelRatio;
 
-      final diagonalInInches = sqrt(pow(screenWidth, 2) + pow(screenHeight, 2)) / 96.0;
+      final diagonalInInches =
+          sqrt(pow(screenWidth, 2) + pow(screenHeight, 2)) / 96.0;
 
-      return diagonalInInches < 10 ? DeviceScreenType.mobile : DeviceScreenType.desktop;
+      return diagonalInInches < 10
+          ? DeviceScreenType.mobile
+          : DeviceScreenType.desktop;
     } else {
       double deviceWidth = MediaQuery.of(context).size.width;
       double deviceHeight = MediaQuery.of(context).size.height;

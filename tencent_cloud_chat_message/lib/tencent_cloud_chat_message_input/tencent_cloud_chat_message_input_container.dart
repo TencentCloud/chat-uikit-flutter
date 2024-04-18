@@ -16,7 +16,6 @@ import 'package:tencent_cloud_chat_common/widgets/group_member_selector/tencent_
 import 'package:tencent_cloud_chat_common/widgets/modal/bottom_modal.dart';
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data.dart';
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data_notifier.dart';
-import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_builders.dart';
 
 class TencentCloudChatMessageInputContainer extends StatefulWidget {
   final String? userID;
@@ -72,7 +71,7 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
       final defaultOptions = [
         TencentCloudChatMessageGeneralOptionItem(icon: Icons.insert_drive_file, label: tL10n.file, onTap: _sendFileFromExplorer),
         TencentCloudChatMessageGeneralOptionItem(icon: Icons.photo_library, label: tL10n.album, onTap: _sendMediaFromGallery),
-        if (TencentCloudChat().dataInstance.basic.useCallKit) TencentCloudChatMessageGeneralOptionItem(icon: Icons.call, label: tL10n.call, onTap: _startCall),
+        if (TencentCloudChat.instance.dataInstance.basic.useCallKit) TencentCloudChatMessageGeneralOptionItem(icon: Icons.call, label: tL10n.call, onTap: _startCall),
       ];
       final additionalAttachmentOptionsForMobile = config.additionalAttachmentOptionsForMobile(
         userID: dataProvider.userID,
@@ -89,18 +88,49 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
         TencentCloudChatModalAction(
           label: tL10n.voiceCall,
           icon: Icons.call,
-          onTap: () {
-            if (widget.userID != null) {
-              TencentCloudChatTUICore.audioCall(userids: [widget.userID!]);
+          onTap: () async {
+            if (TencentCloudChatUtils.checkString(widget.groupID) != null) {
+              final List<V2TimGroupMemberFullInfo> memberInfoList = await showGroupMemberSelector(
+                groupMemberList: dataProvider.groupMemberList.where((element) => element != null).map((e) => e!).toList(),
+                context: context,
+                onSelectLabel: tL10n.startCall,
+              );
+              TencentCloudChatTUICore.audioCall(
+                userids: memberInfoList.map((e) => e.userID).toList(),
+                groupid: widget.groupID,
+              );
+            } else {
+              if (widget.userID != null) {
+                TencentCloudChatTUICore.audioCall(
+                  userids: [widget.userID ?? ""],
+                  groupid: widget.groupID,
+                );
+              }
             }
           },
         ),
         TencentCloudChatModalAction(
           label: tL10n.videoCall,
           icon: Icons.videocam,
-          onTap: () {
-            if (widget.userID != null) {
-              TencentCloudChatTUICore.videoCall(userids: [widget.userID!]);
+          onTap: () async {
+            if (TencentCloudChatUtils.checkString(widget.groupID) != null) {
+              final List<V2TimGroupMemberFullInfo> memberInfoList = await showGroupMemberSelector(
+                groupMemberList: dataProvider.groupMemberList.where((element) => element != null).map((e) => e!).toList(),
+                context: context,
+                onSelectLabel: tL10n.startCall,
+              );
+
+              TencentCloudChatTUICore.videoCall(
+                userids: memberInfoList.map((e) => e.userID).toList(),
+                groupid: widget.groupID,
+              );
+            } else {
+              if (widget.userID != null) {
+                TencentCloudChatTUICore.videoCall(
+                  userids: [widget.userID ?? ""],
+                  groupid: widget.groupID,
+                );
+              }
             }
           },
         ),
@@ -261,7 +291,7 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
     return memberList;
   }
 
-  String currentUserid = TencentCloudChat().dataInstance.basic.currentUser?.userID ?? "";
+  String currentUserid = TencentCloudChat.instance.dataInstance.basic.currentUser?.userID ?? "";
 
   @override
   Widget defaultBuilder(BuildContext context) {
@@ -290,7 +320,7 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
       }
     }
 
-    return TencentCloudChatMessageBuilders.getMessageInputBuilder(
+    return TencentCloudChatMessageDataProviderInherited.of(context).messageBuilders?.getMessageInputBuilder(
       controller: dataProvider.messageController,
       sendTextMessage: _sendTextMessage,
       sendVideoMessage: _sendVideoMessage,
@@ -299,6 +329,7 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
       status: _chatMessageInputStatus,
       sendFileMessage: _sendFileMessage,
       userID: widget.userID,
+      messageAttachmentOptionsBuilder: dataProvider.messageBuilders?.getAttachmentOptionsBuilder,
       isGroupAdmin: isGroupAdmin,
       groupID: widget.groupID,
       attachmentOrInputControlBarOptions: _attachmentOrInputControlBarOptions,
@@ -319,6 +350,6 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
       setCurrentFilteredMembersListForMention: (value) => dataProvider.currentFilteredMembersListForMention = value,
       memberNeedToMention: _memberNeedToMention,
       currentConversationShowName: TencentCloudChatUtils.checkString(showName) ?? tL10n.chat,
-    );
+    ) ?? Container();
   }
 }

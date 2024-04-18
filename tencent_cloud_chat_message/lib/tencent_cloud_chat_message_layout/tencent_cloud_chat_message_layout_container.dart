@@ -4,7 +4,6 @@ import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data.dart';
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data_notifier.dart';
-import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_builders.dart';
 
 class TencentCloudChatMessageLayoutContainer extends StatefulWidget {
   final String? userID;
@@ -119,7 +118,7 @@ class _TencentCloudChatMessageLayoutContainerState
       }
     }
 
-    return TencentCloudChatMessageBuilders.getMessageLayoutBuilder(
+    return TencentCloudChatMessageDataProviderInherited.of(context).messageBuilders?.getMessageLayoutBuilder(
       userID: widget.userID,
       groupID: widget.groupID,
       header: widget.header,
@@ -145,6 +144,6 @@ class _TencentCloudChatMessageLayoutContainerState
         dataProvider.memberNeedToMention = memberData.memberFullInfo;
         dataProvider.currentFilteredMembersListForMention = [];
       },
-    );
+    ) ?? Container();
   }
 }

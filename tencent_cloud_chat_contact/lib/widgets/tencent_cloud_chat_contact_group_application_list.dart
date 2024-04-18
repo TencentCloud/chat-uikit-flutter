@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_contact_sdk.dart';
 import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
-import 'package:tencent_cloud_chat_contact/tencent_cloud_chat_contact_builders.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_leading.dart';
 
 class TencentCloudChatContactGroupApplicationList extends StatefulWidget {
@@ -121,11 +119,11 @@ class TencentCloudChatContactGroupApplicationItemState extends TencentCloudChatS
               ),
               child: Row(
                 children: [
-                  TencentCloudChatContactBuilders.getContactGroupApplicationItemGroupNameBuilder(widget.groupApplication),
-                  TencentCloudChatContactBuilders.getContactGroupApplicationItemContentBuilder(
+                  TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactGroupApplicationItemGroupNameBuilder(widget.groupApplication),
+                  TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactGroupApplicationItemContentBuilder(
                     widget.groupApplication,
                   ),
-                  TencentCloudChatContactBuilders.getContactGroupApplicationItemButtonBuilder(widget.groupApplication)
+                  TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactGroupApplicationItemButtonBuilder(widget.groupApplication)
                 ],
               ),
             ));
@@ -209,7 +207,7 @@ class TencentCloudChatContactGroupApplicationItemButtonState extends TencentClou
   String showName = "";
 
   onAcceptApplication() {
-    TencentCloudChatContactSDK.acceptGroupApplication(widget.application);
+    TencentCloudChat.instance.chatSDKInstance.contactSDK.acceptGroupApplication(widget.application);
     safeSetState(() {
       showButton = false;
       showName = tL10n.accepted;
@@ -217,7 +215,7 @@ class TencentCloudChatContactGroupApplicationItemButtonState extends TencentClou
   }
 
   onRefuseApplication() {
-    TencentCloudChatContactSDK.refuseGroupApplication(widget.application);
+    TencentCloudChat.instance.chatSDKInstance.contactSDK.refuseGroupApplication(widget.application);
     safeSetState(() {
       showButton = false;
       showName = tL10n.declined;

@@ -1,4 +1,7 @@
 import 'package:flutter/widgets.dart';
+import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder.dart';
+import 'package:tencent_cloud_chat/data/contact/tencent_cloud_chat_contact_data.dart';
+import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_add_contacts.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_add_contacts_info.dart';
@@ -19,21 +22,21 @@ typedef ContactItemElseBuilder = Widget? Function(V2TimFriendInfo friend);
 
 typedef ContactListTagBuilder = Widget? Function(String tag);
 
-typedef ContactListTabItemBuilder = Widget? Function(TabItem item);
+typedef ContactListTabItemBuilder = Widget? Function(TTabItem item);
 
 typedef ContactApplicationItemAvatarBuilder = Widget? Function(V2TimFriendApplication application);
 
 typedef ContactApplicationItemContentBuilder = Widget? Function(V2TimFriendApplication application);
 
-typedef ContactApplicationItemButtonBuilder = Widget? Function(V2TimFriendApplication application, ApplicationResult? result, Function? sendApplicationResult);
+typedef ContactApplicationItemButtonBuilder = Widget? Function(V2TimFriendApplication application, ContactApplicationResult? result, Function? sendApplicationResult);
 
 typedef ContactApplicationInfoAvatarBuilder = Widget? Function(V2TimFriendApplication application);
 
 typedef ContactApplicationInfoContentBuilder = Widget? Function(V2TimFriendApplication application);
 
-typedef ContactApplicationInfoAddwordingBuilder = Widget? Function(V2TimFriendApplication application);
+typedef ContactApplicationInfoAddWordingBuilder = Widget? Function(V2TimFriendApplication application);
 
-typedef ContactApplicationInfoButtonBuilder = Widget? Function(V2TimFriendApplication application, Function? function, ApplicationResult? applicationResult);
+typedef ContactApplicationInfoButtonBuilder = Widget? Function(V2TimFriendApplication application, Function? function, ContactApplicationResult? applicationResult);
 
 typedef ContactBlockListItemAvatarBuilder = Widget? Function(V2TimFriendInfo friend);
 
@@ -67,37 +70,37 @@ typedef ContactGroupApplicationItemContentBuilder = Widget? Function(V2TimGroupA
 
 typedef ContactGroupApplicationItemButtonBuilder = Widget? Function(V2TimGroupApplication application);
 
-class TencentCloudChatContactBuilders {
-  static ContactItemAvatarBuilder? _contactItemAvatarBuilder;
-  static ContactItemContentBuilder? _contactItemContentBuilder;
-  static ContactItemElseBuilder? _contactItemElseBuilder;
-  static ContactListTagBuilder? _contactListTagBuilder;
-  static ContactListTabItemBuilder? _contactListTabItemBuilder;
-  static ContactApplicationItemAvatarBuilder? _contactApplicationItemAvatarBuilder;
-  static ContactApplicationItemContentBuilder? _contactApplicationItemContentBuilder;
-  static ContactApplicationItemButtonBuilder? _contactApplicationItemButtonBuilder;
-  static ContactApplicationInfoAvatarBuilder? _contactApplicationInfoAvatarBuilder;
-  static ContactApplicationInfoContentBuilder? _contactApplicationInfoContentBuilder;
-  static ContactApplicationInfoAddwordingBuilder? _contactApplicationInfoAddwordingBuilder;
-  static ContactApplicationInfoButtonBuilder? _contactApplicationInfoButtonBuilder;
-  static ContactBlockListItemAvatarBuilder? _contactBlockListItemAvatarBuilder;
-  static ContactBlockListItemContentBuilder? _contactBlockListItemContentBuilder;
+class TencentCloudChatContactBuilders extends TencentCloudChatComponentBuilder {
+  ContactItemAvatarBuilder? _contactItemAvatarBuilder;
+  ContactItemContentBuilder? _contactItemContentBuilder;
+  ContactItemElseBuilder? _contactItemElseBuilder;
+  ContactListTagBuilder? _contactListTagBuilder;
+  ContactListTabItemBuilder? _contactListTabItemBuilder;
+  ContactApplicationItemAvatarBuilder? _contactApplicationItemAvatarBuilder;
+  ContactApplicationItemContentBuilder? _contactApplicationItemContentBuilder;
+  ContactApplicationItemButtonBuilder? _contactApplicationItemButtonBuilder;
+  ContactApplicationInfoAvatarBuilder? _contactApplicationInfoAvatarBuilder;
+  ContactApplicationInfoContentBuilder? _contactApplicationInfoContentBuilder;
+  ContactApplicationInfoAddWordingBuilder? _contactApplicationInfoAddWordingBuilder;
+  ContactApplicationInfoButtonBuilder? _contactApplicationInfoButtonBuilder;
+  ContactBlockListItemAvatarBuilder? _contactBlockListItemAvatarBuilder;
+  ContactBlockListItemContentBuilder? _contactBlockListItemContentBuilder;
 
-  static ContactGroupListItemAvatarBuilder? _contactGroupListItemAvatarBuilder;
-  static ContactGroupListItemContentBuilder? _contactGroupListItemContentBuilder;
-  static ContactGroupListTagBuilder? _contactGroupListTagBuilder;
-  static ContactAppBarNameBuilder? _contactAppBarNameBuilder;
-  static ContactAddContactsListItemAvatarBuilder? _contactAddContactListItemAvatar;
-  static ContactAddContactsListItemContentBuilder? _contactAddContactListItemContent;
-  static ContactAddContactsInfoAvatarBuilder? _contactAddContactsInfoAvatar;
-  static ContactAddContactsInfoContentBuilder? _contactAddContactsInfoContent;
-  static ContactAddContactsInfoButtonBuilder? _contactAddContactsInfoButton;
-  static ContactAddContactsInfoVerificationBuilder? _contactAddContactsInfoVerificationBuilder;
-  static ContactAddContactsInfoRemarksAndGroupBuilder? _contactAddContactsInfoRemarksAndGroupBuilder;
-  static ContactAddContactsDetailInfoSendButtonBuilder? _contactAddContactsDetailInfoSendButtonBuilder;
-  static ContactGroupApplicationItemGroupNameBuilder? _contactGroupApplicationItemGroupName;
-  static ContactGroupApplicationItemContentBuilder? _contactGroupApplicationItemContent;
-  static ContactGroupApplicationItemButtonBuilder? _contactGroupApplicationItemButton;
+  ContactGroupListItemAvatarBuilder? _contactGroupListItemAvatarBuilder;
+  ContactGroupListItemContentBuilder? _contactGroupListItemContentBuilder;
+  ContactGroupListTagBuilder? _contactGroupListTagBuilder;
+  ContactAppBarNameBuilder? _contactAppBarNameBuilder;
+  ContactAddContactsListItemAvatarBuilder? _contactAddContactListItemAvatar;
+  ContactAddContactsListItemContentBuilder? _contactAddContactListItemContent;
+  ContactAddContactsInfoAvatarBuilder? _contactAddContactsInfoAvatar;
+  ContactAddContactsInfoContentBuilder? _contactAddContactsInfoContent;
+  ContactAddContactsInfoButtonBuilder? _contactAddContactsInfoButton;
+  ContactAddContactsInfoVerificationBuilder? _contactAddContactsInfoVerificationBuilder;
+  ContactAddContactsInfoRemarksAndGroupBuilder? _contactAddContactsInfoRemarksAndGroupBuilder;
+  ContactAddContactsDetailInfoSendButtonBuilder? _contactAddContactsDetailInfoSendButtonBuilder;
+  ContactGroupApplicationItemGroupNameBuilder? _contactGroupApplicationItemGroupName;
+  ContactGroupApplicationItemContentBuilder? _contactGroupApplicationItemContent;
+  ContactGroupApplicationItemButtonBuilder? _contactGroupApplicationItemButton;
 
   TencentCloudChatContactBuilders({
     ContactItemAvatarBuilder? contactItemAvatarBuilder,
@@ -110,7 +113,7 @@ class TencentCloudChatContactBuilders {
     ContactApplicationItemButtonBuilder? contactApplicationItemButtonBuilder,
     ContactApplicationInfoAvatarBuilder? contactApplicationInfoAvatarBuilder,
     ContactApplicationInfoContentBuilder? contactApplicationInfoContentBuilder,
-    ContactApplicationInfoAddwordingBuilder? contactApplicationInfoAddwordingBuilder,
+    ContactApplicationInfoAddWordingBuilder? contactApplicationInfoAddWordingBuilder,
     ContactApplicationInfoButtonBuilder? contactApplicationInfoButtonBuilder,
     ContactBlockListItemAvatarBuilder? contactBlockListItemAvatarBuilder,
     ContactBlockListItemContentBuilder? contactBlockListItemContentBuilder,
@@ -140,7 +143,7 @@ class TencentCloudChatContactBuilders {
     _contactApplicationItemButtonBuilder = contactApplicationItemButtonBuilder;
     _contactApplicationInfoAvatarBuilder = contactApplicationInfoAvatarBuilder;
     _contactApplicationInfoContentBuilder = contactApplicationInfoContentBuilder;
-    _contactApplicationInfoAddwordingBuilder = contactApplicationInfoAddwordingBuilder;
+    _contactApplicationInfoAddWordingBuilder = contactApplicationInfoAddWordingBuilder;
     _contactApplicationInfoButtonBuilder = contactApplicationInfoButtonBuilder;
     _contactBlockListItemAvatarBuilder = contactBlockListItemAvatarBuilder;
     _contactBlockListItemContentBuilder = contactBlockListItemContentBuilder;
@@ -161,7 +164,71 @@ class TencentCloudChatContactBuilders {
     _contactAddContactsDetailInfoSendButtonBuilder = contactAddContactsDetailInfoSendButtonBuilder;
   }
 
-  static Widget getContactItemAvatarBuilder(V2TimFriendInfo friend) {
+  void setBuilders({
+    ContactItemAvatarBuilder? contactItemAvatarBuilder,
+    ContactItemContentBuilder? contactItemContentBuilder,
+    ContactItemElseBuilder? contactItemElseBuilder,
+    ContactListTagBuilder? contactListTagBuilder,
+    ContactListTabItemBuilder? contactListTabItemBuilder,
+    ContactApplicationItemAvatarBuilder? contactApplicationItemAvatarBuilder,
+    ContactApplicationItemContentBuilder? contactApplicationItemContentBuilder,
+    ContactApplicationItemButtonBuilder? contactApplicationItemButtonBuilder,
+    ContactApplicationInfoAvatarBuilder? contactApplicationInfoAvatarBuilder,
+    ContactApplicationInfoContentBuilder? contactApplicationInfoContentBuilder,
+    ContactApplicationInfoAddWordingBuilder? contactApplicationInfoAddWordingBuilder,
+    ContactApplicationInfoButtonBuilder? contactApplicationInfoButtonBuilder,
+    ContactBlockListItemAvatarBuilder? contactBlockListItemAvatarBuilder,
+    ContactBlockListItemContentBuilder? contactBlockListItemContentBuilder,
+    ContactGroupListItemAvatarBuilder? contactGroupListItemAvatarBuilder,
+    ContactGroupListItemContentBuilder? contactGroupListItemContentBuilder,
+    ContactGroupListTagBuilder? contactGroupListTagBuilder,
+    ContactAppBarNameBuilder? contactAppBarNameBuilder,
+    ContactAddContactsListItemAvatarBuilder? contactAddContactListItemAvatar,
+    ContactAddContactsListItemContentBuilder? contactAddContactListItemContent,
+    ContactAddContactsInfoAvatarBuilder? contactAddContactsInfoAvatar,
+    ContactAddContactsInfoContentBuilder? contactAddContactsInfoContent,
+    ContactAddContactsInfoButtonBuilder? contactAddContactsInfoButton,
+    ContactAddContactsInfoVerificationBuilder? contactAddContactsInfoVerificationBuilder,
+    ContactAddContactsInfoRemarksAndGroupBuilder? contactAddContactsInfoRemarksAndGroupBuilder,
+    ContactAddContactsDetailInfoSendButtonBuilder? contactAddContactsDetailInfoSendButtonBuilder,
+    ContactGroupApplicationItemGroupNameBuilder? contactGroupApplicationItemGroupName,
+    ContactGroupApplicationItemContentBuilder? contactGroupApplicationItemContent,
+    ContactGroupApplicationItemButtonBuilder? contactGroupApplicationItemButton,
+  }) {
+    _contactItemAvatarBuilder = contactItemAvatarBuilder;
+    _contactItemContentBuilder = contactItemContentBuilder;
+    _contactItemElseBuilder = contactItemElseBuilder;
+    _contactListTagBuilder = contactListTagBuilder;
+    _contactListTabItemBuilder = contactListTabItemBuilder;
+    _contactApplicationItemAvatarBuilder = contactApplicationItemAvatarBuilder;
+    _contactApplicationItemContentBuilder = contactApplicationItemContentBuilder;
+    _contactApplicationItemButtonBuilder = contactApplicationItemButtonBuilder;
+    _contactApplicationInfoAvatarBuilder = contactApplicationInfoAvatarBuilder;
+    _contactApplicationInfoContentBuilder = contactApplicationInfoContentBuilder;
+    _contactApplicationInfoAddWordingBuilder = contactApplicationInfoAddWordingBuilder;
+    _contactApplicationInfoButtonBuilder = contactApplicationInfoButtonBuilder;
+    _contactBlockListItemAvatarBuilder = contactBlockListItemAvatarBuilder;
+    _contactBlockListItemContentBuilder = contactBlockListItemContentBuilder;
+    _contactGroupListItemAvatarBuilder = contactGroupListItemAvatarBuilder;
+    _contactGroupListItemContentBuilder = contactGroupListItemContentBuilder;
+    _contactGroupListTagBuilder = contactGroupListTagBuilder;
+    _contactAppBarNameBuilder = contactAppBarNameBuilder;
+    _contactAddContactListItemAvatar = contactAddContactListItemAvatar;
+    _contactAddContactListItemContent = contactAddContactListItemContent;
+    _contactAddContactsInfoAvatar = contactAddContactsInfoAvatar;
+    _contactAddContactsInfoContent = contactAddContactsInfoContent;
+    _contactAddContactsInfoButton = contactAddContactsInfoButton;
+    _contactGroupApplicationItemGroupName = contactGroupApplicationItemGroupName;
+    _contactGroupApplicationItemContent = contactGroupApplicationItemContent;
+    _contactGroupApplicationItemButton = contactGroupApplicationItemButton;
+    _contactAddContactsInfoVerificationBuilder = contactAddContactsInfoVerificationBuilder;
+    _contactAddContactsInfoRemarksAndGroupBuilder = contactAddContactsInfoRemarksAndGroupBuilder;
+    _contactAddContactsDetailInfoSendButtonBuilder = contactAddContactsDetailInfoSendButtonBuilder;
+    TencentCloudChat.instance.dataInstance.contact.notifyListener(TencentCloudChatContactDataKeys.builder);
+  }
+
+  @override
+  Widget getContactItemAvatarBuilder(V2TimFriendInfo friend) {
     Widget? widget;
     if (_contactItemAvatarBuilder != null) {
       widget = _contactItemAvatarBuilder!(friend);
@@ -169,7 +236,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactItemAvatar(friend: friend);
   }
 
-  static Widget getContactItemContentBuilder(V2TimFriendInfo friend) {
+  @override
+  Widget getContactItemContentBuilder(V2TimFriendInfo friend) {
     Widget? widget;
     if (_contactItemContentBuilder != null) {
       widget = _contactItemContentBuilder!(friend);
@@ -177,7 +245,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactItemContent(friend: friend);
   }
 
-  static Widget getContactItemElseBuilder(V2TimFriendInfo friend) {
+  @override
+  Widget getContactItemElseBuilder(V2TimFriendInfo friend) {
     Widget? widget;
     if (_contactItemElseBuilder != null) {
       widget = _contactItemElseBuilder!(friend);
@@ -185,7 +254,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactItemElse(friend: friend);
   }
 
-  static Widget getContactListTagBuilder(String tag) {
+  @override
+  Widget getContactListTagBuilder(String tag) {
     Widget? widget;
     if (_contactListTagBuilder != null) {
       widget = _contactListTagBuilder!(tag);
@@ -193,7 +263,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactListTag(tag: tag);
   }
 
-  static Widget getContactListTabItemBuilder(TabItem item) {
+  @override
+  Widget getContactListTabItemBuilder(TTabItem item) {
     Widget? widget;
     if (_contactListTabItemBuilder != null) {
       widget = _contactListTabItemBuilder!(item);
@@ -201,7 +272,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactTabItem(item: item);
   }
 
-  static Widget getContactApplicationItemAvatarBuilder(V2TimFriendApplication application) {
+  @override
+  Widget getContactApplicationItemAvatarBuilder(V2TimFriendApplication application) {
     Widget? widget;
     if (_contactApplicationItemAvatarBuilder != null) {
       widget = _contactApplicationItemAvatarBuilder!(application);
@@ -209,7 +281,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactApplicationItemAvatar(application: application);
   }
 
-  static Widget getContactApplicationItemContentBuilder(V2TimFriendApplication application) {
+  @override
+  Widget getContactApplicationItemContentBuilder(V2TimFriendApplication application) {
     Widget? widget;
     if (_contactApplicationItemContentBuilder != null) {
       widget = _contactApplicationItemContentBuilder!(application);
@@ -217,7 +290,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactApplicationItemContent(application: application);
   }
 
-  static Widget getContactApplicationItemButtonBuilder(V2TimFriendApplication application, ApplicationResult? result, Function? sendApplicationResult) {
+  @override
+  Widget getContactApplicationItemButtonBuilder(V2TimFriendApplication application, ContactApplicationResult? result, Function? sendApplicationResult) {
     Widget? widget;
     if (_contactApplicationItemButtonBuilder != null) {
       widget = _contactApplicationItemButtonBuilder!(application, result, sendApplicationResult);
@@ -225,7 +299,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatApplicationItemButton(application: application, applicationResult: result, sendApplicationResult: sendApplicationResult);
   }
 
-  static Widget getContactApplicationInfoAvatarbuilder(V2TimFriendApplication application) {
+  @override
+  Widget getContactApplicationInfoAvatarBuilder(V2TimFriendApplication application) {
     Widget? widget;
     if (_contactApplicationInfoAvatarBuilder != null) {
       widget = _contactApplicationInfoAvatarBuilder!(application);
@@ -233,7 +308,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactApplicationInfoAvatar(application: application);
   }
 
-  static Widget getContactApplicationInfoContentBuilder(V2TimFriendApplication application) {
+  @override
+  Widget getContactApplicationInfoContentBuilder(V2TimFriendApplication application) {
     Widget? widget;
     if (_contactApplicationInfoContentBuilder != null) {
       widget = _contactApplicationInfoContentBuilder!(application);
@@ -241,15 +317,17 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactApplicationInfoContent(application: application);
   }
 
-  static Widget getContactApplicationInfoAddwordingBuilder(V2TimFriendApplication application) {
+  @override
+  Widget getContactApplicationInfoAddWordingBuilder(V2TimFriendApplication application) {
     Widget? widget;
-    if (_contactApplicationInfoAddwordingBuilder != null) {
-      widget = _contactApplicationInfoAddwordingBuilder!(application);
+    if (_contactApplicationInfoAddWordingBuilder != null) {
+      widget = _contactApplicationInfoAddWordingBuilder!(application);
     }
     return widget ?? TencentCloudChatContentApplicationInfoAddwording(application: application);
   }
 
-  static Widget getContactApplicationInfoButtonBuilder(V2TimFriendApplication application, Function? resultFunction, ApplicationResult? applicationResult) {
+  @override
+  Widget getContactApplicationInfoButtonBuilder(V2TimFriendApplication application, Function? resultFunction, ContactApplicationResult? applicationResult) {
     Widget? widget;
     if (_contactApplicationInfoButtonBuilder != null) {
       widget = _contactApplicationInfoButtonBuilder!(application, resultFunction, applicationResult);
@@ -257,7 +335,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactApplicationInfoButton(application: application, resultFunction: resultFunction, applicationResult: applicationResult);
   }
 
-  static Widget getContactBlockListItemAvatarBuilder(V2TimFriendInfo friend) {
+  @override
+  Widget getContactBlockListItemAvatarBuilder(V2TimFriendInfo friend) {
     Widget? widget;
     if (_contactBlockListItemAvatarBuilder != null) {
       widget = _contactBlockListItemAvatarBuilder!(friend);
@@ -265,7 +344,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactBlockListItemAvatar(friend: friend);
   }
 
-  static Widget getContactBlockListItemContentBuilder(V2TimFriendInfo friend) {
+  @override
+  Widget getContactBlockListItemContentBuilder(V2TimFriendInfo friend) {
     Widget? widget;
     if (_contactBlockListItemContentBuilder != null) {
       widget = _contactBlockListItemContentBuilder!(friend);
@@ -273,7 +353,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactBlockListItemContent(friend: friend);
   }
 
-  static Widget getContactGroupListItemAvatarBuilder(V2TimGroupInfo group) {
+  @override
+  Widget getContactGroupListItemAvatarBuilder(V2TimGroupInfo group) {
     Widget? widget;
     if (_contactGroupListItemAvatarBuilder != null) {
       widget = _contactGroupListItemAvatarBuilder!(group);
@@ -281,7 +362,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactGroupItemAvatar(group: group);
   }
 
-  static Widget getContactGroupListItemContentBuilder(V2TimGroupInfo group) {
+  @override
+  Widget getContactGroupListItemContentBuilder(V2TimGroupInfo group) {
     Widget? widget;
     if (_contactGroupListItemContentBuilder != null) {
       widget = _contactGroupListItemContentBuilder!(group);
@@ -289,7 +371,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactGroupItemContent(group: group);
   }
 
-  static Widget getContactGroupListTagBuilder(String tag, int? count) {
+  @override
+  Widget getContactGroupListTagBuilder(String tag, int? count) {
     Widget? widget;
     if (_contactGroupListTagBuilder != null) {
       widget = _contactGroupListTagBuilder!(tag, count);
@@ -297,7 +380,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactGroupListTag(tag: tag, count: count);
   }
 
-  static Widget getContactAppBarNameBuilder({String? title}) {
+  @override
+  Widget getContactAppBarNameBuilder({String? title}) {
     Widget? widget;
     if (_contactAppBarNameBuilder != null) {
       widget = _contactAppBarNameBuilder!(title: title);
@@ -305,7 +389,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactAppBarName(title: title);
   }
 
-  static Widget getContactAddContactListItemAvatarBuilder(V2TimUserFullInfo userFullInfo) {
+  @override
+  Widget getContactAddContactListItemAvatarBuilder(V2TimUserFullInfo userFullInfo) {
     Widget? widget;
     if (_contactAddContactListItemAvatar != null) {
       widget = _contactAddContactListItemAvatar!(userFullInfo);
@@ -313,7 +398,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactAddContactListItemAvatar(userFullInfo: userFullInfo);
   }
 
-  static Widget getContactAddContactListItemContentBuilder(V2TimUserFullInfo userFullInfo) {
+  @override
+  Widget getContactAddContactListItemContentBuilder(V2TimUserFullInfo userFullInfo) {
     Widget? widget;
     if (_contactAddContactListItemContent != null) {
       widget = _contactAddContactListItemContent!(userFullInfo);
@@ -321,7 +407,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatChontactAddContactListItemContent(userFullInfo: userFullInfo);
   }
 
-  static Widget getContactAddContactInfoAvatarBuilder(V2TimUserFullInfo userFullInfo) {
+  @override
+  Widget getContactAddContactInfoAvatarBuilder(V2TimUserFullInfo userFullInfo) {
     Widget? widget;
     if (_contactAddContactsInfoAvatar != null) {
       widget = _contactAddContactsInfoAvatar!(userFullInfo);
@@ -329,7 +416,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactAddContactsInfoAvatar(userFullInfo: userFullInfo);
   }
 
-  static Widget getContactAddContactInfoContentBuilder(V2TimUserFullInfo userFullInfo) {
+  @override
+  Widget getContactAddContactInfoContentBuilder(V2TimUserFullInfo userFullInfo) {
     Widget? widget;
     if (_contactAddContactsInfoContent != null) {
       widget = _contactAddContactsInfoContent!(userFullInfo);
@@ -337,7 +425,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactAddContactsInfoContent(userFullInfo: userFullInfo);
   }
 
-  static Widget getContactAddContactInfoButtonBuilder(V2TimUserFullInfo userFullInfo, Function? showDetailAddInfo) {
+  @override
+  Widget getContactAddContactInfoButtonBuilder(V2TimUserFullInfo userFullInfo, Function? showDetailAddInfo) {
     Widget? widget;
     if (_contactAddContactsInfoButton != null) {
       widget = _contactAddContactsInfoButton!(userFullInfo, showDetailAddInfo);
@@ -345,7 +434,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactAddContactsInfoButton(userFullInfo: userFullInfo, showDetailAddInfo: showDetailAddInfo);
   }
 
-  static Widget getContactGroupApplicationItemGroupNameBuilder(V2TimGroupApplication groupApplication) {
+  @override
+  Widget getContactGroupApplicationItemGroupNameBuilder(V2TimGroupApplication groupApplication) {
     Widget? widget;
     if (_contactGroupApplicationItemGroupName != null) {
       widget = _contactGroupApplicationItemGroupName!(groupApplication);
@@ -353,7 +443,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactGroupApplicationItemGroupName(application: groupApplication);
   }
 
-  static Widget getContactGroupApplicationItemContentBuilder(V2TimGroupApplication groupApplication) {
+  @override
+  Widget getContactGroupApplicationItemContentBuilder(V2TimGroupApplication groupApplication) {
     Widget? widget;
     if (_contactGroupApplicationItemContent != null) {
       widget = _contactGroupApplicationItemContent!(groupApplication);
@@ -361,7 +452,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactGroupApplicationItemContent(application: groupApplication);
   }
 
-  static Widget getContactGroupApplicationItemButtonBuilder(V2TimGroupApplication groupApplication) {
+  @override
+  Widget getContactGroupApplicationItemButtonBuilder(V2TimGroupApplication groupApplication) {
     Widget? widget;
     if (_contactGroupApplicationItemButton != null) {
       widget = _contactGroupApplicationItemButton!(groupApplication);
@@ -369,7 +461,8 @@ class TencentCloudChatContactBuilders {
     return widget ?? TencentCloudChatContactGroupApplicationItemButton(application: groupApplication);
   }
 
-  static Widget getContactAddContactsInfoVerificationBuilder(Function onVerificationChanged) {
+  @override
+  Widget getContactAddContactsInfoVerificationBuilder(Function onVerificationChanged) {
     Widget? widget;
     if (_contactAddContactsInfoVerificationBuilder != null) {
       widget = _contactAddContactsInfoVerificationBuilder!(onVerificationChanged);
@@ -380,7 +473,8 @@ class TencentCloudChatContactBuilders {
         );
   }
 
-  static Widget getContactAddContactsInfoRemarksAndGroupBuilder(Function onRemarksChanged, Function onFriendGroupChanged) {
+  @override
+  Widget getContactAddContactsInfoRemarksAndGroupBuilder(Function onRemarksChanged, Function onFriendGroupChanged) {
     Widget? widget;
     if (_contactAddContactsInfoRemarksAndGroupBuilder != null) {
       widget = _contactAddContactsInfoRemarksAndGroupBuilder!(onRemarksChanged, onFriendGroupChanged);
@@ -392,7 +486,8 @@ class TencentCloudChatContactBuilders {
         );
   }
 
-  static Widget getContactAddContactsDetailInfoSendButton(Function addFriend) {
+  @override
+  Widget getContactAddContactsDetailInfoSendButton(Function addFriend) {
     Widget? widget;
     if (_contactAddContactsDetailInfoSendButtonBuilder != null) {
       widget = _contactAddContactsDetailInfoSendButtonBuilder!(addFriend);

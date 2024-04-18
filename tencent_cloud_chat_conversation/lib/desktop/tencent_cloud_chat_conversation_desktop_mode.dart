@@ -9,7 +9,6 @@ import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
-import 'package:tencent_cloud_chat_conversation/tencent_cloud_chat_conversation_builders.dart';
 import 'package:tencent_cloud_chat_conversation/widgets/tencent_cloud_chat_conversation_list.dart';
 
 class TencentCloudChatConversationDesktopMode extends StatefulWidget {
@@ -21,16 +20,16 @@ class TencentCloudChatConversationDesktopMode extends StatefulWidget {
 
 class _TencentCloudChatConversationDesktopModeState extends TencentCloudChatState<TencentCloudChatConversationDesktopMode> {
   final Stream<TencentCloudChatConversationData<dynamic>>? _conversationDataStream =
-  TencentCloudChat.eventBusInstance.on<TencentCloudChatConversationData<dynamic>>();
+  TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatConversationData<dynamic>>();
   StreamSubscription<TencentCloudChatConversationData<dynamic>>? _conversationDataSubscription;
 
   final Stream<TencentCloudChatBasicData<dynamic>>? _basicDataStream =
-  TencentCloudChat.eventBusInstance.on<TencentCloudChatBasicData<dynamic>>();
+  TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatBasicData<dynamic>>();
   StreamSubscription<TencentCloudChatBasicData<dynamic>>? _basicDataSubscription;
 
   V2TimConversation? _currentConversation;
-  bool _isShowSearch = false;
-  bool _isShowGroupProfile = false;
+  // bool _isShowSearch = false;
+  // bool _isShowGroupProfile = false;
 
   TencentCloudChatWidgetBuilder? _messageWidget;
 
@@ -62,7 +61,7 @@ class _TencentCloudChatConversationDesktopModeState extends TencentCloudChatStat
   void _addBasicEventListener() {
     _basicDataSubscription = _basicDataStream?.listen((event) {
       if (event.currentUpdatedFields == TencentCloudChatBasicDataKeys.addUsedComponent) {
-        final messageWidget = TencentCloudChat().dataInstance.basic.componentsMap[TencentCloudChatComponentsEnum.message];
+        final messageWidget = TencentCloudChat.instance.dataInstance.basic.componentsMap[TencentCloudChatComponentsEnum.message];
         if (messageWidget != _messageWidget) {
           safeSetState(() {
             _messageWidget = messageWidget;
@@ -78,7 +77,7 @@ class _TencentCloudChatConversationDesktopModeState extends TencentCloudChatStat
     _addBasicEventListener();
     _addConversationDataListener();
 
-    _messageWidget = TencentCloudChat().dataInstance.basic.componentsMap[TencentCloudChatComponentsEnum.message];
+    _messageWidget = TencentCloudChat.instance.dataInstance.basic.componentsMap[TencentCloudChatComponentsEnum.message];
   }
 
   @override
@@ -99,7 +98,7 @@ class _TencentCloudChatConversationDesktopModeState extends TencentCloudChatStat
                       Row(
                         children: [
                           Expanded(
-                            child: TencentCloudChatConversationBuilders.getConversationHeaderBuilder().$1,
+                            child: TencentCloudChat.instance.dataInstance.conversation.conversationBuilder?.getConversationHeaderBuilder().$1,
                           ),
                         ],
                       ),

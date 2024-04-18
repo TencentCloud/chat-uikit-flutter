@@ -52,8 +52,8 @@ class _TencentCloudChatMessageCustomState extends TencentCloudChatMessageState<T
 
   getWidgetFromPlugin() async {
     if (isVoteMessage) {
-      if (TencentCloudChat().dataInstance.basic.hasPlugins('poll')) {
-        var plugin = TencentCloudChat().dataInstance.basic.getPlugin('poll');
+      if (TencentCloudChat.instance.dataInstance.basic.hasPlugins('poll')) {
+        var plugin = TencentCloudChat.instance.dataInstance.basic.getPlugin('poll');
         if (plugin != null) {
           var voteMsg = await plugin.pluginInstance.getWidget(
             methodName: "voteMessageItem",
@@ -80,8 +80,8 @@ class _TencentCloudChatMessageCustomState extends TencentCloudChatMessageState<T
       }
     }
     if (isRobotMessage) {
-      if (TencentCloudChat().dataInstance.basic.hasPlugins('robot')) {
-        var plugin = TencentCloudChat().dataInstance.basic.getPlugin('robot');
+      if (TencentCloudChat.instance.dataInstance.basic.hasPlugins('robot')) {
+        var plugin = TencentCloudChat.instance.dataInstance.basic.getPlugin('robot');
         if (plugin != null) {
           var robotMsg = await plugin.pluginInstance.getWidget(
             methodName: "robotMessageItem",

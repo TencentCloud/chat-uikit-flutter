@@ -7,7 +7,6 @@ import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data.dart';
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data_notifier.dart';
-import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_builders.dart';
 
 class TencentCloudChatMessageRowContainer extends StatefulWidget {
   final V2TimMessage message;
@@ -28,7 +27,7 @@ class TencentCloudChatMessageRowContainer extends StatefulWidget {
 class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<TencentCloudChatMessageRowContainer> {
   late TencentCloudChatMessageSeparateDataProvider dataProvider;
 
-  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.eventBusInstance.on<TencentCloudChatMessageData>();
+  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatMessageData>();
   late StreamSubscription<TencentCloudChatMessageData<dynamic>>? _messageDataSubscription;
 
   bool _isSelected = false;
@@ -75,9 +74,9 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
 
     switch (messageDataKeys) {
       case TencentCloudChatMessageDataKeys.messageNeedUpdate:
-        if (TencentCloudChat().dataInstance.messageData.messageNeedUpdate != null && msgID == TencentCloudChat().dataInstance.messageData.messageNeedUpdate?.msgID && TencentCloudChatUtils.checkString(msgID) != null) {
+        if (TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate != null && msgID == TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate?.msgID && TencentCloudChatUtils.checkString(msgID) != null) {
           safeSetState(() {
-            _message = TencentCloudChat().dataInstance.messageData.messageNeedUpdate!;
+            _message = TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate!;
           });
         }
       default:
@@ -105,10 +104,11 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
     }
   }
 
+
   @override
   Widget defaultBuilder(BuildContext context) {
     // Use LayoutBuilder to get the width of the parent widget (i.e., the width of the message row).
-    return TencentCloudChatMessageBuilders.getMessageRowBuilder(
+    return TencentCloudChat.instance.dataInstance.messageData.messageBuilder?.getMessageRowBuilder(
       key: Key(_message.msgID ?? _message.id!),
       message: _message,
       userID: dataProvider.userID,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat/log/tencent_cloud_chat_log.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 
-/// A utility class for managing the global routing table for TencentCloudChat.
+/// A utility class for managing the global routing table for TencentCloudChat
 ///
 /// This class provides a singleton instance for managing the global routing table
 /// for the entire application. It enables the registration of routes and navigation
@@ -77,14 +77,14 @@ class TencentCloudChatRouter {
           ),
         );
       } catch (e) {
-        TencentCloudChat.logInstance.console(
+        TencentCloudChat.instance.logInstance.console(
           componentName: 'Navigator',
           logs: '`$routeName` failed: ${e.toString()}',
           logLevel: TencentCloudChatLogLevel.error,
         );
       }
     } else {
-      TencentCloudChat.logInstance.console(
+      TencentCloudChat.instance.logInstance.console(
         componentName: 'Navigator',
         logs: '`$routeName` not registered',
         logLevel: TencentCloudChatLogLevel.error,

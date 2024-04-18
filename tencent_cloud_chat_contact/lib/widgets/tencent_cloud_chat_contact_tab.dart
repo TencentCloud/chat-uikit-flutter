@@ -1,11 +1,12 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 
 class TencentCloudChatContactTabItem extends StatefulWidget {
-  final TabItem item;
+  final TTabItem item;
 
   const TencentCloudChatContactTabItem({super.key, required this.item});
 
@@ -21,7 +22,7 @@ class TencentCloudChatContactTabItemState extends TencentCloudChatState<TencentC
 }
 
 class TencentCloudChatContactTab extends StatefulWidget {
-  final TabItem item;
+  final TTabItem item;
 
   const TencentCloudChatContactTab({super.key, required this.item});
 
@@ -138,22 +139,6 @@ class TencentCloudChatContactTabState extends TencentCloudChatState<TencentCloud
       ),
     );
   }
-}
-
-class TabItem {
-  final String id;
-  final String name;
-  final IconData icon;
-  final Function()? onTap;
-  final int? unreadCount;
-
-  TabItem({
-    required this.id,
-    required this.name,
-    required this.icon,
-    this.onTap,
-    this.unreadCount,
-  });
 }
 
 class TencentCloudChatContactTabItemApplicationCount extends StatefulWidget {

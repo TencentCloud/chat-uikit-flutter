@@ -28,6 +28,8 @@ class TencentCloudChatMessageAttachmentOptions {
 
   Widget _buildAttachmentOptions(
       {required BoxConstraints constraints,
+      required BuildContext context,
+      required MessageAttachmentOptionsBuilder? messageAttachmentOptionsBuilder,
       required List<TencentCloudChatMessageGeneralOptionItem>
           attachmentOptions}) {
     final isMobile = TencentCloudChatScreenAdapter.deviceScreenType ==
@@ -41,7 +43,7 @@ class TencentCloudChatMessageAttachmentOptions {
         sizeFactor: _attachmentOptionsAnimation,
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: constraints.maxWidth - 32),
-          child: TencentCloudChatMessageBuilders.getAttachmentOptionsBuilder(
+          child: messageAttachmentOptionsBuilder?.call(
             attachmentOptions: attachmentOptions,
             onActionFinish: _removeEntry,
           ),
@@ -53,6 +55,7 @@ class TencentCloudChatMessageAttachmentOptions {
   void toggleAttachmentOptionsOverlay(
       {required BoxConstraints constraints,
       required BuildContext context,
+      required MessageAttachmentOptionsBuilder? messageAttachmentOptionsBuilder,
       required TapDownDetails tapDownDetails,
       required List<TencentCloudChatMessageGeneralOptionItem>
           attachmentOptions}) {
@@ -61,6 +64,7 @@ class TencentCloudChatMessageAttachmentOptions {
         return GestureDetector(
           onTap: () => toggleAttachmentOptionsOverlay(
               constraints: constraints,
+              messageAttachmentOptionsBuilder: messageAttachmentOptionsBuilder,
               context: context,
               tapDownDetails: tapDownDetails,
               attachmentOptions: attachmentOptions),
@@ -75,6 +79,9 @@ class TencentCloudChatMessageAttachmentOptions {
                     onTap: () {},
                     child: _buildAttachmentOptions(
                         constraints: constraints,
+                        context: context,
+                        messageAttachmentOptionsBuilder:
+                            messageAttachmentOptionsBuilder,
                         attachmentOptions: attachmentOptions),
                   ),
                 ),

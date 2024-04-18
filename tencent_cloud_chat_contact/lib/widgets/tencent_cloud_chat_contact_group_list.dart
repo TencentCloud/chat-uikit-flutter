@@ -1,7 +1,7 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:azlistview_all_platforms/azlistview_all_platforms.dart';
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/components/components_options/tencent_cloud_chat_message_options.dart';
+import 'package:tencent_cloud_chat/components/component_options/tencent_cloud_chat_message_options.dart';
 import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
 import 'package:tencent_cloud_chat/router/tencent_cloud_chat_navigator.dart';
@@ -10,7 +10,6 @@ import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/builders/tencent_cloud_chat_common_builders.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat_common.dart';
-import 'package:tencent_cloud_chat_contact/tencent_cloud_chat_contact_builders.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_azlist.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_leading.dart';
 
@@ -127,7 +126,7 @@ class TencentCloudChatContactGroupAzListState extends TencentCloudChatState<Tenc
       },
       susItemBuilder: (context, index) {
         ISuspensionBeanImpl tag = showList[index];
-        return TencentCloudChatContactBuilders.getContactGroupListTagBuilder(tag.getSuspensionTag(), tagCount[tag.getSuspensionTag()]);
+        return TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactGroupListTagBuilder(tag.getSuspensionTag(), tagCount[tag.getSuspensionTag()]);
       },
       susItemHeight: getSquareSize(30),
     ));
@@ -145,28 +144,17 @@ class TencentCloudChatContactGroupItem extends StatefulWidget {
 
 class TencentCloudChatContactGroupItemState extends TencentCloudChatState<TencentCloudChatContactGroupItem> {
   final isDesktop = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop;
-  navigateToChat() {
-    if (TencentCloudChat().dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.message)) {
-      if (isDesktop) {
-        TencentImSDKPlugin.v2TIMManager.emitUIKitEvent(
-          UIKitEvent(
-            type: "navigateToChat",
-            detail: Map<String, dynamic>.from({
-              "userID": null,
-              "groupID": widget.group.groupID,
-            }),
+  navigateToChat() async {
+    final tryUseOnNavigateToChat = await TencentCloudChat.instance.dataInstance.contact.contactEventHandlers?.uiEventHandlers.onNavigateToChat?.call(userID: null, groupID: widget.group.groupID) ?? false;
+    if(!tryUseOnNavigateToChat){
+      if (TencentCloudChat.instance.dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.message) && !isDesktop) {
+        navigateToMessage(
+          context: context,
+          options: TencentCloudChatMessageOptions(
+            userID: null,
+            groupID: widget.group.groupID,
           ),
         );
-      } else {
-        if (TencentCloudChat().dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.message)) {
-          navigateToMessage(
-            context: context,
-            options: TencentCloudChatMessageOptions(
-              userID: null,
-              groupID: widget.group.groupID,
-            ),
-          );
-        } else {}
       }
     }
   }
@@ -183,7 +171,7 @@ class TencentCloudChatContactGroupItemState extends TencentCloudChatState<Tencen
                       vertical: getHeight(7),
                       horizontal: getWidth(3),
                     ),
-                    child: Row(children: [TencentCloudChatContactBuilders.getContactGroupListItemAvatarBuilder(widget.group), TencentCloudChatContactBuilders.getContactGroupListItemContentBuilder(widget.group)]),
+                    child: Row(children: [TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactGroupListItemAvatarBuilder(widget.group), TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactGroupListItemContentBuilder(widget.group)]),
                   )),
             ));
   }

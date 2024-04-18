@@ -1,5 +1,9 @@
+import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_contact_config.dart';
+import 'package:tencent_cloud_chat/components/component_event_handlers/tencent_cloud_chat_contact_event_handlers.dart';
+import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_base_controller.dart';
 import 'package:tencent_cloud_chat/data/tencent_cloud_chat_data_abstract.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder.dart';
 
 /// An enumeration of contact data keys for TencentCloudChat Contact component
 enum TencentCloudChatContactDataKeys {
@@ -15,7 +19,10 @@ enum TencentCloudChatContactDataKeys {
   addFriendCode,
   deleteConversationCode,
   friendGroup,
-  groupApplicationList
+  groupApplicationList,
+  config,
+  eventHandlers,
+  builder,
 }
 
 /// A class that manages data for TencentCloudChat Contact component.
@@ -25,12 +32,41 @@ enum TencentCloudChatContactDataKeys {
 class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
   TencentCloudChatContactData(super.currentUpdatedFields);
 
+  /// === Config ===
+  TencentCloudChatContactConfig _contactConfig =
+      TencentCloudChatContactConfig();
+
+  TencentCloudChatContactConfig get contactConfig => _contactConfig;
+
+  set contactConfig(TencentCloudChatContactConfig value) {
+    _contactConfig = value;
+    notifyListener(TencentCloudChatContactDataKeys.config as T);
+  }
+
+  /// === Event Handlers ===
+  TencentCloudChatContactEventHandlers? contactEventHandlers;
+
+  /// === Contact Builder ===
+  TencentCloudChatComponentBuilder? _contactBuilder;
+
+  TencentCloudChatComponentBuilder? get contactBuilder => _contactBuilder;
+
+  set contactBuilder(TencentCloudChatComponentBuilder? value) {
+    _contactBuilder = value;
+    notifyListener(TencentCloudChatContactDataKeys.builder as T);
+  }
+
+  /// === Controller ===
+  TencentCloudChatComponentBaseController? contactController;
+
   /// === friend application list ===
   final List<V2TimFriendApplication> _applicationList = [];
 
-  void buildApplicationList(List<V2TimFriendApplication> applicationList, String action) {
+  void buildApplicationList(
+      List<V2TimFriendApplication> applicationList, String action) {
     for (var element in applicationList) {
-      var index = _applicationList.indexWhere((ele) => element.userID == ele.userID);
+      var index =
+          _applicationList.indexWhere((ele) => element.userID == ele.userID);
       if (index > -1) {
         _applicationList[index] = element;
       } else {
@@ -38,29 +74,34 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
       }
     }
     console(
-      logs: "$action buildApplicationList ${applicationList.length} changed. total application length is ${_applicationList.length}",
+      logs:
+          "$action buildApplicationList ${applicationList.length} changed. total application length is ${_applicationList.length}",
     );
     notifyListener(TencentCloudChatContactDataKeys.applicationList as T);
   }
 
   void deleteApplicationList(List<String> applicationList, String action) {
     for (String id in applicationList) {
-      var index = _applicationList.indexWhere((element) => element.userID == id);
+      var index =
+          _applicationList.indexWhere((element) => element.userID == id);
       if (index > -1) {
         _applicationList.removeAt(index);
       }
     }
     console(
-      logs: "$action buildApplicationList ${applicationList.length} changed. total application length is ${_applicationList.length}",
+      logs:
+          "$action buildApplicationList ${applicationList.length} changed. total application length is ${_applicationList.length}",
     );
     notifyListener(TencentCloudChatContactDataKeys.applicationList as T);
   }
 
   /// === friend response type ===
-  FriendResponseTypeEnum responseType = FriendResponseTypeEnum.V2TIM_FRIEND_ACCEPT_AGREE_AND_ADD;
+  FriendResponseTypeEnum responseType =
+      FriendResponseTypeEnum.V2TIM_FRIEND_ACCEPT_AGREE_AND_ADD;
 
   /// === friend application type ===
-  FriendApplicationTypeEnum applicationType = FriendApplicationTypeEnum.V2TIM_FRIEND_APPLICATION_COME_IN;
+  FriendApplicationTypeEnum applicationType =
+      FriendApplicationTypeEnum.V2TIM_FRIEND_APPLICATION_COME_IN;
 
   /// === handle application code and userID===
   int _applicationCode = 0;
@@ -77,7 +118,8 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
 
   void buildGroupList(List<V2TimGroupInfo> groupList, String action) {
     for (var element in groupList) {
-      var index = _groupList.indexWhere((ele) => element.groupID == ele.groupID);
+      var index =
+          _groupList.indexWhere((ele) => element.groupID == ele.groupID);
       if (index > -1) {
         _groupList[index] = element;
       } else {
@@ -117,7 +159,8 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
 
   void buildFriendList(List<V2TimFriendInfo> contactList, String action) {
     for (var element in contactList) {
-      var index = _contactList.indexWhere((ele) => element.userID == ele.userID);
+      var index =
+          _contactList.indexWhere((ele) => element.userID == ele.userID);
       if (index > -1) {
         _contactList[index] = element;
       } else {
@@ -125,7 +168,8 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
       }
     }
     console(
-      logs: "$action buildFriendList ${contactList.length} changed. total contactList length is ${_contactList.length}",
+      logs:
+          "$action buildFriendList ${contactList.length} changed. total contactList length is ${_contactList.length}",
     );
     notifyListener(TencentCloudChatContactDataKeys.contactList as T);
   }
@@ -212,7 +256,8 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
       }
     }
     console(
-      logs: "$action buildUserStatusList ${_userStatus.length} changed. total userStatus length is ${_userStatus.length}",
+      logs:
+          "$action buildUserStatusList ${_userStatus.length} changed. total userStatus length is ${_userStatus.length}",
     );
     notifyListener(TencentCloudChatContactDataKeys.userStatusList as T);
   }
@@ -240,9 +285,11 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
     notifyListener(TencentCloudChatContactDataKeys.blockList as T);
   }
 
-  void buildGroupApplicationList(List<V2TimGroupApplication> groupApplicationList, String action) {
+  void buildGroupApplicationList(
+      List<V2TimGroupApplication> groupApplicationList, String action) {
     for (var element in groupApplicationList) {
-      var index = _groupApplicationList.indexWhere((ele) => element.groupID == ele.groupID && element.fromUser == ele.fromUser);
+      var index = _groupApplicationList.indexWhere((ele) =>
+          element.groupID == ele.groupID && element.fromUser == ele.fromUser);
       if (index > -1) {
         _groupApplicationList[index] = element;
       } else {
@@ -262,7 +309,7 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
   @override
   void notifyListener(T key) {
     currentUpdatedFields = key;
-    TencentCloudChat.eventBusInstance.fire(this);
+    TencentCloudChat.instance.eventBusInstance.fire(this);
   }
 
   @override

@@ -7,7 +7,7 @@ enum TencentCloudChatComponents {
   groupProfile
 }
 
-/// A class that defines route names for TencentCloudChat.
+/// A class that defines route names for TencentCloudChat
 ///
 /// This class provides a set of constants that represent the route names
 /// for various components in the Chat UIKit. These route names can be used

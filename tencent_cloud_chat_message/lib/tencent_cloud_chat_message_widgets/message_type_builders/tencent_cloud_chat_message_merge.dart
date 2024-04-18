@@ -34,7 +34,7 @@ class _TencentCloudChatMessageMergeState extends TencentCloudChatMessageState<Te
   final String _tag = "TencentCloudChatMessageMerge";
 
   console(String log) {
-    TencentCloudChat.logInstance.console(
+    TencentCloudChat.instance.logInstance.console(
       componentName: _tag,
       logs: json.encode(
         {

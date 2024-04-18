@@ -1,19 +1,19 @@
 import 'dart:convert';
 
-import 'package:tencent_cloud_chat/chat_sdk/tencent_cloud_chat_sdk.dart';
 import 'package:tencent_cloud_chat/log/tencent_cloud_chat_log.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 
+class TencentCloudChatMessageSDKGenerator {
+  static TencentCloudChatMessageSDK getInstance() {
+    return TencentCloudChatMessageSDK._();
+  }
+}
+
 class TencentCloudChatMessageSDK {
   static const String _tag = "TencentCloudChatMessageSDK";
 
-  // Private constructor to implement the singleton pattern.
-  TencentCloudChatMessageSDK._internal();
-
-  // Factory constructor that returns the singleton instance of TencentCloudChatMessageSDK.
-  factory TencentCloudChatMessageSDK() => _instance;
-  static final TencentCloudChatMessageSDK _instance = TencentCloudChatMessageSDK._internal();
+  TencentCloudChatMessageSDK._();
 
   /// ==== Init data and the listener ====
   V2TimAdvancedMsgListener? advancedMsgListener;
@@ -29,8 +29,10 @@ class TencentCloudChatMessageSDK {
     OnRecvMessageExtensionsDeleted? onRecvMessageExtensionsDeleted,
     OnMessageDownloadProgressCallback? onMessageDownloadProgressCallback,
   }) {
-    if(advancedMsgListener != null){
-      TencentImSDKPlugin.v2TIMManager.getMessageManager().removeAdvancedMsgListener(listener: advancedMsgListener!);
+    if (advancedMsgListener != null) {
+      TencentImSDKPlugin.v2TIMManager
+          .getMessageManager()
+          .removeAdvancedMsgListener(listener: advancedMsgListener!);
       advancedMsgListener = null;
     }
     advancedMsgListener = V2TimAdvancedMsgListener(
@@ -40,12 +42,18 @@ class TencentCloudChatMessageSDK {
       onSendMessageProgress: onSendMessageProgress,
       onRecvMessageModified: onRecvMessageModified,
       onRecvMessageRevoked: onRecvMessageRevoked,
+      onRecvC2CReadReceipt: onRecvC2CReadReceipt,
+      onRecvMessageExtensionsChanged: onRecvMessageExtensionsChanged,
+      onRecvMessageExtensionsDeleted: onRecvMessageExtensionsDeleted,
     );
-    TencentImSDKPlugin.v2TIMManager.getMessageManager().addAdvancedMsgListener(listener: advancedMsgListener!);
+    TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .addAdvancedMsgListener(listener: advancedMsgListener!);
   }
 
   Future<V2TimMessageListResult> getHistoryMessageList({
-    HistoryMsgGetTypeEnum getType = HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
+    HistoryMsgGetTypeEnum getType =
+        HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
     String? userID,
     String? groupID,
     int lastMsgSeq = -1,
@@ -57,7 +65,9 @@ class TencentCloudChatMessageSDK {
     int? timePeriod,
     bool needCache = true,
   }) async {
-    final res = await TencentImSDKPlugin.v2TIMManager.getMessageManager().getHistoryMessageListV2(
+    final res = await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .getHistoryMessageListV2(
           count: count,
           getType: getType,
           userID: userID,
@@ -70,31 +80,38 @@ class TencentCloudChatMessageSDK {
           timePeriod: timePeriod,
         );
     final response = res.data;
-    TencentCloudChat.logInstance.console(
+    TencentCloudChat.instance.logInstance.console(
         componentName: 'GetHistoryMessageList',
-        logs: "getHistoryMessageListResult -- conv: ${groupID ?? userID} - needCount:$count - needCache: $needCache - ResultLength:${res.data?.messageList.length} - period: $timePeriod - begin: $timeBegin");
+        logs:
+            "getHistoryMessageListResult -- conv: ${groupID ?? userID} - needCount:$count - needCache: $needCache - ResultLength:${res.data?.messageList.length} - period: $timePeriod - begin: $timeBegin");
 
     if (res.code != 0 || response == null) {
-      var componentName = runtimeType.toString().replaceAll("TencentCloudChat", "");
-      TencentCloudChat.logInstance.console(
+      var componentName =
+          runtimeType.toString().replaceAll("TencentCloudChat", "");
+      TencentCloudChat.instance.logInstance.console(
         componentName: componentName,
         logs: "getHistoryMessageList - ${res.desc}",
         logLevel: TencentCloudChatLogLevel.error,
       );
     }
     if (needCache) {
-      if (TencentCloudChatUtils.checkString(lastMsgID) == null && timeBegin == null && lastMsgSeq == -1) {
+      if (TencentCloudChatUtils.checkString(lastMsgID) == null &&
+          timeBegin == null &&
+          lastMsgSeq == -1) {
         if (response != null) {
           if (response.messageList.isNotEmpty) {
             String key = userID == null ? "group_$groupID" : "c2c_$userID";
 
-            TencentCloudChat.cache.cacheMessageListByConvKey(response.messageList, key);
+            TencentCloudChat.instance.cache
+                .cacheMessageListByConvKey(response.messageList, key);
           }
         }
       }
     }
 
-    return (res.code == 0 && response != null) ? response : V2TimMessageListResult(isFinished: true, messageList: []);
+    return (res.code == 0 && response != null)
+        ? response
+        : V2TimMessageListResult(isFinished: true, messageList: []);
   }
 
   Future<V2TimMsgCreateInfoResult?> createTextMessage({
@@ -102,17 +119,22 @@ class TencentCloudChatMessageSDK {
     required List<String> mentionedUsers,
   }) async {
     final res = mentionedUsers.isNotEmpty
-        ? await TencentImSDKPlugin.v2TIMManager.getMessageManager().createTextAtMessage(
+        ? await TencentImSDKPlugin.v2TIMManager
+            .getMessageManager()
+            .createTextAtMessage(
               text: text,
               atUserList: mentionedUsers,
             )
-        : await TencentImSDKPlugin.v2TIMManager.getMessageManager().createTextMessage(text: text);
+        : await TencentImSDKPlugin.v2TIMManager
+            .getMessageManager()
+            .createTextMessage(text: text);
     if (res.code == 0) {
       final messageResult = res.data;
       return messageResult;
     }
-    var componentName = runtimeType.toString().replaceAll("TencentCloudChat", "");
-    TencentCloudChat.logInstance.console(
+    var componentName =
+        runtimeType.toString().replaceAll("TencentCloudChat", "");
+    TencentCloudChat.instance.logInstance.console(
       componentName: componentName,
       logs: "createTextMessage - ${res.desc}",
       logLevel: TencentCloudChatLogLevel.error,
@@ -124,13 +146,16 @@ class TencentCloudChatMessageSDK {
     required String imagePath,
     required String imageName,
   }) async {
-    final res = await TencentImSDKPlugin.v2TIMManager.getMessageManager().createImageMessage(imagePath: imagePath, imageName: imageName);
+    final res = await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .createImageMessage(imagePath: imagePath, imageName: imageName);
     if (res.code == 0) {
       final messageResult = res.data;
       return messageResult;
     }
-    var componentName = runtimeType.toString().replaceAll("TencentCloudChat", "");
-    TencentCloudChat.logInstance.console(
+    var componentName =
+        runtimeType.toString().replaceAll("TencentCloudChat", "");
+    TencentCloudChat.instance.logInstance.console(
       componentName: componentName,
       logs: "createImageMessage - ${res.desc}",
       logLevel: TencentCloudChatLogLevel.error,
@@ -142,13 +167,16 @@ class TencentCloudChatMessageSDK {
     required String filePath,
     required String fileName,
   }) async {
-    final res = await TencentImSDKPlugin.v2TIMManager.getMessageManager().createFileMessage(filePath: filePath, fileName: fileName);
+    final res = await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .createFileMessage(filePath: filePath, fileName: fileName);
     if (res.code == 0) {
       final messageResult = res.data;
       return messageResult;
     }
-    var componentName = runtimeType.toString().replaceAll("TencentCloudChat", "");
-    TencentCloudChat.logInstance.console(
+    var componentName =
+        runtimeType.toString().replaceAll("TencentCloudChat", "");
+    TencentCloudChat.instance.logInstance.console(
       componentName: componentName,
       logs: "createFileMessage - ${res.desc}",
       logLevel: TencentCloudChatLogLevel.error,
@@ -162,7 +190,9 @@ class TencentCloudChatMessageSDK {
     required String snapshotPath,
     required int duration,
   }) async {
-    final res = await TencentImSDKPlugin.v2TIMManager.getMessageManager().createVideoMessage(
+    final res = await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .createVideoMessage(
           videoFilePath: videoFilePath,
           type: type,
           duration: duration,
@@ -172,8 +202,9 @@ class TencentCloudChatMessageSDK {
       final messageResult = res.data;
       return messageResult;
     }
-    var componentName = runtimeType.toString().replaceAll("TencentCloudChat", "");
-    TencentCloudChat.logInstance.console(
+    var componentName =
+        runtimeType.toString().replaceAll("TencentCloudChat", "");
+    TencentCloudChat.instance.logInstance.console(
       componentName: componentName,
       logs: "createVideoMessage - ${res.desc}",
       logLevel: TencentCloudChatLogLevel.error,
@@ -185,7 +216,9 @@ class TencentCloudChatMessageSDK {
     required String voicePath,
     required int duration,
   }) async {
-    final res = await TencentImSDKPlugin.v2TIMManager.getMessageManager().createSoundMessage(
+    final res = await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .createSoundMessage(
           duration: duration,
           soundPath: voicePath,
         );
@@ -193,8 +226,9 @@ class TencentCloudChatMessageSDK {
       final messageResult = res.data;
       return messageResult;
     }
-    var componentName = runtimeType.toString().replaceAll("TencentCloudChat", "");
-    TencentCloudChat.logInstance.console(
+    var componentName =
+        runtimeType.toString().replaceAll("TencentCloudChat", "");
+    TencentCloudChat.instance.logInstance.console(
       componentName: componentName,
       logs: "createVoiceMessage - ${res.desc}",
       logLevel: TencentCloudChatLogLevel.error,
@@ -205,13 +239,16 @@ class TencentCloudChatMessageSDK {
   Future<V2TimMsgCreateInfoResult?> createForwardIndividuallyMessage({
     required String msgID,
   }) async {
-    final res = await TencentImSDKPlugin.v2TIMManager.getMessageManager().createForwardMessage(msgID: msgID);
+    final res = await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .createForwardMessage(msgID: msgID);
     if (res.code == 0) {
       final messageResult = res.data;
       return messageResult;
     }
-    var componentName = runtimeType.toString().replaceAll("TencentCloudChat", "");
-    TencentCloudChat.logInstance.console(
+    var componentName =
+        runtimeType.toString().replaceAll("TencentCloudChat", "");
+    TencentCloudChat.instance.logInstance.console(
       componentName: componentName,
       logs: "createForwardIndividuallyMessage - ${res.desc}",
       logLevel: TencentCloudChatLogLevel.error,
@@ -225,7 +262,9 @@ class TencentCloudChatMessageSDK {
     required List<String> abstractList,
     required String compatibleText,
   }) async {
-    final res = await TencentImSDKPlugin.v2TIMManager.getMessageManager().createMergerMessage(
+    final res = await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .createMergerMessage(
           msgIDList: msgIDList,
           title: title,
           abstractList: abstractList,
@@ -235,8 +274,9 @@ class TencentCloudChatMessageSDK {
       final messageResult = res.data;
       return messageResult;
     }
-    var componentName = runtimeType.toString().replaceAll("TencentCloudChat", "");
-    TencentCloudChat.logInstance.console(
+    var componentName =
+        runtimeType.toString().replaceAll("TencentCloudChat", "");
+    TencentCloudChat.instance.logInstance.console(
       componentName: componentName,
       logs: "createForwardCombinedMessage - ${res.desc}",
       logLevel: TencentCloudChatLogLevel.error,
@@ -256,19 +296,21 @@ class TencentCloudChatMessageSDK {
     String? cloudCustomData,
     String? localCustomData,
   }) async {
-    final result = await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendMessage(
-          id: id,
-          receiver: userID ?? "",
-          groupID: groupID ?? "",
-          priority: priority,
-          onlineUserOnly: onlineUserOnly,
-          offlinePushInfo: offlinePushInfo,
-          needReadReceipt: needReadReceipt,
-          localCustomData: localCustomData,
-          cloudCustomData: cloudCustomData,
-        );
-    var componentName = runtimeType.toString().replaceAll("TencentCloudChat", "");
-    TencentCloudChat.logInstance.console(
+    final result =
+        await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendMessage(
+              id: id,
+              receiver: userID ?? "",
+              groupID: groupID ?? "",
+              priority: priority,
+              onlineUserOnly: onlineUserOnly,
+              offlinePushInfo: offlinePushInfo,
+              needReadReceipt: needReadReceipt,
+              localCustomData: localCustomData,
+              cloudCustomData: cloudCustomData,
+            );
+    var componentName =
+        runtimeType.toString().replaceAll("TencentCloudChat", "");
+    TencentCloudChat.instance.logInstance.console(
       componentName: componentName,
       logs: "sendMessage - ${result.desc}",
       logLevel: TencentCloudChatLogLevel.error,
@@ -276,15 +318,18 @@ class TencentCloudChatMessageSDK {
     return result;
   }
 
-  static Future<V2TimMessageOnlineUrl?> getMessageOnlineUrl({
+  Future<V2TimMessageOnlineUrl?> getMessageOnlineUrl({
     required String msgID,
   }) async {
-    V2TimValueCallback<V2TimMessageOnlineUrl> urlRes = await TencentCloudChatSDK.manager.getMessageManager().getMessageOnlineUrl(msgID: msgID);
+    V2TimValueCallback<V2TimMessageOnlineUrl> urlRes = await TencentCloudChat
+        .instance.chatSDKInstance.manager
+        .getMessageManager()
+        .getMessageOnlineUrl(msgID: msgID);
 
     if (urlRes.code == 0) {
       return urlRes.data;
     }
-    TencentCloudChat.logInstance.console(
+    TencentCloudChat.instance.logInstance.console(
       componentName: _tag,
       logs: "get message online url failed . res is ${urlRes.toJson()}",
       logLevel: TencentCloudChatLogLevel.error,
@@ -299,7 +344,8 @@ class TencentCloudChatMessageSDK {
 
     for (final message in messages) {
       // Step 1: Modify Message
-      final originCloudCustomDataString = TencentCloudChatUtils.checkString(message.cloudCustomData) ?? "{}";
+      final originCloudCustomDataString =
+          TencentCloudChatUtils.checkString(message.cloudCustomData) ?? "{}";
       dynamic cloudCustomData;
       try {
         cloudCustomData = jsonDecode(originCloudCustomDataString);
@@ -309,9 +355,12 @@ class TencentCloudChatMessageSDK {
 
       cloudCustomData["deleteForEveryone"] = true;
       message.cloudCustomData = jsonEncode(cloudCustomData);
-      V2TimValueCallback<V2TimMessageChangeInfo> modifyMessageRes = await TencentImSDKPlugin.v2TIMManager.getMessageManager().modifyMessage(message: message);
+      V2TimValueCallback<V2TimMessageChangeInfo> modifyMessageRes =
+          await TencentImSDKPlugin.v2TIMManager
+              .getMessageManager()
+              .modifyMessage(message: message);
 
-      TencentCloudChat.logInstance.console(
+      TencentCloudChat.instance.logInstance.console(
         componentName: _tag,
         logs: "deleteMessageForEveryone - ${modifyMessageRes.desc}",
         logLevel: TencentCloudChatLogLevel.error,
@@ -321,7 +370,9 @@ class TencentCloudChatMessageSDK {
       }
 
       // Step 2: Recall Message
-      final revokeRes = await TencentImSDKPlugin.v2TIMManager.getMessageManager().revokeMessage(msgID: message.msgID ?? "");
+      final revokeRes = await TencentImSDKPlugin.v2TIMManager
+          .getMessageManager()
+          .revokeMessage(msgID: message.msgID ?? "");
       if (modifyMessageRes.code != 0 && revokeRes.code == 0) {
         resultList.add(message);
       }
@@ -339,12 +390,15 @@ class TencentCloudChatMessageSDK {
   Future<V2TimCallback?> deleteMessagesForMe({
     required List<String> msgIDs,
   }) async {
-    V2TimCallback deleteMessagesRes = await TencentImSDKPlugin.v2TIMManager.getMessageManager().deleteMessages(
+    V2TimCallback deleteMessagesRes = await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .deleteMessages(
       msgIDs: msgIDs,
       webMessageInstanceList: [],
     );
-    var componentName = runtimeType.toString().replaceAll("TencentCloudChat", "");
-    TencentCloudChat.logInstance.console(
+    var componentName =
+        runtimeType.toString().replaceAll("TencentCloudChat", "");
+    TencentCloudChat.instance.logInstance.console(
       componentName: componentName,
       logs: "deleteMessagesForMe - ${deleteMessagesRes.desc}",
       logLevel: TencentCloudChatLogLevel.error,
@@ -355,26 +409,35 @@ class TencentCloudChatMessageSDK {
   Future<V2TimValueCallback<List<V2TimMessage>>> findMessages({
     required List<String> msgIds,
   }) async {
-    return await TencentImSDKPlugin.v2TIMManager.getMessageManager().findMessages(messageIDList: msgIds);
+    return await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .findMessages(messageIDList: msgIds);
   }
 
-  static Future<V2TimValueCallback<V2TimMessageListResult>> getLocalMessageByElemType({
+  Future<V2TimValueCallback<V2TimMessageListResult>> getLocalMessageByElemType({
     required String lastMsgId,
     bool? isNewer,
     required int convType,
     required String convKey,
   }) async {
-    return await TencentImSDKPlugin.v2TIMManager.getMessageManager().getHistoryMessageListV2(
+    return await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .getHistoryMessageListV2(
           groupID: convType == ConversationType.V2TIM_GROUP ? convKey : null,
           userID: convType == ConversationType.V2TIM_C2C ? convKey : null,
           count: 10,
-          messageTypeList: [MessageElemType.V2TIM_ELEM_TYPE_IMAGE, MessageElemType.V2TIM_ELEM_TYPE_VIDEO],
+          messageTypeList: [
+            MessageElemType.V2TIM_ELEM_TYPE_IMAGE,
+            MessageElemType.V2TIM_ELEM_TYPE_VIDEO
+          ],
           lastMsgID: lastMsgId,
-          getType: isNewer == true ? HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_NEWER_MSG : HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
+          getType: isNewer == true
+              ? HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_NEWER_MSG
+              : HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
         );
   }
 
-  static Future<void> setLocalCustomData({
+  Future<void> setLocalCustomData({
     required String msgID,
     required String key,
     required String value,
@@ -390,9 +453,10 @@ class TencentCloudChatMessageSDK {
         var current = json.decode(currentValue);
         data.addAll(current as Map<String, dynamic>);
       } catch (err) {
-        TencentCloudChat.logInstance.console(
+        TencentCloudChat.instance.logInstance.console(
           componentName: _tag,
-          logs: "decode current localCustomData failed. current value is $currentValue please check. $err",
+          logs:
+              "decode current localCustomData failed. current value is $currentValue please check. $err",
           logLevel: TencentCloudChatLogLevel.error,
         );
       }
@@ -410,30 +474,38 @@ class TencentCloudChatMessageSDK {
           localCustomData: local,
         )
         .then((res) {
-      TencentCloudChat().dataInstance.messageData.updateLocalCustomDataInMemory(
-            msgID: currentMemoreyMsgId,
-            data: local,
-            key: convKey,
-            convType: convType,
-          );
-      TencentCloudChat.logInstance.console(
+      TencentCloudChat.instance.dataInstance.messageData
+          .updateLocalCustomDataInMemory(
+        msgID: currentMemoreyMsgId,
+        data: local,
+        key: convKey,
+        convType: convType,
+      );
+      TencentCloudChat.instance.logInstance.console(
         componentName: _tag,
-        logs: "$msgID set localCustomData finish key:$key value:$value setType:$setType all data is ${json.encode(data)}",
+        logs:
+            "$msgID set localCustomData finish key:$key value:$value setType:$setType all data is ${json.encode(data)}",
         logLevel: TencentCloudChatLogLevel.debug,
       );
     });
   }
 
-  static Future<List<V2TimMessage>> getMergeMessages({required String msgID}) async {
-    V2TimValueCallback<List<V2TimMessage>> res = await TencentImSDKPlugin.v2TIMManager.getMessageManager().downloadMergerMessage(msgID: msgID);
+  Future<List<V2TimMessage>> getMergeMessages({required String msgID}) async {
+    V2TimValueCallback<List<V2TimMessage>> res = await TencentImSDKPlugin
+        .v2TIMManager
+        .getMessageManager()
+        .downloadMergerMessage(msgID: msgID);
     if (res.code == 0) {
       return res.data ?? [];
     }
     return [];
   }
 
-  static Future<V2TimCallback> clearC2CHistoryMessage({required String userID}) async {
-    V2TimCallback clearC2CHistoryMessageRes = await TencentImSDKPlugin.v2TIMManager.getMessageManager().clearC2CHistoryMessage(userID: userID);
+  Future<V2TimCallback> clearC2CHistoryMessage({required String userID}) async {
+    V2TimCallback clearC2CHistoryMessageRes = await TencentImSDKPlugin
+        .v2TIMManager
+        .getMessageManager()
+        .clearC2CHistoryMessage(userID: userID);
     return clearC2CHistoryMessageRes;
   }
 }

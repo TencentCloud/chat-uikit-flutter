@@ -1,14 +1,8 @@
-import 'dart:convert';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_contact_sdk.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_conversation_sdk.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_group_sdk.dart';
-import 'package:tencent_cloud_chat/chat_sdk/tencent_cloud_chat_sdk.dart';
-import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
-import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
+import 'package:tencent_cloud_chat/controller/tencent_cloud_chat_controller_utils.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
-import 'package:tencent_cloud_chat/data/tencent_cloud_chat_data.dart';
 import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat/data/theme/tencent_cloud_chat_theme.dart';
 import 'package:tencent_cloud_chat/models/tencent_cloud_chat_callbacks.dart';
@@ -16,7 +10,15 @@ import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_uikit_core/tencent_cloud_uikit_core.dart';
 
+class TencentCloudChatCoreControllerGenerator {
+  static TencentCloudChatCoreController getInstance() {
+    return TencentCloudChatCoreController._();
+  }
+}
+
 class TencentCloudChatCoreController {
+  TencentCloudChatCoreController._();
+
   static bool hasInitialized = false;
 
   /// Initializes the Tencent Cloud Chat with the given configuration.
@@ -25,129 +27,69 @@ class TencentCloudChatCoreController {
   /// internationalization, theme configuration, component registration, and SDK initialization.
   /// It also logs in to the Tencent Cloud Chat server with the provided user ID and signature.
   ///
-  /// [context]: The BuildContext for the app.
   /// [config]: The general configuration for Tencent Cloud Chat.
   /// [options]: The initial options for Tencent Cloud Chat, including user ID, user signature, and SDKAppID.
+  /// [callbacks]: The callbacks module used for managing SDK events, SDK API errors and specific UIKit events that demand user attention.
+  /// [components]: The modular UI components related settings, taking effects on a global scale.
+  /// [plugins]: The list of the used plugins, such as tencent_cloud_chat_robot, etc. For specific usage, please refer to the README of each plugin.
   Future<void> initUIKit({
-    required BuildContext context,
-    required TencentCloudChatConfig config,
+    @Deprecated(
+        "Passing in `context` is no longer required and will be removed in a future version")
+    BuildContext? context,
     required TencentCloudChatInitOptions options,
+    required TencentCloudChatInitComponentsRelated components,
+    TencentCloudChatConfig? config,
     TencentCloudChatCallbacks? callbacks,
     List<TencentCloudChatPluginItem>? plugins,
   }) async {
-    final TencentCloudChatCallbacks tencentCloudChatCallbacks = callbacks ?? TencentCloudChatCallbacks();
-    tencentCloudChatCallbacks.activateCallbackModule();
-    TencentCloudChat().callbacks = tencentCloudChatCallbacks;
-
     if (!hasInitialized) {
       hasInitialized = true;
+      TencentCloudChatControllerUtils.initCallbacks(callbacks);
 
       // Initialize theme
       TencentCloudChatTheme.init(
-        context: context,
-        themeModel: config.themeConfig,
-        brightness: config.brightness,
+        themeModel: config?.themeConfig,
+        brightness: config?.brightness,
       );
 
-      // Register components to routing table
-      for (final func in config.usedComponentsRegister) {
-        final ({TencentCloudChatComponentsEnum componentEnum, TencentCloudChatWidgetBuilder widgetBuilder}) component = func();
-        TencentCloudChat().dataInstance.basic.addUsedComponent(component);
+      if (config?.userConfig != null) {
+        TencentCloudChat.instance.dataInstance.basic
+            .updateUseUserOnlineStatus(config!.userConfig!);
       }
 
-      await TencentCloudChat.cache.init(sdkAppID: options.sdkAppID, currentLoginUserId: options.userID);
+      TencentCloudChatControllerUtils.initComponents(components);
 
-      List<V2TimConversation> convList = TencentCloudChat.cache.getConversationListFromCache();
+      await TencentCloudChat.instance.cache
+          .init(sdkAppID: options.sdkAppID, currentLoginUserId: options.userID);
 
-      if (convList.isNotEmpty) {
-        TencentCloudChat().dataInstance.conversation.updateIsGetDataEnd(true);
-        TencentCloudChat().dataInstance.conversation.conversationList = convList;
-        TencentCloudChat().dataInstance.conversation.buildConversationList(convList, "getConversationListFromCache");
-      }
-
-      List<String> convKey = TencentCloudChat.cache.getAllConvKey();
-
-      if (convKey.isNotEmpty) {
-        for (var i = 0; i < convKey.length; i++) {
-          var keyItem = convKey[i];
-          var messageList = TencentCloudChat.cache.getMessageListByConvKey(keyItem);
-          TencentCloudChat().dataInstance.messageData.updateMessageList(messageList: messageList, userID: keyItem.contains("c2c_") ? keyItem : null, groupID: keyItem.contains("group_") ? keyItem : null);
-        }
-      }
-
-      // Initialize Tencent Cloud Chat SDK
-      await TencentCloudChat.chatSDKInstance.initSDK(
-        sdkAppID: options.sdkAppID,
-        sdkListener: options.sdkListener,
-        logLevel: LogLevelEnum.V2TIM_LOG_NONE,
+      final completer = Completer<void>();
+      await TUILogin.instance.login(
+        options.sdkAppID,
+        options.userID,
+        options.userSig,
+        TUICallback(
+          onSuccess: () async {
+            TencentCloudChatControllerUtils.cacheEnvData(options.userID);
+            TencentCloudChatControllerUtils.initCallService();
+            TencentCloudChatControllerUtils.initPreloadData();
+            TencentCloudChatControllerUtils.initPlugins(plugins);
+            completer.complete();
+            return;
+          },
+          onError: (int code, String message) {
+            completer.complete();
+            return;
+          },
+        ),
+        TencentCloudChat.instance.callbacks?.onSDKEvent ?? options.sdkListener,
       );
 
-      // Log in to Tencent Cloud Chat Server
-      TencentCloudChat.logInstance.console(
+      TencentCloudChat.instance.logInstance.console(
         componentName: "TencentCloudChatCoreController",
-        logs: "The uikit components currently used are ${TencentCloudChat().dataInstance.basic.usedComponents}",
+        logs:
+            "The uikit components currently used are ${TencentCloudChat.instance.dataInstance.basic.usedComponents}",
       );
-
-      // Set the config for each components
-      if (config.messageConfig != null) {
-        TencentCloudChat().dataInstance.basic.messageConfig = config.messageConfig!;
-      }
-      if (config.userConfig != null) {
-        TencentCloudChat().dataInstance.basic.updateUseUserOnlineStatus(config.userConfig!);
-      }
-
-      // Login TencentCloudChat SDK
-      final loginRes = await TencentCloudChat.chatSDKInstance.login(userID: options.userID, userSig: options.userSig);
-
-      if (loginRes == true) {
-        if (plugins != null) {
-          for (var i = 0; i < plugins.length; i++) {
-            var plugin = plugins[i];
-            await plugin.pluginInstance.init(json.encode(plugin.initData));
-            TencentCloudChat().dataInstance.basic.addPlugin(plugin);
-          }
-        }
-
-        if (TencentCloudChatPlatformAdapter().isMobile) {
-          TUICore.instance.getService(TUICALLKIT_SERVICE_NAME).then((value) {
-            TencentCloudChat().dataInstance.basic.useCallKit = value;
-          });
-        }
-
-        final result = await TencentImSDKPlugin.v2TIMManager.getUsersInfo(userIDList: [options.userID]);
-
-        if (result.code == 0 && result.data != null) {
-          // TencentCloudChat().dataInstance.basic.currentUser = result.data!.first;
-          TencentCloudChat().dataInstance.basic.updateCurrentUserInfo(userFullInfo: result.data!.first);
-        }
-
-        V2TimValueCallback<String> versionRes = await TencentImSDKPlugin.v2TIMManager.getVersion();
-        if (versionRes.code == 0) {
-          TencentCloudChat().dataInstance.basic.updateVersion(version: versionRes.data ?? "");
-        }
-
-        TencentCloudChatConversationSDK.getConversationList(seq: "0");
-
-        try {
-          await TencentCloudChatConversationSDK.subscribeUnreadMessageCountByFilter();
-        } catch (e) {
-          debugPrint(e.toString());
-        }
-
-        TencentCloudChatConversationSDK.addConversationListener();
-
-        TencentCloudChatContactSDK.addFriendListener();
-
-        TencentCloudChatGroupSDK.addGroupListener();
-
-        TencentCloudChatContactSDK.getFriendList();
-
-        TencentCloudChatContactSDK.getFriendApplicationList();
-
-        TencentCloudChatContactSDK.getBlackList();
-
-        TencentCloudChatContactSDK.getGroupList();
-      }
+      return completer.future;
     }
     return;
   }
@@ -163,31 +105,46 @@ class TencentCloudChatCoreController {
   }) async {
     bool logoutSuccess = !shouldLogout;
     if (shouldLogout) {
-      try {
-        await TencentCloudChatSDK.logout();
-        logoutSuccess = true;
-      } catch (e) {
-        logoutSuccess = false;
-      }
+      final completer = Completer<bool>();
+      await TUILogin.instance.logout(TUICallback(
+        onSuccess: () async {
+          hasInitialized = false;
+          TencentCloudChat.instance.reset();
+          logoutSuccess = true;
+          completer.complete(logoutSuccess);
+        },
+        onError: (int code, String message) {
+          logoutSuccess = false;
+          completer.complete(logoutSuccess);
+        },
+      ));
+      return completer.future;
+    } else {
+      TencentImSDKPlugin.v2TIMManager.unInitSDK();
+      TUICore.instance.notifyEvent(logoutSuccessEvent);
     }
-    hasInitialized = false;
-    TencentCloudChat().reset();
     return logoutSuccess;
   }
 
   /// Log out the current user from the Tencent Cloud Chat service.
   /// If the logout is unsuccessful, the UIKit will not be reset.
   Future<bool> logout() async {
-    final res = await TencentCloudChatSDK.logout();
-    if (res) {
-      resetUIKit();
-    }
-    return res;
+    await TUILogin.instance.logout(TUICallback(
+      onSuccess: () async {
+        resetUIKit();
+        return;
+      },
+      onError: (int code, String message) {
+        return;
+      },
+    ));
+    return true;
   }
 
   /// Toggles the brightness mode between light and dark.
   void toggleBrightnessMode({Brightness? brightness}) {
-    TencentCloudChatData.theme.toggleBrightnessMode(brightness: brightness);
+    TencentCloudChat.instance.dataInstance.theme
+        .toggleBrightnessMode(brightness: brightness);
   }
 
   /// Returns a ThemeData instance based on the current brightness and configuration.
@@ -197,7 +154,11 @@ class TencentCloudChatCoreController {
     bool needTextTheme = true,
     bool needColorScheme = true,
   }) {
-    return TencentCloudChatData.theme.getThemeData(context: context, brightness: brightness, needColorScheme: needColorScheme, needTextTheme: needTextTheme);
+    return TencentCloudChat.instance.dataInstance.theme.getThemeData(
+        context: context,
+        brightness: brightness,
+        needColorScheme: needColorScheme,
+        needTextTheme: needTextTheme);
   }
 
   /// Sets the theme colors for the specified brightness.
@@ -205,17 +166,20 @@ class TencentCloudChatCoreController {
     required Brightness brightness,
     required TencentCloudChatThemeColors themeColors,
   }) {
-    TencentCloudChatData.theme.setThemeColors(brightness: brightness, themeColors: themeColors);
+    TencentCloudChat.instance.dataInstance.theme
+        .setThemeColors(brightness: brightness, themeColors: themeColors);
   }
 
   /// Sets the brightness mode
   setBrightnessMode(Brightness value) {
-    TencentCloudChatData.theme.brightness = value;
+    TencentCloudChat.instance.dataInstance.theme.brightness = value;
   }
 
   /// Get the current conversation total unread count
   hasConversationUnreadCount() {
-    return TencentCloudChat().dataInstance.conversation.totalUnreadCount > 0;
+    return TencentCloudChat
+            .instance.dataInstance.conversation.totalUnreadCount >
+        0;
   }
 
   void initGlobalAdapterInBuildPhase(BuildContext context) {

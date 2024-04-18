@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_contact_sdk.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
@@ -83,7 +82,7 @@ class TencentCloudChatContactAddGroupBodyState extends TencentCloudChatState<Ten
   }
 
   Widget beforeSearch() {
-    // String userID = TencentCloudChat().dataInstance.basic.currentUser!.userID ?? "";
+    // String userID = TencentCloudChat.instance.dataInstance.basic.currentUser!.userID ?? "";
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Column(
               children: [
@@ -126,7 +125,7 @@ class TencentCloudChatContactAddGroupBodyState extends TencentCloudChatState<Ten
   List<V2TimGroupInfo> groupList = [];
 
   _onSearchGroup() async {
-    List<V2TimGroupInfo> list = await TencentCloudChatContactSDK.getGroupsInfo([searchID]);
+    List<V2TimGroupInfo> list = await TencentCloudChat.instance.chatSDKInstance.contactSDK.getGroupsInfo([searchID]);
     safeSetState(() {
       groupList = list;
     });

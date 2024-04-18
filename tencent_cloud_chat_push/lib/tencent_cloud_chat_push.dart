@@ -5,13 +5,13 @@ import 'package:tencent_cloud_chat_push/common/common_defines.dart';
 import 'package:tencent_cloud_chat_push/common/defines.dart';
 import 'package:tencent_cloud_chat_push/tencent_cloud_chat_push_platform_interface.dart';
 import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
-import 'package:tencent_cloud_uikit_core/tencent_cloud_uikit_core.dart';
 
 class TencentCloudChatPush {
   TencentCloudChatPush._internal();
 
   factory TencentCloudChatPush() => _instance;
-  static final TencentCloudChatPush _instance = TencentCloudChatPush._internal();
+  static final TencentCloudChatPush _instance =
+      TencentCloudChatPush._internal();
 
   // static TencentCloudChatPush get getInstance => _instance;
 
@@ -28,9 +28,11 @@ class TencentCloudChatPush {
   /// it suitable for scenarios where the app needs to handle notification clicks
   /// before Tencent Cloud Chat SDK login is completed.
   Future<TencentCloudChatPushResult> registerOnNotificationClickedEvent({
-    required Function({required String ext, String? userID, String? groupID}) onNotificationClicked,
+    required Function({required String ext, String? userID, String? groupID})
+        onNotificationClicked,
   }) {
-    return TencentCloudChatPushPlatform.instance.registerOnNotificationClickedEvent(
+    return TencentCloudChatPushPlatform.instance
+        .registerOnNotificationClickedEvent(
       onNotificationClicked: onNotificationClicked,
     );
   }
@@ -58,12 +60,14 @@ class TencentCloudChatPush {
   /// user wishes to receive them. Once the callback is registered, the app will
   /// receive notification click events.
   Future<TencentCloudChatPushResult> registerPush({
-    required Function({required String ext, String? userID, String? groupID}) onNotificationClicked,
+    required Function({required String ext, String? userID, String? groupID})
+        onNotificationClicked,
     String? androidPushOEMConfig,
     int? apnsCertificateID,
   }) async {
     if (apnsCertificateID != null) {
-      await TencentCloudChatPushPlatform.instance.setBusID(busID: apnsCertificateID);
+      await TencentCloudChatPushPlatform.instance
+          .setBusID(busID: apnsCertificateID);
     }
     final loginMap = TencentImSDKPlugin.v2TIMManager.getCurrentLoginInfo();
     final int? sdkAppID = int.tryParse(loginMap["a"] ?? "");
@@ -73,41 +77,31 @@ class TencentCloudChatPush {
     if (sdkAppID == null) {
       return TencentCloudChatPushResult(
         code: -1,
-        errorMessage: "Please initialize Tencent Cloud Chat SDK before register push plugin.",
+        errorMessage:
+            "Please initialize Tencent Cloud Chat SDK before register push plugin.",
       );
     }
     if (userID == null || userSig == null) {
       return TencentCloudChatPushResult(
         code: -1,
-        errorMessage: "Please log in to Tencent Cloud Chat SDK before register push plugin.",
+        errorMessage:
+            "Please log in to Tencent Cloud Chat SDK before register push plugin.",
       );
     }
 
     final completer = Completer<TencentCloudChatPushResult>();
 
-    TUILogin.instance.login(
-      sdkAppID,
-      userID,
-      userSig,
-      TUICallback(
-        onSuccess: () async {
-          final registerOnNotificationClickedEventRes = await TencentCloudChatPushPlatform.instance.registerOnNotificationClickedEvent(
-            onNotificationClicked: onNotificationClicked,
-          );
-          if (registerOnNotificationClickedEventRes.code == 0) {
-            final registerPushRes = await TencentCloudChatPushPlatform.instance.registerPush(configJson: androidPushOEMConfig);
-            completer.complete(registerPushRes);
-            return;
-          }
-          completer.complete(registerOnNotificationClickedEventRes);
-          return;
-        },
-        onError: (int code, String message) {
-          completer.completeError(TencentCloudChatPushResult(code: code, errorMessage: message));
-          return;
-        },
-      ),
+    final registerOnNotificationClickedEventRes =
+        await TencentCloudChatPushPlatform.instance
+            .registerOnNotificationClickedEvent(
+      onNotificationClicked: onNotificationClicked,
     );
+    if (registerOnNotificationClickedEventRes.code == 0) {
+      final registerPushRes = await TencentCloudChatPushPlatform.instance
+          .registerPush(configJson: androidPushOEMConfig);
+      completer.complete(registerPushRes);
+    }
+    completer.complete(registerOnNotificationClickedEventRes);
 
     return completer.future;
   }
@@ -136,13 +130,15 @@ class TencentCloudChatPush {
   }
 
   /// Set the push brand ID for the push plugin
-  Future<TencentCloudChatPushResult> setPushBrandId({required TencentCloudChatPushBrandID brandID}) {
+  Future<TencentCloudChatPushResult> setPushBrandId(
+      {required TencentCloudChatPushBrandID brandID}) {
     return TencentCloudChatPushPlatform.instance.setPushBrandId(
       brandId: brandIdToInt(brandID),
     );
   }
 
-  Future<TencentCloudChatPushResult<TencentCloudChatPushBrandID>> getPushBrandId() async {
+  Future<TencentCloudChatPushResult<TencentCloudChatPushBrandID>>
+      getPushBrandId() async {
     final result = await TencentCloudChatPushPlatform.instance.getPushBrandId();
     final brandId = intToBrandId(result.data ?? 0);
     return TencentCloudChatPushResult<TencentCloudChatPushBrandID>(
@@ -152,22 +148,28 @@ class TencentCloudChatPush {
     );
   }
 
-  Future<TencentCloudChatPushResult<String>> checkPushStatus({required TencentCloudChatPushBrandID brandID}) {
-    return TencentCloudChatPushPlatform.instance.checkPushStatus(brandID: brandIdToInt(brandID));
+  Future<TencentCloudChatPushResult<String>> checkPushStatus(
+      {required TencentCloudChatPushBrandID brandID}) {
+    return TencentCloudChatPushPlatform.instance
+        .checkPushStatus(brandID: brandIdToInt(brandID));
   }
 
   /// Set the Certificate ID for Apple Devices.
   ///
   /// Only works on APNS temporarily, while Android Devices please specify with JSON file from console or `androidPushOEMConfig` on `registerPush` method.
-  Future<TencentCloudChatPushResult> setApnsCertificateID({required int apnsCertificateID}) {
-    return TencentCloudChatPushPlatform.instance.setBusID(busID: apnsCertificateID);
+  Future<TencentCloudChatPushResult> setApnsCertificateID(
+      {required int apnsCertificateID}) {
+    return TencentCloudChatPushPlatform.instance
+        .setBusID(busID: apnsCertificateID);
   }
 
   /// Set the application group ID for Apple Devices.
   ///
   /// Only works on APNS.
-  Future<TencentCloudChatPushResult> setApplicationGroupID({required String applicationGroupID}) {
-    return TencentCloudChatPushPlatform.instance.setApplicationGroupID(applicationGroupID: applicationGroupID);
+  Future<TencentCloudChatPushResult> setApplicationGroupID(
+      {required String applicationGroupID}) {
+    return TencentCloudChatPushPlatform.instance
+        .setApplicationGroupID(applicationGroupID: applicationGroupID);
   }
 
   /// Get the device push token.

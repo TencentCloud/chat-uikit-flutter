@@ -3,6 +3,12 @@ import 'dart:async';
 import 'package:tencent_cloud_chat/log/tencent_cloud_chat_log.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 
+class TencentCloudChatEventBusGenerator {
+  static TencentCloudChatEventBus getInstance() {
+    return TencentCloudChatEventBus._();
+  }
+}
+
 /// Dispatches events to listeners using the Dart [Stream] API. The [EventBus]
 /// enables decoupled applications. It allows objects to interact without
 /// requiring to explicitly define listeners and keeping track of them.
@@ -27,7 +33,8 @@ class TencentCloudChatEventBus {
 
   static final Map<String, Stream> _subscriptions = {};
   static final Map<String, dynamic> _cachedEvent = {};
-  factory TencentCloudChatEventBus() {
+
+  factory TencentCloudChatEventBus._() {
     return _instance;
   }
 
@@ -65,16 +72,11 @@ class TencentCloudChatEventBus {
         T.toString(): steam,
       });
       if (_cachedEvent.containsKey(T.toString())) {
-        // TencentCloudChat.logInstance.console(
-        //   componentName: runtimeType.toString(),
-        //   logs: "When ${T.toString()} subscribing to listen, it is detected that there is a cached event to be triggered.",
-        //   logLevel: TencentCloudChatLogLevel.info,
-        // );
         fire(_cachedEvent[T.toString()] as T);
       }
       return steam;
     } else {
-      TencentCloudChat.logInstance.console(
+      TencentCloudChat.instance.logInstance.console(
         componentName: runtimeType.toString(),
         logs: "You must monitor a value of a certain type, not a dynamic type.",
         logLevel: TencentCloudChatLogLevel.error,
@@ -90,6 +92,7 @@ class TencentCloudChatEventBus {
     if (_subscriptions.containsKey(eventName)) {
       Future.delayed(Duration.zero, () {
         _streamController.add(event);
+        _cachedEvent.remove(eventName);
       });
     } else {
       _cachedEvent.addAll({

@@ -14,14 +14,20 @@ enum TencentCloudChatCacheKey {
   permission,
 }
 
+class TencentCloudChatCacheGenerator {
+  static TencentCloudChatCache getInstance() {
+    return TencentCloudChatCache._();
+  }
+}
+
 class TencentCloudChatCache {
   final String _tag = "TencentCloudChatCache";
+  TencentCloudChatCache._();
 
   console(String log) {
-    TencentCloudChat.logInstance.console(componentName: _tag, logs: log);
+    TencentCloudChat.instance.logInstance
+        .console(componentName: _tag, logs: log);
   }
-
-  TencentCloudChatCache();
 
   static bool _inited = false;
 
@@ -63,7 +69,8 @@ class TencentCloudChatCache {
       return;
     }
     String key = TencentCloudChatCacheKey.conversationList.name;
-    await _box!.put("$_perfix$key", convList.map((e) => json.encode(e.toJson())).toList());
+    await _box!.put(
+        "$_perfix$key", convList.map((e) => json.encode(e.toJson())).toList());
     console("set $key to hive. ${convList.length}");
   }
 
@@ -81,12 +88,16 @@ class TencentCloudChatCache {
     final pp = _perfix;
 
     console(pp);
-    List<Map<String, dynamic>> data = origindata.map((e) => json.decode(e.toString())).toList().cast<Map<String, dynamic>>();
+    List<Map<String, dynamic>> data = origindata
+        .map((e) => json.decode(e.toString()))
+        .toList()
+        .cast<Map<String, dynamic>>();
     console("getConversationListFromCache length ${data.length}");
     return data.map((e) => V2TimConversation.fromJson(e)).toList();
   }
 
-  Future<void> cacheMessageListByConvKey(List<V2TimMessage> convList, String convKey) async {
+  Future<void> cacheMessageListByConvKey(
+      List<V2TimMessage> convList, String convKey) async {
     if (_box == null || !_inited) {
       console("cacheMessageListByConvKey _box is null or _inited is false");
       return;
@@ -97,7 +108,8 @@ class TencentCloudChatCache {
     }
     String key = TencentCloudChatCacheKey.messageListByConvKey.name;
     String hivekey = "$_perfix$key-$convKey";
-    await _box!.put(hivekey, convList.map((e) => json.encode(e.toJson())).toList());
+    await _box!
+        .put(hivekey, convList.map((e) => json.encode(e.toJson())).toList());
     await cacheLoadedConvKey(convKey);
     console("set $key to hive. ${convList.length}");
   }
@@ -115,7 +127,10 @@ class TencentCloudChatCache {
     String hivekey = "$_perfix$key-$convKey";
     List<String> origindata = _box!.get(hivekey, defaultValue: []);
 
-    List<Map<String, dynamic>> data = origindata.map((e) => json.decode(e)).toList().cast<Map<String, dynamic>>();
+    List<Map<String, dynamic>> data = origindata
+        .map((e) => json.decode(e))
+        .toList()
+        .cast<Map<String, dynamic>>();
     console("getMessageListByConvKey length ${data.length}");
     return data.map((e) => V2TimMessage.fromJson(e)).toList();
   }
@@ -159,7 +174,8 @@ class TencentCloudChatCache {
     return origindata.map((e) => e.toString()).toList();
   }
 
-  Future<void> cacheGroupMemberList(String groupID, List<V2TimGroupMemberFullInfo> memberList) async {
+  Future<void> cacheGroupMemberList(
+      String groupID, List<V2TimGroupMemberFullInfo> memberList) async {
     if (_box == null || !_inited) {
       console("cacheGroupMemberList _box is null or _inited is false");
       return;
@@ -170,7 +186,8 @@ class TencentCloudChatCache {
     }
     String key = TencentCloudChatCacheKey.groupMemberList.name;
     String hivekey = "$_perfix$key-$groupID";
-    await _box!.put(hivekey, memberList.map((e) => json.encode(e.toJson())).toList());
+    await _box!
+        .put(hivekey, memberList.map((e) => json.encode(e.toJson())).toList());
     console("set $key to hive. ${memberList.length}");
   }
 
@@ -189,7 +206,10 @@ class TencentCloudChatCache {
 
     List<dynamic> origindata = _box!.get(hivekey, defaultValue: []);
 
-    List<Map<String, dynamic>> data = origindata.map((e) => json.decode(e.toString())).toList().cast<Map<String, dynamic>>();
+    List<Map<String, dynamic>> data = origindata
+        .map((e) => json.decode(e.toString()))
+        .toList()
+        .cast<Map<String, dynamic>>();
     return data.map((e) => V2TimGroupMemberFullInfo.fromJson(e)).toList();
   }
 
@@ -232,7 +252,8 @@ class TencentCloudChatCache {
 
   Future<void> cacheCurrentDeviceKeyBordHeight(double height) async {
     if (_box == null || !_inited) {
-      console("cacheCurrentDeviceKeyBordHeight _box is null or _inited is false");
+      console(
+          "cacheCurrentDeviceKeyBordHeight _box is null or _inited is false");
       return;
     }
     if (!_box!.isOpen) {
@@ -301,9 +322,13 @@ class TencentCloudChatCache {
     return null;
   }
 
-  List<V2TimGroupMemberFullInfo> getGroupMemberInfoFromCache({required String groupID, required List<String> members}) {
-    List<V2TimGroupMemberFullInfo> allMembers = getGroupMemberListFromCache(groupID);
+  List<V2TimGroupMemberFullInfo> getGroupMemberInfoFromCache(
+      {required String groupID, required List<String> members}) {
+    List<V2TimGroupMemberFullInfo> allMembers =
+        getGroupMemberListFromCache(groupID);
 
-    return allMembers.takeWhile((value) => members.contains(value.userID)).toList();
+    return allMembers
+        .takeWhile((value) => members.contains(value.userID))
+        .toList();
   }
 }

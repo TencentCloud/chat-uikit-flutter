@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_contact_sdk.dart';
+import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_code_info.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_add_contacts_info.dart';
@@ -42,14 +42,6 @@ class TencentCloudChatContactAddGroupInfoBody extends StatefulWidget {
 
 class TencentCloudChatContactAddGroupInfoBodyState extends TencentCloudChatState<TencentCloudChatContactAddGroupInfoBody> {
   String verification = "";
-  late FToast toast;
-
-  @override
-  void initState() {
-    super.initState();
-    toast = FToast();
-    toast.init(context);
-  }
 
   _getToastIcon(bool check) {
     if (check) {
@@ -68,43 +60,24 @@ class TencentCloudChatContactAddGroupInfoBodyState extends TencentCloudChatState
             ));
   }
 
-  _showToast(bool check, String text) {
-    Widget t = TencentCloudChatThemeWidget(
-        build: (context, colorTheme, textStyle) => Container(
-              padding: EdgeInsets.symmetric(vertical: getHeight(8), horizontal: getWidth(12)),
-              decoration: BoxDecoration(
-                  color: colorTheme.contactBackgroundColor,
-                  borderRadius: BorderRadius.circular(getWidth(4)),
-                  boxShadow: [BoxShadow(color: colorTheme.contactAddContactFriendInfoButtonShadowColor)]),
-              child: Row(
-                children: [
-                  _getToastIcon(check),
-                  SizedBox(
-                    width: getWidth(8),
-                  ),
-                  Text(
-                    text,
-                    style: TextStyle(fontSize: textStyle.fontsize_14),
-                  )
-                ],
-              ),
-            ));
-    toast.showToast(
-      child: t,
-      gravity: ToastGravity.BOTTOM,
-      toastDuration: const Duration(seconds: 2),
-    );
-  }
-
   sendAddGroupApplication() {
     if (widget.groupInfo.groupType == "Work") {
-      _showToast(false, tL10n.cannotSendApplicationToWorkGroup);
+      TencentCloudChat.instance.callbacks?.onUserNotificationEvent?.call(
+        TencentCloudChatComponentsEnum.contact,
+        TencentCloudChatCodeInfo.cannotSendApplicationToWorkGroup,
+      );
     } else if (widget.groupInfo.groupType == "Public") {
-      _showToast(true, tL10n.permissionNeeded);
-      TencentCloudChatContactSDK.joinGroup(widget.groupInfo.groupID, verification, widget.groupInfo.groupType as GroupType);
+      TencentCloudChat.instance.callbacks?.onUserNotificationEvent?.call(
+        TencentCloudChatComponentsEnum.contact,
+        TencentCloudChatCodeInfo.groupJoinedPermissionNeeded,
+      );
+      TencentCloudChat.instance.chatSDKInstance.contactSDK.joinGroup(widget.groupInfo.groupID, verification, widget.groupInfo.groupType as GroupType);
     } else {
-      _showToast(true, tL10n.groupJoined);
-      TencentCloudChatContactSDK.joinGroup(widget.groupInfo.groupID, verification, widget.groupInfo.groupType as GroupType);
+      TencentCloudChat.instance.callbacks?.onUserNotificationEvent?.call(
+        TencentCloudChatComponentsEnum.contact,
+        TencentCloudChatCodeInfo.groupJoined,
+      );
+      TencentCloudChat.instance.chatSDKInstance.contactSDK.joinGroup(widget.groupInfo.groupID, verification, widget.groupInfo.groupType as GroupType);
     }
   }
 

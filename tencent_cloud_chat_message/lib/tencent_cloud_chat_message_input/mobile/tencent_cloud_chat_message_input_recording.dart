@@ -6,10 +6,10 @@ import 'dart:io';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:record/record.dart';
+import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 
 GlobalKey trashIconKey = GlobalKey();
 
@@ -34,13 +34,10 @@ class TencentCloudChatMessageInputRecording extends StatefulWidget {
   });
 
   @override
-  State<TencentCloudChatMessageInputRecording> createState() =>
-      TencentCloudChatMessageInputRecordingState();
+  State<TencentCloudChatMessageInputRecording> createState() => TencentCloudChatMessageInputRecordingState();
 }
 
-class TencentCloudChatMessageInputRecordingState
-    extends TencentCloudChatState<TencentCloudChatMessageInputRecording>
-    with SingleTickerProviderStateMixin {
+class TencentCloudChatMessageInputRecordingState extends TencentCloudChatState<TencentCloudChatMessageInputRecording> with SingleTickerProviderStateMixin {
   late AnimationController _shakeAnimationController;
   bool _isRecording = false;
   double _recordingProgress = 0.0;
@@ -54,8 +51,7 @@ class TencentCloudChatMessageInputRecordingState
   @override
   void initState() {
     super.initState();
-    _shakeAnimationController = AnimationController(
-        duration: const Duration(milliseconds: 100), vsync: this);
+    _shakeAnimationController = AnimationController(duration: const Duration(milliseconds: 100), vsync: this);
     _initRecorder();
   }
 
@@ -83,8 +79,7 @@ class TencentCloudChatMessageInputRecordingState
       });
       // Get the file path
       final directory = await getTemporaryDirectory();
-      final recordingDirectory =
-          Pertypath().join(directory.path, 'tencent_cloud_chat', 'recordings');
+      final recordingDirectory = Pertypath().join(directory.path, 'tencent_cloud_chat', 'recordings');
       await Directory(recordingDirectory).create(recursive: true);
       final uuid = DateTime.now().millisecondsSinceEpoch;
       final path = Pertypath().join(recordingDirectory, '$uuid.wav');
@@ -109,14 +104,11 @@ class TencentCloudChatMessageInputRecordingState
     // Add global pointer event listener
     _pointerEventListener = (event) {
       if (event is PointerMoveEvent && _isRecording) {
-        final trashIconRenderBox =
-            trashIconKey.currentContext!.findRenderObject() as RenderBox;
+        final trashIconRenderBox = trashIconKey.currentContext!.findRenderObject() as RenderBox;
         final trashIconOffset = trashIconRenderBox.localToGlobal(Offset.zero);
         final trashIconSize = trashIconRenderBox.size;
-        final isOverDeleteIcon = event.position.dx >= trashIconOffset.dx &&
-            event.position.dx <= trashIconOffset.dx + trashIconSize.width &&
-            event.position.dy >= trashIconOffset.dy &&
-            event.position.dy <= trashIconOffset.dy + trashIconSize.height;
+        final isOverDeleteIcon =
+            event.position.dx >= trashIconOffset.dx && event.position.dx <= trashIconOffset.dx + trashIconSize.width && event.position.dy >= trashIconOffset.dy && event.position.dy <= trashIconOffset.dy + trashIconSize.height;
 
         if (isOverDeleteIcon != _isFingerOverDelete) {
           setState(() {
@@ -132,8 +124,7 @@ class TencentCloudChatMessageInputRecordingState
         }
       }
     };
-    WidgetsBinding.instance.pointerRouter
-        .addGlobalRoute(_pointerEventListener!);
+    WidgetsBinding.instance.pointerRouter.addGlobalRoute(_pointerEventListener!);
   }
 
   void _startTimer() {
@@ -156,16 +147,14 @@ class TencentCloudChatMessageInputRecordingState
     _timer?.cancel();
     _timer = null;
     _isFingerOverDelete = false;
-    if(_pointerEventListener != null){
-      WidgetsBinding.instance.pointerRouter
-          .removeGlobalRoute(_pointerEventListener!);
+    if (_pointerEventListener != null) {
+      WidgetsBinding.instance.pointerRouter.removeGlobalRoute(_pointerEventListener!);
       _pointerEventListener = null;
     }
 
     final recordedFile = await _audioRecorder?.stop();
     if (!cancel && TencentCloudChatUtils.checkString(recordedFile) != null) {
-      widget.onRecordFinish(RecordInfo(
-          duration: (_recordingDuration / 1000).ceil(), path: recordedFile!));
+      widget.onRecordFinish(RecordInfo(duration: (_recordingDuration / 1000).ceil(), path: recordedFile!));
     } else {
       File recordedFileInstance = File(recordedFile ?? "");
       recordedFileInstance.delete();
@@ -199,24 +188,14 @@ class TencentCloudChatMessageInputRecordingState
                 duration: const Duration(milliseconds: 200),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: _isFingerOverDelete
-                      ? colorTheme.info
-                      : Colors.transparent,
-                  border: _isFingerOverDelete
-                      ? Border.all(color: colorTheme.info, width: 22)
-                      : Border.all(color: Colors.transparent, width: 0),
+                  color: _isFingerOverDelete ? colorTheme.info : Colors.transparent,
+                  border: _isFingerOverDelete ? Border.all(color: colorTheme.info, width: 22) : Border.all(color: Colors.transparent, width: 0),
                 ),
                 child: AnimatedDefaultTextStyle(
                   duration: const Duration(milliseconds: 200),
                   style: TextStyle(
-                    color: _isRecording
-                        ? (_isFingerOverDelete
-                            ? colorTheme.backgroundColor
-                            : colorTheme.primaryColor)
-                        : Colors.transparent,
-                    fontSize: _isFingerOverDelete
-                        ? textStyle.inputAreaIcon + 14
-                        : textStyle.inputAreaIcon + 6,
+                    color: _isRecording ? (_isFingerOverDelete ? colorTheme.backgroundColor : colorTheme.primaryColor) : Colors.transparent,
+                    fontSize: _isFingerOverDelete ? textStyle.inputAreaIcon + 14 : textStyle.inputAreaIcon + 6,
                   ),
                   child: Text(
                     String.fromCharCode(Icons.delete.codePoint),
@@ -227,15 +206,10 @@ class TencentCloudChatMessageInputRecordingState
             ),
             Expanded(
               child: AnimatedContainer(
-                padding: EdgeInsets.symmetric(
-                    vertical: getHeight(8), horizontal: getWidth(16)),
+                padding: EdgeInsets.symmetric(vertical: getHeight(8), horizontal: getWidth(16)),
                 decoration: BoxDecoration(
-                  color: _isRecording
-                      ? colorTheme.primaryColor
-                      : Colors.transparent,
-                  border: _isRecording
-                      ? Border.all(color: colorTheme.primaryColor)
-                      : Border.all(color: Colors.transparent),
+                  color: _isRecording ? colorTheme.primaryColor : Colors.transparent,
+                  border: _isRecording ? Border.all(color: colorTheme.primaryColor) : Border.all(color: Colors.transparent),
                   borderRadius: BorderRadius.circular(25),
                 ),
                 duration: const Duration(milliseconds: 200),
@@ -246,9 +220,7 @@ class TencentCloudChatMessageInputRecordingState
                       width: getWidth(48),
                       child: Text(
                         '${(_recordingDuration ~/ 1000).toString().padLeft(2, '0')}:${((_recordingDuration % 1000) ~/ 10).toString().padLeft(2, '0')}',
-                        style: TextStyle(
-                            fontSize: getFontSize(14),
-                            color: colorTheme.backgroundColor),
+                        style: TextStyle(fontSize: getFontSize(14), color: colorTheme.backgroundColor),
                         overflow: TextOverflow.fade,
                         maxLines: 1,
                       ),

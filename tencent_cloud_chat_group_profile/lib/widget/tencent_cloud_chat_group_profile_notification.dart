@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_group_sdk.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat_common.dart';
@@ -44,7 +43,7 @@ class TencentCloudChatGroupProfileNotificationState
   }
 
   _onSetGroupNotification(String value) async {
-    final res = await TencentCloudChatGroupSDK.setGroupInfo(
+    final res = await TencentCloudChat.instance.chatSDKInstance.groupSDK.setGroupInfo(
         groupID: widget.groupInfo.groupID,
         groupType: widget.groupInfo.groupType,
         notification: value);

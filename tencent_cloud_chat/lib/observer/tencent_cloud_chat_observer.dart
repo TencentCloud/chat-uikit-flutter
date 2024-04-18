@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 
-/// A utility class for checking page routes behavior and add action for audio player for TencentCloudChat.
+/// A utility class for checking page routes behavior and add action for audio player for TencentCloudChat .
 class TencentCloudChatObserver extends RouteObserver<PageRoute<dynamic>> {
   static final TencentCloudChatObserver _instance = TencentCloudChatObserver();
   static bool isClose = false;
@@ -12,7 +12,7 @@ class TencentCloudChatObserver extends RouteObserver<PageRoute<dynamic>> {
 
   /// function handles audio in message when route changed
   void _handleRouteChanged(PageRoute<dynamic> route) {
-    TencentCloudChat().dataInstance.messageData.stopPlayAudio();
+    TencentCloudChat.instance.dataInstance.messageData.stopPlayAudio();
   }
 
   /// function for cheking and handling routes `Push` behavior and stop playing audio.

@@ -35,10 +35,10 @@ class TencentCloudChatPermissionHandler {
       PermissionStatus prevStatus = await permission.status;
       PermissionStatus requestResult = await permission.request();
       if (requestResult.isDenied || requestResult.isPermanentlyDenied) {
-        final permission = TencentCloudChat.cache.getPermission();
+        final permission = TencentCloudChat.instance.cache.getPermission();
         final exist = permission.contains(permissionString);
         if( !exist ){
-          TencentCloudChat.cache.cachePermission(permissionString);
+          TencentCloudChat.instance.cache.cachePermission(permissionString);
           return false;
         }else{
           TencentCloudChatDialog.showAdaptiveDialog(

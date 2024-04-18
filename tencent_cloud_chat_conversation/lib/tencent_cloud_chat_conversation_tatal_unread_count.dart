@@ -21,15 +21,15 @@ class TencentCloudChatConversationTotalUnreadCount extends StatefulWidget {
 }
 
 class TencentCloudChatConversationTotalUnreadCountState extends TencentCloudChatState<TencentCloudChatConversationTotalUnreadCount> {
-  final Stream<TencentCloudChatConversationData<dynamic>>? _conversationDataStream = TencentCloudChat.eventBusInstance.on<TencentCloudChatConversationData<dynamic>>();
+  final Stream<TencentCloudChatConversationData<dynamic>>? _conversationDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatConversationData<dynamic>>();
 
   /// get conversation total unread count from TencentCloudChatData
-  int totalUnreadCount = TencentCloudChat().dataInstance.conversation.totalUnreadCount;
+  int totalUnreadCount = TencentCloudChat.instance.dataInstance.conversation.totalUnreadCount;
 
   late StreamSubscription<TencentCloudChatConversationData<dynamic>>? _conversationDataSubscription;
   final String _tag = "TencentCloudChatConversationTotalUnreadCount";
   console(String log) {
-    TencentCloudChat.logInstance.console(
+    TencentCloudChat.instance.logInstance.console(
       componentName: _tag,
       logs: json.encode(
         {

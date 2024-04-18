@@ -1,6 +1,5 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_group_sdk.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
@@ -31,7 +30,7 @@ class TencentCloudChatGroupProfileManagementState extends TencentCloudChatState<
   }
 
   _onGroupMemberMute(bool value) async {
-    final res = await TencentCloudChatGroupSDK.setGroupInfo(groupID: widget.groupInfo.groupID, groupType: widget.groupInfo.groupType, isAllMuted: value);
+    final res = await TencentCloudChat.instance.chatSDKInstance.groupSDK.setGroupInfo(groupID: widget.groupInfo.groupID, groupType: widget.groupInfo.groupType, isAllMuted: value);
     if (res.code == 0) {
       safeSetState(() {
         isMuted = value;
@@ -208,7 +207,7 @@ class TencentCloudChatGroupProfileAddSilenceMemberListState extends TencentCloud
   submitAdd() async {
     List<V2TimGroupMemberFullInfo> success = [];
     for (int i = 0; i < selectedContacts.length; i++) {
-      final res = await TencentCloudChatGroupSDK.muteGroupMember(groupID: widget.groupInfo.groupID, userID: selectedContacts[i].userID, seconds: 60);
+      final res = await TencentCloudChat.instance.chatSDKInstance.groupSDK.muteGroupMember(groupID: widget.groupInfo.groupID, userID: selectedContacts[i].userID, seconds: 60);
       if (res.code == 0) {
         success.add(selectedContacts[i]);
       }

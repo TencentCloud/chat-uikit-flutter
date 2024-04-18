@@ -18,13 +18,13 @@ With its intuitive design and robust features, the User Profile component caters
 
 To begin, add the [tencent_cloud_chat_user_profile](https://pub.dev/packages/tencent_cloud_chat_user_profile) UI module to your project.
 
-Once installed, you'll need to register this UI component within the `usedComponentsRegister` parameter of the `TencentCloudChat.controller.initUIKit` method's `config`. Here's an example:
+Once installed, you'll need to register this UI component within the `usedComponentsRegister` parameter of the `TencentCloudChat.controller.initUIKit` method's `components`. Here's an example:
 
 ```dart
     await TencentCloudChat.controller.initUIKit(
-      config: TencentCloudChatConfig(
+      components: TencentCloudChatInitComponentsRelated(
         usedComponentsRegister: [
-          TencentCloudChatUserProfileInstance.register, /// Add this line
+          TencentCloudChatUserProfileManager.register, /// Add this line
           /// ...
         ],
       /// ...

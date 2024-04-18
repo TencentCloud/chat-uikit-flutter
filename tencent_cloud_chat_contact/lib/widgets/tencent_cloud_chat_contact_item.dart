@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/components/components_options/tencent_cloud_chat_message_options.dart';
+import 'package:tencent_cloud_chat/components/component_options/tencent_cloud_chat_message_options.dart';
 import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
 import 'package:tencent_cloud_chat/router/tencent_cloud_chat_navigator.dart';
@@ -8,7 +8,6 @@ import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.d
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/builders/tencent_cloud_chat_common_builders.dart';
 import 'package:tencent_cloud_chat_common/widgets/avatar/tencent_cloud_chat_avatar.dart';
-import 'package:tencent_cloud_chat_contact/tencent_cloud_chat_contact_builders.dart';
 
 class TencentCloudChatContactItem extends StatefulWidget {
   final V2TimFriendInfo friend;
@@ -23,19 +22,10 @@ class TencentCloudChatContactItem extends StatefulWidget {
 class TencentCloudChatContactItemState extends TencentCloudChatState<TencentCloudChatContactItem> {
   final isDesktop = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop;
 
-  navigateToChat() {
-    if (TencentCloudChat().dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.message)) {
-      if (isDesktop) {
-        TencentImSDKPlugin.v2TIMManager.emitUIKitEvent(
-          UIKitEvent(
-            type: "navigateToChat",
-            detail: Map<String, dynamic>.from({
-              "userID": widget.friend.userID,
-              "groupID": null,
-            }),
-          ),
-        );
-      } else {
+  navigateToChat() async {
+    final tryUseOnNavigateToChat = await TencentCloudChat.instance.dataInstance.contact.contactEventHandlers?.uiEventHandlers.onNavigateToChat?.call(userID: widget.friend.userID, groupID: null) ?? false;
+    if(!tryUseOnNavigateToChat){
+      if (TencentCloudChat.instance.dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.message) && !isDesktop) {
         navigateToMessage(
           context: context,
           options: TencentCloudChatMessageOptions(
@@ -61,9 +51,9 @@ class TencentCloudChatContactItemState extends TencentCloudChatState<TencentClou
               horizontal: getWidth(3),
             ),
             child: Row(children: [
-              TencentCloudChatContactBuilders.getContactItemAvatarBuilder(widget.friend),
-              TencentCloudChatContactBuilders.getContactItemContentBuilder(widget.friend),
-              TencentCloudChatContactBuilders.getContactItemElseBuilder(widget.friend),
+              TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactItemAvatarBuilder(widget.friend),
+              TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactItemContentBuilder(widget.friend),
+              TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactItemElseBuilder(widget.friend),
             ]),
           ),
         ),

@@ -56,15 +56,14 @@ class TencentCloudChatMessageListView extends StatefulWidget {
   }) : assert((userID == null) != (groupID == null));
 
   @override
-  State<TencentCloudChatMessageListView> createState() =>
-      _TencentCloudChatMessageListViewState();
+  State<TencentCloudChatMessageListView> createState() => _TencentCloudChatMessageListViewState();
 }
 
-class _TencentCloudChatMessageListViewState
-    extends TencentCloudChatState<TencentCloudChatMessageListView> {
+class _TencentCloudChatMessageListViewState extends TencentCloudChatState<TencentCloudChatMessageListView> {
   final MessageListController _messageListController = MessageListController();
   late TencentCloudChatMessageController? controller;
   List<V2TimMessage> _messagesMentionedMe = [];
+  double? _maxWidth;
 
   @override
   void initState() {
@@ -104,101 +103,92 @@ class _TencentCloudChatMessageListViewState
   }
 
   void _controllerEventListener() {
-    final event = controller?.eventName;
-    switch (event) {
-      case EventName.scrollToBottom:
-        _messageListController.scrollToBottom();
-        break;
-      case EventName.scrollToSpecificMessage:
-        final int index = _findMsgIndex(controller?.eventValue);
-        if (index > -1) {
-          _messageListController.animateToIndex(
-            index,
-            duration: const Duration(milliseconds: 200),
-            curve: Curves.bounceInOut,
-            offset: 100,
-            offsetBasedOnBottom: true,
-          );
-        }
-        break;
-      default:
-        break;
+    final current = (controller?.userID == widget.userID && TencentCloudChatUtils.checkString(widget.userID) != null) || (controller?.groupID == widget.groupID && TencentCloudChatUtils.checkString(widget.groupID) != null);
+    if (current) {
+      final event = controller?.eventName;
+      switch (event) {
+        case EventName.scrollToBottom:
+          _messageListController.scrollToBottom();
+          break;
+        case EventName.scrollToSpecificMessage:
+          final int index = _findMsgIndex(controller?.eventValue);
+          if (index > -1) {
+            _messageListController.animateToIndex(
+              index,
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.bounceInOut,
+              offset: 100,
+              offsetBasedOnBottom: true,
+            );
+          }
+          break;
+        default:
+          break;
+      }
     }
   }
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    return LayoutBuilder(
-        builder: (context, constraints) => MessageList(
+    return Column(
+      children: [
+        LayoutBuilder(builder: (context, constraints) {
+          if (_maxWidth != constraints.maxWidth) {
+            Future.delayed(const Duration(milliseconds: 10), () {
+              setState(() {
+                _maxWidth = constraints.maxWidth;
+              });
+            });
+          }
+          return Row(
+            children: [
+              Expanded(
+                  child: Container(
+                height: 0,
+              ))
+            ],
+          );
+        }),
+        if (_maxWidth != null)
+          Expanded(
+            child: MessageList(
               haveMorePreviousData: widget.haveMorePreviousData,
               haveMoreLatestData: widget.haveMoreLatestData,
               offsetToTriggerLoadPrevious: 200,
               offsetToTriggerLoadLatest: 100,
-              unreadMsgCount:
-                  (widget.unreadCount ?? 0) > 0 ? widget.unreadCount : null,
+              unreadMsgCount: (widget.unreadCount ?? 0) > 0 ? widget.unreadCount : null,
               onLoadToLatest: widget.loadToLatestMessage,
-              onLoadPreviousMsgs: () => widget.loadMoreMessages(
-                  direction: TencentCloudChatMessageLoadDirection.previous),
-              onLoadLatestMsgs: () => widget.loadMoreMessages(
-                  direction: TencentCloudChatMessageLoadDirection.latest),
+              onLoadPreviousMsgs: () => widget.loadMoreMessages(direction: TencentCloudChatMessageLoadDirection.previous),
+              onLoadLatestMsgs: () => widget.loadMoreMessages(direction: TencentCloudChatMessageLoadDirection.latest),
               msgCount: widget.messageList.length,
               messagesMentionedMe: _messagesMentionedMe,
               controller: _messageListController,
               determineIsLatestReadMessage: (index) {
                 final message = widget.messageList[index];
-                final messageKey =
-                    TencentCloudChatUtils.checkString(widget.groupID) != null
-                        ? int.tryParse(message.seq ?? "")
-                        : message.timestamp;
+                final messageKey = TencentCloudChatUtils.checkString(widget.groupID) != null ? int.tryParse(message.seq ?? "") : message.timestamp;
                 if (TencentCloudChatUtils.checkString(widget.groupID) != null) {
-                  return (
-                    messageKey == widget.groupReadSequence &&
-                        widget.groupReadSequence != null,
-                    true
-                  );
+                  return (messageKey == widget.groupReadSequence && widget.groupReadSequence != null, true);
                 } else {
-                  final previousMessageKey = widget
-                          .messageList[
-                              min(widget.messageList.length - 1, index + 1)]
-                          .timestamp ??
-                      0;
-                  return (
-                    (widget.c2cReadTimestamp != null) &&
-                        ((widget.c2cReadTimestamp ?? 0) < (messageKey ?? 0)) &&
-                        ((widget.c2cReadTimestamp ?? 0) > previousMessageKey) &&
-                        (previousMessageKey < (messageKey ?? 0)),
-                    false
-                  );
+                  final previousMessageKey = widget.messageList[min(widget.messageList.length - 1, index + 1)].timestamp ?? 0;
+                  return ((widget.c2cReadTimestamp != null) && ((widget.c2cReadTimestamp ?? 0) < (messageKey ?? 0)) && ((widget.c2cReadTimestamp ?? 0) > previousMessageKey) && (previousMessageKey < (messageKey ?? 0)), false);
                 }
               },
-              latestReadMsgKey:
-                  TencentCloudChatUtils.checkString(widget.groupID) != null
-                      ? widget.groupReadSequence
-                      : widget.c2cReadTimestamp,
+              latestReadMsgKey: TencentCloudChatUtils.checkString(widget.groupID) != null ? widget.groupReadSequence : widget.c2cReadTimestamp,
               itemBuilder: (BuildContext context, int index) {
                 V2TimMessage message = widget.messageList[index];
                 return TencentCloudChatMessageRowContainer(
-                  messageRowWidth: constraints.maxWidth,
+                  messageRowWidth: _maxWidth!,
                   message: message,
                   isMergeMessage: false,
                 );
               },
-              onMsgKey: (int index) =>
-                  widget.messageList[index].msgID ??
-                  widget.messageList[index].id ??
-                  widget.messageList[index].timestamp.toString(),
+              onMsgKey: (int index) => widget.messageList[index].msgID ?? widget.messageList[index].id ?? widget.messageList[index].timestamp.toString(),
               onLoadToLatestReadMessage: () async {
                 try {
                   await widget.loadToSpecificMessage(
                     highLightTargetMessage: false,
-                    timeStamp:
-                        TencentCloudChatUtils.checkString(widget.userID) != null
-                            ? widget.c2cReadTimestamp
-                            : null,
-                    seq: TencentCloudChatUtils.checkString(widget.groupID) !=
-                            null
-                        ? widget.groupReadSequence
-                        : null,
+                    timeStamp: TencentCloudChatUtils.checkString(widget.userID) != null ? widget.c2cReadTimestamp : null,
+                    seq: TencentCloudChatUtils.checkString(widget.groupID) != null ? widget.groupReadSequence : null,
                   );
                   return;
                 } catch (e) {
@@ -214,6 +204,9 @@ class _TencentCloudChatMessageListViewState
                 _messagesMentionedMe.removeAt(0);
                 return;
               },
-            ));
+            ),
+          ),
+      ],
+    );
   }
 }

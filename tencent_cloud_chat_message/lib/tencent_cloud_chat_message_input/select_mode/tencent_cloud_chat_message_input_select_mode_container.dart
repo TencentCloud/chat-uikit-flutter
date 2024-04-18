@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_config.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data_notifier.dart';
-import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_builders.dart';
 
 class TencentCloudChatMessageInputSelectModeContainer extends StatefulWidget {
   const TencentCloudChatMessageInputSelectModeContainer({super.key});
@@ -27,7 +26,7 @@ class _TencentCloudChatMessageInputSelectModeContainerState
       groupID: dataProvider.groupID,
     );
 
-    return TencentCloudChatMessageBuilders.getMessageInputSelectBuilder(
+    return TencentCloudChatMessageDataProviderInherited.of(context).messageBuilders?.getMessageInputSelectBuilder(
       messages: dataProvider.selectedMessages,
       enableMessageDeleteForEveryone: config.enableMessageDeleteForEveryone(
             userID: dataProvider.userID,
@@ -53,6 +52,6 @@ class _TencentCloudChatMessageInputSelectModeContainerState
           dataProvider.deleteMessagesForEveryone(messages: messages);
         });
       },
-    );
+    ) ?? Container();
   }
 }

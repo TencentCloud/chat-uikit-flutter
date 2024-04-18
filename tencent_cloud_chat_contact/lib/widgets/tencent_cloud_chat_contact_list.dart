@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_azlist.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_group_list.dart';
-import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_tab.dart';
 
 class TencentCloudChatContactList extends StatefulWidget {
   final List<V2TimFriendInfo> contactList;
-  final List<TabItem>? tabList;
+  final List<TTabItem>? tabList;
   final List<V2TimGroupInfo> groupList;
 
   const TencentCloudChatContactList({

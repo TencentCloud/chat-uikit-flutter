@@ -18,13 +18,13 @@ With its intuitive design and robust features, the Group Profile component cater
 
 To begin, add the [tencent_cloud_chat_group_profile](https://pub.dev/packages/tencent_cloud_chat_group_profile) UI module to your project.
 
-Once installed, you'll need to register this UI component within the `usedComponentsRegister` parameter of the `TencentCloudChat.controller.initUIKit` method's `config`. Here's an example:
+Once installed, you'll need to register this UI component within the `usedComponentsRegister` parameter of the `TencentCloudChat.controller.initUIKit` method's `components`. Here's an example:
 
 ```dart
     await TencentCloudChat.controller.initUIKit(
-      config: TencentCloudChatConfig(
+      components: TencentCloudChatInitComponentsRelated(
         usedComponentsRegister: [
-          TencentCloudChatGroupProfileInstance.register, /// Add this line
+          TencentCloudChatGroupProfileManager.register, /// Add this line
           /// ...
         ],
       /// ...

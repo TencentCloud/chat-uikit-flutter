@@ -6,7 +6,6 @@ import 'dart:io';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
-import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_message_sdk.dart';
 import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
@@ -65,12 +64,12 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
   }) async {
     List<V2TimMessage> msgs = [];
     if (!widget.isSending) {
-      var oldeRres = await TencentCloudChatMessageSDK.getLocalMessageByElemType(
+      var oldeRres = await TencentCloudChat.instance.chatSDKInstance.messageSDK.getLocalMessageByElemType(
         lastMsgId: msgID,
         convKey: widget.convKey,
         convType: widget.convType,
       );
-      var newRes = await TencentCloudChatMessageSDK.getLocalMessageByElemType(
+      var newRes = await TencentCloudChat.instance.chatSDKInstance.messageSDK.getLocalMessageByElemType(
         lastMsgId: msgID,
         convKey: widget.convKey,
         convType: widget.convType,
@@ -151,7 +150,7 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
   }
 
   console(String log) {
-    TencentCloudChat.logInstance.console(
+    TencentCloudChat.instance.logInstance.console(
       componentName: _tag,
       logs: json.encode(
         {
@@ -174,7 +173,7 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
     }
     int type = TimImageType.origin.index;
 
-    TencentCloudChat().dataInstance.messageData.addDownloadMessageToQueue(
+    TencentCloudChat.instance.dataInstance.messageData.addDownloadMessageToQueue(
           data: DownloadMessageQueueData(
             conversationType: conversationType,
             msgID: widget.message.msgID ?? "",
@@ -233,7 +232,7 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
     }
     var message = messages[index];
 
-    return TencentCloudChat().dataInstance.messageData.isDownloading(msgID: message.msgID);
+    return TencentCloudChat.instance.dataInstance.messageData.isDownloading(msgID: message.msgID);
   }
 
   @override

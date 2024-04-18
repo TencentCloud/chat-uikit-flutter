@@ -1,15 +1,14 @@
 import 'package:azlistview_all_platforms/azlistview_all_platforms.dart';
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
-import 'package:tencent_cloud_chat_contact/tencent_cloud_chat_contact_builders.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_item.dart';
-import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_tab.dart';
 
 class TencentCloudChatContactAzlist extends StatefulWidget {
   final List<V2TimFriendInfo> contactList;
-  final List<TabItem>? tabList;
+  final List<TTabItem>? tabList;
 
   const TencentCloudChatContactAzlist({super.key, required this.contactList, this.tabList});
 
@@ -64,7 +63,7 @@ class TencentCloudChatContactAzlistState extends TencentCloudChatState<TencentCl
       return TencentCloudChatThemeWidget(
         build: (context, colors, fontSize) => Column(
           children: [
-            ...showFriendList.map((e) => TencentCloudChatContactBuilders.getContactListTabItemBuilder(e.friendInfo)).toList(),
+            ...showFriendList.map((e) => TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactListTabItemBuilder(e.friendInfo)).toList(),
             Center(
               child: Text(
                 tL10n.noContact,
@@ -87,8 +86,8 @@ class TencentCloudChatContactAzlistState extends TencentCloudChatState<TencentCl
       itemCount: showFriendList.length,
       indexBarData: SuspensionUtil.getTagIndexList(showFriendList).where((element) => element != "@").toList(),
       itemBuilder: (context, index) {
-        if (showFriendList[index].friendInfo is TabItem) {
-          return TencentCloudChatContactBuilders.getContactListTabItemBuilder(showFriendList[index].friendInfo);
+        if (showFriendList[index].friendInfo is TTabItem) {
+          return TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactListTabItemBuilder(showFriendList[index].friendInfo);
         } else {
           final friend = showFriendList[index].friendInfo;
           return TencentCloudChatContactItem(friend: friend);
@@ -99,7 +98,7 @@ class TencentCloudChatContactAzlistState extends TencentCloudChatState<TencentCl
         if (tag.getSuspensionTag() == "@") {
           return Container();
         }
-        return TencentCloudChatContactBuilders.getContactListTagBuilder(tag.getSuspensionTag());
+        return TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactListTagBuilder(tag.getSuspensionTag());
       },
       susItemHeight: getSquareSize(30),
     ));

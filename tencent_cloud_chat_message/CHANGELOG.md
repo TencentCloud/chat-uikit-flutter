@@ -1,3 +1,29 @@
+## 1.3.0
+
+### General
+
+- Enhanced the `initUIKit` function with several improvements, streamlining the configuration process and increasing overall usability. Key updates include:
+    - A new `components` parameter that consolidates component-related configurations, including the required `usedComponentsRegister` for manually declaring utilized components. It also allows for optional global configurations, builders, controllers, and event handlers for each component, affecting all instances of each component.
+    - A new `onTencentCloudChatSDKEvent` callback within the `callbacks` parameter handles SDK-related events, replacing the previous `sdkListener` from `options`.
+    - The `config` parameter now focuses on global configurations for the UIKit, removing `usedComponentsRegister` and `preloadDataConfig`. The `usedComponentsRegister` has been moved to the `components` parameter.
+    - Removed the requirement for passing in `context`.
+    - Enabled automatic initialization of CallKit during this process, eliminating the need of invoking `TUICallKit.instance.login` manually for using voice and video calls.
+- Introduced a new manager for each component, named by appending `Manager` to the component's name (e.g., `TencentCloudChatMessageManager`), providing the following functions for better and easier integration:
+    - `register`: [Manually declares the usage of each component](https://pub.dev/packages/tencent_cloud_chat#basic-usage) during the `initUIKit` call.
+    - `controller`: [Taking control of each component](https://pub.dev/packages/tencent_cloud_chat#global-taking-control-of-each-component) on a global scale.
+    - `eventHandlers`: [Handling component-level events](https://pub.dev/packages/tencent_cloud_chat#global-handling-component-level-events) on a global scale.
+    - `builder`: [Dynamically updating UI builders](https://pub.dev/packages/tencent_cloud_chat#dynamically-updating-ui-builders) for all instances.
+    - `config`: [Configuring components](https://pub.dev/packages/tencent_cloud_chat#global-configuring-components) for all instances dynamically.
+- Migrated the `register` from the `Instance` of each component to the `Manager`, as described in the previous point.
+- Refined the core data storage structure and performance, paving the way for future feature enhancements.
+
+### Message (TencentCloudChatMessage)
+
+- Changed the default configurations for `enabledGroupTypesForMessageReadReceipt` to be empty. This requires specifying the group types for which the message read receipt feature should be enabled, after enabling them in the Console.
+- Fixed an issue where the message read status could not be updated dynamically for one-to-one chats.
+- Reduced the number of rebuilds for message list items to improve performance.
+- Resolved an issue where initiating voice or video calls might not be possible in group chats.
+
 ## 1.2.1
 
 ### Message (TencentCloudChatMessage)

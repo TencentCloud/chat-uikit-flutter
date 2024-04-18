@@ -1,14 +1,14 @@
-// ignore_for_file: public_member_api_docs, sort_constructors_first
+// ignore_for_file: public_member_api_docs, sort_constructors_first, unused_import
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_contact_sdk.dart';
 import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
+import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/builders/tencent_cloud_chat_common_builders.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat_common.dart';
-import 'package:tencent_cloud_chat_contact/tencent_cloud_chat_contact_builders.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_application_info.dart';
 
 class TencentCloudChatContactApplicationList extends StatefulWidget {
@@ -55,9 +55,9 @@ class TencentCloudChatContactApplicationItem extends StatefulWidget {
 }
 
 class TencentCloudChatContactApplicationItemState extends TencentCloudChatState<TencentCloudChatContactApplicationItem> {
-  ApplicationResult applicationResult = ApplicationResult(result: "", userID: "");
+  ContactApplicationResult applicationResult = ContactApplicationResult(result: "", userID: "");
 
-  void getApplicationResultFromButton(ApplicationResult result) {
+  void getApplicationResultFromButton(ContactApplicationResult result) {
     safeSetState(() {
       applicationResult = result;
     });
@@ -66,7 +66,7 @@ class TencentCloudChatContactApplicationItemState extends TencentCloudChatState<
   gotoApplicationInfoPage() async {
     // ApplicationResult applicationResult2 = (await navigateToNewContactApplicationDetail<ApplicationResult>(
     //     context: context, options: TencentCloudChatContactApplicationInfoData(application: widget.application, applicationResult: applicationResult)))!;
-    ApplicationResult applicationResult2 = await Navigator.push(
+    ContactApplicationResult applicationResult2 = await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => TencentCloudChatContactApplicationInfo(
@@ -92,9 +92,9 @@ class TencentCloudChatContactApplicationItemState extends TencentCloudChatState<
                   ),
                   child: Row(
                     children: [
-                      TencentCloudChatContactBuilders.getContactApplicationItemAvatarBuilder(widget.application),
-                      TencentCloudChatContactBuilders.getContactApplicationItemContentBuilder(widget.application),
-                      TencentCloudChatContactBuilders.getContactApplicationItemButtonBuilder(widget.application, applicationResult, getApplicationResultFromButton)
+                      TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactApplicationItemAvatarBuilder(widget.application),
+                      TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactApplicationItemContentBuilder(widget.application),
+                      TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactApplicationItemButtonBuilder(widget.application, applicationResult, getApplicationResultFromButton)
                     ],
                   ),
                 )));
@@ -187,7 +187,7 @@ class TencentCloudChatApplicationContentItemState extends TencentCloudChatState<
 
 class TencentCloudChatApplicationItemButton extends StatefulWidget {
   final V2TimFriendApplication application;
-  final ApplicationResult? applicationResult;
+  final ContactApplicationResult? applicationResult;
   final Function? sendApplicationResult;
 
   const TencentCloudChatApplicationItemButton({Key? key, required this.application, this.applicationResult, this.sendApplicationResult}) : super(key: key);
@@ -202,11 +202,11 @@ class TencentCloudChatApplicationItemButtonState extends TencentCloudChatState<T
   String showName = "";
 
   onAcceptApplication() async {
-    V2TimFriendOperationResult res = await TencentCloudChatContactSDK.acceptFriendApplication(widget.application.userID, FriendResponseTypeEnum.V2TIM_FRIEND_ACCEPT_AGREE_AND_ADD, FriendApplicationTypeEnum.values[widget.application.type]);
+    V2TimFriendOperationResult res = await TencentCloudChat.instance.chatSDKInstance.contactSDK.acceptFriendApplication(widget.application.userID, FriendResponseTypeEnum.V2TIM_FRIEND_ACCEPT_AGREE_AND_ADD, FriendApplicationTypeEnum.values[widget.application.type]);
     String id = res.userID ?? "";
     int code = res.resultCode ?? -1;
     if (id == widget.application.userID && code == 0) {
-      widget.sendApplicationResult!(ApplicationResult(result: tL10n.accepted, userID: widget.application.userID));
+      widget.sendApplicationResult!(ContactApplicationResult(result: tL10n.accepted, userID: widget.application.userID));
       safeSetState(() {
         widget.applicationResult?.result = tL10n.accepted;
         widget.applicationResult?.userID = widget.application.userID;
@@ -215,11 +215,11 @@ class TencentCloudChatApplicationItemButtonState extends TencentCloudChatState<T
   }
 
   onRefuseApplication() async {
-    V2TimFriendOperationResult res = await TencentCloudChatContactSDK.refuseFriendApplication(widget.application.userID, FriendApplicationTypeEnum.values[widget.application.type]);
+    V2TimFriendOperationResult res = await TencentCloudChat.instance.chatSDKInstance.contactSDK.refuseFriendApplication(widget.application.userID, FriendApplicationTypeEnum.values[widget.application.type]);
     String id = res.userID ?? "";
     int code = res.resultCode ?? -1;
     if (id == widget.application.userID && code == 0) {
-      widget.sendApplicationResult!(ApplicationResult(result: tL10n.declined, userID: widget.application.userID));
+      widget.sendApplicationResult!(ContactApplicationResult(result: tL10n.declined, userID: widget.application.userID));
       safeSetState(() {
         widget.applicationResult?.result = tL10n.declined;
         widget.applicationResult?.userID = widget.application.userID;
@@ -279,14 +279,4 @@ class TencentCloudChatApplicationItemButtonState extends TencentCloudChatState<T
               ],
             ));
   }
-}
-
-class ApplicationResult {
-  String result;
-  String userID;
-
-  ApplicationResult({
-    required this.result,
-    required this.userID,
-  });
 }

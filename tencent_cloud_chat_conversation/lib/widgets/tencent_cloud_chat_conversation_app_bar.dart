@@ -97,7 +97,7 @@ class TencentCloudChatConversationAppBarNameState
                   icon: Icon(Icons.brightness_medium,
                       color: colorTheme.appBarIconColor),
                   onPressed: () {
-                    TencentCloudChat.controller.toggleBrightnessMode();
+                    TencentCloudChat.instance.chatController.toggleBrightnessMode();
                   },
                 ),
                 // IconButton(onPressed: addContacts, icon: Icon(Icons.person_add_alt, size: getSquareSize(20), color: colorTheme.contactAppBarIconColor)),

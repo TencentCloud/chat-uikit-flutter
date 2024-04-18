@@ -3,7 +3,7 @@ import 'package:tencent_cloud_uikit_core/tencent_cloud_uikit_core.dart';
 
 class TencentCloudChatTUICore {
   static console(String log) {
-    TencentCloudChat.logInstance
+    TencentCloudChat.instance.logInstance
         .console(componentName: "TencentCloudChatTUICore", logs: log);
   }
 
