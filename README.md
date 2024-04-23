@@ -8,24 +8,21 @@ This repository adopts a monorepo structure, housing multiple packages under one
 
 The packages included in this repository are organized as follows:
 
-- **tencent_cloud_chat_demo**: This package contains a demo application showcasing the use of the Tencent Cloud Chat UIKit.
-
-- **tencent_cloud_chat_sdk**: Server Communication Non-UI Chat SDK (Auto-imported, no manual import needed)
-    - **Tencent Cloud Chat UI Component Library**: Base package for the following UIKit components
-        - **tencent_cloud_chat**: This is the core package that provides basic chat functionalities.
-            - **tencent_cloud_chat_intl**:  This package provides internationalization support for your chat applications.
-            - **tencent_cloud_chat_common**: This package offers a set of versatile and reusable components to streamline development and ensure UI consistency.
-            - **Modular UI Components (Import as needed)**:
-                - **tencent_cloud_chat_conversation**: This package offers a conversation list that displays all participated conversations. 
-                - **tencent_cloud_chat_message**: This package provides a comprehensive messaging experience for your chat applications.
-                - **tencent_cloud_chat_contact**: This package is designed to provide a contact list for your chat applications.
-                - **tencent_cloud_chat_user_profile**: This package enriches your chat applications with a detailed user profile page.
-                - **tencent_cloud_chat_group_profile**: This package enriches your chat applications with a detailed group profile page.
-                - **tencent_cloud_chat_search**: This package provides search functionality for your chat applications.
-    - **Supplementary Add-ons**:
-        - **tencent_cloud_chat_push**: This package provides push notification support for your chat applications.
-        - **tencent_cloud_chat_robot**: This package is designed to facilitate interactions with chat bots within your chat applications.
-        - **tencent_cloud_chat_customer_service**: This package is designed to facilitate customer service interactions within your chat applications.
+- **Tencent Cloud Chat UI Component Library**: Base package for the following UIKit components
+    - **tencent_cloud_chat**: This is the core package that provides basic chat functionalities.
+        - **tencent_cloud_chat_intl**:  This package provides internationalization support for your chat applications.
+        - **tencent_cloud_chat_common**: This package offers a set of versatile and reusable components to streamline development and ensure UI consistency.
+        - **Modular UI Components (Import as needed)**:
+            - **tencent_cloud_chat_conversation**: This package offers a conversation list that displays all participated conversations. 
+            - **tencent_cloud_chat_message**: This package provides a comprehensive messaging experience for your chat applications.
+            - **tencent_cloud_chat_contact**: This package is designed to provide a contact list for your chat applications.
+            - **tencent_cloud_chat_user_profile**: This package enriches your chat applications with a detailed user profile page.
+            - **tencent_cloud_chat_group_profile**: This package enriches your chat applications with a detailed group profile page.
+            - **tencent_cloud_chat_search**: This package provides search functionality for your chat applications.
+- **Supplementary Add-ons**:
+    - **tencent_cloud_chat_push**: This package provides push notification support for your chat applications.
+    - **tencent_cloud_chat_robot**: This package is designed to facilitate interactions with chat bots within your chat applications.
+    - **tencent_cloud_chat_customer_service**: This package is designed to facilitate customer service interactions within your chat applications.
 
 The architecture of our UIKit is shown below:
 
@@ -40,3 +37,10 @@ By offering a modular and flexible structure, we enable developers to create cus
 To get started with using these packages, you can clone this repository and explore the individual packages. Each package includes its own README file with detailed information about its usage and features.
 
 We hope this repository provides you with all the tools you need to create engaging and feature-rich chat applications. If you have any questions or need further information, feel free to raise an issue or submit a pull request.
+
+## Sample App
+
+For easy integration, we provides two sample app with source code.
+
+- **[Comprehensive Integration](https://github.com/TencentCloud/chat-demo-flutter/tree/v2)**: This repo contains a comprehensive sample application showcasing most of the advantage usage of the Tencent Cloud Chat UIKit V2.
+- **[Simplified Integration](https://github.com/TencentCloud/chat-uikit-flutter/tree/v2/tencent_cloud_chat/example)**: This repo contains a basic sample application showcasing a simplified integration process for Tencent Cloud Chat UIKit V2.

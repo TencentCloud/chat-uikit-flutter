@@ -12,7 +12,6 @@ dependencies:
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.0.2
-  tencent_cloud_uikit_core: ^1.6.0
   tencent_cloud_chat_sdk: ^7.9.5672
 
 dev_dependencies:

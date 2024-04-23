@@ -46,9 +46,21 @@ class TencentCloudChatMessageItemBuilders {
 
   TencentCloudChatMessageItemBuilders({
     MessageWidgetBuilder? textMessageBuilder,
+    MessageWidgetBuilder? imageMessageBuilder,
+    MessageWidgetBuilder? soundMessageBuilder,
+    MessageWidgetBuilder? fileMessageBuilder,
+    MessageWidgetBuilder? videoMessageBuilder,
+    MessageWidgetBuilder? mergeMessageBuilder,
+    MessageWidgetBuilder? customMessageBuilder,
     CommonTipsBuilder? commonTipsBuilder,
   }) {
     _textMessageBuilder = textMessageBuilder;
+    _imageMessageBuilder = imageMessageBuilder;
+    _soundMessageBuilder = soundMessageBuilder;
+    _fileMessageBuilder = fileMessageBuilder;
+    _videoMessageBuilder = videoMessageBuilder;
+    _mergeMessageBuilder = mergeMessageBuilder;
+    _customMessageBuilder = customMessageBuilder;
     _commonTipsBuilder = commonTipsBuilder;
   }
 

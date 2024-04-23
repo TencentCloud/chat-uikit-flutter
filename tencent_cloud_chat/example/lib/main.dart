@@ -45,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     TencentCloudChat.controller.initUIKit(
       options: const TencentCloudChatInitOptions(
-        sdkAppID: ,
+        sdkAppID: 0,
 
         /// [Required]: The SDKAppID of your Tencent Cloud Chat application
         userID: "",

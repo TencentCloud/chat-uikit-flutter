@@ -4,7 +4,7 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_linux
-  desktop_drop
+  desktop_drop_for_t
   file_selector_linux
   pasteboard
   record_linux
