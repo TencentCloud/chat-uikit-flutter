@@ -1,6 +1,12 @@
-# Tencent Cloud Chat UIKit
+# Tencent Cloud Chat UIKit V2
 
-Welcome to the Tencent Cloud Chat UIKit repository! This repository hosts a collection of packages designed to provide a comprehensive suite of tools for building feature-rich and engaging chat applications. Our aim is to facilitate the development process and ensure a consistent user experience across both mobile and desktop environments.
+Welcome to the Tencent Cloud Chat UIKit V2 repository which contains all the general and modular packages. You can use these packages to create engaging and feature-rich chat applications that cater to your business needs.
+
+To start using these packages, you can clone or fork the repository and modify them as per your requirements. Each package comes with a detailed README file that provides information about its usage and features.
+
+If you have any questions or need further information, please feel free to raise an issue or submit a pull request. We are here to help you in any way we can.
+
+![uikit.png](https://comm.qq.com/im/static-files/uikit.jpg)
 
 ## Repository Structure and Package Relationships
 
@@ -32,15 +38,9 @@ To use the new version of the UIKit, customers need to first import the `tencent
 
 By offering a modular and flexible structure, we enable developers to create customized chat applications that cater to their specific requirements, with the option to expand to web and desktop platforms or integrate supplementary add-ons for additional functionalities.
 
-## Getting Started
-
-To get started with using these packages, you can clone this repository and explore the individual packages. Each package includes its own README file with detailed information about its usage and features.
-
-We hope this repository provides you with all the tools you need to create engaging and feature-rich chat applications. If you have any questions or need further information, feel free to raise an issue or submit a pull request.
-
 ## Sample App
 
-For easy integration, we provides two sample app with source code.
+To make integration a breeze, we offer two sample apps complete with source code.
 
-- **[Comprehensive Integration](https://github.com/TencentCloud/chat-demo-flutter/tree/v2)**: This repo contains a comprehensive sample application showcasing most of the advantage usage of the Tencent Cloud Chat UIKit V2.
-- **[Simplified Integration](https://github.com/TencentCloud/chat-uikit-flutter/tree/v2/tencent_cloud_chat/example)**: This repo contains a basic sample application showcasing a simplified integration process for Tencent Cloud Chat UIKit V2.
+- **[Comprehensive Integration](https://github.com/TencentCloud/chat-demo-flutter/tree/v2)**: Includes a sample application that demonstrates most of the advanced features of the Tencent Cloud Chat UIKit V2.
+- **[Simplified Integration](https://github.com/TencentCloud/chat-uikit-flutter/tree/v2/tencent_cloud_chat/example)**: Includes a basic sample application that showcases a simplified integration process for the Tencent Cloud Chat UIKit V2.
