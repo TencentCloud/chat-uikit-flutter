@@ -32,7 +32,16 @@ class TIMUIKitFileElem extends StatefulWidget {
   final bool? isShowMessageReaction;
   final TUIChatSeparateViewModel chatModel;
 
-  const TIMUIKitFileElem({Key? key, required this.chatModel, required this.messageID, required this.fileElem, required this.isSelf, required this.isShowJump, this.clearJump, required this.message, this.isShowMessageReaction})
+  const TIMUIKitFileElem(
+      {Key? key,
+      required this.chatModel,
+      required this.messageID,
+      required this.fileElem,
+      required this.isSelf,
+      required this.isShowJump,
+      this.clearJump,
+      required this.message,
+      this.isShowMessageReaction})
       : super(key: key);
 
   @override
@@ -44,14 +53,19 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
   bool isWebDownloading = false;
   final TUIChatGlobalModel model = serviceLocator<TUIChatGlobalModel>();
   int downloadProgress = 0;
-  late V2TimAdvancedMsgListener advancedMsgListener;
+  V2TimAdvancedMsgListener? advancedMsgListener;
   final GlobalKey containerKey = GlobalKey();
   double? containerHeight;
   bool? _downloadFailed = false;
 
   @override
   void dispose() {
-    TencentImSDKPlugin.v2TIMManager.getMessageManager().removeAdvancedMsgListener(listener: advancedMsgListener);
+    if (advancedMsgListener != null) {
+      TencentImSDKPlugin.v2TIMManager
+          .getMessageManager()
+          .removeAdvancedMsgListener(listener: advancedMsgListener);
+      advancedMsgListener = null;
+    }
     super.dispose();
   }
 
@@ -63,8 +77,15 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
         hasFile();
       });
     }
+  }
+
+  Future<bool> addAdvancedMsgListenerForDownload() async {
+    if(advancedMsgListener != null){
+      return false;
+    }
     advancedMsgListener = V2TimAdvancedMsgListener(
-      onMessageDownloadProgressCallback: (V2TimMessageDownloadProgress messageProgress) async {
+      onMessageDownloadProgressCallback:
+          (V2TimMessageDownloadProgress messageProgress) async {
         if (messageProgress.msgID == widget.message.msgID) {
           if (messageProgress.isError || messageProgress.errorCode != 0) {
             setState(() {
@@ -79,12 +100,17 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
                 downloadProgress = 100;
               });
 
-              TencentImSDKPlugin.v2TIMManager.getMessageManager().removeAdvancedMsgListener(
-                    listener: advancedMsgListener,
-                  );
+              if (advancedMsgListener != null) {
+                TencentImSDKPlugin.v2TIMManager
+                    .getMessageManager()
+                    .removeAdvancedMsgListener(listener: advancedMsgListener);
+                advancedMsgListener = null;
+              }
             }
           } else {
-            final currentProgress = (messageProgress.currentSize / messageProgress.totalSize * 100).floor();
+            final currentProgress =
+            (messageProgress.currentSize / messageProgress.totalSize * 100)
+                .floor();
             if (mounted && currentProgress > downloadProgress) {
               setState(() {
                 downloadProgress = currentProgress;
@@ -94,11 +120,17 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
         }
       },
     );
-    TencentImSDKPlugin.v2TIMManager.getMessageManager().addAdvancedMsgListener(listener: advancedMsgListener);
+    await TencentImSDKPlugin.v2TIMManager
+        .getMessageManager()
+        .addAdvancedMsgListener(listener: advancedMsgListener!);
+    return true;
   }
 
   Future<String> getSavePath() async {
-    String savePathWithAppPath = '/storage/emulated/0/Android/data/com.tencent.flutter.tuikit/cache/' + (widget.message.msgID ?? "") + widget.fileElem!.fileName!;
+    String savePathWithAppPath =
+        '/storage/emulated/0/Android/data/com.tencent.flutter.tuikit/cache/' +
+            (widget.message.msgID ?? "") +
+            widget.fileElem!.fileName!;
     return savePathWithAppPath;
   }
 
@@ -106,7 +138,11 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
     if (PlatformUtils().isWeb) {
       return true;
     }
-    String savePath = TencentUtils.checkString(model.getFileMessageLocation(widget.messageID)) ?? TencentUtils.checkString(widget.message.fileElem!.localUrl) ?? widget.message.fileElem?.path ?? '';
+    String savePath = TencentUtils.checkString(
+            model.getFileMessageLocation(widget.messageID)) ??
+        TencentUtils.checkString(widget.message.fileElem!.localUrl) ??
+        widget.message.fileElem?.path ??
+        '';
     File f = File(savePath);
     if (f.existsSync() && widget.messageID != null) {
       filePath = savePath;
@@ -117,6 +153,12 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
       }
       if (model.getMessageProgress(widget.messageID) != 100) {
         model.setMessageProgress(widget.messageID!, 100);
+      }
+      if (advancedMsgListener != null) {
+        TencentImSDKPlugin.v2TIMManager
+            .getMessageManager()
+            .removeAdvancedMsgListener(listener: advancedMsgListener);
+        advancedMsgListener = null;
       }
       return true;
     }
@@ -159,7 +201,8 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
   downloadFile(TUITheme theme) async {
     if (PlatformUtils().isMobile) {
       if (PlatformUtils().isIOS) {
-        if (!await Permissions.checkPermission(context, Permission.photosAddOnly.value, theme, false)) {
+        if (!await Permissions.checkPermission(
+            context, Permission.photosAddOnly.value, theme, false)) {
           return;
         }
       } else {
@@ -191,13 +234,18 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
   }
 
   tryOpenFile(context, theme) async {
-    if (!PlatformUtils().isWeb && (await hasZeroSize(filePath) || widget.message.status == 3)) {
-      onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: "不支持 0KB 文件的传输", infoCode: 6660417));
+    if (!PlatformUtils().isWeb &&
+        (await hasZeroSize(filePath) || widget.message.status == 3)) {
+      onTIMCallback(TIMCallback(
+          type: TIMCallbackType.INFO,
+          infoRecommendText: "不支持 0KB 文件的传输",
+          infoCode: 6660417));
       return;
     }
     if (PlatformUtils().isMobile) {
       if (PlatformUtils().isIOS) {
-        if (!await Permissions.checkPermission(context, Permission.photosAddOnly.value, theme!, false)) {
+        if (!await Permissions.checkPermission(
+            context, Permission.photosAddOnly.value, theme!, false)) {
           return;
         }
       } else {
@@ -241,7 +289,8 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
       );
 
-      final html.AnchorElement downloadAnchor = html.document.createElement('a') as html.AnchorElement;
+      final html.AnchorElement downloadAnchor =
+          html.document.createElement('a') as html.AnchorElement;
 
       final html.Blob blob = html.Blob([response.bodyBytes]);
 
@@ -253,7 +302,8 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
       html.AnchorElement(
         href: widget.fileElem?.path ?? "",
       )
-        ..setAttribute("download", widget.message.fileElem?.fileName ?? fileName)
+        ..setAttribute(
+            "download", widget.message.fileElem?.fileName ?? fileName)
         ..setAttribute("target", '_blank')
         ..style.display = "none"
         ..click();
@@ -272,14 +322,24 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
     final fileName = widget.fileElem!.fileName ?? "";
     final fileSize = widget.fileElem!.fileSize;
     final borderRadius = widget.isSelf
-        ? const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(2), bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10))
-        : const BorderRadius.only(topLeft: Radius.circular(2), topRight: Radius.circular(10), bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10));
+        ? const BorderRadius.only(
+            topLeft: Radius.circular(10),
+            topRight: Radius.circular(2),
+            bottomLeft: Radius.circular(10),
+            bottomRight: Radius.circular(10))
+        : const BorderRadius.only(
+            topLeft: Radius.circular(2),
+            topRight: Radius.circular(10),
+            bottomLeft: Radius.circular(10),
+            bottomRight: Radius.circular(10));
     String? fileFormat;
-    if (widget.fileElem?.fileName != null && widget.fileElem!.fileName!.isNotEmpty) {
+    if (widget.fileElem?.fileName != null &&
+        widget.fileElem!.fileName!.isNotEmpty) {
       final String fileName = widget.fileElem!.fileName!;
       fileFormat = fileName.split(".")[max(fileName.split(".").length - 1, 0)];
     }
-    final RenderBox? containerRenderBox = containerKey.currentContext?.findRenderObject() as RenderBox?;
+    final RenderBox? containerRenderBox =
+        containerKey.currentContext?.findRenderObject() as RenderBox?;
     if (containerRenderBox != null) {
       containerHeight = containerRenderBox.size.height;
     }
@@ -312,6 +372,8 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
                     }
                     return;
                   }
+
+                  await addAdvancedMsgListenerForDownload();
                   if (await hasFile()) {
                     if (received == 100) {
                       tryOpenFile(context, theme);
@@ -328,14 +390,20 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
                   }
                   if (checkIsWaiting()) {
                     onTIMCallback(
-                      TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("已加入待下载队列，其他文件下载中"), infoCode: 6660413),
+                      TIMCallback(
+                          type: TIMCallbackType.INFO,
+                          infoRecommendText: TIM_t("已加入待下载队列，其他文件下载中"),
+                          infoCode: 6660413),
                     );
                     return;
                   } else {
                     await addUrlToWaitingPath(theme);
                   }
                 } catch (e) {
-                  onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: "文件处理异常", infoCode: 6660416));
+                  onTIMCallback(TIMCallback(
+                      type: TIMCallbackType.INFO,
+                      infoRecommendText: "文件处理异常",
+                      infoCode: 6660416));
                 }
               },
               child: ConstrainedBox(
@@ -344,7 +412,8 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
                   width: 237,
                   decoration: BoxDecoration(
                       border: Border.all(
-                        color: theme.weakDividerColor ?? CommonColor.weakDividerColor,
+                        color: theme.weakDividerColor ??
+                            CommonColor.weakDividerColor,
                       ),
                       borderRadius: borderRadius),
                   child: Stack(children: [
@@ -353,44 +422,55 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
                       child: LinearProgressIndicator(
                         minHeight: ((containerHeight) ?? 72) - 6,
                         value: (received == 100 ? 0 : received) / 100,
-                        backgroundColor: received == 100 ? theme.weakBackgroundColor : Colors.white,
-                        valueColor: AlwaysStoppedAnimation(theme.lightPrimaryMaterialColor.shade50),
+                        backgroundColor: received == 100
+                            ? theme.weakBackgroundColor
+                            : Colors.white,
+                        valueColor: AlwaysStoppedAnimation(
+                            theme.lightPrimaryMaterialColor.shade50),
                       ),
                     ),
                     Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-                        child: Row(mainAxisAlignment: widget.isSelf ? MainAxisAlignment.end : MainAxisAlignment.start, children: [
-                          Expanded(
-                              child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 12),
+                        child: Row(
+                            mainAxisAlignment: widget.isSelf
+                                ? MainAxisAlignment.end
+                                : MainAxisAlignment.start,
                             children: [
-                              Container(
-                                constraints: const BoxConstraints(maxWidth: 160),
-                                child: LayoutBuilder(
-                                  builder: (buildContext, boxConstraints) {
-                                    return CustomText(
-                                      fileName,
-                                      width: boxConstraints.maxWidth,
-                                      maxLines: 1,
+                              Expanded(
+                                  child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    constraints:
+                                        const BoxConstraints(maxWidth: 160),
+                                    child: LayoutBuilder(
+                                      builder: (buildContext, boxConstraints) {
+                                        return CustomText(
+                                          fileName,
+                                          width: boxConstraints.maxWidth,
+                                          maxLines: 1,
+                                          style: TextStyle(
+                                            color: theme.darkTextColor,
+                                            fontSize: 16,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  if (fileSize != null)
+                                    Text(
+                                      showFileSize(fileSize),
                                       style: TextStyle(
-                                        color: theme.darkTextColor,
-                                        fontSize: 16,
-                                      ),
-                                    );
-                                  },
-                                ),
+                                          fontSize: 14,
+                                          color: theme.weakTextColor),
+                                    )
+                                ],
+                              )),
+                              TIMUIKitFileIcon(
+                                fileFormat: fileFormat,
                               ),
-                              if (fileSize != null)
-                                Text(
-                                  showFileSize(fileSize),
-                                  style: TextStyle(fontSize: 14, color: theme.weakTextColor),
-                                )
-                            ],
-                          )),
-                          TIMUIKitFileIcon(
-                            fileFormat: fileFormat,
-                          ),
-                        ])),
+                            ])),
                   ]),
                 ),
               ),

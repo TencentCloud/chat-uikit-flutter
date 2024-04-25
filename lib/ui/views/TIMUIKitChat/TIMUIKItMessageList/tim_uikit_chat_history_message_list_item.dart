@@ -646,7 +646,7 @@ class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistory
       alignment: Alignment.center,
       margin: const EdgeInsets.symmetric(vertical: 20),
       child: Text(
-        model.chatConfig.timeDividerConfig?.timestampParser != null ? (model.chatConfig.timeDividerConfig?.timestampParser!(timeStamp))! : TimeAgo().getTimeForMessage(1709740800),
+        model.chatConfig.timeDividerConfig?.timestampParser != null ? (model.chatConfig.timeDividerConfig?.timestampParser!(timeStamp))! : TimeAgo().getTimeForMessage(timeStamp),
         style: widget.themeData?.timelineTextStyle ??
             TextStyle(
               fontSize: 12,

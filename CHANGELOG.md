@@ -3,6 +3,7 @@
 ## Improvements
 
 * Improved memory usage, enhancing performance.
+* Improved the logger storage.
 
 # 2.5.0
 

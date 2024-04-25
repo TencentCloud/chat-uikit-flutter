@@ -230,6 +230,8 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
     axis: Axis.vertical,
   );
 
+  Widget? joinInGroupCallWidget;
+
   @override
   void initState() {
     super.initState();
@@ -346,12 +348,21 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
     return widget.conversation.type == 1 ? ConvType.c2c : ConvType.group;
   }
 
+  _updateJoinInGroupCallWidget() async {
+    if (_getConvType() != ConvType.group) {
+      return;
+    }
+    joinInGroupCallWidget = await TUICore.instance.raiseExtension(TUIExtensionID.joinInGroup, {GROUP_ID: widget.conversationID!});
+    setState(() {});
+  }
+
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final TUITheme theme = value.theme;
     final closePanel = OptimizeUtils.throttle((_) => textFieldController.hideAllPanel(), 60);
     final isBuild = isInit;
     isInit = true;
+    _updateJoinInGroupCallWidget();
 
     return TIMUIKitChatProviderScope(
         model: model,
@@ -450,6 +461,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                           if (widget.customAppBar != null) widget.customAppBar!,
                           if (filteredApplicationList.isNotEmpty) _renderJoinGroupApplication(filteredApplicationList.length, theme),
                           if (widget.topFixWidget != null) widget.topFixWidget!,
+                          if (joinInGroupCallWidget != null) Center(child: joinInGroupCallWidget!),
                           Expanded(
                               child: Container(
                             color: theme.chatBgColor,

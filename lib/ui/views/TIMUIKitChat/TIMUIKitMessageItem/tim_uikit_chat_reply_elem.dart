@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_model_tools.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
 import 'package:extended_text/extended_text.dart';
@@ -93,6 +94,9 @@ class _TIMUIKitReplyElemState extends TIMUIKitState<TIMUIKitReplyElem> {
       }
 
       final messageID = cloudCustomData.messageID;
+      if(PlatformUtils().isWeb){
+        return;
+      }
       V2TimMessage? message = await widget.chatModel.findMessage(messageID);
       if (message == null) {
         try {
@@ -168,7 +172,7 @@ class _TIMUIKitReplyElemState extends TIMUIKitState<TIMUIKitReplyElem> {
     }
     if (message == null) {
       if (repliedMessage?.messageAbstract != null) {
-        _renderMessageSummary(theme);
+        return _renderMessageSummary(theme);
       }
       return const SizedBox(width: 0, height: 12);
     }

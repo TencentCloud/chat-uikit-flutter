@@ -161,14 +161,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.3.1"
-  chewie_for_us:
+  chewie:
     dependency: transitive
     description:
-      name: chewie_for_us
-      sha256: "0307723e811508d361fffa6f8bbd9040b1bfea5536544e4d655e10c27de002ec"
+      name: chewie
+      sha256: "8bc4ac4cf3f316e50a25958c0f5eb9bb12cf7e8308bb1d74a43b230da2cfc144"
       url: "https://pub.dev"
     source: hosted
-    version: "1.5.0"
+    version: "1.7.5"
   clock:
     dependency: transitive
     description:
@@ -241,6 +241,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.2.10"
+  dbus:
+    dependency: transitive
+    description:
+      name: dbus
+      sha256: "365c771ac3b0e58845f39ec6deebc76e3276aa9922b0cc60840712094d9047ac"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.7.10"
   desktop_drop:
     dependency: transitive
     description:
@@ -1233,33 +1241,33 @@ packages:
     dependency: transitive
     description:
       name: tencent_cloud_chat_sdk
-      sha256: a78f1f20dc9ebe40aee1bbb47da097780028434d77e97774fbe733debb21e18e
+      sha256: "358e79b51aba5457418d3bb87e0bbd0f088a1eaf4c4463d09bdda93d1d655aa3"
       url: "https://pub.dev"
     source: hosted
-    version: "7.7.5296"
+    version: "7.9.5672"
   tencent_cloud_chat_uikit:
     dependency: "direct main"
     description:
       path: ".."
       relative: true
     source: path
-    version: "2.5.1"
+    version: "2.5.1+2"
   tencent_cloud_uikit_core:
     dependency: transitive
     description:
       name: tencent_cloud_uikit_core
-      sha256: "7ddb2c034e5f832261ba268957e282b7c2e738acb1d21aa40c62dad4eaa433ea"
+      sha256: "61a5400b3fe75c00252272469f332e7ec07f6d1932ee636a3f2b919cf9805cb8"
       url: "https://pub.dev"
     source: hosted
-    version: "1.5.2"
+    version: "1.6.0"
   tencent_im_base:
     dependency: transitive
     description:
       name: tencent_im_base
-      sha256: "035d97d24bebb87654700d4afc8227de8721a259ef5d0195f3207cb0eb0cdc7a"
+      sha256: daee1faac70fdf5fa4a53576db4fb7268ba5d897cc036353d3114a31abb76fb1
       url: "https://pub.dev"
     source: hosted
-    version: "3.3.775296"
+    version: "3.3.775297"
   tencent_im_sdk_plugin_desktop:
     dependency: "direct main"
     description:
@@ -1516,22 +1524,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "13.0.0"
-  wakelock_for_us:
+  wakelock_plus:
     dependency: transitive
     description:
-      name: wakelock_for_us
-      sha256: a5bdd445e51a617f7c24be8165230391447301f622aacd050038cee7b41989b4
+      name: wakelock_plus
+      sha256: f268ca2116db22e57577fb99d52515a24bdc1d570f12ac18bb762361d43b043d
       url: "https://pub.dev"
     source: hosted
-    version: "0.6.3+1"
-  wakelock_platform_interface:
+    version: "1.1.4"
+  wakelock_plus_platform_interface:
     dependency: transitive
     description:
-      name: wakelock_platform_interface
-      sha256: "1f4aeb81fb592b863da83d2d0f7b8196067451e4df91046c26b54a403f9de621"
+      name: wakelock_plus_platform_interface
+      sha256: "40fabed5da06caff0796dc638e1f07ee395fb18801fbff3255a2372db2d80385"
       url: "https://pub.dev"
     source: hosted
-    version: "0.3.0"
+    version: "1.1.0"
   watcher:
     dependency: transitive
     description:

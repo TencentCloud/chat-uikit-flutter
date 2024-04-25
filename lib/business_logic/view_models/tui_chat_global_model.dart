@@ -17,7 +17,6 @@ import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 
 enum ConvType { none, c2c, group }
 
@@ -504,6 +503,11 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
   }
 
   _onReceiveNewMsg(V2TimMessage msgComing) async {
+    final convID = TencentUtils.checkString(msgComing.userID) ?? msgComing.groupID;
+    if(convID != currentSelectedConv){
+      return;
+    }
+
     final V2TimMessage? newMsg = _lifeCycle?.newMessageWillMount != null ? await _lifeCycle?.newMessageWillMount(msgComing) : msgComing;
     if (newMsg == null) {
       return;
@@ -511,13 +515,12 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
     // check the message is editing status msg. and flutter is only support the latest version
     bool isEditMessage = _editStatusCheck(msgComing);
 
-    // if the message is edit status message dont up to screen
+    // if the message is edit status message don't up to screen
     if (isEditMessage) {
       return;
     }
 
     _checkFromUserisActive(msgComing);
-    final convID = TencentUtils.checkString(newMsg.userID) ?? newMsg.groupID;
     final convType = TencentUtils.checkString(newMsg.groupID) != null ? ConvType.group : ConvType.c2c;
     if (convID != null && convID == currentSelectedConv) {
       final position = getMessageListPosition(convID);
@@ -557,7 +560,8 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
         }
       }
     } else if (convID != null) {
-      final currentMsg = _messageListMap[convID] ?? [];
+      final tempCurrentMsgList = _messageListMap[convID] ?? [];
+      final currentMsg = tempCurrentMsgList..sublist(max(0, (tempCurrentMsgList.length - 20)));
       _messageListMap[convID] = [newMsg, ...currentMsg];
       notifyListeners();
     }
@@ -641,6 +645,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
 
   Future<void> onMessageDownloadProgressCallback(V2TimMessageDownloadProgress messageProgress) async {
     final currentProgress = getMessageProgress(messageProgress.msgID);
+    print("onMessageDownloadProgressCallback, ${messageProgress.type} - ${messageProgress.isFinish} - ${messageProgress.currentSize} - $currentProgress - ");
 
     if (messageProgress.isError || messageProgress.errorCode != 0) {
       V2TimMessage? message = await _findAndRetrieveMessage(messageProgress.msgID);
@@ -666,7 +671,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
     if (message != null) {
       bool isImageType = message.elemType == MessageElemType.V2TIM_ELEM_TYPE_IMAGE;
       bool isVideoType = message.elemType == MessageElemType.V2TIM_ELEM_TYPE_VIDEO;
-      final originalImageType = PlatformUtils().isIOS ? 1 : 0;
+      const originalImageType = 0;
       if (!isImageType && !isVideoType) {
         _updateMessageLocationAndDownloadFile(messageProgress);
       } else if ((isImageType && messageProgress.type == originalImageType) || (isVideoType && !messageProgress.isSnapshot)) {

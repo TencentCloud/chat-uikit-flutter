@@ -2,10 +2,10 @@
 
 import 'dart:async';
 
-import 'package:chewie_for_us/chewie_for_us.dart';
-import 'package:chewie_for_us/src/animated_play_pause.dart';
-import 'package:chewie_for_us/src/helpers/utils.dart';
-import 'package:chewie_for_us/src/material/material_progress_bar.dart';
+import 'package:chewie/chewie.dart';
+import 'package:chewie/src/animated_play_pause.dart';
+import 'package:chewie/src/helpers/utils.dart';
+import 'package:chewie/src/material/material_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
@@ -380,8 +380,7 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls> with 
 
             _startHideTimer();
           },
-          colors: chewieController.materialProgressColors ??
-              ChewieProgressColors(playedColor: Colors.white, handleColor: Colors.white, bufferedColor: Colors.white38, backgroundColor: Colors.white24),
+          colors: chewieController.materialProgressColors ?? ChewieProgressColors(playedColor: Colors.white, handleColor: Colors.white, bufferedColor: Colors.white38, backgroundColor: Colors.white24),
         ),
       ),
     );

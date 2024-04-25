@@ -95,9 +95,6 @@ class CoreServicesImpl implements CoreServices {
     if (platform != null) {
       TUIKitScreenUtils.deviceType = platform;
     }
-    if (TencentUtils.checkString(uikitLogPath) != null) {
-      logOutputGenerator(uikitLogPath!);
-    }
     addIdentifier();
     if (extraLanguage != null) {
       Future.delayed(const Duration(milliseconds: 1), () {

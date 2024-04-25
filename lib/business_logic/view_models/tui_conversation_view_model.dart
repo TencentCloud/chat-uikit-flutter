@@ -119,9 +119,9 @@ class TUIConversationViewModel extends ChangeNotifier {
       notifyListeners();
     }, onSyncServerFinish: () {
       // Remove the process to load such a many of conversations after launching
-      // if (!PlatformUtils().isWeb) {
-      //   loadInitConversation();
-      // }
+      if (!PlatformUtils().isWeb) {
+        loadInitConversation();
+      }
     });
   }
 
