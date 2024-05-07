@@ -129,6 +129,7 @@ class CoreServicesImpl implements CoreServices {
             onKickedOffline: listener.onKickedOffline,
             onUserStatusChanged: (List<V2TimUserStatus> userStatusList) {
               updateUserStatusList(userStatusList);
+              listener.onUserStatusChanged(userStatusList);
             },
             onSelfInfoUpdated: (V2TimUserFullInfo info) {
               listener.onSelfInfoUpdated(info);
