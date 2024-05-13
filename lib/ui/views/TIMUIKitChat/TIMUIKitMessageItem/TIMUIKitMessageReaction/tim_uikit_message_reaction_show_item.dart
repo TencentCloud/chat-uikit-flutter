@@ -31,17 +31,16 @@ class TIMUIKitMessageReactionShowItem extends TIMUIKitStatelessWidget {
   /// the member in current chat
   final List<V2TimGroupMemberFullInfo?> memberList;
 
-  TIMUIKitMessageReactionShowItem(
-      {required this.message,
-      required this.sticker,
-      required this.memberList,
-      required this.onShowDetail,
-      required this.nameList,
-      Key? key})
+  TIMUIKitMessageReactionShowItem({required this.message,
+    required this.sticker,
+    required this.memberList,
+    required this.onShowDetail,
+    required this.nameList,
+    Key? key})
       : super(key: key);
 
   final TUISelfInfoViewModel selfInfoModel =
-      serviceLocator<TUISelfInfoViewModel>();
+  serviceLocator<TUISelfInfoViewModel>();
   final MessageService _messageService = serviceLocator<MessageService>();
 
   clickOnCurrentSticker() async {
@@ -64,17 +63,20 @@ class TIMUIKitMessageReactionShowItem extends TIMUIKitStatelessWidget {
     final theme = value.theme;
     final option1 = nameList.length;
     final TUIChatSeparateViewModel model =
-        Provider.of<TUIChatSeparateViewModel>(context);
+    Provider.of<TUIChatSeparateViewModel>(context);
 
     final List<String> userIDs = [];
     for (final user in nameList) {
       final V2TimGroupMemberFullInfo? memberInfo = memberList
-          .firstWhereOrNull((element) => element?.userID == user && TencentUtils.checkString(user) != null);
-      if((memberInfo == null || TencentUtils.checkString(memberInfo.userID) == null) && TencentUtils.checkString(user.toString()) != null){
+          .firstWhereOrNull((element) =>
+      element?.userID == user && TencentUtils.checkString(user) != null);
+      if ((memberInfo == null ||
+          TencentUtils.checkString(memberInfo.userID) == null) &&
+          TencentUtils.checkString(user.toString()) != null) {
         userIDs.add(user.toString());
       }
     }
-    if(userIDs.isNotEmpty){
+    if (userIDs.isNotEmpty) {
       model.getUserShowName(userIDs);
     }
 
@@ -155,21 +157,21 @@ class TIMUIKitMessageReactionShowItem extends TIMUIKitStatelessWidget {
                           } else {
                             showName = memberInfo.userID;
                           }
-                        }else{
+                        } else {
                           final String? data = model.groupUserShowName[e];
-                          if(TencentUtils.checkString(data) != null){
+                          if (TencentUtils.checkString(data) != null) {
                             showName = data ?? e;
                           }
                         }
                       } catch (error) {
                         final String? data = model.groupUserShowName[e];
-                        if(TencentUtils.checkString(data) != null){
+                        if (TencentUtils.checkString(data) != null) {
                           showName = data ?? e;
                         }
                       }
-                    }else{
+                    } else {
                       final String? data = model.groupUserShowName[e];
-                      if(TencentUtils.checkString(data) != null){
+                      if (TencentUtils.checkString(data) != null) {
                         showName = data ?? e;
                       }
                     }
@@ -184,7 +186,10 @@ class TIMUIKitMessageReactionShowItem extends TIMUIKitStatelessWidget {
                       child: Text(
                         showName,
                         style: TextStyle(
-                            fontSize: 12, color: hexToColor("616669")),
+                          fontSize: 12,
+                          color: message?.isSelf == true
+                              ? Colors.white.withAlpha(200)
+                              : hexToColor("616669"),),
                       ),
                     );
                   })

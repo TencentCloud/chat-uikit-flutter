@@ -176,6 +176,7 @@ class _TIMUIKitAppBarState extends TIMUIKitState<TIMUIKitAppBar> {
           theme.chatHeaderBgColor ??
           theme.appbarBgColor ??
           theme.primaryColor,
+      flexibleSpace: setAppbar?.flexibleSpace,
       actionsIconTheme: setAppbar?.actionsIconTheme,
       foregroundColor: setAppbar?.foregroundColor,
       elevation: setAppbar?.elevation ?? (isDesktopScreen ? 0 : 1),

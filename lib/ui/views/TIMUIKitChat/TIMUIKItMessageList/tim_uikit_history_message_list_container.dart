@@ -17,6 +17,7 @@ import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageLi
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_chat_config.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tim_ui_kit_sticker_plugin/utils/tim_custom_face_data.dart';
+import 'package:tencent_cloud_chat_uikit/ui/theme/tim_uikit_message_theme.dart';
 
 enum LoadingPlace {
   none,
@@ -29,7 +30,7 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
   final AutoScrollController? scrollController;
   final String conversationID;
   final Function(String? userId, String? nickName)?
-      onLongPressForOthersHeadPortrait;
+  onLongPressForOthersHeadPortrait;
   final List<V2TimGroupAtInfo?>? groupAtInfoList;
   final V2TimMessage? initFindingMsg;
 
@@ -41,7 +42,7 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
 
   /// the builder for avatar
   final Widget Function(BuildContext context, V2TimMessage message)?
-      userAvatarBuilder;
+  userAvatarBuilder;
 
   /// the builder for tongue
   final TongueItemBuilder? tongueItemBuilder;
@@ -57,7 +58,7 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
 
   /// Avatar and name in message reaction secondary tap callback.
   final void Function(String userID, TapDownDetails tapDetails)?
-      onSecondaryTapAvatar;
+  onSecondaryTapAvatar;
 
   @Deprecated(
       "Nickname will not show in one-to-one chat, if you tend to control it in group chat, please use `isShowSelfNameInGroup` and `isShowOthersNameInGroup` from `config: TIMUIKitChatConfig` instead")
@@ -100,8 +101,7 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
     this.isAllowScroll = true,
     this.onTapAvatar,
     @Deprecated(
-        "Nickname will not show in one-to-one chat, if you tend to control it in group chat, please use `isShowSelfNameInGroup` and `isShowOthersNameInGroup` from `config: TIMUIKitChatConfig` instead")
-    this.showNickName = true,
+        "Nickname will not show in one-to-one chat, if you tend to control it in group chat, please use `isShowSelfNameInGroup` and `isShowOthersNameInGroup` from `config: TIMUIKitChatConfig` instead") this.showNickName = true,
     this.initFindingMsg,
     this.mainHistoryListConfig,
     this.toolTipsConfig,
@@ -159,7 +159,7 @@ class _TIMUIKitHistoryMessageListContainerState
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final chatConfig = Provider.of<TIMUIKitChatConfig>(context);
     final TUIChatSeparateViewModel model =
-        Provider.of<TUIChatSeparateViewModel>(context, listen: false);
+    Provider.of<TUIChatSeparateViewModel>(context, listen: false);
 
     return TIMUIKitHistoryMessageListSelector(
       conversationID: model.conversationID,
@@ -174,7 +174,7 @@ class _TIMUIKitHistoryMessageListContainerState
           itemBuilder: (context, message) {
             return TIMUIKitHistoryMessageListItem(
                 customMessageHoverBarOnDesktop:
-                    widget.customMessageHoverBarOnDesktop,
+                widget.customMessageHoverBarOnDesktop,
                 groupMemberInfo: widget.groupMemberInfo,
                 textFieldController: widget.textFieldController,
                 userAvatarBuilder: widget.userAvatarBuilder,
@@ -183,18 +183,18 @@ class _TIMUIKitHistoryMessageListContainerState
                 topRowBuilder: _getTopRowBuilder(model),
                 onScrollToIndex: _historyMessageListController.scrollToIndex,
                 onScrollToIndexBegin:
-                    _historyMessageListController.scrollToIndexBegin,
+                _historyMessageListController.scrollToIndexBegin,
                 toolTipsConfig: widget.toolTipsConfig ??
                     ToolTipsConfig(
                         additionalItemBuilder:
-                            widget.extraTipsActionItemBuilder),
+                        widget.extraTipsActionItemBuilder),
                 message: message!,
                 showAvatar: chatConfig.isShowAvatar,
                 onSecondaryTapForOthersPortrait: widget.onSecondaryTapAvatar,
                 onTapForOthersPortrait: widget.onTapAvatar,
                 messageItemBuilder: widget.messageItemBuilder,
                 onLongPressForOthersHeadPortrait:
-                    widget.onLongPressForOthersHeadPortrait,
+                widget.onLongPressForOthersHeadPortrait,
                 allowAtUserWhenReply: chatConfig.isAtWhenReply,
                 allowAvatarTap: chatConfig.isAllowClickAvatar,
                 allowLongPress: chatConfig.isAllowLongPressMessage,

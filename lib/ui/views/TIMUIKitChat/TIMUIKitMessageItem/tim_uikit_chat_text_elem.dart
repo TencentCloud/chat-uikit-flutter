@@ -27,20 +27,19 @@ class TIMUIKitTextElem extends StatefulWidget {
   final bool isUseDefaultEmoji;
   final List<CustomEmojiFaceData> customEmojiStickerList;
 
-  const TIMUIKitTextElem(
-      {Key? key,
-      required this.message,
-      required this.isFromSelf,
-      required this.isShowJump,
-      required this.clearJump,
-      this.fontStyle,
-      this.borderRadius,
-      this.isShowMessageReaction,
-      this.backgroundColor,
-      this.textPadding,
-      required this.chatModel,
-      this.isUseDefaultEmoji = false,
-      this.customEmojiStickerList = const []})
+  const TIMUIKitTextElem({Key? key,
+    required this.message,
+    required this.isFromSelf,
+    required this.isShowJump,
+    required this.clearJump,
+    this.fontStyle,
+    this.borderRadius,
+    this.isShowMessageReaction,
+    this.backgroundColor,
+    this.textPadding,
+    required this.chatModel,
+    this.isUseDefaultEmoji = false,
+    this.customEmojiStickerList = const []})
       : super(key: key);
 
   @override
@@ -104,7 +103,7 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
           widget.message.localCustomData!.isNotEmpty) {
         final String localJSON = widget.message.localCustomData!;
         final LocalCustomDataModel? localPreviewInfo =
-            LocalCustomDataModel.fromMap(json.decode(localJSON));
+        LocalCustomDataModel.fromMap(json.decode(localJSON));
         // If [localCustomData] is not empty, check if the link preview info exists
         if (localPreviewInfo == null || localPreviewInfo.isLinkPreviewEmpty()) {
           // If not exists, get it
@@ -138,14 +137,14 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
       try {
         final String localJSON = widget.message.localCustomData!;
         final LocalCustomDataModel? localPreviewInfo =
-            LocalCustomDataModel.fromMap(json.decode(localJSON));
+        LocalCustomDataModel.fromMap(json.decode(localJSON));
         if (localPreviewInfo != null &&
             !localPreviewInfo.isLinkPreviewEmpty()) {
           return Container(
             margin: const EdgeInsets.only(top: 8),
             child:
-                // You can use this default widget [LinkPreviewWidget] to render preview card, or you can use custom widget.
-                LinkPreviewWidget(linkPreview: localPreviewInfo),
+            // You can use this default widget [LinkPreviewWidget] to render preview card, or you can use custom widget.
+            LinkPreviewWidget(linkPreview: localPreviewInfo),
           );
         } else {
           return null;
@@ -168,26 +167,26 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
         widget.chatModel.chatConfig.isSupportMarkdownForTextMessage,
         onLinkTap: widget.chatModel.chatConfig.onTapLink,
         isUseQQPackage: (widget.chatModel.chatConfig.stickerPanelConfig
-                    ?.useTencentCloudChatStickerPackage ??
-                true) ||
+            ?.useTencentCloudChatStickerPackage ??
+            true) ||
             widget.isUseDefaultEmoji,
         isUseTencentCloudChatPackage: widget.chatModel.chatConfig
-                .stickerPanelConfig?.useTencentCloudChatStickerPackage ??
+            .stickerPanelConfig?.useTencentCloudChatStickerPackage ??
             true,
         customEmojiStickerList: widget.customEmojiStickerList,
         isEnableTextSelection:
-            widget.chatModel.chatConfig.isEnableTextSelection ?? false);
+        widget.chatModel.chatConfig.isEnableTextSelection ?? false);
     final borderRadius = widget.isFromSelf
         ? const BorderRadius.only(
-            topLeft: Radius.circular(10),
-            topRight: Radius.circular(2),
-            bottomLeft: Radius.circular(10),
-            bottomRight: Radius.circular(10))
+        topLeft: Radius.circular(10),
+        topRight: Radius.circular(2),
+        bottomLeft: Radius.circular(10),
+        bottomRight: Radius.circular(10))
         : const BorderRadius.only(
-            topLeft: Radius.circular(2),
-            topRight: Radius.circular(10),
-            bottomLeft: Radius.circular(10),
-            bottomRight: Radius.circular(10));
+        topLeft: Radius.circular(2),
+        topRight: Radius.circular(10),
+        bottomLeft: Radius.circular(10),
+        bottomRight: Radius.circular(10));
     if ((widget.chatModel.jumpMsgID == widget.message.msgID)) {}
     if (widget.isShowJump) {
       if (!isShining) {
@@ -204,7 +203,7 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
 
     final defaultStyle = widget.isFromSelf
         ? (theme.chatMessageItemFromSelfBgColor ??
-            theme.lightPrimaryMaterialColor.shade50)
+        theme.lightPrimaryMaterialColor.shade50)
         : (theme.chatMessageItemFromOthersBgColor);
 
     final backgroundColor = isShowJumpState
@@ -218,7 +217,10 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
         borderRadius: widget.borderRadius ?? borderRadius,
       ),
       constraints:
-          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.6),
+      BoxConstraints(maxWidth: MediaQuery
+          .of(context)
+          .size
+          .width * 0.6),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -226,34 +228,36 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
           // You can render the widget from extension directly, with a [TextStyle] optionally.
           widget.chatModel.chatConfig.urlPreviewType != UrlPreviewType.none
               ? textWithLink!(
-                  style: widget.fontStyle ??
-                      TextStyle(
-                          fontSize: isDesktopScreen ? 14 : 16,
-                          textBaseline: TextBaseline.ideographic,
-                          height: widget.chatModel.chatConfig.textHeight))
+              style: widget.fontStyle ??
+                  TextStyle(
+                      color: widget.isFromSelf ? Colors.white : Colors.black,
+                      fontSize: isDesktopScreen ? 14 : 16,
+                      textBaseline: TextBaseline.ideographic,
+                      height: widget.chatModel.chatConfig.textHeight))
               : ExtendedText(widget.message.textElem?.text ?? "",
-                  softWrap: true,
-                  style: widget.fontStyle ??
-                      TextStyle(
-                          fontSize: isDesktopScreen ? 14 : 16,
-                          height: widget.chatModel.chatConfig.textHeight),
-                  specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
-                    isUseQQPackage: (widget
-                                .chatModel
-                                .chatConfig
-                                .stickerPanelConfig
-                                ?.useTencentCloudChatStickerPackage ??
-                            true) ||
-                        widget.isUseDefaultEmoji,
-                    isUseTencentCloudChatPackage: widget
-                            .chatModel
-                            .chatConfig
-                            .stickerPanelConfig
-                            ?.useTencentCloudChatStickerPackage ??
-                        true,
-                    customEmojiStickerList: widget.customEmojiStickerList,
-                    showAtBackground: true,
-                  )),
+              softWrap: true,
+              style: widget.fontStyle ??
+                  TextStyle(
+                      color: widget.isFromSelf ? Colors.white : Colors.black,
+                      fontSize: isDesktopScreen ? 14 : 16,
+                      height: widget.chatModel.chatConfig.textHeight),
+              specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
+                isUseQQPackage: (widget
+                    .chatModel
+                    .chatConfig
+                    .stickerPanelConfig
+                    ?.useTencentCloudChatStickerPackage ??
+                    true) ||
+                    widget.isUseDefaultEmoji,
+                isUseTencentCloudChatPackage: widget
+                    .chatModel
+                    .chatConfig
+                    .stickerPanelConfig
+                    ?.useTencentCloudChatStickerPackage ??
+                    true,
+                customEmojiStickerList: widget.customEmojiStickerList,
+                showAtBackground: true,
+              )),
           // If the link preview info is available, render the preview card.
           if (_renderPreviewWidget() != null &&
               widget.chatModel.chatConfig.urlPreviewType ==
