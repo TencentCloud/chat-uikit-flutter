@@ -210,7 +210,7 @@ class TUIConversationViewModel extends ChangeNotifier {
     for (int element = 0; element < list.length; element++) {
       int index = _conversationList.indexWhere((item) => item!.conversationID == list[element].conversationID);
       if (index > -1) {
-        _conversationList.setAll(index, [list[element]]);
+        _conversationList.setAll(index, [list[element]] as List<V2TimConversation?>);
       } else {
         _conversationList.add(list[element]);
       }

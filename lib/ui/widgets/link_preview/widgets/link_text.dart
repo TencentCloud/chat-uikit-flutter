@@ -54,7 +54,7 @@ class LinkTextMarkdown extends TIMStatelessWidget {
       selectable: isEnableTextSelection ?? false,
       styleSheet: MarkdownStyleSheet.fromTheme(ThemeData(
               textTheme: TextTheme(
-                  bodyText2: style ?? const TextStyle(fontSize: 16.0))))
+                  bodyMedium: style ?? const TextStyle(fontSize: 16.0))))
           .copyWith(
         a: TextStyle(color: LinkUtils.hexToColor("015fff")),
       ),
