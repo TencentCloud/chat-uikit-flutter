@@ -56,6 +56,7 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
   V2TimAdvancedMsgListener? advancedMsgListener;
   final GlobalKey containerKey = GlobalKey();
   double? containerHeight;
+  bool? _downloadFailed = false;
 
   @override
   void dispose() {
@@ -88,6 +89,7 @@ class _TIMUIKitFileElemState extends TIMUIKitState<TIMUIKitFileElem> {
         if (messageProgress.msgID == widget.message.msgID) {
           if (messageProgress.isError || messageProgress.errorCode != 0) {
             setState(() {
+              _downloadFailed = true;
             });
             return;
           }
