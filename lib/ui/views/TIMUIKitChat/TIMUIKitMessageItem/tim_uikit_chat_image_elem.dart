@@ -524,7 +524,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
               ""),
       child: Stack(
         children: [
-          if (currentPositionRadio != null || positionRadio != null)
+          if (positionRadio != null)
             AspectRatio(
               aspectRatio: (currentPositionRadio ?? positionRadio)!,
               child: Container(
