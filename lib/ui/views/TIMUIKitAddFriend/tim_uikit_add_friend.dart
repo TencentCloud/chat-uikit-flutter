@@ -27,12 +27,18 @@ class TIMUIKitAddFriend extends StatefulWidget {
   /// The callback function to close the widget upon completion by the parent component.
   final VoidCallback? closeFunc;
 
-  const TIMUIKitAddFriend(
-      {Key? key,
-      this.isShowDefaultGroup = false,
-      this.lifeCycle,
-      required this.onTapAlreadyFriendsItem,
-      this.closeFunc})
+  final Function(
+      AddFriendLifeCycle? lifeCycle,
+      bool? isShowDefaultGroup,
+      V2TimUserFullInfo friendInfo,
+      TUISelfInfoViewModel selfInfoViewModel)? onTap;
+
+  const TIMUIKitAddFriend({Key? key,
+    this.isShowDefaultGroup = false,
+    this.lifeCycle,
+    required this.onTapAlreadyFriendsItem,
+    this.onTap,
+    this.closeFunc})
       : super(key: key);
 
   @override
@@ -43,16 +49,16 @@ class _TIMUIKitAddFriendState extends TIMUIKitState<TIMUIKitAddFriend> {
   final TextEditingController _controller = TextEditingController();
   final CoreServicesImpl _coreServicesImpl = serviceLocator<CoreServicesImpl>();
   final FriendshipServices _friendshipServices =
-      serviceLocator<FriendshipServices>();
+  serviceLocator<FriendshipServices>();
   final TUISelfInfoViewModel _selfInfoViewModel =
-      serviceLocator<TUISelfInfoViewModel>();
+  serviceLocator<TUISelfInfoViewModel>();
   final FocusNode _focusNode = FocusNode();
   bool isFocused = false;
   bool showResult = false;
   List<V2TimUserFullInfo>? searchResult;
 
-  Widget _searchResultItemBuilder(
-      V2TimUserFullInfo friendInfo, TUITheme theme) {
+  Widget _searchResultItemBuilder(V2TimUserFullInfo friendInfo,
+      TUITheme theme) {
     final isDesktopScreen =
         TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
 
@@ -60,8 +66,8 @@ class _TIMUIKitAddFriendState extends TIMUIKitState<TIMUIKitAddFriend> {
     final userID = friendInfo.userID ?? "";
     final String showName =
         ((friendInfo.nickName != null && friendInfo.nickName!.isNotEmpty)
-                ? friendInfo.nickName
-                : userID) ??
+            ? friendInfo.nickName
+            : userID) ??
             "";
     return InkWell(
       onTap: () async {
@@ -92,24 +98,42 @@ class _TIMUIKitAddFriendState extends TIMUIKitState<TIMUIKitAddFriend> {
           TUIKitWidePopup.showPopupWindow(
             operationKey: TUIKitWideModalOperationKey.addFriend,
             context: context,
-            width: MediaQuery.of(context).size.width * 0.3,
-            height: MediaQuery.of(context).size.width * 0.4,
+            width: MediaQuery
+                .of(context)
+                .size
+                .width * 0.3,
+            height: MediaQuery
+                .of(context)
+                .size
+                .width * 0.4,
             title: TIM_t("添加好友"),
-            child: (closeFuncSendApplication) => SendApplication(
-                lifeCycle: widget.lifeCycle,
-                isShowDefaultGroup: widget.isShowDefaultGroup ?? false,
-                friendInfo: friendInfo,
-                model: _selfInfoViewModel),
+            child: (closeFuncSendApplication) =>
+                SendApplication(
+                    lifeCycle: widget.lifeCycle,
+                    isShowDefaultGroup: widget.isShowDefaultGroup ?? false,
+                    friendInfo: friendInfo,
+                    model: _selfInfoViewModel),
           );
         } else {
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => SendApplication(
-                      lifeCycle: widget.lifeCycle,
-                      isShowDefaultGroup: widget.isShowDefaultGroup ?? false,
-                      friendInfo: friendInfo,
-                      model: _selfInfoViewModel)));
+          if (widget.onTap != null) {
+            widget.onTap?.call(
+              widget.lifeCycle,
+              widget.isShowDefaultGroup ?? false,
+              friendInfo,
+              _selfInfoViewModel,
+            );
+          } else {
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) =>
+                        SendApplication(
+                            lifeCycle: widget.lifeCycle,
+                            isShowDefaultGroup: widget.isShowDefaultGroup ??
+                                false,
+                            friendInfo: friendInfo,
+                            model: _selfInfoViewModel)));
+          }
         }
       },
       child: Container(
@@ -147,8 +171,8 @@ class _TIMUIKitAddFriendState extends TIMUIKitState<TIMUIKitAddFriend> {
     );
   }
 
-  List<Widget> _searchResultBuilder(
-      List<V2TimUserFullInfo>? searchResult, TUITheme theme) {
+  List<Widget> _searchResultBuilder(List<V2TimUserFullInfo>? searchResult,
+      TUITheme theme) {
     final noResult = searchResult == null || searchResult.isEmpty;
     if (noResult) {
       return [
@@ -208,46 +232,50 @@ class _TIMUIKitAddFriendState extends TIMUIKitState<TIMUIKitAddFriend> {
                 children: [
                   Expanded(
                       child: TextField(
-                    autofocus: true,
-                    focusNode: _focusNode,
-                    controller: _controller,
-                    onChanged: (value) {
-                      if (value.trim().isEmpty) {
-                        setState(() {
-                          showResult = false;
-                        });
-                      }
-                    },
-                    textInputAction: TextInputAction.search,
-                    onSubmitted: (_) {
-                      final searchParams = _controller.text;
-                      if (searchParams.trim().isNotEmpty) {
-                        searchFriend(searchParams);
-                        showResult = true;
-                        _focusNode.requestFocus();
-                        setState(() {});
-                      }
-                    },
-                    decoration: InputDecoration(
-                        prefixIcon: Icon(
-                          Icons.search_outlined,
-                          color: theme.weakTextColor,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(8),
-                          borderSide: const BorderSide(
-                            width: 0,
-                            style: BorderStyle.none,
-                          ),
-                        ),
-                        contentPadding: EdgeInsets.zero,
-                        hintStyle: TextStyle(
-                          color: theme.weakTextColor,
-                        ),
-                        fillColor: theme.inputFillColor,
-                        filled: true,
-                        hintText: TIM_t("搜索用户 ID")),
-                  )),
+                        autofocus: true,
+                        focusNode: _focusNode,
+                        controller: _controller,
+                        onChanged: (value) {
+                          if (value
+                              .trim()
+                              .isEmpty) {
+                            setState(() {
+                              showResult = false;
+                            });
+                          }
+                        },
+                        textInputAction: TextInputAction.search,
+                        onSubmitted: (_) {
+                          final searchParams = _controller.text;
+                          if (searchParams
+                              .trim()
+                              .isNotEmpty) {
+                            searchFriend(searchParams);
+                            showResult = true;
+                            _focusNode.requestFocus();
+                            setState(() {});
+                          }
+                        },
+                        decoration: InputDecoration(
+                            prefixIcon: Icon(
+                              Icons.search_outlined,
+                              color: theme.weakTextColor,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(8),
+                              borderSide: const BorderSide(
+                                width: 0,
+                                style: BorderStyle.none,
+                              ),
+                            ),
+                            contentPadding: EdgeInsets.zero,
+                            hintStyle: TextStyle(
+                              color: theme.weakTextColor,
+                            ),
+                            fillColor: theme.inputFillColor,
+                            filled: true,
+                            hintText: TIM_t("搜索用户 ID")),
+                      )),
                 ],
               ),
             ),
