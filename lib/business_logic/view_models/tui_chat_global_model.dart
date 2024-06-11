@@ -17,7 +17,6 @@ import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 
 enum ConvType { none, c2c, group }
 
@@ -198,8 +197,10 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
 
   clearCurrentConversation() {
     // Only keep the last 20 messages when existing a chat.
-    _messageListMap[currentSelectedConv] = (_messageListMap[currentSelectedConv] ?? []).sublist(max(0, ((_messageListMap[currentSelectedConv] ?? []).length - 20)));
-    _currentConversationList.removeLast();
+    _messageListMap[currentSelectedConv] = (_messageListMap[currentSelectedConv] ?? []).sublist(0, min(10, ((_messageListMap[currentSelectedConv] ?? []).length - 1)));
+    if (_currentConversationList.isNotEmpty) {
+      _currentConversationList.removeLast();
+    }
     // notifyListeners();
   }
 
@@ -269,7 +270,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
       if (conversationItem == null || conversationItem.type == null) {
         return;
       }
-      final conversationID = conversationItem.userID ?? conversationItem.groupID ?? conversationItem.conversationID;
+      final conversationID = TencentUtils.checkString(conversationItem.userID) ?? TencentUtils.checkString(conversationItem.groupID) ?? conversationItem.conversationID;
       if (messageListMap[conversationID] == null || messageListMap[conversationID]!.isEmpty) {
         index++;
         Future.delayed(Duration(milliseconds: 500 * index), () {
@@ -502,6 +503,11 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
   }
 
   _onReceiveNewMsg(V2TimMessage msgComing) async {
+    final convID = TencentUtils.checkString(msgComing.userID) ?? msgComing.groupID;
+    if(convID != currentSelectedConv){
+      return;
+    }
+
     final V2TimMessage? newMsg = _lifeCycle?.newMessageWillMount != null ? await _lifeCycle?.newMessageWillMount(msgComing) : msgComing;
     if (newMsg == null) {
       return;
@@ -509,13 +515,12 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
     // check the message is editing status msg. and flutter is only support the latest version
     bool isEditMessage = _editStatusCheck(msgComing);
 
-    // if the message is edit status message dont up to screen
+    // if the message is edit status message don't up to screen
     if (isEditMessage) {
       return;
     }
 
     _checkFromUserisActive(msgComing);
-    final convID = TencentUtils.checkString(newMsg.userID) ?? newMsg.groupID;
     final convType = TencentUtils.checkString(newMsg.groupID) != null ? ConvType.group : ConvType.c2c;
     if (convID != null && convID == currentSelectedConv) {
       final position = getMessageListPosition(convID);
@@ -533,8 +538,8 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
           });
         }
         _receivedNewMessageCount = 0;
-        final currentMsg = _messageListMap[convID] ?? [];
-        _messageListMap[convID] = [newMsg, ...currentMsg];
+        final tempCurrentMsgList = _messageListMap[convID] ?? [];
+        _messageListMap[convID] = [newMsg, ...tempCurrentMsgList];
         notifyListeners();
         final messageID = newMsg.msgID;
         final needReadReceipt = newMsg.needReadReceipt ?? false;
@@ -554,8 +559,8 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
         }
       }
     } else if (convID != null) {
-      final currentMsg = _messageListMap[convID] ?? [];
-      _messageListMap[convID] = [newMsg, ...currentMsg];
+      final tempCurrentMsgList = _messageListMap[convID] ?? [];
+      _messageListMap[convID] = [newMsg, ...tempCurrentMsgList];
       notifyListeners();
     }
   }
@@ -638,6 +643,13 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
 
   Future<void> onMessageDownloadProgressCallback(V2TimMessageDownloadProgress messageProgress) async {
     final currentProgress = getMessageProgress(messageProgress.msgID);
+    print("onMessageDownloadProgressCallback, ${messageProgress.type} - ${messageProgress.isFinish} - ${messageProgress.currentSize} - $currentProgress - ");
+
+    if (messageProgress.isError || messageProgress.errorCode != 0) {
+      V2TimMessage? message = await _findAndRetrieveMessage(messageProgress.msgID);
+      _handleDownloadError(messageProgress, message);
+      return;
+    }
 
     if (messageProgress.isFinish && currentProgress < 100) {
       V2TimMessage? message = await _findAndRetrieveMessage(messageProgress.msgID);
@@ -657,7 +669,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
     if (message != null) {
       bool isImageType = message.elemType == MessageElemType.V2TIM_ELEM_TYPE_IMAGE;
       bool isVideoType = message.elemType == MessageElemType.V2TIM_ELEM_TYPE_VIDEO;
-      final originalImageType = PlatformUtils().isIOS ? 1 : 0;
+      const originalImageType = 0;
       if (!isImageType && !isVideoType) {
         _updateMessageLocationAndDownloadFile(messageProgress);
       } else if ((isImageType && messageProgress.type == originalImageType) || (isVideoType && !messageProgress.isSnapshot)) {
@@ -668,6 +680,11 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
     } else {
       _updateMessageLocationAndDownloadFile(messageProgress);
     }
+  }
+
+  void _handleDownloadError(V2TimMessageDownloadProgress messageProgress, V2TimMessage? message) {
+    setMessageProgress(messageProgress.msgID, 0);
+    downloadFile();
   }
 
   void _updateMessageAndDownloadFile(V2TimMessage message, V2TimMessageDownloadProgress messageProgress) {

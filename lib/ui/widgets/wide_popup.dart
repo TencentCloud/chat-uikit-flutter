@@ -2,15 +2,15 @@
 
 import 'dart:io';
 
-import 'package:chewie_for_us/chewie_for_us.dart';
+import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/drag_widget.dart';
-import 'package:path/path.dart' as p;
 import 'package:video_player/video_player.dart';
 
 class TUIKitWidePopup {
@@ -70,26 +70,10 @@ class TUIKitWidePopup {
     }
     isShow = true;
 
-    final TUISelfInfoViewModel selfInfoViewModel =
-        serviceLocator<TUISelfInfoViewModel>();
+    final TUISelfInfoViewModel selfInfoViewModel = serviceLocator<TUISelfInfoViewModel>();
 
     if (selfInfoViewModel.globalConfig?.showDesktopModalFunc != null) {
-      final res = await selfInfoViewModel.globalConfig!.showDesktopModalFunc!(
-          operationKey,
-          context,
-          child,
-          theme,
-          width,
-          height,
-          offset,
-          initText,
-          borderRadius,
-          isDarkBackground,
-          title,
-          onSubmit,
-          submitWidget,
-          onConfirm,
-          onCancel);
+      final res = await selfInfoViewModel.globalConfig!.showDesktopModalFunc!(operationKey, context, child, theme, width, height, offset, initText, borderRadius, isDarkBackground, title, onSubmit, submitWidget, onConfirm, onCancel);
 
       if (res == true) {
         return;
@@ -102,8 +86,7 @@ class TUIKitWidePopup {
       width: width,
       height: height,
       decoration: BoxDecoration(
-        borderRadius:
-            borderRadius ?? const BorderRadius.all(Radius.circular(16)),
+        borderRadius: borderRadius ?? const BorderRadius.all(Radius.circular(16)),
         color: theme?.wideBackgroundColor ?? const Color(0xFFffffff),
         border: isDarkBackground
             ? Border.all(
@@ -129,9 +112,7 @@ class TUIKitWidePopup {
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: hexToColor("f5f6f7"),
-                borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(16),
-                    topRight: Radius.circular(16)),
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(16), topRight: Radius.circular(16)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -139,9 +120,7 @@ class TUIKitWidePopup {
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
-                        fontSize: 18,
-                        color: theme?.darkTextColor ?? const Color(0xFF444444)),
+                    style: TextStyle(fontSize: 18, color: theme?.darkTextColor ?? const Color(0xFF444444)),
                   ),
                   InkWell(
                     onTap: () {
@@ -156,9 +135,7 @@ class TUIKitWidePopup {
                         entry = null;
                       }
                     },
-                    child: onSubmit != null
-                        ? (submitWidget ?? const Icon(Icons.check))
-                        : const Icon(Icons.close),
+                    child: onSubmit != null ? (submitWidget ?? const Icon(Icons.check)) : const Icon(Icons.close),
                   )
                 ],
               ),
@@ -212,8 +189,7 @@ class TUIKitWidePopup {
                           },
                           child: Text(
                             TIM_t("取消"),
-                            style: TextStyle(
-                                color: theme?.weakTextColor ?? Colors.black),
+                            style: TextStyle(color: theme?.weakTextColor ?? Colors.black),
                           )),
                     ),
                   if (onConfirm != null)
@@ -293,8 +269,7 @@ class TUIKitWidePopup {
     required VoidCallback onClickOrigin,
     double? aspectRatio,
   }) async {
-    assert((mediaLocalPath != null) || (mediaURL != null),
-        "At least one of mediaLocalPath or mediaURL must be provided.");
+    assert((mediaLocalPath != null) || (mediaURL != null), "At least one of mediaLocalPath or mediaURL must be provided.");
 
     String _removeQueryString(String urlString) {
       Uri uri = Uri.parse(urlString);
@@ -310,10 +285,8 @@ class TUIKitWidePopup {
     final String mediaPath = mediaLocalPath ?? mediaURL ?? "";
     final isLocalResource = mediaLocalPath != null;
 
-    String fileExtension = p
-        .extension(isLocalResource ? mediaPath : _removeQueryString(mediaPath));
-    bool isVideo =
-        ['.mp4', '.avi', '.mov', '.flv', '.wmv'].contains(fileExtension);
+    String fileExtension = p.extension(isLocalResource ? mediaPath : _removeQueryString(mediaPath));
+    bool isVideo = ['.mp4', '.avi', '.mov', '.flv', '.wmv'].contains(fileExtension);
 
     VideoPlayerController? videoController;
     ChewieController? chewieController;
@@ -324,8 +297,7 @@ class TUIKitWidePopup {
       if (isLocalResource) {
         videoController = VideoPlayerController.file(File(mediaPath));
       } else {
-        videoController =
-            VideoPlayerController.networkUrl(Uri.parse(mediaPath));
+        videoController = VideoPlayerController.networkUrl(Uri.parse(mediaPath));
       }
 
       await videoController.initialize();
@@ -342,9 +314,7 @@ class TUIKitWidePopup {
 
       mediaWidget = Chewie(controller: chewieController);
     } else {
-      mediaWidget = isLocalResource
-          ? Image.file(File(mediaPath), fit: BoxFit.contain)
-          : Image.network(mediaPath, fit: BoxFit.contain);
+      mediaWidget = isLocalResource ? Image.file(File(mediaPath), fit: BoxFit.contain) : Image.network(mediaPath, fit: BoxFit.contain);
     }
 
     showDialog(
@@ -373,11 +343,7 @@ class TUIKitWidePopup {
                           maxWidth: MediaQuery.of(context).size.width * 0.85,
                           maxHeight: MediaQuery.of(context).size.height * 0.82,
                         ),
-                        child: aspectRatioFinal != null
-                            ? AspectRatio(
-                            aspectRatio: aspectRatioFinal,
-                            child: mediaWidget)
-                            : mediaWidget,
+                        child: aspectRatioFinal != null ? AspectRatio(aspectRatio: aspectRatioFinal, child: mediaWidget) : mediaWidget,
                       ),
                       const SizedBox(height: 10),
                       InkWell(

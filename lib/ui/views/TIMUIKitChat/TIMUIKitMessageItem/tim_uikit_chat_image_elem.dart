@@ -2,38 +2,40 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'package:crypto/crypto.dart';
-import 'package:device_info_plus/device_info_plus.dart';
-import 'package:http/http.dart' as http;
-import 'package:open_file/open_file.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
-import 'package:universal_html/html.dart' as html;
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
+
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:collection/collection.dart';
+import 'package:crypto/crypto.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_wrapper.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/image_screen.dart';
+import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
 import 'package:transparent_image/transparent_image.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:universal_html/html.dart' as html;
 import 'package:url_launcher/url_launcher.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 
 class TIMUIKitImageElem extends StatefulWidget {
   final V2TimMessage message;
@@ -454,6 +456,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
 
   Widget _renderAllImage(
       {dynamic heroTag,
+      double? positionRadio,
       required TUITheme theme,
       bool isNetworkImage = false,
       String? webPath,
@@ -489,6 +492,26 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
       }
     }
 
+    double? currentPositionRadio;
+    // File imgF = File((TencentUtils.checkString(originLocalPath) != null
+    //         ? originLocalPath
+    //         : smallLocalPath) ??
+    //     "");
+    // bool isExist = imgF.existsSync();
+    //
+    // if (!isExist) {
+    //   return errorDisplay(context, theme);
+    // }
+    // Image image = Image.file(imgF);
+    //
+    // image.image
+    //     .resolve(const ImageConfiguration())
+    //     .addListener(ImageStreamListener((image, synchronousCall) {
+    //   if (image.image.width != 0 && image.image.height != 0) {
+    //     currentPositionRadio = image.image.width / image.image.height;
+    //   }
+    // }));
+
     return GestureDetector(
       onTap: () => onClickImage(
           theme: theme,
@@ -499,14 +522,38 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
                   ? originLocalPath
                   : smallLocalPath) ??
               ""),
-      child: getImageWidget(),
+      child: Stack(
+        children: [
+          if (positionRadio != null)
+            AspectRatio(
+              aspectRatio: (currentPositionRadio ?? positionRadio)!,
+              child: Container(
+                decoration: const BoxDecoration(color: Colors.transparent),
+              ),
+            ),
+          getImageWidget(),
+        ],
+      ),
     );
   }
 
   void initImages() async {
+    final zeroImageLocal = TencentUtils.checkString(widget
+        .message.imageElem?.imageList
+        ?.firstWhereOrNull((element) => element?.type == 0)
+        ?.localUrl);
+    final oneImageLocal = TencentUtils.checkString(widget
+        .message.imageElem?.imageList
+        ?.firstWhereOrNull((element) => element?.type == 1)
+        ?.localUrl);
+    final twoImageLocal = TencentUtils.checkString(widget
+        .message.imageElem?.imageList
+        ?.firstWhereOrNull((element) => element?.type == 2)
+        ?.localUrl);
+
     if (!PlatformUtils().isWeb &&
         TencentUtils.checkString(widget.message.msgID) != null) {
-      if (widget.message.imageElem?.imageList == null ||
+      if ((widget.message.imageElem?.imageList) == null ||
           widget.message.imageElem!.imageList!.isEmpty) {
         final response = await _messageService.getMessageOnlineUrl(
             msgID: widget.message.msgID!);
@@ -515,43 +562,25 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
           widget.message.imageElem = elem.imageElem;
         }
       }
-      if (widget.message.imageElem?.imageList == null ||
-          widget.message.imageElem!.imageList!.isEmpty ||
-          TencentUtils.checkString(
-                  widget.message.imageElem?.imageList?[0]?.localUrl) ==
-              null ||
-          !File(widget.message.imageElem!.imageList![0]!.localUrl!)
-              .existsSync()) {
-        _messageService.downloadMessage(
-            msgID: widget.message.msgID!,
-            messageType: 3,
-            imageType: 0,
-            isSnapshot: false);
-      }
-      if (widget.message.imageElem?.imageList == null ||
-          widget.message.imageElem!.imageList!.length < 2 &&
-              TencentUtils.checkString(
-                      widget.message.imageElem?.imageList?[1]?.localUrl) ==
-                  null ||
-          !File(widget.message.imageElem!.imageList![1]!.localUrl!)
-              .existsSync()) {
+      if (oneImageLocal == null || !File(oneImageLocal).existsSync()) {
         _messageService.downloadMessage(
             msgID: widget.message.msgID!,
             messageType: 3,
             imageType: 1,
             isSnapshot: false);
       }
-      if (widget.message.imageElem?.imageList != null ||
-          widget.message.imageElem!.imageList!.length < 3 ||
-          TencentUtils.checkString(
-                  widget.message.imageElem?.imageList?[2]?.localUrl) ==
-              null ||
-          !File(widget.message.imageElem!.imageList![2]!.localUrl!)
-              .existsSync()) {
+      if (twoImageLocal == null || !File(twoImageLocal).existsSync()) {
         _messageService.downloadMessage(
             msgID: widget.message.msgID!,
             messageType: 3,
             imageType: 2,
+            isSnapshot: false);
+      }
+      if (zeroImageLocal == null || !File(zeroImageLocal).existsSync()) {
+        _messageService.downloadMessage(
+            msgID: widget.message.msgID!,
+            messageType: 3,
+            imageType: 0,
             isSnapshot: false);
       }
     }
@@ -572,6 +601,15 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
 
   Widget? _renderImage(dynamic heroTag, TUITheme theme,
       {V2TimImage? originalImg, V2TimImage? smallImg}) {
+
+    double positionRadio = 1.0;
+    if (smallImg?.width != null &&
+        smallImg?.height != null &&
+        smallImg?.width != 0 &&
+        smallImg?.height != 0) {
+      positionRadio = (smallImg!.width! / smallImg.height!);
+    }
+
     if (PlatformUtils().isWeb && widget.message.imageElem!.path != null) {
       // Displaying on Web only
       return _renderAllImage(
@@ -580,6 +618,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
           isNetworkImage: true,
           smallImg: smallImg,
           originalImg: originalImg,
+          positionRadio: positionRadio,
           webPath: widget.message.imageElem!.path);
     }
 
@@ -592,11 +631,12 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
             smallLocalPath: widget.message.imageElem!.path!,
             heroTag: heroTag,
             theme: theme,
+            positionRadio: positionRadio,
             originLocalPath: widget.message.imageElem!.path!);
       }
     } catch (e) {
       // ignore: avoid_print
-      outputLogger.i(e);
+      outputLogger.i(e.toString());
     }
 
     try {
@@ -608,16 +648,18 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
             smallLocalPath: smallImg?.localUrl ?? "",
             heroTag: heroTag,
             theme: theme,
+            positionRadio: positionRadio,
             originLocalPath: originalImg?.localUrl);
       }
     } catch (e) {
       // ignore: avoid_print
-      outputLogger.i(e);
+      outputLogger.i(e.toString());
       return _renderAllImage(
           heroTag: heroTag,
           theme: theme,
           isNetworkImage: true,
           smallImg: smallImg,
+          positionRadio: positionRadio,
           originalImg: originalImg);
     }
 
@@ -627,6 +669,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
           heroTag: heroTag,
           theme: theme,
           isNetworkImage: true,
+          positionRadio: positionRadio,
           smallImg: smallImg,
           originalImg: originalImg);
     }

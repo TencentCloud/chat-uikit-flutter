@@ -36,6 +36,10 @@ abstract class DefaultLifeCycle {
     return message;
   }
 
+  static Future<V2TimMessage> defaultTwoMessagesSolution(V2TimMessage message, [V2TimMessage? repliedMessage]) async {
+    return message;
+  }
+
   static Future<List<V2TimMessage>> defaultMessageListSolution(List<V2TimMessage> list) async {
     return list;
   }

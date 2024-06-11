@@ -213,6 +213,9 @@ class TIMUIKitMessageTooltipState
             widget.message.elemType == MessageElemType.V2TIM_ELEM_TYPE_IMAGE &&
             fileBeenDownloaded);
 
+    final dynamicQuote =
+        model.chatConfig.isAtWhenReplyDynamic?.call(widget.message);
+
     final List<MessageToolTipItem> defaultTipsList = [
       if (fileBeenDownloaded)
         MessageToolTipItem(
@@ -240,7 +243,8 @@ class TIMUIKitMessageTooltipState
             onClick: () => _onTap("forwardMessage", model)),
       if (shouldShowReplyAction)
         MessageToolTipItem(
-            label: TIM_t(model.chatConfig.isAtWhenReply ? "回复" : "引用"),
+            label: TIM_t(
+                (dynamicQuote ?? model.chatConfig.isAtWhenReply) ? "回复" : "引用"),
             id: "replyMessage",
             iconImageAsset: "images/reply_message.png",
             onClick: () => _onTap("replyMessage", model)),
@@ -502,7 +506,7 @@ class TIMUIKitMessageTooltipState
         } else if (widget.message.elemType ==
             MessageElemType.V2TIM_ELEM_TYPE_IMAGE) {
           final savePath = (TencentUtils.checkString(
-              widget.message.imageElem!.imageList?[0]?.localUrl) ??
+                  widget.message.imageElem!.imageList?[0]?.localUrl) ??
               TencentUtils.checkString(widget.message.imageElem?.path) ??
               "");
           copyImageToClipboard(savePath);
@@ -510,12 +514,14 @@ class TIMUIKitMessageTooltipState
         break;
       case "replyMessage":
         model.repliedMessage = widget.message;
+        final dynamicQuote =
+            model.chatConfig.isAtWhenReplyDynamic?.call(widget.message);
         final isSelf = widget.message.isSelf ?? true;
         final isGroup =
             TencentUtils.checkString(widget.message.groupID) != null;
         final isAtWhenReply = !isSelf &&
             isGroup &&
-            widget.allowAtUserWhenReply &&
+            (dynamicQuote ?? widget.allowAtUserWhenReply) &&
             widget.onLongPressForOthersHeadPortrait != null;
 
         /// If replying to a self message, do not add a at tag, only requestFocus.

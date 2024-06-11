@@ -96,6 +96,10 @@ class TIMUIKitChatConfig {
   /// [Default]: true.
   final bool isAtWhenReply;
 
+  /// Control if allowed to at when reply automatically.
+  /// [Default]: true.
+  final bool Function(V2TimMessage message)? isAtWhenReplyDynamic;
+
   /// The main switch of the group read receipt.
   final bool isShowGroupMessageReadReceipt;
 
@@ -258,6 +262,7 @@ class TIMUIKitChatConfig {
       this.isUseMessageReaction = true,
       this.isShowAvatar = true,
       this.isShowSelfNameInGroup = false,
+        this.isAtWhenReplyDynamic,
       this.offlinePushInfo,
       @Deprecated("Please use [isShowGroupReadingStatus] instead")
       this.isShowGroupMessageReadReceipt = true,

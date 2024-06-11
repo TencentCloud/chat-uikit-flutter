@@ -1,4 +1,46 @@
+# 2.6.0
+
+## Breaking Changes
+
+* Migrated to Flutter 3.22. Support for Flutter 3.19 and earlier versions has been discontinued.
+
+
+
+# 2.5.1
+
+## Improvements
+
+* Improved memory usage, enhancing performance.
+* Improved the logger storage.
+
+# 2.5.0
+
+## Breaking Changes
+
+* Migrated to Flutter 3.19. Support for Flutter 3.16 and earlier versions has been discontinued.
+
+## Notes
+
+* Starting from Flutter 3.19, it is recommended to apply Flutter's Gradle plugins using Gradle's declarative plugins {} block (also known as the Plugin DSL) ([see details](https://docs.flutter.dev/release/breaking-changes/flutter-gradle-plugin-apply)).
+* In line with this, our sample app on the GitHub repo has also been migrated to this new approach. If you'd like to migrate to this new approach, please refer to our [sample app repo](https://github.com/TencentCloud/chat-demo-flutter).
+
+# 2.4.3
+
+## Bug Fixes
+
+* Fixed an keyboard issue on Web.
+
+# 2.4.2
+
+## Bug Fixes
+
+* Fixed an UI issue on Material3 mode.
+
 # 2.4.1
+
+## Improvements
+
+* Enhanced stability for message reaction.
 
 ## Bug Fixes
 
@@ -8,7 +50,7 @@
 
 ## Breaking Changes
 
-* Migrated to Flutter 3.16.0.
+* Migrated to Flutter 3.16. Support for Flutter 3.13 and earlier versions has been discontinued.
 * Upgraded the minimum supported Android Gradle Plugin to 7.3 to meet Flutter requirements.
 
 # 2.3.3
@@ -44,11 +86,11 @@
 
 ## Breaking Changes
 
-* Upgraded and migrated to support Flutter 3.13.0. Support for Flutter 3.10 and earlier versions has been dropped.
+* Upgraded and migrated to support Flutter 3.13. Support for Flutter 3.10 and earlier versions has been discontinued.
 
 ## Recommendations
 
-* Customers who do not wish to upgrade to Flutter 3.13.0 are advised to continue using version 2.2.1 of our Chat UIKit. However, we strongly recommend upgrading to Flutter 3.13.0 as it includes numerous performance improvements and introduces cutting-edge features.
+* Customers who do not wish to upgrade to Flutter 3.13 are advised to continue using version 2.2.1 of our Chat UIKit. However, we strongly recommend upgrading to Flutter 3.13.0 as it includes numerous performance improvements and introduces cutting-edge features.
 
 # 2.2.1
 
