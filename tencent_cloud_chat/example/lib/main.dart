@@ -51,8 +51,7 @@ class _MyHomePageState extends State<MyHomePage> {
         userID: "",
 
         /// [Required]: The userID of the logged-in user
-        userSig:
-            "",
+        userSig: "",
 
         /// [Required]: The userSig of the logged-in user
       ),
@@ -86,10 +85,8 @@ class _MyHomePageState extends State<MyHomePage> {
           }
         },
         items: const [
-          BottomNavigationBarItem(
-              icon: Icon(Icons.chat_bubble_outline), label: "Chats"),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.contacts), label: "Contacts"),
+          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), label: "Chats"),
+          BottomNavigationBarItem(icon: Icon(Icons.contacts), label: "Contacts"),
         ],
       ),
       body: pages[currentIndex],

@@ -120,17 +120,17 @@ class TencentCloudChatContactAddContactsInfoBodyState extends TencentCloudChatSt
     TencentCloudChat.instance.chatSDKInstance.contactSDK.addFriend(widget.userFullInfo.userID ?? "", remark, friendGroup, verification, "flutter", FriendTypeEnum.V2TIM_FRIEND_TYPE_BOTH);
     int code = TencentCloudChat.instance.dataInstance.contact.addFriendCode;
     if (code == 0) {
-      TencentCloudChat.instance.callbacks?.onUserNotificationEvent?.call(
+      TencentCloudChat.instance.callbacks.onUserNotificationEvent.call(
         TencentCloudChatComponentsEnum.contact,
         TencentCloudChatCodeInfo.contactAddedSuccessfully,
       );
     } else if (code == 30539) {
-      TencentCloudChat.instance.callbacks?.onUserNotificationEvent?.call(
+      TencentCloudChat.instance.callbacks.onUserNotificationEvent.call(
         TencentCloudChatComponentsEnum.contact,
         TencentCloudChatCodeInfo.contactRequestSent,
       );
     } else {
-      TencentCloudChat.instance.callbacks?.onUserNotificationEvent?.call(
+      TencentCloudChat.instance.callbacks.onUserNotificationEvent.call(
         TencentCloudChatComponentsEnum.contact,
         TencentCloudChatCodeInfo.cannotAddContact,
       );

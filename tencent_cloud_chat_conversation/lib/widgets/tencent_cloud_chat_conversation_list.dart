@@ -23,14 +23,15 @@ class TencentCloudChatConversationList extends StatefulWidget {
 }
 
 class TencentCloudChatConversationListState extends TencentCloudChatState<TencentCloudChatConversationList> {
-  final Stream<TencentCloudChatConversationData<dynamic>>? _conversationDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatConversationData<dynamic>>();
+  final Stream<TencentCloudChatConversationData<dynamic>>? _conversationDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatConversationData<dynamic>>("TencentCloudChatConversationData");
+
   late StreamSubscription<TencentCloudChatConversationData<dynamic>>? _conversationDataSubscription;
 
   List<V2TimConversation> _conversationList = TencentCloudChat.instance.dataInstance.conversation.conversationList;
 
   bool _getDataEnd = TencentCloudChat.instance.dataInstance.conversation.isGetDataEnd;
 
-  final Stream<TencentCloudChatContactData<dynamic>>? _contactDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatContactData<dynamic>>();
+  final Stream<TencentCloudChatContactData<dynamic>>? _contactDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatContactData<dynamic>>("TencentCloudChatContactData");
 
   late StreamSubscription<TencentCloudChatContactData<dynamic>>? _contactDataSubscription;
 

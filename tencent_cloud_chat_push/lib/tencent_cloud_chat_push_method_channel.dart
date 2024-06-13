@@ -26,7 +26,9 @@ class MethodChannelTencentCloudChatPush extends TencentCloudChatPushPlatform {
     try {
       _tencentCloudChatPushModal.onNotificationClicked = onNotificationClicked;
       _methodChannel.setMethodCallHandler(_tencentCloudChatPushModal.handleMethod);
-      await _methodChannel.invokeMethod("registerOnNotificationClickedEvent");
+      if(Platform.isAndroid || Platform.isIOS){
+        await _methodChannel.invokeMethod("registerOnNotificationClickedEvent");
+      }
       return TencentCloudChatPushResult(code: 0);
     } on PlatformException catch (e) {
       return TencentCloudChatPushResult(
@@ -43,7 +45,9 @@ class MethodChannelTencentCloudChatPush extends TencentCloudChatPushPlatform {
     try {
       _tencentCloudChatPushModal.onAppWakeUp = onAppWakeUpEvent;
       _methodChannel.setMethodCallHandler(_tencentCloudChatPushModal.handleMethod);
-      await _methodChannel.invokeMethod("registerOnAppWakeUpEvent");
+      if(Platform.isAndroid){
+        await _methodChannel.invokeMethod("registerOnAppWakeUpEvent");
+      }
       return TencentCloudChatPushResult(code: 0);
     } on PlatformException catch (e) {
       return TencentCloudChatPushResult(
@@ -56,7 +60,9 @@ class MethodChannelTencentCloudChatPush extends TencentCloudChatPushPlatform {
   @override
   Future<TencentCloudChatPushResult> registerPush({String? configJson}) async {
     try {
-      await _methodChannel.invokeMethod("registerPush", {"push_config_json": configJson ?? ""});
+      if(Platform.isIOS || Platform.isAndroid){
+        await _methodChannel.invokeMethod("registerPush", {"push_config_json": configJson ?? ""});
+      }
       return TencentCloudChatPushResult(code: 0);
     } on PlatformException catch (e) {
       return TencentCloudChatPushResult(

@@ -47,7 +47,7 @@ class _TencentCloudChatGroupProfileState
     extends TencentCloudChatState<TencentCloudChatGroupProfile> {
   final Stream<TencentCloudChatGroupProfileData<dynamic>>?
       _groupProfileDataStream = TencentCloudChat.instance.eventBusInstance
-          .on<TencentCloudChatGroupProfileData<dynamic>>();
+          .on<TencentCloudChatGroupProfileData<dynamic>>("TencentCloudChatGroupProfileData");
   StreamSubscription<TencentCloudChatGroupProfileData<dynamic>>?
       _groupProfileDataSubscription;
 

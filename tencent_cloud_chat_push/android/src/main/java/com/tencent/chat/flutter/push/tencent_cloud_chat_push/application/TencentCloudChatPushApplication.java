@@ -23,21 +23,28 @@ public class TencentCloudChatPushApplication extends FlutterApplication {
     private String TAG = "TencentCloudChatPushApplication";
 
     public static boolean useCustomFlutterEngine = false;
+    public static boolean hadLaunchedMainActivity = false;
 
     @Override
     public void onCreate() {
         super.onCreate();
-
         TUICore.callService(TUIConstants.TIMPush.SERVICE_NAME, TUIConstants.TIMPush.METHOD_DISABLE_AUTO_REGISTER_PUSH, null);
         registerOnNotificationClickedEventToTUICore();
         registerOnAppWakeUp();
     }
 
     private void generateFlutterEngine(){
-        useCustomFlutterEngine = true;
-        FlutterEngine engine = new FlutterEngine(this);
-        engine.getDartExecutor().executeDartEntrypoint(DartExecutor.DartEntrypoint.createDefault());
-        FlutterEngineCache.getInstance().put(Extras.FLUTTER_ENGINE, engine);
+        if (FlutterEngineCache.getInstance().contains(Extras.FLUTTER_ENGINE) || hadLaunchedMainActivity) {
+            return;
+        }
+
+        new Handler(Looper.getMainLooper()).post(() -> {
+            useCustomFlutterEngine = true;
+            FlutterEngine engine = new FlutterEngine(this);
+            engine.getDartExecutor().executeDartEntrypoint(DartExecutor.DartEntrypoint.createDefault());
+            FlutterEngineCache.getInstance().put(Extras.FLUTTER_ENGINE, engine);
+            FlutterEngineCache cache = FlutterEngineCache.getInstance();
+        });
     }
 
     private void launchMainActivity(boolean showInForeground) {

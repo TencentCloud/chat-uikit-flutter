@@ -1,8 +1,8 @@
 import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_group_profile_config.dart';
 import 'package:tencent_cloud_chat/components/component_event_handlers/tencent_cloud_chat_group_profile_event_handlers.dart';
 import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_base_controller.dart';
-import 'package:tencent_cloud_chat/data/tencent_cloud_chat_data_abstract.dart';
 import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder.dart';
+import 'package:tencent_cloud_chat/data/tencent_cloud_chat_data_abstract.dart';
 
 enum TencentCloudChatGroupProfileDataKeys { none, config, builder }
 
@@ -18,11 +18,9 @@ class TencentCloudChatGroupProfileData<T> extends TencentCloudChatDataAB<T> {
   }
 
   /// === Group Profile Config ===
-  TencentCloudChatGroupProfileConfig _groupProfileConfig =
-      TencentCloudChatGroupProfileConfig();
+  TencentCloudChatGroupProfileConfig _groupProfileConfig = TencentCloudChatGroupProfileConfig();
 
-  TencentCloudChatGroupProfileConfig get groupProfileConfig =>
-      _groupProfileConfig;
+  TencentCloudChatGroupProfileConfig get groupProfileConfig => _groupProfileConfig;
 
   set groupProfileConfig(TencentCloudChatGroupProfileConfig value) {
     _groupProfileConfig = value;
@@ -35,8 +33,7 @@ class TencentCloudChatGroupProfileData<T> extends TencentCloudChatDataAB<T> {
   /// === Group Profile Builder ===
   TencentCloudChatComponentBuilder? _groupProfileBuilder;
 
-  TencentCloudChatComponentBuilder? get groupProfileBuilder =>
-      _groupProfileBuilder;
+  TencentCloudChatComponentBuilder? get groupProfileBuilder => _groupProfileBuilder;
 
   set groupProfileBuilder(TencentCloudChatComponentBuilder? value) {
     _groupProfileBuilder = value;

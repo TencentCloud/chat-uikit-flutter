@@ -1246,4 +1246,7 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
 
   @override
   String get markAsRead => 'Mark as Read';
+
+  @override
+  String get reEdit => 'Re-Edit';
 }

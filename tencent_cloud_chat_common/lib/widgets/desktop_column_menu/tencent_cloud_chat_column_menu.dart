@@ -1,23 +1,18 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_common_defines.dart';
 import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
-
-class ColumnMenuItem {
-  String label;
-  VoidCallback onClick;
-  Widget? icon;
-
-  ColumnMenuItem({required this.label, required this.onClick, this.icon});
-}
+import 'dart:ui' as ui;
 
 class TencentCloudChatColumnMenu extends StatefulWidget {
   const TencentCloudChatColumnMenu({Key? key, required this.data, this.padding})
       : super(key: key);
 
-  final List<ColumnMenuItem> data;
+  final List<TencentCloudChatMessageGeneralOptionItem> data;
   final EdgeInsetsGeometry? padding;
 
   @override
@@ -33,18 +28,49 @@ class TencentCloudChatColumnMenuState
             color: Colors.transparent,
             child: InkWell(
               onTap: () {
-                item.onClick();
+                item.onTap();
               },
               child: Container(
                 padding: widget.padding ?? const EdgeInsets.all(8),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    if (item.icon != null) item.icon!,
-                    if (item.icon != null)
+                    Builder(builder: (ctx){
+                      if (item.iconAsset != null) {
+                        final type = item.iconAsset!.path.split(".")[item.iconAsset!.path.split(".").length - 1];
+                        if (type == "svg") {
+                          return SvgPicture.asset(
+                            item.iconAsset!.path,
+                            package: item.iconAsset!.package,
+                            width: 16,
+                            height: 16,
+                            colorFilter: ui.ColorFilter.mode(
+                              theme.secondaryTextColor,
+                              ui.BlendMode.srcIn,
+                            ),
+                          );
+                        }
+                        return Image.asset(
+                          item.iconAsset!.path,
+                          package: item.iconAsset!.package,
+                          width: 14,
+                          height: 14,
+                          color: theme.secondaryTextColor,
+                        );
+                      }
+                      if (item.icon != null) {
+                        return Icon(
+                          item.icon,
+                          size: 14,
+                        );
+                      }
+                      return Container();
+                    }),
+                    if (item.icon != null || item.iconAsset != null)
                       const SizedBox(
                         height: 4,
-                        width: 6,
+                        width: 8,
                       ),
                     Text(
                       item.label,

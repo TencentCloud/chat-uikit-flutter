@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
@@ -6,28 +7,25 @@ import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.d
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 
 class TencentCloudChatMessageInputReply extends StatefulWidget {
-  final V2TimMessage? repliedMessage;
-  final VoidCallback onCancel;
-  final VoidCallback onClickReply;
+  final MessageInputReplyBuilderWidgets? widgets;
+  final MessageInputReplyBuilderData data;
+  final MessageInputReplyBuilderMethods methods;
 
   const TencentCloudChatMessageInputReply({
     super.key,
-    this.repliedMessage,
-    required this.onCancel,
-    required this.onClickReply,
+    this.widgets,
+    required this.data,
+    required this.methods,
   });
 
   @override
-  State<TencentCloudChatMessageInputReply> createState() =>
-      _TencentCloudChatMessageInputReplyState();
+  State<TencentCloudChatMessageInputReply> createState() => _TencentCloudChatMessageInputReplyState();
 }
 
-class _TencentCloudChatMessageInputReplyState
-    extends TencentCloudChatState<TencentCloudChatMessageInputReply> {
+class _TencentCloudChatMessageInputReplyState extends TencentCloudChatState<TencentCloudChatMessageInputReply> {
   @override
   Widget defaultBuilder(BuildContext context) {
-    final isDesktopScreen = TencentCloudChatScreenAdapter.deviceScreenType ==
-        DeviceScreenType.desktop;
+    final isDesktopScreen = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop;
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Container(
               color: isDesktopScreen ? colorTheme.inputAreaBackground : null,
@@ -41,7 +39,7 @@ class _TencentCloudChatMessageInputReplyState
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   IconButton(
-                    onPressed: widget.onClickReply,
+                    onPressed: widget.methods.onClickReply,
                     icon: Icon(
                       Icons.reply_outlined,
                       color: colorTheme.primaryColor,
@@ -66,7 +64,7 @@ class _TencentCloudChatMessageInputReplyState
                       mainAxisSize: MainAxisSize.max,
                       children: [
                         Text(
-                          tL10n.replyTo(widget.repliedMessage?.sender ?? ""),
+                          tL10n.replyTo(widget.data.repliedMessage?.sender ?? ""),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                           style: TextStyle(
@@ -75,8 +73,7 @@ class _TencentCloudChatMessageInputReplyState
                           ),
                         ),
                         Text(
-                          TencentCloudChatUtils.getMessageSummary(
-                              message: widget.repliedMessage),
+                          TencentCloudChatUtils.getMessageSummary(message: widget.data.repliedMessage),
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                           style: TextStyle(
@@ -88,7 +85,7 @@ class _TencentCloudChatMessageInputReplyState
                     ),
                   ),
                   IconButton(
-                    onPressed: widget.onCancel,
+                    onPressed: widget.methods.onCancel,
                     icon: Icon(
                       Icons.cancel_outlined,
                       color: colorTheme.secondaryTextColor,

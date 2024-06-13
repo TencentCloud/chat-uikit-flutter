@@ -90,3 +90,8 @@ For more in-depth UI customization, you can use custom builders. The builders fo
 ## Conclusion
 
 We hope this documentation provides you with a comprehensive understanding of the Group Profile component within the Tencent Cloud Chat UIKit. By leveraging the customization options and features available, you can create a tailored chat experience that meets your specific requirements.
+
+If you have any questions or need further information, feel free to reach out us.
+
+- [Telegram](https://t.me/+gvScYl0uQ3U4MTRl)
+- [X (Twitter)](https://x.com/runlin_wang95)

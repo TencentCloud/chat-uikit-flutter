@@ -28,3 +28,8 @@ In addition to the common components, we also provide a set of desktop-specific 
 - **TencentCloudChatDragArea**: This component provides a drag area for desktop applications.
 
 These are just a few examples of the many components available in the Tencent Cloud Chat UIKit. Feel free to explore these and many other components to create a truly engaging and user-friendly chat application.
+
+If you have any questions or need further information, feel free to reach out us.
+
+- [Telegram](https://t.me/+gvScYl0uQ3U4MTRl)
+- [X (Twitter)](https://x.com/runlin_wang95)

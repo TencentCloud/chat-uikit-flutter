@@ -13,6 +13,16 @@ import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_list_view/
 const constKeepPositionOffset = 40.0;
 const constLargeUnreadIndex = 100000000000;
 
+class TencentCloudChatScrollBehavior extends MaterialScrollBehavior {
+  @override
+  Set<PointerDeviceKind> get dragDevices => {
+    PointerDeviceKind.touch,
+    PointerDeviceKind.trackpad,
+    PointerDeviceKind.stylus,
+    PointerDeviceKind.unknown,
+  };
+}
+
 /// Proudly modified based on https://pub.dev/packages/flutter_chat_list for our needs.
 /// Thanks for their contributions.
 class MessageList extends StatefulWidget {
@@ -52,7 +62,10 @@ class MessageList extends StatefulWidget {
     required this.onLoadToLatestReadMessage,
     required this.messagesMentionedMe,
     required this.onLoadToLatestMessageMentionedMe,
+    required this.closeSticker,
   }) : super(key: key);
+
+  final Function() closeSticker;
 
   /// [msgCount] is message count
   /// [onMsgKey] will return the message id
@@ -291,6 +304,7 @@ class MessageListState extends State<MessageList> {
   }
 
   _handleScrolling() {
+    widget.closeSticker();
     var offset = listViewController.offset;
     ScrollPosition position = listViewController.position;
     var maxScrollExtent = position.maxScrollExtent;
@@ -481,37 +495,48 @@ class MessageListState extends State<MessageList> {
         controller: listViewController,
         thickness: TencentCloudChatPlatformAdapter().isDesktop ? 0 : 4.0,
         radius: const Radius.circular(4.0),
-        child: SmartRefresher(
-          enablePullDown: widget.haveMoreLatestData,
-          enablePullUp: true,
-          footer: CustomFooter(
-            height: widget.haveMorePreviousData ? 60 : 16,
-            builder: (context, mode) => widget.loadPreviousProgressBuilder != null
-                ? widget.loadPreviousProgressBuilder!(context, mode)
-                : defaultLoadPreviousProgressBuilder(
-                    context,
-                    mode,
-                    widget.haveMorePreviousData,
-                  ),
-          ),
-          controller: refreshController,
-          onRefresh: _onLoadLatestMessages,
-          onLoading: _onLoadPreviousMessages,
-          child: FlutterListView(
-            reverse: true,
-            controller: listViewController,
-            physics: widget.physics,
-            scrollBehavior: widget.scrollBehavior,
-            delegate: FlutterListViewDelegate(
-              _renderItem,
-              childCount: widget.msgCount,
-              onItemKey: (index) => widget.onMsgKey(index),
-              keepPosition: true,
-              keepPositionOffset: keepPositionOffset,
-              initIndex: initIndex,
-              initOffset: 0,
-              initOffsetBasedOnBottom: true,
-              firstItemAlign: FirstItemAlign.end,
+        child: ScrollConfiguration(
+          behavior: TencentCloudChatScrollBehavior(),
+          child: SmartRefresher(
+            enablePullDown: widget.haveMoreLatestData,
+            enablePullUp: true,
+            footer: CustomFooter(
+              height: widget.haveMorePreviousData ? 60 : 16,
+              builder: (context, mode) => widget.loadPreviousProgressBuilder != null
+                  ? widget.loadPreviousProgressBuilder!(context, mode)
+                  : defaultLoadPreviousProgressBuilder(
+                context,
+                mode,
+                widget.haveMorePreviousData,
+              ),
+            ),
+            controller: refreshController,
+            onRefresh: _onLoadLatestMessages,
+            onLoading: _onLoadPreviousMessages,
+            child: FlutterListView(
+              reverse: true,
+              controller: listViewController,
+              scrollBehavior: const MaterialScrollBehavior().copyWith(
+                dragDevices: {
+                  /*Add this*/
+                  PointerDeviceKind.mouse,
+                  PointerDeviceKind.touch,
+                  PointerDeviceKind.stylus,
+                  PointerDeviceKind.trackpad,
+                  PointerDeviceKind.unknown,
+                },
+              ),
+              delegate: FlutterListViewDelegate(
+                _renderItem,
+                childCount: widget.msgCount,
+                onItemKey: (index) => widget.onMsgKey(index),
+                keepPosition: true,
+                keepPositionOffset: keepPositionOffset,
+                initIndex: initIndex,
+                initOffset: 0,
+                initOffsetBasedOnBottom: true,
+                firstItemAlign: FirstItemAlign.end,
+              ),
             ),
           ),
         ),
@@ -524,10 +549,7 @@ class MessageListState extends State<MessageList> {
         valueListenable: showLastUnreadButton,
         builder: (context, bool showButton, child) {
           if (widget.showUnreadMsgButton && showButton && widget.unreadMsgCount != null) {
-            return GestureDetector(
-              onTap: _scrollToLatestReadMessage,
-              child: defaultUnreadMsgButtonBuilder(context, widget.unreadMsgCount!, loadingLatestReadMessage),
-            );
+            return unreadMsgButtonBuilder(_scrollToLatestReadMessage, context, widget.unreadMsgCount!, loadingLatestReadMessage);
           }
           return Container();
         });
@@ -535,10 +557,7 @@ class MessageListState extends State<MessageList> {
 
   Widget _renderMessagesMentionedMeButton() {
     if (widget.messagesMentionedMe.isNotEmpty) {
-      return GestureDetector(
-        onTap: _scrollToLatestMessageMentionedMe,
-        child: defaultMessageMentionedMeBuilder(context, widget.messagesMentionedMe.length, loadingMessageMentionedMe),
-      );
+      return messageMentionedMeBuilder(_scrollToLatestMessageMentionedMe, context, widget.messagesMentionedMe.length, loadingMessageMentionedMe);
     }
     return Container();
   }
@@ -571,17 +590,11 @@ class MessageListState extends State<MessageList> {
   }
 
   Widget _renderNewMessagesButton(int newMsgCount) {
-    return GestureDetector(
-      onTap: scrollToLatestMessage,
-      child: widget.receivedMsgButtonBuilder != null ? widget.receivedMsgButtonBuilder!(context, newMsgCount) : defaultReceivedMsgButtonBuilder(context, newMsgCount),
-    );
+    return receivedMsgButtonBuilder(scrollToLatestMessage, context, newMsgCount);
   }
 
   Widget _renderScrollToTop() {
-    return GestureDetector(
-      onTap: scrollToLatestMessage,
-      child: widget.scrollToTopButtonBuilder != null ? widget.scrollToTopButtonBuilder!(context) : defaultScrollToTopButtonBuilder(context, loadingMessagesOnButton),
-    );
+    return scrollToTopButtonBuilder(scrollToLatestMessage, context, loadingMessagesOnButton);
   }
 
   @override

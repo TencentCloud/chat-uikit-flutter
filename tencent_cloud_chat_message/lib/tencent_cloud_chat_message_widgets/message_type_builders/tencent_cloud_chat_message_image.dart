@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
@@ -18,25 +20,25 @@ import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/te
 
 // static final int 	V2TIM_IMAGE_TYPE_LARGE = 2
 
-enum TimImageType {
+enum ImageType {
   origin,
   thumb,
   large,
 }
 
-enum TimImageCurrentRenderType {
+enum ImageCurrentRenderType {
   online,
   local,
   path,
 }
 
-class TimImageCurrentRenderInfo {
-  final TimImageCurrentRenderType type;
+class ImageCurrentRenderInfo {
+  final ImageCurrentRenderType type;
   final double width;
   final double height;
   final String path;
 
-  TimImageCurrentRenderInfo({
+  ImageCurrentRenderInfo({
     required this.height,
     required this.path,
     required this.type,
@@ -56,19 +58,8 @@ class TimImageCurrentRenderInfo {
 class TencentCloudChatMessageImage extends TencentCloudChatMessageItemBase {
   const TencentCloudChatMessageImage({
     super.key,
-    super.userID,
-    super.groupID,
-    required super.message,
-    required super.showMessageStatusIndicator,
-    required super.showMessageTimeIndicator,
-    required super.shouldBeHighlighted,
-    required super.clearHighlightFunc,
-    super.messageReceipt,
-    required super.messageRowWidth,
-    super.sendingMessageData,
-    required super.renderOnMenuPreview,
-    required super.inSelectMode,
-    required super.onSelectMessage,
+    required super.data,
+    required super.methods,
   });
 
   @override
@@ -79,11 +70,11 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
   @override
   void didUpdateWidget(covariant TencentCloudChatMessageImage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.sendingMessageData != null) {
-      if (setLocalDelayData != null && widget.sendingMessageData!.isSendComplete) {
+    if (widget.data.sendingMessageData != null) {
+      if (setLocalDelayData != null && widget.data.sendingMessageData!.isSendComplete) {
         Future.delayed(const Duration(seconds: 1), () {
           setLocalCustomData(
-            messageid: widget.sendingMessageData!.sdkID,
+            messageid: widget.data.sendingMessageData!.sdkID,
             key: setLocalDelayData!['key'] ?? "",
             value: setLocalDelayData!['value'] ?? "",
             currentValue: setLocalDelayData!['currentValue'] ?? "",
@@ -92,10 +83,15 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
           setLocalDelayData = null;
         });
       }
+      if ((oldWidget.data.sendingMessageData == null || !oldWidget.data.sendingMessageData!.isSendComplete || oldWidget.data.sendingMessageData!.progress != 100) &&
+          widget.data.sendingMessageData != null &&
+          widget.data.sendingMessageData!.isSendComplete) {
+        _getImageUrl();
+      }
     }
   }
 
-  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatMessageData<dynamic>>();
+  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatMessageData<dynamic>>("TencentCloudChatMessageData");
   late StreamSubscription<TencentCloudChatMessageData<dynamic>>? __messageDataSubscription;
   final String _tag = "TencentCloudChatMessageImage";
 
@@ -103,7 +99,7 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
 
   int renderRandom = Random().nextInt(100000);
 
-  TimImageCurrentRenderInfo? currentRenderImageInfo;
+  ImageCurrentRenderInfo? currentRenderImageInfo;
 
   late double localDefaultWidth;
 
@@ -114,7 +110,7 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
       componentName: _tag,
       logs: json.encode(
         {
-          "msgID": msgID,
+          "msgID": widget.data.message.msgID,
           "log": log,
         },
       ),
@@ -131,8 +127,11 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
     required String setType,
     bool? delay,
   }) {
-    String convkey = TencentCloudChatUtils.checkString(widget.message.userID) ?? widget.message.groupID ?? "";
-    int conversationType = TencentCloudChatUtils.checkString(widget.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
+    if (kIsWeb) {
+      return;
+    }
+    String convkey = TencentCloudChatUtils.checkString(widget.data.message.userID) ?? widget.data.message.groupID ?? "";
+    int conversationType = TencentCloudChatUtils.checkString(widget.data.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
     if (delay == true) {
       setLocalDelayData = {
         "msgID": messageid,
@@ -153,7 +152,7 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
       convKey: convkey,
       convType: conversationType,
       setType: setType,
-      currentMemoreyMsgId: msgID,
+      currentMemoreyMsgId: widget.data.message.msgID ?? "",
     );
   }
 
@@ -173,44 +172,44 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
       return;
     }
 
-    if (TencentCloudChatUtils.checkString(msgID) != null) {
-      String key = TencentCloudChatUtils.checkString(widget.message.userID) ?? widget.message.groupID ?? "";
-      int conversationType = TencentCloudChatUtils.checkString(widget.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
+    if (TencentCloudChatUtils.checkString(widget.data.message.msgID) != null) {
+      String key = TencentCloudChatUtils.checkString(widget.data.message.userID) ?? widget.data.message.groupID ?? "";
+      int conversationType = TencentCloudChatUtils.checkString(widget.data.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
       if (key.isEmpty) {
         console("add to download queue error. key is empty. ");
         return;
       }
-      int type = TimImageType.thumb.index;
+      int type = ImageType.thumb.index;
       if (!hasOriginLocal && hasThumbLocal) {
-        type = TimImageType.origin.index;
+        type = ImageType.origin.index;
         console("thumb has been download . download origin local");
       }
       TencentCloudChat.instance.dataInstance.messageData.addDownloadMessageToQueue(
-            data: DownloadMessageQueueData(
-              conversationType: conversationType,
-              msgID: widget.message.msgID ?? msgID,
-              messageType: MessageElemType.V2TIM_ELEM_TYPE_IMAGE,
-              imageType: type,
-              // download origin image
-              isSnapshot: false,
-              key: key,
-            ),
-            isClick: isClick,
-          );
+        data: DownloadMessageQueueData(
+          conversationType: conversationType,
+          msgID: widget.data.message.msgID!,
+          messageType: MessageElemType.V2TIM_ELEM_TYPE_IMAGE,
+          imageType: type,
+          // download origin image
+          isSnapshot: false,
+          key: key,
+        ),
+        isClick: isClick,
+      );
     }
   }
 
   bool isSendingMessage() {
-    if (widget.message.status == 1) {
+    if (widget.data.message.status == 1) {
       return true;
     }
     return false;
   }
 
   Future<bool> hasSelfClientPath() async {
-    if (widget.message.imageElem != null) {
-      if (TencentCloudChatUtils.checkString(widget.message.imageElem!.path) != null) {
-        if (File(widget.message.imageElem!.path!).existsSync()) {
+    if (widget.data.message.imageElem != null && !TencentCloudChatPlatformAdapter().isWeb) {
+      if (TencentCloudChatUtils.checkString(widget.data.message.imageElem!.path) != null) {
+        if (File(widget.data.message.imageElem!.path!).existsSync()) {
           return true;
         }
       }
@@ -222,15 +221,15 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
     bool? isOrigin,
   }) {
     bool res = false;
-    if (widget.message.imageElem != null) {
-      V2TimImageElem images = widget.message.imageElem!;
+    if (widget.data.message.imageElem != null && !TencentCloudChatPlatformAdapter().isWeb) {
+      V2TimImageElem images = widget.data.message.imageElem!;
       String localUrl = "";
       List<V2TimImage?> imageLists = images.imageList ?? [];
       if (imageLists.isNotEmpty) {
         for (var i = 0; i < imageLists.length; i++) {
           V2TimImage? image = imageLists[i];
           if (image != null) {
-            int type = isOrigin == true ? TimImageType.origin.index : TimImageType.thumb.index;
+            int type = isOrigin == true ? ImageType.origin.index : ImageType.thumb.index;
             if (image.type == type) {
               if (TencentCloudChatUtils.checkString(image.localUrl) != null) {
                 localUrl = image.localUrl!;
@@ -251,8 +250,10 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
     return res;
   }
 
-  getRenderLocalUrlFormImageElem(V2TimImageElem image, int type) {
+  (String, double, double) getRenderLocalUrlFormImageElem(V2TimImageElem image, int type) {
     String res = '';
+    double w = 0;
+    double h = 0;
     if (image.imageList != null) {
       if (image.imageList!.isNotEmpty) {
         for (var i = 0; i < image.imageList!.length; i++) {
@@ -264,40 +265,56 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
                   res = img.localUrl!;
                 }
               }
+              if (img.width != null) {
+                w = img.width!.toDouble();
+              }
+              if (img.height != null) {
+                h = img.height!.toDouble();
+              }
             }
           }
         }
       }
     }
-    return res;
+    return (res, w, h);
   }
 
-  String getOnlineThumbUrl() {
+  (String, double, double) getOnlineThumbUrl() {
     var res = '';
-    var imgElem = widget.message.imageElem!;
+    double width = 0;
+    double height = 0;
+    var imgElem = widget.data.message.imageElem!;
     var imgList = imgElem.imageList ?? [];
     for (var i = 0; i < imgList.length; i++) {
       var img = imgList[i];
       if (img != null) {
-        if (img.type == TimImageType.thumb.index) {}
+        if (img.type == ImageType.thumb.index) {}
         if (img.url != null) {
           if (img.url!.isNotEmpty) {
             res = img.url!;
           }
         }
+        if (img.width != null) {
+          width = img.width!.toDouble();
+        }
+        if (img.height != null) {
+          height = img.height!.toDouble();
+        }
       }
     }
-    return res;
+    return (res, width, height);
   }
 
-  getImageUrl() async {
-    if (TencentCloudChatUtils.checkString(msgID) != null) {
+  _getImageUrl() async {
+    if (TencentCloudChatUtils.checkString(widget.data.message.msgID) != null) {
       // check if exits local url . if not get online url
+
       bool hasLocal = hasLocalImage();
       bool hasClientPath = await hasSelfClientPath();
+      console("hasLocal: $hasLocal hasClientPath: $hasClientPath");
       if (hasClientPath) {
-        String localPath = widget.message.imageElem!.path!;
-        String currentLocalCustomData = widget.message.localCustomData ?? "";
+        String localPath = widget.data.message.imageElem!.path!;
+        String currentLocalCustomData = widget.data.message.localCustomData ?? "";
         final fileBytes = File(localPath).readAsBytesSync();
 
         double owidth = 200;
@@ -315,11 +332,12 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
           var renderInfo = obj["renderInfo"];
 
           if (renderInfo == null) {
-            ImageExifInfo imageExifInfo = await TencentCloudChatUtils.getImageExifInfoByBuffer(fileBuffer: fileBytes);
-
-            owidth = imageExifInfo.width;
-            oheight = imageExifInfo.height;
-            isRotate = imageExifInfo.isRotate;
+            ImageExifInfo? imageExifInfo = await TencentCloudChatUtils.getImageExifInfoByBuffer(fileBuffer: fileBytes);
+            if (imageExifInfo != null) {
+              owidth = imageExifInfo.width;
+              oheight = imageExifInfo.height;
+              isRotate = imageExifInfo.isRotate;
+            }
           } else {
             try {
               var renderInfoObj = Map<String, dynamic>.from(json.decode(renderInfo));
@@ -334,7 +352,7 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
 
           if (from == "send") {
             setLocalCustomData(
-              messageid: msgID,
+              messageid: widget.data.message.msgID ?? "",
               key: 'renderInfo',
               value: json.encode({
                 'h': oheight,
@@ -349,9 +367,9 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
         } catch (err) {
           // err
         }
-
+        var (fw, fh) = formatwh(owidth, oheight);
         safeSetState(() {
-          currentRenderImageInfo = TimImageCurrentRenderInfo(height: oheight, path: widget.message.imageElem!.path!, type: TimImageCurrentRenderType.path, width: owidth);
+          currentRenderImageInfo = ImageCurrentRenderInfo(height: fh, path: widget.data.message.imageElem!.path!, type: ImageCurrentRenderType.path, width: fw);
         });
 
         console("message has self local path. render by path");
@@ -359,11 +377,11 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
         return;
       }
       if (hasLocal) {
-        String currentLocalCustomData = widget.message.localCustomData ?? "";
-        String localUrl = getRenderLocalUrlFormImageElem(widget.message.imageElem!, TimImageType.thumb.index);
+        String currentLocalCustomData = widget.data.message.localCustomData ?? "";
+        var (localUrl, ew, eh) = getRenderLocalUrlFormImageElem(widget.data.message.imageElem!, ImageType.thumb.index);
         bool needGetExif = false;
-        double owidth = 200;
-        double oheight = 266;
+        double owidth = ew;
+        double oheight = eh;
         bool isRotate = false;
         if (currentLocalCustomData.isEmpty) {
           needGetExif = true;
@@ -391,14 +409,16 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
         }
         if (needGetExif) {
           final fileBytes = File(localUrl).readAsBytesSync();
-          ImageExifInfo imageExifInfo = await TencentCloudChatUtils.getImageExifInfoByBuffer(fileBuffer: fileBytes);
+          ImageExifInfo? imageExifInfo = await TencentCloudChatUtils.getImageExifInfoByBuffer(fileBuffer: fileBytes);
 
-          owidth = imageExifInfo.width;
-          oheight = imageExifInfo.height;
-          isRotate = imageExifInfo.isRotate;
+          if (imageExifInfo != null) {
+            owidth = imageExifInfo.width;
+            oheight = imageExifInfo.height;
+            isRotate = imageExifInfo.isRotate;
+          }
 
           setLocalCustomData(
-            messageid: msgID,
+            messageid: widget.data.message.msgID ?? "",
             key: 'renderInfo',
             value: json.encode({
               'h': oheight,
@@ -409,72 +429,72 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
             setType: "local",
           );
         }
-
+        var (fw, fh) = formatwh(owidth, oheight);
         safeSetState(() {
-          currentRenderImageInfo = TimImageCurrentRenderInfo(height: oheight, path: localUrl, type: TimImageCurrentRenderType.local, width: owidth);
+          currentRenderImageInfo = ImageCurrentRenderInfo(height: fh, path: localUrl, type: ImageCurrentRenderType.local, width: fw);
         });
 
         console("message has localurl. render by local");
         return;
       }
-
-      if (widget.message.imageElem != null) {
+      if (widget.data.message.imageElem != null) {
         bool isRotate = false;
-        var thumbUrl = getOnlineThumbUrl();
+        var (thumbUrl, dwidth, dheight) = getOnlineThumbUrl();
 
-        double owidth = 200;
-        double oheight = 266;
-        String currentLocalCustomData = widget.message.localCustomData ?? "";
+        double owidth = dwidth;
+        double oheight = dheight;
+        String currentLocalCustomData = widget.data.message.localCustomData ?? "";
         if (thumbUrl.isNotEmpty) {
           var response = await http.get(Uri.parse(thumbUrl));
           if (response.statusCode == 200) {
             var imageBytes = response.bodyBytes;
-            ImageExifInfo imageExifInfo = await TencentCloudChatUtils.getImageExifInfoByBuffer(fileBuffer: imageBytes);
-            owidth = imageExifInfo.width;
-            oheight = imageExifInfo.height;
-            isRotate = imageExifInfo.isRotate;
+            ImageExifInfo? imageExifInfo = await TencentCloudChatUtils.getImageExifInfoByBuffer(fileBuffer: imageBytes);
 
-            try {
-              late Map<String, dynamic> obj;
+            if (imageExifInfo != null) {
+              owidth = imageExifInfo.width;
+              oheight = imageExifInfo.height;
+              isRotate = imageExifInfo.isRotate;
+              console("get online thumb url success. width: $owidth, height: $oheight currentLocalCustomData $currentLocalCustomData");
               try {
-                obj = json.decode(currentLocalCustomData);
+                late Map<String, dynamic> obj;
+                try {
+                  obj = json.decode(currentLocalCustomData);
+                } catch (err) {
+                  // err
+                  obj = Map.from({});
+                }
+                var renderInfo = obj["renderInfo"];
+                if (renderInfo == "" || renderInfo == null) {
+                  setLocalCustomData(
+                    messageid: widget.data.message.msgID ?? "",
+                    key: 'renderInfo',
+                    value: json.encode({
+                      'h': oheight,
+                      'w': owidth,
+                      'rotate': isRotate ? "1" : "0",
+                    }),
+                    currentValue: currentLocalCustomData,
+                    setType: "online",
+                  );
+                }
               } catch (err) {
                 // err
-                obj = Map.from({});
               }
-              var renderInfo = obj["renderInfo"];
-              if (renderInfo == "" || renderInfo == null) {
-                setLocalCustomData(
-                  messageid: msgID,
-                  key: 'renderInfo',
-                  value: json.encode({
-                    'h': oheight,
-                    'w': owidth,
-                    'rotate': isRotate ? "1" : "0",
-                  }),
-                  currentValue: currentLocalCustomData,
-                  setType: "online",
-                );
-              }
-            } catch (err) {
-              // err
             }
           } else {
             console("get online url bytes error ${response.statusCode}");
           }
+          var (fw, fh) = formatwh(owidth, oheight);
+          safeSetState(() {
+            currentRenderImageInfo = ImageCurrentRenderInfo(height: fh, path: thumbUrl, type: ImageCurrentRenderType.online, width: fw);
+          });
         }
-        safeSetState(() {
-          currentRenderImageInfo = TimImageCurrentRenderInfo(height: oheight, path: getOnlineThumbUrl(), type: TimImageCurrentRenderType.online, width: owidth);
-        });
       } else {
         safeSetState(() {
           isErrorMessage = true;
         });
-
-        console("get messame online url return. by no image elem  please check.");
       }
     } else {
-      console("the image message has no message id. please check.");
       safeSetState(() {
         isErrorMessage = true;
       });
@@ -482,6 +502,7 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
   }
 
   Widget renderLocalImage(String p, double w, double h) {
+    console("render local image . path: $p, w: $w, h: $h ");
     var (fw, fh) = formatwh(w, h);
     return ClipRRect(
       borderRadius: BorderRadius.only(
@@ -571,8 +592,7 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
   }
 
   Widget renderOnlineImage(String url, double w, double h) {
-    var (fw, fh) = formatwh(w, h);
-
+    console("render online image . url: $url, w: $w, h: $h ");
     return ClipRRect(
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(getSquareSize(16)),
@@ -582,52 +602,51 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
       ),
       child: TencentCloudChatCacheImage(
         fit: BoxFit.cover,
-        width: getWidth(fw),
-        height: getHeight(fh),
-        memCacheWidth: fw.toInt(),
-        memCacheHeight: fh.toInt(),
+        width: getWidth(w),
+        height: getHeight(h),
+        memCacheWidth: w.toInt(),
+        memCacheHeight: h.toInt(),
         url: url,
         errorWidget: (context, error, stackTrace) {
           console("network image render failed. please check the path is right . path: $url");
-          return getErrorWidget(fw, fh);
+          return getErrorWidget(w, h);
         },
         progressIndicatorBuilder: (context, child, loadingProgress) {
-          return getLoadingWidget(fw, fh);
+          return getLoadingWidget(w, h);
         },
       ),
     );
   }
 
   showImage() {
-    Navigator.push(
-      context,
-      ZoomPageRoute(builder: (BuildContext context) {
-        String convkey = TencentCloudChatUtils.checkString(widget.message.userID) ?? widget.message.groupID ?? "";
-        int conversationType = TencentCloudChatUtils.checkString(widget.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
-
+    String convkey = TencentCloudChatUtils.checkString(widget.data.message.userID) ?? widget.data.message.groupID ?? "";
+    int conversationType = TencentCloudChatUtils.checkString(widget.data.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
+    showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
         return TencentCloudChatMessageViewer(
           convKey: convkey,
-          message: widget.message,
+          message: widget.data.message,
           convType: conversationType,
-          isSending: widget.message.status == 1,
+          isSending: widget.data.message.status == 1,
         );
-      }),
+      },
     );
   }
 
   int onTapDownTime = 0;
 
   onTapDown(TapDownDetails details) {
-    if (widget.inSelectMode) {
-      widget.onSelectMessage();
+    if (widget.data.inSelectMode) {
+      widget.methods.onSelectMessage();
     } else {
       onTapDownTime = DateTime.now().millisecondsSinceEpoch;
     }
   }
 
   onTapUp(TapUpDetails details) {
-    if (widget.inSelectMode) {
-      widget.onSelectMessage();
+    if (widget.data.inSelectMode) {
+      widget.methods.onSelectMessage();
       return;
     }
     int onTapUpTime = DateTime.now().millisecondsSinceEpoch;
@@ -635,7 +654,7 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
       console("tap to long break.");
       return;
     }
-    if (widget.renderOnMenuPreview) {
+    if (widget.data.renderOnMenuPreview) {
       return;
     }
     onTapDownTime = 0;
@@ -643,7 +662,7 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
   }
 
   Widget renderImage() {
-    if (currentRenderImageInfo?.type == TimImageCurrentRenderType.path || currentRenderImageInfo?.type == TimImageCurrentRenderType.local) {
+    if (!TencentCloudChatPlatformAdapter().isWeb && (currentRenderImageInfo?.type == ImageCurrentRenderType.path || currentRenderImageInfo?.type == ImageCurrentRenderType.local)) {
       return GestureDetector(
         onTapDown: onTapDown,
         onTapUp: onTapUp,
@@ -662,8 +681,9 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
     double h = 266;
     double w = 200;
     bool isRotate = false;
-    if (TencentCloudChatUtils.checkString(widget.message.localCustomData) != null) {
-      String local = widget.message.localCustomData!;
+    if (TencentCloudChatUtils.checkString(widget.data.message.localCustomData) != null) {
+      String local = widget.data.message.localCustomData!;
+      console("use local custom data $local");
       try {
         Map<String, dynamic> localObj = json.decode(local);
         var renderInfo = localObj["renderInfo"]; // renderInfo
@@ -680,8 +700,8 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
         console('get info errpr ${err.toString()}');
       }
     }
-    if (widget.message.imageElem != null) {
-      String cloudCustomdata = widget.message.cloudCustomData ?? "";
+    if (widget.data.message.imageElem != null) {
+      String cloudCustomdata = widget.data.message.cloudCustomData ?? "";
       bool needRotate = false;
       if (cloudCustomdata.isNotEmpty) {
         try {
@@ -698,12 +718,12 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
           // err
         }
       }
-      var imagelist = widget.message.imageElem!.imageList;
+      var imagelist = widget.data.message.imageElem!.imageList;
       if (imagelist != null) {
         for (var i = 0; i < imagelist.length; i++) {
           var image = imagelist[i];
           if (image != null) {
-            if (image.type == TimImageType.thumb.index) {
+            if (image.type == ImageType.thumb.index) {
               h = (image.height ?? 266).toDouble();
               w = (image.width ?? 200).toDouble();
               if (needRotate) {
@@ -760,7 +780,7 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
 
   downloadCallback(TencentCloudChatMessageData data) {
     if (data.currentUpdatedFields == TencentCloudChatMessageDataKeys.downloadMessage) {
-      if (data.currentDownloadMessage?.msgID == (widget.message.msgID ?? msgID)) {
+      if (data.currentDownloadMessage?.msgID == (widget.data.message.msgID)) {
         console("downloading finished:${data.currentDownloadMessage?.downloadFinish}");
         safeSetState(() {
           currentdownload = data.currentDownloadMessage;
@@ -774,17 +794,17 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
   }
 
   bool isDownloading() {
-    return TencentCloudChat.instance.dataInstance.messageData.isDownloading(msgID: (widget.message.msgID ?? msgID));
+    return TencentCloudChat.instance.dataInstance.messageData.isDownloading(msgID: (widget.data.message.msgID));
   }
 
   bool isInDownloadQueue() {
-    return TencentCloudChat.instance.dataInstance.messageData.isInDownloadQueue(msgID: (widget.message.msgID ?? msgID));
+    return TencentCloudChat.instance.dataInstance.messageData.isInDownloadQueue(msgID: (widget.data.message.msgID));
   }
 
   removeFromDownloadQueue() {
     bool inQueue = isInDownloadQueue();
     if (inQueue == true) {
-      TencentCloudChat.instance.dataInstance.messageData.removeFromDownloadQueue(msgID: (widget.message.msgID ?? msgID));
+      TencentCloudChat.instance.dataInstance.messageData.removeFromDownloadQueue(msgID: (widget.data.message.msgID ?? ""));
       safeSetState(() {
         renderRandom = Random().nextInt(10000);
       });
@@ -838,7 +858,7 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
 
     late Widget finalRenderDownloadStatusWidget;
 
-    if (hasLocalImage() || currentdownload?.downloadFinish == true || isErrorMessage || isSendingMessage() || TencentCloudChatUtils.checkString(widget.message.id) != null) {
+    if (hasLocalImage() || currentdownload?.downloadFinish == true || isErrorMessage || isSendingMessage() || TencentCloudChatUtils.checkString(widget.data.message.id) != null) {
       return Container();
     } else {
       if (isDownloading()) {
@@ -868,28 +888,35 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
 
   initImageRenderWH() {
     var (w, h) = getDefaultWidthAndHeight();
+
     localDefaultHeight = h;
     localDefaultWidth = w;
+    console("current render width $localDefaultWidth height $localDefaultHeight");
   }
 
   @override
   void initState() {
     super.initState();
+    console(widget.data.message.imageElem?.toJson().toString() ?? "no image info");
     initImageRenderWH();
-    addDownloadListener();
-    getImageUrl();
-    addDownloadMessageToQueue();
+    _getImageUrl();
+    if (!TencentCloudChatPlatformAdapter().isWeb) {
+      addDownloadListener();
+      addDownloadMessageToQueue();
+    }
   }
 
   @override
   void dispose() {
     super.dispose();
-    __messageDataSubscription?.cancel();
+    if (!TencentCloudChatPlatformAdapter().isWeb) {
+      __messageDataSubscription?.cancel();
+    }
   }
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    final maxBubbleWidth = widget.messageRowWidth * 0.8;
+    final maxBubbleWidth = widget.data.messageRowWidth * 0.8;
     return TencentCloudChatThemeWidget(build: (context, colorTheme, textStyle) {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: getWidth(4), vertical: getHeight(4)),
@@ -922,11 +949,12 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
                     left: 0,
                     child: messageInfo(),
                   ),
-                  Positioned(
-                    top: getHeight(4),
-                    left: getWidth(4),
-                    child: downloadStatus(),
-                  )
+                  if (!TencentCloudChatPlatformAdapter().isWeb)
+                    Positioned(
+                      top: getHeight(4),
+                      left: getWidth(4),
+                      child: downloadStatus(),
+                    )
                 ],
               ),
             ),

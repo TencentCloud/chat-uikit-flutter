@@ -536,5 +536,6 @@
   "permissionDeniedContent": "Please go to settings and enable the {permissionString} permission.",
   "goToSettingsButtonText": "Go to Settings",
   "originalMessageNotFound": "Original message not found",
-  "markAsRead": "Mark as Read"
+  "markAsRead": "Mark as Read",
+  "reEdit": "Re-Edit"
 }

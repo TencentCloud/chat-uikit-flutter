@@ -6,7 +6,7 @@ import 'package:tencent_cloud_chat/controller/tencent_cloud_chat_controller.dart
 import 'package:tencent_cloud_chat/data/tencent_cloud_chat_data.dart';
 import 'package:tencent_cloud_chat/eventbus/tencent_cloud_chat_eventbus.dart';
 import 'package:tencent_cloud_chat/log/tencent_cloud_chat_log.dart';
-import 'package:tencent_cloud_chat/models/tencent_cloud_chat_callbacks.dart';
+import 'package:tencent_cloud_chat/models/tencent_cloud_chat_callbacks_trigger.dart';
 import 'package:tencent_cloud_chat/observer/tencent_cloud_chat_observer.dart';
 
 export 'package:path_provider/path_provider.dart';
@@ -156,34 +156,29 @@ class TencentCloudChat {
 
   static TencentCloudChat get instance => _instance;
 
-  TencentCloudChatCallbacks? callbacks;
-
   void reset() {
     TencentCloudChatDataManager.resetInstance();
-    callbacks = null;
   }
 
-  final TencentCloudChatCoreController chatController =
-      TencentCloudChatCoreControllerGenerator.getInstance();
 
-  static TencentCloudChatCoreController get controller =>
-      TencentCloudChat.instance.chatController;
+  final TencentCloudChatCallbacksTrigger callbacks = TencentCloudChatCallbacksTriggerGenerator.getInstance();
 
-  final TencentCloudChatLog logInstance =
-      TencentCloudChatLogGenerator.getInstance();
+  final TencentCloudChatCoreController chatController = TencentCloudChatCoreControllerGenerator.getInstance();
 
-  final TencentCloudChatEventBus eventBusInstance =
-      TencentCloudChatEventBusGenerator.getInstance();
+  static TencentCloudChatCoreController get controller => TencentCloudChat.instance.chatController;
 
-  final TencentCloudChatSDK chatSDKInstance =
-      TencentCloudChatSDKGenerator.getInstance();
+  final TencentCloudChatLog logInstance = TencentCloudChatLogGenerator.getInstance();
 
-  final TencentCloudChatObserver navigatorObserver =
-      TencentCloudChatObserver.getInstance();
+  final TencentCloudChatData dataInstance =
+  TencentCloudChatDataManager.getInstance();
+
+  final TencentCloudChatEventBus eventBusInstance = TencentCloudChatEventBusGenerator.getInstance();
+
+  final TencentCloudChatSDK chatSDKInstance = TencentCloudChatSDKGenerator.getInstance();
 
   final TencentCloudChatCache cache =
       TencentCloudChatCacheGenerator.getInstance();
 
-  final TencentCloudChatData dataInstance =
-      TencentCloudChatDataManager.getInstance();
+  final TencentCloudChatObserver navigatorObserver =
+  TencentCloudChatObserver.getInstance();
 }

@@ -62,18 +62,18 @@ class TencentCloudChatContactAddGroupInfoBodyState extends TencentCloudChatState
 
   sendAddGroupApplication() {
     if (widget.groupInfo.groupType == "Work") {
-      TencentCloudChat.instance.callbacks?.onUserNotificationEvent?.call(
+      TencentCloudChat.instance.callbacks.onUserNotificationEvent.call(
         TencentCloudChatComponentsEnum.contact,
         TencentCloudChatCodeInfo.cannotSendApplicationToWorkGroup,
       );
     } else if (widget.groupInfo.groupType == "Public") {
-      TencentCloudChat.instance.callbacks?.onUserNotificationEvent?.call(
+      TencentCloudChat.instance.callbacks.onUserNotificationEvent.call(
         TencentCloudChatComponentsEnum.contact,
         TencentCloudChatCodeInfo.groupJoinedPermissionNeeded,
       );
       TencentCloudChat.instance.chatSDKInstance.contactSDK.joinGroup(widget.groupInfo.groupID, verification, widget.groupInfo.groupType as GroupType);
     } else {
-      TencentCloudChat.instance.callbacks?.onUserNotificationEvent?.call(
+      TencentCloudChat.instance.callbacks.onUserNotificationEvent.call(
         TencentCloudChatComponentsEnum.contact,
         TencentCloudChatCodeInfo.groupJoined,
       );

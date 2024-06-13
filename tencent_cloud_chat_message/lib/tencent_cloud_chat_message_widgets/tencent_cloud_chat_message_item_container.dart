@@ -17,16 +17,17 @@ class TencentCloudChatMessageItemContainer extends StatefulWidget {
   /// automatically wrapping text messages in a message bubble.
   final double messageRowWidth;
 
-  final Widget Function(BuildContext context, bool shouldBeHighlighted, VoidCallback clearHighlightFunc, V2TimMessageReceipt? messageReceipt, String? messageText, SendingMessageData? sendingMessageData) messageBuilder;
+  final Widget Function(BuildContext context, bool shouldBeHighlighted, VoidCallback clearHighlightFunc,
+      V2TimMessageReceipt? messageReceipt, String? messageText, SendingMessageData? sendingMessageData) messageBuilder;
 
-  final bool isMergeMessage;
+  final bool inMergerMessagePreviewMode;
 
   const TencentCloudChatMessageItemContainer({
     Key? key,
     required this.message,
     required this.messageBuilder,
     required this.messageRowWidth,
-    required this.isMergeMessage,
+    required this.inMergerMessagePreviewMode,
   }) : super(key: key);
 
   @override
@@ -37,7 +38,8 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
   bool _shouldBeHighlighted = false;
   V2TimMessageReceipt? _messageReceipt;
   SendingMessageData? _sendingMessageData;
-  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatMessageData>();
+  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream =
+      TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatMessageData>("TencentCloudChatMessageData");
   late StreamSubscription<TencentCloudChatMessageData<dynamic>>? _messageDataSubscription;
 
   // This method handles changes in message data.
@@ -65,7 +67,10 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
           userID: widget.message.userID ?? "",
           timestamp: widget.message.timestamp ?? 0,
         );
-        if (isGroup && (_messageReceipt == null || _messageReceipt?.readCount != receipt.readCount || _messageReceipt?.unreadCount != receipt.unreadCount)) {
+        if (isGroup &&
+            (_messageReceipt == null ||
+                _messageReceipt?.readCount != receipt.readCount ||
+                _messageReceipt?.unreadCount != receipt.unreadCount)) {
           setState(() {
             _messageReceipt = receipt;
           });
@@ -76,7 +81,8 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
         break;
       case TencentCloudChatMessageDataKeys.sendMessageProgress:
         if (messageData.messageProgressData.containsKey(msgID)) {
-          if (messageData.messageProgressData[msgID] != null) {
+          if (messageData.messageProgressData[msgID] != null && _sendingMessageData != messageData.messageProgressData[msgID]) {
+            _sendingMessageData = messageData.messageProgressData[msgID];
             setState(() {
               _sendingMessageData = messageData.messageProgressData[msgID];
             });
@@ -100,10 +106,10 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
     super.initState();
     _messageDataSubscription = _messageDataStream?.listen(_messageDataHandler);
     _messageReceipt = TencentCloudChat.instance.dataInstance.messageData.getMessageReadReceipt(
-          msgID: widget.message.msgID ?? "",
-          userID: widget.message.userID ?? "",
-          timestamp: widget.message.timestamp ?? 0,
-        );
+      msgID: widget.message.msgID ?? "",
+      userID: widget.message.userID ?? "",
+      timestamp: widget.message.timestamp ?? 0,
+    );
   }
 
   @override
@@ -126,11 +132,18 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
     } else {
       switch (widget.message.elemType) {
         case 101:
-          final TencentCloudChatMessageSeparateDataProvider dataProvider = TencentCloudChatMessageDataProviderInherited.of(context);
+          final TencentCloudChatMessageSeparateDataProvider dataProvider =
+              TencentCloudChatMessageDataProviderInherited.of(context);
           final timeDividerConfig = dataProvider.config.timeDividerConfig;
-          final customTimeStampParser = timeDividerConfig(userID: dataProvider.userID, groupID: dataProvider.groupID).timestampParser;
-          final String? customTimeStamp = customTimeStampParser != null ? customTimeStampParser(widget.message.timestamp ?? 0) : null;
-          messageText = customTimeStamp ?? TencentCloudChatIntl.localizedDateString(widget.message.timestamp ?? 0, context);
+          final customTimeStampParser = timeDividerConfig(
+            userID: dataProvider.userID,
+            groupID: dataProvider.groupID,
+            topicID: dataProvider.topicID,
+          ).timestampParser;
+          final String? customTimeStamp =
+              customTimeStampParser != null ? customTimeStampParser(widget.message.timestamp ?? 0) : null;
+          messageText =
+              customTimeStamp ?? TencentCloudChatIntl.localizedDateString(widget.message.timestamp ?? 0, context);
           break;
         case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
           messageText = widget.message.textElem?.text;
@@ -142,16 +155,13 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
       }
     }
 
-    return ConstrainedBox(
-      constraints: BoxConstraints(maxWidth: widget.messageRowWidth * 0.8),
-      child: widget.messageBuilder(
-        context,
-        _shouldBeHighlighted,
-        _clearHighlight,
-        _messageReceipt,
-        messageText,
-        _sendingMessageData,
-      ),
+    return widget.messageBuilder(
+      context,
+      _shouldBeHighlighted,
+      _clearHighlight,
+      _messageReceipt,
+      messageText,
+      _sendingMessageData,
     );
   }
 }

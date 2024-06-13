@@ -22,7 +22,7 @@ abstract class TencentCloudChatState<T extends StatefulWidget> extends State<T> 
   TencentCloudChatEventBus eventbus = TencentCloudChat.instance.eventBusInstance;
 
   // Listener for theme data changes
-  Stream<TencentCloudChatTheme>? themeDataListener = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatTheme>();
+  Stream<TencentCloudChatTheme>? themeDataListener = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatTheme>("TencentCloudChatTheme");
 
   // Ticker for FPS monitoring
   Ticker? _fpsTicker;
@@ -66,10 +66,10 @@ abstract class TencentCloudChatState<T extends StatefulWidget> extends State<T> 
 
   @override
   void dispose() {
+    super.dispose();
     _fpsTicker?.dispose();
     _stopwatch?.stop();
     WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
   }
 
   void startFPSMonitor() {
@@ -131,36 +131,60 @@ abstract class TencentCloudChatState<T extends StatefulWidget> extends State<T> 
     final isMobileScreen = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.mobile;
 
     // Select the appropriate builder based on the current platform and screen type
-    if (TencentCloudChatPlatformAdapter().isWeb && isDesktopScreen && desktopWebBuilder(context) != null) {
-      return desktopWebBuilder(context)!;
+    if (TencentCloudChatPlatformAdapter().isWeb && isDesktopScreen) {
+      final testBuild = desktopWebBuilder(context);
+      if(testBuild != null){
+        return testBuild;
+      }
     }
 
-    if (TencentCloudChatPlatformAdapter().isWeb && isMobileScreen && mobileWebBuilder(context) != null) {
-      return mobileWebBuilder(context)!;
+    if (TencentCloudChatPlatformAdapter().isWeb && isMobileScreen) {
+      final testBuild = mobileWebBuilder(context);
+      if(testBuild != null){
+        return testBuild;
+      }
     }
 
-    if (TencentCloudChatPlatformAdapter().isMobile && isDesktopScreen && tabletAppBuilder(context) != null) {
-      return tabletAppBuilder(context)!;
+    if (TencentCloudChatPlatformAdapter().isMobile && isDesktopScreen) {
+      final testBuild = tabletAppBuilder(context);
+      if(testBuild != null){
+        return testBuild;
+      }
     }
 
-    if (TencentCloudChatPlatformAdapter().isMobile && mobileAppBuilder(context) != null) {
-      return mobileAppBuilder(context)!;
+    if (TencentCloudChatPlatformAdapter().isMobile) {
+      final testBuild = mobileAppBuilder(context);
+      if(testBuild != null){
+        return testBuild;
+      }
     }
 
-    if (TencentCloudChatPlatformAdapter().isDesktop && desktopAppBuilder(context) != null) {
-      return desktopAppBuilder(context)!;
+    if (TencentCloudChatPlatformAdapter().isDesktop) {
+      final testBuild = desktopAppBuilder(context);
+      if(testBuild != null){
+        return testBuild;
+      }
     }
 
-    if (TencentCloudChatPlatformAdapter().isWeb && webBuilder(context) != null) {
-      return webBuilder(context)!;
+    if (TencentCloudChatPlatformAdapter().isWeb) {
+      final testBuild = webBuilder(context);
+      if(testBuild != null){
+        return testBuild;
+      }
     }
 
-    if (isMobileScreen && mobileBuilder(context) != null) {
-      return mobileBuilder(context)!;
+    if (isMobileScreen) {
+      final testBuild = mobileBuilder(context);
+      if(testBuild != null){
+        return testBuild;
+      }
     }
 
-    if (isDesktopScreen && desktopBuilder(context) != null) {
-      return desktopBuilder(context)!;
+    if (isDesktopScreen) {
+      final testBuild = desktopBuilder(context);
+      if(testBuild != null){
+        return testBuild;
+      }
     }
     return defaultBuilder(context);
   }

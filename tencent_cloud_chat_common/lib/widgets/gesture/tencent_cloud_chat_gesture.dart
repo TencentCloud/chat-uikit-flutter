@@ -1,6 +1,6 @@
-import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 
 class TencentCloudChatGestureColors {
   Color? focusColor;
@@ -62,7 +62,7 @@ class TencentCloudChatGestureState extends State<TencentCloudChatGesture> {
       focusColor: colors.focusColor,
       hoverColor: colors.hoverColor,
       highlightColor: colors.highlightColor,
-      splashColor: Platform.isAndroid
+      splashColor: !TencentCloudChatPlatformAdapter().isWeb && TencentCloudChatPlatformAdapter().isAndroid
           ? colors.splashColor
           : Colors.transparent, // this field on used on android
       child: widget.child,

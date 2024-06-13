@@ -16,6 +16,7 @@ public class TencentCloudChatPushActivity extends FlutterActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         handleIntent(getIntent());
+        TencentCloudChatPushApplication.hadLaunchedMainActivity = true;
     }
 
     @Override

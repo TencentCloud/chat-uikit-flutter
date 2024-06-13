@@ -21,15 +21,13 @@ class TencentCloudChatSDK {
 
   final contactSDK = TencentCloudChatContactSDKGenerator.getInstance();
 
-  final conversationSDK =
-      TencentCloudChatConversationSDKGenerator.getInstance();
+  final conversationSDK = TencentCloudChatConversationSDKGenerator.getInstance();
 
   final messageSDK = TencentCloudChatMessageSDKGenerator.getInstance();
 
   final groupSDK = TencentCloudChatGroupSDKGenerator.getInstance();
 
-  V2TimSDKListener getInitSDKListener(V2TimSDKListener? sdkListener) =>
-      V2TimSDKListener(
+  V2TimSDKListener getInitSDKListener(V2TimSDKListener? sdkListener) => V2TimSDKListener(
         onConnectFailed: (code, error) {
           sdkListener?.onConnectFailed(code, error);
         },
@@ -47,8 +45,7 @@ class TencentCloudChatSDK {
           sdkListener?.onKickedOffline();
         },
         onSelfInfoUpdated: (info) {
-          TencentCloudChat.instance.dataInstance.basic
-              .updateCurrentUserInfo(userFullInfo: info);
+          TencentCloudChat.instance.dataInstance.basic.updateCurrentUserInfo(userFullInfo: info);
 
           sdkListener?.onSelfInfoUpdated(info);
         },
@@ -60,8 +57,7 @@ class TencentCloudChatSDK {
           sdkListener?.onUserSigExpired();
         },
         onUserStatusChanged: (userStatusList) {
-          TencentCloudChat.instance.dataInstance.contact
-              .buildUserStatusList(userStatusList, "onUserStatusChanged");
+          TencentCloudChat.instance.dataInstance.contact.buildUserStatusList(userStatusList, "onUserStatusChanged");
 
           sdkListener?.onUserStatusChanged(userStatusList);
         },
@@ -69,11 +65,9 @@ class TencentCloudChatSDK {
           // Handle TencentCloudChatRobot Plugin sendMessage
           if (event.pluginName == "TencentCloudChatRobotPlugin") {
             if (event.type == "onSendMessageToRobotSuccess") {
-              Map<String, dynamic> messageMap =
-                  json.decode(event.detail["data"] ?? "{}");
+              Map<String, dynamic> messageMap = json.decode(event.detail["data"] ?? "{}");
               var message = V2TimMessage.fromJson(messageMap);
-              TencentCloudChat.instance.dataInstance.messageData
-                  .onReceiveNewMessage(message);
+              TencentCloudChat.instance.dataInstance.messageData.onReceiveNewMessage(message);
             }
           }
 
@@ -132,8 +126,7 @@ class TencentCloudChatSDK {
     }
     TencentCloudChat.instance.logInstance.console(
       componentName: _tag,
-      logs:
-          "login Is Called. Res Is $res. Desc Is ${loginRes.desc} Code is ${loginRes.code}",
+      logs: "login Is Called. Res Is $res. Desc Is ${loginRes.desc} Code is ${loginRes.code}",
     );
     TencentCloudChat.instance.dataInstance.basic.updateLoginStatus(
       status: loginRes.code == 0,
@@ -150,8 +143,7 @@ class TencentCloudChatSDK {
     }
     TencentCloudChat.instance.logInstance.console(
       componentName: _tag,
-      logs:
-          "logout Is Called. Res Is $res. Desc Is ${logoutRes.desc} Code is ${logoutRes.code}",
+      logs: "logout Is Called. Res Is $res. Desc Is ${logoutRes.desc} Code is ${logoutRes.code}",
     );
     TencentCloudChat.instance.dataInstance.basic.updateLoginStatus(
       status: res,

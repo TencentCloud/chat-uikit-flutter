@@ -1240,4 +1240,7 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
 
   @override
   String get markAsRead => '既読にする';
+
+  @override
+  String get reEdit => '再編集';
 }

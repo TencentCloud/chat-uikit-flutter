@@ -492,26 +492,22 @@ class TencentCloudChatMaterialApp extends StatefulWidget {
   });
 
   @override
-  State<TencentCloudChatMaterialApp> createState() =>
-      _TencentCloudChatMaterialAppState();
+  State<TencentCloudChatMaterialApp> createState() => _TencentCloudChatMaterialAppState();
 }
 
-class _TencentCloudChatMaterialAppState
-    extends State<TencentCloudChatMaterialApp> {
+class _TencentCloudChatMaterialAppState extends State<TencentCloudChatMaterialApp> {
   // Theme instance for the Chat UIKit
   TencentCloudChatTheme theme = TencentCloudChat.instance.dataInstance.theme;
 
   // Color theme based on the current brightness mode
-  TencentCloudChatThemeColors colorTheme =
-      TencentCloudChat.instance.dataInstance.theme.colorTheme;
+  TencentCloudChatThemeColors colorTheme = TencentCloudChat.instance.dataInstance.theme.colorTheme;
 
   // Text styles for the Chat UIKit
-  TencentCloudChatTextStyle textStyle =
-      TencentCloudChat.instance.dataInstance.theme.textStyle;
+  TencentCloudChatTextStyle textStyle = TencentCloudChat.instance.dataInstance.theme.textStyle;
 
   // Listener for theme data changes
   Stream<TencentCloudChatTheme>? themeDataListener =
-      TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatTheme>();
+      TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatTheme>("TencentCloudChatTheme");
 
   bool isInitIntl = false;
 
@@ -540,8 +536,8 @@ class _TencentCloudChatMaterialAppState
     _addThemeDataChangeListener();
   }
 
-  Locale? _initIntl() {
-    final locale = TencentCloudChatCacheGlobal().getCachedLocale();
+  Locale? _initIntl(Locale? l) {
+    final locale = l ?? TencentCloudChatCacheGlobal().getCachedLocale();
     final tencentCloudChatIntl = TencentCloudChatIntl(locale: locale);
     if (locale != null) {
       tencentCloudChatIntl.setLocale(locale);
@@ -551,10 +547,10 @@ class _TencentCloudChatMaterialAppState
     return res;
   }
 
-  Future<Locale?> _getLocale() async {
+  Future<Locale?> _getLocale(Locale? l) async {
     try {
       await TencentCloudChatCacheGlobal().init();
-      final locale = _initIntl();
+      final locale = _initIntl(l);
       return locale;
     } catch (e) {
       isInitIntl = true;
@@ -565,9 +561,17 @@ class _TencentCloudChatMaterialAppState
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: _getLocale(),
+        future: _getLocale(widget.locale),
         builder: (context, snapshot) {
           if (isInitIntl || snapshot.data != null) {
+            final themeMode = widget.themeMode ??
+                (theme.brightness != null
+                    ? (theme.brightness == Brightness.light ? ThemeMode.light : ThemeMode.dark)
+                    : null);
+            if(widget.themeMode != null){
+              theme.brightnessWithoutFire = themeMode == ThemeMode.light ? Brightness.light : Brightness.dark;
+            }
+
             return MaterialApp(
               key: widget.key,
               navigatorKey: widget.navigatorKey,
@@ -599,25 +603,18 @@ class _TencentCloudChatMaterialAppState
                   ),
               highContrastTheme: widget.highContrastTheme,
               highContrastDarkTheme: widget.highContrastDarkTheme,
-              themeMode: widget.themeMode ??
-                  (theme.brightness != null
-                      ? (theme.brightness == Brightness.light
-                          ? ThemeMode.light
-                          : ThemeMode.dark)
-                      : null),
+              themeMode: themeMode,
               themeAnimationDuration: widget.themeAnimationDuration,
               themeAnimationCurve: widget.themeAnimationCurve,
               locale: widget.locale ?? snapshot.data,
-              localizationsDelegates: widget.localizationsDelegates ??
-                  TencentCloudChatLocalizations.localizationsDelegates,
+              localizationsDelegates:
+                  widget.localizationsDelegates ?? TencentCloudChatLocalizations.localizationsDelegates,
               localeListResolutionCallback: widget.localeListResolutionCallback,
               localeResolutionCallback: widget.localeResolutionCallback,
-              supportedLocales: widget.supportedLocales ??
-                  TencentCloudChatLocalizations.supportedLocales,
+              supportedLocales: widget.supportedLocales ?? TencentCloudChatLocalizations.supportedLocales,
               debugShowMaterialGrid: widget.debugShowMaterialGrid,
               showPerformanceOverlay: widget.showPerformanceOverlay,
-              checkerboardRasterCacheImages:
-                  widget.checkerboardRasterCacheImages,
+              checkerboardRasterCacheImages: widget.checkerboardRasterCacheImages,
               checkerboardOffscreenLayers: widget.checkerboardOffscreenLayers,
               showSemanticsDebugger: widget.showSemanticsDebugger,
               debugShowCheckedModeBanner: widget.debugShowCheckedModeBanner,

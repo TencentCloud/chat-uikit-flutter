@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
 class TencentCloudChatMessageGeneralOptionItem {
-  final IconData icon;
+  final IconData? icon;
   final String label;
+  final ({String path, String? package})? iconAsset;
 
   /// Not every events include offset data, mainly support on desktop.
   final Function({Offset? offset}) onTap;
 
-  TencentCloudChatMessageGeneralOptionItem(
-      {required this.icon, required this.label, required this.onTap});
+  TencentCloudChatMessageGeneralOptionItem({this.iconAsset, this.icon, required this.label, required this.onTap});
 }
 
 class TencentCloudChatTimeDividerConfig {
@@ -65,6 +65,27 @@ class TencentCloudChatMessageDefaultMessageMenuConfig {
     this.enableMessageDeleteForSelf = true,
     this.enableMessageDeleteForEveryone = true,
     this.enableGroupMessageReceipt = true,
+  });
+}
+
+class TencentCloudChatMessageAttachmentConfig {
+  /// Works on Mobile.
+  final bool enableSendMediaFromMobileGallery;
+
+  /// Works on Desktop & Web.
+  final bool enableSendImage;
+
+  /// Works on Desktop & Web.
+  final bool enableSendVideo;
+
+  /// Works on all platforms.
+  final bool enableSendFile;
+
+  TencentCloudChatMessageAttachmentConfig({
+    this.enableSendMediaFromMobileGallery = true,
+    this.enableSendImage = true,
+    this.enableSendVideo = true,
+    this.enableSendFile = true,
   });
 }
 

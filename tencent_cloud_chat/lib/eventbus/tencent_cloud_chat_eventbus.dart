@@ -13,23 +13,18 @@ class TencentCloudChatEventBusGenerator {
 /// enables decoupled applications. It allows objects to interact without
 /// requiring to explicitly define listeners and keeping track of them.
 ///
-/// Not all events should be broadcasted through the [EventBus] but only those of
+/// Not all events should be broadcast through the [EventBus] but only those of
 /// general interest.
 ///
 /// Events are normal Dart objects. By specifying a class, listeners can
 /// filter events.
 ///
 class TencentCloudChatEventBus {
-  static final List<String> allowList = [
-    "TencentCloudChatTheme",
-    "TencentCloudChat"
-  ];
+  static final List<String> allowList = ["TencentCloudChatConversationData","TencentCloudChatTheme", "TencentCloudChat"];
 
-  static final StreamController _streamController =
-      StreamController.broadcast(sync: false);
+  static final StreamController _streamController = StreamController.broadcast(sync: false);
 
-  static final TencentCloudChatEventBus _instance =
-      TencentCloudChatEventBus._internal();
+  static final TencentCloudChatEventBus _instance = TencentCloudChatEventBus._internal();
 
   static final Map<String, Stream> _subscriptions = {};
   static final Map<String, dynamic> _cachedEvent = {};
@@ -63,16 +58,15 @@ class TencentCloudChatEventBus {
   /// unpaused or canceled. So it's usually better to just cancel and later
   /// subscribe again (avoids memory leak).
   ///
-  Stream<T>? on<T>() {
-    if (allowList.contains(_formatToComponentName(T.toString()))) {
-      Stream<T> steam =
-          _streamController.stream.where((event) => event is T).cast<T>();
+  Stream<T>? on<T>(String widgetName) {
+    if (allowList.contains(_formatToComponentName(widgetName))) {
+      Stream<T> steam = _streamController.stream.where((event) => event is T).cast<T>();
 
       _subscriptions.addAll({
-        T.toString(): steam,
+        widgetName: steam,
       });
-      if (_cachedEvent.containsKey(T.toString())) {
-        fire(_cachedEvent[T.toString()] as T);
+      if (_cachedEvent.containsKey(widgetName)) {
+        fire(_cachedEvent[widgetName] as T, widgetName);
       }
       return steam;
     } else {
@@ -87,8 +81,7 @@ class TencentCloudChatEventBus {
 
   /// Fires a new event on the event bus with the specified [event].
   ///
-  void fire(event) {
-    String eventName = event.runtimeType.toString();
+  void fire(event, String eventName) {
     if (_subscriptions.containsKey(eventName)) {
       Future.delayed(Duration.zero, () {
         _streamController.add(event);

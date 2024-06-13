@@ -11,19 +11,8 @@ import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/te
 class TencentCloudChatMessageMerge extends TencentCloudChatMessageItemBase {
   const TencentCloudChatMessageMerge({
     super.key,
-    super.userID,
-    super.groupID,
-    required super.message,
-    required super.shouldBeHighlighted,
-    required super.clearHighlightFunc,
-    required super.renderOnMenuPreview,
-    super.messageReceipt,
-    required super.messageRowWidth,
-    required super.showMessageStatusIndicator,
-    required super.showMessageTimeIndicator,
-    super.sendingMessageData,
-    required super.inSelectMode,
-    required super.onSelectMessage,
+    required super.data,
+    required super.methods,
   });
 
   @override
@@ -38,7 +27,7 @@ class _TencentCloudChatMessageMergeState extends TencentCloudChatMessageState<Te
       componentName: _tag,
       logs: json.encode(
         {
-          "msgID": msgID,
+          "msgID": widget.data.message.msgID,
           "log": log,
         },
       ),
@@ -52,23 +41,23 @@ class _TencentCloudChatMessageMergeState extends TencentCloudChatMessageState<Te
       context,
       MaterialPageRoute(
         builder: (context) => TencentCloudChatMessageMergeDetail(
-          message: widget.message,
+          message: widget.data.message,
         ),
       ),
     );
   }
 
   onTapDown(TapDownDetails details) {
-    if (widget.inSelectMode) {
-      widget.onSelectMessage();
+    if (widget.data.inSelectMode) {
+      widget.methods.onSelectMessage();
     } else {
       onTapDownTime = DateTime.now().millisecondsSinceEpoch;
     }
   }
 
   onTapUp(TapUpDetails details) {
-    if (widget.inSelectMode) {
-      widget.onSelectMessage();
+    if (widget.data.inSelectMode) {
+      widget.methods.onSelectMessage();
       return;
     }
     int onTapUpTime = DateTime.now().millisecondsSinceEpoch;
@@ -76,7 +65,7 @@ class _TencentCloudChatMessageMergeState extends TencentCloudChatMessageState<Te
       console("tap to long break.");
       return;
     }
-    if (widget.renderOnMenuPreview) {
+    if (widget.data.renderOnMenuPreview) {
       return;
     }
     onTapDownTime = 0;
@@ -85,9 +74,9 @@ class _TencentCloudChatMessageMergeState extends TencentCloudChatMessageState<Te
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    final maxBubbleWidth = widget.messageRowWidth * 0.8;
-    String title = TencentCloudChatUtils.checkString(widget.message.mergerElem!.title) ?? tL10n.chatHistory;
-    List<String> abstractList = widget.message.mergerElem!.abstractList ?? [];
+    final maxBubbleWidth = widget.data.messageRowWidth * 0.8;
+    String title = TencentCloudChatUtils.checkString(widget.data.message.mergerElem!.title) ?? tL10n.chatHistory;
+    List<String> abstractList = widget.data.message.mergerElem!.abstractList ?? [];
     int displayLen = abstractList.length > 3 ? 3 : abstractList.length;
     return TencentCloudChatThemeWidget(build: (context, colorTheme, textStyle) {
       return GestureDetector(

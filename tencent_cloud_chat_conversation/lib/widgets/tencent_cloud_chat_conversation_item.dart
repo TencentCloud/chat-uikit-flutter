@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
+import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_common_defines.dart';
 import 'package:tencent_cloud_chat/components/component_options/tencent_cloud_chat_message_options.dart';
 import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
@@ -15,7 +16,6 @@ import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.d
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/builders/tencent_cloud_chat_common_builders.dart';
 import 'package:tencent_cloud_chat_common/widgets/avatar/tencent_cloud_chat_avatar.dart';
-import 'package:tencent_cloud_chat_common/widgets/desktop_column_menu/tencent_cloud_chat_column_menu.dart';
 import 'package:tencent_cloud_chat_common/widgets/desktop_popup/tencent_cloud_chat_desktop_popup.dart';
 import 'package:tencent_cloud_chat_common/widgets/gesture/tencent_cloud_chat_gesture.dart';
 import 'package:tencent_cloud_chat_common/widgets/loading/tencent_cloud_chat_loading.dart';
@@ -76,21 +76,21 @@ class TencentCloudChatConversationItemState extends TencentCloudChatState<Tencen
     final screenHeight = MediaQuery.of(context).size.height;
 
     final items = [
-      ColumnMenuItem(
+      TencentCloudChatMessageGeneralOptionItem(
         label: isPin() ? tL10n.unpin : tL10n.pin,
-        onClick: _pinConversation,
+        onTap: _pinConversation,
       ),
-      ColumnMenuItem(
+      TencentCloudChatMessageGeneralOptionItem(
         label: tL10n.markAsRead,
-        onClick: _markAsRead,
+        onTap: _markAsRead,
       ),
-      ColumnMenuItem(
+      TencentCloudChatMessageGeneralOptionItem(
         label: tL10n.hide,
-        onClick: _cleanConversation,
+        onTap: _cleanConversation,
       ),
-      ColumnMenuItem(
+      TencentCloudChatMessageGeneralOptionItem(
         label: tL10n.delete,
-        onClick: _cleanConversationAndHistoryMessageList,
+        onTap: _cleanConversationAndHistoryMessageList,
       ),
     ];
 
@@ -104,7 +104,7 @@ class TencentCloudChatConversationItemState extends TencentCloudChatState<Tencen
     );
   }
 
-  _markAsRead() {
+  _markAsRead({Offset? offset}) {
     TencentCloudChat.instance.chatSDKInstance.manager.getConversationManager().cleanConversationUnreadMessageCount(
           conversationID: widget.conversation.conversationID,
           cleanTimestamp: 0,
@@ -211,25 +211,25 @@ class TencentCloudChatConversationItemState extends TencentCloudChatState<Tencen
     );
   }
 
-  hideMoreItemAction() {
+  hideMoreItemAction({Offset? offset}) {
     Navigator.of(context).pop();
   }
 
-  _cleanConversation() async {
+  _cleanConversation({Offset? offset}) async {
     await TencentCloudChat.instance.chatSDKInstance.conversationSDK.cleanConversation(
       conversationIDList: [widget.conversation.conversationID],
       clearMessage: false,
     );
   }
 
-  _cleanConversationAndHistoryMessageList() async {
+  _cleanConversationAndHistoryMessageList({Offset? offset}) async {
     await TencentCloudChat.instance.chatSDKInstance.conversationSDK.cleanConversation(
       conversationIDList: [widget.conversation.conversationID],
       clearMessage: true,
     );
   }
 
-  _pinConversation() async {
+  _pinConversation({Offset? offset}) async {
     await TencentCloudChat.instance.chatSDKInstance.conversationSDK.pinConversation(
       conversationID: widget.conversation.conversationID,
       isPinned: isPin() ? false : true,

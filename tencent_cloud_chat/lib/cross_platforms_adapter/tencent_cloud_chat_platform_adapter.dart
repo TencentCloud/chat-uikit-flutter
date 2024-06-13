@@ -11,8 +11,7 @@ class TencentCloudChatPlatformAdapter {
   /// Private constructor to implement the singleton pattern.
   TencentCloudChatPlatformAdapter._internal();
 
-  static final TencentCloudChatPlatformAdapter _instance =
-      TencentCloudChatPlatformAdapter._internal();
+  static final TencentCloudChatPlatformAdapter _instance = TencentCloudChatPlatformAdapter._internal();
 
   static bool _hasInstantiation = false;
 

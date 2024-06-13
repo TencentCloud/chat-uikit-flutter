@@ -14,8 +14,7 @@ class TencentCloudChatDesktopMemberMentionPanel extends StatefulWidget {
   final int activeMentionIndex;
   final List<V2TimGroupMemberFullInfo?> currentFilteredMembersListForMention;
 
-  final ValueChanged<({V2TimGroupMemberFullInfo memberFullInfo, int index})>
-      onSelectMember;
+  final ValueChanged<({V2TimGroupMemberFullInfo memberFullInfo, int index})> onSelectMember;
 
   // final TextFieldWebController textFieldWebController;
   const TencentCloudChatDesktopMemberMentionPanel( // this.textFieldWebController,
@@ -45,8 +44,7 @@ class _TencentCloudChatDesktopMemberMentionPanelState
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    final List<V2TimGroupMemberFullInfo?> groupMemberList =
-        widget.currentFilteredMembersListForMention;
+    final List<V2TimGroupMemberFullInfo?> groupMemberList = widget.currentFilteredMembersListForMention;
     final double positionX = widget.desktopMentionBoxPositionX;
     final double positionY = widget.desktopMentionBoxPositionY;
     final int activeIndex = widget.activeMentionIndex;
@@ -77,14 +75,10 @@ class _TencentCloudChatDesktopMemberMentionPanelState
                 itemBuilder: ((context, index) {
                   final memberItem = groupMemberList[index];
                   if (memberItem == null) {
-                    return AutoScrollTag(
-                        key: ValueKey(index),
-                        controller: widget.atMemberPanelScroll,
-                        index: index);
+                    return AutoScrollTag(key: ValueKey(index), controller: widget.atMemberPanelScroll, index: index);
                   }
                   final showName = _getShowName(memberItem);
-                  final isAtAll =
-                      memberItem.userID == "__kImSDK_MesssageAtALL__";
+                  final isAtAll = memberItem.userID == "__kImSDK_MesssageAtALL__";
                   return AutoScrollTag(
                     key: ValueKey(index),
                     controller: widget.atMemberPanelScroll,
@@ -93,49 +87,37 @@ class _TencentCloudChatDesktopMemberMentionPanelState
                       color: colorTheme.backgroundColor,
                       child: InkWell(
                         onTap: () {
-                          widget.onSelectMember(
-                              (memberFullInfo: memberItem, index: index));
+                          widget.onSelectMember((memberFullInfo: memberItem, index: index));
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          color: activeIndex == index
-                              ? colorTheme.primaryColor
-                              : colorTheme.backgroundColor,
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          color: activeIndex == index ? colorTheme.primaryColor : colorTheme.backgroundColor,
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
                               TencentCloudChatAvatar(
-                                imageList: [
-                                  TencentCloudChatUtils.checkString(
-                                          memberItem.faceUrl)
-                                ],
+                                imageList: [TencentCloudChatUtils.checkString(memberItem.faceUrl)],
                                 height: 24,
                                 width: 24,
-                                scene: TencentCloudChatAvatarScene
-                                    .groupMemberSelector,
+                                scene: TencentCloudChatAvatarScene.groupMemberSelector,
                               ),
                               const SizedBox(
                                 width: 8,
                               ),
                               Expanded(
                                 child: Text(
-                                  isAtAll
-                                      ? "$showName(${groupMemberList.length - 1})"
-                                      : showName,
+                                  isAtAll ? "$showName(${groupMemberList.length - 1})" : showName,
                                   softWrap: false,
                                   style: TextStyle(
                                       fontSize: 14,
                                       overflow: TextOverflow.ellipsis,
-                                      fontWeight: memberItem.role == 400 ||
-                                              memberItem.role == 300
+                                      fontWeight: memberItem.role == 400 || memberItem.role == 300
                                           ? FontWeight.w500
                                           : FontWeight.normal,
                                       color: activeIndex == index
                                           ? colorTheme.onPrimary
-                                          : (memberItem.role == 400 ||
-                                                  memberItem.role == 300
+                                          : (memberItem.role == 400 || memberItem.role == 300
                                               ? colorTheme.primaryColor
                                               : colorTheme.primaryTextColor)),
                                 ),

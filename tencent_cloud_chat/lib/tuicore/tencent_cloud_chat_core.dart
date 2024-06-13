@@ -3,8 +3,7 @@ import 'package:tencent_cloud_uikit_core/tencent_cloud_uikit_core.dart';
 
 class TencentCloudChatTUICore {
   static console(String log) {
-    TencentCloudChat.instance.logInstance
-        .console(componentName: "TencentCloudChatTUICore", logs: log);
+    TencentCloudChat.instance.logInstance.console(componentName: "TencentCloudChatTUICore", logs: log);
   }
 
   static Future<void> callService(
@@ -23,10 +22,8 @@ class TencentCloudChatTUICore {
     required List<String> userids,
     String? groupid,
   }) async {
-    console(
-        "audioCall ${userids.join(",")} total ${userids.length} groupid $groupid");
-    return TUICore.instance
-        .callService(TUICALLKIT_SERVICE_NAME, METHOD_NAME_CALL, {
+    console("audioCall ${userids.join(",")} total ${userids.length} groupid $groupid");
+    return TUICore.instance.callService(TUICALLKIT_SERVICE_NAME, METHOD_NAME_CALL, {
       PARAM_NAME_TYPE: TYPE_AUDIO,
       PARAM_NAME_USERIDS: userids,
       PARAM_NAME_GROUPID: groupid ?? "",
@@ -37,8 +34,7 @@ class TencentCloudChatTUICore {
     required List<String> userids,
     String? groupid,
   }) async {
-    console(
-        "audioCall ${userids.join(",")} total ${userids.length} groupid $groupid");
+    console("audioCall ${userids.join(",")} total ${userids.length} groupid $groupid");
     TUICore.instance.callService(TUICALLKIT_SERVICE_NAME, METHOD_NAME_CALL, {
       PARAM_NAME_TYPE: TYPE_VIDEO,
       PARAM_NAME_USERIDS: userids,

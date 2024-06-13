@@ -90,7 +90,7 @@ class TencentCloudChatMessageMergeDetailState
               return TencentCloudChatMessageRowContainer(
                 messageRowWidth: constraints.maxWidth,
                 message: messages[index],
-                isMergeMessage: true,
+                inMergerMessagePreviewMode: true,
               );
             },
             itemCount: messages.length,

@@ -20,11 +20,11 @@ class TencentCloudChatConversationDesktopMode extends StatefulWidget {
 
 class _TencentCloudChatConversationDesktopModeState extends TencentCloudChatState<TencentCloudChatConversationDesktopMode> {
   final Stream<TencentCloudChatConversationData<dynamic>>? _conversationDataStream =
-  TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatConversationData<dynamic>>();
+  TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatConversationData<dynamic>>("TencentCloudChatConversationData");
   StreamSubscription<TencentCloudChatConversationData<dynamic>>? _conversationDataSubscription;
 
   final Stream<TencentCloudChatBasicData<dynamic>>? _basicDataStream =
-  TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatBasicData<dynamic>>();
+  TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatBasicData<dynamic>>("TencentCloudChatBasicData");
   StreamSubscription<TencentCloudChatBasicData<dynamic>>? _basicDataSubscription;
 
   V2TimConversation? _currentConversation;

@@ -4,27 +4,18 @@ typedef OnTapContactItem = Future<bool> Function({
 });
 
 class TencentCloudChatContactEventHandlers {
-  late final TencentCloudChatContactUIEventHandlers? _uiEventHandlers;
-  late final TencentCloudChatContactLifeCycleEventHandlers?
-      _lifeCycleEventHandlers;
+  final TencentCloudChatContactUIEventHandlers _uiEventHandlers;
+  final TencentCloudChatContactLifeCycleEventHandlers _lifeCycleEventHandlers;
 
   TencentCloudChatContactEventHandlers({
     TencentCloudChatContactUIEventHandlers? uiEventHandlers,
     TencentCloudChatContactLifeCycleEventHandlers? lifeCycleEventHandlers,
-  }) {
-    _uiEventHandlers = uiEventHandlers;
-    _lifeCycleEventHandlers = lifeCycleEventHandlers;
-  }
+  })  : _uiEventHandlers = uiEventHandlers ?? TencentCloudChatContactUIEventHandlers(),
+        _lifeCycleEventHandlers = lifeCycleEventHandlers ?? TencentCloudChatContactLifeCycleEventHandlers();
 
-  TencentCloudChatContactUIEventHandlers get uiEventHandlers {
-    _uiEventHandlers ??= TencentCloudChatContactUIEventHandlers();
-    return _uiEventHandlers!;
-  }
+  TencentCloudChatContactUIEventHandlers get uiEventHandlers => _uiEventHandlers;
 
-  TencentCloudChatContactLifeCycleEventHandlers get lifeCycleEventHandlers {
-    _lifeCycleEventHandlers ??= TencentCloudChatContactLifeCycleEventHandlers();
-    return _lifeCycleEventHandlers!;
-  }
+  TencentCloudChatContactLifeCycleEventHandlers get lifeCycleEventHandlers => _lifeCycleEventHandlers;
 }
 
 class TencentCloudChatContactUIEventHandlers {
@@ -45,10 +36,12 @@ class TencentCloudChatContactUIEventHandlers {
   void setEventHandlers({
     OnTapContactItem? onTapContactItem,
   }) {
-    _onTapContactItem = onTapContactItem ?? onTapContactItem;
+    _onTapContactItem = onTapContactItem ?? _onTapContactItem;
   }
 }
 
 class TencentCloudChatContactLifeCycleEventHandlers {
+  TencentCloudChatContactLifeCycleEventHandlers();
+
   void setEventHandlers() {}
 }

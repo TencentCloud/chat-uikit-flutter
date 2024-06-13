@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
@@ -85,8 +86,7 @@ class TencentCloudChatAvatar extends StatefulWidget {
   State<TencentCloudChatAvatar> createState() => _TencentCloudChatAvatarState();
 }
 
-class _TencentCloudChatAvatarState
-    extends TencentCloudChatState<TencentCloudChatAvatar> {
+class _TencentCloudChatAvatarState extends TencentCloudChatState<TencentCloudChatAvatar> {
   final tag = "TencentCloudChatUIKitAvatar";
   List<String> _filteredImages = [];
 
@@ -103,21 +103,18 @@ class _TencentCloudChatAvatarState
   }
 
   List<String> _generateImageList(List<String?> originalList) {
-    return originalList
-        .map((e) => TencentCloudChatUtils.checkString(e) != null
-            ? e!
-            : "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png")
-        .toList();
+    return originalList.map((e) => TencentCloudChatUtils.checkString(e) != null ? e! : "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png").toList();
   }
 
   Widget _buildImage(String imagePath, double width, double height) {
     if (imagePath.startsWith('http') || imagePath.startsWith('https')) {
-      if (imagePath.endsWith("svg")) {
+      if (imagePath.endsWith("svg") && !TencentCloudChatPlatformAdapter().isWeb) {
         return SvgPicture.network(
           imagePath,
-          placeholderBuilder: (BuildContext context) => Container(
-              padding: const EdgeInsets.all(30.0),
-              child: const CircularProgressIndicator()),
+          placeholderBuilder: (BuildContext context) => SizedBox(
+            width: width,
+            height: height,
+          ),
           width: width,
           height: height,
         );
@@ -127,15 +124,21 @@ class _TencentCloudChatAvatarState
         width: width,
         height: height,
         fit: BoxFit.cover,
+        errorWidget: (context, url, error) {
+          return SizedBox(
+            width: width,
+            height: height,
+          );
+        },
       );
     } else {
-      if (imagePath.endsWith("svg")) {
-        return SvgPicture.file(
-          File(imagePath),
-          width: width,
-          height: height,
-        );
-      }
+      // if (imagePath.endsWith("svg")) {
+      //   return SvgPicture.file(
+      //     File(imagePath),
+      //     width: width,
+      //     height: height,
+      //   );
+      // }
       return Image.file(
         File(imagePath),
         width: width,
@@ -150,8 +153,7 @@ class _TencentCloudChatAvatarState
       width: width,
       height: height,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(
-            widget.borderRadius ?? TencentCloudChatScreenAdapter.getRadius(6)),
+        borderRadius: BorderRadius.circular(widget.borderRadius ?? TencentCloudChatScreenAdapter.getRadius(6)),
         color: Colors.grey[300],
       ),
     );
@@ -159,15 +161,11 @@ class _TencentCloudChatAvatarState
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    final avatarHeight =
-        widget.height ?? TencentCloudChatScreenAdapter.getSquareSize(36);
-    final avatarWidth =
-        widget.width ?? TencentCloudChatScreenAdapter.getSquareSize(36);
-    final avatarRadius =
-        widget.borderRadius ?? TencentCloudChatScreenAdapter.getRadius(6);
+    final avatarHeight = widget.height ?? TencentCloudChatScreenAdapter.getSquareSize(36);
+    final avatarWidth = widget.width ?? TencentCloudChatScreenAdapter.getSquareSize(36);
+    final avatarRadius = widget.borderRadius ?? TencentCloudChatScreenAdapter.getRadius(6);
 
-    final images =
-        _filteredImages.getRange(0, min(_filteredImages.length, 9)).toList();
+    final images = _filteredImages.getRange(0, min(_filteredImages.length, 9)).toList();
 
     if (_filteredImages.isEmpty) {
       return _buildSkeletonAnimation(avatarWidth, avatarHeight);
@@ -182,8 +180,7 @@ class _TencentCloudChatAvatarState
       } else {
         int gridCount = (images.length <= 4) ? 2 : 3;
         double spacing = 2.0;
-        double imageSize =
-            (avatarWidth - (gridCount - 1) * spacing) / gridCount;
+        double imageSize = (avatarWidth - (gridCount - 1) * spacing) / gridCount;
 
         return Container(
           width: avatarWidth,
@@ -244,13 +241,8 @@ class _AvatarFlowDelegate extends FlowDelegate {
     for (int i = 0; i < context.childCount; ++i) {
       int row = rowCount - 1 - (i ~/ gridCount);
       int col = i % gridCount;
-      double rowSpacing =
-          (context.size.height - rowCount * imageSize) / (rowCount + 1);
-      double x = (context.size.width -
-                  gridCount * imageSize -
-                  (gridCount - 1) * spacing) /
-              2 +
-          col * (imageSize + spacing);
+      double rowSpacing = (context.size.height - rowCount * imageSize) / (rowCount + 1);
+      double x = (context.size.width - gridCount * imageSize - (gridCount - 1) * spacing) / 2 + col * (imageSize + spacing);
       double y = rowSpacing + row * (imageSize + rowSpacing);
       context.paintChild(i, transform: Matrix4.translationValues(x, y, 0));
     }
@@ -258,8 +250,6 @@ class _AvatarFlowDelegate extends FlowDelegate {
 
   @override
   bool shouldRepaint(_AvatarFlowDelegate oldDelegate) {
-    return gridCount != oldDelegate.gridCount ||
-        imageSize != oldDelegate.imageSize ||
-        spacing != oldDelegate.spacing;
+    return gridCount != oldDelegate.gridCount || imageSize != oldDelegate.imageSize || spacing != oldDelegate.spacing;
   }
 }

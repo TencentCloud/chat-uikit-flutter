@@ -2,8 +2,7 @@ import 'package:hive/hive.dart';
 
 @HiveType(typeId: 1)
 class TencentCloudChatAdpter {
-  TencentCloudChatAdpter(
-      {required this.name, required this.age, required this.friends});
+  TencentCloudChatAdpter({required this.name, required this.age, required this.friends});
 
   @HiveField(0)
   String name;

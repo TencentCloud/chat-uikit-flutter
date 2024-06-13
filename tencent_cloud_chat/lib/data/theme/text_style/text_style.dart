@@ -29,58 +29,33 @@ class TencentCloudChatTextStyle {
     double? fontsize_22,
     double? fontsize_24,
     double? fontsize_34,
-  })  : _auxiliaryText =
-            auxiliaryText ?? TencentCloudChatScreenAdapter.getFontSize(12),
-        _messageBody =
-            messageBody ?? TencentCloudChatScreenAdapter.getFontSize(14),
-        _messageSnippet =
-            messageSnippet ?? TencentCloudChatScreenAdapter.getFontSize(16),
-        _contactTitle =
-            contactTitle ?? TencentCloudChatScreenAdapter.getFontSize(18),
-        _navigationTitle =
-            navigationTitle ?? TencentCloudChatScreenAdapter.getFontSize(20),
-        _sectionHeader =
-            sectionHeader ?? TencentCloudChatScreenAdapter.getFontSize(24),
-        _buttonLabel =
-            buttonLabel ?? TencentCloudChatScreenAdapter.getFontSize(16),
-        _mediaCaption =
-            mediaCaption ?? TencentCloudChatScreenAdapter.getFontSize(14),
-        _textFieldPlaceholder = textFieldPlaceholder ??
-            TencentCloudChatScreenAdapter.getFontSize(14),
+  })  : _auxiliaryText = auxiliaryText ?? TencentCloudChatScreenAdapter.getFontSize(12),
+        _messageBody = messageBody ?? TencentCloudChatScreenAdapter.getFontSize(14),
+        _messageSnippet = messageSnippet ?? TencentCloudChatScreenAdapter.getFontSize(16),
+        _contactTitle = contactTitle ?? TencentCloudChatScreenAdapter.getFontSize(18),
+        _navigationTitle = navigationTitle ?? TencentCloudChatScreenAdapter.getFontSize(20),
+        _sectionHeader = sectionHeader ?? TencentCloudChatScreenAdapter.getFontSize(24),
+        _buttonLabel = buttonLabel ?? TencentCloudChatScreenAdapter.getFontSize(16),
+        _mediaCaption = mediaCaption ?? TencentCloudChatScreenAdapter.getFontSize(14),
+        _textFieldPlaceholder = textFieldPlaceholder ?? TencentCloudChatScreenAdapter.getFontSize(14),
         _infoLabel = infoLabel ?? TencentCloudChatScreenAdapter.getFontSize(14),
         _subtitle = subtitle ?? TencentCloudChatScreenAdapter.getFontSize(16),
-        _emphasizedText =
-            emphasizedText ?? TencentCloudChatScreenAdapter.getFontSize(18),
-        _standardLargeText =
-            standardLargeText ?? TencentCloudChatScreenAdapter.getFontSize(16),
-        _standardSmallText =
-            standardSmallText ?? TencentCloudChatScreenAdapter.getFontSize(12),
-        _standardText =
-            standardText ?? TencentCloudChatScreenAdapter.getFontSize(14),
-        _inputAreaIcon =
-            inputAreaIcon ?? TencentCloudChatScreenAdapter.getFontSize(24),
-        _fontsize_8 =
-            fontsize_8 ?? TencentCloudChatScreenAdapter.getFontSize(8),
-        _fontsize_10 =
-            fontsize_10 ?? TencentCloudChatScreenAdapter.getFontSize(10),
-        _fontsize_12 =
-            fontsize_12 ?? TencentCloudChatScreenAdapter.getFontSize(12),
-        _fontsize_13 =
-            fontsize_13 ?? TencentCloudChatScreenAdapter.getFontSize(13),
-        _fontsize_14 =
-            fontsize_14 ?? TencentCloudChatScreenAdapter.getFontSize(14),
-        _fontsize_16 =
-            fontsize_16 ?? TencentCloudChatScreenAdapter.getFontSize(16),
-        _fontsize_18 =
-            fontsize_18 ?? TencentCloudChatScreenAdapter.getFontSize(18),
-        _fontsize_20 =
-            fontsize_20 ?? TencentCloudChatScreenAdapter.getFontSize(20),
-        _fontsize_22 =
-            fontsize_22 ?? TencentCloudChatScreenAdapter.getFontSize(22),
-        _fontsize_24 =
-            fontsize_24 ?? TencentCloudChatScreenAdapter.getFontSize(24),
-        _fontsize_34 =
-            fontsize_34 ?? TencentCloudChatScreenAdapter.getFontSize(34);
+        _emphasizedText = emphasizedText ?? TencentCloudChatScreenAdapter.getFontSize(18),
+        _standardLargeText = standardLargeText ?? TencentCloudChatScreenAdapter.getFontSize(16),
+        _standardSmallText = standardSmallText ?? TencentCloudChatScreenAdapter.getFontSize(12),
+        _standardText = standardText ?? TencentCloudChatScreenAdapter.getFontSize(14),
+        _inputAreaIcon = inputAreaIcon ?? TencentCloudChatScreenAdapter.getFontSize(24),
+        _fontsize_8 = fontsize_8 ?? TencentCloudChatScreenAdapter.getFontSize(8),
+        _fontsize_10 = fontsize_10 ?? TencentCloudChatScreenAdapter.getFontSize(10),
+        _fontsize_12 = fontsize_12 ?? TencentCloudChatScreenAdapter.getFontSize(12),
+        _fontsize_13 = fontsize_13 ?? TencentCloudChatScreenAdapter.getFontSize(13),
+        _fontsize_14 = fontsize_14 ?? TencentCloudChatScreenAdapter.getFontSize(14),
+        _fontsize_16 = fontsize_16 ?? TencentCloudChatScreenAdapter.getFontSize(16),
+        _fontsize_18 = fontsize_18 ?? TencentCloudChatScreenAdapter.getFontSize(18),
+        _fontsize_20 = fontsize_20 ?? TencentCloudChatScreenAdapter.getFontSize(20),
+        _fontsize_22 = fontsize_22 ?? TencentCloudChatScreenAdapter.getFontSize(22),
+        _fontsize_24 = fontsize_24 ?? TencentCloudChatScreenAdapter.getFontSize(24),
+        _fontsize_34 = fontsize_34 ?? TencentCloudChatScreenAdapter.getFontSize(34);
 
   final double _inputAreaIcon;
   final double _auxiliaryText;

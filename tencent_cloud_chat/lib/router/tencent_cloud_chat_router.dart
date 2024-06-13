@@ -16,8 +16,7 @@ class TencentCloudChatRouter {
 
   // Factory constructor that returns the singleton instance of TencentCloudChatRouter.
   factory TencentCloudChatRouter() => _instance;
-  static final TencentCloudChatRouter _instance =
-      TencentCloudChatRouter._internal();
+  static final TencentCloudChatRouter _instance = TencentCloudChatRouter._internal();
 
   /// A map containing the registered routes.
   final Map<String, WidgetBuilder> routes = {};

@@ -22,8 +22,7 @@ abstract class TencentCloudChatDataAB<T> {
     required String logs,
     TencentCloudChatLogLevel? logLevel,
   }) {
-    var componentName =
-        runtimeType.toString().replaceAll("TencentCloudChat", "");
+    var componentName = runtimeType.toString().replaceAll("TencentCloudChat", "");
     TencentCloudChat.instance.logInstance.console(
       componentName: componentName,
       logs: logs,

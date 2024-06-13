@@ -130,4 +130,7 @@ We hope this documentation provides you with a comprehensive understanding of th
 
 By leveraging the customization options and features available, you can create a tailored chat experience that meets your specific requirements. 
 
-Should you have any questions or need additional information, please feel free to reach out.
+Should you have any questions or need additional information, please feel free to reach out us.
+
+- [Telegram](https://t.me/+gvScYl0uQ3U4MTRl)
+- [X (Twitter)](https://x.com/runlin_wang95)

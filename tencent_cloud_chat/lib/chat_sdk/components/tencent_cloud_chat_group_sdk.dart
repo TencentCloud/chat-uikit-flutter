@@ -12,17 +12,32 @@ class TencentCloudChatGroupSDKGenerator {
 class TencentCloudChatGroupSDK {
   TencentCloudChatGroupSDK._();
 
-  Future<List<V2TimGroupInfoResult>?> getGroupsInfo({
-    required List<String> groupIDList,
+  Future<List<V2TimTopicInfoResult>?> getTopicInfo({
+    required String groupID,
+    required List<String> topicIDList,
   }) async {
-    final res = await TencentImSDKPlugin.v2TIMManager
-        .getGroupManager()
-        .getGroupsInfo(groupIDList: groupIDList);
+    final res = await TencentImSDKPlugin.v2TIMManager.getGroupManager().getTopicInfoList(topicIDList: topicIDList, groupID: groupID,);
     if (res.code == 0) {
       return res.data;
     } else {
-      var componentName =
-          runtimeType.toString().replaceAll("TencentCloudChat", "");
+      var componentName = runtimeType.toString().replaceAll("TencentCloudChat", "");
+      TencentCloudChat.instance.logInstance.console(
+        componentName: componentName,
+        logs: "getGroupsInfo - ${res.desc}",
+        logLevel: TencentCloudChatLogLevel.error,
+      );
+      return null;
+    }
+  }
+
+  Future<List<V2TimGroupInfoResult>?> getGroupsInfo({
+    required List<String> groupIDList,
+  }) async {
+    final res = await TencentImSDKPlugin.v2TIMManager.getGroupManager().getGroupsInfo(groupIDList: groupIDList);
+    if (res.code == 0) {
+      return res.data;
+    } else {
+      var componentName = runtimeType.toString().replaceAll("TencentCloudChat", "");
       TencentCloudChat.instance.logInstance.console(
         componentName: componentName,
         logs: "getGroupsInfo - ${res.desc}",
@@ -41,17 +56,11 @@ class TencentCloudChatGroupSDK {
   }) async {
     final res = await TencentImSDKPlugin.v2TIMManager
         .getGroupManager()
-        .getGroupMemberList(
-            groupID: groupID,
-            filter: filter,
-            nextSeq: nextSeq,
-            count: count,
-            offset: offset);
+        .getGroupMemberList(groupID: groupID, filter: filter, nextSeq: nextSeq, count: count, offset: offset);
     if (res.code == 0) {
       return res;
     }
-    var componentName =
-        runtimeType.toString().replaceAll("TencentCloudChat", "");
+    var componentName = runtimeType.toString().replaceAll("TencentCloudChat", "");
     TencentCloudChat.instance.logInstance.console(
       componentName: componentName,
       logs: "getGroupMemberList - ${res.desc}",
@@ -69,10 +78,8 @@ class TencentCloudChatGroupSDK {
     onGroupCreated: (groupID) {},
     onGroupDismissed: (groupID, opUser) {},
     onGroupInfoChanged: (groupID, changeInfos) {
-      List<V2TimConversation> conversationList =
-          TencentCloudChat.instance.dataInstance.conversation.conversationList;
-      int index = conversationList.indexWhere(
-          (element) => element.conversationID == "group_${groupID}");
+      List<V2TimConversation> conversationList = TencentCloudChat.instance.dataInstance.conversation.conversationList;
+      int index = conversationList.indexWhere((element) => element.conversationID == "group_${groupID}");
       if (index > -1) {
         V2TimConversation conversation = conversationList[index];
         for (int i = 0; i < changeInfos.length; i++) {
@@ -87,8 +94,7 @@ class TencentCloudChatGroupSDK {
               break;
           }
         }
-        TencentCloudChat.instance.dataInstance.conversation
-            .buildConversationList([conversation], "onGroupInfoChanged");
+        TencentCloudChat.instance.dataInstance.conversation.buildConversationList([conversation], "onGroupInfoChanged");
       }
     },
     onGroupRecycled: (groupID, opUser) {},
@@ -108,10 +114,8 @@ class TencentCloudChatGroupSDK {
   );
 
   addGroupListener() async {
-    await TencentCloudChat.instance.chatSDKInstance.manager
-        .removeGroupListener(listener: groupListener);
-    await TencentCloudChat.instance.chatSDKInstance.manager
-        .addGroupListener(listener: groupListener);
+    await TencentCloudChat.instance.chatSDKInstance.manager.removeGroupListener(listener: groupListener);
+    await TencentCloudChat.instance.chatSDKInstance.manager.addGroupListener(listener: groupListener);
   }
 
   Future<V2TimCallback> setGroupInfo({
@@ -124,25 +128,21 @@ class TencentCloudChatGroupSDK {
     bool? isAllMuted,
     int? groupAddOpt,
   }) async {
-    V2TimCallback res = await TencentImSDKPlugin.v2TIMManager
-        .getGroupManager()
-        .setGroupInfo(
-            info: V2TimGroupInfo(
-                groupID: groupID,
-                groupType: groupType,
-                groupName: groupName,
-                notification: notification,
-                introduction: introduction,
-                faceUrl: faceUrl,
-                isAllMuted: isAllMuted,
-                groupAddOpt: groupAddOpt));
+    V2TimCallback res = await TencentImSDKPlugin.v2TIMManager.getGroupManager().setGroupInfo(
+        info: V2TimGroupInfo(
+            groupID: groupID,
+            groupType: groupType,
+            groupName: groupName,
+            notification: notification,
+            introduction: introduction,
+            faceUrl: faceUrl,
+            isAllMuted: isAllMuted,
+            groupAddOpt: groupAddOpt));
     return res;
   }
 
   Future<V2TimCallback> setGroupMemberRole(
-      {required String groupID,
-      required String userID,
-      required GroupMemberRoleTypeEnum role}) async {
+      {required String groupID, required String userID, required GroupMemberRoleTypeEnum role}) async {
     V2TimCallback res = await TencentImSDKPlugin.v2TIMManager
         .getGroupManager()
         .setGroupMemberRole(groupID: groupID, userID: userID, role: role);
@@ -150,46 +150,30 @@ class TencentCloudChatGroupSDK {
   }
 
   Future<V2TimCallback> kickGroupMember(
-      {required String groupID,
-      required List<String> memberList,
-      String reason = ""}) async {
+      {required String groupID, required List<String> memberList, String reason = ""}) async {
     V2TimCallback res = await TencentImSDKPlugin.v2TIMManager
         .getGroupManager()
-        .kickGroupMember(
-            groupID: groupID, memberList: memberList, reason: reason);
+        .kickGroupMember(groupID: groupID, memberList: memberList, reason: reason);
     return res;
   }
 
   Future<V2TimCallback> setGroupMemberInfo(
-      {required String groupID,
-      required String userID,
-      String? nameCard,
-      Map<String, String>? customInfo}) async {
+      {required String groupID, required String userID, String? nameCard, Map<String, String>? customInfo}) async {
     V2TimCallback setGroupMemberInfoRes = await TencentImSDKPlugin.v2TIMManager
         .getGroupManager()
-        .setGroupMemberInfo(
-            groupID: groupID,
-            userID: userID,
-            nameCard: nameCard,
-            customInfo: customInfo);
+        .setGroupMemberInfo(groupID: groupID, userID: userID, nameCard: nameCard, customInfo: customInfo);
     return setGroupMemberInfoRes;
   }
 
-  Future<V2TimCallback> setGroupReceiveMessageOpt(
-      {required String groupID, required ReceiveMsgOptEnum opt}) async {
-    V2TimCallback setGroupReceiveMessageOptRes = await TencentImSDKPlugin
-        .v2TIMManager
-        .getMessageManager()
-        .setGroupReceiveMessageOpt(groupID: groupID, opt: opt);
+  Future<V2TimCallback> setGroupReceiveMessageOpt({required String groupID, required ReceiveMsgOptEnum opt}) async {
+    V2TimCallback setGroupReceiveMessageOptRes =
+        await TencentImSDKPlugin.v2TIMManager.getMessageManager().setGroupReceiveMessageOpt(groupID: groupID, opt: opt);
     return setGroupReceiveMessageOptRes;
   }
 
-  Future<V2TimCallback> clearGroupHistoryMessage(
-      {required String groupID}) async {
-    V2TimCallback clearGroupHistoryMessageRes = await TencentImSDKPlugin
-        .v2TIMManager
-        .getMessageManager()
-        .clearGroupHistoryMessage(groupID: groupID);
+  Future<V2TimCallback> clearGroupHistoryMessage({required String groupID}) async {
+    V2TimCallback clearGroupHistoryMessageRes =
+        await TencentImSDKPlugin.v2TIMManager.getMessageManager().clearGroupHistoryMessage(groupID: groupID);
     return clearGroupHistoryMessageRes;
   }
 
@@ -201,29 +185,23 @@ class TencentCloudChatGroupSDK {
   }
 
   Future<V2TimCallback> dismissGroup({required String groupID}) async {
-    V2TimCallback res =
-        await TencentImSDKPlugin.v2TIMManager.dismissGroup(groupID: groupID);
+    V2TimCallback res = await TencentImSDKPlugin.v2TIMManager.dismissGroup(groupID: groupID);
     return res;
   }
 
-  inviteUserToGroup(
-      {required String groupID, required List<String> userList}) async {
+  inviteUserToGroup({required String groupID, required List<String> userList}) async {
     await TencentImSDKPlugin.v2TIMManager.getGroupManager().inviteUserToGroup(
           groupID: groupID,
           userList: userList,
         );
   }
 
-  Future<V2TimCallback> muteGroupMember(
-      {required String groupID,
-      required String userID,
-      required int seconds}) async {
-    V2TimCallback muteGroupMemberRes =
-        await TencentImSDKPlugin.v2TIMManager.getGroupManager().muteGroupMember(
-            groupID: groupID, // 禁言的群组id
-            userID: userID, // 禁言的用户id
-            seconds: seconds // 禁言时间
-            );
+  Future<V2TimCallback> muteGroupMember({required String groupID, required String userID, required int seconds}) async {
+    V2TimCallback muteGroupMemberRes = await TencentImSDKPlugin.v2TIMManager.getGroupManager().muteGroupMember(
+        groupID: groupID, // 禁言的群组id
+        userID: userID, // 禁言的用户id
+        seconds: seconds // 禁言时间
+        );
     return muteGroupMemberRes;
   }
 }

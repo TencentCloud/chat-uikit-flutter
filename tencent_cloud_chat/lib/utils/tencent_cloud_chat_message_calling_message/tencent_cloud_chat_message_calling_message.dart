@@ -213,10 +213,7 @@ class CallingMessage {
     final actionType = callMsg.actionType!;
     final cmd = callMsg.cmd ?? '';
     final inviteID = callMsg.inviteID;
-    if (actionType == 1 &&
-        cmd == 'hangup' &&
-        callMsg.excludeFromHistoryMessage == null &&
-        inviteID != null) {
+    if (actionType == 1 && cmd == 'hangup' && callMsg.excludeFromHistoryMessage == null && inviteID != null) {
       return true;
     }
     return false;

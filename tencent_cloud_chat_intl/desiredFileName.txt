@@ -367,6 +367,7 @@
     "permissionDeniedContent",
     "goToSettingsButtonText",
     "originalMessageNotFound",
-    "markAsRead"
+    "markAsRead",
+    "reEdit"
   ]
 }

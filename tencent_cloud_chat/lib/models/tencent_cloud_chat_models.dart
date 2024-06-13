@@ -10,20 +10,18 @@ import 'package:tencent_cloud_chat/components/component_event_handlers/tencent_c
 import 'package:tencent_cloud_chat/components/component_event_handlers/tencent_cloud_chat_group_profile_event_handlers.dart';
 import 'package:tencent_cloud_chat/components/component_event_handlers/tencent_cloud_chat_message_event_handlers.dart';
 import 'package:tencent_cloud_chat/components/component_event_handlers/tencent_cloud_chat_user_profile_event_handlers.dart';
-import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
 import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_base_controller.dart';
+import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder.dart';
+import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
 import 'package:tencent_cloud_chat/data/theme/tencent_cloud_chat_theme_model.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder.dart';
 
 typedef TencentCloudChatPluginWidget = Widget Function(V2TimMessage message);
 typedef MessageBuilderForPlugin = Widget Function(V2TimMessage message);
-typedef ConversationBuilderForPlugin = Widget Function(
-    V2TimConversation conversation);
+typedef ConversationBuilderForPlugin = Widget Function(V2TimConversation conversation);
 typedef PlaceHolderBuilder = Widget Function();
 
-typedef TencentCloudChatWidgetBuilder = Widget Function(
-    {required Map<String, dynamic> options});
+typedef TencentCloudChatWidgetBuilder = Widget Function({required Map<String, dynamic> options});
 
 typedef TencentCloudChatModularUIPackageRegister = ({
   TencentCloudChatComponentsEnum componentEnum,

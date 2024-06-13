@@ -1,11 +1,13 @@
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
+import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_custom.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_file.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_image.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_merge.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_sound.dart';
+import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_sticker.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_tips_common.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_video.dart';
 
@@ -13,19 +15,8 @@ import 'message_type_builders/tencent_cloud_chat_message_text.dart';
 
 typedef MessageWidgetBuilder = Widget? Function({
   Key? key,
-  required V2TimMessage message,
-  required bool shouldBeHighlighted,
-  required VoidCallback clearHighlightFunc,
-  required bool showMessageStatusIndicator,
-  required bool showMessageTimeIndicator,
-  V2TimMessageReceipt? messageReceipt,
-  String? userID,
-  String? groupID,
-  required double messageRowWidth,
-  SendingMessageData? sendingMessageData,
-  required bool renderOnMenuPreview,
-  required bool inSelectMode,
-  required VoidCallback onSelectMessage,
+  required MessageItemBuilderData data,
+  required MessageItemBuilderMethods methods,
 });
 
 typedef CommonTipsBuilder = Widget? Function({
@@ -35,45 +26,14 @@ typedef CommonTipsBuilder = Widget? Function({
 });
 
 class TencentCloudChatMessageItemBuilders {
-  MessageWidgetBuilder? _textMessageBuilder;
-  CommonTipsBuilder? _commonTipsBuilder;
-  MessageWidgetBuilder? _imageMessageBuilder;
-  MessageWidgetBuilder? _soundMessageBuilder;
-  MessageWidgetBuilder? _fileMessageBuilder;
-  MessageWidgetBuilder? _videoMessageBuilder;
-  MessageWidgetBuilder? _mergeMessageBuilder;
-  MessageWidgetBuilder? _customMessageBuilder;
-
-  TencentCloudChatMessageItemBuilders({
-    MessageWidgetBuilder? textMessageBuilder,
-    MessageWidgetBuilder? imageMessageBuilder,
-    MessageWidgetBuilder? soundMessageBuilder,
-    MessageWidgetBuilder? fileMessageBuilder,
-    MessageWidgetBuilder? videoMessageBuilder,
-    MessageWidgetBuilder? mergeMessageBuilder,
-    MessageWidgetBuilder? customMessageBuilder,
-    CommonTipsBuilder? commonTipsBuilder,
-  }) {
-    _textMessageBuilder = textMessageBuilder;
-    _imageMessageBuilder = imageMessageBuilder;
-    _soundMessageBuilder = soundMessageBuilder;
-    _fileMessageBuilder = fileMessageBuilder;
-    _videoMessageBuilder = videoMessageBuilder;
-    _mergeMessageBuilder = mergeMessageBuilder;
-    _customMessageBuilder = customMessageBuilder;
-    _commonTipsBuilder = commonTipsBuilder;
-  }
-
-  Widget getMessageTipsBuilder({
+  static Widget getMessageTipsBuilder({
     Key? key,
     required V2TimMessage message,
-    required,
     required String text,
   }) {
     final int messageType = message.elemType;
     switch (messageType) {
       case 101:
-// Time Divider
         return getCommonTipsBuilder(
           message: message,
           text: text,
@@ -83,629 +43,216 @@ class TencentCloudChatMessageItemBuilders {
     }
   }
 
-  Widget getImageMessageBuilder({
+  static Widget getImageMessageBuilder({
     Key? key,
-    String? userID,
-    String? groupID,
-    required V2TimMessage message,
-    required bool shouldBeHighlighted,
-    required VoidCallback clearHighlightFunc,
-    V2TimMessageReceipt? messageReceipt,
-    required bool showMessageStatusIndicator,
-    required bool showMessageTimeIndicator,
-    SendingMessageData? sendingMessageData,
-    required double messageRowWidth,
-    required bool renderOnMenuPreview,
-    required bool inSelectMode,
-    required VoidCallback onSelectMessage,
+    required MessageItemBuilderData data,
+    required MessageItemBuilderMethods methods,
   }) {
-    Widget? widget;
-
-    if (_imageMessageBuilder != null) {
-      widget = _imageMessageBuilder!(
-        key: key,
-        message: message,
-        shouldBeHighlighted: shouldBeHighlighted,
-        clearHighlightFunc: clearHighlightFunc,
-        messageReceipt: messageReceipt,
-        showMessageTimeIndicator: showMessageTimeIndicator,
-        showMessageStatusIndicator: showMessageStatusIndicator,
-        userID: userID,
-        groupID: groupID,
-        messageRowWidth: messageRowWidth,
-        sendingMessageData: sendingMessageData,
-        onSelectMessage: onSelectMessage,
-        inSelectMode: inSelectMode,
-        renderOnMenuPreview: renderOnMenuPreview,
-      );
-    }
-
-    return widget ??
-        TencentCloudChatMessageImage(
-          key: key,
-          message: message,
-          userID: userID,
-          groupID: groupID,
-          shouldBeHighlighted: shouldBeHighlighted,
-          clearHighlightFunc: clearHighlightFunc,
-          messageReceipt: messageReceipt,
-          showMessageTimeIndicator: showMessageTimeIndicator,
-          showMessageStatusIndicator: showMessageStatusIndicator,
-          onSelectMessage: onSelectMessage,
-          inSelectMode: inSelectMode,
-          messageRowWidth: messageRowWidth,
-          renderOnMenuPreview: renderOnMenuPreview,
-          sendingMessageData: sendingMessageData,
-        );
+    return TencentCloudChatMessageImage(
+      key: key,
+      data: data,
+      methods: methods,
+    );
   }
 
-  Widget getCustomMessageBuilder({
+  static Widget getCustomMessageBuilder({
     Key? key,
-    String? userID,
-    String? groupID,
-    required V2TimMessage message,
-    required bool shouldBeHighlighted,
-    required VoidCallback clearHighlightFunc,
-    V2TimMessageReceipt? messageReceipt,
-    required double messageRowWidth,
-    required bool showMessageStatusIndicator,
-    required bool showMessageTimeIndicator,
-    SendingMessageData? sendingMessageData,
-    required bool renderOnMenuPreview,
-    required bool inSelectMode,
-    required VoidCallback onSelectMessage,
+    required MessageItemBuilderData data,
+    required MessageItemBuilderMethods methods,
   }) {
-    Widget? widget;
-
-    if (_customMessageBuilder != null) {
-      widget = _customMessageBuilder!(
-        key: key,
-        message: message,
-        shouldBeHighlighted: shouldBeHighlighted,
-        clearHighlightFunc: clearHighlightFunc,
-        messageReceipt: messageReceipt,
-        messageRowWidth: messageRowWidth,
-        sendingMessageData: sendingMessageData,
-        userID: userID,
-        groupID: groupID,
-        renderOnMenuPreview: renderOnMenuPreview,
-        showMessageTimeIndicator: showMessageTimeIndicator,
-        showMessageStatusIndicator: showMessageStatusIndicator,
-        onSelectMessage: onSelectMessage,
-        inSelectMode: inSelectMode,
-      );
-    }
-
-    return widget ??
-        TencentCloudChatMessageCustom(
-          key: key,
-          message: message,
-          userID: userID,
-          groupID: groupID,
-          shouldBeHighlighted: shouldBeHighlighted,
-          clearHighlightFunc: clearHighlightFunc,
-          messageReceipt: messageReceipt,
-          messageRowWidth: messageRowWidth,
-          sendingMessageData: sendingMessageData,
-          onSelectMessage: onSelectMessage,
-          inSelectMode: inSelectMode,
-          showMessageTimeIndicator: showMessageTimeIndicator,
-          showMessageStatusIndicator: showMessageStatusIndicator,
-          renderOnMenuPreview: renderOnMenuPreview,
-        );
+    return TencentCloudChatMessageCustom(
+      key: key,
+      data: data,
+      methods: methods,
+    );
   }
 
-  Widget getVideoMessageBuilder({
+  static Widget getVideoMessageBuilder({
     Key? key,
-    String? userID,
-    String? groupID,
-    required V2TimMessage message,
-    required bool shouldBeHighlighted,
-    required VoidCallback clearHighlightFunc,
-    required bool showMessageStatusIndicator,
-    required bool showMessageTimeIndicator,
-    V2TimMessageReceipt? messageReceipt,
-    required double messageRowWidth,
-    SendingMessageData? sendingMessageData,
-    required bool renderOnMenuPreview,
-    required bool inSelectMode,
-    required VoidCallback onSelectMessage,
+    required MessageItemBuilderData data,
+    required MessageItemBuilderMethods methods,
   }) {
-    Widget? widget;
-
-    if (_videoMessageBuilder != null) {
-      widget = _videoMessageBuilder!(
-        key: key,
-        message: message,
-        shouldBeHighlighted: shouldBeHighlighted,
-        clearHighlightFunc: clearHighlightFunc,
-        messageReceipt: messageReceipt,
-        messageRowWidth: messageRowWidth,
-        sendingMessageData: sendingMessageData,
-        userID: userID,
-        groupID: groupID,
-        showMessageTimeIndicator: showMessageTimeIndicator,
-        showMessageStatusIndicator: showMessageStatusIndicator,
-        renderOnMenuPreview: renderOnMenuPreview,
-        onSelectMessage: onSelectMessage,
-        inSelectMode: inSelectMode,
-      );
-    }
-
-    return widget ??
-        TencentCloudChatMessageVideo(
-          key: key,
-          message: message,
-          shouldBeHighlighted: shouldBeHighlighted,
-          clearHighlightFunc: clearHighlightFunc,
-          messageReceipt: messageReceipt,
-          messageRowWidth: messageRowWidth,
-          sendingMessageData: sendingMessageData,
-          userID: userID,
-          showMessageTimeIndicator: showMessageTimeIndicator,
-          showMessageStatusIndicator: showMessageStatusIndicator,
-          groupID: groupID,
-          onSelectMessage: onSelectMessage,
-          inSelectMode: inSelectMode,
-          renderOnMenuPreview: renderOnMenuPreview,
-        );
+    return TencentCloudChatMessageVideo(
+      key: UniqueKey(),
+      data: data,
+      methods: methods,
+    );
   }
 
-  Widget getSoundMessageBuilder({
+  static Widget getSoundMessageBuilder({
     Key? key,
-    String? userID,
-    String? groupID,
-    required V2TimMessage message,
-    required bool shouldBeHighlighted,
-    required bool showMessageStatusIndicator,
-    required bool showMessageTimeIndicator,
-    required VoidCallback clearHighlightFunc,
-    V2TimMessageReceipt? messageReceipt,
-    required double messageRowWidth,
-    SendingMessageData? sendingMessageData,
-    CurrentPlayAudioInfo? currentPlayAudioInfo,
-    required bool renderOnMenuPreview,
-    required bool inSelectMode,
-    required VoidCallback onSelectMessage,
+    required MessageItemBuilderData data,
+    required MessageItemBuilderMethods methods,
   }) {
-    Widget? widget;
-
-    if (_soundMessageBuilder != null) {
-      widget = _soundMessageBuilder!(
-        key: key,
-        message: message,
-        shouldBeHighlighted: shouldBeHighlighted,
-        clearHighlightFunc: clearHighlightFunc,
-        messageReceipt: messageReceipt,
-        onSelectMessage: onSelectMessage,
-        userID: userID,
-        groupID: groupID,
-        showMessageTimeIndicator: showMessageTimeIndicator,
-        showMessageStatusIndicator: showMessageStatusIndicator,
-        inSelectMode: inSelectMode,
-        messageRowWidth: messageRowWidth,
-        renderOnMenuPreview: renderOnMenuPreview,
-        sendingMessageData: sendingMessageData,
-      );
-    }
-
-    return widget ??
-        TencentCloudChatMessageSound(
-          key: key,
-          message: message,
-          shouldBeHighlighted: shouldBeHighlighted,
-          clearHighlightFunc: clearHighlightFunc,
-          messageReceipt: messageReceipt,
-          showMessageTimeIndicator: showMessageTimeIndicator,
-          showMessageStatusIndicator: showMessageStatusIndicator,
-          renderOnMenuPreview: renderOnMenuPreview,
-          userID: userID,
-          groupID: groupID,
-          messageRowWidth: messageRowWidth,
-          onSelectMessage: onSelectMessage,
-          inSelectMode: inSelectMode,
-          sendingMessageData: sendingMessageData,
-        );
+    return TencentCloudChatMessageSound(
+      key: key,
+      data: data,
+      methods: methods,
+    );
   }
 
-  Widget getFileMessageBuilder({
+  static Widget getFileMessageBuilder({
     Key? key,
-    required V2TimMessage message,
-    String? userID,
-    String? groupID,
-    required bool shouldBeHighlighted,
-    required bool showMessageStatusIndicator,
-    required bool showMessageTimeIndicator,
-    required VoidCallback clearHighlightFunc,
-    V2TimMessageReceipt? messageReceipt,
-    required double messageRowWidth,
-    SendingMessageData? sendingMessageData,
-    required bool renderOnMenuPreview,
-    required bool inSelectMode,
-    required VoidCallback onSelectMessage,
+    required MessageItemBuilderData data,
+    required MessageItemBuilderMethods methods,
   }) {
-    Widget? widget;
-
-    if (_fileMessageBuilder != null) {
-      widget = _fileMessageBuilder!(
-        key: key,
-        message: message,
-        userID: userID,
-        groupID: groupID,
-        shouldBeHighlighted: shouldBeHighlighted,
-        clearHighlightFunc: clearHighlightFunc,
-        onSelectMessage: onSelectMessage,
-        inSelectMode: inSelectMode,
-        showMessageTimeIndicator: showMessageTimeIndicator,
-        showMessageStatusIndicator: showMessageStatusIndicator,
-        messageReceipt: messageReceipt,
-        messageRowWidth: messageRowWidth,
-        renderOnMenuPreview: renderOnMenuPreview,
-        sendingMessageData: sendingMessageData,
-      );
-    }
-
-    return widget ??
-        TencentCloudChatMessageFile(
-          key: key,
-          message: message,
-          shouldBeHighlighted: shouldBeHighlighted,
-          clearHighlightFunc: clearHighlightFunc,
-          userID: userID,
-          groupID: groupID,
-          showMessageTimeIndicator: showMessageTimeIndicator,
-          showMessageStatusIndicator: showMessageStatusIndicator,
-          renderOnMenuPreview: renderOnMenuPreview,
-          messageReceipt: messageReceipt,
-          onSelectMessage: onSelectMessage,
-          inSelectMode: inSelectMode,
-          messageRowWidth: messageRowWidth,
-          sendingMessageData: sendingMessageData,
-        );
+    return TencentCloudChatMessageFile(
+      key: key,
+      data: data,
+      methods: methods,
+    );
   }
 
-  Widget getFaceMessageBuilder({
+  static Widget getFaceMessageBuilder({
     Key? key,
-    required V2TimMessage message,
-    required bool shouldBeHighlighted,
-    String? userID,
-    String? groupID,
-    required VoidCallback clearHighlightFunc,
-    V2TimMessageReceipt? messageReceipt,
-    required double messageRowWidth,
-    required bool showMessageStatusIndicator,
-    required bool showMessageTimeIndicator,
-    SendingMessageData? sendingMessageData,
-    required bool renderOnMenuPreview,
-    required bool inSelectMode,
-    required VoidCallback onSelectMessage,
+    required MessageItemBuilderData data,
+    required MessageItemBuilderMethods methods,
   }) {
-    return const Text("Sticker Message");
+    return TencentCloudChatMessageSticker(
+      key: key,
+      data: data,
+      methods: methods,
+    );
   }
 
-  Widget getLocationMessageBuilder({
+  static Widget getLocationMessageBuilder({
     Key? key,
-    required String? userID,
-    required String? groupID,
-    required V2TimMessage message,
-    required bool shouldBeHighlighted,
-    required bool showMessageStatusIndicator,
-    required bool showMessageTimeIndicator,
-    required VoidCallback clearHighlightFunc,
-    V2TimMessageReceipt? messageReceipt,
-    required double messageRowWidth,
-    SendingMessageData? sendingMessageData,
-    required bool renderOnMenuPreview,
-    required bool inSelectMode,
-    required VoidCallback onSelectMessage,
+    required MessageItemBuilderData data,
+    required MessageItemBuilderMethods methods,
   }) {
     return const Text("Location message todo");
   }
 
-  Widget getMergeMessageBuilder({
+  static Widget getMergeMessageBuilder({
     Key? key,
-    required V2TimMessage message,
-    String? userID,
-    String? groupID,
-    required bool shouldBeHighlighted,
-    required VoidCallback clearHighlightFunc,
-    V2TimMessageReceipt? messageReceipt,
-    required bool showMessageStatusIndicator,
-    required bool showMessageTimeIndicator,
-    required double messageRowWidth,
-    SendingMessageData? sendingMessageData,
-    required bool renderOnMenuPreview,
-    required bool inSelectMode,
-    required VoidCallback onSelectMessage,
+    required MessageItemBuilderData data,
+    required MessageItemBuilderMethods methods,
   }) {
-    Widget? widget;
+    return TencentCloudChatMessageMerge(
+      key: key,
+      data: data,
+      methods: methods,
+    );
+  }
 
-    if (_mergeMessageBuilder != null) {
-      widget = _mergeMessageBuilder!(
-        key: key,
-        message: message,
-        shouldBeHighlighted: shouldBeHighlighted,
-        clearHighlightFunc: clearHighlightFunc,
-        renderOnMenuPreview: renderOnMenuPreview,
-        onSelectMessage: onSelectMessage,
-        userID: userID,
-        groupID: groupID,
-        inSelectMode: inSelectMode,
-        showMessageTimeIndicator: showMessageTimeIndicator,
-        showMessageStatusIndicator: showMessageStatusIndicator,
-        messageReceipt: messageReceipt,
-        messageRowWidth: messageRowWidth,
-        sendingMessageData: sendingMessageData,
+  static Widget getMessageItemBuilder({
+    Key? key,
+    required MessageItemBuilderData data,
+    required MessageItemBuilderMethods methods,
+  }) {
+    final int messageType = data.message.elemType;
+    Widget renderWidget = Text(tL10n.messageInfo);
+
+    final tipsItem = data.message.elemType == 101 || data.message.elemType == MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS;
+    final recalledMessage = data.message.status == MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED;
+
+    if (tipsItem || recalledMessage) {
+      return getCommonTipsBuilder(
+        message: data.message,
+        text: data.altText,
+        buttonText: recalledMessage
+            ? (
+                text: tL10n.reEdit,
+                onTap: () => methods.setMessageTextWithMentions(
+                      messageText: TencentCloudChatUtils.getMessageSummary(message: data.message, needStatus: false),
+                      groupMembersNeedToMention: data.message.groupAtUserList ?? [],
+                    )
+              )
+            : null,
       );
     }
 
-    return widget ??
-        TencentCloudChatMessageMerge(
-          key: key,
-          message: message,
-          shouldBeHighlighted: shouldBeHighlighted,
-          clearHighlightFunc: clearHighlightFunc,
-          renderOnMenuPreview: renderOnMenuPreview,
-          userID: userID,
-          groupID: groupID,
-          showMessageTimeIndicator: showMessageTimeIndicator,
-          showMessageStatusIndicator: showMessageStatusIndicator,
-          messageReceipt: messageReceipt,
-          onSelectMessage: onSelectMessage,
-          inSelectMode: inSelectMode,
-          messageRowWidth: messageRowWidth,
-          sendingMessageData: sendingMessageData,
-        );
-  }
-
-  Widget getMessageItemBuilder(
-      {Key? key,
-      required V2TimMessage message,
-      String? userID,
-      String? groupID,
-      required bool showMessageStatusIndicator,
-      required bool showMessageTimeIndicator,
-      required bool shouldBeHighlighted,
-      required VoidCallback clearHighlightFunc,
-      V2TimMessageReceipt? messageReceipt,
-      SendingMessageData? sendingMessageData,
-      CurrentPlayAudioInfo? currentPlayAudioInfo,
-      required double messageRowWidth,
-      required bool renderOnMenuPreview,
-      required bool inSelectMode,
-      required VoidCallback onSelectMessage,
-      required bool isMergeMessage,
-      v}) {
-    final int messageType = message.elemType;
-    Widget renderWidget = Text(tL10n.messageInfo);
     switch (messageType) {
       case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
         renderWidget = getTextMessageBuilder(
-          message: message,
-          shouldBeHighlighted: shouldBeHighlighted,
-          clearHighlightFunc: clearHighlightFunc,
-          renderOnMenuPreview: renderOnMenuPreview,
-          showMessageTimeIndicator: showMessageTimeIndicator,
-          showMessageStatusIndicator: showMessageStatusIndicator,
-          userID: userID,
-          groupID: groupID,
-          messageRowWidth: messageRowWidth,
-          onSelectMessage: onSelectMessage,
-          inSelectMode: inSelectMode,
-          messageReceipt: messageReceipt,
-          sendingMessageData: sendingMessageData,
+          key: key,
+          data: data,
+          methods: methods,
         );
         break;
       case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
         renderWidget = getImageMessageBuilder(
-          message: message,
-          shouldBeHighlighted: shouldBeHighlighted,
-          clearHighlightFunc: clearHighlightFunc,
-          userID: userID,
-          showMessageTimeIndicator: showMessageTimeIndicator,
-          showMessageStatusIndicator: showMessageStatusIndicator,
-          groupID: groupID,
-          renderOnMenuPreview: renderOnMenuPreview,
-          onSelectMessage: onSelectMessage,
-          inSelectMode: inSelectMode,
-          messageRowWidth: messageRowWidth,
-          messageReceipt: messageReceipt,
-          sendingMessageData: sendingMessageData,
+          key: key,
+          data: data,
+          methods: methods,
         );
         break;
       case MessageElemType.V2TIM_ELEM_TYPE_FACE:
         renderWidget = getFaceMessageBuilder(
-          message: message,
-          shouldBeHighlighted: shouldBeHighlighted,
-          renderOnMenuPreview: renderOnMenuPreview,
-          clearHighlightFunc: clearHighlightFunc,
-          messageRowWidth: messageRowWidth,
-          showMessageTimeIndicator: showMessageTimeIndicator,
-          showMessageStatusIndicator: showMessageStatusIndicator,
-          onSelectMessage: onSelectMessage,
-          userID: userID,
-          groupID: groupID,
-          inSelectMode: inSelectMode,
-          messageReceipt: messageReceipt,
-          sendingMessageData: sendingMessageData,
+          key: key,
+          data: data,
+          methods: methods,
         );
         break;
       case MessageElemType.V2TIM_ELEM_TYPE_FILE:
         renderWidget = getFileMessageBuilder(
-          message: message,
-          shouldBeHighlighted: shouldBeHighlighted,
-          onSelectMessage: onSelectMessage,
-          inSelectMode: inSelectMode,
-          clearHighlightFunc: clearHighlightFunc,
-          messageRowWidth: messageRowWidth,
-          userID: userID,
-          showMessageTimeIndicator: showMessageTimeIndicator,
-          showMessageStatusIndicator: showMessageStatusIndicator,
-          groupID: groupID,
-          renderOnMenuPreview: renderOnMenuPreview,
-          messageReceipt: messageReceipt,
-          sendingMessageData: sendingMessageData,
+          key: key,
+          data: data,
+          methods: methods,
         );
         break;
       case MessageElemType.V2TIM_ELEM_TYPE_LOCATION:
         renderWidget = getLocationMessageBuilder(
-          message: message,
-          shouldBeHighlighted: shouldBeHighlighted,
-          clearHighlightFunc: clearHighlightFunc,
-          renderOnMenuPreview: renderOnMenuPreview,
-          messageRowWidth: messageRowWidth,
-          onSelectMessage: onSelectMessage,
-          userID: userID,
-          showMessageTimeIndicator: showMessageTimeIndicator,
-          showMessageStatusIndicator: showMessageStatusIndicator,
-          groupID: groupID,
-          inSelectMode: inSelectMode,
-          messageReceipt: messageReceipt,
-          sendingMessageData: sendingMessageData,
+          key: key,
+          data: data,
+          methods: methods,
         );
         break;
       case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
         renderWidget = getSoundMessageBuilder(
-          message: message,
-          shouldBeHighlighted: shouldBeHighlighted,
-          clearHighlightFunc: clearHighlightFunc,
-          renderOnMenuPreview: renderOnMenuPreview,
-          messageRowWidth: messageRowWidth,
-          onSelectMessage: onSelectMessage,
-          showMessageTimeIndicator: showMessageTimeIndicator,
-          showMessageStatusIndicator: showMessageStatusIndicator,
-          inSelectMode: inSelectMode,
-          messageReceipt: messageReceipt,
-          userID: userID,
-          groupID: groupID,
-          sendingMessageData: sendingMessageData,
-          currentPlayAudioInfo: currentPlayAudioInfo,
+          key: key,
+          data: data,
+          methods: methods,
         );
         break;
       case MessageElemType.V2TIM_ELEM_TYPE_VIDEO:
         renderWidget = getVideoMessageBuilder(
-          message: message,
-          shouldBeHighlighted: shouldBeHighlighted,
-          clearHighlightFunc: clearHighlightFunc,
-          userID: userID,
-          groupID: groupID,
-          renderOnMenuPreview: renderOnMenuPreview,
-          messageRowWidth: messageRowWidth,
-          showMessageTimeIndicator: showMessageTimeIndicator,
-          showMessageStatusIndicator: showMessageStatusIndicator,
-          messageReceipt: messageReceipt,
-          onSelectMessage: onSelectMessage,
-          inSelectMode: inSelectMode,
-          sendingMessageData: sendingMessageData,
+          key: key,
+          data: data,
+          methods: methods,
         );
         break;
       case MessageElemType.V2TIM_ELEM_TYPE_MERGER:
         renderWidget = getMergeMessageBuilder(
-          message: message,
-          userID: userID,
-          groupID: groupID,
-          shouldBeHighlighted: shouldBeHighlighted,
-          renderOnMenuPreview: renderOnMenuPreview,
-          clearHighlightFunc: clearHighlightFunc,
-          messageRowWidth: messageRowWidth,
-          onSelectMessage: onSelectMessage,
-          inSelectMode: inSelectMode,
-          showMessageTimeIndicator: showMessageTimeIndicator,
-          showMessageStatusIndicator: showMessageStatusIndicator,
-          messageReceipt: messageReceipt,
-          sendingMessageData: sendingMessageData,
+          key: key,
+          data: data,
+          methods: methods,
         );
         break;
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
         renderWidget = getCustomMessageBuilder(
-          message: message,
-          renderOnMenuPreview: renderOnMenuPreview,
-          shouldBeHighlighted: shouldBeHighlighted,
-          clearHighlightFunc: clearHighlightFunc,
-          userID: userID,
-          groupID: groupID,
-          messageRowWidth: messageRowWidth,
-          onSelectMessage: onSelectMessage,
-          inSelectMode: inSelectMode,
-          messageReceipt: messageReceipt,
-          showMessageTimeIndicator: showMessageTimeIndicator,
-          showMessageStatusIndicator: showMessageStatusIndicator,
-          sendingMessageData: sendingMessageData,
+          key: key,
+          data: data,
+          methods: methods,
         );
         break;
     }
     return renderWidget;
   }
 
-  Widget getCommonTipsBuilder({
+  static Widget getCommonTipsBuilder({
     Key? key,
     required V2TimMessage message,
     required String text,
+    ({String text, VoidCallback onTap})? buttonText,
   }) {
-    Widget? widget;
-
-    if (_commonTipsBuilder != null) {
-      widget = _commonTipsBuilder!(key: key, message: message, text: text);
-    }
-
-    return widget ??
-        TencentCloudChatMessageTipsCommon(
-            key: key, text: text, message: message);
+    return TencentCloudChatMessageTipsCommon(
+      key: key,
+      text: text,
+      message: message,
+      buttonText: buttonText,
+    );
   }
 
-  Widget getTextMessageBuilder({
+  static Widget getTextMessageBuilder({
     Key? key,
-    String? userID,
-    String? groupID,
-    required V2TimMessage message,
-    required bool shouldBeHighlighted,
-    required VoidCallback clearHighlightFunc,
-    required bool showMessageStatusIndicator,
-    required bool showMessageTimeIndicator,
-    V2TimMessageReceipt? messageReceipt,
-    SendingMessageData? sendingMessageData,
-    required double messageRowWidth,
-    required bool renderOnMenuPreview,
-    required bool inSelectMode,
-    required VoidCallback onSelectMessage,
+    required MessageItemBuilderData data,
+    required MessageItemBuilderMethods methods,
   }) {
-    Widget? widget;
-
-    if (_textMessageBuilder != null) {
-      widget = _textMessageBuilder!(
-        key: key,
-        message: message,
-        shouldBeHighlighted: shouldBeHighlighted,
-        clearHighlightFunc: clearHighlightFunc,
-        messageReceipt: messageReceipt,
-        userID: userID,
-        groupID: groupID,
-        messageRowWidth: messageRowWidth,
-        sendingMessageData: sendingMessageData,
-        renderOnMenuPreview: renderOnMenuPreview,
-        showMessageTimeIndicator: showMessageTimeIndicator,
-        showMessageStatusIndicator: showMessageStatusIndicator,
-        onSelectMessage: onSelectMessage,
-        inSelectMode: inSelectMode,
-      );
-    }
-
-    return widget ??
-        TencentCloudChatMessageText(
-          key: key,
-          message: message,
-          shouldBeHighlighted: shouldBeHighlighted,
-          clearHighlightFunc: clearHighlightFunc,
-          userID: userID,
-          groupID: groupID,
-          messageReceipt: messageReceipt,
-          onSelectMessage: onSelectMessage,
-          inSelectMode: inSelectMode,
-          messageRowWidth: messageRowWidth,
-          showMessageTimeIndicator: showMessageTimeIndicator,
-          showMessageStatusIndicator: showMessageStatusIndicator,
-          sendingMessageData: sendingMessageData,
-          renderOnMenuPreview: renderOnMenuPreview,
-        );
+    return TencentCloudChatMessageText(
+      key: key,
+      data: data,
+      methods: methods,
+    );
   }
 }

@@ -55,7 +55,7 @@ class _TencentCloudChatMessageState
     extends TencentCloudChatState<TencentCloudChatMessage> {
   final Stream<TencentCloudChatMessageData<dynamic>>?
   _messageDataStream = TencentCloudChat.instance.eventBusInstance
-      .on<TencentCloudChatMessageData<dynamic>>();
+      .on<TencentCloudChatMessageData<dynamic>>("TencentCloudChatMessageData");
   StreamSubscription<TencentCloudChatMessageData<dynamic>>?
   _messageDataSubscription;
   
@@ -70,6 +70,7 @@ class _TencentCloudChatMessageState
     _messageSeparateDataProvider.init(
       userID: widget.options?.userID,
       groupID: widget.options?.groupID,
+      topicID: widget.options?.topicID,
       config: widget.config,
       eventHandlers: widget.eventHandlers,
       controller: null,
@@ -89,11 +90,17 @@ class _TencentCloudChatMessageState
             !(TencentCloudChatUtils.checkString(widget.options?.groupID) ==
                     null &&
                 TencentCloudChatUtils.checkString(oldWidget.options?.groupID) ==
+                    null))||
+        (widget.options?.topicID != oldWidget.options?.topicID &&
+            !(TencentCloudChatUtils.checkString(widget.options?.topicID) ==
+                null &&
+                TencentCloudChatUtils.checkString(oldWidget.options?.topicID) ==
                     null))) {
       _messageSeparateDataProvider.unInit();
       _messageSeparateDataProvider.init(
         userID: widget.options?.userID,
         groupID: widget.options?.groupID,
+        topicID: widget.options?.topicID,
         config: widget.config,
         eventHandlers: widget.eventHandlers,
         controller: null,
@@ -157,18 +164,22 @@ class _TencentCloudChatMessageState
             child: TencentCloudChatMessageLayoutContainer(
               userID: widget.options!.userID,
               groupID: widget.options!.groupID,
+              topicID: widget.options!.topicID,
               header: TencentCloudChatMessageHeaderContainer(
                 toolbarHeight: getHeight(isDesktop ? 64 : 60),
                 userID: widget.options!.userID,
                 groupID: widget.options!.groupID,
+                topicID: widget.options!.topicID,
               ),
               messageListView: TencentCloudChatMessageListViewContainer(
                 userID: widget.options!.userID,
                 groupID: widget.options!.groupID,
+                topicID: widget.options!.topicID,
               ),
               messageInput: TencentCloudChatMessageInputContainer(
                 userID: widget.options!.userID,
                 groupID: widget.options!.groupID,
+                topicID: widget.options!.topicID,
               ),
             ),
           )
@@ -268,6 +279,7 @@ class TencentCloudChatMessageManager {
             options: TencentCloudChatMessageOptions(
               userID: options["userID"],
               groupID: options["groupID"],
+              topicID: options["topicID"],
             ),
           ),
     );

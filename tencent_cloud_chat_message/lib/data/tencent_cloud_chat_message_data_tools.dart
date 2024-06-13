@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_config.dart';
+import 'package:tencent_cloud_chat/components/component_event_handlers/tencent_cloud_chat_message_event_handlers.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 
@@ -12,36 +14,39 @@ class TencentCloudChatMessageDataTools {
     V2TimMessage? repliedMessage,
     V2TimGroupInfo? groupInfo,
     String? groupID,
+    bool? needReadReceipt,
     required OfflinePushInfo offlinePushInfo,
   }) {
     final loginUserInfo = TencentCloudChat.instance.dataInstance.basic.currentUser;
     if (loginUserInfo != null) {
-      messageInfo.faceUrl = loginUserInfo.faceUrl;
-      messageInfo.nickName = loginUserInfo.nickName;
-      messageInfo.sender = loginUserInfo.userID;
+      messageInfo.faceUrl = messageInfo.faceUrl ?? loginUserInfo.faceUrl;
+      messageInfo.nickName = messageInfo.nickName ?? loginUserInfo.nickName;
+      messageInfo.sender = messageInfo.sender ?? loginUserInfo.userID;
     }
-    messageInfo.timestamp = (DateTime.now().millisecondsSinceEpoch / 1000).ceil();
-    messageInfo.isSelf = true;
-    messageInfo.status = MessageStatus.V2TIM_MSG_STATUS_SENDING;
-    messageInfo.id = id;
-    messageInfo.msgID = id;
+    messageInfo.timestamp = messageInfo.timestamp ?? (DateTime.now().millisecondsSinceEpoch / 1000).ceil();
+    messageInfo.isSelf = messageInfo.isSelf ?? true;
+    messageInfo.status = messageInfo.status ?? MessageStatus.V2TIM_MSG_STATUS_SENDING;
+    messageInfo.id = messageInfo.id ?? id;
+    messageInfo.needReadReceipt = needReadReceipt;
+    messageInfo.msgID = messageInfo.msgID ?? id;
 
-    messageInfo.offlinePushInfo = OfflinePushInfo(
-      ext: offlinePushInfo.ext ?? (TencentCloudChatUtils.checkString(groupID) != null ? "{\"conversationID\": \"group_$groupID\"}" : "{\"conversationID\": \"c2c_${loginUserInfo?.userID ?? ""}\"}"),
-      title: offlinePushInfo.title ?? (groupInfo != null ? (groupInfo.groupName ?? groupInfo.groupID) : (loginUserInfo?.nickName ?? loginUserInfo?.userID)),
-      desc: offlinePushInfo.desc ?? (TencentCloudChatUtils.getMessageSummary(message: messageInfo)),
-      disablePush: offlinePushInfo.disablePush,
-      ignoreIOSBadge: offlinePushInfo.ignoreIOSBadge,
-      iOSPushType: offlinePushInfo.iOSPushType,
-      androidFCMChannelID: offlinePushInfo.androidFCMChannelID,
-      iOSSound: offlinePushInfo.iOSSound,
-      androidSound: offlinePushInfo.androidSound,
-      androidHuaWeiCategory: offlinePushInfo.androidHuaWeiCategory,
-      androidOPPOChannelID: offlinePushInfo.androidOPPOChannelID,
-      androidVIVOCategory: offlinePushInfo.androidVIVOCategory,
-      androidVIVOClassification: offlinePushInfo.androidVIVOClassification,
-      androidXiaoMiChannelID: offlinePushInfo.androidXiaoMiChannelID,
-    );
+    messageInfo.offlinePushInfo = messageInfo.offlinePushInfo ??
+        OfflinePushInfo(
+          ext: offlinePushInfo.ext ?? (TencentCloudChatUtils.checkString(groupID) != null ? "{\"conversationID\": \"group_$groupID\"}" : "{\"conversationID\": \"c2c_${loginUserInfo?.userID ?? ""}\"}"),
+          title: offlinePushInfo.title ?? (groupInfo != null ? (groupInfo.groupName ?? groupInfo.groupID) : (loginUserInfo?.nickName ?? loginUserInfo?.userID)),
+          desc: offlinePushInfo.desc ?? (TencentCloudChatUtils.getMessageSummary(message: messageInfo)),
+          disablePush: offlinePushInfo.disablePush,
+          ignoreIOSBadge: offlinePushInfo.ignoreIOSBadge,
+          iOSPushType: offlinePushInfo.iOSPushType,
+          androidFCMChannelID: offlinePushInfo.androidFCMChannelID,
+          iOSSound: offlinePushInfo.iOSSound,
+          androidSound: offlinePushInfo.androidSound,
+          androidHuaWeiCategory: offlinePushInfo.androidHuaWeiCategory,
+          androidOPPOChannelID: offlinePushInfo.androidOPPOChannelID,
+          androidVIVOCategory: offlinePushInfo.androidVIVOCategory,
+          androidVIVOClassification: offlinePushInfo.androidVIVOClassification,
+          androidXiaoMiChannelID: offlinePushInfo.androidXiaoMiChannelID,
+        );
 
     if (repliedMessage != null) {
       final cloudCustomData = {
@@ -55,7 +60,8 @@ class TencentCloudChatMessageDataTools {
           "version": 1
         }
       };
-      messageInfo.cloudCustomData = json.encode(cloudCustomData);
+
+      messageInfo.cloudCustomData = TencentCloudChatUtils.checkString(messageInfo.cloudCustomData) ?? json.encode(cloudCustomData);
     }
 
     return messageInfo;
@@ -65,109 +71,108 @@ class TencentCloudChatMessageDataTools {
     required V2TimMsgCreateInfoResult createdMessage,
     String? groupID,
     String? userID,
+    String? topicID,
     V2TimMessage? repliedMessage,
     V2TimGroupInfo? groupInfo,
     OfflinePushInfo? offlinePushInfo,
     bool? needReadReceipt,
     TencentCloudChatMessageConfig? config,
+    BeforeMessageSending? beforeMessageSendingHook,
   }) async {
-    List<V2TimMessage> currentHistoryMsgList = TencentCloudChat.instance
-        .dataInstance
-        .messageData
-        .getMessageList(
-        key: TencentCloudChatUtils.checkString(groupID) ?? userID ?? "");
+    List<V2TimMessage> currentHistoryMsgList = TencentCloudChat.instance.dataInstance.messageData.getMessageList(key: TencentCloudChatUtils.checkString(topicID) ?? TencentCloudChatUtils.checkString(groupID) ?? userID ?? "");
     final messageInfo = createdMessage.messageInfo;
     bool needSendRotate = false;
+    final nRR = needReadReceipt ??
+        (TencentCloudChatUtils.checkString(groupID) != null &&
+            groupInfo != null &&
+            (config?.enabledGroupTypesForMessageReadReceipt(
+              userID: userID,
+              groupID: groupID,
+              topicID: topicID,
+            ) ??
+                [])
+                .contains(groupInfo.groupType));
+
     if (messageInfo != null) {
-      final messageInfoWithAdditionalInfo =
-      TencentCloudChatMessageDataTools.setAdditionalInfoForMessage(
+      V2TimMessage? messageInfoWithAdditionalInfo = TencentCloudChatMessageDataTools.setAdditionalInfoForMessage(
         messageInfo: messageInfo,
         id: createdMessage.id!,
         repliedMessage: repliedMessage,
         groupID: groupID,
-        offlinePushInfo: offlinePushInfo ?? config?.messageOfflinePushInfo(
-            userID: userID, groupID: groupID, message: messageInfo) ?? OfflinePushInfo(),
+        needReadReceipt: nRR,
+        offlinePushInfo: offlinePushInfo ?? config?.messageOfflinePushInfo(userID: userID, groupID: groupID, topicID: topicID, message: messageInfo) ?? OfflinePushInfo(),
         groupInfo: groupInfo,
       );
 
-      if (messageInfo.elemType == MessageElemType.V2TIM_ELEM_TYPE_IMAGE) {
+      if (beforeMessageSendingHook != null) {
+        messageInfoWithAdditionalInfo = beforeMessageSendingHook(
+          createdMessage: messageInfoWithAdditionalInfo,
+          repliedMessage: repliedMessage,
+          userID: userID,
+          groupID: groupID,
+        );
+      }
+
+      if (messageInfoWithAdditionalInfo == null) {
+        return null;
+      }
+
+      if (messageInfo.elemType == MessageElemType.V2TIM_ELEM_TYPE_IMAGE && !kIsWeb) {
         if (messageInfo.imageElem != null) {
-          if (TencentCloudChatUtils.checkString(messageInfo.imageElem!.path) !=
-              null) {
+          if (TencentCloudChatUtils.checkString(messageInfo.imageElem!.path) != null) {
             File image = File(messageInfo.imageElem!.path!);
-            ImageExifInfo imageExifInfo =
-            await TencentCloudChatUtils.getImageExifInfoByBuffer(
-                fileBuffer: image.readAsBytesSync());
-            String currentLocal = TencentCloudChatUtils.addDataToStringFiled(
-              key: "renderInfo",
-              value: json.encode({
-                'h': imageExifInfo.height,
-                'w': imageExifInfo.width,
-                'rotate': imageExifInfo.isRotate ? "1" : "0",
-                "from": "send",
-              }),
-              currentString:
-              messageInfoWithAdditionalInfo.localCustomData ?? "",
-            );
+            ImageExifInfo? imageExifInfo = await TencentCloudChatUtils.getImageExifInfoByBuffer(fileBuffer: image.readAsBytesSync());
+            if (imageExifInfo != null) {
+              String currentLocal = TencentCloudChatUtils.addDataToStringFiled(
+                key: "renderInfo",
+                value: json.encode({
+                  'h': imageExifInfo.height,
+                  'w': imageExifInfo.width,
+                  'rotate': imageExifInfo.isRotate ? "1" : "0",
+                  "from": "send",
+                }),
+                currentString: messageInfoWithAdditionalInfo.localCustomData ?? "",
+              );
 
-            if (imageExifInfo.isRotate) {
-              needSendRotate = true;
+              if (imageExifInfo.isRotate) {
+                needSendRotate = true;
+              }
+              messageInfoWithAdditionalInfo.localCustomData = currentLocal;
+
+              TencentCloudChat.instance.logInstance.console(componentName: "TencentCloudChatMessageSeparateDataProvider", logs: "before send image message. get image info $currentLocal");
             }
-            messageInfoWithAdditionalInfo.localCustomData = currentLocal;
-
-            TencentCloudChat.instance.logInstance.console(
-                componentName: "TencentCloudChatMessageSeparateDataProvider",
-                logs:
-                "before send image message. get image info $currentLocal");
           }
         }
       }
 
-      if (messageInfo.elemType == MessageElemType.V2TIM_ELEM_TYPE_VIDEO) {
+      if (messageInfo.elemType == MessageElemType.V2TIM_ELEM_TYPE_VIDEO && !kIsWeb) {
         if (messageInfo.videoElem != null) {
-          if (TencentCloudChatUtils.checkString(
-              messageInfo.videoElem!.snapshotPath) !=
-              null) {
+          if (TencentCloudChatUtils.checkString(messageInfo.videoElem!.snapshotPath) != null) {
             File image = File(messageInfo.videoElem!.snapshotPath!);
-            ImageExifInfo imageExifInfo =
-            await TencentCloudChatUtils.getImageExifInfoByBuffer(
-                fileBuffer: image.readAsBytesSync());
-            String currentLocal = TencentCloudChatUtils.addDataToStringFiled(
-              key: "renderInfo",
-              value: json.encode({
-                'h': imageExifInfo.height,
-                'w': imageExifInfo.width,
-                'rotate': imageExifInfo.isRotate ? "1" : "0",
-                "from": "send",
-              }),
-              currentString:
-              messageInfoWithAdditionalInfo.localCustomData ?? "",
-            );
-            if (imageExifInfo.isRotate) {
-              needSendRotate = true;
+            ImageExifInfo? imageExifInfo = await TencentCloudChatUtils.getImageExifInfoByBuffer(fileBuffer: image.readAsBytesSync());
+            if (imageExifInfo != null) {
+              String currentLocal = TencentCloudChatUtils.addDataToStringFiled(
+                key: "renderInfo",
+                value: json.encode({
+                  'h': imageExifInfo.height,
+                  'w': imageExifInfo.width,
+                  'rotate': imageExifInfo.isRotate ? "1" : "0",
+                  "from": "send",
+                }),
+                currentString: messageInfoWithAdditionalInfo.localCustomData ?? "",
+              );
+              if (imageExifInfo.isRotate) {
+                needSendRotate = true;
+              }
+              messageInfoWithAdditionalInfo.localCustomData = currentLocal;
+              TencentCloudChat.instance.logInstance.console(componentName: "TencentCloudChatMessageSeparateDataProvider", logs: "before send image message. get image info $currentLocal");
             }
-            messageInfoWithAdditionalInfo.localCustomData = currentLocal;
-            TencentCloudChat.instance.logInstance.console(
-                componentName: "TencentCloudChatMessageSeparateDataProvider",
-                logs:
-                "before send image message. get image info $currentLocal");
           }
         }
       }
 
       currentHistoryMsgList.insert(0, messageInfoWithAdditionalInfo);
-      TencentCloudChat.instance.dataInstance.messageData.updateMessageList(
-          messageList: currentHistoryMsgList,
-          userID: userID,
-          groupID: groupID);
-
-      final nRR = needReadReceipt ??
-          (TencentCloudChatUtils.checkString(groupID) != null &&
-              groupInfo != null &&
-              (config
-                  ?.enabledGroupTypesForMessageReadReceipt(
-                  userID: userID, groupID: groupID) ?? [])
-                  .contains(groupInfo.groupType));
+      TencentCloudChat.instance.dataInstance.messageData.updateMessageList(messageList: currentHistoryMsgList, userID: userID, groupID: (groupID));
 
       return await sendMessageFinalPhase(
         userID: userID,
@@ -178,13 +183,12 @@ class TencentCloudChatMessageDataTools {
         offlinePushInfo: messageInfoWithAdditionalInfo.offlinePushInfo,
         cloudCustomData: needSendRotate
             ? TencentCloudChatUtils.addDataToStringFiled(
-          key: "renderInfo",
-          value: json.encode({
-            "rotate": "1",
-          }),
-          currentString:
-          messageInfoWithAdditionalInfo.cloudCustomData ?? "",
-        )
+                key: "renderInfo",
+                value: json.encode({
+                  "rotate": "1",
+                }),
+                currentString: messageInfoWithAdditionalInfo.cloudCustomData ?? "",
+              )
             : messageInfoWithAdditionalInfo.cloudCustomData,
       );
     }
@@ -218,26 +222,31 @@ class TencentCloudChatMessageDataTools {
       onlineUserOnly: onlineUserOnly ?? false,
       cloudCustomData: cloudCustomData,
     );
-
     if (sendMsgRes.data != null && isCurrentConversation) {
       List<V2TimMessage> currentHistoryMsgList = TencentCloudChat.instance.dataInstance.messageData.getMessageList(key: TencentCloudChatUtils.checkString(groupID) ?? userID ?? "");
 
       // Update the message in the currentHistoryMsgList with the same id.
       currentHistoryMsgList = currentHistoryMsgList.map((message) {
         if (message.id == id) {
+          
           return sendMsgRes.data!;
         }
         return message;
       }).toList();
 
       TencentCloudChat.instance.dataInstance.messageData.updateMessageList(
-            messageList: currentHistoryMsgList,
-            userID: userID,
-            groupID: groupID,
-            disableNotify: true,
-          );
+        messageList: currentHistoryMsgList,
+        userID: userID,
+        groupID: groupID,
+        disableNotify: true,
+      );
 
-      TencentCloudChat.instance.dataInstance.messageData.onSendMessageProgress(sendMsgRes.data!, 100, true);
+      TencentCloudChat.instance.dataInstance.messageData.onSendMessageProgress(
+        message: sendMsgRes.data!,
+        progress: 100,
+        isSendComplete: true,
+        id: id,
+      );
     }
     return sendMsgRes;
   }

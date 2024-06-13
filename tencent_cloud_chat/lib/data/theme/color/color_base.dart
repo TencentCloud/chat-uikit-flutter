@@ -228,7 +228,9 @@ abstract class TencentCloudChatThemeColors {
 
   /// color for contact add contact friend state button color if inactive
   Color get contactAddContactFriendInfoStateButtonInactiveColor;
+
   Color get contactAddContactToastCheckColor;
+
   Color get contactAddContactToastRefuseColor;
 
   /// color for contact search friends/groups background
@@ -274,14 +276,21 @@ abstract class TencentCloudChatThemeColors {
   Color get loginCardBackground;
 
   Color get profileChatButtonBackground;
+
   Color get profileChatButtonBoxShadow;
+
   Color get groupProfileTabBackground;
+
   Color get groupProfileTabTextColor;
+
   Color get groupProfileTextColor;
+
   Color get groupProfileAddMemberTextColor;
+
   Color get groupProfileTabBorderColor;
 
   Color get desktopBackgroundColorLinearGradientOne;
+
   Color get desktopBackgroundColorLinearGradientTwo;
 
   ColorScheme toColorScheme(Brightness brightness) {

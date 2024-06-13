@@ -29,18 +29,13 @@ class TencentCloudChatData {
 
   final TencentCloudChatTheme theme = TencentCloudChatTheme();
   final TencentCloudChatBasicData basic =
-      TencentCloudChatBasicData<TencentCloudChatBasicDataKeys>(
-          TencentCloudChatBasicDataKeys.none);
+      TencentCloudChatBasicData<TencentCloudChatBasicDataKeys>(TencentCloudChatBasicDataKeys.none);
   final TencentCloudChatConversationData conversation =
-      TencentCloudChatConversationData(
-          TencentCloudChatConversationDataKeys.none);
-  final TencentCloudChatMessageData messageData =
-      TencentCloudChatMessageData(TencentCloudChatMessageDataKeys.none);
+      TencentCloudChatConversationData(TencentCloudChatConversationDataKeys.none);
+  final TencentCloudChatMessageData messageData = TencentCloudChatMessageData(TencentCloudChatMessageDataKeys.none);
   final TencentCloudChatGroupProfileData groupProfile =
-      TencentCloudChatGroupProfileData(
-          TencentCloudChatGroupProfileDataKeys.none);
+      TencentCloudChatGroupProfileData(TencentCloudChatGroupProfileDataKeys.none);
   final TencentCloudChatUserProfileData userProfile =
       TencentCloudChatUserProfileData(TencentCloudChatUserProfileDataKeys.none);
-  final TencentCloudChatContactData contact =
-      TencentCloudChatContactData(TencentCloudChatContactDataKeys.none);
+  final TencentCloudChatContactData contact = TencentCloudChatContactData(TencentCloudChatContactDataKeys.none);
 }

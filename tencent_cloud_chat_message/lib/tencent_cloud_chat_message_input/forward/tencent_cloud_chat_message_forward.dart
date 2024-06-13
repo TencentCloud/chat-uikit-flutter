@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
 import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
@@ -9,38 +10,27 @@ import 'package:tencent_cloud_chat_common/builders/tencent_cloud_chat_common_bui
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat_common.dart';
 
 class TencentCloudChatMessageForward extends StatefulWidget {
-  final TencentCloudChatForwardType type;
-  final List<V2TimConversation> conversationList;
-  final List<V2TimFriendInfo> contactList;
-  final List<V2TimGroupInfo> groupList;
-  final ValueChanged<List<({String? userID, String? groupID})>>
-      onSelectConversations;
-  final VoidCallback onCancel;
+  final MessageForwardBuilderWidgets? widgets;
+  final MessageForwardBuilderData data;
+  final MessageForwardBuilderMethods methods;
 
   const TencentCloudChatMessageForward({
     super.key,
-    required this.type,
-    required this.conversationList,
-    required this.onSelectConversations,
-    required this.onCancel,
-    required this.contactList,
-    required this.groupList,
+    required this.data,
+    required this.methods,
+    this.widgets,
   });
 
   @override
-  State<TencentCloudChatMessageForward> createState() =>
-      _TencentCloudChatMessageForwardState();
+  State<TencentCloudChatMessageForward> createState() => _TencentCloudChatMessageForwardState();
 }
 
-class _TencentCloudChatMessageForwardState
-    extends TencentCloudChatState<TencentCloudChatMessageForward> {
+class _TencentCloudChatMessageForwardState extends TencentCloudChatState<TencentCloudChatMessageForward> {
   final List<({String? userID, String? groupID})> _selectedConversations = [];
 
-  bool _matchChats(({String? userID, String? groupID}) chat1,
-      ({String? userID, String? groupID}) chat2) {
+  bool _matchChats(({String? userID, String? groupID}) chat1, ({String? userID, String? groupID}) chat2) {
     final conversationUserID = TencentCloudChatUtils.checkString(chat1.userID);
-    final conversationGroupID =
-        TencentCloudChatUtils.checkString(chat1.groupID);
+    final conversationGroupID = TencentCloudChatUtils.checkString(chat1.groupID);
 
     final recordUserID = TencentCloudChatUtils.checkString(chat2.userID);
     final recordGroupID = TencentCloudChatUtils.checkString(chat2.groupID);
@@ -51,35 +41,30 @@ class _TencentCloudChatMessageForwardState
 
   Widget _renderHeader() => TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Padding(
-          padding: EdgeInsets.only(
-              top: getHeight(8), left: getWidth(4), right: getWidth(4)),
+          padding: EdgeInsets.only(top: getHeight(8), left: getWidth(4), right: getWidth(4)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextButton(
-                onPressed: widget.onCancel,
+                onPressed: widget.methods.onCancel,
                 child: Text(
                   tL10n.cancel,
-                  style: TextStyle(
-                      fontSize: textStyle.fontsize_14,
-                      color: colorTheme.primaryColor),
+                  style: TextStyle(fontSize: textStyle.fontsize_14, color: colorTheme.primaryColor),
                 ),
               ),
               Text(
-                widget.type == TencentCloudChatForwardType.individually
+                widget.data.type == TencentCloudChatForwardType.individually
                     ? tL10n.forwardIndividually
                     : tL10n.forwardCombined,
                 style: TextStyle(fontSize: textStyle.fontsize_16),
               ),
               TextButton(
                 onPressed: () {
-                  widget.onSelectConversations(_selectedConversations);
+                  widget.methods.onSelectConversations(_selectedConversations);
                 },
                 child: Text(
                   tL10n.send,
-                  style: TextStyle(
-                      fontSize: textStyle.fontsize_14,
-                      color: colorTheme.primaryColor),
+                  style: TextStyle(fontSize: textStyle.fontsize_14, color: colorTheme.primaryColor),
                 ),
               ),
             ],
@@ -87,27 +72,19 @@ class _TencentCloudChatMessageForwardState
         ),
       );
 
-  Widget _chatItem(
-      {required ({String? userID, String? groupID}) conversation,
-      String? showName,
-      String? faceUrl}) {
-    final isSelected = _selectedConversations
-        .any((element) => _matchChats(conversation, element));
+  Widget _chatItem({required ({String? userID, String? groupID}) conversation, String? showName, String? faceUrl}) {
+    final isSelected = _selectedConversations.any((element) => _matchChats(conversation, element));
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => AnimatedContainer(
-        padding: EdgeInsets.symmetric(
-            horizontal: getWidth(8), vertical: getHeight(8)),
-        color: isSelected
-            ? colorTheme.messageBeenChosenBackgroundColor
-            : Colors.transparent,
+        padding: EdgeInsets.symmetric(horizontal: getWidth(8), vertical: getHeight(8)),
+        color: isSelected ? colorTheme.messageBeenChosenBackgroundColor : Colors.transparent,
         duration: const Duration(milliseconds: 300),
         child: InkWell(
             onTap: () {
               if (!isSelected) {
                 _selectedConversations.add(conversation);
               } else {
-                _selectedConversations.removeWhere(
-                    (element) => _matchChats(conversation, element));
+                _selectedConversations.removeWhere((element) => _matchChats(conversation, element));
               }
               setState(() {});
             },
@@ -115,8 +92,7 @@ class _TencentCloudChatMessageForwardState
               children: [
                 Checkbox(
                   value: isSelected,
-                  visualDensity:
-                      const VisualDensity(vertical: -4, horizontal: -2),
+                  visualDensity: const VisualDensity(vertical: -4, horizontal: -2),
                   activeColor: colorTheme.primaryColor,
                   checkColor: colorTheme.backgroundColor,
                   shape: RoundedRectangleBorder(
@@ -126,8 +102,7 @@ class _TencentCloudChatMessageForwardState
                     if ((value ?? false)) {
                       _selectedConversations.add(conversation);
                     } else {
-                      _selectedConversations.removeWhere(
-                          (element) => _matchChats(conversation, element));
+                      _selectedConversations.removeWhere((element) => _matchChats(conversation, element));
                     }
                     setState(() {});
                   },
@@ -140,9 +115,7 @@ class _TencentCloudChatMessageForwardState
                     width: getHeight(40),
                     height: getHeight(40),
                     borderRadius: getHeight(20),
-                    imageList: [
-                      faceUrl
-                    ]),
+                    imageList: [faceUrl]),
                 SizedBox(
                   width: getWidth(8),
                 ),
@@ -159,9 +132,9 @@ class _TencentCloudChatMessageForwardState
   Widget _renderConversationList() {
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => ListView.builder(
-        itemCount: widget.conversationList.length,
+        itemCount: widget.data.conversationList.length,
         itemBuilder: (context, index) {
-          final conversation = widget.conversationList[index];
+          final conversation = widget.data.conversationList[index];
           return _chatItem(conversation: (
             userID: TencentCloudChatUtils.checkString(conversation.userID),
             groupID: TencentCloudChatUtils.checkString(conversation.groupID)
@@ -174,17 +147,13 @@ class _TencentCloudChatMessageForwardState
   Widget _renderContactList() {
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => ListView.builder(
-        itemCount: widget.contactList.length,
+        itemCount: widget.data.contactList.length,
         itemBuilder: (context, index) {
-          final contact = widget.contactList[index];
+          final contact = widget.data.contactList[index];
           return _chatItem(
-            conversation: (
-              userID: TencentCloudChatUtils.checkString(contact.userID),
-              groupID: null
-            ),
+            conversation: (userID: TencentCloudChatUtils.checkString(contact.userID), groupID: null),
             showName: TencentCloudChatUtils.checkString(contact.friendRemark) ??
-                TencentCloudChatUtils.checkString(
-                    contact.userProfile?.nickName) ??
+                TencentCloudChatUtils.checkString(contact.userProfile?.nickName) ??
                 TencentCloudChatUtils.checkString(contact.userID),
             faceUrl: contact.userProfile?.faceUrl,
           );
@@ -196,14 +165,11 @@ class _TencentCloudChatMessageForwardState
   Widget _renderGroupList() {
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => ListView.builder(
-        itemCount: widget.groupList.length,
+        itemCount: widget.data.groupList.length,
         itemBuilder: (context, index) {
-          final group = widget.groupList[index];
+          final group = widget.data.groupList[index];
           return _chatItem(
-            conversation: (
-              userID: null,
-              groupID: TencentCloudChatUtils.checkString(group.groupID)
-            ),
+            conversation: (userID: null, groupID: TencentCloudChatUtils.checkString(group.groupID)),
             showName: group.groupName,
             faceUrl: group.faceUrl,
           );
@@ -245,9 +211,7 @@ class _TencentCloudChatMessageForwardState
               margin: EdgeInsets.only(right: getWidth(16)),
               child: Text(
                 tL10n.numChats(_selectedConversations.length),
-                style: TextStyle(
-                    fontSize: textStyle.fontsize_12,
-                    color: colorTheme.secondaryTextColor),
+                style: TextStyle(fontSize: textStyle.fontsize_12, color: colorTheme.secondaryTextColor),
               ),
             ),
           ],
@@ -286,13 +250,10 @@ class _TencentCloudChatMessageForwardState
     double contentHeight = MediaQuery.of(context).size.height * 0.8;
     double headerHeight = getHeight(100);
     double listItemHeight = getHeight(46);
-    double listHeight = max(widget.groupList.length,
-            max(widget.contactList.length, widget.conversationList.length)) *
-        listItemHeight;
+    double listHeight =
+        max(widget.data.groupList.length, max(widget.data.contactList.length, widget.data.conversationList.length)) * listItemHeight;
     double maxHeight = headerHeight + listHeight;
-    double heightFactor = maxHeight < contentHeight
-        ? maxHeight / MediaQuery.of(context).size.height
-        : 0.8;
+    double heightFactor = maxHeight < contentHeight ? maxHeight / MediaQuery.of(context).size.height : 0.8;
 
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => ClipRRect(

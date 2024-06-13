@@ -1,5 +1,12 @@
 import 'dart:convert';
 
+class ParseExtInfoResult {
+  final String? userID;
+  final String? groupID;
+
+  ParseExtInfoResult({this.userID, this.groupID});
+}
+
 class TencentCloudChatPushUtils {
   /// Parses the given [ext] string to extract the userID and groupID.
   ///
@@ -28,7 +35,7 @@ class TencentCloudChatPushUtils {
   /// If the parsing fails, it then attempts to parse the new JSON format.
   ///
   /// Returns a record containing the userID and groupID.
-  static ({String? userID, String? groupID}) parseExtInfo(String ext) {
+  static ParseExtInfoResult parseExtInfo(String ext) {
     String? userID;
     String? groupID;
     // ext = "{\"ext\":{\"entity\":{\"version\":1,\"action\":1,\"chatType\":1,\"sender\":\"@im_agent#online_shopping_mall\",\"nickname\":\"线上商城 Demo\"}}}";
@@ -66,6 +73,9 @@ class TencentCloudChatPushUtils {
       // ignore: empty_catches
     } catch (e) {}
 
-    return (userID: userID, groupID: groupID);
+    return ParseExtInfoResult(
+      userID: userID,
+      groupID: groupID,
+    );
   }
 }

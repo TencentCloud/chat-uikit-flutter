@@ -1,3 +1,19 @@
+
+## 1.4.0
+
+### General
+
+* **[Breakthrough]**: Added comprehensive support for **Web**, including both Mobile and Desktop browsers.
+* Added support to return the login status for the `initUIKit` method.
+* Added `addGlobalCallback` and `removeGlobalCallback` to `TencentCloudChatCoreController`, enabling the integration and management of custom `TencentCloudChatCallbacks` throughout your codebase.
+* Improved device screen recognition logic.
+
+## 1.3.1
+
+### General
+
+- Added support to Flutter 3.22.
+
 ## 1.3.0
 
 ### General

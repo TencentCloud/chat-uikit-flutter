@@ -47,7 +47,7 @@ class TencentCloudChatContactState
     extends TencentCloudChatState<TencentCloudChatContact> {
   final Stream<TencentCloudChatContactData<dynamic>>? _contactDataStream =
       TencentCloudChat.instance.eventBusInstance
-          .on<TencentCloudChatContactData<dynamic>>();
+          .on<TencentCloudChatContactData<dynamic>>("TencentCloudChatContactData");
   late StreamSubscription<TencentCloudChatContactData<dynamic>>?
       _contactDataSubscription;
 

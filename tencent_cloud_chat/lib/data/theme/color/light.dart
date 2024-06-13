@@ -120,214 +120,123 @@ class LightTencentCloudChatColors extends TencentCloudChatThemeColors {
         _onSurface = onSurface ?? const Color(0xFF222222),
         _onBackground = onBackground ?? const Color(0xFF222222),
         _error = error ?? const Color(0xFFD32F2F),
-        _appBarBackgroundColor =
-            appBarBackgroundColor ?? const Color(0xFFFFFFFF),
+        _appBarBackgroundColor = appBarBackgroundColor ?? const Color(0xFFFFFFFF),
         _appBarIconColor = appBarIconColor ?? Colors.black,
         _dividerColor = dividerColor ?? const Color(0xFFE0E0E0),
         _firstButtonColor = firstButtonColor ?? const Color(0xFF0365F9),
         _info = info ?? const Color(0xFFFF3742),
         _inputAreaBackground = inputAreaBackground ?? const Color(0xFFF9F9F9),
         _inputAreaIconColor = inputAreaIconColor ?? const Color(0xFF000000),
-        _inputFieldBorderColor =
-            inputFieldBorderColor ?? const Color(0xFFD3DAF3),
-        _messageStatusIconColor =
-            messageStatusIconColor ?? const Color(0xFF0365F9),
-        _othersMessageBubbleBorderColor =
-            othersMessageBubbleBorderColor ?? const Color(0xFFECEBEB),
-        _othersMessageBubbleColor =
-            othersMessageBubbleColor ?? const Color(0xFFFFFFFF),
-        _othersMessageTextColor =
-            othersMessageTextColor ?? const Color(0xFF222222),
+        _inputFieldBorderColor = inputFieldBorderColor ?? const Color(0xFFD3DAF3),
+        _messageStatusIconColor = messageStatusIconColor ?? const Color(0xFF0365F9),
+        _othersMessageBubbleBorderColor = othersMessageBubbleBorderColor ?? const Color(0xFFECEBEB),
+        _othersMessageBubbleColor = othersMessageBubbleColor ?? const Color(0xFFFFFFFF),
+        _othersMessageTextColor = othersMessageTextColor ?? const Color(0xFF222222),
         _secondButtonColor = secondButtonColor ?? const Color(0xFF4CAF50),
         _secondaryTextColor = secondaryTextColor ?? const Color(0xFF666666),
-        _selfMessageBubbleBorderColor =
-            selfMessageBubbleBorderColor ?? const Color(0xFFECEBEB),
-        _selfMessageBubbleColor =
-            selfMessageBubbleColor ?? const Color(0xFFECEBEB),
+        _selfMessageBubbleBorderColor = selfMessageBubbleBorderColor ?? const Color(0xFFECEBEB),
+        _selfMessageBubbleColor = selfMessageBubbleColor ?? const Color(0xFFECEBEB),
         _selfMessageTextColor = selfMessageTextColor ?? const Color(0xFF222222),
         _switchActivatedColor = switchActivatedColor ?? const Color(0xFF0365F9),
         _tipsColor = tipsColor ?? const Color(0xFFFF3742),
-        _messageTipsBackgroundColor =
-            messageTipsBackgroundColor ?? const Color(0xFFECEBEB),
-        _messageBeenChosenBackgroundColor =
-            messageBeenChosenBackgroundColor ?? const Color(0xFFF3F3F3),
+        _messageTipsBackgroundColor = messageTipsBackgroundColor ?? const Color(0xFFECEBEB),
+        _messageBeenChosenBackgroundColor = messageBeenChosenBackgroundColor ?? const Color(0xFFF3F3F3),
 
         // The color value used by the conversation component
-        _conversationItemLastMessageColor = conversationItemLastMessageColor ??
-            secondaryTextColor ??
-            const Color(0xFF7A7A7A),
-        _conversationItemTitleColor =
-            conversationItemTitleColor ?? const Color(0xFF000000),
+        _conversationItemLastMessageColor =
+            conversationItemLastMessageColor ?? secondaryTextColor ?? const Color(0xFF7A7A7A),
+        _conversationItemTitleColor = conversationItemTitleColor ?? const Color(0xFF000000),
         _conversationItemSwipeActionOneBgColor =
-            conversationItemSwipeActionOneBgColor ??
-                firstButtonColor ??
-                const Color(0xFF0365F9),
+            conversationItemSwipeActionOneBgColor ?? firstButtonColor ?? const Color(0xFF0365F9),
         _conversationItemSwipeActionTwoBgColor =
-            conversationItemSwipeActionTwoBgColor ??
-                secondButtonColor ??
-                const Color(0xFF000000),
+            conversationItemSwipeActionTwoBgColor ?? secondButtonColor ?? const Color(0xFF000000),
         _conversationItemSwipeActionOneTextColor =
-            conversationItemSwipeActionOneTextColor ??
-                backgroundColor ??
-                const Color(0xFFFFFFFF),
+            conversationItemSwipeActionOneTextColor ?? backgroundColor ?? const Color(0xFFFFFFFF),
         _conversationItemSwipeActionTwoTextColor =
-            conversationItemSwipeActionTwoTextColor ??
-                backgroundColor ??
-                const Color(0xFFFFFFFF),
-        _conversationItemIsPinedBgColor = conversationItemIsPinedBgColor ??
-            dividerColor ??
-            const Color(0xFFE0E0E0),
-        _conversationItemNormalBgColor = conversationItemNormalBgColor ??
-            backgroundColor ??
-            const Color(0xFFFFFFFF),
+            conversationItemSwipeActionTwoTextColor ?? backgroundColor ?? const Color(0xFFFFFFFF),
+        _conversationItemIsPinedBgColor = conversationItemIsPinedBgColor ?? dividerColor ?? const Color(0xFFE0E0E0),
+        _conversationItemNormalBgColor = conversationItemNormalBgColor ?? backgroundColor ?? const Color(0xFFFFFFFF),
         _conversationItemShowNameTextColor =
-            conversationItemShowNameTextColor ??
-                backgroundColor ??
-                const Color(0xFF121212),
-        _conversationItemSendingIconColor = conversationItemSendingIconColor ??
-            primaryColor ??
-            const Color(0xFF147AFF),
+            conversationItemShowNameTextColor ?? backgroundColor ?? const Color(0xFF121212),
+        _conversationItemSendingIconColor = conversationItemSendingIconColor ?? primaryColor ?? const Color(0xFF147AFF),
         _conversationItemSendFailedIconColor =
-            conversationItemSendFailedIconColor ??
-                tipsColor ??
-                const Color(0xFFFF3742),
-        _conversationItemDraftTextColor = conversationItemDraftTextColor ??
-            tipsColor ??
-            const Color(0xFFFF3742),
+            conversationItemSendFailedIconColor ?? tipsColor ?? const Color(0xFFFF3742),
+        _conversationItemDraftTextColor = conversationItemDraftTextColor ?? tipsColor ?? const Color(0xFFFF3742),
         _conversationItemLastMessageTextColor =
-            conversationItemLastMessageTextColor ??
-                secondaryTextColor ??
-                const Color(0xFF7A7A7A),
+            conversationItemLastMessageTextColor ?? secondaryTextColor ?? const Color(0xFF7A7A7A),
         _conversationItemGroupAtInfoTextColor =
-            conversationItemGroupAtInfoTextColor ??
-                tipsColor ??
-                const Color(0xFFFF3742),
+            conversationItemGroupAtInfoTextColor ?? tipsColor ?? const Color(0xFFFF3742),
         _conversationItemNoReceiveIconColor =
-            conversationItemNoReceiveIconColor ??
-                secondaryTextColor ??
-                const Color(0xFF7A7A7A),
+            conversationItemNoReceiveIconColor ?? secondaryTextColor ?? const Color(0xFF7A7A7A),
         _conversationItemUnreadCountBgColor =
-            conversationItemUnreadCountBgColor ??
-                tipsColor ??
-                const Color(0xFFFF3742),
+            conversationItemUnreadCountBgColor ?? tipsColor ?? const Color(0xFFFF3742),
         _conversationItemUnreadCountTextColor =
-            conversationItemUnreadCountTextColor ??
-                backgroundColor ??
-                const Color(0xFFF1F0F0),
-        _conversationItemTimeTextColor = conversationItemTimeTextColor ??
-            secondaryTextColor ??
-            const Color(0xFF7A7A7A),
-        _conversationItemUnreadIconColor = conversationItemUnreadIconColor ??
-            secondaryTextColor ??
-            const Color(0xFF666666),
-        _conversationItemReadIconColor = conversationItemReadIconColor ??
-            secondButtonColor ??
-            const Color(0xFF4CAF50),
+            conversationItemUnreadCountTextColor ?? backgroundColor ?? const Color(0xFFF1F0F0),
+        _conversationItemTimeTextColor = conversationItemTimeTextColor ?? secondaryTextColor ?? const Color(0xFF7A7A7A),
+        _conversationItemUnreadIconColor =
+            conversationItemUnreadIconColor ?? secondaryTextColor ?? const Color(0xFF666666),
+        _conversationItemReadIconColor = conversationItemReadIconColor ?? secondButtonColor ?? const Color(0xFF4CAF50),
         _conversationNoConversationTextColor =
-            conversationNoConversationTextColor ??
-                secondaryTextColor ??
-                const Color(0xFF7A7A7A),
+            conversationNoConversationTextColor ?? secondaryTextColor ?? const Color(0xFF7A7A7A),
         _conversationItemMoreActionItemNormalTextColor =
-            conversationItemMoreActionItemNormalTextColor ??
-                primaryColor ??
-                const Color(0xFF147AFF),
+            conversationItemMoreActionItemNormalTextColor ?? primaryColor ?? const Color(0xFF147AFF),
         _conversationItemMoreActionItemDeleteTextColor =
-            conversationItemMoreActionItemDeleteTextColor ??
-                tipsColor ??
-                const Color(0xFFFF3742),
-        _conversationItemUserStatusBgColor =
-            conversationItemUserStatusBgColor ?? const Color(0XFF20E070),
+            conversationItemMoreActionItemDeleteTextColor ?? tipsColor ?? const Color(0xFFFF3742),
+        _conversationItemUserStatusBgColor = conversationItemUserStatusBgColor ?? const Color(0XFF20E070),
         // end
         // contact color start
-        _contactItemFriendNameColor =
-            contactItemFriendNameColor ?? const Color(0xFF000000),
-        _contactItemTabItemNameColor =
-            contactItemTabItemNameColor ?? const Color(0x99000000),
-        _contactApplicationBackgroundColor =
-            contactApplicationBackgroundColor ?? const Color(0xFFF1F1F1),
-        _contactItemTabItemBorderColor =
-            contactItemTabItemBorderColor ?? const Color(0x0D000000),
-        _contactTabItemBackgroundColor =
-            contactTabItemBackgroundColor ?? const Color(0xFFF9F9F9),
-        _contactTabItemIconColor =
-            contactTabItemIconColor ?? const Color(0xFFD9D9D9),
-        _contactApplicationUnreadCountTextColor =
-            contactApplicationUnreadCountTextColor ?? const Color(0xFFFFFFFF),
-        _contactBackgroundColor =
-            contactBackgroundColor ?? const Color(0xFFFFFFFF),
-        _contactBackButtonColor =
-            contactBackButtonColor ?? const Color(0xFF0365F9),
+        _contactItemFriendNameColor = contactItemFriendNameColor ?? const Color(0xFF000000),
+        _contactItemTabItemNameColor = contactItemTabItemNameColor ?? const Color(0x99000000),
+        _contactApplicationBackgroundColor = contactApplicationBackgroundColor ?? const Color(0xFFF1F1F1),
+        _contactItemTabItemBorderColor = contactItemTabItemBorderColor ?? const Color(0x0D000000),
+        _contactTabItemBackgroundColor = contactTabItemBackgroundColor ?? const Color(0xFFF9F9F9),
+        _contactTabItemIconColor = contactTabItemIconColor ?? const Color(0xFFD9D9D9),
+        _contactApplicationUnreadCountTextColor = contactApplicationUnreadCountTextColor ?? const Color(0xFFFFFFFF),
+        _contactBackgroundColor = contactBackgroundColor ?? const Color(0xFFFFFFFF),
+        _contactBackButtonColor = contactBackButtonColor ?? const Color(0xFF0365F9),
         _contactNoListColor = contactNoListColor ?? const Color(0xFF666666),
-        _contactAgreeButtonColor =
-            contactAgreeButtonColor ?? const Color(0xFF1890FF),
-        _contactRefuseButtonColor =
-            contactRefuseButtonColor ?? const Color(0xFFCE3125),
-        _contactAppBarIconColor =
-            contactAppBarIconColor ?? const Color(0xFF0365F9),
-        _contactAddContactBackgroundColor =
-            contactAddContactBackgroundColor ?? const Color(0xE6F2F2F2),
-        _contactAddContactInfoBackgroundColor =
-            contactAddContactInfoBackgroundColor ?? const Color(0xE6E5E5EA),
+        _contactAgreeButtonColor = contactAgreeButtonColor ?? const Color(0xFF1890FF),
+        _contactRefuseButtonColor = contactRefuseButtonColor ?? const Color(0xFFCE3125),
+        _contactAppBarIconColor = contactAppBarIconColor ?? const Color(0xFF0365F9),
+        _contactAddContactBackgroundColor = contactAddContactBackgroundColor ?? const Color(0xE6F2F2F2),
+        _contactAddContactInfoBackgroundColor = contactAddContactInfoBackgroundColor ?? const Color(0xE6E5E5EA),
         _contactAddContactFriendInfoButtonShadowColor =
-            contactAddContactFriendInfoButtonShadowColor ??
-                const Color(0x40FFFFFF),
+            contactAddContactFriendInfoButtonShadowColor ?? const Color(0x40FFFFFF),
         _contactAddContactFriendInfoStateButtonBackgroundColor =
-            contactAddContactFriendInfoStateButtonBackgroundColor ??
-                const Color(0xF2F9F9F9),
+            contactAddContactFriendInfoStateButtonBackgroundColor ?? const Color(0xF2F9F9F9),
         _contactAddContactFriendInfoStateButtonTextColor =
-            contactAddContactFriendInfoStateButtonTextColor ??
-                const Color(0x99000000),
+            contactAddContactFriendInfoStateButtonTextColor ?? const Color(0x99000000),
         _contactAddContactFriendInfoStateButtonActiveColor =
-            contactAddContactFriendInfoStateButtonActiveColor ??
-                const Color(0xFF34C759),
+            contactAddContactFriendInfoStateButtonActiveColor ?? const Color(0xFF34C759),
         _contactAddContactFriendInfoStateButtonInactiveColor =
-            contactAddContactFriendInfoStateButtonInactiveColor ??
-                const Color(0xFFDDDDE0),
-        _contactAddContactToastCheckColor =
-            contactAddContactToastCheckColor ?? const Color(0xFF49935A),
-        _contactAddContactToastRefuseColor =
-            contactAddContactToastRefuseColor ?? const Color(0xFFCE3125),
-        _contactSearchBackgroundColor =
-            contactSearchBackgroundColor ?? const Color(0xFFEDEDED),
-        _contactSearchCursorColor =
-            contactSearchCursorColor ?? const Color(0xFF07C160),
-        _contactSearchButtonColor =
-            contactSearchButtonColor ?? const Color(0xFF576B95),
+            contactAddContactFriendInfoStateButtonInactiveColor ?? const Color(0xFFDDDDE0),
+        _contactAddContactToastCheckColor = contactAddContactToastCheckColor ?? const Color(0xFF49935A),
+        _contactAddContactToastRefuseColor = contactAddContactToastRefuseColor ?? const Color(0xFFCE3125),
+        _contactSearchBackgroundColor = contactSearchBackgroundColor ?? const Color(0xFFEDEDED),
+        _contactSearchCursorColor = contactSearchCursorColor ?? const Color(0xFF07C160),
+        _contactSearchButtonColor = contactSearchButtonColor ?? const Color(0xFF576B95),
         // setting colors
-        _settingBackgroundColor =
-            settingBackgroundColor ?? const Color(0xFFFFFFFF),
-        _settingTabBackgroundColor =
-            settingTabBackgroundColor ?? const Color(0xF2F9F9F9),
+        _settingBackgroundColor = settingBackgroundColor ?? const Color(0xFFFFFFFF),
+        _settingTabBackgroundColor = settingTabBackgroundColor ?? const Color(0xF2F9F9F9),
         _settingTitleColor = settingTitleColor ?? const Color(0xFF000000),
         _settingTabTitleColor = settingTabTitleColor ?? const Color(0x99000000),
         _settingLogoutColor = settingLogoutColor ?? const Color(0xFFCE3125),
         _settingInfoEditColor = settingInfoEditColor ?? const Color(0xFF0365F9),
-        _settingAboutBorderColor =
-            settingAboutBorderColor ?? const Color(0x1A000000),
-        _settingInfoBackgroundColor =
-            settingInfoBackgroundColor ?? const Color(0xFFF1F1F1),
+        _settingAboutBorderColor = settingAboutBorderColor ?? const Color(0x1A000000),
+        _settingInfoBackgroundColor = settingInfoBackgroundColor ?? const Color(0xFFF1F1F1),
         //login
         _loginBackgroundColor = loginBackgroundColor ?? const Color(0xFF0078D7),
         _loginButtonDisableColor = loginButtonDisableColor ?? Colors.grey,
         _loginCardBackground = loginCardBackground ?? const Color(0xE6FFFFFF),
-        _profileChatButtonBackground =
-            profileChatButtonBackground ?? const Color(0xFFFFFFFF),
-        _profileChatButtonBoxShadow =
-            profileChatButtonBoxShadow ?? const Color(0x40000000),
-        _groupProfileTabBackground =
-            groupProfileTabBackground ?? const Color(0xFFF9F9F9),
-        _groupProfileTabTextColor =
-            groupProfileTabTextColor ?? const Color(0x99000000),
-        _groupProfileTextColor =
-            groupProfileTextColor ?? const Color(0xFF000000),
-        _groupProfileAddMemberTextColor =
-            groupProfileAddMemberTextColor ?? const Color(0xFF0365F9),
-        _groupProfileTabBorderColor =
-            groupProfileTabBorderColor ?? const Color(0xFFE0E0E0),
-        _desktopBackgroundColorLinearGradientOne =
-            desktopBackgroundColorLinearGradientOne ?? const Color(0xFFEAEBEE),
-        _desktopBackgroundColorLinearGradientTwo =
-            desktopBackgroundColorLinearGradientTwo ?? const Color(0xFFF6F6F6)
+        _profileChatButtonBackground = profileChatButtonBackground ?? const Color(0xFFFFFFFF),
+        _profileChatButtonBoxShadow = profileChatButtonBoxShadow ?? const Color(0x40000000),
+        _groupProfileTabBackground = groupProfileTabBackground ?? const Color(0xFFF9F9F9),
+        _groupProfileTabTextColor = groupProfileTabTextColor ?? const Color(0x99000000),
+        _groupProfileTextColor = groupProfileTextColor ?? const Color(0xFF000000),
+        _groupProfileAddMemberTextColor = groupProfileAddMemberTextColor ?? const Color(0xFF0365F9),
+        _groupProfileTabBorderColor = groupProfileTabBorderColor ?? const Color(0xFFE0E0E0),
+        _desktopBackgroundColorLinearGradientOne = desktopBackgroundColorLinearGradientOne ?? const Color(0xFFEAEBEE),
+        _desktopBackgroundColorLinearGradientTwo = desktopBackgroundColorLinearGradientTwo ?? const Color(0xFFF6F6F6)
   // end
   ;
 
@@ -365,6 +274,7 @@ class LightTencentCloudChatColors extends TencentCloudChatThemeColors {
   final Color _messageTipsBackgroundColor;
 
   final Color _messageBeenChosenBackgroundColor;
+
   // The color value used by the conversation component
   final Color _conversationItemLastMessageColor; // 待废弃
   final Color _conversationItemTitleColor; // 待废弃
@@ -390,6 +300,7 @@ class LightTencentCloudChatColors extends TencentCloudChatThemeColors {
   final Color _conversationItemMoreActionItemDeleteTextColor;
   final Color _conversationNoConversationTextColor;
   final Color _conversationItemUserStatusBgColor;
+
   // The color value used by the contact component
   final Color _contactItemFriendNameColor;
   final Color _contactItemTabItemNameColor;
@@ -438,6 +349,7 @@ class LightTencentCloudChatColors extends TencentCloudChatThemeColors {
 
   final Color _desktopBackgroundColorLinearGradientOne;
   final Color _desktopBackgroundColorLinearGradientTwo;
+
   // end
 
   @override
@@ -531,30 +443,26 @@ class LightTencentCloudChatColors extends TencentCloudChatThemeColors {
   Color get tipsColor => _tipsColor;
 
   @override
-  Color get conversationItemLastMessageColor =>
-      _conversationItemLastMessageColor;
+  Color get conversationItemLastMessageColor => _conversationItemLastMessageColor;
 
   @override
   Color get messageTipsBackgroundColor => _messageTipsBackgroundColor;
+
   // The color value used by the convergestion component
   @override
   Color get conversationItemTitleColor => _conversationItemTitleColor; // 待废弃
 
   @override
-  Color get conversationItemSwipeActionOneBgColor =>
-      _conversationItemSwipeActionOneBgColor;
+  Color get conversationItemSwipeActionOneBgColor => _conversationItemSwipeActionOneBgColor;
 
   @override
-  Color get conversationItemSwipeActionTwoBgColor =>
-      _conversationItemSwipeActionTwoBgColor;
+  Color get conversationItemSwipeActionTwoBgColor => _conversationItemSwipeActionTwoBgColor;
 
   @override
-  Color get conversationItemSwipeActionOneTextColor =>
-      _conversationItemSwipeActionOneTextColor;
+  Color get conversationItemSwipeActionOneTextColor => _conversationItemSwipeActionOneTextColor;
 
   @override
-  Color get conversationItemSwipeActionTwoTextColor =>
-      _conversationItemSwipeActionTwoTextColor;
+  Color get conversationItemSwipeActionTwoTextColor => _conversationItemSwipeActionTwoTextColor;
 
   @override
   Color get conversationItemIsPinedBgColor => _conversationItemIsPinedBgColor;
@@ -563,39 +471,31 @@ class LightTencentCloudChatColors extends TencentCloudChatThemeColors {
   Color get conversationItemNormalBgColor => _conversationItemNormalBgColor;
 
   @override
-  Color get conversationItemShowNameTextColor =>
-      _conversationItemShowNameTextColor;
+  Color get conversationItemShowNameTextColor => _conversationItemShowNameTextColor;
 
   @override
-  Color get conversationItemSendingIconColor =>
-      _conversationItemSendingIconColor;
+  Color get conversationItemSendingIconColor => _conversationItemSendingIconColor;
 
   @override
-  Color get conversationItemSendFailedIconColor =>
-      _conversationItemSendFailedIconColor;
+  Color get conversationItemSendFailedIconColor => _conversationItemSendFailedIconColor;
 
   @override
   Color get conversationItemDraftTextColor => _conversationItemDraftTextColor;
 
   @override
-  Color get conversationItemLastMessageTextColor =>
-      _conversationItemLastMessageTextColor;
+  Color get conversationItemLastMessageTextColor => _conversationItemLastMessageTextColor;
 
   @override
-  Color get conversationItemGroupAtInfoTextColor =>
-      _conversationItemGroupAtInfoTextColor;
+  Color get conversationItemGroupAtInfoTextColor => _conversationItemGroupAtInfoTextColor;
 
   @override
-  Color get conversationItemNoReceiveIconColor =>
-      _conversationItemNoReceiveIconColor;
+  Color get conversationItemNoReceiveIconColor => _conversationItemNoReceiveIconColor;
 
   @override
-  Color get conversationItemUnreadCountBgColor =>
-      _conversationItemUnreadCountBgColor;
+  Color get conversationItemUnreadCountBgColor => _conversationItemUnreadCountBgColor;
 
   @override
-  Color get conversationItemUnreadCountTextColor =>
-      _conversationItemUnreadCountTextColor;
+  Color get conversationItemUnreadCountTextColor => _conversationItemUnreadCountTextColor;
 
   @override
   Color get conversationItemTimeTextColor => _conversationItemTimeTextColor;
@@ -607,33 +507,29 @@ class LightTencentCloudChatColors extends TencentCloudChatThemeColors {
   Color get conversationItemReadIconColor => _conversationItemReadIconColor;
 
   @override
-  Color get conversationNoConversationTextColor =>
-      _conversationNoConversationTextColor;
+  Color get conversationNoConversationTextColor => _conversationNoConversationTextColor;
 
   @override
-  Color get conversationItemMoreActionItemNormalTextColor =>
-      _conversationItemMoreActionItemNormalTextColor;
+  Color get conversationItemMoreActionItemNormalTextColor => _conversationItemMoreActionItemNormalTextColor;
 
   @override
-  Color get conversationItemMoreActionItemDeleteTextColor =>
-      _conversationItemMoreActionItemDeleteTextColor;
+  Color get conversationItemMoreActionItemDeleteTextColor => _conversationItemMoreActionItemDeleteTextColor;
 
   @override
-  Color get conversationItemUserStatusBgColor =>
-      _conversationItemUserStatusBgColor;
+  Color get conversationItemUserStatusBgColor => _conversationItemUserStatusBgColor;
 
   @override
-  Color get messageBeenChosenBackgroundColor =>
-      _messageBeenChosenBackgroundColor;
+  Color get messageBeenChosenBackgroundColor => _messageBeenChosenBackgroundColor;
 
   @override
   Color get contactItemTabItemNameColor => _contactItemTabItemNameColor;
 
   @override
   Color get contactItemFriendNameColor => _contactItemFriendNameColor;
+
   @override
-  Color get contactApplicationBackgroundColor =>
-      _contactApplicationBackgroundColor;
+  Color get contactApplicationBackgroundColor => _contactApplicationBackgroundColor;
+
   @override
   Color get contactItemTabItemBorderColor => _contactItemTabItemBorderColor;
 
@@ -644,8 +540,7 @@ class LightTencentCloudChatColors extends TencentCloudChatThemeColors {
   Color get contactTabItemIconColor => _contactTabItemIconColor;
 
   @override
-  Color get contactApplicationUnreadCountTextColor =>
-      _contactApplicationUnreadCountTextColor;
+  Color get contactApplicationUnreadCountTextColor => _contactApplicationUnreadCountTextColor;
 
   @override
   Color get contactBackgroundColor => _contactBackgroundColor;
@@ -666,42 +561,34 @@ class LightTencentCloudChatColors extends TencentCloudChatThemeColors {
   Color get contactAppBarIconColor => _contactAppBarIconColor;
 
   @override
-  Color get contactAddContactBackgroundColor =>
-      _contactAddContactBackgroundColor;
+  Color get contactAddContactBackgroundColor => _contactAddContactBackgroundColor;
 
   @override
-  Color get contactAddContactInfoBackgroundColor =>
-      _contactAddContactInfoBackgroundColor;
+  Color get contactAddContactInfoBackgroundColor => _contactAddContactInfoBackgroundColor;
 
   @override
-  Color get contactAddContactFriendInfoButtonShadowColor =>
-      _contactAddContactFriendInfoButtonShadowColor;
+  Color get contactAddContactFriendInfoButtonShadowColor => _contactAddContactFriendInfoButtonShadowColor;
 
   @override
   Color get contactAddContactFriendInfoStateButtonBackgroundColor =>
       _contactAddContactFriendInfoStateButtonBackgroundColor;
 
   @override
-  Color get contactAddContactFriendInfoStateButtonTextColor =>
-      _contactAddContactFriendInfoStateButtonTextColor;
+  Color get contactAddContactFriendInfoStateButtonTextColor => _contactAddContactFriendInfoStateButtonTextColor;
 
   @override
-  Color get contactAddContactFriendInfoStateButtonActiveColor =>
-      _contactAddContactFriendInfoStateButtonActiveColor;
+  Color get contactAddContactFriendInfoStateButtonActiveColor => _contactAddContactFriendInfoStateButtonActiveColor;
 
   @override
-  Color get contactAddContactFriendInfoStateButtonInactiveColor =>
-      _contactAddContactFriendInfoStateButtonInactiveColor;
+  Color get contactAddContactFriendInfoStateButtonInactiveColor => _contactAddContactFriendInfoStateButtonInactiveColor;
 
   @override
   // TODO: implement contactAddContactToastCheckColor
-  Color get contactAddContactToastCheckColor =>
-      _contactAddContactToastCheckColor;
+  Color get contactAddContactToastCheckColor => _contactAddContactToastCheckColor;
 
   @override
   // TODO: implement contactAddContactToastRefuseColor
-  Color get contactAddContactToastRefuseColor =>
-      _contactAddContactToastRefuseColor;
+  Color get contactAddContactToastRefuseColor => _contactAddContactToastRefuseColor;
 
   @override
   // TODO: implement settingBackgroundColor
@@ -788,12 +675,10 @@ class LightTencentCloudChatColors extends TencentCloudChatThemeColors {
   Color get groupProfileTabBorderColor => _groupProfileTabBorderColor;
 
   @override
-  Color get desktopBackgroundColorLinearGradientOne =>
-      _desktopBackgroundColorLinearGradientOne;
+  Color get desktopBackgroundColorLinearGradientOne => _desktopBackgroundColorLinearGradientOne;
 
   @override
-  Color get desktopBackgroundColorLinearGradientTwo =>
-      _desktopBackgroundColorLinearGradientTwo;
+  Color get desktopBackgroundColorLinearGradientTwo => _desktopBackgroundColorLinearGradientTwo;
 
-  // end
+// end
 }

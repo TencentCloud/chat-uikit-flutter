@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
 import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
@@ -6,7 +7,7 @@ import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separ
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_builders.dart';
 
 class TencentCloudChatMessageForwardContainer extends StatefulWidget {
-  final MessageForwardBuilder? messageForwardBuilder;
+  final MFInternalBuilder? messageForwardBuilder;
   final TencentCloudChatForwardType type;
   final BuildContext context;
   final List<V2TimMessage> messages;
@@ -25,7 +26,8 @@ class TencentCloudChatMessageForwardContainer extends StatefulWidget {
   State<TencentCloudChatMessageForwardContainer> createState() => _TencentCloudChatMessageForwardContainerState();
 }
 
-class _TencentCloudChatMessageForwardContainerState extends TencentCloudChatState<TencentCloudChatMessageForwardContainer> {
+class _TencentCloudChatMessageForwardContainerState
+    extends TencentCloudChatState<TencentCloudChatMessageForwardContainer> {
   @override
   Widget defaultBuilder(BuildContext context) {
     final conversationList = TencentCloudChat.instance.dataInstance.conversation.conversationList;
@@ -33,25 +35,30 @@ class _TencentCloudChatMessageForwardContainerState extends TencentCloudChatStat
     final groupList = TencentCloudChat.instance.dataInstance.contact.groupList;
 
     return widget.messageForwardBuilder?.call(
-          type: widget.type,
-          conversationList: conversationList.toList(),
-          onSelectConversations: (chatList) {
-            final messageModal = TencentCloudChatMessageDataProviderInherited.of(widget.context);
-            if (widget.type == TencentCloudChatForwardType.individually) {
-              messageModal.sendForwardIndividuallyMessage(widget.messages.map((e) => e.msgID ?? "").toList(), chatList);
-            } else {
-              messageModal.sendForwardCombinedMessage(widget.messages, chatList);
-            }
-            messageModal.inSelectMode = false;
-            if (widget.onCloseModal != null) {
-              widget.onCloseModal!();
-            } else {
-              Navigator.pop(context);
-            }
-          },
-          onCancel: widget.onCloseModal ?? () => Navigator.pop(context),
-          groupList: groupList,
-          contactList: contactList,
+          data: MessageForwardBuilderData(
+            type: widget.type,
+            conversationList: conversationList.toList(),
+            groupList: groupList,
+            contactList: contactList,
+          ),
+          methods: MessageForwardBuilderMethods(
+            onSelectConversations: (chatList) {
+              final messageModal = TencentCloudChatMessageDataProviderInherited.of(widget.context);
+              if (widget.type == TencentCloudChatForwardType.individually) {
+                messageModal.sendForwardIndividuallyMessage(
+                    widget.messages.map((e) => e.msgID ?? "").toList(), chatList);
+              } else {
+                messageModal.sendForwardCombinedMessage(widget.messages, chatList);
+              }
+              messageModal.inSelectMode = false;
+              if (widget.onCloseModal != null) {
+                widget.onCloseModal!();
+              } else {
+                Navigator.pop(context);
+              }
+            },
+            onCancel: widget.onCloseModal ?? () => Navigator.pop(context),
+          ),
         ) ??
         Container();
   }

@@ -1240,6 +1240,9 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
 
   @override
   String get markAsRead => '标为已读';
+
+  @override
+  String get reEdit => '重新编辑';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2483,4 +2486,7 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
 
   @override
   String get markAsRead => '標為已讀';
+
+  @override
+  String get reEdit => '重新編輯';
 }

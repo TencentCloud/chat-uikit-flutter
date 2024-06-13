@@ -1240,4 +1240,7 @@ class TencentCloudChatLocalizationsAr extends TencentCloudChatLocalizations {
 
   @override
   String get markAsRead => 'وضع علامة مقروء';
+
+  @override
+  String get reEdit => 'إعادة تحرير';
 }

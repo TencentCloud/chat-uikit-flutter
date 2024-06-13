@@ -8,29 +8,18 @@ typedef OnTapConversationItem = Future<bool> Function({
 });
 
 class TencentCloudChatConversationEventHandlers {
-  late TencentCloudChatConversationUIEventHandlers? _uiEventHandlers;
-  late TencentCloudChatConversationLifeCycleEventHandlers?
-      _lifeCycleEventHandlers;
+  final TencentCloudChatConversationUIEventHandlers _uiEventHandlers;
+  final TencentCloudChatConversationLifeCycleEventHandlers _lifeCycleEventHandlers;
 
   TencentCloudChatConversationEventHandlers({
     TencentCloudChatConversationUIEventHandlers? uiEventHandlers,
     TencentCloudChatConversationLifeCycleEventHandlers? lifeCycleEventHandlers,
-  }) {
-    _uiEventHandlers = uiEventHandlers;
-    _lifeCycleEventHandlers = lifeCycleEventHandlers;
-  }
+  })  : _uiEventHandlers = uiEventHandlers ?? TencentCloudChatConversationUIEventHandlers(),
+        _lifeCycleEventHandlers = lifeCycleEventHandlers ?? TencentCloudChatConversationLifeCycleEventHandlers();
 
-  TencentCloudChatConversationUIEventHandlers get uiEventHandlers {
-    _uiEventHandlers ??= TencentCloudChatConversationUIEventHandlers();
-    return _uiEventHandlers!;
-  }
+  TencentCloudChatConversationUIEventHandlers get uiEventHandlers => _uiEventHandlers;
 
-  TencentCloudChatConversationLifeCycleEventHandlers
-      get lifeCycleEventHandlers {
-    _lifeCycleEventHandlers ??=
-        TencentCloudChatConversationLifeCycleEventHandlers();
-    return _lifeCycleEventHandlers!;
-  }
+  TencentCloudChatConversationLifeCycleEventHandlers get lifeCycleEventHandlers => _lifeCycleEventHandlers;
 }
 
 class TencentCloudChatConversationUIEventHandlers {

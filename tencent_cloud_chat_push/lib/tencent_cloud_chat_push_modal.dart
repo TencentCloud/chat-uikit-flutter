@@ -16,7 +16,7 @@ class TencentCloudChatPushModal {
       case "on_notification_clicked":
         debugPrint("TencentCloudChatPush: ${call.arguments}");
         final ext = call.arguments.toString();
-        final ({String? userID, String? groupID}) conversationInfo = TencentCloudChatPushUtils.parseExtInfo(ext);
+        final ParseExtInfoResult conversationInfo = TencentCloudChatPushUtils.parseExtInfo(ext);
         onNotificationClicked?.call(
           ext: call.arguments.toString(),
           userID: conversationInfo.userID,
@@ -25,6 +25,7 @@ class TencentCloudChatPushModal {
         break;
       case "on_app_wake_up":
         onAppWakeUp?.call();
+        break;
       default:
         throw UnsupportedError("Unrecognized Event");
     }

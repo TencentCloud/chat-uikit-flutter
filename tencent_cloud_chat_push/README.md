@@ -180,3 +180,8 @@ Android if needed:
 ```dart
 TencentCloudChatPush().registerPush(onNotificationClicked: _onNotificationClicked);
 ```
+
+If you have any questions or need further information, feel free to reach out us.
+
+- [Telegram](https://t.me/+gvScYl0uQ3U4MTRl)
+- [X (Twitter)](https://x.com/runlin_wang95)

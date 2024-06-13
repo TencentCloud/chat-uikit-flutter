@@ -8,8 +8,7 @@ class TencentCloudChatCacheGlobal {
   final String _tag = "TencentCloudChatCacheGlobal";
 
   console(String log) {
-    TencentCloudChat.instance.logInstance
-        .console(componentName: _tag, logs: log);
+    TencentCloudChat.instance.logInstance.console(componentName: _tag, logs: log);
   }
 
   static Box? _box;
@@ -39,8 +38,7 @@ class TencentCloudChatCacheGlobal {
     }
     String hivekey = TencentCloudChatCacheKey.locale.name;
     await _box!.put(hivekey, TencentCloudChatIntl.serializeLocale(locale));
-    console(
-        "set $hivekey to hive. ${TencentCloudChatIntl.serializeLocale(locale)}");
+    console("set $hivekey to hive. ${TencentCloudChatIntl.serializeLocale(locale)}");
   }
 
   Locale? getCachedLocale() {

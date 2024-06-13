@@ -37,9 +37,7 @@ class CallMessageItem extends StatelessWidget {
       }
 
       if (!isShowIcon) {
-        return isCallEnd
-            ? Text("通话时间 $callTime")
-            : Text(CallingMessage.getActionType(callingMessage));
+        return isCallEnd ? Text("通话时间 $callTime") : Text(CallingMessage.getActionType(callingMessage));
       }
 
       return Row(
@@ -49,23 +47,17 @@ class CallMessageItem extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.only(right: 4),
               child: Image.asset(
-                isVoiceCall
-                    ? "assets/calling_message/voice_call.png"
-                    : "assets/calling_message/video_call.png",
+                isVoiceCall ? "assets/calling_message/voice_call.png" : "assets/calling_message/video_call.png",
                 height: 16,
                 width: 16,
               ),
             ),
-          isCallEnd
-              ? Text("通话时间：$callTime")
-              : Text(CallingMessage.getActionType(callingMessage)),
+          isCallEnd ? Text("通话时间：$callTime") : Text(CallingMessage.getActionType(callingMessage)),
           if (isFromSelf)
             Padding(
               padding: const EdgeInsets.only(left: 4),
               child: Image.asset(
-                isVoiceCall
-                    ? "assets/calling_message/voice_call.png"
-                    : "assets/calling_message/video_call_self.png",
+                isVoiceCall ? "assets/calling_message/voice_call.png" : "assets/calling_message/video_call_self.png",
                 height: 16,
                 width: 16,
               ),

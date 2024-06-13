@@ -25,17 +25,25 @@ class TencentCloudChatContactItemState extends TencentCloudChatState<TencentClou
   navigateToChat() async {
     final tryUseOnNavigateToChat = await TencentCloudChat.instance.dataInstance.contact.contactEventHandlers?.uiEventHandlers.onNavigateToChat?.call(userID: widget.friend.userID, groupID: null) ?? false;
     if(!tryUseOnNavigateToChat){
-      if (TencentCloudChat.instance.dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.message) && !isDesktop) {
-        navigateToMessage(
-          context: context,
-          options: TencentCloudChatMessageOptions(
+      if (TencentCloudChat.instance.dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.message)) {
+        if(!isDesktop){
+          navigateToMessage(
+            context: context,
+            options: TencentCloudChatMessageOptions(
+              userID: widget.friend.userID,
+              groupID: null,
+            ),
+          );
+        }else{
+          final conv = await TencentCloudChat.instance.chatSDKInstance.conversationSDK.getConversation(
             userID: widget.friend.userID,
-            groupID: null,
-          ),
-        );
+          );
+          TencentCloudChat.instance.dataInstance.conversation.currentConversation = conv;
+        }
+        }
       }
     }
-  }
+
 
   @override
   Widget defaultBuilder(BuildContext context) {

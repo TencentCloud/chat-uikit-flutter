@@ -1,114 +1,70 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
-import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
+import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
+import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data_notifier.dart';
 
-Widget _floatContainer({
-  String? text,
-  IconData? iconData,
-  bool isLoading = false,
-}) {
-  final isDesktopScreen = TencentCloudChatScreenAdapter.deviceScreenType ==
-      DeviceScreenType.desktop;
-
-  return MouseRegion(
-    cursor: isDesktopScreen ? SystemMouseCursors.click : MouseCursor.defer,
-    child: TencentCloudChatThemeWidget(
-      build: (context, colorTheme, textStyle) => AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        decoration: BoxDecoration(
-            color: colorTheme.backgroundColor,
-            boxShadow: [
-              BoxShadow(
-                color: colorTheme.dividerColor.withOpacity(0.8),
-                spreadRadius: 5,
-                blurRadius: 7,
-                offset: const Offset(0, 3), // changes position of shadow
-              ),
-            ],
-            borderRadius: const BorderRadius.all(Radius.circular(30))),
-        child: Row(
-          children: [
-            if (TencentCloudChatUtils.checkString(text) != null && !isLoading)
-              SizedBox(
-                height: 40,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 8.0, horizontal: 15),
-                    child: Text(
-                      text!,
-                      style: TextStyle(color: colorTheme.primaryColor),
-                    ),
-                  ),
-                ),
-              ),
-            if (iconData != null && !isLoading)
-              SizedBox(
-                height: 40,
-                width: 40,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 8.0, horizontal: 8),
-                    child: Icon(
-                      iconData,
-                      color: colorTheme.primaryColor,
-                    ),
-                  ),
-                ),
-              ),
-            if (isLoading)
-              SizedBox(
-                height: 40,
-                width: 40,
-                child: Center(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10, horizontal: 10),
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                          colorTheme.primaryColor),
-                    ),
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    ),
-  );
+Widget unreadMsgButtonBuilder(
+    VoidCallback triggerDefaultButtonTappedEvent, BuildContext context, int unreadMsgCount, bool isLoading) {
+  return TencentCloudChatMessageDataProviderInherited.of(context).messageBuilders?.getMessageDynamicButtonBuilder(
+            data: MessageDynamicButtonBuilderData(
+              text: tL10n.unreadCount(unreadMsgCount),
+              isLoading: isLoading,
+              eventType: MessageDynamicButtonEventType.navigateToTheLatestReadMessage,
+            ),
+            methods: MessageDynamicButtonBuilderMethods(
+              triggerDefaultButtonTappedEvent: triggerDefaultButtonTappedEvent,
+            ),
+          ) ??
+      Container();
 }
 
-Widget defaultUnreadMsgButtonBuilder(
-    BuildContext context, int unreadMsgCount, bool isLoading) {
-  return _floatContainer(
-      text: tL10n.unreadCount(unreadMsgCount), isLoading: isLoading);
+Widget messageMentionedMeBuilder(
+    VoidCallback triggerDefaultButtonTappedEvent, BuildContext context, int messageCount, bool isLoading) {
+  return TencentCloudChatMessageDataProviderInherited.of(context).messageBuilders?.getMessageDynamicButtonBuilder(
+            data: MessageDynamicButtonBuilderData(
+              text: tL10n.mentionedMessages(messageCount),
+              isLoading: isLoading,
+              eventType: MessageDynamicButtonEventType.navigateToTheLatestMessageMentionedMe,
+            ),
+            methods: MessageDynamicButtonBuilderMethods(
+              triggerDefaultButtonTappedEvent: triggerDefaultButtonTappedEvent,
+            ),
+          ) ??
+      Container();
 }
 
-Widget defaultMessageMentionedMeBuilder(
-    BuildContext context, int messageCount, bool isLoading) {
-  return _floatContainer(
-      text: tL10n.mentionedMessages(messageCount), isLoading: isLoading);
+Widget receivedMsgButtonBuilder(VoidCallback triggerDefaultButtonTappedEvent, BuildContext context, int newMsgCount) {
+  return TencentCloudChatMessageDataProviderInherited.of(context).messageBuilders?.getMessageDynamicButtonBuilder(
+            data: MessageDynamicButtonBuilderData(
+              text: tL10n.newMsgCount(newMsgCount),
+              isLoading: false,
+              eventType: MessageDynamicButtonEventType.navigateToTheLatestReceivedMessage,
+            ),
+            methods: MessageDynamicButtonBuilderMethods(
+              triggerDefaultButtonTappedEvent: triggerDefaultButtonTappedEvent,
+            ),
+          ) ??
+      Container();
 }
 
-Widget defaultReceivedMsgButtonBuilder(BuildContext context, int newMsgCount) {
-  return _floatContainer(text: tL10n.newMsgCount(newMsgCount));
+Widget scrollToTopButtonBuilder(VoidCallback triggerDefaultButtonTappedEvent, BuildContext context, bool isLoading) {
+  return TencentCloudChatMessageDataProviderInherited.of(context).messageBuilders?.getMessageDynamicButtonBuilder(
+            data: MessageDynamicButtonBuilderData(
+              iconData: Icons.keyboard_double_arrow_down_rounded,
+              isLoading: isLoading,
+              eventType: MessageDynamicButtonEventType.navigateToTheBottomOfMessageList,
+            ),
+            methods: MessageDynamicButtonBuilderMethods(
+              triggerDefaultButtonTappedEvent: triggerDefaultButtonTappedEvent,
+            ),
+          ) ??
+      Container();
 }
 
-Widget defaultScrollToTopButtonBuilder(BuildContext context, bool isLoading) {
-  return _floatContainer(
-    iconData: Icons.keyboard_double_arrow_down_rounded,
-    isLoading: isLoading,
-  );
-}
-
-Widget defaultLoadPreviousProgressBuilder(
-    BuildContext context, LoadStatus? mode, bool haveMorePreviousMessage) {
+Widget defaultLoadPreviousProgressBuilder(BuildContext context, LoadStatus? mode, bool haveMorePreviousMessage) {
   Widget body;
   if (!haveMorePreviousMessage) {
     body = Container();

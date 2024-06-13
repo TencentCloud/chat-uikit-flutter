@@ -37,7 +37,8 @@ class TencentCloudChatMessageInputRecording extends StatefulWidget {
   State<TencentCloudChatMessageInputRecording> createState() => TencentCloudChatMessageInputRecordingState();
 }
 
-class TencentCloudChatMessageInputRecordingState extends TencentCloudChatState<TencentCloudChatMessageInputRecording> with SingleTickerProviderStateMixin {
+class TencentCloudChatMessageInputRecordingState extends TencentCloudChatState<TencentCloudChatMessageInputRecording>
+    with SingleTickerProviderStateMixin {
   late AnimationController _shakeAnimationController;
   bool _isRecording = false;
   double _recordingProgress = 0.0;
@@ -107,8 +108,10 @@ class TencentCloudChatMessageInputRecordingState extends TencentCloudChatState<T
         final trashIconRenderBox = trashIconKey.currentContext!.findRenderObject() as RenderBox;
         final trashIconOffset = trashIconRenderBox.localToGlobal(Offset.zero);
         final trashIconSize = trashIconRenderBox.size;
-        final isOverDeleteIcon =
-            event.position.dx >= trashIconOffset.dx && event.position.dx <= trashIconOffset.dx + trashIconSize.width && event.position.dy >= trashIconOffset.dy && event.position.dy <= trashIconOffset.dy + trashIconSize.height;
+        final isOverDeleteIcon = event.position.dx >= trashIconOffset.dx &&
+            event.position.dx <= trashIconOffset.dx + trashIconSize.width &&
+            event.position.dy >= trashIconOffset.dy &&
+            event.position.dy <= trashIconOffset.dy + trashIconSize.height;
 
         if (isOverDeleteIcon != _isFingerOverDelete) {
           setState(() {
@@ -189,12 +192,16 @@ class TencentCloudChatMessageInputRecordingState extends TencentCloudChatState<T
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: _isFingerOverDelete ? colorTheme.info : Colors.transparent,
-                  border: _isFingerOverDelete ? Border.all(color: colorTheme.info, width: 22) : Border.all(color: Colors.transparent, width: 0),
+                  border: _isFingerOverDelete
+                      ? Border.all(color: colorTheme.info, width: 22)
+                      : Border.all(color: Colors.transparent, width: 0),
                 ),
                 child: AnimatedDefaultTextStyle(
                   duration: const Duration(milliseconds: 200),
                   style: TextStyle(
-                    color: _isRecording ? (_isFingerOverDelete ? colorTheme.backgroundColor : colorTheme.primaryColor) : Colors.transparent,
+                    color: _isRecording
+                        ? (_isFingerOverDelete ? colorTheme.backgroundColor : colorTheme.primaryColor)
+                        : Colors.transparent,
                     fontSize: _isFingerOverDelete ? textStyle.inputAreaIcon + 14 : textStyle.inputAreaIcon + 6,
                   ),
                   child: Text(
@@ -209,7 +216,8 @@ class TencentCloudChatMessageInputRecordingState extends TencentCloudChatState<T
                 padding: EdgeInsets.symmetric(vertical: getHeight(8), horizontal: getWidth(16)),
                 decoration: BoxDecoration(
                   color: _isRecording ? colorTheme.primaryColor : Colors.transparent,
-                  border: _isRecording ? Border.all(color: colorTheme.primaryColor) : Border.all(color: Colors.transparent),
+                  border:
+                      _isRecording ? Border.all(color: colorTheme.primaryColor) : Border.all(color: Colors.transparent),
                   borderRadius: BorderRadius.circular(25),
                 ),
                 duration: const Duration(milliseconds: 200),

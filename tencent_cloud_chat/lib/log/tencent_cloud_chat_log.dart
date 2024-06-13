@@ -63,8 +63,7 @@ class TencentCloudChatLog {
 
     logLevel ??= TencentCloudChatLogLevel.debug;
 
-    var cacheLogs =
-        "TCCF:$currentTime:$componentName:${logLevel.name}:{ $logs }";
+    var cacheLogs = "TCCF:$currentTime:$componentName:${logLevel.name}:{ $logs }";
 
     if (kDebugMode) {
       // Print the log message to the console if the app is running in debug mode
@@ -91,8 +90,7 @@ class TencentCloudChatLog {
       return;
     }
 
-    TencentCloudChat.instance.chatSDKInstance
-        .uikitTrace(trace: _cachedLogList.join("\n"));
+    TencentCloudChat.instance.chatSDKInstance.uikitTrace(trace: _cachedLogList.join("\n"));
 
     /// Log a message indicating that the timer executed and the number of logs written
 

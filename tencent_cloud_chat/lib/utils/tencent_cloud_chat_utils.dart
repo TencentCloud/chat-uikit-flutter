@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_message_calling_message/tencent_cloud_chat_message_calling_message.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ImageExifInfo {
   final double width;
@@ -21,6 +22,15 @@ class ImageExifInfo {
     required this.isRotate,
     required this.width,
   });
+}
+
+/// Extensions on [Uri]
+extension UriX on Uri {
+  /// Return the URI adding the http scheme if it is missing
+  Uri get withScheme {
+    if (hasScheme) return this;
+    return Uri.parse('http://${toString()}');
+  }
 }
 
 class TencentCloudChatUtils {
@@ -184,10 +194,7 @@ class TencentCloudChatUtils {
   }
 
   static String getMessageSummary(
-      {V2TimMessage? message,
-      int? messageReceiveOption,
-      int? unreadCount,
-      String? draftText}) {
+      {V2TimMessage? message, int? messageReceiveOption, int? unreadCount, String? draftText, bool needStatus = true}) {
     String text = "";
 
     if (message != null) {
@@ -198,8 +205,7 @@ class TencentCloudChatUtils {
           }
           break;
         case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
-          final (String lineOne, String? lineTwo, IconData? _) =
-              handleCustomMessage(message);
+          final (String lineOne, String? lineTwo, IconData? _) = handleCustomMessage(message);
           text = lineTwo != null ? "$lineOne: $lineTwo" : lineOne;
           break;
         case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
@@ -212,8 +218,7 @@ class TencentCloudChatUtils {
           text = '[${tL10n.file}]';
           break;
         case MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS:
-          text =
-              "[${tL10n.groupTips}]${buildGroupTipsText(message.groupTipsElem)}";
+          text = "[${tL10n.groupTips}]${buildGroupTipsText(message.groupTipsElem)}";
           break;
         case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
           text = '[${tL10n.image}]';
@@ -230,10 +235,10 @@ class TencentCloudChatUtils {
         default:
           text = "";
       }
-      if (message.status == 4) {
+      if (message.status == 4 && needStatus) {
         text = tL10n.messageDeleted;
       }
-      if (message.status == 6) {
+      if (message.status == 6 && needStatus) {
         text = tL10n.messageRecalled;
       }
       if (messageReceiveOption != 0) {
@@ -296,23 +301,17 @@ class TencentCloudChatUtils {
     String res = "";
     if (tips != null) {
       int type = tips.type;
-      List<V2TimGroupChangeInfo?> groupChangeInfo =
-          tips.groupChangeInfoList ?? [];
-      List<V2TimGroupMemberChangeInfo?> memberChangeInfo =
-          (tips.memberChangeInfoList ?? []);
+      List<V2TimGroupChangeInfo?> groupChangeInfo = tips.groupChangeInfoList ?? [];
+      List<V2TimGroupMemberChangeInfo?> memberChangeInfo = (tips.memberChangeInfoList ?? []);
       List<V2TimGroupMemberInfo?> memberList = (tips.memberList ?? []);
       V2TimGroupMemberInfo opMember = tips.opMember;
 
       String membersDisplayText = memberList
-          .map((e) =>
-              TencentCloudChatUtils.getDisplayNameByV2TimGroupMemberInfo(
-                  TencentCloudChatUtils
-                      .v2TimGroupMemberInfo2V2TimGroupMemberFullInfo(e)))
+          .map((e) => TencentCloudChatUtils.getDisplayNameByV2TimGroupMemberInfo(
+              TencentCloudChatUtils.v2TimGroupMemberInfo2V2TimGroupMemberFullInfo(e)))
           .join(",");
-      String opMemberDisplayText =
-          TencentCloudChatUtils.getDisplayNameByV2TimGroupMemberInfo(
-              TencentCloudChatUtils
-                  .v2TimGroupMemberInfo2V2TimGroupMemberFullInfo(opMember));
+      String opMemberDisplayText = TencentCloudChatUtils.getDisplayNameByV2TimGroupMemberInfo(
+          TencentCloudChatUtils.v2TimGroupMemberInfo2V2TimGroupMemberFullInfo(opMember));
 
       switch (type) {
         case 0:
@@ -328,27 +327,21 @@ class TencentCloudChatUtils {
           res = tL10n.memberLeftGroup(membersDisplayText);
           break;
         case 4:
-          res =
-              tL10n.opRemovedFromGroup(membersDisplayText, opMemberDisplayText);
+          res = tL10n.opRemovedFromGroup(membersDisplayText, opMemberDisplayText);
           break;
         case 5:
-          res =
-              tL10n.opPromotedToAdmin(membersDisplayText, opMemberDisplayText);
+          res = tL10n.opPromotedToAdmin(membersDisplayText, opMemberDisplayText);
           break;
         case 6:
           res = tL10n.opRevokedAdmin(membersDisplayText, opMemberDisplayText);
           break;
         case 7:
           res = tL10n.opChangedGroupInfo(
-              groupChangeInfo.map((e) => buildGroupChangeInfoText(e)).join(","),
-              opMemberDisplayText);
+              groupChangeInfo.map((e) => buildGroupChangeInfoText(e)).join(","), opMemberDisplayText);
           break;
         case 9:
           res = tL10n.opChangedMemberInfo(
-              memberChangeInfo
-                  .map((e) => buildGroupMemberChangeInfoText(e))
-                  .join(","),
-              opMemberDisplayText);
+              memberChangeInfo.map((e) => buildGroupMemberChangeInfoText(e)).join(","), opMemberDisplayText);
           break;
       }
     }
@@ -367,11 +360,22 @@ class TencentCloudChatUtils {
   ///
   /// [callback]: The function to be executed after the debounce duration.
   /// [duration]: The duration to wait before executing the callback function.
-  static void debounce(String key, Function() callback,
-      {Duration duration = const Duration(milliseconds: 500)}) {
+  static void debounce(String key, Function() callback, {Duration duration = const Duration(milliseconds: 500)}) {
     _debounceTimers[key]?.cancel();
     _debounceTimers[key] = Timer(duration, callback);
   }
+
+  static void launchLink({
+    required String link,
+  }) {
+    launchUrl(
+      Uri.parse(link).withScheme,
+      mode: LaunchMode.externalApplication,
+    );
+  }
+
+  static RegExp urlReg = RegExp(
+      r"([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/|[wW]{3}.|[wW][aA][pP].|[fF][tT][pP].|[fF][iI][lL][eE].)[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]");
 
   /// Throttle function that ensures the [callback] function is not called
   /// more often than the specified [duration].
@@ -382,8 +386,7 @@ class TencentCloudChatUtils {
   ///
   /// [callback]: The function to be executed with a throttled rate.
   /// [duration]: The minimum duration between consecutive callback executions.
-  static void throttle(String key, Function() callback,
-      {Duration duration = const Duration(milliseconds: 500)}) {
+  static void throttle(String key, Function() callback, {Duration duration = const Duration(milliseconds: 500)}) {
     if (_throttleTimers[key] == null) {
       _throttleTimers[key] = Timer(duration, () {
         callback();
@@ -396,24 +399,31 @@ class TencentCloudChatUtils {
     return const DeepCollectionEquality.unordered().equals(previous, next);
   }
 
-  static Future<ImageExifInfo> getImageExifInfoByBuffer({
+  static String getMessageSenderName(V2TimMessage message) {
+    return checkString(message.friendRemark) ?? checkString(message.nickName) ?? checkString(message.sender) ?? "";
+  }
+
+  static Future<ImageExifInfo?> getImageExifInfoByBuffer({
     required Uint8List fileBuffer,
   }) async {
+    if (kIsWeb) {
+      return null;
+    }
     final data = await readExifFromBytes(fileBuffer);
-    String owidth = data["EXIF ExifImageWidth"]?.printable ?? "200";
-    String oheight = data["EXIF ExifImageLength"]?.printable ?? "260";
+    String? owidth = data["EXIF ExifImageWidth"]?.printable;
+    String? oheight = data["EXIF ExifImageLength"]?.printable;
     bool isRotate = false;
-    final rotate = data["Image Orientation"]?.printable ?? "";
-    if (rotate.contains("90") || rotate.contains("270")) {
-      isRotate = true;
+    String? rotate = data["Image Orientation"]?.printable;
+    if (owidth != null && oheight != null && rotate != null) {
+      if (rotate.contains("90") || rotate.contains("270")) {
+        isRotate = true;
+      }
+      if (isRotate) {
+        (owidth, oheight) = (oheight, owidth);
+      }
+      return ImageExifInfo(height: double.parse(oheight), width: double.parse(owidth), isRotate: isRotate);
     }
-    if (isRotate) {
-      (owidth, oheight) = (oheight, owidth);
-    }
-    return ImageExifInfo(
-        height: double.parse(oheight),
-        width: double.parse(owidth),
-        isRotate: isRotate);
+    return null;
   }
 
   static addDataToStringFiled({
@@ -532,8 +542,7 @@ class TencentCloudChatUtils {
     return res;
   }
 
-  static String buildGroupMemberChangeInfoText(
-      V2TimGroupMemberChangeInfo? info) {
+  static String buildGroupMemberChangeInfoText(V2TimGroupMemberChangeInfo? info) {
     if (info == null) {
       return "";
     }
@@ -551,8 +560,7 @@ class TencentCloudChatUtils {
     return res;
   }
 
-  static v2TimGroupMemberInfo2V2TimGroupMemberFullInfo(
-      V2TimGroupMemberInfo? info) {
+  static v2TimGroupMemberInfo2V2TimGroupMemberFullInfo(V2TimGroupMemberInfo? info) {
     return V2TimGroupMemberFullInfo.fromJson({
       "faceUrl": info?.faceUrl,
       "friendRemark": info?.friendRemark,
@@ -581,13 +589,8 @@ class TencentCloudChatUtils {
   /// all values (messageSender, messageAbstract, and messageID) will be returned as null.
   ///
   /// Returns a tuple containing the messageSender, messageAbstract, and messageID.
-  static ({
-    String? messageAbstract,
-    String? messageID,
-    String? messageSender,
-    int? messageSeq,
-    int? messageTimestamp
-  }) parseMessageReply(String? jsonString) {
+  static ({String? messageAbstract, String? messageID, String? messageSender, int? messageSeq, int? messageTimestamp})
+      parseMessageReply(String? jsonString) {
     String? messageSender;
     String? messageAbstract;
     String? messageID;
@@ -627,8 +630,7 @@ class TencentCloudChatUtils {
     );
   }
 
-  static ({String character, int index, bool isAddText}) compareString(
-      String oldText, String newText) {
+  static ({String character, int index, bool isAddText}) compareString(String oldText, String newText) {
     final isAddText = newText.length > oldText.length;
     final longerText = isAddText ? newText : oldText;
     final shorterText = isAddText ? oldText : newText;
@@ -645,8 +647,7 @@ class TencentCloudChatUtils {
       diffIndex = shorterText.length;
     }
 
-    String characters = longerText.substring(
-        diffIndex, longerText.length - shorterText.length + diffIndex);
+    String characters = longerText.substring(diffIndex, longerText.length - shorterText.length + diffIndex);
 
     return (
       character: characters,
@@ -655,8 +656,7 @@ class TencentCloudChatUtils {
     );
   }
 
-  static (String, String?, IconData?) handleCustomMessage(
-      V2TimMessage message) {
+  static (String, String?, IconData?) handleCustomMessage(V2TimMessage message) {
     final customElem = message.customElem;
     String lineOne = "[${tL10n.custom}]";
     String? lineTwo;
@@ -683,9 +683,7 @@ class TencentCloudChatUtils {
         callTime = CallingMessage.getShowTime(callingMessage.callEnd!);
       }
 
-      lineTwo = isCallEnd
-          ? tL10n.callDuration(callTime ?? "0")
-          : CallingMessage.getActionType(callingMessage);
+      lineTwo = isCallEnd ? tL10n.callDuration(callTime ?? "0") : CallingMessage.getActionType(callingMessage);
 
       lineOne = isVoiceCall ? tL10n.voiceCall : tL10n.videoCall;
       icon = isVoiceCall ? Icons.call : Icons.video_call_outlined;
@@ -773,8 +771,8 @@ class Pertypath {
           String? part13,
           String? part14,
           String? part15]) =>
-      p.context.absolute(part1, part2, part3, part4, part5, part6, part7, part8,
-          part9, part10, part11, part12, part13, part14, part15);
+      p.context.absolute(part1, part2, part3, part4, part5, part6, part7, part8, part9, part10, part11, part12, part13,
+          part14, part15);
 
   /// Gets the part of [path] after the last separator.
   ///
@@ -794,8 +792,7 @@ class Pertypath {
   /// Trailing separators are ignored.
   ///
   ///     p.basenameWithoutExtension('path/to/foo.dart/'); // -> 'foo'
-  String basenameWithoutExtension(String path) =>
-      p.context.basenameWithoutExtension(path);
+  String basenameWithoutExtension(String path) => p.context.basenameWithoutExtension(path);
 
   /// Gets the part of [path] before the last separator.
   ///
@@ -841,8 +838,7 @@ class Pertypath {
   ///     p.extension('foo.bar.dart.js', 3);   // -> '.bar.dart.js'
   ///     p.extension('foo.bar.dart.js', 10);  // -> '.bar.dart.js'
   ///     p.extension('path/to/foo.bar.dart.js', 2);  // -> '.dart.js'
-  String extension(String path, [int level = 1]) =>
-      p.context.extension(path, level);
+  String extension(String path, [int level = 1]) => p.context.extension(path, level);
 
   /// Returns the root of [path], if it's absolute, or the empty string if it's
   /// relative.
@@ -921,8 +917,8 @@ class Pertypath {
           String? part14,
           String? part15,
           String? part16]) =>
-      p.context.join(part1, part2, part3, part4, part5, part6, part7, part8,
-          part9, part10, part11, part12, part13, part14, part15, part16);
+      p.context.join(part1, part2, part3, part4, part5, part6, part7, part8, part9, part10, part11, part12, part13,
+          part14, part15, part16);
 
   /// Joins the given path parts into a single path using the current platform's
   /// [separator]. Example:
@@ -1015,16 +1011,14 @@ class Pertypath {
   ///     // URL
   ///     p.relative('https://dart.dev', from: 'https://pub.dev');
   ///       // -> 'https://dart.dev'
-  String relative(String path, {String? from}) =>
-      p.context.relative(path, from: from);
+  String relative(String path, {String? from}) => p.context.relative(path, from: from);
 
   /// Returns `true` if [child] is a path beneath `parent`, and `false` otherwise.
   ///
   ///     p.isWithin('/root/path', '/root/path/a'); // -> true
   ///     p.isWithin('/root/path', '/root/other'); // -> false
   ///     p.isWithin('/root/path', '/root/path') // -> false
-  bool isWithin(String parent, String child) =>
-      p.context.isWithin(parent, child);
+  bool isWithin(String parent, String child) => p.context.isWithin(parent, child);
 
   /// Returns `true` if [path1] points to the same location as [path2], and
   /// `false` otherwise.
@@ -1054,8 +1048,7 @@ class Pertypath {
   ///     p.setExtension('path/to/foo.dart.js', '.map')
   ///       // -> 'path/to/foo.dart.map'
   ///     p.setExtension('path/to/foo', '.js') // -> 'path/to/foo.js'
-  String setExtension(String path, String extension) =>
-      p.context.setExtension(path, extension);
+  String setExtension(String path, String extension) => p.context.setExtension(path, extension);
 
   /// Returns the path represented by [uri], which may be a [String] or a [Uri].
   ///

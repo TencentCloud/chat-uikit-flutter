@@ -42,7 +42,7 @@ class TencentCloudChatConversation extends TencentCloudChatComponent<
 class TencentCloudChatConversationState
     extends TencentCloudChatState<TencentCloudChatConversation> {
   final Stream<TencentCloudChatConversationData<dynamic>>? _conversationDataStream =
-  TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatConversationData<dynamic>>();
+  TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatConversationData<dynamic>>("TencentCloudChatConversationData");
   StreamSubscription<TencentCloudChatConversationData<dynamic>>? _conversationDataSubscription;
 
   late bool _useDesktopMode;
@@ -53,6 +53,11 @@ class TencentCloudChatConversationState
     _addConversationDataListener();
     _updateGlobalData();
     _useDesktopMode = TencentCloudChat.instance.dataInstance.conversation.conversationConfig.useDesktopMode;
+
+    TencentCloudChat.instance.logInstance.console(
+        componentName: 'TencentCloudChatConversation',
+        logs:
+        "add _conversationDataStream start ${_conversationDataStream != null}");
   }
 
   @override

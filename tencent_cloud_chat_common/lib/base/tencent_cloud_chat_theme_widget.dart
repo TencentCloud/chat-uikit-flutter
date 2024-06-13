@@ -25,7 +25,7 @@ class _TencentCloudChatThemeWidgetState extends State<TencentCloudChatThemeWidge
   TencentCloudChatTextStyle _textStyle = TencentCloudChat.instance.dataInstance.theme.textStyle;
 
   // Listener for theme data changes
-  final Stream<TencentCloudChatTheme>? _themeDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatTheme>();
+  final Stream<TencentCloudChatTheme>? _themeDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatTheme>("TencentCloudChatTheme");
 
   late StreamSubscription<TencentCloudChatTheme>? _themeDataSubscription;
 

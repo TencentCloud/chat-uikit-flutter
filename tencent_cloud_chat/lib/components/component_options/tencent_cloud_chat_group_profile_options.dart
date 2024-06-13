@@ -23,8 +23,7 @@ class TencentCloudChatGroupProfileOptions {
   static TencentCloudChatGroupProfileOptions fromMap(Map<String, dynamic> map) {
     return TencentCloudChatGroupProfileOptions(
         groupID: map['groupID'] as String,
-        getGroupMembersInfo: map['getGroupMembersInfo']
-            as List<V2TimGroupMemberFullInfo> Function(),
+        getGroupMembersInfo: map['getGroupMembersInfo'] as List<V2TimGroupMemberFullInfo> Function(),
         startVideoCall: map['startVideoCall'] as VoidCallback,
         startVoiceCall: map['startVoiceCall'] as VoidCallback);
   }

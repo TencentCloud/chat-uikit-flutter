@@ -11,44 +11,42 @@ class TencentCloudChatUserNotificationEvent {
 }
 
 class TencentCloudChatCodeInfo {
-  static TencentCloudChatUserNotificationEvent originalMessageNotFound =
-      TencentCloudChatUserNotificationEvent(
+  static TencentCloudChatUserNotificationEvent originalMessageNotFound = TencentCloudChatUserNotificationEvent(
     eventCode: -10301,
     text: tL10n.originalMessageNotFound,
   );
 
-  static TencentCloudChatUserNotificationEvent contactAddedSuccessfully =
-      TencentCloudChatUserNotificationEvent(
+  static TencentCloudChatUserNotificationEvent retrievingGroupMembers = TencentCloudChatUserNotificationEvent(
+    eventCode: -10302,
+    text: "Just a moment, retrieving group members.",
+  );
+
+  static TencentCloudChatUserNotificationEvent contactAddedSuccessfully = TencentCloudChatUserNotificationEvent(
     eventCode: -10401,
     text: tL10n.contactAddedSuccessfully,
   );
 
-  static TencentCloudChatUserNotificationEvent contactRequestSent =
-      TencentCloudChatUserNotificationEvent(
+  static TencentCloudChatUserNotificationEvent contactRequestSent = TencentCloudChatUserNotificationEvent(
     eventCode: -10402,
     text: tL10n.requestSent,
   );
 
-  static TencentCloudChatUserNotificationEvent cannotAddContact =
-      TencentCloudChatUserNotificationEvent(
+  static TencentCloudChatUserNotificationEvent cannotAddContact = TencentCloudChatUserNotificationEvent(
     eventCode: -10403,
     text: tL10n.cannotAddContact,
   );
 
-  static TencentCloudChatUserNotificationEvent
-      cannotSendApplicationToWorkGroup = TencentCloudChatUserNotificationEvent(
+  static TencentCloudChatUserNotificationEvent cannotSendApplicationToWorkGroup = TencentCloudChatUserNotificationEvent(
     eventCode: -10404,
     text: tL10n.cannotSendApplicationToWorkGroup,
   );
 
-  static TencentCloudChatUserNotificationEvent groupJoinedPermissionNeeded =
-      TencentCloudChatUserNotificationEvent(
+  static TencentCloudChatUserNotificationEvent groupJoinedPermissionNeeded = TencentCloudChatUserNotificationEvent(
     eventCode: -10405,
     text: tL10n.permissionNeeded,
   );
 
-  static TencentCloudChatUserNotificationEvent groupJoined =
-      TencentCloudChatUserNotificationEvent(
+  static TencentCloudChatUserNotificationEvent groupJoined = TencentCloudChatUserNotificationEvent(
     eventCode: -10406,
     text: tL10n.groupJoined,
   );

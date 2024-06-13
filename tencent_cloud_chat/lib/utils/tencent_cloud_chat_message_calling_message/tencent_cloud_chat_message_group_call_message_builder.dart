@@ -19,6 +19,7 @@ class _GroupCallMessageItemState extends State<GroupCallMessageItem> {
   /// check if the message would be shown
   /// not all message should be shown
   bool isShow = true;
+
   // CustomMessage最终展示的内容
   /// text be shown for custom messasge
   String customMessageShowText = "[自定义]";
@@ -44,8 +45,7 @@ class _GroupCallMessageItemState extends State<GroupCallMessageItem> {
     }
   }
 
-  getShowNameListFromGroupList(
-      List<String> inviteList, List<V2TimGroupMemberFullInfo?> groupInfoList) {
+  getShowNameListFromGroupList(List<String> inviteList, List<V2TimGroupMemberFullInfo?> groupInfoList) {
     final showNameList = [];
     for (var info in groupInfoList) {
       final isContains = inviteList.contains(info!.userID);
@@ -59,8 +59,7 @@ class _GroupCallMessageItemState extends State<GroupCallMessageItem> {
 
 // 先更新为userID的封装
   /// This function get text of invitee user ID from inviteeList
-  handleShowUserIDFromInviteList(
-      List<String> inviteeList, String actionTypeText) {
+  handleShowUserIDFromInviteList(List<String> inviteeList, String actionTypeText) {
     String nameStr = "";
     for (String showName in inviteeList) {
       nameStr = "$nameStr、$showName";
@@ -73,8 +72,7 @@ class _GroupCallMessageItemState extends State<GroupCallMessageItem> {
 
   // 后更新showName的封装
   /// this function get text of user name from list
-  handleShowNameStringFromList(
-      List<dynamic> showNameList, String actionTypeText) {
+  handleShowNameStringFromList(List<dynamic> showNameList, String actionTypeText) {
     if (showNameList.isEmpty) {
       return;
     }
@@ -98,8 +96,7 @@ class _GroupCallMessageItemState extends State<GroupCallMessageItem> {
 
   // 封装需要节流获取情况用户成员的情况
   /// this function encapsulates the situation where user members need to be throttled to obtain the status
-  handleThrottleGetShowName(
-      String groupId, String actionTypeText, CallingMessage callingMessage) {
+  handleThrottleGetShowName(String groupId, String actionTypeText, CallingMessage callingMessage) {
     handleShowUserIDFromInviteList(callingMessage.inviteeList!, actionTypeText);
   }
 
@@ -122,8 +119,7 @@ class _GroupCallMessageItemState extends State<GroupCallMessageItem> {
     if (actionType == 1 && groupId != null) {
       String nameStr = "";
       var infoList = TencentCloudChat.instance.cache
-          .getGroupMemberInfoFromCache(
-              groupID: groupId, members: [callingMessage.inviter!]);
+          .getGroupMemberInfoFromCache(groupID: groupId, members: [callingMessage.inviter!]);
       // TencentImSDKPlugin.v2TIMManager.getGroupManager().getGroupMembersInfo(groupID: groupId, memberList: [callingMessage.inviter!]).then((V2TimValueCallback<List<V2TimGroupMemberFullInfo>> res) {
       //   List<V2TimGroupMemberFullInfo>? infoList = res.data ?? [];
 
@@ -146,8 +142,8 @@ class _GroupCallMessageItemState extends State<GroupCallMessageItem> {
     if (actionType == 3 && groupId != null) {
       List<String> inviteeShowNameList = [];
 
-      var infos = TencentCloudChat.instance.cache.getGroupMemberInfoFromCache(
-          groupID: groupId, members: callingMessage.inviteeList ?? []);
+      var infos = TencentCloudChat.instance.cache
+          .getGroupMemberInfoFromCache(groupID: groupId, members: callingMessage.inviteeList ?? []);
       for (var element in infos) {
         inviteeShowNameList.add(getShowName(element));
       }
@@ -158,8 +154,8 @@ class _GroupCallMessageItemState extends State<GroupCallMessageItem> {
     if (actionType == 4 && groupId != null) {
       List<String> inviteeShowNameList = [];
 
-      var infos = TencentCloudChat.instance.cache.getGroupMemberInfoFromCache(
-          groupID: groupId, members: callingMessage.inviteeList ?? []);
+      var infos = TencentCloudChat.instance.cache
+          .getGroupMemberInfoFromCache(groupID: groupId, members: callingMessage.inviteeList ?? []);
       for (var element in infos) {
         inviteeShowNameList.add(getShowName(element));
       }
@@ -170,8 +166,8 @@ class _GroupCallMessageItemState extends State<GroupCallMessageItem> {
     if (actionType == 5 && groupId != null) {
       String nameStr = "";
 
-      var infos = TencentCloudChat.instance.cache.getGroupMemberInfoFromCache(
-          groupID: groupId, members: callingMessage.inviteeList ?? []);
+      var infos = TencentCloudChat.instance.cache
+          .getGroupMemberInfoFromCache(groupID: groupId, members: callingMessage.inviteeList ?? []);
       for (var element in infos) {
         final showName = getShowName(element);
         nameStr = "$nameStr、$showName";
@@ -213,10 +209,7 @@ class _GroupCallMessageItemState extends State<GroupCallMessageItem> {
 
       return Text(
         showText,
-        style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w400,
-            color: Color(0XFF888888)),
+        style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w400, color: Color(0XFF888888)),
         textAlign: TextAlign.center,
         softWrap: true,
       );
@@ -226,14 +219,11 @@ class _GroupCallMessageItemState extends State<GroupCallMessageItem> {
   }
 
   Widget wrapMessageTips(Widget child) {
-    return Container(
-        margin: const EdgeInsets.symmetric(vertical: 10), child: child);
+    return Container(margin: const EdgeInsets.symmetric(vertical: 10), child: child);
   }
 
   @override
   Widget build(BuildContext context) {
-    return isShow
-        ? wrapMessageTips(_callElemBuilder(context))
-        : const SizedBox();
+    return isShow ? wrapMessageTips(_callElemBuilder(context)) : const SizedBox();
   }
 }

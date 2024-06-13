@@ -1,18 +1,18 @@
 name: tencent_cloud_chat_push
 description: Notification push for Tencent Cloud Chat. Support offline push on APNs, Google FCM, multiple Android OEM manufactures.
-version: 7.9.5668
+version: 7.9.5668+1
 repository: https://github.com/RoleWong/tencent_cloud_chat_push
-homepage: https://trtc.io/products/chat?utm_source=gfs&utm_medium=link&utm_campaign=%E6%B8%A0%E9%81%93&_channel_track_key=k6WgfCKn
+homepage: https://trtc.io/products/chat?utm_source=flutter_pub
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
-  flutter: '>=3.3.0'
+  sdk: '>=2.12.0 <4.0.0'
+  flutter: '>=2.10.0'
 
 dependencies:
   flutter:
     sdk: flutter
   plugin_platform_interface: ^2.0.2
-  tencent_cloud_chat_sdk: ^7.9.5672
+  tencent_cloud_chat_sdk: ^7.9.5687
 
 dev_dependencies:
   flutter_test:
@@ -43,9 +43,8 @@ flutter:
         pluginClass: TencentCloudChatPushPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
-  # assets:
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+#  assets:
+#    - assets/
   #
   # For details regarding assets in packages, see
   # https://flutter.dev/assets-and-images/#from-packages

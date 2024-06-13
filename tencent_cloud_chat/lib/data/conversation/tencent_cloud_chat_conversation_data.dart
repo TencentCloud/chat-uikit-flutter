@@ -1,9 +1,10 @@
 import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_conversation_config.dart';
 import 'package:tencent_cloud_chat/components/component_event_handlers/tencent_cloud_chat_conversation_event_handlers.dart';
 import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_base_controller.dart';
+import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder.dart';
+import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat/data/tencent_cloud_chat_data_abstract.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder.dart';
 
 /// An enumeration of conversation data keys TencentCloudChat conversation component
 enum TencentCloudChatConversationDataKeys {
@@ -25,16 +26,13 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
   TencentCloudChatConversationData(super.currentUpdatedFields);
 
   /// === Conversation Config ===
-  TencentCloudChatConversationConfig _conversationConfig =
-      TencentCloudChatConversationConfig();
+  TencentCloudChatConversationConfig _conversationConfig = TencentCloudChatConversationConfig();
 
-  TencentCloudChatConversationConfig get conversationConfig =>
-      _conversationConfig;
+  TencentCloudChatConversationConfig get conversationConfig => _conversationConfig;
 
   set conversationConfig(TencentCloudChatConversationConfig value) {
     _conversationConfig = value;
-    notifyListener(
-        TencentCloudChatConversationDataKeys.conversationConfig as T);
+    notifyListener(TencentCloudChatConversationDataKeys.conversationConfig as T);
   }
 
   /// === Conversation Event Handlers ===
@@ -43,13 +41,11 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
   /// === Conversation Builder ===
   TencentCloudChatComponentBuilder? _conversationBuilder;
 
-  TencentCloudChatComponentBuilder? get conversationBuilder =>
-      _conversationBuilder;
+  TencentCloudChatComponentBuilder? get conversationBuilder => _conversationBuilder;
 
   set conversationBuilder(TencentCloudChatComponentBuilder? value) {
     _conversationBuilder = value;
-    notifyListener(
-        TencentCloudChatConversationDataKeys.conversationBuilder as T);
+    notifyListener(TencentCloudChatConversationDataKeys.conversationBuilder as T);
   }
 
   /// === Controller ===
@@ -62,8 +58,7 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
 
   set currentConversation(V2TimConversation? value) {
     _currentConversation = value;
-    notifyListener(
-        TencentCloudChatConversationDataKeys.currentConversation as T);
+    notifyListener(TencentCloudChatConversationDataKeys.currentConversation as T);
   }
 
   /// === Conversation list ===
@@ -106,8 +101,7 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
 
   void buildConversationList(List<V2TimConversation> convList, String action) {
     for (var element in convList) {
-      var index = _conversationList
-          .indexWhere((ele) => element.conversationID == ele.conversationID);
+      var index = _conversationList.indexWhere((ele) => element.conversationID == ele.conversationID);
       if (index > -1) {
         _conversationList[index] = element;
       } else {
@@ -115,13 +109,26 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
       }
     }
     // sort
-    _conversationList.sort(
-      (a, b) {
-        int aR = a.orderkey ?? 0;
-        int bR = b.orderkey ?? 0;
-        return bR.compareTo(aR);
-      },
-    );
+    if (TencentCloudChatPlatformAdapter().isWeb) {
+      try {
+        _conversationList.sort((a, b) {
+          return b.lastMessage!.timestamp!.compareTo(a.lastMessage!.timestamp!);
+        });
+
+        final pinnedConversation = _conversationList.where((element) => element.isPinned == true).toList();
+        _conversationList.removeWhere((element) => element.isPinned == true);
+        _conversationList = [...pinnedConversation, ..._conversationList];
+        // ignore: empty_catches
+      } catch (e) {}
+    }else{
+      _conversationList.sort(
+            (a, b) {
+          int aR = a.orderkey ?? 0;
+          int bR = b.orderkey ?? 0;
+          return bR.compareTo(aR);
+        },
+      );
+    }
     console(
         logs:
             "$action buildConversationList ${convList.length} conv changed. total conv length is ${_conversationList.length}");
@@ -132,11 +139,8 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
   void removeConversation(List<String> convIds) {
     for (var i = 0; i < convIds.length; i++) {
       String convID = convIds[i];
-      _conversationList
-          .removeWhere((element) => element.conversationID == convID);
-      console(
-          logs:
-              "removeConversation $convID conv changed. total conv length is ${_conversationList.length}");
+      _conversationList.removeWhere((element) => element.conversationID == convID);
+      console(logs: "removeConversation $convID conv changed. total conv length is ${_conversationList.length}");
     }
     notifyListener(TencentCloudChatConversationDataKeys.conversationList as T);
   }
@@ -144,7 +148,7 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
   @override
   void notifyListener(T key) {
     currentUpdatedFields = key;
-    TencentCloudChat.instance.eventBusInstance.fire(this);
+    TencentCloudChat.instance.eventBusInstance.fire(this, "TencentCloudChatConversationData");
   }
 
   @override

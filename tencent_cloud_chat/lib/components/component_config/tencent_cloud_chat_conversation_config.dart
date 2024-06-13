@@ -16,7 +16,7 @@ class TencentCloudChatConversationConfig {
     bool? useDesktopMode,
   }) {
     _useDesktopMode = useDesktopMode ?? _useDesktopMode;
-    TencentCloudChat.instance.dataInstance.conversation.notifyListener(
-        TencentCloudChatConversationDataKeys.conversationConfig);
+    TencentCloudChat.instance.dataInstance.conversation
+        .notifyListener(TencentCloudChatConversationDataKeys.conversationConfig);
   }
 }

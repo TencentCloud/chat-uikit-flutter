@@ -1,11 +1,4 @@
-enum TencentCloudChatComponents {
-  conversation,
-  message,
-  search,
-  contact,
-  userProfile,
-  groupProfile
-}
+enum TencentCloudChatComponents { conversation, message, search, contact, userProfile, groupProfile }
 
 /// A class that defines route names for TencentCloudChat
 ///
@@ -32,22 +25,19 @@ class TencentCloudChatRouteNames {
   static const userProfile = 'tuikit:///userProfile/userProfile.component';
 
   /// Route name for the user profile edit component.
-  static const userProfileEdit =
-      'tuikit:///userProfile/userProfileEdit.component';
+  static const userProfileEdit = 'tuikit:///userProfile/userProfileEdit.component';
 
   /// Route name for the group profile component.
   static const groupProfile = 'tuikit:///groupProfile/groupProfile.component';
 
   /// Route name for the group member list component.
-  static const groupMemberList =
-      'tuikit:///groupProfile/groupMemberList.component';
+  static const groupMemberList = 'tuikit:///groupProfile/groupMemberList.component';
 
   /// Route name for the group notice component.
   static const groupNotice = 'tuikit:///groupProfile/groupNotice.component';
 
   /// Route name for the group management component.
-  static const groupManagement =
-      'tuikit:///groupProfile/groupManagement.component';
+  static const groupManagement = 'tuikit:///groupProfile/groupManagement.component';
 
   /// Route name for the contacts component.
   static const contact = 'tuikit:///contact/contacts.component';
@@ -59,12 +49,10 @@ class TencentCloudChatRouteNames {
   static const addGroup = 'tuikit:///contact/addGroup.component';
 
   /// Route name for the new contact application component.
-  static const newContactApplication =
-      'tuikit:///contact/newContactApplication.component';
+  static const newContactApplication = 'tuikit:///contact/newContactApplication.component';
 
   /// Route name for the new contact application detail component.
-  static const newContactApplicationDetail =
-      'tuikit:///contact/newContactApplicationDetail.component';
+  static const newContactApplicationDetail = 'tuikit:///contact/newContactApplicationDetail.component';
 
   /// Route name for the group list component.
   static const groupList = 'tuikit:///contact/groupList.component';
@@ -76,8 +64,7 @@ class TencentCloudChatRouteNames {
   static const friendInfo = 'tuikit:///contact/friendInfo.component';
 
   /// Route name for the group application list component
-  static const groupApplication =
-      'tuikit:///contact/groupApplication.component';
+  static const groupApplication = 'tuikit:///contact/groupApplication.component';
   static const settings = 'tuikit:///settings/settings.component';
   static const settingsInfo = 'tuikit:///settings/settingsInfo.component';
   static const settingsAbout = 'tuikit:///settings/settingsAbout.component';

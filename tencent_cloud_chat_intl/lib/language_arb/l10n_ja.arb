@@ -533,5 +533,6 @@
   "permissionDeniedContent": "設定に移動して {permissionString} 権限を有効にしてください。",
   "goToSettingsButtonText": "設定へ",
   "originalMessageNotFound": "元のメッセージが見つかりません",
-  "markAsRead": "既読にする"
+  "markAsRead": "既読にする",
+  "reEdit": "再編集"
 }

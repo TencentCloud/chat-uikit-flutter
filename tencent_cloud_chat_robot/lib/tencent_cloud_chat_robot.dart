@@ -11,6 +11,8 @@ import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
 
 /// A TencentCloudChatRobot.
 class TencentCloudChatRobotPlugin extends TencentCloudChatPlugin {
+  
+
   @override
   Future<Map<String, dynamic>> callMethod(
       {required String methodName, String? data}) async {
@@ -192,5 +194,17 @@ class TencentCloudChatRobotPlugin extends TencentCloudChatPlugin {
       return renderRobotMessage(V2TimMessage.fromJson(json.decode(message)));
     }
     return null;
+  }
+  
+  @override
+  Map<String, dynamic> callMethodSync({required String methodName, String? data}) {
+    // TODO: implement callMethodSync
+    throw UnimplementedError();
+  }
+
+  @override
+  Widget? getWidgetSync({required String methodName, Map<String, String>? data, Map<String, TencentCloudChatPluginTapFn>? fns}) {
+    // TODO: implement getWidgetSync
+    throw UnimplementedError();
   }
 }

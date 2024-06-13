@@ -15,7 +15,7 @@ class TencentCloudChatObserver extends RouteObserver<PageRoute<dynamic>> {
     TencentCloudChat.instance.dataInstance.messageData.stopPlayAudio();
   }
 
-  /// function for cheking and handling routes `Push` behavior and stop playing audio.
+  /// function for checking and handling routes `Push` behavior and stop playing audio.
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
     if (route is PageRoute<dynamic>) {
@@ -23,7 +23,7 @@ class TencentCloudChatObserver extends RouteObserver<PageRoute<dynamic>> {
     }
   }
 
-  /// function for cheking and handling routes `Pop` behavior and stop playing audio.
+  /// function for checking and handling routes `Pop` behavior and stop playing audio.
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
     if (previousRoute is PageRoute<dynamic>) {
@@ -31,7 +31,7 @@ class TencentCloudChatObserver extends RouteObserver<PageRoute<dynamic>> {
     }
   }
 
-  /// function for cheking and handling routes `Replace route` behavior and stop playing audio.
+  /// function for checking and handling routes `Replace route` behavior and stop playing audio.
   @override
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
     if (newRoute is PageRoute<dynamic>) {

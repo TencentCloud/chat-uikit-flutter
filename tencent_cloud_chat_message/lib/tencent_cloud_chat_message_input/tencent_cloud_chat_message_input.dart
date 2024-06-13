@@ -1,90 +1,24 @@
-import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_common_defines.dart';
+import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
-import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_builders.dart';
-import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_controller.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/desktop/tencent_cloud_chat_message_input_desktop.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/mobile/tencent_cloud_chat_message_input_mobile.dart';
 
 class TencentCloudChatMessageInput extends StatefulWidget {
-  final String? userID;
-  final String? groupID;
-  final Function({
-    required String text,
-    List<String>? mentionedUsers,
-  }) sendTextMessage;
-  final Function({required String imagePath}) sendImageMessage;
-  final Function({required String videoPath}) sendVideoMessage;
-  final Function({required String filePath}) sendFileMessage;
-  final Function({required String voicePath, required int duration})
-      sendVoiceMessage;
-  final bool inSelectMode;
-  final List<V2TimMessage> selectedMessages;
-  final V2TimMessage? repliedMessage;
-  final VoidCallback clearRepliedMessage;
-  final List<TencentCloudChatMessageGeneralOptionItem> attachmentOptions;
-  final TencentCloudChatMessageController controller;
-  final Future<List<V2TimGroupMemberFullInfo>> Function({
-    int? maxSelectionAmount,
-    String? title,
-    String? onSelectLabel,
-  }) onChooseGroupMembers;
-  final TencentCloudChatMessageInputStatus status;
-  final bool isGroupAdmin;
-  final String currentConversationShowName;
-  final MessageAttachmentOptionsBuilder? messageAttachmentOptionsBuilder;
-
-  /// Desktop mentioning members
-  final AutoScrollController desktopInputMemberSelectionPanelScroll;
-  final double desktopMentionBoxPositionX;
-  final double desktopMentionBoxPositionY;
-  final int activeMentionIndex;
-  final List<V2TimGroupMemberFullInfo?> currentFilteredMembersListForMention;
-  final ValueChanged<double> setDesktopMentionBoxPositionX;
-  final ValueChanged<double> setDesktopMentionBoxPositionY;
-  final ValueChanged<int> setActiveMentionIndex;
-  final ValueChanged<List<V2TimGroupMemberFullInfo?>>
-      setCurrentFilteredMembersListForMention;
-  final List<V2TimGroupMemberFullInfo> groupMemberList;
-  final V2TimGroupMemberFullInfo? memberNeedToMention;
+  final MessageInputBuilderWidgets? widgets;
+  final MessageInputBuilderData data;
+  final MessageInputBuilderMethods methods;
 
   const TencentCloudChatMessageInput({
     super.key,
-    required this.sendTextMessage,
-    this.userID,
-    this.groupID,
-    required this.inSelectMode,
-    required this.selectedMessages,
-    this.repliedMessage,
-    required this.attachmentOptions,
-    required this.sendImageMessage,
-    required this.controller,
-    required this.sendVideoMessage,
-    required this.sendFileMessage,
-    required this.sendVoiceMessage,
-    required this.onChooseGroupMembers,
-    required this.status,
-    required this.clearRepliedMessage,
-    required this.desktopMentionBoxPositionX,
-    required this.desktopMentionBoxPositionY,
-    required this.activeMentionIndex,
-    required this.currentFilteredMembersListForMention,
-    required this.setDesktopMentionBoxPositionX,
-    required this.setDesktopMentionBoxPositionY,
-    required this.setActiveMentionIndex,
-    required this.setCurrentFilteredMembersListForMention,
-    required this.desktopInputMemberSelectionPanelScroll,
-    required this.groupMemberList,
-    required this.isGroupAdmin,
-    required this.memberNeedToMention,
-    required this.currentConversationShowName,
-    this.messageAttachmentOptionsBuilder,
-  }) : assert((userID == null) != (groupID == null));
+    this.widgets,
+    required this.data,
+    required this.methods,
+  });
 
   @override
   State<TencentCloudChatMessageInput> createState() =>
@@ -95,7 +29,7 @@ class _TencentCloudChatMessageInputState
     extends TencentCloudChatState<TencentCloudChatMessageInput> {
   String? _getMessageInputStatusText() {
     String? result;
-    switch (widget.status) {
+    switch (widget.data.status) {
       case TencentCloudChatMessageInputStatus.canSendMessage:
         break;
       case TencentCloudChatMessageInputStatus.cantSendMessage:
@@ -130,26 +64,11 @@ class _TencentCloudChatMessageInputState
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    final String? statusText = _getMessageInputStatusText();
+    _getMessageInputStatusText();
     return TencentCloudChatMessageInputMobile(
-      key: Key(TencentCloudChatUtils.checkString(widget.groupID) ??
-          widget.userID ??
-          ""),
-      userID: widget.userID,
-      groupID: widget.groupID,
-      sendFileMessage: widget.sendFileMessage,
-      messageAttachmentOptionsBuilder: widget.messageAttachmentOptionsBuilder,
-      sendImageMessage: widget.sendImageMessage,
-      sendTextMessage: widget.sendTextMessage,
-      sendVideoMessage: widget.sendVideoMessage,
-      sendVoiceMessage: widget.sendVoiceMessage,
-      inSelectMode: widget.inSelectMode,
-      statusText: statusText,
-      selectedMessages: widget.selectedMessages,
-      repliedMessage: widget.repliedMessage,
-      messageController: widget.controller,
-      onChooseGroupMembers: widget.onChooseGroupMembers,
-      attachmentOptions: widget.attachmentOptions,
+      key: Key(TencentCloudChatUtils.checkString(widget.data.groupID) ?? widget.data.userID ?? ""),
+      inputMethods: widget.methods,
+      inputData: widget.data,
     );
   }
 
@@ -157,40 +76,10 @@ class _TencentCloudChatMessageInputState
   Widget desktopBuilder(BuildContext context) {
     final String? statusText = _getMessageInputStatusText();
     return TencentCloudChatMessageInputDesktop(
-      key: Key(TencentCloudChatUtils.checkString(widget.groupID) ??
-          widget.userID ??
-          ""),
-      userID: widget.userID,
-      groupID: widget.groupID,
-      currentConversationShowName: widget.currentConversationShowName,
-      sendFileMessage: widget.sendFileMessage,
-      sendImageMessage: widget.sendImageMessage,
-      sendTextMessage: widget.sendTextMessage,
-      sendVideoMessage: widget.sendVideoMessage,
-      sendVoiceMessage: widget.sendVoiceMessage,
-      inSelectMode: widget.inSelectMode,
-      clearRepliedMessage: widget.clearRepliedMessage,
+      key: Key(TencentCloudChatUtils.checkString(widget.data.groupID) ?? widget.data.userID ?? ""),
+      inputMethods: widget.methods,
+      inputData: widget.data,
       statusText: statusText,
-      selectedMessages: widget.selectedMessages,
-      repliedMessage: widget.repliedMessage,
-      messageController: widget.controller,
-      isGroupAdmin: widget.isGroupAdmin,
-      onChooseGroupMembers: widget.onChooseGroupMembers,
-      controlBarItems: widget.attachmentOptions,
-      desktopMentionBoxPositionX: widget.desktopMentionBoxPositionX,
-      desktopMentionBoxPositionY: widget.desktopMentionBoxPositionY,
-      activeMentionIndex: widget.activeMentionIndex,
-      currentFilteredMembersListForMention:
-          widget.currentFilteredMembersListForMention,
-      setDesktopMentionBoxPositionX: widget.setDesktopMentionBoxPositionX,
-      memberNeedToMention: widget.memberNeedToMention,
-      setDesktopMentionBoxPositionY: widget.setDesktopMentionBoxPositionY,
-      setActiveMentionIndex: widget.setActiveMentionIndex,
-      desktopInputMemberSelectionPanelScroll:
-          widget.desktopInputMemberSelectionPanelScroll,
-      setCurrentFilteredMembersListForMention:
-          widget.setCurrentFilteredMembersListForMention,
-      groupMemberList: widget.groupMemberList,
     );
   }
 }

@@ -1,11 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:scroll_to_index/scroll_to_index.dart';
-import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_common_defines.dart';
 import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder.dart';
+import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
 import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
-import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_controller.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_header/tencent_cloud_chat_message_header.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/forward/tencent_cloud_chat_message_forward.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/message_reply/tencent_cloud_chat_message_input_reply.dart';
@@ -14,289 +11,383 @@ import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/sele
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/tencent_cloud_chat_message_input.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_layout/special_case/tencent_cloud_chat_message_no_chat.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_layout/tencent_cloud_chat_message_layout.dart';
+import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_list_view/dynamic_button/tencent_cloud_chat_dynamic_button.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_list_view/message_row/tencent_cloud_chat_message_row.dart';
+import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_list_view/message_row/tencent_cloud_chat_message_row_message_sender_avatar.dart';
+import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_list_view/message_row/tencent_cloud_chat_message_row_message_sender_name.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_list_view/tencent_cloud_chat_message_list_view.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/menu/tencent_cloud_chat_message_item_with_menu.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/tencent_cloud_chat_message_item_builders.dart';
+import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/tencent_cloud_chat_message_reply_view.dart';
 
-typedef MessageLayoutBuilder = Widget? Function(
-    {String? userID,
-    String? groupID,
-    required PreferredSizeWidget header,
-    required Widget messageListView,
-    required Widget messageInput,
-    required Function({
-      required String text,
-      List<String>? mentionedUsers,
-    }) sendTextMessage,
-    required Function({required String imagePath}) sendImageMessage,
-    required Function({required String videoPath}) sendVideoMessage,
-    required Function({required String filePath}) sendFileMessage,
-    required String currentConversationShowName,
-    required Function({required String voicePath, required int duration}) sendVoiceMessage,
-    required double desktopMentionBoxPositionX,
-    required double desktopMentionBoxPositionY,
-    required int activeMentionIndex,
-    required List<V2TimGroupMemberFullInfo?> currentFilteredMembersListForMention,
-    required AutoScrollController desktopInputMemberSelectionPanelScroll,
-    required ValueChanged<({V2TimGroupMemberFullInfo memberFullInfo, int index})> onSelectMember});
+typedef MessageDynamicButtonBuilder = Widget? Function({
+  Key? key,
+  required MessageDynamicButtonBuilderWidgets widgets,
+  required MessageDynamicButtonBuilderData data,
+  required MessageDynamicButtonBuilderMethods methods,
+});
+
+typedef MessageLayoutBuilder = Widget? Function({
+  Key? key,
+  required MessageLayoutBuilderWidgets widgets,
+  required MessageLayoutBuilderData data,
+  required MessageLayoutBuilderMethods methods,
+});
 
 typedef MessageListViewBuilder = Widget? Function({
   Key? key,
-  String? userID,
-  String? groupID,
-  required List<V2TimMessage> messageList,
-  required Future Function() loadToLatestMessage,
-  required Function({
-    required TencentCloudChatMessageLoadDirection direction,
-  }) loadMoreMessage,
-  required bool haveMoreLatestData,
-  required List<V2TimMessage> Function() getMessageList,
-  required bool haveMorePreviousData,
-  required ValueChanged<List<V2TimMessage>> onSelectMessages,
-  required ValueChanged<V2TimMessage> highlightMessage,
-  required TencentCloudChatMessageController controller,
-  required List<V2TimMessage> messagesMentionedMe,
-  int? unreadCount,
-  int? c2cReadTimestamp,
-  int? groupReadSequence,
-  required Future<bool> Function({
-    required bool highLightTargetMessage,
-    V2TimMessage? message,
-    int? timeStamp,
-    int? seq,
-  }) loadToSpecificMessage,
+  required MessageListViewBuilderWidgets widgets,
+  required MessageListViewBuilderData data,
+  required MessageListViewBuilderMethods methods,
+});
+
+typedef MessageReplyViewBuilder = Widget? Function({
+  Key? key,
+  required MessageReplyViewBuilderWidgets widgets,
+  required MessageReplyViewBuilderData data,
+  required MessageReplyViewBuilderMethods methods,
 });
 
 typedef MessageNoChatBuilder = Widget? Function();
 
 typedef MessageInputBuilder = Widget? Function({
-  String? userID,
-  String? groupID,
-  required List<TencentCloudChatMessageGeneralOptionItem> attachmentOptions,
-  required Function({
-    required String text,
-    List<String>? mentionedUsers,
-  }) sendTextMessage,
-  required Function({required String imagePath}) sendImageMessage,
-  required Function({required String videoPath}) sendVideoMessage,
-  required Function({required String filePath}) sendFileMessage,
-  required Function({required String voicePath, required int duration}) sendVoiceMessage,
-  required bool inSelectMode,
-  required TencentCloudChatMessageInputStatus status,
-  required List<V2TimMessage> selectedMessages,
-  V2TimMessage? repliedMessage,
-  required Future<List<V2TimGroupMemberFullInfo>> Function({
-    int? maxSelectionAmount,
-    String? title,
-    String? onSelectLabel,
-  }) onChooseGroupMembers,
-MessageAttachmentOptionsBuilder? messageAttachmentOptionsBuilder,
-  required TencentCloudChatMessageController controller,
-  required VoidCallback clearRepliedMessage,
-  required double desktopMentionBoxPositionX,
-  required double desktopMentionBoxPositionY,
-  required bool isGroupAdmin,
-  required int activeMentionIndex,
-  required List<V2TimGroupMemberFullInfo?> currentFilteredMembersListForMention,
-  required ValueChanged<double> setDesktopMentionBoxPositionX,
-  required ValueChanged<double> setDesktopMentionBoxPositionY,
-  required ValueChanged<int> setActiveMentionIndex,
-  required ValueChanged<List<V2TimGroupMemberFullInfo?>> setCurrentFilteredMembersListForMention,
-  required AutoScrollController desktopInputMemberSelectionPanelScroll,
-  required List<V2TimGroupMemberFullInfo> groupMemberList,
-  required V2TimGroupMemberFullInfo? memberNeedToMention,
-  required String currentConversationShowName,
+  Key? key,
+  required MessageInputBuilderWidgets widgets,
+  required MessageInputBuilderData data,
+  required MessageInputBuilderMethods methods,
 });
 
 typedef MessageRowBuilder = Widget? Function({
   Key? key,
-  required V2TimMessage message,
-  String? userID,
-  String? groupID,
+  required MessageRowBuilderWidgets widgets,
+  required MessageRowBuilderData data,
+  required MessageRowBuilderMethods methods,
+});
 
-  /// The width of the message row, which represents the available width
-  /// for displaying the message on the screen. This is useful for
-  /// automatically wrapping text messages in a message bubble.
-  required double messageRowWidth,
-  required bool inSelectMode,
-  required bool isSelected,
-  required bool showMessageStatusIndicator,
-  required bool showSelfAvatar,
-  required bool showOthersAvatar,
-  required bool showMessageTimeIndicator,
-  required ValueChanged<V2TimMessage> onSelectCurrent,
-  required Future<bool> Function({
-    required bool highLightTargetMessage,
-    V2TimMessage? message,
-    int? timeStamp,
-    int? seq,
-  }) loadToSpecificMessage,
+typedef MessageRowMessageSenderAvatarBuilder = Widget? Function({
+  Key? key,
+  required MessageRowMessageSenderAvatarBuilderWidgets widgets,
+  required MessageRowMessageSenderAvatarBuilderData data,
+  required MessageRowMessageSenderAvatarBuilderMethods methods,
+});
+
+typedef MessageRowMessageSenderNameBuilder = Widget? Function({
+  Key? key,
+  required MessageRowMessageSenderNameBuilderWidgets widgets,
+  required MessageRowMessageSenderNameBuilderData data,
+  required MessageRowMessageSenderNameBuilderMethods methods,
+});
+
+typedef MAOInternalBuilder = Widget? Function({
+  Key? key,
+  required MessageAttachmentOptionsBuilderData data,
+  required MessageAttachmentOptionsBuilderMethods methods,
 });
 
 typedef MessageAttachmentOptionsBuilder = Widget? Function({
-  required List<TencentCloudChatMessageGeneralOptionItem> attachmentOptions,
-  required VoidCallback onActionFinish,
+  Key? key,
+  required MessageAttachmentOptionsBuilderWidgets widgets,
+  required MessageAttachmentOptionsBuilderData data,
+  required MessageAttachmentOptionsBuilderMethods methods,
 });
 
 typedef MessageHeaderBuilder = Widget? Function({
-  V2TimConversation? conversation,
-  required Future<V2TimConversation> Function({bool shouldUpdateState}) loadConversation,
-  String? userID,
-  String? groupID,
-  VoidCallback? startVoiceCall,
-  VoidCallback? startVideoCall,
-  required bool inSelectMode,
-  required int selectAmount,
-  required VoidCallback onClearSelect,
-  required VoidCallback onCancelSelect,
-  required bool showUserOnlineStatus,
-  required bool Function({required String userID}) getUserOnlineStatus,
-  required TencentCloudChatMessageController controller,
+  Key? key,
+  required MessageHeaderBuilderWidgets widgets,
+  required MessageHeaderBuilderData data,
+  required MessageHeaderBuilderMethods methods,
 });
 
-typedef MessageLongPressBuilder = Widget? Function({
-  required Widget Function({required bool renderOnMenuPreview}) messageItem,
-  required bool useMessageReaction,
-  required V2TimMessage message,
-  required List<TencentCloudChatMessageGeneralOptionItem> menuOptions,
-  required bool inSelectMode,
-  required VoidCallback onSelectMessage,
+typedef MessageItemBuilder = Widget? Function({
+  Key? key,
+  required MessageItemBuilderWidgets widgets,
+  required MessageItemBuilderData data,
+  required MessageItemBuilderMethods methods,
+});
+
+typedef MessageItemMenuBuilder = Widget? Function({
+  Key? key,
+  required MessageItemMenuBuilderWidgets widgets,
+  required MessageItemMenuBuilderData data,
+  required MessageItemMenuBuilderMethods methods,
 });
 
 typedef MessageForwardBuilder = Widget? Function({
-  required TencentCloudChatForwardType type,
-  required List<V2TimConversation> conversationList,
-  required ValueChanged<List<({String? userID, String? groupID})>> onSelectConversations,
-  required VoidCallback onCancel,
-  required List<V2TimFriendInfo> contactList,
-  required List<V2TimGroupInfo> groupList,
+  Key? key,
+  required MessageForwardBuilderWidgets widgets,
+  required MessageForwardBuilderData data,
+  required MessageForwardBuilderMethods methods,
+});
+
+typedef MFInternalBuilder = Widget? Function({
+  Key? key,
+  MessageForwardBuilderWidgets? widgets,
+  required MessageForwardBuilderData data,
+  required MessageForwardBuilderMethods methods,
 });
 
 typedef MessageInputReplyBuilder = Widget? Function({
-  required V2TimMessage? repliedMessage,
-  required VoidCallback onCancel,
-  required VoidCallback onClickReply,
+  Key? key,
+  required MessageInputReplyBuilderWidgets widgets,
+  required MessageInputReplyBuilderData data,
+  required MessageInputReplyBuilderMethods methods,
 });
 
 typedef MessageInputSelectBuilder = Widget? Function({
-  required List<V2TimMessage> messages,
-  required bool enableMessageDeleteForEveryone,
-  required ValueChanged<List<V2TimMessage>> onDeleteForMe,
-  required ValueChanged<List<V2TimMessage>> onDeleteForEveryone,
-  required bool enableMessageForwardIndividually,
-  required bool enableMessageForwardCombined,
-  required bool enableMessageDeleteForSelf,
+  Key? key,
+  required MessageInputSelectBuilderWidgets widgets,
+  required MessageInputSelectBuilderData data,
+  required MessageInputSelectBuilderMethods methods,
 });
 
 class TencentCloudChatMessageBuilders extends TencentCloudChatComponentBuilder {
-  TencentCloudChatMessageItemBuilders? _tencentCloudChatMessageItemBuilders;
   MessageLayoutBuilder? _messageLayoutBuilder;
   MessageHeaderBuilder? _messageHeaderBuilder;
   MessageListViewBuilder? _messageListViewBuilder;
   MessageRowBuilder? _messageRowBuilder;
   MessageInputBuilder? _messageInputBuilder;
   MessageAttachmentOptionsBuilder? _messageAttachmentOptionsBuilder;
-  MessageLongPressBuilder? _messageLongPressBuilder;
+  MessageItemMenuBuilder? _messageItemMenuBuilder;
   MessageForwardBuilder? _messageForwardBuilder;
   MessageInputReplyBuilder? _messageInputReplyBuilder;
   MessageInputSelectBuilder? _messageInputSelectBuilder;
   MessageNoChatBuilder? _messageNoChatBuilder;
+  MessageReplyViewBuilder? _messageReplyViewBuilder;
+  MessageItemBuilder? _messageItemBuilder;
+  MessageDynamicButtonBuilder? _messageDynamicButtonBuilder;
+  MessageRowMessageSenderNameBuilder? _messageRowMessageSenderNameBuilder;
+  MessageRowMessageSenderAvatarBuilder? _messageRowMessageSenderAvatarBuilder;
 
   TencentCloudChatMessageBuilders({
-    TencentCloudChatMessageItemBuilders? tencentCloudChatMessageItemBuilders,
     MessageLayoutBuilder? messageLayoutBuilder,
     MessageHeaderBuilder? messageHeaderBuilder,
     MessageListViewBuilder? messageListViewBuilder,
     MessageRowBuilder? messageRowBuilder,
     MessageInputBuilder? messageInputBuilder,
     MessageAttachmentOptionsBuilder? messageAttachmentOptionsBuilder,
-    MessageLongPressBuilder? messageLongPressBuilder,
+    MessageItemMenuBuilder? messageItemMenuBuilder,
     MessageForwardBuilder? messageForwardBuilder,
     MessageInputReplyBuilder? messageInputReplyBuilder,
     MessageNoChatBuilder? messageNoChatBuilder,
     MessageInputSelectBuilder? messageInputSelectBuilder,
+    MessageReplyViewBuilder? messageReplyViewBuilder,
+    MessageItemBuilder? messageItemBuilder,
+    MessageDynamicButtonBuilder? messageDynamicButtonBuilder,
+    MessageRowMessageSenderNameBuilder? messageRowMessageSenderNameBuilder,
+    MessageRowMessageSenderAvatarBuilder? messageRowMessageSenderAvatarBuilder,
   }) {
-    _tencentCloudChatMessageItemBuilders = tencentCloudChatMessageItemBuilders;
     _messageLayoutBuilder = messageLayoutBuilder;
     _messageListViewBuilder = messageListViewBuilder;
     _messageRowBuilder = messageRowBuilder;
     _messageInputBuilder = messageInputBuilder;
     _messageAttachmentOptionsBuilder = messageAttachmentOptionsBuilder;
     _messageHeaderBuilder = messageHeaderBuilder;
-    _messageLongPressBuilder = messageLongPressBuilder;
+    _messageItemMenuBuilder = messageItemMenuBuilder;
     _messageForwardBuilder = messageForwardBuilder;
     _messageNoChatBuilder = messageNoChatBuilder;
     _messageInputReplyBuilder = messageInputReplyBuilder;
+    _messageReplyViewBuilder = messageReplyViewBuilder;
     _messageInputSelectBuilder = messageInputSelectBuilder;
+    _messageItemBuilder = messageItemBuilder;
+    _messageDynamicButtonBuilder = messageDynamicButtonBuilder;
+    _messageRowMessageSenderNameBuilder = messageRowMessageSenderNameBuilder;
+    _messageRowMessageSenderAvatarBuilder = messageRowMessageSenderAvatarBuilder;
   }
 
   void setBuilders({
-    TencentCloudChatMessageItemBuilders? tencentCloudChatMessageItemBuilders,
+    MessageDynamicButtonBuilder? messageDynamicButtonBuilder,
     MessageLayoutBuilder? messageLayoutBuilder,
     MessageHeaderBuilder? messageHeaderBuilder,
     MessageListViewBuilder? messageListViewBuilder,
     MessageRowBuilder? messageRowBuilder,
     MessageInputBuilder? messageInputBuilder,
     MessageAttachmentOptionsBuilder? messageAttachmentOptionsBuilder,
-    MessageLongPressBuilder? messageLongPressBuilder,
+    MessageItemMenuBuilder? messageItemMenuBuilder,
     MessageForwardBuilder? messageForwardBuilder,
     MessageInputReplyBuilder? messageInputReplyBuilder,
+    MessageReplyViewBuilder? messageReplyViewBuilder,
     MessageNoChatBuilder? messageNoChatBuilder,
     MessageInputSelectBuilder? messageInputSelectBuilder,
+    MessageItemBuilder? messageItemBuilder,
+    MessageRowMessageSenderNameBuilder? messageRowMessageSenderNameBuilder,
+    MessageRowMessageSenderAvatarBuilder? messageRowMessageSenderAvatarBuilder,
   }) {
-    _tencentCloudChatMessageItemBuilders = tencentCloudChatMessageItemBuilders;
-    _messageLayoutBuilder = messageLayoutBuilder;
-    _messageListViewBuilder = messageListViewBuilder;
-    _messageRowBuilder = messageRowBuilder;
-    _messageInputBuilder = messageInputBuilder;
-    _messageAttachmentOptionsBuilder = messageAttachmentOptionsBuilder;
-    _messageHeaderBuilder = messageHeaderBuilder;
-    _messageLongPressBuilder = messageLongPressBuilder;
-    _messageForwardBuilder = messageForwardBuilder;
-    _messageNoChatBuilder = messageNoChatBuilder;
-    _messageInputReplyBuilder = messageInputReplyBuilder;
-    _messageInputSelectBuilder = messageInputSelectBuilder;
+    _messageLayoutBuilder = messageLayoutBuilder ?? _messageLayoutBuilder;
+    _messageListViewBuilder = messageListViewBuilder ?? _messageListViewBuilder;
+    _messageDynamicButtonBuilder = messageDynamicButtonBuilder ?? _messageDynamicButtonBuilder;
+    _messageItemBuilder = messageItemBuilder ?? _messageItemBuilder;
+    _messageRowBuilder = messageRowBuilder ?? _messageRowBuilder;
+    _messageInputBuilder = messageInputBuilder ?? _messageInputBuilder;
+    _messageAttachmentOptionsBuilder = messageAttachmentOptionsBuilder ?? _messageAttachmentOptionsBuilder;
+    _messageHeaderBuilder = messageHeaderBuilder ?? _messageHeaderBuilder;
+    _messageItemMenuBuilder = messageItemMenuBuilder ?? _messageItemMenuBuilder;
+    _messageForwardBuilder = messageForwardBuilder ?? _messageForwardBuilder;
+    _messageNoChatBuilder = messageNoChatBuilder ?? _messageNoChatBuilder;
+    _messageReplyViewBuilder = messageReplyViewBuilder ?? _messageReplyViewBuilder;
+    _messageInputReplyBuilder = messageInputReplyBuilder ?? _messageInputReplyBuilder;
+    _messageInputSelectBuilder = messageInputSelectBuilder ?? _messageInputSelectBuilder;
+    _messageRowMessageSenderNameBuilder = messageRowMessageSenderNameBuilder ?? _messageRowMessageSenderNameBuilder;
+    _messageRowMessageSenderAvatarBuilder =
+        messageRowMessageSenderAvatarBuilder ?? _messageRowMessageSenderAvatarBuilder;
     TencentCloudChat.instance.dataInstance.messageData.notifyListener(TencentCloudChatMessageDataKeys.builder);
-
   }
 
   @override
-  TencentCloudChatMessageItemBuilders get tencentCloudChatMessageItemBuilders => _tencentCloudChatMessageItemBuilders ?? TencentCloudChatMessageItemBuilders();
+  Widget getMessageRowMessageSenderNameBuilder({
+    Key? key,
+    MessageRowMessageSenderNameBuilderWidgets? widgets,
+    required MessageRowMessageSenderNameBuilderData data,
+    required MessageRowMessageSenderNameBuilderMethods methods,
+  }) {
+    Widget? widget;
+
+    if (_messageRowMessageSenderNameBuilder != null) {
+      widget = _messageRowMessageSenderNameBuilder!(
+        key: key,
+        widgets: widgets ??
+            MessageRowMessageSenderNameBuilderWidgets(
+              messageRowMessageSenderNameView: TencentCloudChatMessageRowMessageSenderName(
+                data: data,
+                methods: methods,
+              ),
+            ),
+        data: data,
+        methods: methods,
+      );
+    }
+
+    return widget ??
+        TencentCloudChatMessageRowMessageSenderName(
+          key: key,
+          data: data,
+          methods: methods,
+        );
+  }
+
+  @override
+  Widget getMessageRowMessageSenderAvatarBuilder({
+    Key? key,
+    MessageRowMessageSenderAvatarBuilderWidgets? widgets,
+    required MessageRowMessageSenderAvatarBuilderData data,
+    required MessageRowMessageSenderAvatarBuilderMethods methods,
+  }) {
+    Widget? widget;
+
+    if (_messageRowMessageSenderAvatarBuilder != null) {
+      widget = _messageRowMessageSenderAvatarBuilder!(
+        key: key,
+        widgets: widgets ??
+            MessageRowMessageSenderAvatarBuilderWidgets(
+              messageRowMessageSenderAvatarView: TencentCloudChatMessageRowMessageSenderAvatar(
+                data: data,
+                methods: methods,
+              ),
+            ),
+        data: data,
+        methods: methods,
+      );
+    }
+
+    return widget ??
+        TencentCloudChatMessageRowMessageSenderAvatar(
+          key: key,
+          data: data,
+          methods: methods,
+        );
+  }
+
+  @override
+  Widget getMessageDynamicButtonBuilder({
+    Key? key,
+    MessageDynamicButtonBuilderWidgets? widgets,
+    required MessageDynamicButtonBuilderData data,
+    required MessageDynamicButtonBuilderMethods methods,
+  }) {
+    Widget? widget;
+
+    if (_messageDynamicButtonBuilder != null) {
+      widget = _messageDynamicButtonBuilder!(
+        key: key,
+        widgets: widgets ??
+            MessageDynamicButtonBuilderWidgets(
+              messageDynamicButtonView: TencentCloudChatMessageListViewDynamicButton(
+                data: data,
+                methods: methods,
+              ),
+            ),
+        data: data,
+        methods: methods,
+      );
+    }
+
+    return widget ??
+        TencentCloudChatMessageListViewDynamicButton(
+          key: key,
+          data: data,
+          methods: methods,
+        );
+  }
 
   @override
   Widget getMessageInputSelectBuilder({
-    required List<V2TimMessage> messages,
-    required ValueChanged<List<V2TimMessage>> onDeleteForMe,
-    required ValueChanged<List<V2TimMessage>> onDeleteForEveryone,
-    required bool enableMessageDeleteForEveryone,
-    required bool enableMessageForwardIndividually,
-    required bool enableMessageForwardCombined,
-    required bool enableMessageDeleteForSelf,
+    Key? key,
+    MessageInputSelectBuilderWidgets? widgets,
+    required MessageInputSelectBuilderData data,
+    required MessageInputSelectBuilderMethods methods,
   }) {
     Widget? widget;
 
     if (_messageInputSelectBuilder != null) {
       widget = _messageInputSelectBuilder!(
-        messages: messages,
-        onDeleteForMe: onDeleteForMe,
-        onDeleteForEveryone: onDeleteForEveryone,
-        enableMessageDeleteForSelf: enableMessageDeleteForSelf,
-        enableMessageForwardCombined: enableMessageForwardCombined,
-        enableMessageForwardIndividually: enableMessageForwardIndividually,
-        enableMessageDeleteForEveryone: enableMessageDeleteForEveryone,
+        key: key,
+        widgets: widgets ??
+            MessageInputSelectBuilderWidgets(
+              messageInputSelectView: TencentCloudChatMessageInputSelectMode(
+                data: data,
+                methods: methods,
+              ),
+            ),
+        data: data,
+        methods: methods,
       );
     }
 
     return widget ??
         TencentCloudChatMessageInputSelectMode(
-          messages: messages,
-          onDeleteForMe: onDeleteForMe,
-          onDeleteForEveryone: onDeleteForEveryone,
-          enableMessageDeleteForSelf: enableMessageDeleteForSelf,
-          enableMessageForwardCombined: enableMessageForwardCombined,
-          enableMessageForwardIndividually: enableMessageForwardIndividually,
-          enableMessageDeleteForEveryone: enableMessageDeleteForEveryone,
+          key: key,
+          data: data,
+          methods: methods,
+        );
+  }
+
+  Widget getMessageReplyViewBuilder({
+    Key? key,
+    MessageReplyViewBuilderWidgets? widgets,
+    required MessageReplyViewBuilderData data,
+    required MessageReplyViewBuilderMethods methods,
+  }) {
+    Widget? widget;
+
+    if (_messageReplyViewBuilder != null) {
+      widget = _messageReplyViewBuilder!(
+        key: key,
+        widgets: widgets ??
+            MessageReplyViewBuilderWidgets(
+              messageReplyView: TencentCloudChatMessageReplyView(
+                data: data,
+                methods: methods,
+              ),
+            ),
+        data: data,
+        methods: methods,
+      );
+    }
+
+    return widget ??
+        TencentCloudChatMessageReplyView(
+          key: key,
+          data: data,
+          methods: methods,
         );
   }
 
@@ -313,477 +404,306 @@ class TencentCloudChatMessageBuilders extends TencentCloudChatComponentBuilder {
 
   @override
   Widget getMessageInputReplyBuilder({
-    V2TimMessage? repliedMessage,
-    required Null Function() onCancel,
-    required V2TimMessage? Function() onClickReply,
+    Key? key,
+    MessageInputReplyBuilderWidgets? widgets,
+    required MessageInputReplyBuilderData data,
+    required MessageInputReplyBuilderMethods methods,
   }) {
     Widget? widget;
 
     if (_messageInputReplyBuilder != null) {
       widget = _messageInputReplyBuilder!(
-        onCancel: onCancel,
-        onClickReply: onClickReply,
-        repliedMessage: repliedMessage,
+        key: key,
+        widgets: widgets ??
+            MessageInputReplyBuilderWidgets(
+                messageInputReplyView: TencentCloudChatMessageInputReply(
+              key: key,
+              widgets: widgets,
+              data: data,
+              methods: methods,
+            )),
+        data: data,
+        methods: methods,
       );
     }
 
     return widget ??
         TencentCloudChatMessageInputReply(
-          onCancel: onCancel,
-          onClickReply: onClickReply,
-          repliedMessage: repliedMessage,
+          key: key,
+          widgets: widgets,
+          data: data,
+          methods: methods,
         );
   }
 
   @override
   Widget getMessageForwardBuilder({
-    required TencentCloudChatForwardType type,
-    required List<V2TimConversation> conversationList,
-    required ValueChanged<List<({String? userID, String? groupID})>> onSelectConversations,
-    required VoidCallback onCancel,
-    required List<V2TimFriendInfo> contactList,
-    required List<V2TimGroupInfo> groupList,
+    Key? key,
+    MessageForwardBuilderWidgets? widgets,
+    required MessageForwardBuilderData data,
+    required MessageForwardBuilderMethods methods,
   }) {
     Widget? widget;
 
     if (_messageForwardBuilder != null) {
       widget = _messageForwardBuilder!(
-        type: type,
-        conversationList: conversationList,
-        onSelectConversations: onSelectConversations,
-        onCancel: onCancel,
-        groupList: groupList,
-        contactList: contactList,
+        key: key,
+        widgets: widgets ??
+            MessageForwardBuilderWidgets(
+              messageForwardView: TencentCloudChatMessageForward(
+                key: key,
+                widgets: widgets,
+                data: data,
+                methods: methods,
+              ),
+            ),
+        data: data,
+        methods: methods,
       );
     }
 
     return widget ??
         TencentCloudChatMessageForward(
-          type: type,
-          conversationList: conversationList,
-          onSelectConversations: onSelectConversations,
-          onCancel: onCancel,
-          groupList: groupList,
-          contactList: contactList,
+          key: key,
+          widgets: widgets,
+          data: data,
+          methods: methods,
         );
   }
 
-  Widget getMessageLongPressBuilder({
-    required Widget Function({required bool renderOnMenuPreview}) messageItem,
-    required bool useMessageReaction,
-    required V2TimMessage message,
-    required List<TencentCloudChatMessageGeneralOptionItem> menuOptions,
-    required bool inSelectMode,
-    required VoidCallback onSelectMessage,
-    required bool isMergeMessage,
+  Widget getMessageItemMenuBuilder({
+    Key? key,
+    MessageItemMenuBuilderWidgets? widgets,
+    required MessageItemMenuBuilderData data,
+    required MessageItemMenuBuilderMethods methods,
   }) {
     Widget? widget;
 
-    if (_messageLongPressBuilder != null) {
-      widget = _messageLongPressBuilder!(
-        message: message,
-        menuOptions: menuOptions,
-        messageItem: messageItem,
-        inSelectMode: inSelectMode,
-        onSelectMessage: onSelectMessage,
-        useMessageReaction: useMessageReaction,
+    if (_messageItemMenuBuilder != null) {
+      widget = _messageItemMenuBuilder!(
+        key: key,
+        widgets: widgets ??
+            MessageItemMenuBuilderWidgets(
+              messageItemMenuView: TencentCloudChatMessageItemWithMenu(
+                data: data,
+                methods: methods,
+              ),
+            ),
+        data: data,
+        methods: methods,
       );
     }
 
     return widget ??
         TencentCloudChatMessageItemWithMenu(
-          message: message,
-          menuOptions: menuOptions,
-          inSelectMode: inSelectMode,
-          onSelectMessage: onSelectMessage,
-          messageItem: messageItem,
-          useMessageReaction: useMessageReaction,
-          isMergeMessage: isMergeMessage,
+          key: key,
+          data: data,
+          methods: methods,
+        );
+  }
+
+  @override
+  Widget getMessageItemBuilder({
+    Key? key,
+    MessageItemBuilderWidgets? widgets,
+    required MessageItemBuilderData data,
+    required MessageItemBuilderMethods methods,
+  }) {
+    Widget? widget;
+
+    if (_messageItemBuilder != null) {
+      widget = _messageItemBuilder!(
+        key: key,
+        widgets: widgets ??
+            MessageItemBuilderWidgets(
+              messageItemView: TencentCloudChatMessageItemBuilders.getMessageItemBuilder(
+                data: data,
+                methods: methods,
+              ),
+            ),
+        data: data,
+        methods: methods,
+      );
+    }
+
+    return widget ??
+        TencentCloudChatMessageItemBuilders.getMessageItemBuilder(
+          data: data,
+          methods: methods,
         );
   }
 
   @override
   Widget getMessageHeader({
-    required controller,
-    required bool Function() onCancelSelect,
-    required List<V2TimMessage> Function() onClearSelect,
-    required int selectAmount,
-    required bool inSelectMode,
-    required Future<V2TimConversation> Function({bool shouldUpdateState}) loadConversation,
-    String? userID,
-    String? groupID,
-    V2TimConversation? conversation,
-    Future<void> Function()? startVideoCall,
-    Future<void> Function()? startVoiceCall,
-    required bool showUserOnlineStatus,
-    required bool Function({required String userID}) getUserOnlineStatus,
-    required List<V2TimGroupMemberFullInfo> Function() getGroupMembersInfo,
+    Key? key,
+    required MessageHeaderBuilderWidgets widgets,
+    required MessageHeaderBuilderData data,
+    required MessageHeaderBuilderMethods methods,
   }) {
     Widget? widget;
 
     if (_messageHeaderBuilder != null) {
       widget = _messageHeaderBuilder!(
-        conversation: conversation,
-        loadConversation: loadConversation,
-        userID: userID,
-        groupID: groupID,
-        onClearSelect: onClearSelect,
-        startVideoCall: startVideoCall,
-        startVoiceCall: startVoiceCall,
-        inSelectMode: inSelectMode,
-        selectAmount: selectAmount,
-        onCancelSelect: onCancelSelect,
-        showUserOnlineStatus: showUserOnlineStatus,
-        getUserOnlineStatus: getUserOnlineStatus,
-        controller: controller,
+        key: key,
+        widgets: widgets,
+        data: data,
+        methods: methods,
       );
     }
 
     return widget ??
         TencentCloudChatMessageHeader(
-          onCancelSelect: onCancelSelect,
-          onClearSelect: onClearSelect,
-          conversation: conversation,
-          inSelectMode: inSelectMode,
-          loadConversation: loadConversation,
-          userID: userID,
-          groupID: groupID,
-          startVideoCall: startVideoCall,
-          startVoiceCall: startVoiceCall,
-          selectAmount: selectAmount,
-          showUserOnlineStatus: showUserOnlineStatus,
-          getUserOnlineStatus: getUserOnlineStatus,
-          getGroupMembersInfo: getGroupMembersInfo,
-          controller: controller,
+          key: key,
+          widgets: widgets,
+          data: data,
+          methods: methods,
         );
   }
 
   @override
   Widget getAttachmentOptionsBuilder({
-    required List<TencentCloudChatMessageGeneralOptionItem> attachmentOptions,
-    required VoidCallback onActionFinish,
+    Key? key,
+    MessageAttachmentOptionsBuilderWidgets? widgets,
+    required MessageAttachmentOptionsBuilderData data,
+    required MessageAttachmentOptionsBuilderMethods methods,
   }) {
     Widget? widget;
 
     if (_messageAttachmentOptionsBuilder != null) {
       widget = _messageAttachmentOptionsBuilder!(
-        attachmentOptions: attachmentOptions,
-        onActionFinish: onActionFinish,
+        key: key,
+        methods: methods,
+        data: data,
+        widgets: widgets ??
+            MessageAttachmentOptionsBuilderWidgets(
+              messageAttachmentOptionsView: TencentCloudChatMessageAttachmentOptionsWidget(
+                methods: methods,
+                data: data,
+              ),
+            ),
       );
     }
 
     return widget ??
         TencentCloudChatMessageAttachmentOptionsWidget(
-          attachmentOptions: attachmentOptions,
-          onActionFinish: onActionFinish,
+          key: key,
+          methods: methods,
+          data: data,
         );
   }
 
   @override
   Widget getMessageInputBuilder({
-    required controller,
-    required void Function({List<String>? mentionedUsers, required String text}) sendTextMessage,
-    required void Function({required String videoPath}) sendVideoMessage,
-    required void Function({required String imagePath}) sendImageMessage,
-    required void Function({required int duration, required String voicePath}) sendVoiceMessage,
-    required TencentCloudChatMessageInputStatus status,
-    required void Function({required String filePath}) sendFileMessage,
-    String? userID,
-    required bool isGroupAdmin,
-    String? groupID,
-    required List<TencentCloudChatMessageGeneralOptionItem> attachmentOrInputControlBarOptions,
-    required bool inSelectMode,
-    required List<V2TimMessage> selectedMessages,
-    V2TimMessage? repliedMessage,
-    required Null Function() clearRepliedMessage,
-    required Future<List<V2TimGroupMemberFullInfo>> Function({int? maxSelectionAmount, String? onSelectLabel, String? title}) onChooseGroupMembers,
-    required desktopInputMemberSelectionPanelScroll,
-    required double desktopMentionBoxPositionX,
-    required double desktopMentionBoxPositionY,
-    required List<V2TimGroupMemberFullInfo> groupMemberList,
-    required int activeMentionIndex,
-    required List<V2TimGroupMemberFullInfo?> currentFilteredMembersListForMention,
-    required Function(dynamic value) setDesktopMentionBoxPositionX,
-    required Function(dynamic value) setDesktopMentionBoxPositionY,
-    required Function(dynamic value) setActiveMentionIndex,
-    required Function(dynamic value) setCurrentFilteredMembersListForMention,
-    V2TimGroupMemberFullInfo? memberNeedToMention,
-    required String currentConversationShowName,
-    MessageAttachmentOptionsBuilder? messageAttachmentOptionsBuilder,
+    Key? key,
+    MessageInputBuilderWidgets? widgets,
+    required MessageInputBuilderData data,
+    required MessageInputBuilderMethods methods,
   }) {
     Widget? widget;
 
     if (_messageInputBuilder != null) {
       widget = _messageInputBuilder!(
-        userID: userID,
-        groupID: groupID,
-        attachmentOptions: attachmentOrInputControlBarOptions,
-        sendTextMessage: sendTextMessage,
-        sendImageMessage: sendImageMessage,
-        sendVideoMessage: sendVideoMessage,
-        sendFileMessage: sendFileMessage,
-        sendVoiceMessage: sendVoiceMessage,
-        onChooseGroupMembers: onChooseGroupMembers,
-        inSelectMode: inSelectMode,
-        status: status,
-        selectedMessages: selectedMessages,
-        repliedMessage: repliedMessage,
-        controller: controller,
-        messageAttachmentOptionsBuilder: messageAttachmentOptionsBuilder,
-        clearRepliedMessage: clearRepliedMessage,
-        desktopMentionBoxPositionX: desktopMentionBoxPositionX,
-        desktopMentionBoxPositionY: desktopMentionBoxPositionY,
-        activeMentionIndex: activeMentionIndex,
-        currentFilteredMembersListForMention: currentFilteredMembersListForMention,
-        isGroupAdmin: isGroupAdmin,
-        setActiveMentionIndex: setActiveMentionIndex,
-        setCurrentFilteredMembersListForMention: setCurrentFilteredMembersListForMention,
-        setDesktopMentionBoxPositionX: setDesktopMentionBoxPositionX,
-        setDesktopMentionBoxPositionY: setDesktopMentionBoxPositionY,
-        groupMemberList: groupMemberList,
-        desktopInputMemberSelectionPanelScroll: desktopInputMemberSelectionPanelScroll,
-        memberNeedToMention: memberNeedToMention,
-        currentConversationShowName: currentConversationShowName,
+        key: key,
+        data: data,
+        methods: methods,
+        widgets: widgets ??
+            MessageInputBuilderWidgets(
+                messageInput: TencentCloudChatMessageInput(
+              data: data,
+              methods: methods,
+            )),
       );
     }
 
     return widget ??
         TencentCloudChatMessageInput(
-          userID: userID,
-          groupID: groupID,
-          memberNeedToMention: memberNeedToMention,
-          attachmentOptions: attachmentOrInputControlBarOptions,
-          sendTextMessage: sendTextMessage,
-          sendImageMessage: sendImageMessage,
-          currentConversationShowName: currentConversationShowName,
-          status: status,
-          messageAttachmentOptionsBuilder: messageAttachmentOptionsBuilder,
-          clearRepliedMessage: clearRepliedMessage,
-          isGroupAdmin: isGroupAdmin,
-          groupMemberList: groupMemberList,
-          sendVideoMessage: sendVideoMessage,
-          desktopMentionBoxPositionX: desktopMentionBoxPositionX,
-          desktopMentionBoxPositionY: desktopMentionBoxPositionY,
-          activeMentionIndex: activeMentionIndex,
-          currentFilteredMembersListForMention: currentFilteredMembersListForMention,
-          setActiveMentionIndex: setActiveMentionIndex,
-          setCurrentFilteredMembersListForMention: setCurrentFilteredMembersListForMention,
-          setDesktopMentionBoxPositionX: setDesktopMentionBoxPositionX,
-          setDesktopMentionBoxPositionY: setDesktopMentionBoxPositionY,
-          sendFileMessage: sendFileMessage,
-          sendVoiceMessage: sendVoiceMessage,
-          onChooseGroupMembers: onChooseGroupMembers,
-          desktopInputMemberSelectionPanelScroll: desktopInputMemberSelectionPanelScroll,
-          inSelectMode: inSelectMode,
-          selectedMessages: selectedMessages,
-          repliedMessage: repliedMessage,
-          controller: controller,
+          key: key,
+          data: data,
+          methods: methods,
         );
   }
 
   @override
   Widget getMessageRowBuilder({
     Key? key,
-    required V2TimMessage message,
-
-    /// The width of the message row, which represents the available width
-    /// for displaying the message on the screen. This is useful for
-    /// automatically wrapping text messages in a message bubble.
-    required double messageRowWidth,
-    required bool inSelectMode,
-    required bool isSelected,
-    required ValueChanged<V2TimMessage> onSelectCurrent,
-    required bool isMergeMessage,
-    String? userID,
-    String? groupID,
-    required bool showMessageStatusIndicator,
-    required bool showMessageTimeIndicator,
-    required bool showSelfAvatar,
-    required bool showOthersAvatar,
-    required Future<bool> Function({
-      required bool highLightTargetMessage,
-      V2TimMessage? message,
-      int? timeStamp,
-      int? seq,
-    }) loadToSpecificMessage,
+    required MessageRowBuilderWidgets widgets,
+    required MessageRowBuilderData data,
+    required MessageRowBuilderMethods methods,
   }) {
     Widget? widget;
 
     if (_messageRowBuilder != null) {
       widget = _messageRowBuilder!(
         key: key,
-        message: message,
-        messageRowWidth: messageRowWidth,
-        userID: userID,
-        groupID: groupID,
-        showMessageStatusIndicator: showMessageStatusIndicator,
-        showMessageTimeIndicator: showMessageTimeIndicator,
-        isSelected: isSelected,
-        showOthersAvatar: showOthersAvatar,
-        showSelfAvatar: showSelfAvatar,
-        inSelectMode: inSelectMode,
-        onSelectCurrent: onSelectCurrent,
-        loadToSpecificMessage: loadToSpecificMessage,
+        widgets: widgets,
+        data: data,
+        methods: methods,
       );
     }
 
     return widget ??
         TencentCloudChatMessageRow(
           key: key,
-          showOthersAvatar: showOthersAvatar,
-          showSelfAvatar: showSelfAvatar,
-          message: message,
-          messageRowWidth: messageRowWidth,
-          userID: userID,
-          groupID: groupID,
-          isSelected: isSelected,
-          showMessageStatusIndicator: showMessageStatusIndicator,
-          showMessageTimeIndicator: showMessageTimeIndicator,
-          inSelectMode: inSelectMode,
-          onSelectCurrent: onSelectCurrent,
-          isMergeMessage: isMergeMessage,
-          loadToSpecificMessage: loadToSpecificMessage,
+          widgets: widgets,
+          data: data,
+          methods: methods,
         );
   }
 
   @override
   Widget getMessageLayoutBuilder({
-    String? userID,
-    String? groupID,
-    required PreferredSizeWidget header,
-    required Widget messageListView,
-    required Widget messageInput,
-    required String currentConversationShowName,
-    required double desktopMentionBoxPositionY,
-    required double desktopMentionBoxPositionX,
-    required int activeMentionIndex,
-    required List<V2TimGroupMemberFullInfo?> currentFilteredMembersListForMention,
-    required desktopInputMemberSelectionPanelScroll,
-    required void Function({required String filePath}) sendFileMessage,
-    required void Function({required int duration, required String voicePath}) sendVoiceMessage,
-    required void Function({required String videoPath}) sendVideoMessage,
-    required void Function({required String imagePath}) sendImageMessage,
-    required void Function({List<String>? mentionedUsers, required String text}) sendTextMessage,
-    required Null Function(({int index, V2TimGroupMemberFullInfo memberFullInfo}) memberData) onSelectMember,
+    Key? key,
+    required MessageLayoutBuilderWidgets widgets,
+    required MessageLayoutBuilderData data,
+    required MessageLayoutBuilderMethods methods,
   }) {
-    assert((userID == null) != (groupID == null));
     Widget? widget;
 
     if (_messageLayoutBuilder != null) {
       widget = _messageLayoutBuilder!(
-        userID: userID,
-        groupID: groupID,
-        header: header,
-        sendTextMessage: sendTextMessage,
-        sendImageMessage: sendImageMessage,
-        sendVideoMessage: sendVideoMessage,
-        sendFileMessage: sendFileMessage,
-        sendVoiceMessage: sendVoiceMessage,
-        messageListView: messageListView,
-        currentConversationShowName: currentConversationShowName,
-        messageInput: messageInput,
-        desktopMentionBoxPositionX: desktopMentionBoxPositionX,
-        desktopMentionBoxPositionY: desktopMentionBoxPositionY,
-        activeMentionIndex: activeMentionIndex,
-        currentFilteredMembersListForMention: currentFilteredMembersListForMention,
-        desktopInputMemberSelectionPanelScroll: desktopInputMemberSelectionPanelScroll,
-        onSelectMember: onSelectMember,
+        key: key,
+        data: data,
+        widgets: widgets,
+        methods: methods,
       );
     }
 
     return widget ??
         TencentCloudChatMessageLayout(
-          userID: userID,
-          groupID: groupID,
-          header: header,
-          messageListView: messageListView,
-          messageInput: messageInput,
-          currentConversationShowName: currentConversationShowName,
-          sendTextMessage: sendTextMessage,
-          sendImageMessage: sendImageMessage,
-          sendVideoMessage: sendVideoMessage,
-          sendFileMessage: sendFileMessage,
-          sendVoiceMessage: sendVoiceMessage,
-          desktopMentionBoxPositionX: desktopMentionBoxPositionX,
-          desktopMentionBoxPositionY: desktopMentionBoxPositionY,
-          activeMentionIndex: activeMentionIndex,
-          currentFilteredMembersListForMention: currentFilteredMembersListForMention,
-          desktopInputMemberSelectionPanelScroll: desktopInputMemberSelectionPanelScroll,
-          onSelectMember: onSelectMember,
+          key: key,
+          data: data,
+          widgets: widgets,
+          methods: methods,
         );
   }
 
   Widget getMessageListViewBuilder({
     Key? key,
-    String? userID,
-    String? groupID,
-    required List<V2TimMessage> messageList,
-    required Function({
-      required TencentCloudChatMessageLoadDirection direction,
-    }) loadMoreMessages,
-    required Future Function() loadToLatestMessage,
-    required bool haveMoreLatestData,
-    required bool haveMorePreviousData,
-    required ValueChanged<List<V2TimMessage>> onSelectMessages,
-    required List<V2TimMessage> messagesMentionedMe,
-    required TencentCloudChatMessageController controller,
-    int? unreadCount,
-    int? c2cReadTimestamp,
-    int? groupReadSequence,
-    required Future<bool> Function({
-      required bool highLightTargetMessage,
-      V2TimMessage? message,
-      int? timeStamp,
-      int? seq,
-    }) loadToSpecificMessage,
-    required List<V2TimMessage> Function() getMessageList,
-    required ValueChanged<V2TimMessage> highlightMessage,
+    MessageListViewBuilderWidgets? widgets,
+    required MessageListViewBuilderData data,
+    required MessageListViewBuilderMethods methods,
   }) {
-    assert((userID == null) != (groupID == null));
-
     Widget? widget;
 
     if (_messageListViewBuilder != null) {
       widget = _messageListViewBuilder!(
         key: key,
-        loadToLatestMessage: loadToLatestMessage,
-        userID: userID,
-        groupID: groupID,
-        messageList: messageList,
-        haveMoreLatestData: haveMoreLatestData,
-        messagesMentionedMe: messagesMentionedMe,
-        haveMorePreviousData: haveMorePreviousData,
-        loadMoreMessage: loadMoreMessages,
-        onSelectMessages: onSelectMessages,
-        controller: controller,
-        unreadCount: unreadCount,
-        getMessageList: getMessageList,
-        highlightMessage: highlightMessage,
-        c2cReadTimestamp: c2cReadTimestamp,
-        loadToSpecificMessage: loadToSpecificMessage,
-        groupReadSequence: groupReadSequence,
+        data: data,
+        methods: methods,
+        widgets: widgets ??
+            MessageListViewBuilderWidgets(
+                messageListView: TencentCloudChatMessageListView(
+              data: data,
+              methods: methods,
+            )),
       );
     }
 
     return widget ??
         TencentCloudChatMessageListView(
           key: key,
-          loadToLatestMessage: loadToLatestMessage,
-          userID: userID,
-          groupID: groupID,
-          controller: controller,
-          messagesMentionedMe: messagesMentionedMe,
-          messageList: messageList,
-          haveMoreLatestData: haveMoreLatestData,
-          getMessageList: getMessageList,
-          unreadCount: unreadCount,
-          highlightMessage: highlightMessage,
-          loadToSpecificMessage: loadToSpecificMessage,
-          c2cReadTimestamp: c2cReadTimestamp,
-          groupReadSequence: groupReadSequence,
-          haveMorePreviousData: haveMorePreviousData,
-          loadMoreMessages: loadMoreMessages,
-          onSelectMessages: onSelectMessages,
+          data: data,
+          methods: methods,
         );
   }
 }

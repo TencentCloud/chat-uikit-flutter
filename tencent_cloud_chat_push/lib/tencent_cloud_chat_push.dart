@@ -7,6 +7,7 @@ import 'package:tencent_cloud_chat_push/tencent_cloud_chat_push_platform_interfa
 import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
 
 class TencentCloudChatPush {
+  final tag = "TIMPush TencentCloudChatPushFlutter";
   TencentCloudChatPush._internal();
 
   factory TencentCloudChatPush() => _instance;
@@ -45,6 +46,9 @@ class TencentCloudChatPush {
   Future<TencentCloudChatPushResult> registerOnAppWakeUpEvent({
     required VoidCallback onAppWakeUpEvent,
   }) {
+    TencentImSDKPlugin.manager?.uikitTrace(
+      trace: "$tag registerOnAppWakeUpEvent",
+    );
     return TencentCloudChatPushPlatform.instance.registerOnAppWakeUpEvent(
       onAppWakeUpEvent: onAppWakeUpEvent,
     );
@@ -65,6 +69,9 @@ class TencentCloudChatPush {
     String? androidPushOEMConfig,
     int? apnsCertificateID,
   }) async {
+    TencentImSDKPlugin.manager?.uikitTrace(
+      trace: "$tag registerPush start",
+    );
     if (apnsCertificateID != null) {
       await TencentCloudChatPushPlatform.instance
           .setBusID(busID: apnsCertificateID);
@@ -89,6 +96,11 @@ class TencentCloudChatPush {
       );
     }
 
+
+    TencentImSDKPlugin.manager?.uikitTrace(
+      trace: "$tag registerPush checked login status complete",
+    );
+
     final completer = Completer<TencentCloudChatPushResult>();
 
     final registerOnNotificationClickedEventRes =
@@ -96,23 +108,39 @@ class TencentCloudChatPush {
             .registerOnNotificationClickedEvent(
       onNotificationClicked: onNotificationClicked,
     );
+    TencentImSDKPlugin.manager?.uikitTrace(
+      trace: "$tag registerPush registerOnNotificationClickedEvent completed",
+    );
     if (registerOnNotificationClickedEventRes.code == 0) {
       final registerPushRes = await TencentCloudChatPushPlatform.instance
           .registerPush(configJson: androidPushOEMConfig);
+      TencentImSDKPlugin.manager?.uikitTrace(
+        trace: "$tag registerPush completed",
+      );
       completer.complete(registerPushRes);
+    }else{
+      TencentImSDKPlugin.manager?.uikitTrace(
+        trace: "$tag registerOnNotificationClickedEvent failed",
+      );
+      completer.complete(registerOnNotificationClickedEventRes);
     }
-    completer.complete(registerOnNotificationClickedEventRes);
 
     return completer.future;
   }
 
   /// Unregister the push plugin and log out from the Tencent Cloud Chat
   Future<TencentCloudChatPushResult> unRegisterPush() async {
+    TencentImSDKPlugin.manager?.uikitTrace(
+      trace: "$tag unRegisterPush",
+    );
     return TencentCloudChatPushPlatform.instance.unRegisterPush();
   }
 
   /// Disable the auto-registration of the push plugin
   Future<TencentCloudChatPushResult> disableAutoRegisterPush() {
+    TencentImSDKPlugin.manager?.uikitTrace(
+      trace: "$tag disableAutoRegisterPush",
+    );
     return TencentCloudChatPushPlatform.instance.disableAutoRegisterPush();
   }
 
@@ -122,6 +150,9 @@ class TencentCloudChatPush {
     required String ringName,
     required bool enable,
   }) {
+    TencentImSDKPlugin.manager?.uikitTrace(
+      trace: "$tag configFCMPrivateRing - $channelId - $ringName - $enable",
+    );
     return TencentCloudChatPushPlatform.instance.configFCMPrivateRing(
       channelId: channelId,
       ringName: ringName,
@@ -132,6 +163,9 @@ class TencentCloudChatPush {
   /// Set the push brand ID for the push plugin
   Future<TencentCloudChatPushResult> setPushBrandId(
       {required TencentCloudChatPushBrandID brandID}) {
+    TencentImSDKPlugin.manager?.uikitTrace(
+      trace: "$tag setPushBrandId - $brandID",
+    );
     return TencentCloudChatPushPlatform.instance.setPushBrandId(
       brandId: brandIdToInt(brandID),
     );
@@ -139,8 +173,14 @@ class TencentCloudChatPush {
 
   Future<TencentCloudChatPushResult<TencentCloudChatPushBrandID>>
       getPushBrandId() async {
+    TencentImSDKPlugin.manager?.uikitTrace(
+      trace: "$tag getPushBrandId - start",
+    );
     final result = await TencentCloudChatPushPlatform.instance.getPushBrandId();
     final brandId = intToBrandId(result.data ?? 0);
+    TencentImSDKPlugin.manager?.uikitTrace(
+      trace: "$tag getPushBrandId - finished - $brandId",
+    );
     return TencentCloudChatPushResult<TencentCloudChatPushBrandID>(
       code: result.code,
       errorMessage: result.errorMessage,
@@ -150,6 +190,9 @@ class TencentCloudChatPush {
 
   Future<TencentCloudChatPushResult<String>> checkPushStatus(
       {required TencentCloudChatPushBrandID brandID}) {
+    TencentImSDKPlugin.manager?.uikitTrace(
+      trace: "$tag checkPushStatus",
+    );
     return TencentCloudChatPushPlatform.instance
         .checkPushStatus(brandID: brandIdToInt(brandID));
   }
@@ -159,6 +202,10 @@ class TencentCloudChatPush {
   /// Only works on APNS temporarily, while Android Devices please specify with JSON file from console or `androidPushOEMConfig` on `registerPush` method.
   Future<TencentCloudChatPushResult> setApnsCertificateID(
       {required int apnsCertificateID}) {
+
+    TencentImSDKPlugin.manager?.uikitTrace(
+      trace: "$tag setApnsCertificateID - $apnsCertificateID",
+    );
     return TencentCloudChatPushPlatform.instance
         .setBusID(busID: apnsCertificateID);
   }
@@ -168,6 +215,9 @@ class TencentCloudChatPush {
   /// Only works on APNS.
   Future<TencentCloudChatPushResult> setApplicationGroupID(
       {required String applicationGroupID}) {
+    TencentImSDKPlugin.manager?.uikitTrace(
+      trace: "$tag setApplicationGroupID - $applicationGroupID",
+    );
     return TencentCloudChatPushPlatform.instance
         .setApplicationGroupID(applicationGroupID: applicationGroupID);
   }
@@ -176,6 +226,9 @@ class TencentCloudChatPush {
   ///
   /// Only works on Android.
   Future<TencentCloudChatPushResult<String>> getAndroidPushToken() async {
+    TencentImSDKPlugin.manager?.uikitTrace(
+      trace: "$tag getAndroidPushToken",
+    );
     return TencentCloudChatPushPlatform.instance.getAndroidPushToken();
   }
 
@@ -186,6 +239,10 @@ class TencentCloudChatPush {
     required String businessID,
     required String pushToken,
   }) async {
+
+    TencentImSDKPlugin.manager?.uikitTrace(
+      trace: "$tag setAndroidPushToken - $businessID - $pushToken",
+    );
     return TencentCloudChatPushPlatform.instance.setAndroidPushToken(
       businessID: businessID,
       pushToken: pushToken,
@@ -204,6 +261,10 @@ class TencentCloudChatPush {
     /// The name of the custom configuration file. The path should remain the same: "project_root_directory/android/app/src/assets/"
     required String configs,
   }) async {
+
+    TencentImSDKPlugin.manager?.uikitTrace(
+      trace: "$tag setAndroidCustomTIMPushConfigs - $configs",
+    );
     return TencentCloudChatPushPlatform.instance.setAndroidCustomTIMPushConfigs(
       configs: configs,
     );

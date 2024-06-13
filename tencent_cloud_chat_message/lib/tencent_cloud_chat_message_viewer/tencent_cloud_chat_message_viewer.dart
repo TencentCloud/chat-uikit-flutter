@@ -5,34 +5,12 @@ import 'dart:io';
 
 import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/material.dart';
-import 'package:photo_view/photo_view.dart';
+import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_viewer/tencent_cloud_chat_message_videoplayer.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_image.dart';
-
-class ZoomPageRoute<T> extends PageRouteBuilder<T> {
-  final WidgetBuilder builder;
-
-  ZoomPageRoute({
-    required this.builder,
-  }) : super(
-          pageBuilder: (context, animation, secondaryAnimation) => builder(context),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            var begin = 0.0;
-            var end = 1.0;
-            var curve = Curves.ease;
-
-            var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-            return ScaleTransition(
-              scale: animation.drive(tween),
-              child: child,
-            );
-          },
-        );
-}
 
 class TencentCloudChatMessageViewer extends StatefulWidget {
   final String convKey;
@@ -132,11 +110,11 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
     for (var i = 0; i < imageList.length; i++) {
       var image = imageList[i];
       if (image != null) {
-        if (image.type == TimImageType.origin.index) {
+        if (image.type == ImageType.origin.index) {
           origin = image.localUrl ?? "";
           isOrigin = true;
         }
-        if (image.type == TimImageType.thumb.index) {
+        if (image.type == ImageType.thumb.index) {
           thumb = image.localUrl ?? "";
         }
       }
@@ -144,9 +122,9 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
     return (isOrigin, origin.isEmpty ? thumb : origin);
   }
 
-  getImageOnlineStumbUrl(V2TimImageElem imageElem) {
+  getImageOnlineOriginUrl(V2TimImageElem imageElem) {
     List<V2TimImage?> imageList = imageElem.imageList ?? [];
-    return imageList.firstWhere((element) => element?.type == TimImageType.thumb.index)?.url;
+    return imageList.firstWhere((element) => element?.type == ImageType.origin.index)?.url;
   }
 
   console(String log) {
@@ -171,20 +149,20 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
       console("add to download queue error. key is empty. ");
       return;
     }
-    int type = TimImageType.origin.index;
+    int type = ImageType.origin.index;
 
     TencentCloudChat.instance.dataInstance.messageData.addDownloadMessageToQueue(
-          data: DownloadMessageQueueData(
-            conversationType: conversationType,
-            msgID: widget.message.msgID ?? "",
-            messageType: MessageElemType.V2TIM_ELEM_TYPE_IMAGE,
-            imageType: type,
-            // download origin image
-            isSnapshot: false,
-            key: key,
-          ),
-          isClick: isClick,
-        );
+      data: DownloadMessageQueueData(
+        conversationType: conversationType,
+        msgID: widget.message.msgID ?? "",
+        messageType: MessageElemType.V2TIM_ELEM_TYPE_IMAGE,
+        imageType: type,
+        // download origin image
+        isSnapshot: false,
+        key: key,
+      ),
+      isClick: isClick,
+    );
   }
 
   bool hasOriginLocalUrl() {
@@ -196,7 +174,7 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
     if (message.elemType == MessageElemType.V2TIM_ELEM_TYPE_IMAGE) {
       if (message.imageElem != null) {
         var imageList = message.imageElem!.imageList ?? [];
-        var image = imageList.firstWhere((element) => element?.type == TimImageType.origin.index, orElse: () => null);
+        var image = imageList.firstWhere((element) => element?.type == ImageType.origin.index, orElse: () => null);
         if (image != null) {
           if (TencentCloudChatUtils.checkString(image.localUrl) != null) {
             res = true;
@@ -209,6 +187,26 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
         if (TencentCloudChatUtils.checkString(message.videoElem!.localVideoUrl) != null) {
           res = true;
         }
+      }
+    }
+    return res;
+  }
+
+  bool hasLeft() {
+    bool res = false;
+    if (messages.length > 1) {
+      if (index > 0) {
+        return true;
+      }
+    }
+    return res;
+  }
+
+  hasRight() {
+    bool res = false;
+    if (messages.length > 1) {
+      if (index < (messages.length - 1)) {
+        return true;
       }
     }
     return res;
@@ -237,14 +235,22 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
 
   @override
   Widget build(BuildContext context) {
+    double w = MediaQuery.of(context).size.width;
+    double h = MediaQuery.of(context).size.height;
+    double verticalPadding = h * 0.1;
+    double horipadding = w * 0.1;
+    double itemwidth = w * 0.9;
     var haslocalurl = hasOriginLocalUrl();
     var videomessage = isVideo();
     var isdownloading = isDownloading();
+    double boxWid = 60;
+    var bottom = (h / 2) + (boxWid / 2) - 40; // remove appbar height
+
     return GestureDetector(
       onTap: closeViewer,
       onDoubleTap: () {},
       child: Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: const Color.fromRGBO(255, 255, 255, 0),
         body: SafeArea(
           child: Center(
             child: isLoading
@@ -257,69 +263,129 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
                     alignment: Alignment.center,
                     children: [
                       Positioned(
-                        child: Swiper(
-                          controller: controller,
-                          itemBuilder: (BuildContext context, int index) {
-                            V2TimMessage message = messages[index];
-                            if (message.elemType == MessageElemType.V2TIM_ELEM_TYPE_IMAGE) {
-                              if (message.imageElem != null) {
-                                if (widget.isSending) {
-                                  var lp = message.imageElem!.path ?? "";
-                                  if (lp.isNotEmpty) {
-                                    return PhotoView(
-                                      imageProvider: Image.file(
+                        child: Padding(
+                          padding: TencentCloudChatPlatformAdapter().isDesktop
+                              ? EdgeInsets.symmetric(
+                                  vertical: verticalPadding,
+                                  horizontal: horipadding,
+                                )
+                              : const EdgeInsets.all(0),
+                          child: Swiper(
+                            controller: controller,
+                            itemBuilder: (BuildContext context, int index) {
+                              V2TimMessage message = messages[index];
+                              if (message.elemType == MessageElemType.V2TIM_ELEM_TYPE_IMAGE) {
+                                if (message.imageElem != null) {
+                                  if (widget.isSending) {
+                                    var lp = message.imageElem!.path ?? "";
+                                    if (lp.isNotEmpty) {
+                                      console("view sending path");
+                                      return Image.file(
                                         File(lp),
-                                      ).image,
+                                      );
+                                    }
+                                  }
+                                  var (isOrigin, local) = getImageLocalurl(message.imageElem!);
+                                  var originOrl = getImageOnlineOriginUrl(message.imageElem!);
+                                  if (local.isNotEmpty) {
+                                    console("view local url is origin $isOrigin");
+                                    return Image.file(
+                                      File(local),
+                                    );
+                                  }
+
+                                  if (TencentCloudChatUtils.checkString(originOrl) != null) {
+                                    console("view online origin url");
+                                    return Image.network(
+                                      originOrl,
                                     );
                                   }
                                 }
-                                var (_, local) = getImageLocalurl(message.imageElem!);
-                                var thumbUrl = getImageOnlineStumbUrl(message.imageElem!);
-                                if (local.isNotEmpty) {
-                                  return PhotoView(
-                                    imageProvider: Image.file(
-                                      File(local),
-                                    ).image,
-                                  );
-                                }
-
-                                if (TencentCloudChatUtils.checkString(thumbUrl) != null) {
-                                  return PhotoView(
-                                    imageProvider: Image.network(
-                                      thumbUrl,
-                                    ).image,
-                                  );
-                                }
+                              } else if (message.elemType == MessageElemType.V2TIM_ELEM_TYPE_VIDEO) {
+                                return TencentCloudChatMessageVideoPlayer(
+                                  message: message,
+                                  controller: true,
+                                  isSending: widget.isSending,
+                                );
                               }
-                            } else if (message.elemType == MessageElemType.V2TIM_ELEM_TYPE_VIDEO) {
-                              return TencentCloudChatMessageVideoPlayer(
-                                message: message,
-                                controller: true,
-                                isSending: widget.isSending,
-                              );
-                            }
-                            return Center(
-                              child: Container(
-                                height: 100,
-                                width: 100,
-                                color: Colors.white,
-                                child: Text(
-                                  "need render $index",
+                              return Center(
+                                child: Container(
+                                  height: 100,
+                                  width: 100,
+                                  color: Colors.white,
+                                  child: Text(
+                                    "need render $index",
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                          itemCount: messages.length,
-                          scale: 1,
-                          index: index,
-                          loop: false,
-                          onIndexChanged: (value) {
-                            setState(() {
-                              index = value;
-                            });
-                          },
+                              );
+                            },
+                            itemCount: messages.length,
+                            scale: 1,
+                            index: index,
+                            loop: false,
+                            onIndexChanged: (value) {
+                              setState(() {
+                                index = value;
+                              });
+                            },
+                          ),
                         ),
                       ),
+                      if (TencentCloudChatPlatformAdapter().isDesktop && hasLeft())
+                        Positioned(
+                          left: 20,
+                          bottom: bottom,
+                          child: MouseRegion(
+                            cursor: MouseCursor.uncontrolled,
+                            child: GestureDetector(
+                              onTap: () async {
+                                await controller.previous();
+                              },
+                              child: Container(
+                                width: boxWid,
+                                height: boxWid,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(boxWid / 2),
+                                  ),
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    Icons.arrow_circle_left_outlined,
+                                    size: boxWid * 0.6,
+                                    color: Colors.white60,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (TencentCloudChatPlatformAdapter().isDesktop && hasRight())
+                        Positioned(
+                          right: 20,
+                          bottom: bottom,
+                          child: GestureDetector(
+                            onTap: () async {
+                              await controller.next();
+                            },
+                            child: Container(
+                              width: boxWid,
+                              height: boxWid,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(boxWid / 2),
+                                ),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  size: boxWid * 0.6,
+                                  Icons.arrow_circle_right_outlined,
+                                  color: Colors.white60,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       // if (!haslocalurl && !videomessage)
                       //   Positioned(
                       //     bottom: 0,

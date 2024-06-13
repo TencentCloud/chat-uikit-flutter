@@ -524,5 +524,6 @@
   "permissionDeniedContent": "请前往设置并启用 {permissionString} 权限。",
   "goToSettingsButtonText": "前往设置",
   "originalMessageNotFound": "未找到原始消息",
-    "markAsRead": "标为已读"
+    "markAsRead": "标为已读",
+  "reEdit": "重新编辑"
 }

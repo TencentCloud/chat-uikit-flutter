@@ -3,7 +3,6 @@ import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 
 class TencentCloudChatGroupProfileConfig {
   setConfigs() {
-    TencentCloudChat.instance.dataInstance.groupProfile
-        .notifyListener(TencentCloudChatGroupProfileDataKeys.config);
+    TencentCloudChat.instance.dataInstance.groupProfile.notifyListener(TencentCloudChatGroupProfileDataKeys.config);
   }
 }

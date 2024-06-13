@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_common_defines.dart';
 import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_config.dart';
+import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
 import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
 import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
@@ -18,26 +19,29 @@ import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separ
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/forward/tencent_cloud_chat_message_forward_container.dart';
 
 class TencentCloudChatMessageItemWithMenuContainer extends StatefulWidget {
-  final Widget Function({required bool renderOnMenuPreview}) messageItem;
+  final Widget Function({required bool renderOnMenuPreview}) getMessageItemWidget;
   final bool useMessageReaction;
   final V2TimMessage message;
   final bool isMergeMessage;
 
   const TencentCloudChatMessageItemWithMenuContainer({
     super.key,
-    required this.messageItem,
+    required this.getMessageItemWidget,
     required this.useMessageReaction,
     required this.message,
     required this.isMergeMessage,
   });
 
   @override
-  State<TencentCloudChatMessageItemWithMenuContainer> createState() => _TencentCloudChatMessageItemWithMenuContainerState();
+  State<TencentCloudChatMessageItemWithMenuContainer> createState() =>
+      _TencentCloudChatMessageItemWithMenuContainerState();
 }
 
-class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudChatState<TencentCloudChatMessageItemWithMenuContainer> {
+class _TencentCloudChatMessageItemWithMenuContainerState
+    extends TencentCloudChatState<TencentCloudChatMessageItemWithMenuContainer> {
   late TencentCloudChatMessageSeparateDataProvider dataProvider;
-  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatMessageData>();
+  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream =
+      TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatMessageData>("TencentCloudChatMessageData");
   late StreamSubscription<TencentCloudChatMessageData<dynamic>>? _messageDataSubscription;
 
   List<TencentCloudChatMessageGeneralOptionItem> _menuOptions = [];
@@ -62,10 +66,11 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
           userID: _message.userID ?? "",
           timestamp: _message.timestamp ?? 0,
         );
-        if (isGroup && (_messageReceipt == null || _messageReceipt?.readCount != receipt.readCount || _messageReceipt?.unreadCount != receipt.unreadCount)) {
-          setState(() {
-            _messageReceipt = receipt;
-          });
+        if (isGroup &&
+            (_messageReceipt == null ||
+                _messageReceipt?.readCount != receipt.readCount ||
+                _messageReceipt?.unreadCount != receipt.unreadCount)) {
+          _messageReceipt = receipt;
           _generateMenuOptions(messageReceipt: receipt);
         }
       case TencentCloudChatMessageDataKeys.messageList:
@@ -75,12 +80,10 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
       case TencentCloudChatMessageDataKeys.sendMessageProgress:
         if (messageData.messageProgressData.containsKey(msgID)) {
           if (messageData.messageProgressData[msgID] != null) {
-            setState(() {
-              var data = messageData.messageProgressData[msgID];
-              if (data != null) {
-                _message = data.message;
-              }
-            });
+            var data = messageData.messageProgressData[msgID];
+            if (data != null) {
+              _message = data.message;
+            }
             _generateMenuOptions();
           }
         }
@@ -88,7 +91,9 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
       case TencentCloudChatMessageDataKeys.currentPlayAudioInfo:
         break;
       case TencentCloudChatMessageDataKeys.messageNeedUpdate:
-        if (TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate != null && msgID == TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate?.msgID && TencentCloudChatUtils.checkString(msgID) != null) {
+        if (TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate != null &&
+            msgID == TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate?.msgID &&
+            TencentCloudChatUtils.checkString(msgID) != null) {
           safeSetState(() {
             _message = TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate!;
           });
@@ -126,19 +131,30 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
 
   bool _showRecallButton() {
     final TencentCloudChatMessageConfig config = dataProvider.config;
-    final defaultMessageMenuConfig = config.defaultMessageMenuConfig(userID: dataProvider.userID, groupID: dataProvider.groupID);
+    final defaultMessageMenuConfig = config.defaultMessageMenuConfig(
+      userID: dataProvider.userID,
+      groupID: dataProvider.groupID,
+      topicID: dataProvider.topicID,
+    );
     if (!defaultMessageMenuConfig.enableMessageRecall) {
       return false;
     }
-    final recallTimeLimit = config.recallTimeLimit(userID: dataProvider.userID, groupID: dataProvider.groupID);
+    final recallTimeLimit = config.recallTimeLimit(
+      userID: dataProvider.userID,
+      groupID: dataProvider.groupID,
+      topicID: dataProvider.topicID,
+    );
 
     final timeDiff = (DateTime.now().millisecondsSinceEpoch / 1000).ceil() - (_message.timestamp ?? 0);
-    final enableRecall = (timeDiff < recallTimeLimit) && (_message.isSelf ?? true) && _message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC;
+    final enableRecall = (timeDiff < recallTimeLimit) &&
+        (_message.isSelf ?? true) &&
+        _message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC;
 
     return enableRecall;
   }
 
-  void _generateMenuOptions({V2TimMessageReceipt? messageReceipt}) {
+  List<TencentCloudChatMessageGeneralOptionItem> _generateMenuOptions(
+      {V2TimMessageReceipt? messageReceipt, String? selectedText}) {
     final isDesktopScreen = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop;
 
     final TencentCloudChatMessageConfig config = dataProvider.config;
@@ -146,6 +162,8 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
     final List<TencentCloudChatMessageGeneralOptionItem> additionalOptions = config.additionalMessageMenuOptions(
       userID: dataProvider.userID,
       groupID: dataProvider.groupID,
+      topicID: dataProvider.topicID,
+      message: _message,
     );
 
     final defaultMessageMenuConfig = config.defaultMessageMenuConfig(
@@ -154,7 +172,12 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
     );
 
     // === Message Delete ===
-    final enableMessageDeleteForEveryone = defaultMessageMenuConfig.enableMessageDeleteForEveryone && config.enableMessageDeleteForEveryone(userID: dataProvider.userID, groupID: dataProvider.groupID);
+    final enableMessageDeleteForEveryone = defaultMessageMenuConfig.enableMessageDeleteForEveryone &&
+        config.enableMessageDeleteForEveryone(
+          userID: dataProvider.userID,
+          groupID: dataProvider.groupID,
+          topicID: dataProvider.topicID,
+        );
     final enableMessageDeleteForSelf = defaultMessageMenuConfig.enableMessageDeleteForSelf;
     final showDeleteForEveryone = (_message.isSelf ?? false) && enableMessageDeleteForEveryone;
     final showMessageDelete = showDeleteForEveryone || enableMessageDeleteForSelf;
@@ -166,11 +189,12 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
             .enabledGroupTypesForMessageReadReceipt(
               userID: dataProvider.userID,
               groupID: dataProvider.groupID,
+              topicID: dataProvider.topicID,
             )
             .contains(dataProvider.groupInfo?.groupType);
     final showReadReceipt = useReadReceipt && (_message.isSelf ?? true) && (_message.needReadReceipt ?? false);
     final receipt = showReadReceipt
-        ? messageReceipt ??
+        ? (messageReceipt ?? _messageReceipt) ??
             TencentCloudChat.instance.dataInstance.messageData.getMessageReadReceipt(
               msgID: _message.msgID ?? "",
               userID: _message.userID ?? "",
@@ -184,24 +208,30 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
     final defaultMenuOptions = [
       if (defaultMessageMenuConfig.enableMessageCopy)
         TencentCloudChatMessageGeneralOptionItem(
-            icon: Icons.copy,
+            iconAsset: (path: "lib/assets/copy_message.svg", package: "tencent_cloud_chat_message"),
             label: tL10n.copy,
             onTap: ({Offset? offset}) {
               final text = _message.textElem?.text ?? "";
               Clipboard.setData(
-                ClipboardData(text: text),
+                ClipboardData(text: selectedText ?? text),
               );
             }),
       if (defaultMessageMenuConfig.enableMessageReply)
         TencentCloudChatMessageGeneralOptionItem(
-            icon: Icons.reply_outlined,
-            label: tL10n.reply,
+            iconAsset: (path: "lib/assets/reply_message.svg", package: "tencent_cloud_chat_message"),
+            label: config.enableReplyWithMention(
+              userID: dataProvider.userID,
+              topicID: dataProvider.topicID,
+              groupID: dataProvider.groupID,
+            )
+                ? tL10n.reply
+                : tL10n.quote,
             onTap: ({Offset? offset}) {
               dataProvider.repliedMessage = _message;
             }),
       if (defaultMessageMenuConfig.enableMessageSelect)
         TencentCloudChatMessageGeneralOptionItem(
-          icon: Icons.check_circle_outline,
+          iconAsset: (path: "lib/assets/multi_message.svg", package: "tencent_cloud_chat_message"),
           label: tL10n.select,
           onTap: ({Offset? offset}) {
             Future.delayed(
@@ -215,7 +245,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
         ),
       if (defaultMessageMenuConfig.enableMessageForward)
         TencentCloudChatMessageGeneralOptionItem(
-            icon: Icons.forward,
+            iconAsset: (path: "lib/assets/forward_message.svg", package: "tencent_cloud_chat_message"),
             label: tL10n.forward,
             onTap: ({Offset? offset}) {
               if (isDesktopScreen) {
@@ -229,7 +259,9 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
                     onCloseModal: closeFunc,
                     context: context,
                     messages: [_message],
-                    messageForwardBuilder: TencentCloudChatMessageDataProviderInherited.of(context).messageBuilders?.getMessageForwardBuilder,
+                    messageForwardBuilder: TencentCloudChatMessageDataProviderInherited.of(context)
+                        .messageBuilders
+                        ?.getMessageForwardBuilder,
                   ),
                 );
               } else {
@@ -242,7 +274,9 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
                   builder: (BuildContext _) {
                     return TencentCloudChatMessageForwardContainer(
                       type: TencentCloudChatForwardType.individually,
-                      messageForwardBuilder: TencentCloudChatMessageDataProviderInherited.of(context).messageBuilders?.getMessageForwardBuilder,
+                      messageForwardBuilder: TencentCloudChatMessageDataProviderInherited.of(context)
+                          .messageBuilders
+                          ?.getMessageForwardBuilder,
                       context: context,
                       messages: [_message],
                     );
@@ -252,7 +286,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
             }),
       if (showMessageDelete)
         TencentCloudChatMessageGeneralOptionItem(
-            icon: Icons.delete_outline_outlined,
+            iconAsset: (path: "lib/assets/delete_message.svg", package: "tencent_cloud_chat_message"),
             label: tL10n.delete,
             onTap: ({Offset? offset}) {
               if (isDesktopScreen) {
@@ -321,7 +355,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
             }),
       if (_showRecallButton())
         TencentCloudChatMessageGeneralOptionItem(
-            icon: Icons.undo_outlined,
+            iconAsset: (path: "lib/assets/revoke_message.svg", package: "tencent_cloud_chat_message"),
             label: tL10n.recall,
             onTap: ({Offset? offset}) {
               if (isDesktopScreen) {
@@ -359,7 +393,11 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
                 );
               }
             }),
-      if (showReadReceipt) TencentCloudChatMessageGeneralOptionItem(icon: Icons.visibility, label: isAllRead ? tL10n.allMembersRead : tL10n.memberReadCount(readCount ?? 0), onTap: ({Offset? offset}) {}),
+      if (showReadReceipt)
+        TencentCloudChatMessageGeneralOptionItem(
+            icon: Icons.visibility,
+            label: isAllRead ? tL10n.allMembersRead : tL10n.memberReadCount(readCount ?? 0),
+            onTap: ({Offset? offset}) {}),
     ];
 
     final mergedList = [...defaultMenuOptions, ...additionalOptions];
@@ -372,21 +410,28 @@ class _TencentCloudChatMessageItemWithMenuContainerState extends TencentCloudCha
       mergedList.removeWhere((element) => element.label == tL10n.recall);
     }
 
-    setState(() {
+    if (TencentCloudChatUtils.checkString(selectedText) == null) {
       _menuOptions = mergedList;
-    });
+    }
+    return mergedList;
   }
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    return TencentCloudChatMessageDataProviderInherited.of(context).messageBuilders?.getMessageLongPressBuilder(
-              messageItem: widget.messageItem,
-              useMessageReaction: widget.useMessageReaction,
-              message: _message,
-              menuOptions: _menuOptions,
-              isMergeMessage: widget.isMergeMessage,
-              inSelectMode: dataProvider.inSelectMode,
-              onSelectMessage: () => dataProvider.triggerSelectedMessage(message: _message),
+    return TencentCloudChatMessageDataProviderInherited.of(context).messageBuilders?.getMessageItemMenuBuilder(
+              data: MessageItemMenuBuilderData(
+                message: _message,
+                isMergeMessage: widget.isMergeMessage,
+                inSelectMode: dataProvider.inSelectMode,
+                useMessageReaction: widget.useMessageReaction,
+              ),
+              methods: MessageItemMenuBuilderMethods(
+                onSelectMessage: () => dataProvider.triggerSelectedMessage(message: _message),
+                getMessageItemWidget: widget.getMessageItemWidget,
+                getMenuOptions: ({String? selectedText}) => TencentCloudChatUtils.checkString(selectedText) == null
+                    ? _menuOptions
+                    : _generateMenuOptions(selectedText: selectedText),
+              ),
             ) ??
         Container();
   }

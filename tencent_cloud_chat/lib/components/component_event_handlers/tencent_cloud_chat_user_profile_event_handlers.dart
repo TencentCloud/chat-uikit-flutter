@@ -1,26 +1,16 @@
 class TencentCloudChatUserProfileEventHandlers {
-  late final TencentCloudChatUserProfileUIEventHandlers? _uiEventHandlers;
-  late final TencentCloudChatUserProfileLifeCycleEventHandlers?
-      _lifeCycleEventHandlers;
+  final TencentCloudChatUserProfileUIEventHandlers _uiEventHandlers;
+  final TencentCloudChatUserProfileLifeCycleEventHandlers _lifeCycleEventHandlers;
 
   TencentCloudChatUserProfileEventHandlers({
     TencentCloudChatUserProfileUIEventHandlers? uiEventHandlers,
     TencentCloudChatUserProfileLifeCycleEventHandlers? lifeCycleEventHandlers,
-  }) {
-    _uiEventHandlers = uiEventHandlers;
-    _lifeCycleEventHandlers = lifeCycleEventHandlers;
-  }
+  }) : _uiEventHandlers = uiEventHandlers ?? TencentCloudChatUserProfileUIEventHandlers(),
+  _lifeCycleEventHandlers = lifeCycleEventHandlers ?? TencentCloudChatUserProfileLifeCycleEventHandlers();
 
-  TencentCloudChatUserProfileUIEventHandlers get uiEventHandlers {
-    _uiEventHandlers ??= TencentCloudChatUserProfileUIEventHandlers();
-    return _uiEventHandlers!;
-  }
+  TencentCloudChatUserProfileUIEventHandlers get uiEventHandlers => _uiEventHandlers;
 
-  TencentCloudChatUserProfileLifeCycleEventHandlers get lifeCycleEventHandlers {
-    _lifeCycleEventHandlers ??=
-        TencentCloudChatUserProfileLifeCycleEventHandlers();
-    return _lifeCycleEventHandlers!;
-  }
+  TencentCloudChatUserProfileLifeCycleEventHandlers get lifeCycleEventHandlers => _lifeCycleEventHandlers;
 }
 
 class TencentCloudChatUserProfileUIEventHandlers {

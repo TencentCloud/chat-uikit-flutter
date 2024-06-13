@@ -11,19 +11,8 @@ import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/te
 class TencentCloudChatMessageCustom extends TencentCloudChatMessageItemBase {
   const TencentCloudChatMessageCustom({
     super.key,
-    super.userID,
-    super.groupID,
-    required super.showMessageStatusIndicator,
-    required super.showMessageTimeIndicator,
-    required super.message,
-    required super.shouldBeHighlighted,
-    required super.clearHighlightFunc,
-    super.messageReceipt,
-    required super.messageRowWidth,
-    super.sendingMessageData,
-    required super.renderOnMenuPreview,
-    required super.inSelectMode,
-    required super.onSelectMessage,
+    required super.data,
+    required super.methods,
   });
 
   @override
@@ -59,7 +48,7 @@ class _TencentCloudChatMessageCustomState extends TencentCloudChatMessageState<T
             methodName: "voteMessageItem",
             data: Map.from(
               {
-                "message": json.encode(widget.message.toJson()),
+                "message": json.encode(widget.data.message.toJson()),
               },
             ),
             fns: Map<String, TencentCloudChatPluginTapFn>.from(
@@ -87,7 +76,7 @@ class _TencentCloudChatMessageCustomState extends TencentCloudChatMessageState<T
             methodName: "robotMessageItem",
             data: Map.from(
               {
-                "message": json.encode(widget.message.toJson()),
+                "message": json.encode(widget.data.message.toJson()),
               },
             ),
             fns: Map<String, TencentCloudChatPluginTapFn>.from(
@@ -112,8 +101,8 @@ class _TencentCloudChatMessageCustomState extends TencentCloudChatMessageState<T
   @override
   void initState() {
     super.initState();
-    isVoteMessage = TencentCloudChatUtils.isVoteMessage(widget.message);
-    isRobotMessage = TencentCloudChatUtils.isRobotMessage(widget.message);
+    isVoteMessage = TencentCloudChatUtils.isVoteMessage(widget.data.message);
+    isRobotMessage = TencentCloudChatUtils.isRobotMessage(widget.data.message);
     getWidgetFromPlugin();
   }
 
@@ -131,7 +120,7 @@ class _TencentCloudChatMessageCustomState extends TencentCloudChatMessageState<T
       return renderRobotMessage(colorTheme, textStyle);
     }
 
-    final (String lineOne, String? lineTwo, IconData? icon) = TencentCloudChatUtils.handleCustomMessage(widget.message);
+    final (String lineOne, String? lineTwo, IconData? icon) = TencentCloudChatUtils.handleCustomMessage(widget.data.message);
     if (lineTwo == null) {
       return Row(
         mainAxisSize: MainAxisSize.min,
@@ -204,7 +193,7 @@ class _TencentCloudChatMessageCustomState extends TencentCloudChatMessageState<T
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    final maxBubbleWidth = widget.messageRowWidth * 0.8;
+    final maxBubbleWidth = widget.data.messageRowWidth * 0.8;
     return TencentCloudChatThemeWidget(build: (context, colorTheme, textStyle) {
       return Container(
         padding: EdgeInsets.symmetric(horizontal: getWidth(10), vertical: getHeight(8)),

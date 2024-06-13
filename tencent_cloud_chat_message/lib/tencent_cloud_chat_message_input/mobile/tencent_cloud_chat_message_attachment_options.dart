@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_common_defines.dart';
+import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_builders.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'dart:ui' as ui;
 
 class TencentCloudChatMessageAttachmentOptions {
   OverlayEntry? _overlayEntry;
@@ -29,11 +31,9 @@ class TencentCloudChatMessageAttachmentOptions {
   Widget _buildAttachmentOptions(
       {required BoxConstraints constraints,
       required BuildContext context,
-      required MessageAttachmentOptionsBuilder? messageAttachmentOptionsBuilder,
-      required List<TencentCloudChatMessageGeneralOptionItem>
-          attachmentOptions}) {
-    final isMobile = TencentCloudChatScreenAdapter.deviceScreenType ==
-        DeviceScreenType.mobile;
+      required MAOInternalBuilder? messageAttachmentOptionsBuilder,
+      required List<TencentCloudChatMessageGeneralOptionItem> attachmentOptions}) {
+    final isMobile = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.mobile;
     return SlideTransition(
       position: _attachmentOptionsAnimation.drive(Tween<Offset>(
         begin: isMobile ? const Offset(-1, 0) : const Offset(0, 0),
@@ -44,8 +44,12 @@ class TencentCloudChatMessageAttachmentOptions {
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: constraints.maxWidth - 32),
           child: messageAttachmentOptionsBuilder?.call(
-            attachmentOptions: attachmentOptions,
-            onActionFinish: _removeEntry,
+            data: MessageAttachmentOptionsBuilderData(
+              attachmentOptions: attachmentOptions,
+            ),
+            methods: MessageAttachmentOptionsBuilderMethods(
+              onActionFinish: _removeEntry,
+            ),
           ),
         ),
       ),
@@ -55,10 +59,9 @@ class TencentCloudChatMessageAttachmentOptions {
   void toggleAttachmentOptionsOverlay(
       {required BoxConstraints constraints,
       required BuildContext context,
-      required MessageAttachmentOptionsBuilder? messageAttachmentOptionsBuilder,
+      required MAOInternalBuilder? messageAttachmentOptionsBuilder,
       required TapDownDetails tapDownDetails,
-      required List<TencentCloudChatMessageGeneralOptionItem>
-          attachmentOptions}) {
+      required List<TencentCloudChatMessageGeneralOptionItem> attachmentOptions}) {
     if (_overlayEntry == null) {
       _overlayEntry = OverlayEntry(builder: (BuildContext context) {
         return GestureDetector(
@@ -80,8 +83,7 @@ class TencentCloudChatMessageAttachmentOptions {
                     child: _buildAttachmentOptions(
                         constraints: constraints,
                         context: context,
-                        messageAttachmentOptionsBuilder:
-                            messageAttachmentOptionsBuilder,
+                        messageAttachmentOptionsBuilder: messageAttachmentOptionsBuilder,
                         attachmentOptions: attachmentOptions),
                   ),
                 ),
@@ -107,13 +109,15 @@ class TencentCloudChatMessageAttachmentOptions {
 }
 
 class TencentCloudChatMessageAttachmentOptionsWidget extends StatefulWidget {
-  final List<TencentCloudChatMessageGeneralOptionItem> attachmentOptions;
-  final VoidCallback onActionFinish;
+  final MessageAttachmentOptionsBuilderWidgets? widgets;
+  final MessageAttachmentOptionsBuilderData data;
+  final MessageAttachmentOptionsBuilderMethods methods;
 
   const TencentCloudChatMessageAttachmentOptionsWidget({
     super.key,
-    required this.attachmentOptions,
-    required this.onActionFinish,
+    this.widgets,
+    required this.data,
+    required this.methods,
   });
 
   @override
@@ -122,14 +126,12 @@ class TencentCloudChatMessageAttachmentOptionsWidget extends StatefulWidget {
 }
 
 class _TencentCloudChatMessageAttachmentOptionsWidgetState
-    extends TencentCloudChatState<
-        TencentCloudChatMessageAttachmentOptionsWidget> {
-  Widget _buildAttachmentOptionsItem(
-      TencentCloudChatMessageGeneralOptionItem item) {
+    extends TencentCloudChatState<TencentCloudChatMessageAttachmentOptionsWidget> {
+  Widget _buildAttachmentOptionsItem(TencentCloudChatMessageGeneralOptionItem item) {
     return TencentCloudChatThemeWidget(build: (context, colorTheme, textStyle) {
       return InkWell(
         onTap: () {
-          widget.onActionFinish();
+          widget.methods.onActionFinish();
           item.onTap();
         },
         child: SizedBox(
@@ -143,20 +145,44 @@ class _TencentCloudChatMessageAttachmentOptionsWidgetState
                   color: colorTheme.primaryColor,
                   border: Border.all(color: colorTheme.primaryColor, width: 12),
                 ),
-                child: Icon(
-                  item.icon,
-                  color: colorTheme.backgroundColor,
-                  size: textStyle.standardLargeText,
-                ),
+                child: () {
+                  if (item.iconAsset != null) {
+                    final type = item.iconAsset!.path.split(".")[item.iconAsset!.path.split(".").length - 1];
+                    if (type == "svg") {
+                      return SvgPicture.asset(
+                        item.iconAsset!.path,
+                        package: item.iconAsset!.package,
+                        width: 16,
+                        height: 16,
+                        colorFilter: ui.ColorFilter.mode(
+                          colorTheme.backgroundColor,
+                          ui.BlendMode.srcIn,
+                        ),
+                      );
+                    }
+                    return Image.asset(
+                      item.iconAsset!.path,
+                      package: item.iconAsset!.package,
+                      color: colorTheme.inputAreaIconColor.withOpacity(0.6),
+                      width: 16,
+                      height: 16,
+                    );
+                  }
+                  if (item.icon != null) {
+                    return Icon(
+                      item.icon,
+                      color: colorTheme.backgroundColor,
+                      size: textStyle.standardLargeText,
+                    );
+                  }
+                }(),
               ),
               const SizedBox(
                 height: 6,
               ),
               Text(
                 item.label,
-                style: TextStyle(
-                    color: colorTheme.secondaryTextColor,
-                    fontSize: textStyle.standardSmallText),
+                style: TextStyle(color: colorTheme.secondaryTextColor, fontSize: textStyle.standardSmallText),
               )
             ],
           ),
@@ -181,9 +207,7 @@ class _TencentCloudChatMessageAttachmentOptionsWidgetState
                   child: Wrap(
                     spacing: 24,
                     runSpacing: 24,
-                    children: widget.attachmentOptions
-                        .map((e) => _buildAttachmentOptionsItem(e))
-                        .toList(),
+                    children: widget.data.attachmentOptions.map((e) => _buildAttachmentOptionsItem(e)).toList(),
                   ),
                 ),
               ),

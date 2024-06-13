@@ -1,9 +1,9 @@
 # TencentCloudChat Internationalization (i18n) Tool
 
 Welcome to
-the [TencentCloudChat](https://trtc.io/products/chat?utm_source=gfs&utm_medium=link&utm_campaign=%E6%B8%A0%E9%81%93&_channel_track_key=k6WgfCKn)
+the [TencentCloudChat](https://trtc.io/products/chat?utm_source=flutter_demo&utm_medium=link&utm_campaign=%E6%B8%A0%E9%81%93&_channel_track_key=k6WgfCKn)
 Internationalization (i18n) Tool, a dedicated package developed by
-the [Chat](https://trtc.io/products/chat?utm_source=gfs&utm_medium=link&utm_campaign=%E6%B8%A0%E9%81%93&_channel_track_key=k6WgfCKn)
+the [Chat](https://trtc.io/products/chat?utm_source=flutter_demo&utm_medium=link&utm_campaign=%E6%B8%A0%E9%81%93&_channel_track_key=k6WgfCKn)
 team.
 
 This package offers a lightweight, powerful, and developer-friendly internationalization language
@@ -149,6 +149,9 @@ new language entries and modifying existing translations.
 4. Run the `dart run tencent_cloud_chat_intl` command and select option `C` to apply your
    changes.
 
-## License
+## Contact
 
-This project is licensed under the [MIT License](LICENSE).
+If you have any questions or need further information, feel free to reach out us.
+
+- [Telegram](https://t.me/+gvScYl0uQ3U4MTRl)
+- [X (Twitter)](https://x.com/runlin_wang95)

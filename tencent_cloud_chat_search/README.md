@@ -1,1 +1,1 @@
-This package is still developing.
+This package is currently under active development.

@@ -1,3 +1,9 @@
+## 7.9.5668+1
+
+* Fixed an issue that may throw an exception during the `registerPush` process.
+* Downgraded the minimum supported Flutter version to `flutter: '>=2.10.0'`.
+* Fixed an issue that may cause an exception for FCM launching processes.
+
 ## 7.9.5668
 * Implemented additional enhancements to our Native Push Plugin in version 7.9.5668.
 * Fixed several bugs.

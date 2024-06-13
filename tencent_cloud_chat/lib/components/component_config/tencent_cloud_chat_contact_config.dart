@@ -3,7 +3,6 @@ import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 
 class TencentCloudChatContactConfig {
   setConfigs() {
-    TencentCloudChat.instance.dataInstance.contact
-        .notifyListener(TencentCloudChatContactDataKeys.config);
+    TencentCloudChat.instance.dataInstance.contact.notifyListener(TencentCloudChatContactDataKeys.config);
   }
 }

@@ -13,7 +13,8 @@ class TencentCloudChatMessageCamera {
     required Function({required String imagePath}) onSendImage,
     required Function({required String videoPath}) onSendVideo,
   }) async {
-    if(TencentCloudChatPlatformAdapter().isMobile && await TencentCloudChatPermissionHandler.checkPermission("camera", context)) {
+    if (TencentCloudChatPlatformAdapter().isMobile &&
+        await TencentCloudChatPermissionHandler.checkPermission("camera", context)) {
       final ImagePicker picker = ImagePicker();
       if (isVideo) {
         final file = await picker.pickVideo(source: source);
