@@ -3,20 +3,20 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_item.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/ui/utils/common_utils.dart';
+import 'package:zhaopin/im/ui/utils/screen_utils.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_item.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:zhaopin/im/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:zhaopin/im/data_services/message/message_services.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
 
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/main.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_face_elem.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_cloud_custom_data.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKitMessageItem/main.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_face_elem.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/tim_uikit_cloud_custom_data.dart';
+import 'package:zhaopin/im/ui/widgets/avatar.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
 
 class MergerMessageScreen extends StatefulWidget {
   final TUIChatSeparateViewModel model;

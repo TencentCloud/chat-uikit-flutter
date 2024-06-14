@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/profile_life_cycle.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_profile_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitProfile/profile_widget.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitProfile/widget/tim_uikit_profile_widget.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/business_logic/life_cycle/profile_life_cycle.dart';
+import 'package:zhaopin/im/business_logic/separate_models/tui_profile_view_model.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_self_info_view_model.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/ui/utils/screen_utils.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitProfile/profile_widget.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitProfile/widget/tim_uikit_profile_widget.dart';
 
 typedef OnSelfAvatarTap = void Function();
 

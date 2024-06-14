@@ -1,14 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_item.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/merger_message_screen.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:zhaopin/im/data_services/core/tim_uikit_wide_modal_operation_key.dart';
+import 'package:zhaopin/im/ui/utils/screen_utils.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_item.dart';
+import 'package:zhaopin/im/ui/widgets/merger_message_screen.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/ui/widgets/wide_popup.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'TIMUIKitMessageReaction/tim_uikit_message_reaction_show_panel.dart';
 

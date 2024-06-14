@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:link_preview_generator_for_us/link_preview_generator.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/common/extensions.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/link_preview_entry.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/ui/widgets/link_preview/common/extensions.dart';
+import 'package:zhaopin/im/ui/widgets/link_preview/link_preview_entry.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LinkUtils {

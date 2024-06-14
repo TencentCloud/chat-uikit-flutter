@@ -3,16 +3,16 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_group_profile_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitGroupProfile/group_member/tui_add_group_member.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitGroupProfile/group_member/tui_delete_group_member.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitGroupProfile/group_member/tui_group_member_list.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_statelesswidget.dart';
+import 'package:zhaopin/im/business_logic/separate_models/tui_group_profile_model.dart';
+import 'package:zhaopin/im/data_services/core/tim_uikit_wide_modal_operation_key.dart';
+import 'package:zhaopin/im/ui/utils/screen_utils.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitGroupProfile/group_member/tui_add_group_member.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitGroupProfile/group_member/tui_delete_group_member.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitGroupProfile/group_member/tui_group_member_list.dart';
+import 'package:zhaopin/im/ui/widgets/avatar.dart';
+import 'package:zhaopin/im/ui/widgets/wide_popup.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
 class GroupMemberTile extends TIMUIKitStatelessWidget {

@@ -1,4 +1,4 @@
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
 
 class TIMUIKitChatUtils {
   static String? getMessageIDWithinIndex(

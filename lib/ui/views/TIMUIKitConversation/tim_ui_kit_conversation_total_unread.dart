@@ -2,11 +2,11 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_conversation_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/unread_message.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_statelesswidget.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_conversation_view_model.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
+import 'package:zhaopin/im/ui/widgets/unread_message.dart';
 
 typedef unreadCountBuilder = Widget Function(int unreadCount);
 

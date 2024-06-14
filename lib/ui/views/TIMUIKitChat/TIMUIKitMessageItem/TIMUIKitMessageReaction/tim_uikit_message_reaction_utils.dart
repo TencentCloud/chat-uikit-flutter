@@ -1,11 +1,11 @@
 import 'dart:convert';
 
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_cloud_custom_data.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_self_info_view_model.dart';
+import 'package:zhaopin/im/data_services/message/message_services.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
+import 'package:zhaopin/im/ui/utils/platform.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/tim_uikit_cloud_custom_data.dart';
 
 class MessageReactionUtils {
   static final TUISelfInfoViewModel selfInfoModel =

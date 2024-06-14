@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_group_profile_model.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/contact_list.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/business_logic/separate_models/tui_group_profile_model.dart';
+import 'package:zhaopin/im/ui/utils/screen_utils.dart';
+import 'package:zhaopin/im/ui/widgets/contact_list.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
 GlobalKey<_AddGroupMemberPageState> addGroupMemberKey = GlobalKey();

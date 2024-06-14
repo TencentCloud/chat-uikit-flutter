@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/ui/widgets/avatar.dart';
 
 class AtMemberPanel extends StatefulWidget {
   /// messageList widget scroll controller

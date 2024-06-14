@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/ui/utils/platform.dart';
 
 final outputLogger = Logger(
   output: _outputLogger ?? logOutputGenerator(null),
@@ -52,8 +52,13 @@ class TUIKitOutput extends LogOutput {
     String pkgName = packageInfo.packageName;
     var timeName =
         "${DateTime.now().year}-${DateTime.now().month}-${DateTime.now().day}";
-    final logPath = p.join(documentsDirectoryPath, "Documents", ".TencentCloudChat",
-        pkgName, "uikit_log", 'Flutter-TUIKit-$timeName.log');
+    final logPath = p.join(
+        documentsDirectoryPath,
+        "Documents",
+        ".TencentCloudChat",
+        pkgName,
+        "uikit_log",
+        'Flutter-TUIKit-$timeName.log');
     print("The path to local log: $logPath");
 
     return logPath;
@@ -72,7 +77,7 @@ class TUIKitOutput extends LogOutput {
             logFile!.createSync(recursive: true);
           }
         }
-      });
+      }).catchError((error) {});
     }
   }
 

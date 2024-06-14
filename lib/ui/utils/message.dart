@@ -3,11 +3,13 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
-import 'package:tencent_cloud_chat_uikit/ui/constants/time.dart';
+import 'package:zhaopin/im/ui/constants/history_message_constant.dart';
+import 'package:zhaopin/im/ui/constants/time.dart';
 import 'package:collection/collection.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
+import 'package:zhaopin/im/ui/utils/common_utils.dart';
+import 'package:zhaopin/im/ui/utils/logger.dart';
+import 'package:zhaopin/im/utils/im_enum.dart';
+import 'package:zhaopin/model/im_custom_message_model.dart';
 
 class MessageUtils {
   // 判断CallingData的方式和Trtc的方法一致
@@ -101,7 +103,7 @@ class MessageUtils {
   }
 
   static String? _getOpUserNick(V2TimGroupMemberInfo? opUser) {
-    if(opUser == null){
+    if (opUser == null) {
       return "";
     }
     return TencentUtils.checkString(opUser.friendRemark) ??
@@ -158,21 +160,21 @@ class MessageUtils {
         break;
       case GroupTipsElemType.V2TIM_GROUP_TIPS_TYPE_INVITE:
         final option5 =
-        memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
+            memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
         final inviteUser = _getOpUserNick(operationMember);
         displayMessage = '$inviteUser' +
             TIM_t_para("邀请{{option5}}加入群组", "邀请$option5加入群组")(option5: option5);
         break;
       case GroupTipsElemType.V2TIM_GROUP_TIPS_TYPE_KICKED:
         final option4 =
-        memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
+            memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
         final kickUser = _getOpUserNick(operationMember);
         displayMessage = '$kickUser' +
             TIM_t_para("将{{option4}}踢出群组", "将$option4踢出群组")(option4: option4);
         break;
       case GroupTipsElemType.V2TIM_GROUP_TIPS_TYPE_JOIN:
         final option3 =
-        memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
+            memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
         displayMessage = TIM_t_para("用户{{option3}}加入了群聊", "用户$option3加入了群聊")(
             option3: option3);
         break;
@@ -189,7 +191,7 @@ class MessageUtils {
         break;
       case GroupTipsElemType.V2TIM_GROUP_TIPS_TYPE_SET_ADMIN:
         final adminMember =
-        memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
+            memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
         final opMember = _getOpUserNick(operationMember);
         final option1 = adminMember;
         displayMessage = '$opMember' +
@@ -198,7 +200,7 @@ class MessageUtils {
         break;
       case GroupTipsElemType.V2TIM_GROUP_TIPS_TYPE_CANCEL_ADMIN:
         final adminMember =
-        memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
+            memberList!.map((e) => _getMemberNickName(e!).toString()).join("、");
         final opMember = _getOpUserNick(operationMember);
         final option1 = adminMember;
         displayMessage = '$opMember' +
@@ -248,8 +250,8 @@ class MessageUtils {
         margin: const EdgeInsets.symmetric(vertical: 10), child: child);
   }
 
-  static String getAbstractMessageAsync(V2TimMessage message,
-      List<V2TimGroupMemberFullInfo?> groupMemberList) {
+  static String getAbstractMessageAsync(
+      V2TimMessage message, List<V2TimGroupMemberFullInfo?> groupMemberList) {
     final msgType = message.elemType;
     switch (msgType) {
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
@@ -285,8 +287,8 @@ class MessageUtils {
     try {
       for (String type in order) {
         img = list?.firstWhere(
-                (e) =>
-            e?.type == HistoryMessageDartConstant.V2_TIM_IMAGE_TYPES[type],
+            (e) =>
+                e?.type == HistoryMessageDartConstant.V2_TIM_IMAGE_TYPES[type],
             orElse: () => null);
       }
     } catch (e) {
@@ -303,10 +305,10 @@ class MessageUtils {
     final displayName = friendRemark.isNotEmpty
         ? friendRemark
         : nameCard.isNotEmpty
-        ? nameCard
-        : nickName.isNotEmpty
-        ? nickName
-        : sender;
+            ? nameCard
+            : nickName.isNotEmpty
+                ? nickName
+                : sender;
     return displayName.toString();
   }
 
@@ -322,5 +324,18 @@ class MessageUtils {
     if (sendMsgRes == null) return null;
 
     return sendMsgRes;
+  }
+
+  static bool isCustomTipMessage(V2TimMessage message) {
+    final model =
+        ImCustomMessageModel.fromJson(jsonDecode(message.customElem!.data!));
+    return [IMChatCustomItemType.TIP, IMChatCustomItemType.B_ZTSALE_REPLACE_TIP]
+        .contains(model.type ?? '');
+  }
+
+  static String getCustomTipMessage(V2TimMessage message) {
+    final model =
+        ImCustomMessageModel.fromJson(jsonDecode(message.customElem!.data!));
+    return model.data['text'] ?? '';
   }
 }

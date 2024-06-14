@@ -8,20 +8,20 @@ import 'package:flutter/services.dart';
 import 'package:image_clipboard/image_clipboard.dart';
 import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_select_emoji.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_self_info_view_model.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
+import 'package:zhaopin/im/ui/utils/common_utils.dart';
+import 'package:zhaopin/im/ui/utils/message.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_select_emoji.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_item.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/forward_message_screen.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:zhaopin/im/ui/utils/platform.dart';
+import 'package:zhaopin/im/ui/utils/screen_utils.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list_item.dart';
+import 'package:zhaopin/im/ui/widgets/forward_message_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path/path.dart' as path;
 
@@ -218,52 +218,52 @@ class TIMUIKitMessageTooltipState
         MessageToolTipItem(
             label: TIM_t("打开"),
             id: "open",
-            iconImageAsset: "images/open_in_new.png",
+            iconImageAsset: "assets/im_images/open_in_new.png",
             onClick: () => _onTap("open", model)),
       if (fileBeenDownloaded && PlatformUtils().isDesktop)
         MessageToolTipItem(
             label: PlatformUtils().isMacOS ? TIM_t("在访达中打开") : TIM_t("查看文件夹"),
             id: "finder",
-            iconImageAsset: "images/folder_open.png",
+            iconImageAsset: "assets/im_images/folder_open.png",
             onClick: () => _onTap("finder", model)),
       if (messageCanCopy)
         MessageToolTipItem(
             label: TIM_t("复制"),
             id: "copyMessage",
-            iconImageAsset: "images/copy_message.png",
+            iconImageAsset: "assets/im_images/copy_message.png",
             onClick: () => _onTap("copyMessage", model)),
       if (shouldShowForwardAction && !isVoteMessage(widget.message))
         MessageToolTipItem(
             label: TIM_t("转发"),
             id: "forwardMessage",
-            iconImageAsset: "images/forward_message.png",
+            iconImageAsset: "assets/im_images/forward_message.png",
             onClick: () => _onTap("forwardMessage", model)),
       if (shouldShowReplyAction)
         MessageToolTipItem(
             label: TIM_t(model.chatConfig.isAtWhenReply ? "回复" : "引用"),
             id: "replyMessage",
-            iconImageAsset: "images/reply_message.png",
+            iconImageAsset: "assets/im_images/reply_message.png",
             onClick: () => _onTap("replyMessage", model)),
       MessageToolTipItem(
           label: TIM_t("多选"),
           id: "multiSelect",
-          iconImageAsset: "images/multi_message.png",
+          iconImageAsset: "assets/im_images/multi_message.png",
           onClick: () => _onTap("multiSelect", model)),
       MessageToolTipItem(
           label: TIM_t("翻译"),
           id: "translate",
-          iconImageAsset: "images/translate.png",
+          iconImageAsset: "assets/im_images/translate.png",
           onClick: () => _onTap("translate", model)),
       MessageToolTipItem(
           label: TIM_t("删除"),
           id: "delete",
-          iconImageAsset: "images/delete_message.png",
+          iconImageAsset: "assets/im_images/delete_message.png",
           onClick: () => _onTap("delete", model)),
       if (shouldShowRevokeAction)
         MessageToolTipItem(
             label: TIM_t("撤回"),
             id: "revoke",
-            iconImageAsset: "images/revoke_message.png",
+            iconImageAsset: "assets/im_images/revoke_message.png",
             onClick: () => _onTap("revoke", model)),
     ];
     final defaultTipsIds = defaultTipsList.map((e) => e.id);
@@ -367,9 +367,6 @@ class TIMUIKitMessageTooltipState
                   children: [
                     Image.asset(
                       item.iconImageAsset,
-                      package: defaultTipsIds.contains(item.id)
-                          ? 'tencent_cloud_chat_uikit'
-                          : null,
                       width: 20,
                       height: 20,
                     ),

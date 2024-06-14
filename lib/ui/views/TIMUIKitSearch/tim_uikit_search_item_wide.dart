@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_statelesswidget.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
 
-import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/ui/widgets/avatar.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
 
 class TIMUIKitSearchWideItem extends TIMUIKitStatelessWidget {
   final String faceUrl;

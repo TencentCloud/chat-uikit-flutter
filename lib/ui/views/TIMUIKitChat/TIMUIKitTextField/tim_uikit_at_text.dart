@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/data_services/group/group_services.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
 
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
+import 'package:zhaopin/im/ui/utils/platform.dart';
+import 'package:zhaopin/im/ui/utils/screen_utils.dart';
 
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitGroupProfile/widgets/tim_ui_group_member_search.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/group_member_list.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitGroupProfile/widgets/tim_ui_group_member_search.dart';
+import 'package:zhaopin/im/ui/widgets/group_member_list.dart';
 
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
 
 class AtText extends StatefulWidget {
   final String? groupID;
@@ -147,8 +147,7 @@ class _AtTextState extends TIMUIKitState<AtText> {
                     padding: const EdgeInsets.only(left: 16),
                     constraints: const BoxConstraints(),
                     icon: Image.asset(
-                      'images/arrow_back.png',
-                      package: 'tencent_cloud_chat_uikit',
+                      'assets/im_images/arrow_back.png',
                       height: 34,
                       width: 34,
                       color: theme.appbarTextColor,

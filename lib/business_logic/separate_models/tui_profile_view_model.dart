@@ -2,14 +2,14 @@
 
 import 'package:flutter/material.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/profile_life_cycle.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/model/profile_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendship_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/conversation/conversation_services.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/friendShip/friendship_services.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:zhaopin/im/business_logic/life_cycle/profile_life_cycle.dart';
+import 'package:zhaopin/im/business_logic/model/profile_model.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_friendship_view_model.dart';
+import 'package:zhaopin/im/data_services/conversation/conversation_services.dart';
+import 'package:zhaopin/im/data_services/core/core_services_implements.dart';
+import 'package:zhaopin/im/data_services/friendShip/friendship_services.dart';
+import 'package:zhaopin/im/data_services/message/message_services.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
 
 class TUIProfileViewModel extends ChangeNotifier {
   final ConversationService _conversationService =

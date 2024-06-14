@@ -4,12 +4,12 @@ import 'dart:io';
 
 import 'package:chewie_for_us/chewie_for_us.dart';
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/drag_widget.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_self_info_view_model.dart';
+import 'package:zhaopin/im/data_services/core/tim_uikit_wide_modal_operation_key.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/ui/utils/platform.dart';
+import 'package:zhaopin/im/ui/widgets/drag_widget.dart';
 import 'package:path/path.dart' as p;
 import 'package:video_player/video_player.dart';
 

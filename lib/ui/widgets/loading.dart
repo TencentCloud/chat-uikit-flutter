@@ -40,8 +40,7 @@ class _LoadingState extends State<Loading> with TickerProviderStateMixin {
     return RotationTransition(
       turns: Tween(begin: .0, end: .9).animate(_animationController),
       child: Image.asset(
-        "images/message_sending.png",
-        package: 'tencent_cloud_chat_uikit',
+        "assets/im_images/message_sending.png",
         height: widget.width,
         width: widget.height,
       ),

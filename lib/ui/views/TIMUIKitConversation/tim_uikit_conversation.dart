@@ -5,21 +5,21 @@ import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/conversation_life_cycle.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_conversation_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendship_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-import 'package:tencent_cloud_chat_uikit/ui/controller/tim_uikit_conversation_controller.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitConversation/tim_uikit_conversation_item.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/customize_ball_pulse_header.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_statelesswidget.dart';
+import 'package:zhaopin/im/business_logic/life_cycle/conversation_life_cycle.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_conversation_view_model.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_friendship_view_model.dart';
+import 'package:zhaopin/im/data_services/core/tim_uikit_wide_modal_operation_key.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/ui/controller/tim_uikit_conversation_controller.dart';
+import 'package:zhaopin/im/ui/utils/platform.dart';
+import 'package:zhaopin/im/ui/utils/screen_utils.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitConversation/tim_uikit_conversation_item.dart';
+import 'package:zhaopin/im/ui/widgets/customize_ball_pulse_header.dart';
+import 'package:zhaopin/im/ui/widgets/wide_popup.dart';
 
 typedef ConversationItemBuilder = Widget Function(V2TimConversation conversationItem, [V2TimUserStatus? onlineStatus]);
 
@@ -381,7 +381,7 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
                             key: ValueKey(conversationItem.conversationID),
                             controller: _autoScrollController,
                             index: index,
-                            child: Slidable(groupTag: 'conversation-list', child: conversationLineItem(), endActionPane: ActionPane(extentRatio: slideChildren.length > 2 ? 0.77 : 0.5, motion: const DrawerMotion(), children: slideChildren)),
+                            child: Slidable(groupTag: 'conversation-list', endActionPane: ActionPane(extentRatio: slideChildren.length > 2 ? 0.77 : 0.5, motion: const DrawerMotion(), children: slideChildren), child: conversationLineItem()),
                           ));
                     })
                 : (widget.emptyBuilder != null ? widget.emptyBuilder!() : Container());

@@ -3,7 +3,7 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:zhaopin/im/ui/utils/platform.dart';
 
 enum DeviceType { Desktop, Mobile }
 

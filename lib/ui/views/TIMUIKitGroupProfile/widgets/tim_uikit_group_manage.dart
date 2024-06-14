@@ -4,17 +4,17 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_group_profile_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitProfile/widget/tim_uikit_operation_item.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/column_menu.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/radio_button.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/business_logic/separate_models/tui_group_profile_model.dart';
+import 'package:zhaopin/im/data_services/core/tim_uikit_wide_modal_operation_key.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
+import 'package:zhaopin/im/ui/utils/screen_utils.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitProfile/widget/tim_uikit_operation_item.dart';
+import 'package:zhaopin/im/ui/widgets/avatar.dart';
+import 'package:zhaopin/im/ui/widgets/column_menu.dart';
+import 'package:zhaopin/im/ui/widgets/radio_button.dart';
+import 'package:zhaopin/im/ui/widgets/wide_popup.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
 GlobalKey<_GroupProfileAddAdminState> groupProfileAddAdminKey = GlobalKey();
@@ -335,8 +335,7 @@ class _GroupProfileGroupManagePageState extends TIMUIKitState<GroupProfileGroupM
                     padding: const EdgeInsets.only(left: 16),
                     constraints: const BoxConstraints(),
                     icon: Image.asset(
-                      'images/arrow_back.png',
-                      package: 'tencent_cloud_chat_uikit',
+                      'assets/im_images/arrow_back.png',
                       height: 34,
                       width: 34,
                       color: theme.appbarTextColor,

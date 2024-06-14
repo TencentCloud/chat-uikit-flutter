@@ -6,25 +6,25 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/chat_life_cycle.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/listener_model/tui_group_listener_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_conversation_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
-import 'package:tencent_cloud_chat_uikit/ui/controller/tim_uikit_chat_controller.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/frame.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/optimize_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/at_member_panel.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_multi_select_panel.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_send_file.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/business_logic/life_cycle/chat_life_cycle.dart';
+import 'package:zhaopin/im/business_logic/listener_model/tui_group_listener_model.dart';
+import 'package:zhaopin/im/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_conversation_view_model.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_self_info_view_model.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/ui/constants/history_message_constant.dart';
+import 'package:zhaopin/im/ui/controller/tim_uikit_chat_controller.dart';
+import 'package:zhaopin/im/ui/utils/frame.dart';
+import 'package:zhaopin/im/ui/utils/logger.dart';
+import 'package:zhaopin/im/ui/utils/optimize_utils.dart';
+import 'package:zhaopin/im/ui/utils/platform.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKitTextField/at_member_panel.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/tim_uikit_multi_select_panel.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/tim_uikit_send_file.dart';
 
 import 'TIMUIKItMessageList/TIMUIKitTongue/tim_uikit_chat_history_message_list_tongue.dart';
 import 'TIMUIKItMessageList/tim_uikit_chat_history_message_list_config.dart';
@@ -138,7 +138,7 @@ class TIMUIKitChat extends StatefulWidget {
   /// Specify the custom small png emoji packages.
   final List<CustomEmojiFaceData> customEmojiStickerList;
 
-  final Widget? customAppBar;
+  final PreferredSizeWidget? customAppBar;
 
   final Widget? inputTopBuilder;
 
@@ -424,7 +424,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                         conversationID: _getConvID(),
                         showC2cMessageEditStatus: widget.config?.showC2cMessageEditStatus ?? true,
                       )
-                    : null,
+                    : widget.customAppBar!,
                 body: DropTarget(
                   onDragDone: (detail) {
                     setState(() {
@@ -447,7 +447,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          if (widget.customAppBar != null) widget.customAppBar!,
+                          // if (widget.customAppBar != null) widget.customAppBar!,
                           if (filteredApplicationList.isNotEmpty) _renderJoinGroupApplication(filteredApplicationList.length, theme),
                           if (widget.topFixWidget != null) widget.topFixWidget!,
                           Expanded(

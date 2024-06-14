@@ -1,5 +1,5 @@
-import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/base_life_cycle.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/business_logic/life_cycle/base_life_cycle.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
 
 class ChatLifeCycle {
   /// Before a new message will be added to historical message list from long connection.

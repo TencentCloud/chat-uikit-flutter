@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_group_profile_model.dart';
+import 'package:zhaopin/im/business_logic/separate_models/tui_group_profile_model.dart';
 
 class SharedDataWidget extends InheritedWidget {
   final TUIGroupProfileModel model;

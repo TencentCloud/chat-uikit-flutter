@@ -4,15 +4,15 @@ import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/pureUI/tim_uikit_search_item.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/pureUI/tim_uikit_search_folder.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitSearch/pureUI/tim_uikit_search_item.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitSearch/pureUI/tim_uikit_search_folder.dart';
 
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_search_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitSearch/pureUI/tim_uikit_search_showAll.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_search_view_model.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitSearch/pureUI/tim_uikit_search_showAll.dart';
 
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
 
 class TIMUIKitSearchFriend extends StatefulWidget {
   List<V2TimFriendInfoResult> friendResultList;

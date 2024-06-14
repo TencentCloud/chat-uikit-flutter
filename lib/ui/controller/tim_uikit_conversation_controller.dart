@@ -1,5 +1,5 @@
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_conversation_view_model.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_conversation_view_model.dart';
 
 class TIMUIKitConversationController {
   late TUIConversationViewModel model;

@@ -8,10 +8,10 @@ import 'package:chewie_for_us/src/helpers/utils.dart';
 import 'package:chewie_for_us/src/material/material_progress_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_statelesswidget.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
 import 'package:video_player/video_player.dart';
 
 import 'center_play_button.dart';
@@ -83,14 +83,14 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls> with 
               ),
               if (isLoading)
                 Container(
-                  child: LoadingAnimationWidget.staggeredDotsWave(
-                    size: 35,
-                    color: Colors.white,
-                  ),
                   padding: const EdgeInsets.all(30),
                   decoration: const BoxDecoration(
                     color: Color(0xB22b2b2b),
                     borderRadius: BorderRadius.all(Radius.circular(20)),
+                  ),
+                  child: LoadingAnimationWidget.staggeredDotsWave(
+                    size: 35,
+                    color: Colors.white,
                   ),
                 ),
             ],
@@ -140,8 +140,7 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls> with 
               height: 48,
               child: IconButton(
                 icon: Image.asset(
-                  'images/close.png',
-                  package: 'tencent_cloud_chat_uikit',
+                  'assets/im_images/close.png',
                 ),
                 iconSize: 30,
                 onPressed: () {
@@ -158,8 +157,7 @@ class _VideoCustomControlsState extends TIMUIKitState<VideoCustomControls> with 
               height: 48,
               child: IconButton(
                 icon: Image.asset(
-                  'images/download.png',
-                  package: 'tencent_cloud_chat_uikit',
+                  'assets/im_images/download.png',
                 ),
                 iconSize: 30,
                 onPressed: () async {

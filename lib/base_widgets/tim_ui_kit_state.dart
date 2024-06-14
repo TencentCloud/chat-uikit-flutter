@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/data_services/core/core_services_implements.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
 
 class TIMUIKitState<T extends StatefulWidget> extends TIMState<T> {
   final CoreServicesImpl _coreServices = serviceLocator<CoreServicesImpl>();

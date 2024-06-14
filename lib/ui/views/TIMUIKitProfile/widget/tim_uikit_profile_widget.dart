@@ -2,11 +2,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_class.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_class.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/ui/utils/screen_utils.dart';
 
-import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
+import 'package:zhaopin/im/ui/widgets/avatar.dart';
 
 class TIMUIKitProfileWidget extends TIMUIKitClass {
   static final bool isDesktopScreen =

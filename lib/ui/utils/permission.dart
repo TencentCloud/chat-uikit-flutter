@@ -8,9 +8,9 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/ui/utils/platform.dart';
 
 
 class PermissionRequestInfo extends StatefulWidget {
@@ -59,27 +59,27 @@ class _PermissionRequestInfo extends TIMUIKitState<PermissionRequestInfo>
     final permission = {
       1: {
         "name": TIM_t("相机"),
-        "icon": "images/chat_permission_icon_camera.png",
+        "icon": "assets/im_images/chat_permission_icon_camera.png",
         "text": TIM_t("为方便您将所拍摄的照片或视频发送给朋友，以及进行视频通话，请允许我们访问摄像头进行拍摄照片和视频。")
       },
       7: {
         "name": TIM_t("麦克风"),
-        "icon": "images/chat_permission_icon_mic.png",
+        "icon": "assets/im_images/chat_permission_icon_mic.png",
         "text": TIM_t("为方便您发送语音消息、拍摄视频以及音视频通话，请允许我们使用麦克风进行录音。")
       },
       9: {
         "name": TIM_t("相册"),
-        "icon": "images/chat_permission_icon_file.png",
+        "icon": "assets/im_images/chat_permission_icon_file.png",
         "text": TIM_t("为方便您查看和选择相册里的图片视频发送给朋友，以及保存内容到设备，请允许我们访问您设备上的照片、媒体内容。")
       },
       15: {
         "name": TIM_t("存储"),
-        "icon": "images/chat_permission_icon_file.png",
+        "icon": "assets/im_images/chat_permission_icon_file.png",
         "text": TIM_t("为方便您查看和选择相册里的图片视频发送给朋友，以及保存内容到设备，请允许我们访问您设备上的照片、媒体内容。")
       },
       32: {
         "name": TIM_t("相册"),
-        "icon": "images/chat_permission_icon_file.png",
+        "icon": "assets/im_images/chat_permission_icon_file.png",
         "text": TIM_t("为方便您查看和选择相册里的图片视频发送给朋友，以及保存内容到设备，请允许我们访问您设备上的照片、媒体内容。")
       },
     }[widget.permissionType];

@@ -1,13 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/image_screen.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_self_info_view_model.dart';
+import 'package:zhaopin/im/ui/utils/common_utils.dart';
+import 'package:zhaopin/im/ui/widgets/image_screen.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_statelesswidget.dart';
+import 'package:zhaopin/im/data_services/core/core_services_implements.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
 
 class Avatar extends TIMUIKitStatelessWidget {
   final String faceUrl;
@@ -38,7 +38,7 @@ class Avatar extends TIMUIKitStatelessWidget {
         return Image.asset(
             TencentUtils.checkString(
                     selfInfoViewModel.globalConfig?.defaultAvatarAssetPath) ??
-                'images/default_c2c_head.png',
+                'assets/im_images/default_c2c_head.png',
             fit: BoxFit.cover,
             package:
                 selfInfoViewModel.globalConfig?.defaultAvatarAssetPath != null
@@ -48,7 +48,7 @@ class Avatar extends TIMUIKitStatelessWidget {
         return Image.asset(
             TencentUtils.checkString(
                     selfInfoViewModel.globalConfig?.defaultAvatarAssetPath) ??
-                'images/default_group_head.png',
+                'assets/im_images/default_group_head.png',
             fit: BoxFit.cover,
             package:
                 selfInfoViewModel.globalConfig?.defaultAvatarAssetPath != null
@@ -83,7 +83,7 @@ class Avatar extends TIMUIKitStatelessWidget {
         return Image.asset(
                 TencentUtils.checkString(selfInfoViewModel
                         .globalConfig?.defaultAvatarAssetPath) ??
-                    'images/default_c2c_head.png',
+                    'assets/im_images/default_c2c_head.png',
                 fit: BoxFit.cover,
                 package:
                     selfInfoViewModel.globalConfig?.defaultAvatarAssetPath !=
@@ -95,7 +95,7 @@ class Avatar extends TIMUIKitStatelessWidget {
         return Image.asset(
                 TencentUtils.checkString(selfInfoViewModel
                         .globalConfig?.defaultAvatarAssetPath) ??
-                    'images/default_group_head.png',
+                    'assets/im_images/default_group_head.png',
                 fit: BoxFit.cover,
                 package:
                     selfInfoViewModel.globalConfig?.defaultAvatarAssetPath !=

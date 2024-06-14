@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
+import 'package:zhaopin/im/data_services/core/tim_uikit_wide_modal_operation_key.dart';
 import 'package:tencent_im_base/theme/tui_theme.dart';
 
 class TIMUIKitConfig {

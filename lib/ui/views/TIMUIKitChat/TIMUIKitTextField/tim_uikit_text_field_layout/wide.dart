@@ -17,22 +17,22 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:pasteboard/pasteboard.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_setting_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/optimize_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_shot.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/drag_widget.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_setting_model.dart';
+import 'package:zhaopin/im/data_services/core/tim_uikit_wide_modal_operation_key.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/ui/utils/logger.dart';
+import 'package:zhaopin/im/ui/utils/message.dart';
+import 'package:zhaopin/im/ui/utils/optimize_utils.dart';
+import 'package:zhaopin/im/ui/utils/platform.dart';
+import 'package:zhaopin/im/ui/utils/screen_shot.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
+import 'package:zhaopin/im/ui/widgets/drag_widget.dart';
+import 'package:zhaopin/im/ui/widgets/wide_popup.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:uuid/uuid.dart';
@@ -744,7 +744,7 @@ class _TIMUIKitTextFieldLayoutWideState extends TIMUIKitState<TIMUIKitTextFieldL
             onClick: (offset) {
               _sendEmoji(offset, widget.theme);
             },
-            imgPath: "images/svg/send_face.png"),
+            imgPath: "assets/im_images/svg/send_face.png"),
       if (config.showScreenshotButton && PlatformUtils().isDesktop)
         DesktopControlBarItem(
             item: "screenShot",
@@ -752,7 +752,7 @@ class _TIMUIKitTextFieldLayoutWideState extends TIMUIKitState<TIMUIKitTextFieldL
             onClick: (offset) {
               _sendScreenShot();
             },
-            svgPath: "images/svg/send_screenshot.svg"),
+            svgPath: "assets/im_images/svg/send_screenshot.svg"),
       if (config.showSendFileButton)
         DesktopControlBarItem(
             item: "file",
@@ -760,7 +760,7 @@ class _TIMUIKitTextFieldLayoutWideState extends TIMUIKitState<TIMUIKitTextFieldL
             onClick: (offset) {
               _sendFile(widget.model, widget.theme);
             },
-            svgPath: "images/svg/send_file.svg"),
+            svgPath: "assets/im_images/svg/send_file.svg"),
       if (config.showSendImageButton)
         DesktopControlBarItem(
             item: "photo",
@@ -772,7 +772,7 @@ class _TIMUIKitTextFieldLayoutWideState extends TIMUIKitState<TIMUIKitTextFieldL
                 _sendMediaMessage(widget.model, widget.theme, FileType.image);
               }
             },
-            svgPath: "images/svg/send_image.svg"),
+            svgPath: "assets/im_images/svg/send_image.svg"),
       if (config.showSendVideoButton)
         DesktopControlBarItem(
             item: "video",
@@ -784,7 +784,7 @@ class _TIMUIKitTextFieldLayoutWideState extends TIMUIKitState<TIMUIKitTextFieldL
                 _sendMediaMessage(widget.model, widget.theme, FileType.video);
               }
             },
-            svgPath: "images/svg/send_video.svg"),
+            svgPath: "assets/im_images/svg/send_video.svg"),
       if (config.showMessageHistoryButton)
         DesktopControlBarItem(
             item: "history",
@@ -803,7 +803,7 @@ class _TIMUIKitTextFieldLayoutWideState extends TIMUIKitState<TIMUIKitTextFieldL
                       ),
                   theme: widget.theme);
             },
-            svgPath: "images/svg/message_history.svg"),
+            svgPath: "assets/im_images/svg/message_history.svg"),
     ];
     defaultControlBarItems = itemsList;
   }

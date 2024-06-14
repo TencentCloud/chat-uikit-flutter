@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/message_reaction_emoji.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_emoji_panel.dart'
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/ui/utils/screen_utils.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/message_reaction_emoji.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_emoji_panel.dart'
     as emoji;
-import 'package:tencent_cloud_chat_uikit/ui/widgets/emoji.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/extended_wrap/extended_wrap.dart';
+import 'package:zhaopin/im/ui/widgets/emoji.dart';
+import 'package:zhaopin/im/ui/widgets/extended_wrap/extended_wrap.dart';
 
 enum SelectEmojiPanelPosition { up, down }
 

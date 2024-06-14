@@ -4,15 +4,15 @@ import 'dart:math';
 // import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/sound_record.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:zhaopin/im/data_services/message/message_services.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
+import 'package:zhaopin/im/ui/constants/history_message_constant.dart';
+import 'package:zhaopin/im/ui/utils/platform.dart';
+import 'package:zhaopin/im/ui/utils/sound_record.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
 import 'TIMUIKitMessageReaction/tim_uikit_message_reaction_show_panel.dart';
@@ -212,14 +212,12 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
                       ),
                       isPlaying
                           ? Image.asset(
-                              'images/play_voice_send.gif',
-                              package: 'tencent_cloud_chat_uikit',
+                              'assets/im_images/play_voice_send.gif',
                               width: 16,
                               height: 16,
                             )
                           : Image.asset(
-                              'images/voice_send.png',
-                              package: 'tencent_cloud_chat_uikit',
+                              'assets/im_images/voice_send.png',
                               width: 16,
                               height: 16,
                             ),
@@ -227,16 +225,14 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
                   : [
                       isPlaying
                           ? Image.asset(
-                              'images/play_voice_receive.gif',
-                              package: 'tencent_cloud_chat_uikit',
+                              'assets/im_images/play_voice_receive.gif',
                               width: 16,
                               height: 16,
                             )
                           : Image.asset(
-                              'images/voice_receive.png',
+                              'assets/im_images/voice_receive.png',
                               width: 16,
                               height: 16,
-                              package: 'tencent_cloud_chat_uikit',
                             ),
                       Text(
                         " ${stateElement.duration}''",

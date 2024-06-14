@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_self_info_view_model.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
 
-import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
+import 'package:zhaopin/im/ui/widgets/avatar.dart';
 
 class TIMUIKitMessageReactionDetail extends StatefulWidget {
   /// the index of the current emoji sticker

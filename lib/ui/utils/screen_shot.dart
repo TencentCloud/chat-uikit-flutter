@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:zhaopin/im/ui/utils/platform.dart';
 import 'package:uuid/uuid.dart';
 
 class ScreenshotHelper {

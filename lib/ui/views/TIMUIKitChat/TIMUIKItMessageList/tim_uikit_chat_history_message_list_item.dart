@@ -6,33 +6,35 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/time_ago.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_message_tooltip.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_message_read_receipt.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/main.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_custom_elem.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_face_elem.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_text_translate_elem.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_cloud_custom_data.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/forward_message_screen.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/radio_button.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
+import 'package:zhaopin/b/pages/im/im_chat/widget/custom_tip/index.dart';
+import 'package:zhaopin/b/pages/im/im_chat/widget/robot_avatar_header.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_statelesswidget.dart';
+import 'package:zhaopin/im/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_self_info_view_model.dart';
+import 'package:zhaopin/im/data_services/core/tim_uikit_wide_modal_operation_key.dart';
+import 'package:zhaopin/im/data_services/message/message_services.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/ui/constants/history_message_constant.dart';
+import 'package:zhaopin/im/ui/utils/message.dart';
+import 'package:zhaopin/im/ui/utils/platform.dart';
+import 'package:zhaopin/im/ui/utils/screen_utils.dart';
+import 'package:zhaopin/im/ui/utils/time_ago.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_message_tooltip.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_message_read_receipt.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_utils.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKitMessageItem/main.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_custom_elem.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_face_elem.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKitMessageItem/tim_uikit_chat_text_translate_elem.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/tim_uikit_cloud_custom_data.dart';
+import 'package:zhaopin/im/ui/widgets/avatar.dart';
+import 'package:zhaopin/im/ui/widgets/forward_message_screen.dart';
+import 'package:zhaopin/im/ui/widgets/radio_button.dart';
+import 'package:zhaopin/im/ui/widgets/wide_popup.dart';
 import 'package:tencent_super_tooltip/tencent_super_tooltip.dart';
 
 import '../TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_select_emoji.dart';
@@ -646,7 +648,7 @@ class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistory
       alignment: Alignment.center,
       margin: const EdgeInsets.symmetric(vertical: 20),
       child: Text(
-        model.chatConfig.timeDividerConfig?.timestampParser != null ? (model.chatConfig.timeDividerConfig?.timestampParser!(timeStamp))! : TimeAgo().getTimeForMessage(1709740800),
+        model.chatConfig.timeDividerConfig?.timestampParser != null ? (model.chatConfig.timeDividerConfig?.timestampParser!(timeStamp))! : TimeAgo().getTimeForMessage(timeStamp),
         style: widget.themeData?.timelineTextStyle ??
             TextStyle(
               fontSize: 12,
@@ -1087,6 +1089,7 @@ class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistory
     final msgType = message.elemType;
     final isSelf = message.isSelf ?? true;
     final isGroupTipsMsg = msgType == MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS;
+    final isCustomMsg = msgType == MessageElemType.V2TIM_ELEM_TYPE_CUSTOM;
 
     final revokeStatus = isRevokeMessage(message, model);
     final isRevokedMsg = revokeStatus.$1;
@@ -1100,12 +1103,19 @@ class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistory
     final isShowNickNameForSelf = isGroupMessage && model.chatConfig.isShowSelfNameInGroup;
     final isShowNickNameForOthers = isGroupMessage && model.chatConfig.isShowOthersNameInGroup;
     final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+    final isCustomDivider = isCustomMsg && MessageUtils.isCustomTipMessage(message);
     if (isTimeDivider) {
       return _timeDividerBuilder(theme, message.timestamp ?? 0, model);
     }
+
+    if (isCustomDivider) {
+      return CustomMessageTip(message: message);
+    }
+
     if (isLatestDivider) {
       return _latestDividerBuilder(theme);
     }
+
     void clearJump() {
       Future.delayed(const Duration(milliseconds: 100), () {
         model.jumpMsgID = "";
@@ -1292,6 +1302,7 @@ class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistory
                                     return Column(
                                       crossAxisAlignment: (message.isSelf ?? true) ? CrossAxisAlignment.end : CrossAxisAlignment.start,
                                       children: [
+                                        if(!(message.isSelf ?? false))RobotAvatarHeader(message: widget.message),
                                         GestureDetector(
                                           child: IgnorePointer(ignoring: model.isMultiSelect, child: _getMessageItemBuilder(message, message.status, model)),
                                           onSecondaryTapDown: (details) {

@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
+import 'package:zhaopin/im/data_services/core/tim_uikit_wide_modal_operation_key.dart';
+import 'package:zhaopin/im/ui/utils/screen_utils.dart';
+import 'package:zhaopin/im/ui/widgets/wide_popup.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/add_group_life_cycle.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendship_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/conversation/conversation_services.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/business_logic/life_cycle/add_group_life_cycle.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_friendship_view_model.dart';
+import 'package:zhaopin/im/data_services/conversation/conversation_services.dart';
+import 'package:zhaopin/im/data_services/group/group_services.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
 
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitAddGroup/tim_uikit_send_application.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitAddGroup/tim_uikit_send_application.dart';
+import 'package:zhaopin/im/ui/widgets/avatar.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
 
 class TIMUIKitAddGroup extends StatefulWidget {
   /// The life cycle hooks for adding group business logic

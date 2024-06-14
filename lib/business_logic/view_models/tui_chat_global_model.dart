@@ -7,17 +7,17 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_class.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/chat_life_cycle.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_model_tools.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_class.dart';
+import 'package:zhaopin/im/business_logic/life_cycle/chat_life_cycle.dart';
+import 'package:zhaopin/im/business_logic/separate_models/tui_chat_model_tools.dart';
+import 'package:zhaopin/im/data_services/group/group_services.dart';
+import 'package:zhaopin/im/data_services/message/message_services.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/ui/constants/history_message_constant.dart';
+import 'package:zhaopin/im/ui/utils/logger.dart';
+import 'package:zhaopin/im/ui/utils/message.dart';
+import 'package:zhaopin/im/ui/utils/platform.dart';
 
 enum ConvType { none, c2c, group }
 
@@ -587,6 +587,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
   }
 
   onMessageModified(V2TimMessage modifiedMessage, [String? convID]) async {
+    print('------modifi------${modifiedMessage.toJson()}');
     modifiedMessage.id = DateTime.now().millisecondsSinceEpoch.toString();
     final String? exactId = TencentUtils.checkString(modifiedMessage.userID) ?? TencentUtils.checkString(modifiedMessage.groupID);
     final activeMessageList = _messageListMap[convID ?? exactId];

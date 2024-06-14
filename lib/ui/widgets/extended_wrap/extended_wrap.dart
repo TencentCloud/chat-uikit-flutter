@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:tencent_cloud_chat_uikit/ui/widgets/extended_wrap/extended_render_wrap.dart';
+import 'package:zhaopin/im/ui/widgets/extended_wrap/extended_render_wrap.dart';
 
 class ExtendedWrap extends MultiChildRenderObjectWidget {
   /// Creates a wrap layout.

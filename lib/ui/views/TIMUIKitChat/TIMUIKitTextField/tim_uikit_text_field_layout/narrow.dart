@@ -4,19 +4,22 @@ import 'dart:math';
 import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
-import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
-import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_setting_model.dart';
-import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/optimize_utils.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
-import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_send_sound_message.dart';
+import 'package:zhaopin/b/pages/im/im_chat/widget/jd_analysis_tip_bar.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
+import 'package:zhaopin/im/base_widgets/tim_ui_kit_state.dart';
+import 'package:zhaopin/im/business_logic/separate_models/tui_chat_separate_view_model.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_chat_global_model.dart';
+import 'package:zhaopin/im/business_logic/view_models/tui_setting_model.dart';
+import 'package:zhaopin/im/data_services/services_locatar.dart';
+import 'package:zhaopin/im/tencent_cloud_chat_uikit.dart';
+import 'package:zhaopin/im/ui/utils/message.dart';
+import 'package:zhaopin/im/ui/utils/optimize_utils.dart';
+import 'package:zhaopin/im/ui/utils/permission.dart';
+import 'package:zhaopin/im/ui/utils/platform.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKitTextField/custom_panel/custom_common_reply_panel.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKitTextField/custom_panel/custom_emoji_panel.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
+import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_send_sound_message.dart';
 import 'package:tencent_keyboard_visibility/tencent_keyboard_visibility.dart';
 
 GlobalKey<_TIMUIKitTextFieldLayoutNarrowState> narrowTextFieldKey = GlobalKey();
@@ -141,6 +144,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
   bool showMoreButton = true;
   bool showSendSoundText = false;
   bool showEmojiPanel = false;
+  bool showCommonReply = false;
   bool showKeyboard = false;
   Function? setKeyboardHeight;
   double? bottomPadding;
@@ -178,11 +182,12 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
   hideAllPanel() {
     widget.focusNode.unfocus();
     widget.currentCursor == null;
-    if (showKeyboard != false || showMore != false || showEmojiPanel != false) {
+    if (showKeyboard != false || showMore != false || showEmojiPanel != false || showCommonReply != false) {
       setState(() {
         showKeyboard = false;
         showMore = false;
         showEmojiPanel = false;
+        showCommonReply = false;
       });
     }
   }
@@ -216,7 +221,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                 setSendButton();
               }),
               defaultCustomEmojiStickerList: widget.isUseDefaultEmoji ? TUIKitStickerConstData.emojiList : [])
-          : StickerPanel(
+          : CustomEmojiPanel (   // StickerPanel
               isWideScreen: false,
               sendTextMsg: () {
                 widget.onEmojiSubmitted();
@@ -250,6 +255,10 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
       return MorePanel(morePanelConfig: widget.morePanelConfig, conversationID: widget.conversationID, conversationType: widget.conversationType);
     }
 
+    if(showCommonReply) {
+      return CustomCommonReplyPanel();
+    }
+
     return const SizedBox(height: 0);
   }
 
@@ -267,7 +276,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
       }
       final height = originHeight != 0 ? originHeight : currentKeyboardHeight;
       return height;
-    } else if (showMore || showEmojiPanel) {
+    } else if (showMore || showEmojiPanel || showCommonReply) {
       return 248.0 + (bottomPadding ?? 0.0);
     } else if (widget.textEditingController.text.length >= 46 && showKeyboard == false) {
       return 25 + (bottomPadding ?? 0.0);
@@ -284,6 +293,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
     setState(() {
       showKeyboard = false;
       showEmojiPanel = false;
+      showCommonReply = false;
       showSendSoundText = false;
       showMore = !showMore;
     });
@@ -301,7 +311,25 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
     setState(() {
       showMore = false;
       showSendSoundText = false;
+      showCommonReply = false;
       showEmojiPanel = !showEmojiPanel;
+    });
+  }
+
+  _openCommonReplyPanel() {
+    widget.onCursorChange();
+    showKeyboard = showCommonReply;
+    if (showCommonReply) {
+      widget.focusNode.requestFocus();
+    } else {
+      widget.focusNode.unfocus();
+    }
+
+    setState(() {
+      showMore = false;
+      showSendSoundText = false;
+      showEmojiPanel = false;
+      showCommonReply = !showCommonReply;
     });
   }
 
@@ -404,6 +432,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
       onTap: () {},
       child: Column(
         children: [
+          const JDAnalysisTipBar(),
           _buildRepliedMessage(widget.repliedMessage),
           Container(
             color: widget.backgroundColor ?? hexToColor("f5f5f6"),
@@ -444,15 +473,27 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                             )) {
                               setState(() {
                                 showEmojiPanel = false;
+                                showCommonReply = false;
                                 showMore = false;
                                 showSendSoundText = !showSendSoundText;
                               });
                             }
                           },
                           child: SvgPicture.asset(
-                            showSendSoundText ? 'images/keyboard.svg' : 'images/voice.svg',
-                            package: 'tencent_cloud_chat_uikit',
+                            showSendSoundText ? 'assets/im_images/keyboard.svg' : 'assets/im_images/voice.svg',
                             color: const Color.fromRGBO(68, 68, 68, 1),
+                            height: 28,
+                            width: 28,
+                          ),
+                        ),
+                      if (widget.forbiddenText == null)
+                        InkWell(
+                          onTap: () {
+                            _openCommonReplyPanel();
+                            widget.goDownBottom();
+                          },
+                          child: Image.asset(
+                            'assets/im_images/chat_input_bar_common_reply.webp',
                             height: 28,
                             width: 28,
                           ),
@@ -476,6 +517,7 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                                         widget.goDownBottom();
                                         setState(() {
                                           showEmojiPanel = false;
+                                          showCommonReply = false;
                                           showMore = false;
                                         });
                                       },
@@ -533,9 +575,8 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                           child: PlatformUtils().isWeb
                               ? Icon(showEmojiPanel ? Icons.keyboard_alt_outlined : Icons.mood_outlined, color: hexToColor("5c6168"), size: 32)
                               : SvgPicture.asset(
-                                  showEmojiPanel ? 'images/keyboard.svg' : 'images/face.svg',
-                                  package: 'tencent_cloud_chat_uikit',
-                                  color: const Color.fromRGBO(68, 68, 68, 1),
+                                  showEmojiPanel ? 'assets/im_images/keyboard.svg' : 'assets/im_images/face.svg',
+                                  colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
                                   height: 28,
                                   width: 28,
                                 ),
@@ -554,9 +595,8 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                           child: PlatformUtils().isWeb
                               ? Icon(Icons.add_circle_outline_outlined, color: hexToColor("5c6168"), size: 32)
                               : SvgPicture.asset(
-                                  'images/add.svg',
-                                  package: 'tencent_cloud_chat_uikit',
-                                  color: const Color.fromRGBO(68, 68, 68, 1),
+                                  'assets/im_images/add.svg',
+                                  colorFilter: const ColorFilter.mode(Colors.black, BlendMode.srcIn),
                                   height: 28,
                                   width: 28,
                                 ),
@@ -576,6 +616,10 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                                 });
                               }
                             },
+                            style: FilledButton.styleFrom(
+                              backgroundColor: const Color(0xff28C6A4),
+                              foregroundColor: Colors.white,
+                            ),
                             child: Text(TIM_t("发送")),
                           ),
                         ),

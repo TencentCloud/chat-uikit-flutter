@@ -1,4 +1,4 @@
-import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/base_life_cycle.dart';
+import 'package:zhaopin/im/business_logic/life_cycle/base_life_cycle.dart';
 
 class BlockListLifeCycle {
   /// Before requesting to delete a user from block list,
