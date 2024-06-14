@@ -140,9 +140,9 @@ class TUIConversationViewModel extends ChangeNotifier {
       notifyListeners();
     }, onSyncServerFinish: () {
       // Remove the process to load such a many of conversations after launching
-      // if (!PlatformUtils().isWeb) {
-      //   loadInitConversation();
-      // }
+      if (!PlatformUtils().isWeb) {
+        loadInitConversation();
+      }
     });
   }
 
@@ -258,7 +258,7 @@ class TUIConversationViewModel extends ChangeNotifier {
       int index = _conversationList.indexWhere(
           (item) => item!.conversationID == list[element].conversationID);
       if (index > -1) {
-        _conversationList.setAll(index, [list[element]]);
+        _conversationList.setAll(index, [list[element]] as List<V2TimConversation?>);
       } else {
         _conversationList.add(list[element]);
       }

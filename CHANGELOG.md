@@ -1,8 +1,17 @@
+# 2.6.0
+
+## Breaking Changes
+
+* Migrated to Flutter 3.22. Support for Flutter 3.19 and earlier versions has been discontinued.
+
+
+
 # 2.5.1
 
 ## Improvements
 
 * Improved memory usage, enhancing performance.
+* Improved the logger storage.
 
 # 2.5.0
 

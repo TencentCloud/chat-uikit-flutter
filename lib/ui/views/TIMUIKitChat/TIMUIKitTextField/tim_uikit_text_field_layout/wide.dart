@@ -222,7 +222,7 @@ class _TIMUIKitTextFieldLayoutWideState extends TIMUIKitState<TIMUIKitTextFieldL
       }
     } catch (e) {
       // ignore: avoid_print
-      outputLogger.i(e);
+      outputLogger.i(e.toString());
     }
     generateDefaultControlBarItems();
   }

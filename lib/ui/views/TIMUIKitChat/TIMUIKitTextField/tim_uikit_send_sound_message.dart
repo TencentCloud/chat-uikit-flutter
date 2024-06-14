@@ -261,7 +261,7 @@ class _SendSoundMessageState extends TIMUIKitState<SendSoundMessage> {
           isRecording = true;
         });
       } else {
-        outputLogger.i(status);
+        outputLogger.i(status.toString());
       }
     });
     final amplitudesResponseSubscription =

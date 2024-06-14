@@ -7,6 +7,7 @@ import 'package:zhaopin/im/business_logic/separate_models/tui_chat_model_tools.d
 import 'package:zhaopin/im/ui/utils/common_utils.dart';
 import 'package:zhaopin/im/ui/utils/screen_utils.dart';
 import 'package:zhaopin/im/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
+
 import 'package:extended_text/extended_text.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:zhaopin/im/base_widgets/tim_ui_kit_base.dart';
@@ -94,6 +95,9 @@ class _TIMUIKitReplyElemState extends TIMUIKitState<TIMUIKitReplyElem> {
       }
 
       final messageID = cloudCustomData.messageID;
+      if(PlatformUtils().isWeb){
+        return;
+      }
       V2TimMessage? message = await widget.chatModel.findMessage(messageID);
       if (message == null) {
         try {
@@ -169,7 +173,7 @@ class _TIMUIKitReplyElemState extends TIMUIKitState<TIMUIKitReplyElem> {
     }
     if (message == null) {
       if (repliedMessage?.messageAbstract != null) {
-        _renderMessageSummary(theme);
+        return _renderMessageSummary(theme);
       }
       return const SizedBox(width: 0, height: 12);
     }

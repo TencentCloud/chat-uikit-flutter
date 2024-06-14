@@ -32,11 +32,13 @@ class SoundPlayer {
       _soundInterruptListener!();
     }
     await _audioPlayer.setUrl(url);
+
     await _audioPlayer.play();
   }
 
   static stop() {
     _audioPlayer.stop();
+
   }
 
   static dispose() {

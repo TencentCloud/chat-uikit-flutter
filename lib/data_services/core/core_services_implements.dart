@@ -95,9 +95,6 @@ class CoreServicesImpl implements CoreServices {
     if (platform != null) {
       TUIKitScreenUtils.deviceType = platform;
     }
-    if (TencentUtils.checkString(uikitLogPath) != null) {
-      logOutputGenerator(uikitLogPath!);
-    }
     addIdentifier();
     if (extraLanguage != null) {
       Future.delayed(const Duration(milliseconds: 1), () {
@@ -132,6 +129,7 @@ class CoreServicesImpl implements CoreServices {
             onKickedOffline: listener.onKickedOffline,
             onUserStatusChanged: (List<V2TimUserStatus> userStatusList) {
               updateUserStatusList(userStatusList);
+              listener.onUserStatusChanged(userStatusList);
             },
             onSelfInfoUpdated: (V2TimUserFullInfo info) {
               listener.onSelfInfoUpdated(info);
