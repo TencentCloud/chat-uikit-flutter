@@ -28,6 +28,7 @@
 * Fixed video preview and playback issues.
 * Fixed various UI display errors, including boundary issues.
 * Fixed an issue where the message list could not be scrolled using a laptop touchpad.
+* Fixed an issue where recording on mobile phone may lose control in some cases.
 
 ## 1.3.1
 

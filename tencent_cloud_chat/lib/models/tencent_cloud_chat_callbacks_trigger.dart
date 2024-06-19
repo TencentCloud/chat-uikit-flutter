@@ -52,21 +52,31 @@ class TencentCloudChatCallbacksTrigger {
         }
       },
       onKickedOffline: (){
+        TencentCloudChat.instance.dataInstance.basic.updateLoginStatus(
+          status: false,
+        );
         for (final callbacks in callbacksList) {
           callbacks.onSDKEvent?.onKickedOffline();
         }
       },
       onUserSigExpired: (){
+        TencentCloudChat.instance.dataInstance.basic.updateLoginStatus(
+          status: false,
+        );
+
         for (final callbacks in callbacksList) {
           callbacks.onSDKEvent?.onUserSigExpired();
         }
       },
       onSelfInfoUpdated: (V2TimUserFullInfo info,){
+        TencentCloudChat.instance.dataInstance.basic.updateCurrentUserInfo(userFullInfo: info);
         for (final callbacks in callbacksList) {
           callbacks.onSDKEvent?.onSelfInfoUpdated(info);
         }
       },
       onUserStatusChanged: (List<V2TimUserStatus> userStatusList){
+
+        TencentCloudChat.instance.dataInstance.contact.buildUserStatusList(userStatusList, "onUserStatusChanged");
         for (final callbacks in callbacksList) {
           callbacks.onSDKEvent?.onUserStatusChanged(userStatusList);
         }
@@ -97,6 +107,14 @@ class TencentCloudChatCallbacksTrigger {
         }
       },
       onPluginEventEmited: (PluginEvent event){
+        // Handle TencentCloudChatRobot Plugin sendMessage
+        if (event.pluginName == "TencentCloudChatRobotPlugin") {
+          if (event.type == "onSendMessageToRobotSuccess") {
+            Map<String, dynamic> messageMap = json.decode(event.detail["data"] ?? "{}");
+            var message = V2TimMessage.fromJson(messageMap);
+            TencentCloudChat.instance.dataInstance.messageData.onReceiveNewMessage(message);
+          }
+        }
         for (final callbacks in callbacksList) {
           callbacks.onSDKEvent?.onPluginEventEmited(event);
         }

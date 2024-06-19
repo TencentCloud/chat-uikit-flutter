@@ -59,8 +59,10 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
 
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => Container(
+        margin: EdgeInsets.only(
+          bottom: getSquareSize(16),
+        ),
         padding: EdgeInsets.only(
-            bottom: getSquareSize(16),
             right: isDesktopScreen ? getSquareSize(8) : 0,
             left: isDesktopScreen ? getSquareSize(8) : 0),
         color: (widget.data.isSelected && widget.data.inSelectMode)
@@ -155,8 +157,10 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
 
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => AnimatedContainer(
+        margin: EdgeInsets.only(
+          bottom: getSquareSize(16),
+        ),
         padding: EdgeInsets.only(
-            bottom: getSquareSize(16),
             right:  getSquareSize(6) ,
             left:  getSquareSize(6)),
         color: (widget.data.isSelected && widget.data.inSelectMode)
@@ -229,10 +233,7 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
                             children: [
                               if (widget.data.showMessageSenderName)
                                 widget.widgets.messageRowMessageSenderName,
-                              ConstrainedBox(
-                                constraints: BoxConstraints(maxWidth: widget.data.messageRowWidth * 0.8),
-                                child: widget.widgets.messageRowMessageItem ?? Container(),
-                              ),
+                              widget.widgets.messageRowMessageItem ?? Container(),
                             ],
                           )),
                           if (!(widget.data.message.isSelf ?? true) ||

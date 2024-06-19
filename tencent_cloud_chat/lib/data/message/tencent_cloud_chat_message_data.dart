@@ -322,12 +322,13 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
 
   /// function for getting sending message progress
   onSendMessageProgressFromSDK(V2TimMessage message, int progress) {
-    print("onSendMessageProgressFromSDK ${message.msgID} $progress");
+    if (!kIsWeb) {
     onSendMessageProgress(
       message: message,
       progress: progress,
-      isSendComplete: progress == 1,
+        isSendComplete: false,
     );
+    }
   }
 
   /// ==== Message Read Receipt Map ====
@@ -597,14 +598,18 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
       String? id}) {
     String? createID = TencentCloudChatUtils.checkString(message.id) ?? id;
     if (TencentCloudChatUtils.checkString(createID) != null) {
-      _messageProgressData[createID!] = SendingMessageData(
-        createID: createID,
-        message: message,
-        sdkID: message.msgID ?? "",
-        progress: progress,
-        isSendComplete: isSendComplete,
-      );
-      notifyListener(TencentCloudChatMessageDataKeys.sendMessageProgress as T);
+      print("message progress ${message.imageElem?.toJson()}");
+      print("message progress ${_messageProgressData[createID!]?.isSendComplete}");
+      if (_messageProgressData[createID] == null || !_messageProgressData[createID]!.isSendComplete) {
+        _messageProgressData[createID] = SendingMessageData(
+          createID: createID,
+          message: message,
+          sdkID: message.msgID ?? "",
+          progress: progress,
+          isSendComplete: isSendComplete,
+        );
+        notifyListener(TencentCloudChatMessageDataKeys.sendMessageProgress as T);
+      }
     }
   }
 

@@ -145,30 +145,34 @@ class TencentCloudChatMessageInputRecordingState extends TencentCloudChatState<T
   }
 
   Future<void> stopRecording({required bool cancel}) async {
-    _shakeAnimationController.stop();
-    _shakeAnimationController.reset();
-    _timer?.cancel();
-    _timer = null;
-    _isFingerOverDelete = false;
-    if (_pointerEventListener != null) {
-      WidgetsBinding.instance.pointerRouter.removeGlobalRoute(_pointerEventListener!);
-      _pointerEventListener = null;
-    }
+    try{
+      _shakeAnimationController.stop();
+      _shakeAnimationController.reset();
+      _timer?.cancel();
+      _timer = null;
+      _isFingerOverDelete = false;
+      if (_pointerEventListener != null) {
+        WidgetsBinding.instance.pointerRouter.removeGlobalRoute(_pointerEventListener!);
+        _pointerEventListener = null;
+      }
 
-    final recordedFile = await _audioRecorder?.stop();
-    if (!cancel && TencentCloudChatUtils.checkString(recordedFile) != null) {
-      widget.onRecordFinish(RecordInfo(duration: (_recordingDuration / 1000).ceil(), path: recordedFile!));
-    } else {
-      File recordedFileInstance = File(recordedFile ?? "");
-      recordedFileInstance.delete();
-    }
-    _audioRecorder?.dispose();
+      final recordedFile = await _audioRecorder?.stop();
+      if (!cancel && TencentCloudChatUtils.checkString(recordedFile) != null) {
+        widget.onRecordFinish(RecordInfo(duration: (_recordingDuration / 1000).ceil(), path: recordedFile!));
+      } else {
+        File recordedFileInstance = File(recordedFile ?? "");
+        recordedFileInstance.delete();
+      }
+      _audioRecorder?.dispose();
 
-    setState(() {
-      _isRecording = false;
-      _recordingProgress = 0.0;
-      _recordingDuration = 0;
-    });
+      setState(() {
+        _isRecording = false;
+        _recordingProgress = 0.0;
+        _recordingDuration = 0;
+      });
+    }catch(e){
+      debugPrint(e.toString());
+    }
   }
 
   @override

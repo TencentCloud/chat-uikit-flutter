@@ -318,6 +318,7 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
 
       RenderBox messageBox = context.findRenderObject() as RenderBox;
       Offset messagePosition = messageBox.localToGlobal(Offset.zero);
+      Size messageSize = messageBox.size;
       double availableSpace = screenHeight - messagePosition.dy - messageBox.size.height - 32;
 
       double messageOffset = 0;
@@ -412,9 +413,14 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
                             scale: _overlayMessageScaleAnimation,
                             child: Material(
                               color: Colors.transparent,
-                              child: SelectionArea(
-                                child: widget.methods.getMessageItemWidget(
-                                  renderOnMenuPreview: true,
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: messageSize.width,
+                                ),
+                                child: SelectionArea(
+                                  child: widget.methods.getMessageItemWidget(
+                                    renderOnMenuPreview: true,
+                                  ),
                                 ),
                               ),
                             ),

@@ -48,8 +48,9 @@ class TencentCloudChatMessageItemBuilders {
     required MessageItemBuilderData data,
     required MessageItemBuilderMethods methods,
   }) {
+    
     return TencentCloudChatMessageImage(
-      key: key,
+      key: UniqueKey(),
       data: data,
       methods: methods,
     );

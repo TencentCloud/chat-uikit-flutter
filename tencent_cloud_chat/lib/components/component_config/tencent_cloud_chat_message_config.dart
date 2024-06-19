@@ -52,6 +52,9 @@ class TencentCloudChatMessageConfig {
   /// A configuration option that determines whether to parse and render text messages as Markdown formatted content.
   TencentCloudChatMessageValueConfig<bool> _enableParseMarkdown;
 
+  /// A configuration option that determines whether allow mention group admins and owner only.
+  TencentCloudChatMessageValueConfig<bool> _mentionGroupAdminAndOwnerOnly;
+
   /// A configuration option that specifies the message referencing behavior.
   /// If set to true, the message context menu will display a `Reply` option, which, when used in group chats, will automatically mention (@) the sender of the original message.
   /// If set to false, the message context menu will display a `Quote` option, without automatically mentioning (@) the sender of the original message.
@@ -144,6 +147,7 @@ class TencentCloudChatMessageConfig {
     TencentCloudChatMessageValueConfig<bool>? enableAutoReportReadStatusForComingMessages,
     TencentCloudChatMessageValueConfig<bool>? enableParseMarkdown,
     TencentCloudChatMessageValueConfig<bool>? enableReplyWithMention,
+    TencentCloudChatMessageValueConfig<bool>? mentionGroupAdminAndOwnerOnly,
     TencentCloudChatMessageValueConfig<int>? desktopMessageInputLines,
     TencentCloudChatMessageValueConfig<int>? recallTimeLimit,
     TencentCloudChatMessageValueConfig<bool>? showOthersAvatar,
@@ -168,6 +172,7 @@ class TencentCloudChatMessageConfig {
     TencentCloudChatMessageValueConfig<List<String>>? enabledGroupTypesForMessageReadReceipt,
   })  : _showSelfAvatar = showSelfAvatar ?? createDefaultValue(false),
         _showOthersAvatar = showOthersAvatar ?? createDefaultValue(true),
+        _mentionGroupAdminAndOwnerOnly = mentionGroupAdminAndOwnerOnly ?? createDefaultValue(false),
         _enableParseMarkdown = enableParseMarkdown ?? createDefaultValue(false),
         _enableReplyWithMention = enableReplyWithMention ?? createDefaultValue(true),
         _enableAutoReportReadStatusForComingMessages =
@@ -194,7 +199,7 @@ class TencentCloudChatMessageConfig {
         _timeDividerConfig = timeDividerConfig ??
             createDefaultValue<TencentCloudChatTimeDividerConfig>(TencentCloudChatTimeDividerConfig()),
         _enabledGroupTypesForMessageReadReceipt =
-            enabledGroupTypesForMessageReadReceipt ?? createDefaultValue<List<String>>([GroupType.Work, GroupType.Public, GroupType.Meeting, GroupType.Community]),
+            enabledGroupTypesForMessageReadReceipt ?? createDefaultValue<List<String>>([GroupType.Work, GroupType.Public, GroupType.Meeting]),
         _additionalInputControlBarOptionsForDesktop = additionalInputControlBarOptionsForDesktop ??
             createDefaultValue<List<TencentCloudChatMessageGeneralOptionItem>>([]),
         _additionalAttachmentOptionsForMobile = additionalAttachmentOptionsForMobile ??
@@ -219,6 +224,7 @@ class TencentCloudChatMessageConfig {
     TencentCloudChatMessageValueConfig<List<TencentCloudChatStickerSet>>? additionalStickerSets,
     TencentCloudChatMessageValueConfig<List<TencentCloudChatMessageGeneralOptionItem>>?
         additionalAttachmentOptionsForMobile,
+    TencentCloudChatMessageValueConfig<bool>? mentionGroupAdminAndOwnerOnly,
     TencentCloudChatMessageValueConfig<List<TencentCloudChatMessageGeneralOptionItem>>?
         additionalInputControlBarOptionsForDesktop,
     TencentCloudChatMessageValueConfig<TencentCloudChatMessageDefaultMessageSelectionOptionsConfig>?
@@ -238,6 +244,7 @@ class TencentCloudChatMessageConfig {
     _recallTimeLimit = recallTimeLimit ?? _recallTimeLimit;
     _enableAutoReportReadStatusForComingMessages =
         enableAutoReportReadStatusForComingMessages ?? createDefaultValue(true);
+    _mentionGroupAdminAndOwnerOnly = mentionGroupAdminAndOwnerOnly ?? createDefaultValue(false);
     _enableMessageDeleteForEveryone = enableMessageDeleteForEveryone ?? _enableMessageDeleteForEveryone;
     _enableDefaultEmojis = enableDefaultEmojis ?? _enableDefaultEmojis;
     _enableReplyWithMention = enableReplyWithMention ?? createDefaultValue(true);
@@ -267,6 +274,8 @@ class TencentCloudChatMessageConfig {
   TencentCloudChatMessageValueConfig<bool> get showMessageSenderName => _showMessageSenderName;
 
   TencentCloudChatMessageValueConfig<bool> get showMessageTimeIndicator => _showMessageTimeIndicator;
+
+  TencentCloudChatMessageValueConfig<bool> get mentionGroupAdminAndOwnerOnly => _mentionGroupAdminAndOwnerOnly;
 
   TencentCloudChatMessageValueConfig<bool> get showMessageStatusIndicator => _showMessageStatusIndicator;
 

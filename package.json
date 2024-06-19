@@ -1,0 +1,19 @@
+{
+  "name": "tencent_cloud_chat_uikit_plus",
+  "version": "1.0.0",
+  "description": "Welcome to the Tencent Cloud Chat UIKit V2 repository which contains all the general and modular packages. You can use these packages to create engaging and feature-rich chat applications that cater to your business needs.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tox:build@dev": "echo \"Error: no test specified\"",
+    "tox:publish@dev": "tox publish online --silence",
+    "tox:publish@master": "tox publish online --silence",
+    "tox:build@master": "echo \"Error: no test specified\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.woa.com/29294-22989-29805-29810/tencent_cloud_chat_uikit_plus.git"
+  },
+  "author": "",
+  "license": "ISC"
+}

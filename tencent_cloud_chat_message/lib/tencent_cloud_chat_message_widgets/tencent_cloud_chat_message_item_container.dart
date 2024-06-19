@@ -44,7 +44,10 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
 
   // This method handles changes in message data.
   void _messageDataHandler(TencentCloudChatMessageData messageData) {
-    final msgID = widget.message.msgID ?? "";
+    final msgID = TencentCloudChatUtils.checkString(widget.message.msgID) ?? TencentCloudChatUtils.checkString(widget.message.id) ?? "";
+    if(TencentCloudChatUtils.checkString(msgID) == null){
+      return;
+    }
     final bool isGroup = TencentCloudChatUtils.checkString(widget.message.groupID) != null;
     final TencentCloudChatMessageDataKeys messageDataKeys = messageData.currentUpdatedFields;
 
@@ -94,11 +97,6 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
       default:
         break;
     }
-  }
-
-  @override
-  void didUpdateWidget(TencentCloudChatMessageItemContainer oldWidget) {
-    super.didUpdateWidget(oldWidget);
   }
 
   @override

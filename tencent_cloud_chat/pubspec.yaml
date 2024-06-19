@@ -1,6 +1,6 @@
 name: tencent_cloud_chat
 description: Tencent Cloud Chat UIKit base package offers a foundation for building feature-rich, customizable chat applications and integrating Modular UI Component Packages.
-version: 1.4.0
+version: 1.4.0+2
 repository: https://github.com/TencentCloud/chat-uikit-flutter/tree/v2/tencent_cloud_chat
 homepage: https://trtc.io/products/chat?utm_source=flutter_pub
 

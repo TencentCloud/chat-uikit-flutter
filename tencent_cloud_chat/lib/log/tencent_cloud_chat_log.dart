@@ -67,7 +67,7 @@ class TencentCloudChatLog {
 
     if (kDebugMode) {
       // Print the log message to the console if the app is running in debug mode
-      debugPrint(cacheLogs);
+      print(cacheLogs);
     }
     if (logLevel.index > TencentCloudChatLogLevel.none.index) {
       _cachedLogList.add(cacheLogs);

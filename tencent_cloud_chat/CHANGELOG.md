@@ -15,19 +15,20 @@
 * Added a unified format for all builders in `TencentCloudChatMessage`, modifying their parameters. The previous builders have been removed. Each builder in `TencentCloudChatMessageBuilders` now includes four standardized parameters: `Key? key`, `widgets`, `data`, and `methods`, enhancing usability and comprehension. Builders from other components will be updated to this unified format in future versions.
 * Added support to select message text on desktop, facilitating easier copying of entire or partial text messages.
 * Added markdown parsing support for text messages, which is disabled by default. Additionally, URLs in text messages can now be launched directly.
-* Added new customization options to `TencentCloudChatMessageConfig`: `showMessageSenderName`, `enableParseMarkdown`, `enableAutoReportReadStatusForComingMessages`, `enableReplyWithMention`, `attachmentConfig`, `additionalAttachmentOptionsForMobile`, `additionalInputControlBarOptionsForDesktop`, `defaultMessageSelectionOperationsConfig`, and `additionalMessageMenuOptions`.
+* Added new customization options to `TencentCloudChatMessageConfig`: `mentionGroupAdminAndOwnerOnly`, `showMessageSenderName`, `enableParseMarkdown`, `enableAutoReportReadStatusForComingMessages`, `enableReplyWithMention`, `attachmentConfig`, `additionalAttachmentOptionsForMobile`, `additionalInputControlBarOptionsForDesktop`, `defaultMessageSelectionOperationsConfig`, and `additionalMessageMenuOptions`.
 * Added `beforeMessageSending` and `beforeRenderMessageList` hooks to `TencentCloudChatMessageLifeCycleEventHandlers`, and added `onTapLink`, `onPrimaryTapAvatar`, and `onSecondaryTapAvatar` to `TencentCloudChatMessageUIEventHandlers` for enhanced business logic customization.
 * Added new methods to `TencentCloudChatMessageController`: `updateMessages`, `mentionGroupMembers`, `setMessageTextWithMentions`, and `scrollToBottom`, providing greater control over the component.
 * Added support to re-edit recalled messages.
 * Improved the UI display for text messages, particularly the time and status indicators, message bubble width, and more.
 * Improved the icons in both the message context menu and input attachment actions, replacing Material Icons with custom-designed icons.
-* Improved the display of quoted/replied messages in the message list.
+* Improved the display of quoted/replied messages in the message list, and changed the interaction for navigation.
 * Improved the logic for message replies and sending, including group member mentions, auto-focus when replying, scrolling to the bottom after sending a message, and media message sending.
 * Improved the performance of the message list, message status updates, and group member lists in large groups.
 * Fixed an issue where calls could not be initiated via message header actions.
 * Fixed video preview and playback issues.
 * Fixed various UI display errors, including boundary issues.
 * Fixed an issue where the message list could not be scrolled using a laptop touchpad.
+* Fixed an issue where recording on mobile phone may lose control in some cases.
 
 ## 1.3.1
 

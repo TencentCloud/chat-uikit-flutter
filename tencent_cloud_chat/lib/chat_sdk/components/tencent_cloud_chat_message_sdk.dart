@@ -314,7 +314,6 @@ class TencentCloudChatMessageSDK {
   Future<V2TimMessageOnlineUrl?> getMessageOnlineUrl({
     required String msgID,
   }) async {
-    
     V2TimValueCallback<V2TimMessageOnlineUrl> urlRes = await TencentCloudChat.instance.chatSDKInstance.manager.getMessageManager().getMessageOnlineUrl(msgID: msgID);
 
     if (urlRes.code == 0) {
@@ -480,16 +479,28 @@ class TencentCloudChatMessageSDK {
   String addUIKitListener({
     required var listener,
   }) {
-    return TencentImSDKPlugin.v2TIMManager.addUIKitListener(
+    
+    String id = TencentImSDKPlugin.v2TIMManager.addUIKitListener(
       listener: V2TimUIKitListener(
         onUiKitEventEmit: listener,
       ),
     );
+    TencentCloudChat.instance.logInstance.console(
+      componentName: _tag,
+      logs: "addUIKitListener $id",
+      logLevel: TencentCloudChatLogLevel.debug,
+    );
+    return id;
   }
 
   void removeUIKitListener({
     required String listenerID,
   }) {
+    TencentCloudChat.instance.logInstance.console(
+      componentName: _tag,
+      logs: "removeUIKitListener $listenerID",
+      logLevel: TencentCloudChatLogLevel.debug,
+    );
     TencentImSDKPlugin.v2TIMManager.removeUIKitListener(uuid: listenerID);
   }
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
@@ -100,15 +99,9 @@ class _TencentCloudChatMessageReplyViewState
     final supportNavigation =
         widget.data.messageSeq != null || widget.data.messageTimestamp != null;
     return TencentCloudChatThemeWidget(
-      build: (context, colorTheme, textStyle) => Tooltip(
-        message: supportNavigation ? tL10n.longPressToNavigate : "",
-        triggerMode: supportNavigation
-            ? TooltipTriggerMode.tap
-            : TooltipTriggerMode.manual,
-        child: GestureDetector(
-          onLongPress: supportNavigation ? widget.methods.onTriggerNavigation : null,
-          child: replyView(),
-        ),
+      build: (context, colorTheme, textStyle) => GestureDetector(
+        onTap: supportNavigation ? widget.methods.onTriggerNavigation : null,
+        child: replyView(),
       ),
     );
   }
@@ -118,12 +111,9 @@ class _TencentCloudChatMessageReplyViewState
     final supportNavigation =
         widget.data.messageSeq != null || widget.data.messageTimestamp != null;
     return TencentCloudChatThemeWidget(
-      build: (context, colorTheme, textStyle) => Container(
-        margin: const EdgeInsets.only(top: 4),
-        child: InkWell(
-          onTap: supportNavigation ? widget.methods.onTriggerNavigation : null,
-          child: replyView(),
-        ),
+      build: (context, colorTheme, textStyle) =>  InkWell(
+        onTap: supportNavigation ? widget.methods.onTriggerNavigation : null,
+        child: replyView(),
       ),
     );
   }

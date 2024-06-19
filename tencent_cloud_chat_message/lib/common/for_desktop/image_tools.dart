@@ -18,8 +18,10 @@ class TencentCloudChatDesktopImageTools {
     Size? imageSize,
     required BuildContext context,
     required String imagePath,
+    String? imageName,
+    dynamic inputElement,
     required String currentConversationShowName,
-    required Function({required String imagePath}) sendImageMessage,
+    required Function({String? imagePath, String? imageName, dynamic inputElement}) sendImageMessage,
   }) async {
     final Size size = imageSize ?? await getImageSize(imagePath);
 
@@ -72,7 +74,11 @@ class TencentCloudChatDesktopImageTools {
                   ),
                   ElevatedButton(
                       onPressed: () {
-                        sendImageMessage(imagePath: imagePath);
+                        sendImageMessage(
+                          imagePath: imagePath,
+                          imageName: imageName,
+                          inputElement: inputElement,
+                        );
                         closeFunc();
                       },
                       child: Text(tL10n.send))

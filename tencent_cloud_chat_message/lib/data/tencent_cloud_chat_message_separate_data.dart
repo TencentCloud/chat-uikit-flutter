@@ -215,7 +215,9 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
   }
 
   String addUIKitListener() {
-    return TencentCloudChat.instance.chatSDKInstance.messageSDK.addUIKitListener(listener: uikitListener);
+    var id = TencentCloudChat.instance.chatSDKInstance.messageSDK.addUIKitListener(listener: uikitListener);
+    listenerID = id;
+    return id;
   }
 
   void removeUIKitListener() {
@@ -283,7 +285,7 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
     int? seq,
   }) async {
     assert(message != null || timeStamp != null || seq != null);
-    if(TencentCloudChatPlatformAdapter().isWeb){
+    if (TencentCloudChatPlatformAdapter().isWeb) {
       return false;
     }
     try {
@@ -427,7 +429,10 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
           cleanTimestamp: 0,
           cleanSequence: 0,
         );
-    listenerID = addUIKitListener();
+    if (listenerID.isNotEmpty) {
+      removeUIKitListener();
+    }
+    addUIKitListener();
     addMessageVideoInit();
   }
 
@@ -438,6 +443,12 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
       macOS: true, // default: false    -    dependency: media_kit_libs_macos_video
       windows: true, // default: false    -    dependency: media_kit_libs_windows_video
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    removeUIKitListener();
   }
 
   void unInit() {
@@ -484,9 +495,14 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
   }
 
   Future<List<V2TimGroupMemberFullInfo?>> _loadGroupMemberList({String nextSeq = "0"}) async {
+    final bool mentionGroupAdminAndOwnerOnly = config.mentionGroupAdminAndOwnerOnly(
+      groupID: _groupID,
+      userID: _userID,
+      topicID: _topicID,
+    );
     final res = await TencentCloudChat.instance.chatSDKInstance.groupSDK.getGroupMemberList(
       groupID: _groupID ?? "",
-      filter: GroupMemberFilterTypeEnum.V2TIM_GROUP_MEMBER_FILTER_ALL,
+      filter: mentionGroupAdminAndOwnerOnly ? GroupMemberFilterTypeEnum.V2TIM_GROUP_MEMBER_FILTER_ADMIN : GroupMemberFilterTypeEnum.V2TIM_GROUP_MEMBER_FILTER_ALL,
       nextSeq: nextSeq,
     );
     List<V2TimGroupMemberFullInfo?> list = [];
@@ -500,6 +516,14 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
     }
 
     if (nextSeq == "0") {
+      if (mentionGroupAdminAndOwnerOnly) {
+        final res = await TencentCloudChat.instance.chatSDKInstance.groupSDK.getGroupMemberList(
+          groupID: _groupID ?? "",
+          filter: GroupMemberFilterTypeEnum.V2TIM_GROUP_MEMBER_FILTER_OWNER,
+          nextSeq: nextSeq,
+        );
+        list.insertAll(0, res?.data?.memberInfoList ?? []);
+      }
       setGroupMemberList(list, true);
     }
     return list;
@@ -616,29 +640,31 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
 
   _sendMessage({V2TimMsgCreateInfoResult? messageInfoResult}) async {
     if (messageInfoResult != null) {
-      messageController.scrollToBottom(
-        userID: _userID,
-        groupID: _groupID,
-        topicID: _topicID,
-      );
+      final tempRepliedMessage = _repliedMessage;
+
+      if (_repliedMessage != null) {
+        _repliedMessage = null;
+        notifyListeners();
+      }
 
       final res = await _messageController?.sendMessage(
         createdMessage: messageInfoResult,
         userID: _userID,
         groupID: _groupID,
         topicID: _topicID,
-        repliedMessage: _repliedMessage,
+        repliedMessage: tempRepliedMessage,
         groupInfo: _groupInfo,
         config: _config,
         beforeMessageSendingHook: messageEventHandlers?.lifeCycleEventHandlers.beforeMessageSending,
       );
 
-      if (res != null && res.code == 0) {
-        if (repliedMessage != null) {
-          repliedMessage = null;
-          notifyListeners();
-        }
-      } else {
+      messageController.scrollToBottom(
+        userID: _userID,
+        groupID: _groupID,
+        topicID: _topicID,
+      );
+
+      if (res == null || res.code != 0) {
         TencentCloudChat.instance.callbacks.onSDKFailed(
           "sendMessage",
           res?.code ?? -1,
@@ -693,7 +719,7 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
     }
     String? snapshotPath;
     final String fileExtension = Pertypath().extension(videoPath ?? "").toLowerCase();
-    if(!TencentCloudChatPlatformAdapter().isWeb){
+    if (!TencentCloudChatPlatformAdapter().isWeb) {
       final plugin = FcNativeVideoThumbnail();
       snapshotPath = "${(await getTemporaryDirectory()).path}${Pertypath().basename(videoPath ?? "")}.jpeg";
       await plugin.getVideoThumbnail(
