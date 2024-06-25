@@ -162,6 +162,9 @@ class TIMUIKitChat extends StatefulWidget {
   /// additional network requests to fetch the group member information internally.
   List<V2TimGroupMemberFullInfo?>? groupMemberList;
 
+  /// If you are an administrator, you need to hide the input module
+  final bool? isAdministrator;
+
   TIMUIKitChat(
       {Key? key,
       this.groupID,
@@ -198,7 +201,8 @@ class TIMUIKitChat extends StatefulWidget {
       this.customAppBar,
       this.inputTopBuilder,
       this.onSecondaryTapAvatar,
-      this.customMessageHoverBarOnDesktop})
+      this.customMessageHoverBarOnDesktop,
+      this.isAdministrator = false,})
       : super(key: key) {
     startTime = DateTime.now().millisecondsSinceEpoch;
   }
@@ -508,6 +512,9 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                           widget.inputTopBuilder ?? Container(),
                           Selector<TUIChatSeparateViewModel, bool>(
                             builder: (context, value, child) {
+                              if (widget.isAdministrator == true) {
+                                return SizedBox();
+                              }
                               return value
                                   ? MultiSelectPanel(
                                       conversationType: _getConvType(),
