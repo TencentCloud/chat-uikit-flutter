@@ -197,7 +197,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
 
   clearCurrentConversation() {
     // Only keep the last 20 messages when existing a chat.
-    _messageListMap[currentSelectedConv] = (_messageListMap[currentSelectedConv] ?? []).sublist(0, min(10, ((_messageListMap[currentSelectedConv] ?? []).length - 1)));
+    _messageListMap[currentSelectedConv] = (_messageListMap[currentSelectedConv] ?? []).sublist(0, max(0, min(10, ((_messageListMap[currentSelectedConv] ?? []).length - 1))));
     if (_currentConversationList.isNotEmpty) {
       _currentConversationList.removeLast();
     }
