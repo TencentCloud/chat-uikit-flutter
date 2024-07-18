@@ -30,57 +30,70 @@ class TencentCloudChatColumnMenuState
               onTap: () {
                 item.onTap();
               },
-              child: Container(
-                padding: widget.padding ?? const EdgeInsets.all(8),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Builder(builder: (ctx){
-                      if (item.iconAsset != null) {
-                        final type = item.iconAsset!.path.split(".")[item.iconAsset!.path.split(".").length - 1];
-                        if (type == "svg") {
-                          return SvgPicture.asset(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minWidth: 130),
+                child: Container(
+                  padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 14, vertical: 8,),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+
+                      // if (item.icon != null || item.iconAsset != null)
+                      //   const SizedBox(
+                      //     height: 4,
+                      //     width: 4,
+                      //   ),
+                      Builder(builder: (ctx){
+                        if (item.iconAsset != null) {
+                          final type = item.iconAsset!.path.split(".")[item.iconAsset!.path.split(".").length - 1];
+                          if (type == "svg") {
+                            return SvgPicture.asset(
+                              item.iconAsset!.path,
+                              package: item.iconAsset!.package,
+                              width: 16,
+                              height: 16,
+                              colorFilter: ui.ColorFilter.mode(
+                                theme.secondaryTextColor,
+                                ui.BlendMode.srcIn,
+                              ),
+                            );
+                          }
+                          return Image.asset(
                             item.iconAsset!.path,
                             package: item.iconAsset!.package,
-                            width: 16,
-                            height: 16,
-                            colorFilter: ui.ColorFilter.mode(
-                              theme.secondaryTextColor,
-                              ui.BlendMode.srcIn,
-                            ),
+                            width: 14,
+                            height: 14,
+                            color: theme.secondaryTextColor,
                           );
                         }
-                        return Image.asset(
-                          item.iconAsset!.path,
-                          package: item.iconAsset!.package,
-                          width: 14,
-                          height: 14,
-                          color: theme.secondaryTextColor,
-                        );
-                      }
-                      if (item.icon != null) {
-                        return Icon(
-                          item.icon,
-                          size: 14,
-                        );
-                      }
-                      return Container();
-                    }),
-                    if (item.icon != null || item.iconAsset != null)
+                        if (item.icon != null) {
+                          return Icon(
+                            item.icon,
+                            size: 14,
+                          );
+                        }
+                        return Container();
+                      }),
+                      if (item.icon != null || item.iconAsset != null)
+                        const SizedBox(
+                          height: 12,
+                          width: 12,
+                        ),
+                      Text(
+                        item.label,
+                        style: TextStyle(
+                          decoration: TextDecoration.none,
+                          color: theme.primaryTextColor,
+                          fontSize: 13,
+                        ),
+                      ),
                       const SizedBox(
                         height: 4,
                         width: 8,
                       ),
-                    Text(
-                      item.label,
-                      style: TextStyle(
-                        decoration: TextDecoration.none,
-                        color: theme.primaryTextColor,
-                        fontSize: 13,
-                      ),
-                    )
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),

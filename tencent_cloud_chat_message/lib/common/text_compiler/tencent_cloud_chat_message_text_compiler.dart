@@ -119,6 +119,7 @@ String getMarkDownStringData({
   return formattedText;
 }
 
+
 String _addSpaceAfterLeftBracket(String inputText) {
   return inputText.splitMapJoin(
     RegExp(r'<\w+[^<>]*>'),

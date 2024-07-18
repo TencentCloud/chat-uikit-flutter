@@ -26,7 +26,7 @@ class MethodChannelTencentCloudChatPush extends TencentCloudChatPushPlatform {
     try {
       _tencentCloudChatPushModal.onNotificationClicked = onNotificationClicked;
       _methodChannel.setMethodCallHandler(_tencentCloudChatPushModal.handleMethod);
-      if(Platform.isAndroid || Platform.isIOS){
+      if (Platform.isAndroid || Platform.isIOS) {
         await _methodChannel.invokeMethod("registerOnNotificationClickedEvent");
       }
       return TencentCloudChatPushResult(code: 0);
@@ -45,7 +45,7 @@ class MethodChannelTencentCloudChatPush extends TencentCloudChatPushPlatform {
     try {
       _tencentCloudChatPushModal.onAppWakeUp = onAppWakeUpEvent;
       _methodChannel.setMethodCallHandler(_tencentCloudChatPushModal.handleMethod);
-      if(Platform.isAndroid){
+      if (Platform.isAndroid) {
         await _methodChannel.invokeMethod("registerOnAppWakeUpEvent");
       }
       return TencentCloudChatPushResult(code: 0);
@@ -58,12 +58,13 @@ class MethodChannelTencentCloudChatPush extends TencentCloudChatPushPlatform {
   }
 
   @override
-  Future<TencentCloudChatPushResult> registerPush({String? configJson}) async {
+  Future<TencentCloudChatPushResult> registerPush() async {
     try {
-      if(Platform.isIOS || Platform.isAndroid){
-        await _methodChannel.invokeMethod("registerPush", {"push_config_json": configJson ?? ""});
+      if (Platform.isIOS || Platform.isAndroid) {
+        final res = await _methodChannel.invokeMethod("registerPush");
+        return TencentCloudChatPushResult(code: 0, data: res);
       }
-      return TencentCloudChatPushResult(code: 0);
+      return TencentCloudChatPushResult(code: -1);
     } on PlatformException catch (e) {
       return TencentCloudChatPushResult(
         code: int.tryParse(e.code) ?? -1,
@@ -99,13 +100,13 @@ class MethodChannelTencentCloudChatPush extends TencentCloudChatPushPlatform {
   }
 
   @override
-  Future<TencentCloudChatPushResult> configFCMPrivateRing({
+  Future<TencentCloudChatPushResult> setCustomFCMRing({
     required String channelId,
     required String ringName,
     required bool enable,
   }) async {
     try {
-      await _methodChannel.invokeMethod("configFCMPrivateRing", {
+      await _methodChannel.invokeMethod("setCustomFCMRing", {
         "fcm_push_channel_id": channelId,
         "private_ring_name": ringName,
         "enable_fcm_private_ring": enable.toString(),
@@ -223,12 +224,29 @@ class MethodChannelTencentCloudChatPush extends TencentCloudChatPushPlatform {
   }
 
   @override
-  Future<TencentCloudChatPushResult> setAndroidCustomTIMPushConfigs({
+  Future<TencentCloudChatPushResult> setAndroidCustomConfigFile({
     required String configs,
   }) async {
     try {
-      await _methodChannel.invokeMethod("setAndroidCustomTIMPushConfigs", {
+      await _methodChannel.invokeMethod("setAndroidCustomConfigFile", {
         "configs": configs,
+      });
+      return TencentCloudChatPushResult(code: 0);
+    } on PlatformException catch (e) {
+      return TencentCloudChatPushResult(
+        code: int.tryParse(e.code) ?? -1,
+        errorMessage: e.message,
+      );
+    }
+  }
+
+  @override
+  Future<TencentCloudChatPushResult> setXiaoMiPushStorageRegion({
+    required int region,
+  }) async {
+    try {
+      await _methodChannel.invokeMethod("setXiaoMiPushStorageRegion", {
+        "region": region.toString(),
       });
       return TencentCloudChatPushResult(code: 0);
     } on PlatformException catch (e) {

@@ -91,6 +91,7 @@ class MessageItemBuilderData {
   final bool hasStickerPlugin;
   final TencentCloudChatPlugin? stickerPluginInstance;
   final Widget? repliedMessageItem;
+  final TencentCloudChatPlugin? messageReactionPluginInstance;
 
   MessageItemBuilderData({
     this.repliedMessageItem,
@@ -113,6 +114,7 @@ class MessageItemBuilderData {
     required this.inMergerMessagePreviewMode,
     required this.hasStickerPlugin,
     this.stickerPluginInstance,
+    this.messageReactionPluginInstance,
   });
 }
 
@@ -146,17 +148,19 @@ class MessageItemMenuBuilderData {
   final V2TimMessage message;
   final bool inSelectMode;
   final bool isMergeMessage;
+  final TencentCloudChatPlugin? messageReactionPluginInstance;
 
-  MessageItemMenuBuilderData({
+  MessageItemMenuBuilderData( {
     required this.useMessageReaction,
     required this.message,
     required this.inSelectMode,
     required this.isMergeMessage,
+    this.messageReactionPluginInstance,
   });
 }
 
 class MessageItemMenuBuilderMethods {
-  final Widget Function({required bool renderOnMenuPreview}) getMessageItemWidget;
+  final Widget Function({required bool renderOnMenuPreview, Key? key,}) getMessageItemWidget;
   final VoidCallback onSelectMessage;
   final List<TencentCloudChatMessageGeneralOptionItem> Function({String? selectedText}) getMenuOptions;
 
@@ -663,12 +667,18 @@ class MessageRowBuilderWidgets {
 
   final Widget? messageReplyItem;
 
+  final Widget? messageTextTransalteItem;
+
+  final Widget? messageSoundToTextItem;
+
   MessageRowBuilderWidgets({
     required this.messageRowAvatar,
     this.messageRowMessageItem,
+    this.messageTextTransalteItem,
     required this.messageRowMessageSenderName,
     this.messageRowTips,
     this.messageReplyItem,
+    this.messageSoundToTextItem
   });
 }
 

@@ -1243,4 +1243,77 @@ class TencentCloudChatLocalizationsAr extends TencentCloudChatLocalizations {
 
   @override
   String get reEdit => 'إعادة تحرير';
+
+  @override
+  String get translate => 'ترجمة';
+
+  @override
+  String memberRecalledMessage(Object member) {
+    return '$member استدعى رسالة';
+  }
+
+  @override
+  String get copyFileSuccess => 'تم نسخ الملف بنجاح';
+
+  @override
+  String get saveFileSuccess => 'تم حفظ الملف بنجاح';
+
+  @override
+  String get saveFileFailed => 'فشل حفظ الملف';
+
+  @override
+  String get copyLinkSuccess => 'تم نسخ الرابط بنجاح';
+
+  @override
+  String get copyImageContextMenuBtnText => 'نسخ الصورة';
+
+  @override
+  String get saveToLocalContextMenuBtnText => 'حفظ باسم';
+
+  @override
+  String get copyLinkContextMenuBtnText => 'نسخ الرابط';
+
+  @override
+  String get openLinkContextMenuBtnText => 'فتح في نافذة جديدة';
+
+  @override
+  String get reactionList => 'Reaction List';
+
+  @override
+  String get translatedBy => 'مدعوم من Tencent RTC';
+
+  @override
+  String get convertToText => 'تحويل';
+
+  @override
+  String numMessages(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count رسالات',
+      one: '1 رسالة',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get filterBy => 'تصفية حسب';
+
+  @override
+  String get text => 'نص';
+
+  @override
+  String get numMessagesOver99 => '99+ رسائل';
+
+  @override
+  String get setGroupAnnouncement => 'تعيين إعلان المجموعة';
+
+  @override
+  String get setNickName => 'تعيين اسم المجموعة';
+
+  @override
+  String get joinTime => 'وقت الانضمام';
+
+  @override
+  String get myRoleInGroup => 'الدور';
 }

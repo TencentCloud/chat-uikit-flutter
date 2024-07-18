@@ -1243,6 +1243,79 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
 
   @override
   String get reEdit => '重新编辑';
+
+  @override
+  String get translate => '翻译';
+
+  @override
+  String memberRecalledMessage(Object member) {
+    return '$member撤回了一条消息';
+  }
+
+  @override
+  String get copyFileSuccess => '复制文件成功';
+
+  @override
+  String get saveFileSuccess => '保存文件成功';
+
+  @override
+  String get saveFileFailed => '保存文件失败';
+
+  @override
+  String get copyLinkSuccess => '复制链接成功';
+
+  @override
+  String get copyImageContextMenuBtnText => '复制图片';
+
+  @override
+  String get saveToLocalContextMenuBtnText => '另存为';
+
+  @override
+  String get copyLinkContextMenuBtnText => '复制链接';
+
+  @override
+  String get openLinkContextMenuBtnText => '在新窗口打开';
+
+  @override
+  String get reactionList => 'Reaction List';
+
+  @override
+  String get translatedBy => '由腾讯云IM提供支持';
+
+  @override
+  String get convertToText => '转换';
+
+  @override
+  String numMessages(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 条消息',
+      one: '1 条消息',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get filterBy => '筛选';
+
+  @override
+  String get text => '文本';
+
+  @override
+  String get numMessagesOver99 => '99+ 条消息';
+
+  @override
+  String get setGroupAnnouncement => '设置群公告';
+
+  @override
+  String get setNickName => '设置群名片';
+
+  @override
+  String get joinTime => '加入时间';
+
+  @override
+  String get myRoleInGroup => '角色';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2489,4 +2562,74 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
 
   @override
   String get reEdit => '重新編輯';
+
+  @override
+  String get translate => '翻譯';
+
+  @override
+  String memberRecalledMessage(Object member) {
+    return '$member撤回咗一條訊息';
+  }
+
+  @override
+  String get copyFileSuccess => '複製文件成功';
+
+  @override
+  String get saveFileSuccess => '儲存文件成功';
+
+  @override
+  String get saveFileFailed => '儲存文件失敗';
+
+  @override
+  String get copyLinkSuccess => '複製連結成功';
+
+  @override
+  String get copyImageContextMenuBtnText => '複製圖片';
+
+  @override
+  String get saveToLocalContextMenuBtnText => '另存為';
+
+  @override
+  String get copyLinkContextMenuBtnText => '複製連結';
+
+  @override
+  String get openLinkContextMenuBtnText => '喺新窗口打開';
+
+  @override
+  String get translatedBy => '由騰訊 RTC 提供支持';
+
+  @override
+  String get convertToText => '轉換';
+
+  @override
+  String numMessages(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 條訊息',
+      one: '1 條訊息',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get filterBy => '篩選';
+
+  @override
+  String get text => '文字';
+
+  @override
+  String get numMessagesOver99 => '99+ 條訊息';
+
+  @override
+  String get setGroupAnnouncement => '設置群公告';
+
+  @override
+  String get setNickName => '設置群名片';
+
+  @override
+  String get joinTime => '加入時間';
+
+  @override
+  String get myRoleInGroup => '角色';
 }

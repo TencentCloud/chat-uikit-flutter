@@ -1,3 +1,37 @@
+## 1.5.0
+
+### General
+
+* Upgraded the underlying Flutter Chat SDK, as well as the iOS and Android Chat SDKs, to version 8.0.
+* Migrated group data storage to a global LRU-optimized cache, improving the integration between TencentCloudChatMessage
+  and TencentCloudChatGroupProfile components.
+
+### Message (TencentCloudChatMessage)
+
+* Added the ability to display sender avatars in offline push notifications when applicable.
+* Fixed an issue affecting the message sending workflow.
+* Fixed a problem with video previews and playback functionality.
+* Fixed a bug in the offline message push data handling that could result in the `onNotificationClicked` event
+  malfunctioning.
+
+### Group Profile (TencentCloudChatGroupProfile)
+
+* Improved Desktop platform compatibility and performance.
+* Fixed several issues to enhance overall stability.
+
+## 1.4.1
+
+### General
+* Enhanced performance on the Web.
+
+### Message (TencentCloudChatMessage)
+* **[Breakthrough]**: Integrated the new **Message Reaction Plugin**, enabling users to react to messages with stickers.
+* **[Breakthrough]**: Integrated the new **Message Translation Plugin**, enabling users to translate messages.
+* Added copy, save as, and open in a new window functionality for image messages.
+* Added support for navigating to specific messages on the Web.
+* Added support for navigating to specific messages in Communities.
+* Optimized memory usage for the message list on the Web.
+* Improved the styling of the message context menu.
 
 ## 1.4.0
 

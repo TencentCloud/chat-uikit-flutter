@@ -11,9 +11,11 @@ import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
 import 'package:tencent_cloud_chat/router/tencent_cloud_chat_route_names.dart';
 import 'package:tencent_cloud_chat/router/tencent_cloud_chat_router.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat/tuicore/tencent_cloud_chat_core.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_component_widget.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat_common.dart';
+import 'package:tencent_cloud_chat_common/widgets/group_member_selector/tencent_cloud_chat_group_member_selector.dart';
 import 'package:tencent_cloud_chat_group_profile/tencent_cloud_chat_group_profile_builders.dart';
 import 'package:tencent_cloud_chat_group_profile/tencent_cloud_chat_group_profile_controller.dart';
 import 'package:tencent_cloud_chat/components/component_event_handlers/tencent_cloud_chat_group_profile_event_handlers.dart';
@@ -47,9 +49,12 @@ class _TencentCloudChatGroupProfileState
     extends TencentCloudChatState<TencentCloudChatGroupProfile> {
   final Stream<TencentCloudChatGroupProfileData<dynamic>>?
       _groupProfileDataStream = TencentCloudChat.instance.eventBusInstance
-          .on<TencentCloudChatGroupProfileData<dynamic>>("TencentCloudChatGroupProfileData");
+          .on<TencentCloudChatGroupProfileData<dynamic>>(
+              "TencentCloudChatGroupProfileData");
   StreamSubscription<TencentCloudChatGroupProfileData<dynamic>>?
       _groupProfileDataSubscription;
+
+  List<V2TimGroupMemberFullInfo> _groupMemberList = [];
 
   Future<V2TimGroupInfo?> _loadGroupInfo() async {
     final res = await TencentCloudChat.instance.chatSDKInstance.manager
@@ -76,6 +81,7 @@ class _TencentCloudChatGroupProfileState
   @override
   void initState() {
     super.initState();
+    _groupMemberList = _getGroupMembersInfo();
     _addGroupProfileDataListener();
     _updateGlobalData();
   }
@@ -89,7 +95,7 @@ class _TencentCloudChatGroupProfileState
   @override
   void didUpdateWidget(TencentCloudChatGroupProfile oldWidget) {
     super.didUpdateWidget(oldWidget);
-    _updateGlobalData(oldWidget);
+    // _updateGlobalData(oldWidget);
   }
 
   _addGroupProfileDataListener() {
@@ -103,6 +109,15 @@ class _TencentCloudChatGroupProfileState
         data.currentUpdatedFields ==
             TencentCloudChatGroupProfileDataKeys.config) {
       setState(() {});
+    }
+
+    if (data.currentUpdatedFields ==
+        TencentCloudChatGroupProfileDataKeys.membersChange) {
+      if (data.updateGroupID == widget.options?.groupID) {
+        setState(() {
+          _groupMemberList = _getGroupMembersInfo();
+        });
+      }
     }
   }
 
@@ -135,6 +150,67 @@ class _TencentCloudChatGroupProfileState
     }
   }
 
+  List<V2TimGroupMemberFullInfo> _getGroupMembersInfo() {
+    final res = TencentCloudChat.instance.dataInstance.groupProfile
+        .getGroupMemberList(widget.options!.groupID);
+    return res.whereType<V2TimGroupMemberFullInfo>().toList();
+  }
+
+  _startVoiceCall() async {
+    final useCallKit = TencentCloudChat.instance.dataInstance.basic.useCallKit;
+    if (useCallKit) {
+      if (TencentCloudChatUtils.checkString(widget.options?.groupID) != null) {
+        final List<V2TimGroupMemberFullInfo> memberInfoList =
+            await showGroupMemberSelector(
+          groupMemberList: _groupMemberList,
+          context: context,
+          onSelectLabel: tL10n.startCall,
+        );
+        TencentCloudChatTUICore.audioCall(
+          userids: memberInfoList.map((e) => e.userID).toList(),
+          groupid: widget.options?.groupID,
+        );
+      }
+    }
+  }
+
+  _startVideoCall() async {
+    final useCallKit = TencentCloudChat.instance.dataInstance.basic.useCallKit;
+    if (useCallKit) {
+      if (TencentCloudChatUtils.checkString(widget.options?.groupID) != null) {
+        final List<V2TimGroupMemberFullInfo> memberInfoList =
+            await showGroupMemberSelector(
+          groupMemberList: _groupMemberList,
+          context: context,
+          onSelectLabel: tL10n.startCall,
+        );
+
+        TencentCloudChatTUICore.videoCall(
+          userids: memberInfoList.map((e) => e.userID).toList(),
+          groupid: widget.options?.groupID,
+        );
+      }
+    }
+  }
+
+  @override
+  Widget? desktopBuilder(BuildContext context) {
+    return FutureBuilder(
+      future: _loadGroupInfo(),
+      builder: (BuildContext context, AsyncSnapshot<V2TimGroupInfo?> snapshot) {
+        final groupInfo = widget.options?.groupInfo ?? snapshot.data;
+        return groupInfo != null
+            ? TencentCloudChatGroupProfileBody(
+                groupInfo: groupInfo,
+                groupMemberList: _groupMemberList,
+                startVideoCall: _startVideoCall,
+                startVoiceCall: _startVoiceCall,
+              )
+            : Container();
+      },
+    );
+  }
+
   @override
   Widget defaultBuilder(BuildContext context) {
     return FutureBuilder(
@@ -146,9 +222,9 @@ class _TencentCloudChatGroupProfileState
                 appBar: AppBar(title: Text(_getShowName(groupInfo: groupInfo))),
                 body: TencentCloudChatGroupProfileBody(
                   groupInfo: groupInfo,
-                  getGroupMembersInfo: widget.options!.getGroupMembersInfo,
-                  startVideoCall: widget.options!.startVideoCall,
-                  startVoiceCall: widget.options!.startVoiceCall,
+                  groupMemberList: _groupMemberList,
+                  startVideoCall: _startVideoCall,
+                  startVoiceCall: _startVoiceCall,
                 ))
             : Scaffold(
                 appBar: AppBar(title: Text(_getShowName())),
@@ -164,7 +240,6 @@ class _TencentCloudChatGroupProfileState
 /// and provides control over the component's configuration, UI widget builders, and event listeners on a global scale,
 /// affecting all instances of the TencentCloudChatGroupProfile component.
 class TencentCloudChatGroupProfileManager {
-
   /// Allows dynamic updating of UI widget builders for all instances.
   /// Call the `setBuilders` method and pass any UI builders to be modified,
   /// which will replace the previous configuration and apply changes immediately.
@@ -205,7 +280,7 @@ class TencentCloudChatGroupProfileManager {
     return TencentCloudChat
         .instance.dataInstance.groupProfile.groupProfileEventHandlers!;
   }
-  
+
   /// Manually declares the usage of the `TencentCloudChatGroupProfile` component.
   /// During the `initUIKit` call, add `TencentCloudChatGroupProfileManager.register` in `usedComponentsRegister` within `components`
   /// if you plan to use this component.
@@ -227,12 +302,8 @@ class TencentCloudChatGroupProfileManager {
                 .getArgumentFromMap<TencentCloudChatGroupProfileOptions>(
                     context, 'options') ??
             TencentCloudChatGroupProfileOptions(
-                groupID: "",
-                getGroupMembersInfo: () {
-                  return [];
-                },
-                startVideoCall: () {},
-                startVoiceCall: () {}),
+              groupID: "",
+            ),
       ),
     );
     return (
@@ -240,10 +311,7 @@ class TencentCloudChatGroupProfileManager {
       widgetBuilder: ({required Map<String, dynamic> options}) =>
           TencentCloudChatGroupProfile(
             options: TencentCloudChatGroupProfileOptions(
-                groupID: options["groupID"],
-                getGroupMembersInfo: options["getGroupMembersInfo"],
-                startVideoCall: options["startVideoCall"],
-                startVoiceCall: options["startVoiceCall"]),
+                groupID: options["groupID"]),
           ),
     );
   }

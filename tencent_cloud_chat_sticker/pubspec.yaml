@@ -1,6 +1,6 @@
 name: tencent_cloud_chat_sticker
 description: "tencent_cloud_chat_sticker"
-version: 1.0.0
+version: 1.1.0
 homepage:
 
 environment:
@@ -10,7 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  tencent_cloud_chat_sdk: ^7.9.5687
+  tencent_cloud_chat_sdk: ^8.0.5897
 
 dev_dependencies:
   flutter_test:

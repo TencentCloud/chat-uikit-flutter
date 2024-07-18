@@ -4,6 +4,7 @@ import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_contac
 import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_conversation_sdk.dart';
 import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_group_sdk.dart';
 import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_message_sdk.dart';
+import 'package:tencent_cloud_chat/chat_sdk/components/tencent_cloud_chat_search_sdk.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 
 class TencentCloudChatSDKGenerator {
@@ -26,6 +27,8 @@ class TencentCloudChatSDK {
   final messageSDK = TencentCloudChatMessageSDKGenerator.getInstance();
 
   final groupSDK = TencentCloudChatGroupSDKGenerator.getInstance();
+
+  final searchSDK = TencentCloudChatSearchSDKGenerator.getInstance();
 
   V2TimSDKListener getInitSDKListener(V2TimSDKListener? sdkListener) => V2TimSDKListener(
         onConnectFailed: (code, error) {

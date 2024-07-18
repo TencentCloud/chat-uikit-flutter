@@ -39,4 +39,5 @@ enum TencentCloudChatPopupOperationKey {
   confirmGeneral,
   unableToSendDueToFolders,
   sendResourcesOnDesktop,
+  searchInChat,
 }

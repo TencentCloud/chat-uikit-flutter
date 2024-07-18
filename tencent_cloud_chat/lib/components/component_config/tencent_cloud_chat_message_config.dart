@@ -52,6 +52,9 @@ class TencentCloudChatMessageConfig {
   /// A configuration option that determines whether to parse and render text messages as Markdown formatted content.
   TencentCloudChatMessageValueConfig<bool> _enableParseMarkdown;
 
+  /// A configuration option that controls whether to enable Emoji reactions for messages.
+  /// The `tencent_cloud_chat_sticker` package is required to use this feature, so it must be imported first.
+  TencentCloudChatMessageValueConfig<bool> _enableMessageReaction;
   /// A configuration option that determines whether allow mention group admins and owner only.
   TencentCloudChatMessageValueConfig<bool> _mentionGroupAdminAndOwnerOnly;
 
@@ -111,14 +114,6 @@ class TencentCloudChatMessageConfig {
   /// ```
   TencentCloudChatMessageValueConfig<List<String>> _enabledGroupTypesForMessageReadReceipt;
 
-  /// Determines whether to use the built-in QQ-style emoji set.
-  ///
-  /// When set to `true`, it will enable the built-in QQ-style
-  /// emoji set, which consists of small icons that can be embedded within
-  /// text messages. Users can choose from these emojis to enhance their
-  /// communication and express their emotions in a more engaging way.
-  TencentCloudChatMessageValueConfig<bool> _enableDefaultEmojis;
-
   /// A list of custom sticker sets provided by you.
   ///
   /// You can add your own sticker sets to the application by including
@@ -154,8 +149,8 @@ class TencentCloudChatMessageConfig {
     TencentCloudChatMessageValueConfig<bool>? showMessageSenderName,
     TencentCloudChatMessageValueConfig<bool>? showMessageTimeIndicator,
     TencentCloudChatMessageValueConfig<bool>? showMessageStatusIndicator,
-    enableMessageDeleteForEveryone,
-    TencentCloudChatMessageValueConfig<bool>? enableDefaultEmojis,
+    TencentCloudChatMessageValueConfig<bool>? enableMessageDeleteForEveryone,
+    TencentCloudChatMessageValueConfig<bool>? enableMessageReaction,
     TencentCloudChatMessageValueConfigWithMessage<OfflinePushInfo>? messageOfflinePushInfo,
     TencentCloudChatMessageValueConfig<List<TencentCloudChatStickerSet>>? additionalStickerSets,
     TencentCloudChatMessageValueConfig<TencentCloudChatMessageAttachmentConfig>? attachmentConfig,
@@ -183,9 +178,9 @@ class TencentCloudChatMessageConfig {
         _desktopMessageInputLines = desktopMessageInputLines ?? createDefaultValue(5),
         _recallTimeLimit = recallTimeLimit ?? createDefaultValue(120),
         _enableMessageDeleteForEveryone = enableMessageDeleteForEveryone ?? createDefaultValue(true),
+        _enableMessageReaction = enableMessageReaction ?? createDefaultValue(true),
         _attachmentConfig = attachmentConfig ??
             createDefaultValue<TencentCloudChatMessageAttachmentConfig>(TencentCloudChatMessageAttachmentConfig()),
-        _enableDefaultEmojis = enableDefaultEmojis ?? createDefaultValue(true),
         _messageOfflinePushInfo = messageOfflinePushInfo ?? createDefaultValueWithMessage(OfflinePushInfo()),
         _additionalStickerSets = additionalStickerSets ?? createDefaultValue<List<TencentCloudChatStickerSet>>([]),
         _defaultMessageSelectionOperationsConfig = defaultMessageSelectionOperationsConfig ??
@@ -215,11 +210,13 @@ class TencentCloudChatMessageConfig {
     TencentCloudChatMessageValueConfig<bool>? enableParseMarkdown,
     TencentCloudChatMessageValueConfig<TencentCloudChatMessageAttachmentConfig>? attachmentConfig,
     TencentCloudChatMessageValueConfig<bool>? showMessageTimeIndicator,
+    TencentCloudChatMessageValueConfig<bool>? enableMessageReaction,
     TencentCloudChatMessageValueConfig<bool>? showMessageStatusIndicator,
     enableMessageDeleteForEveryone,
     TencentCloudChatMessageValueConfig<bool>? enableDefaultEmojis,
     TencentCloudChatMessageValueConfig<bool>? enableReplyWithMention,
     TencentCloudChatMessageValueConfig<bool>? showMessageSenderName,
+    TencentCloudChatMessageValueConfig<bool>? enableMessageTranslate,
     TencentCloudChatMessageValueConfigWithMessage<OfflinePushInfo>? messageOfflinePushInfo,
     TencentCloudChatMessageValueConfig<List<TencentCloudChatStickerSet>>? additionalStickerSets,
     TencentCloudChatMessageValueConfig<List<TencentCloudChatMessageGeneralOptionItem>>?
@@ -241,12 +238,12 @@ class TencentCloudChatMessageConfig {
     _showMessageStatusIndicator = showMessageStatusIndicator ?? _showMessageStatusIndicator;
     _desktopMessageInputLines = desktopMessageInputLines ?? _desktopMessageInputLines;
     _enableParseMarkdown = enableParseMarkdown ?? createDefaultValue(false);
+    _enableMessageReaction = enableMessageReaction ?? createDefaultValue(true);
     _recallTimeLimit = recallTimeLimit ?? _recallTimeLimit;
     _enableAutoReportReadStatusForComingMessages =
         enableAutoReportReadStatusForComingMessages ?? createDefaultValue(true);
     _mentionGroupAdminAndOwnerOnly = mentionGroupAdminAndOwnerOnly ?? createDefaultValue(false);
     _enableMessageDeleteForEveryone = enableMessageDeleteForEveryone ?? _enableMessageDeleteForEveryone;
-    _enableDefaultEmojis = enableDefaultEmojis ?? _enableDefaultEmojis;
     _enableReplyWithMention = enableReplyWithMention ?? createDefaultValue(true);
     _attachmentConfig = attachmentConfig ??
         createDefaultValue<TencentCloudChatMessageAttachmentConfig>(TencentCloudChatMessageAttachmentConfig());
@@ -307,8 +304,9 @@ class TencentCloudChatMessageConfig {
 
   TencentCloudChatMessageValueConfig<bool> get showSelfAvatar => _showSelfAvatar;
 
-  TencentCloudChatMessageValueConfig<List<String>> get enabledGroupTypesForMessageReadReceipt =>
-      _enabledGroupTypesForMessageReadReceipt;
+  TencentCloudChatMessageValueConfig<List<String>> get enabledGroupTypesForMessageReadReceipt => _enabledGroupTypesForMessageReadReceipt;
+
+  TencentCloudChatMessageValueConfig<bool> get enableMessageReaction => _enableMessageReaction;
 
   TencentCloudChatMessageValueConfig<bool> get enableParseMarkdown => _enableParseMarkdown;
 

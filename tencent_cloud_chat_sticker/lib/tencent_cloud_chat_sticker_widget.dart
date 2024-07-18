@@ -4,16 +4,16 @@ import 'package:tencent_cloud_chat_sticker/tencent_cloud_chat_sticker.dart';
 import 'package:tencent_cloud_chat_sticker/tencent_cloud_chat_sticker_model.dart';
 import 'package:tencent_cloud_chat_sticker/tencent_cloud_chat_sticker_utils.dart';
 
-class TencentCloudChatStickerPannel extends StatefulWidget {
-  const TencentCloudChatStickerPannel({super.key});
+class TencentCloudChatStickerPanel extends StatefulWidget {
+  const TencentCloudChatStickerPanel({super.key});
 
   @override
-  State<StatefulWidget> createState() => TencentCloudChatStickerPannelState();
+  State<StatefulWidget> createState() => TencentCloudChatStickerPanelState();
 }
 
 typedef OnTabClickCallback = void Function(int currentIndex);
 
-class TencentCloudChatStickerPannelState extends State<TencentCloudChatStickerPannel> with SingleTickerProviderStateMixin {
+class TencentCloudChatStickerPanelState extends State<TencentCloudChatStickerPanel> with SingleTickerProviderStateMixin {
   int activeTabIndex = 0;
   late OnTabClickCallback onTabClickCallback;
   late AnimationController _controller;

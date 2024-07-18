@@ -114,7 +114,7 @@ const Map<String, String> tencentCloudChatStickerCustomFace4352 = {
   "assets/custom_face_resource/4352/gcs07@2x.png": "[gcs07]",
   "assets/custom_face_resource/4352/gcs08@2x.png": "[gcs08]",
   "assets/custom_face_resource/4352/gcs09@2x.png": "[gcs09]",
-  "assets/custom_face_resource/4352/gcs10@2x.png": "[gcs00]",
+  "assets/custom_face_resource/4352/gcs10@2x.png": "[gcs10]",
   "assets/custom_face_resource/4352/gcs11@2x.png": "[gcs11]",
   "assets/custom_face_resource/4352/gcs12@2x.png": "[gcs12]",
   "assets/custom_face_resource/4352/gcs13@2x.png": "[gcs13]",

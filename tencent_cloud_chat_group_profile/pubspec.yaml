@@ -1,6 +1,6 @@
 name: tencent_cloud_chat_group_profile
 description: Tencent Cloud Chat UIKit Group Profile component offers a feature-rich and customizable group profile page, enabling seamless group management and an engaging chat experience.
-version: 1.4.0
+version: 1.5.0
 repository: https://github.com/TencentCloud/chat-uikit-flutter/tree/v2/tencent_cloud_chat_group_profile
 homepage: https://trtc.io/products/chat?utm_source=flutter_pub
 
@@ -18,9 +18,15 @@ platforms:
 dependencies:
   flutter:
     sdk: flutter
-  tencent_cloud_chat: ^1.4.0
-  tencent_cloud_chat_common: ^1.4.0
+  tencent_cloud_chat: ^1.5.0
+  tencent_cloud_chat_common: ^1.5.0
   azlistview_all_platforms: ^2.1.2
+
+dependency_overrides:
+  tencent_cloud_chat:
+    path: ../tencent_cloud_chat
+  tencent_cloud_chat_intl:
+    path: ../tencent_cloud_chat_intl
 
 dev_dependencies:
   flutter_test:

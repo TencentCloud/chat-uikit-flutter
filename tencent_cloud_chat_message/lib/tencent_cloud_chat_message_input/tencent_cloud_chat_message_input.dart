@@ -66,7 +66,7 @@ class _TencentCloudChatMessageInputState
   Widget defaultBuilder(BuildContext context) {
     _getMessageInputStatusText();
     return TencentCloudChatMessageInputMobile(
-      key: Key(TencentCloudChatUtils.checkString(widget.data.groupID) ?? widget.data.userID ?? ""),
+      key: Key(TencentCloudChatUtils.checkString(widget.data.topicID) ?? TencentCloudChatUtils.checkString(widget.data.groupID) ?? widget.data.userID ?? ""),
       inputMethods: widget.methods,
       inputData: widget.data,
     );
@@ -76,7 +76,7 @@ class _TencentCloudChatMessageInputState
   Widget desktopBuilder(BuildContext context) {
     final String? statusText = _getMessageInputStatusText();
     return TencentCloudChatMessageInputDesktop(
-      key: Key(TencentCloudChatUtils.checkString(widget.data.groupID) ?? widget.data.userID ?? ""),
+      key: Key(TencentCloudChatUtils.checkString(widget.data.topicID) ?? TencentCloudChatUtils.checkString(widget.data.groupID) ?? widget.data.userID ?? ""),
       inputMethods: widget.methods,
       inputData: widget.data,
       statusText: statusText,

@@ -13,7 +13,7 @@ import 'package:tencent_cloud_chat_sticker/tencent_cloud_chat_sticker_version_in
 import 'package:tencent_cloud_chat_sticker/tencent_cloud_chat_sticker_widget.dart';
 
 class TencentCloudChatStickerPluginExpWidgetName {
-  static const String stickerPannel = "stickerPannel";
+  static const String stickerPanel = "stickerPanel";
   static const String getStickerWidgetForMessageItem = "getStickerWidgetForMessageItem";
 }
 
@@ -74,8 +74,8 @@ class TencentCloudChatStickerPlugin extends TencentCloudChatPlugin {
     Map<String, String>? data,
     Map<String, TencentCloudChatPluginTapFn>? fns,
   }) async {
-    if (methodName == TencentCloudChatStickerPluginExpWidgetName.stickerPannel) {
-      return const TencentCloudChatStickerPannel();
+    if (methodName == TencentCloudChatStickerPluginExpWidgetName.stickerPanel) {
+      return const TencentCloudChatStickerPanel();
     }
     return null;
   }
@@ -177,7 +177,7 @@ class TencentCloudChatStickerPlugin extends TencentCloudChatPlugin {
         initData.customStickerLists!.insert(
           0,
           TencentCloudChatCustomSticker(
-            name: "所有表情",
+            name: "All Stickers",
             stickers: stickers,
             iconPath: tencentCloudChatStickerDefault.keys.first,
             type: 0,

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
+import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
@@ -14,14 +15,15 @@ class TencentCloudChatMessageListViewContainer extends StatefulWidget {
   final String? userID;
   final String? groupID;
   final String? topicID;
-  const TencentCloudChatMessageListViewContainer({super.key, this.userID, this.groupID, this.topicID}) : assert((userID == null) != (groupID == null));
+  final V2TimMessage? targetMessage;
+  const TencentCloudChatMessageListViewContainer({super.key, this.userID, this.groupID, this.topicID, this.targetMessage}) : assert((userID == null) != (groupID == null));
 
   @override
   State<TencentCloudChatMessageListViewContainer> createState() => _TencentCloudChatMessageListViewContainerState();
 }
 
 class _TencentCloudChatMessageListViewContainerState extends TencentCloudChatState<TencentCloudChatMessageListViewContainer> {
-  List<V2TimMessage> messageList = [];
+  List<V2TimMessage> _messageList = [];
   Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatMessageData>("TencentCloudChatMessageData");
   late StreamSubscription<TencentCloudChatMessageData<dynamic>>? _messageDataSubscription;
   late TencentCloudChatMessageSeparateDataProvider dataProvider;
@@ -57,13 +59,13 @@ class _TencentCloudChatMessageListViewContainerState extends TencentCloudChatSta
         break;
       case TencentCloudChatMessageDataKeys.messageList:
         if (isCurrentConversation) {
-          var previousList = messageList;
+          var previousList = _messageList;
           var nextList = dataProvider.getMessageListForRender(
             messageListKey: TencentCloudChatUtils.checkString(widget.topicID) ?? TencentCloudChatUtils.checkString(widget.groupID) ?? widget.userID,
           );
           if (!TencentCloudChatUtils.deepEqual(previousList, nextList)) {
             safeSetState(() {
-              messageList = nextList;
+              _messageList = nextList;
               _haveMoreLatestData = dataProvider.haveMoreLatestData;
               _haveMorePreviousData = dataProvider.haveMorePreviousData;
             });
@@ -107,22 +109,35 @@ class _TencentCloudChatMessageListViewContainerState extends TencentCloudChatSta
         "add _messageDataHandler end");
 
     SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
+      _loadInitMessageList();
+    });
+  }
+
+  void _loadInitMessageList(){
+    _messageList.clear();
+    safeSetState(() {
+      _messageList = dataProvider.getMessageListForRender(
+        messageListKey: TencentCloudChatUtils.checkString(widget.topicID) ?? TencentCloudChatUtils.checkString(widget.groupID) ?? widget.userID,
+      );
+      _haveMoreLatestData = dataProvider.haveMoreLatestData;
+      _haveMorePreviousData = dataProvider.haveMorePreviousData;
+    });
+    if(widget.targetMessage != null ){
+      Future.delayed(const Duration(microseconds: 10), (){
+        dataProvider.loadToSpecificMessage(
+          message: widget.targetMessage,
+        );
+      });
+    }else{
       Future.delayed(const Duration(milliseconds: 10), () {
-        safeSetState(() {
-          messageList = dataProvider.getMessageListForRender(
-            messageListKey: TencentCloudChatUtils.checkString(widget.topicID) ?? TencentCloudChatUtils.checkString(widget.groupID) ?? widget.userID,
-          );
-          _haveMoreLatestData = dataProvider.haveMoreLatestData;
-          _haveMorePreviousData = dataProvider.haveMorePreviousData;
-        });
-        TencentCloudChat.instance.dataInstance.messageData.loadMessageList(
+        dataProvider.loadMessageList(
           groupID: widget.groupID,
           userID: widget.userID,
           topicID: widget.topicID,
           direction: TencentCloudChatMessageLoadDirection.previous,
         );
       });
-    });
+    }
   }
 
   closeSticker() {
@@ -144,23 +159,15 @@ class _TencentCloudChatMessageListViewContainerState extends TencentCloudChatSta
     if ((widget.userID != oldWidget.userID && !(TencentCloudChatUtils.checkString(widget.userID) == null && TencentCloudChatUtils.checkString(oldWidget.userID) == null)) ||
         (widget.groupID != oldWidget.groupID && !(TencentCloudChatUtils.checkString(widget.groupID) == null && TencentCloudChatUtils.checkString(oldWidget.groupID) == null)) ||
           (widget.topicID != oldWidget.topicID && !(TencentCloudChatUtils.checkString(widget.topicID) == null && TencentCloudChatUtils.checkString(oldWidget.topicID) == null))) {
-      // SchedulerBinding.instance.addPostFrameCallback((timeStamp) {
-      Future.delayed(const Duration(milliseconds: 10), () {
-        safeSetState(() {
-          messageList = dataProvider.getMessageListForRender(
-            messageListKey:  TencentCloudChatUtils.checkString(widget.topicID) ??  TencentCloudChatUtils.checkString(widget.groupID) ?? widget.userID,
-          );
-          _haveMoreLatestData = dataProvider.haveMoreLatestData;
-          _haveMorePreviousData = dataProvider.haveMorePreviousData;
-        });
-        TencentCloudChat.instance.dataInstance.messageData.loadMessageList(
-          groupID: widget.groupID,
-          topicID: widget.topicID,
-          userID: widget.userID,
-          direction: TencentCloudChatMessageLoadDirection.previous,
+      _loadInitMessageList();
+    }
+
+    if(widget.targetMessage != null && widget.targetMessage != oldWidget.targetMessage){
+      Future.delayed(const Duration(microseconds: 10), (){
+        dataProvider.loadToSpecificMessage(
+          message: widget.targetMessage,
         );
       });
-      // });
     }
   }
 
@@ -212,12 +219,14 @@ class _TencentCloudChatMessageListViewContainerState extends TencentCloudChatSta
       key: dataProvider.topicID ?? dataProvider.groupID ?? dataProvider.userID ?? "",
     );
     final lastMsgID = direction == TencentCloudChatMessageLoadDirection.previous ? actualMessageList.last.msgID : actualMessageList.first.msgID;
+    final lastMsgSeq = direction == TencentCloudChatMessageLoadDirection.previous ? actualMessageList.last.seq : actualMessageList.first.seq;
     return dataProvider.loadMessageList(
       groupID: widget.groupID,
       userID: widget.userID,
       topicID: widget.topicID,
       direction: direction,
       lastMsgID: lastMsgID,
+      lastMsgSeq: (TencentCloudChatPlatformAdapter().isWeb && TencentCloudChatUtils.checkString(widget.groupID) != null && direction == TencentCloudChatMessageLoadDirection.latest) ? int.parse(lastMsgSeq ?? "-1") : null,
     );
   }
 
@@ -255,7 +264,7 @@ class _TencentCloudChatMessageListViewContainerState extends TencentCloudChatSta
                 closeSticker: closeSticker,
               ),
               data: MessageListViewBuilderData(
-                messageList: messageList,
+                messageList: _messageList,
                 messagesMentionedMe: _messagesMentionedMe ?? [],
                 haveMorePreviousData: _haveMorePreviousData,
                 groupID: widget.groupID,

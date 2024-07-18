@@ -18,39 +18,55 @@ class TencentCloudChatConversationDesktopMode extends StatefulWidget {
   State<TencentCloudChatConversationDesktopMode> createState() => _TencentCloudChatConversationDesktopModeState();
 }
 
-class _TencentCloudChatConversationDesktopModeState extends TencentCloudChatState<TencentCloudChatConversationDesktopMode> {
-  final Stream<TencentCloudChatConversationData<dynamic>>? _conversationDataStream =
-  TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatConversationData<dynamic>>("TencentCloudChatConversationData");
+class _TencentCloudChatConversationDesktopModeState
+    extends TencentCloudChatState<TencentCloudChatConversationDesktopMode> {
+  late TextEditingController _textEditingController;
+
+  final Stream<TencentCloudChatConversationData<dynamic>>? _conversationDataStream = TencentCloudChat
+      .instance.eventBusInstance
+      .on<TencentCloudChatConversationData<dynamic>>("TencentCloudChatConversationData");
   StreamSubscription<TencentCloudChatConversationData<dynamic>>? _conversationDataSubscription;
 
   final Stream<TencentCloudChatBasicData<dynamic>>? _basicDataStream =
-  TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatBasicData<dynamic>>("TencentCloudChatBasicData");
+      TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatBasicData<dynamic>>("TencentCloudChatBasicData");
   StreamSubscription<TencentCloudChatBasicData<dynamic>>? _basicDataSubscription;
 
   V2TimConversation? _currentConversation;
-  // bool _isShowSearch = false;
-  // bool _isShowGroupProfile = false;
+  V2TimMessage? _currentTargetMessage;
 
   TencentCloudChatWidgetBuilder? _messageWidget;
+  TencentCloudChatWidgetBuilder? _globalSearchWidget;
+  String _searchText = "";
 
   @override
   void dispose() {
     _conversationDataSubscription?.cancel();
     _basicDataSubscription?.cancel();
+    _textEditingController.removeListener(_searchTextListenerHandler);
     super.dispose();
   }
 
-  @override
-  void didUpdateWidget(TencentCloudChatConversationDesktopMode oldWidget) {
-    super.didUpdateWidget(oldWidget);
-  }
-
   _conversationDataHandler(TencentCloudChatConversationData data) {
+    bool needUpdate = false;
+    if (data.currentTargetMessage != _currentTargetMessage && data.currentTargetMessage != null) {
+      _currentTargetMessage = data.currentTargetMessage;
+      data.currentTargetMessage = null;
+      _searchText = "";
+      _textEditingController.clear();
+      needUpdate = true;
+    } else {
+      _currentTargetMessage = null;
+    }
+
+    /// === Current Conversation ===
     /// === Current Conversation ===
     if (data.currentConversation?.conversationID != _currentConversation?.conversationID) {
-      setState(() {
-        _currentConversation = data.currentConversation;
-      });
+      needUpdate = true;
+      _currentConversation = data.currentConversation;
+    }
+
+    if(needUpdate){
+      safeSetState(() {});
     }
   }
 
@@ -61,11 +77,24 @@ class _TencentCloudChatConversationDesktopModeState extends TencentCloudChatStat
   void _addBasicEventListener() {
     _basicDataSubscription = _basicDataStream?.listen((event) {
       if (event.currentUpdatedFields == TencentCloudChatBasicDataKeys.addUsedComponent) {
-        final messageWidget = TencentCloudChat.instance.dataInstance.basic.componentsMap[TencentCloudChatComponentsEnum.message];
+        final messageWidget =
+            TencentCloudChat.instance.dataInstance.basic.componentsMap[TencentCloudChatComponentsEnum.message];
+        final searchWidget =
+            TencentCloudChat.instance.dataInstance.basic.componentsMap[TencentCloudChatComponentsEnum.search];
         if (messageWidget != _messageWidget) {
           safeSetState(() {
             _messageWidget = messageWidget;
           });
+        }
+        if (searchWidget != _globalSearchWidget) {
+          safeSetState(() {
+            _globalSearchWidget = searchWidget;
+          });
+          if (_globalSearchWidget != null) {
+            _textEditingController.addListener(_searchTextListenerHandler);
+          } else {
+            _textEditingController.removeListener(_searchTextListenerHandler);
+          }
         }
       }
     });
@@ -76,8 +105,20 @@ class _TencentCloudChatConversationDesktopModeState extends TencentCloudChatStat
     super.initState();
     _addBasicEventListener();
     _addConversationDataListener();
-
     _messageWidget = TencentCloudChat.instance.dataInstance.basic.componentsMap[TencentCloudChatComponentsEnum.message];
+    _globalSearchWidget =
+        TencentCloudChat.instance.dataInstance.basic.componentsMap[TencentCloudChatComponentsEnum.search];
+    _textEditingController = TextEditingController();
+    if (_globalSearchWidget != null) {
+      _textEditingController.addListener(_searchTextListenerHandler);
+    }
+  }
+
+  void _searchTextListenerHandler() {
+    final text = _textEditingController.text;
+    safeSetState(() {
+      _searchText = text;
+    });
   }
 
   @override
@@ -88,45 +129,57 @@ class _TencentCloudChatConversationDesktopModeState extends TencentCloudChatStat
   @override
   Widget desktopBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(
-        build: (context, colorTheme, textStyle) => Row(
+      build: (context, colorTheme, textStyle) => Row(
+        children: [
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: getWidth(280)),
+            child: Column(
               children: [
-                ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: getWidth(280)),
-                  child: Column(
-                    children: [
-                      /// TODO: Will be replaced by the search bar in the following version.
-                      Row(
-                        children: [
-                          Expanded(
-                            child: TencentCloudChat.instance.dataInstance.conversation.conversationBuilder?.getConversationHeaderBuilder().$1,
-                          ),
-                        ],
-                      ),
-                      // const TencentCloudChatConversationDesktopSearchAndAdd(),
-                      Expanded(
-                        child: TencentCloudChatConversationList(
+                Row(
+                  children: [
+                    Expanded(
+                      child: TencentCloudChat.instance.dataInstance.conversation.conversationBuilder
+                              ?.getConversationHeaderBuilder(
+                                textEditingController: _textEditingController,
+                              )
+                              .$1 ??
+                          Container(),
+                    ),
+                  ],
+                ),
+                // const TencentCloudChatConversationDesktopSearchAndAdd(),
+                Expanded(
+                  child: (TencentCloudChatUtils.checkString(_searchText) != null && _globalSearchWidget != null)
+                      ? _globalSearchWidget!(
+                          options: {
+                            "keyWord": _searchText,
+                          },
+                        )
+                      : TencentCloudChatConversationList(
                           currentConversation: _currentConversation,
                         ),
-                      ),
-                    ],
-                  ),
                 ),
-                SizedBox(
-                  width: 1,
-                  child: Container(
-                    color: colorTheme.dividerColor,
-                  ),
-                ),
-                if (_messageWidget != null)
-                  Expanded(
-                    child: _messageWidget!(
-                      options: {
-                        "userID": TencentCloudChatUtils.checkString(_currentConversation?.userID),
-                        "groupID": TencentCloudChatUtils.checkString(_currentConversation?.groupID),
-                      },
-                    ),
-                  ),
               ],
-            ));
+            ),
+          ),
+          SizedBox(
+            width: 1,
+            child: Container(
+              color: colorTheme.dividerColor,
+            ),
+          ),
+          if (_messageWidget != null)
+            Expanded(
+              child: _messageWidget!(
+                options: {
+                  "userID": TencentCloudChatUtils.checkString(_currentConversation?.userID),
+                  "groupID": TencentCloudChatUtils.checkString(_currentConversation?.groupID),
+                  "targetMessage": _currentTargetMessage,
+                },
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }

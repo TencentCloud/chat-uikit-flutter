@@ -144,6 +144,7 @@ export "package:tencent_cloud_chat_sdk/models/v2_tim_topic_info_result.dart";
 export "package:tencent_cloud_chat_sdk/models/v2_tim_topic_operation_result.dart";
 export "package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart";
 export "package:tencent_cloud_chat_sdk/models/v2_tim_user_info.dart";
+export 'package:tencent_cloud_chat_sdk/models/v2_tim_message_reaction.dart';
 export "package:tencent_cloud_chat_sdk/models/v2_tim_user_status.dart";
 export "package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart";
 export "package:tencent_cloud_chat_sdk/models/v2_tim_video_elem.dart";
@@ -159,7 +160,6 @@ class TencentCloudChat {
   void reset() {
     TencentCloudChatDataManager.resetInstance();
   }
-
 
   final TencentCloudChatCallbacksTrigger callbacks = TencentCloudChatCallbacksTriggerGenerator.getInstance();
 

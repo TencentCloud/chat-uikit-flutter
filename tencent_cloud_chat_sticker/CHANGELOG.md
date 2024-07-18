@@ -1,3 +1,3 @@
-## 0.0.1
+## 1.4.1
 
-* TODO: Describe initial release.
+* First initialize of Message Reaction plugin.

@@ -1249,4 +1249,77 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
 
   @override
   String get reEdit => 'Re-Edit';
+
+  @override
+  String get translate => 'Translate';
+
+  @override
+  String memberRecalledMessage(Object member) {
+    return '$member Recalled a Message';
+  }
+
+  @override
+  String get copyFileSuccess => 'Copy File Success';
+
+  @override
+  String get saveFileSuccess => 'Save File Success';
+
+  @override
+  String get saveFileFailed => 'Save File Failed';
+
+  @override
+  String get copyLinkSuccess => 'Copy Link Success';
+
+  @override
+  String get copyImageContextMenuBtnText => 'Copy Image';
+
+  @override
+  String get saveToLocalContextMenuBtnText => 'Save As';
+
+  @override
+  String get copyLinkContextMenuBtnText => 'Copy Link';
+
+  @override
+  String get openLinkContextMenuBtnText => 'Open in New Window';
+
+  @override
+  String get reactionList => 'Reaction List';
+
+  @override
+  String get translatedBy => 'Powered by Tencent RTC';
+
+  @override
+  String get convertToText => 'Convert';
+
+  @override
+  String numMessages(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count Messages',
+      one: '1 Message',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get filterBy => 'Filter by';
+
+  @override
+  String get text => 'Text';
+
+  @override
+  String get numMessagesOver99 => '99+ Messages';
+
+  @override
+  String get setGroupAnnouncement => 'Set Group Announcement';
+
+  @override
+  String get setNickName => 'Set Group Name Card';
+
+  @override
+  String get joinTime => 'Joined Time';
+
+  @override
+  String get myRoleInGroup => 'Role';
 }

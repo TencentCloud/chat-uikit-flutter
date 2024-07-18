@@ -27,12 +27,7 @@ import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/tenc
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_layout/tencent_cloud_chat_message_layout_container.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_list_view/tencent_cloud_chat_message_list_view_container.dart';
 
-
-class TencentCloudChatMessage extends TencentCloudChatComponent<
-    TencentCloudChatMessageOptions,
-    TencentCloudChatMessageConfig,
-    TencentCloudChatMessageBuilders,
-    TencentCloudChatMessageEventHandlers> {
+class TencentCloudChatMessage extends TencentCloudChatComponent<TencentCloudChatMessageOptions, TencentCloudChatMessageConfig, TencentCloudChatMessageBuilders, TencentCloudChatMessageEventHandlers> {
   const TencentCloudChatMessage({
     required TencentCloudChatMessageOptions options,
     Key? key,
@@ -51,17 +46,11 @@ class TencentCloudChatMessage extends TencentCloudChatComponent<
   State<StatefulWidget> createState() => _TencentCloudChatMessageState();
 }
 
-class _TencentCloudChatMessageState
-    extends TencentCloudChatState<TencentCloudChatMessage> {
-  final Stream<TencentCloudChatMessageData<dynamic>>?
-  _messageDataStream = TencentCloudChat.instance.eventBusInstance
-      .on<TencentCloudChatMessageData<dynamic>>("TencentCloudChatMessageData");
-  StreamSubscription<TencentCloudChatMessageData<dynamic>>?
-  _messageDataSubscription;
-  
-  final TencentCloudChatMessageSeparateDataProvider
-      _messageSeparateDataProvider =
-      TencentCloudChatMessageSeparateDataProvider();
+class _TencentCloudChatMessageState extends TencentCloudChatState<TencentCloudChatMessage> {
+  final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatMessageData<dynamic>>("TencentCloudChatMessageData");
+  StreamSubscription<TencentCloudChatMessageData<dynamic>>? _messageDataSubscription;
+
+  final TencentCloudChatMessageSeparateDataProvider _messageSeparateDataProvider = TencentCloudChatMessageSeparateDataProvider();
 
   @override
   void initState() {
@@ -81,21 +70,9 @@ class _TencentCloudChatMessageState
   @override
   void didUpdateWidget(covariant TencentCloudChatMessage oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if ((widget.options?.userID != oldWidget.options?.userID &&
-            !(TencentCloudChatUtils.checkString(widget.options?.userID) ==
-                    null &&
-                TencentCloudChatUtils.checkString(oldWidget.options?.userID) ==
-                    null)) ||
-        (widget.options?.groupID != oldWidget.options?.groupID &&
-            !(TencentCloudChatUtils.checkString(widget.options?.groupID) ==
-                    null &&
-                TencentCloudChatUtils.checkString(oldWidget.options?.groupID) ==
-                    null))||
-        (widget.options?.topicID != oldWidget.options?.topicID &&
-            !(TencentCloudChatUtils.checkString(widget.options?.topicID) ==
-                null &&
-                TencentCloudChatUtils.checkString(oldWidget.options?.topicID) ==
-                    null))) {
+    if ((widget.options?.userID != oldWidget.options?.userID && !(TencentCloudChatUtils.checkString(widget.options?.userID) == null && TencentCloudChatUtils.checkString(oldWidget.options?.userID) == null)) ||
+        (widget.options?.groupID != oldWidget.options?.groupID && !(TencentCloudChatUtils.checkString(widget.options?.groupID) == null && TencentCloudChatUtils.checkString(oldWidget.options?.groupID) == null)) ||
+        (widget.options?.topicID != oldWidget.options?.topicID && !(TencentCloudChatUtils.checkString(widget.options?.topicID) == null && TencentCloudChatUtils.checkString(oldWidget.options?.topicID) == null))) {
       _messageSeparateDataProvider.unInit();
       _messageSeparateDataProvider.init(
         userID: widget.options?.userID,
@@ -115,8 +92,7 @@ class _TencentCloudChatMessageState
       _messageSeparateDataProvider.config = widget.config!;
     }
 
-    if ((oldWidget.eventHandlers != widget.eventHandlers &&
-        widget.eventHandlers != null)) {
+    if ((oldWidget.eventHandlers != widget.eventHandlers && widget.eventHandlers != null)) {
       _messageSeparateDataProvider.messageEventHandlers = widget.eventHandlers;
     }
 
@@ -133,20 +109,16 @@ class _TencentCloudChatMessageState
   }
 
   _addMessageDataListener() {
-    _messageDataSubscription =
-        _messageDataStream?.listen(_messageDataHandler);
+    _messageDataSubscription = _messageDataStream?.listen(_messageDataHandler);
   }
 
   _messageDataHandler(TencentCloudChatMessageData data) {
-    if (data.currentUpdatedFields ==
-        TencentCloudChatMessageDataKeys.builder && TencentCloudChat.instance.dataInstance.messageData.messageBuilder != null) {
+    if (data.currentUpdatedFields == TencentCloudChatMessageDataKeys.builder && TencentCloudChat.instance.dataInstance.messageData.messageBuilder != null) {
       _messageSeparateDataProvider.messageBuilders = TencentCloudChat.instance.dataInstance.messageData.messageBuilder as TencentCloudChatMessageBuilders?;
       setState(() {});
     }
 
-    if (
-        data.currentUpdatedFields ==
-            TencentCloudChatMessageDataKeys.config) {
+    if (data.currentUpdatedFields == TencentCloudChatMessageDataKeys.config) {
       _messageSeparateDataProvider.config = TencentCloudChat.instance.dataInstance.messageData.messageConfig;
       setState(() {});
     }
@@ -154,10 +126,8 @@ class _TencentCloudChatMessageState
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    final hasChat =
-        (widget.options?.userID == null) != (widget.options?.groupID == null);
-    final isDesktop = TencentCloudChatScreenAdapter.deviceScreenType ==
-        DeviceScreenType.desktop;
+    final hasChat = (widget.options?.userID == null) != (widget.options?.groupID == null);
+    final isDesktop = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop;
     return hasChat
         ? TencentCloudChatMessageDataProviderInherited(
             dataProvider: _messageSeparateDataProvider,
@@ -175,6 +145,7 @@ class _TencentCloudChatMessageState
                 userID: widget.options!.userID,
                 groupID: widget.options!.groupID,
                 topicID: widget.options!.topicID,
+                targetMessage: widget.options?.targetMessage,
               ),
               messageInput: TencentCloudChatMessageInputContainer(
                 userID: widget.options!.userID,
@@ -183,11 +154,7 @@ class _TencentCloudChatMessageState
               ),
             ),
           )
-        : widget.builders?.getMessageNoChatBuilder() ??
-            TencentCloudChat.instance.dataInstance.messageData.messageBuilder
-                ?.getMessageNoChatBuilder() ??
-            TencentCloudChatMessageBuilders().getMessageNoChatBuilder() ??
-            Container();
+        : widget.builders?.getMessageNoChatBuilder() ?? TencentCloudChat.instance.dataInstance.messageData.messageBuilder?.getMessageNoChatBuilder() ?? TencentCloudChatMessageBuilders().getMessageNoChatBuilder() ?? Container();
   }
 }
 
@@ -196,25 +163,20 @@ class _TencentCloudChatMessageState
 /// and provides control over the component's configuration, UI widget builders, and event listeners on a global scale,
 /// affecting all instances of the TencentCloudChatMessage component.
 class TencentCloudChatMessageManager {
-
   /// Allows dynamic updating of UI widget builders for all instances.
   /// Call the `setBuilders` method and pass any UI builders to be modified,
   /// which will replace the previous configuration and apply changes immediately.
   static TencentCloudChatMessageBuilders get builder {
-    TencentCloudChat.instance.dataInstance.messageData.messageBuilder ??=
-        TencentCloudChatMessageBuilders();
-    return TencentCloudChat.instance.dataInstance.messageData.messageBuilder
-        as TencentCloudChatMessageBuilders;
+    TencentCloudChat.instance.dataInstance.messageData.messageBuilder ??= TencentCloudChatMessageBuilders();
+    return TencentCloudChat.instance.dataInstance.messageData.messageBuilder as TencentCloudChatMessageBuilders;
   }
 
   /// Retrieves the controller for controlling `TencentCloudChatMessage` components,
   /// applying to all instances.
   /// Utilize the provided control methods.
   static TencentCloudChatMessageController get controller {
-    TencentCloudChat.instance.dataInstance.messageData.messageController ??=
-        TencentCloudChatMessageControllerGenerator.getInstance();
-    return TencentCloudChat.instance.dataInstance.messageData.messageController
-        as TencentCloudChatMessageController;
+    TencentCloudChat.instance.dataInstance.messageData.messageController ??= TencentCloudChatMessageControllerGenerator.getInstance();
+    return TencentCloudChat.instance.dataInstance.messageData.messageController as TencentCloudChatMessageController;
   }
 
   /// Enables dynamic updating of configurations for all instances.
@@ -222,8 +184,7 @@ class TencentCloudChatMessageManager {
   /// which will replace the previous configuration and apply changes immediately.
   /// Note: This will cause the all configs that specified through the input parameter of each instance to be invalidated, i.e., overridden.
   static TencentCloudChatMessageConfig get config {
-    return TencentCloudChat
-        .instance.dataInstance.messageData.messageConfig;
+    return TencentCloudChat.instance.dataInstance.messageData.messageConfig;
   }
 
   /// Attaches listeners to Component-level events.
@@ -231,55 +192,42 @@ class TencentCloudChatMessageManager {
   /// Call `setEventHandlers` from both `uiEventHandlers` and `lifeCycleEventHandlers` to update specific event handlers.
   /// Note: This will cause the corresponding event's previously attached handlers to be invalidated, i.e., overridden.
   static TencentCloudChatMessageEventHandlers get eventHandlers {
-    TencentCloudChat
-        .instance.dataInstance.messageData.messageEventHandlers ??=
-        TencentCloudChatMessageEventHandlers();
-    return TencentCloudChat
-        .instance.dataInstance.messageData.messageEventHandlers!;
+    TencentCloudChat.instance.dataInstance.messageData.messageEventHandlers ??= TencentCloudChatMessageEventHandlers();
+    return TencentCloudChat.instance.dataInstance.messageData.messageEventHandlers!;
   }
 
   /// Manually declares the usage of the `TencentCloudChatMessage` component.
   /// During the `initUIKit` call, add `TencentCloudChatMessageManager.register` in `usedComponentsRegister` within `components`
   /// if you plan to use this component.
-  static ({
-    TencentCloudChatComponentsEnum componentEnum,
-    TencentCloudChatWidgetBuilder widgetBuilder
-  }) register() {
+  static ({TencentCloudChatComponentsEnum componentEnum, TencentCloudChatWidgetBuilder widgetBuilder}) register() {
     TencentCloudChat.instance.dataInstance.messageData.init();
 
     TencentCloudChatRouter().registerRouter(
       routeName: TencentCloudChatRouteNames.message,
       builder: (context) => TencentCloudChatMessage(
-        options: TencentCloudChatRouter()
-            .getArgumentFromMap<TencentCloudChatMessageOptions>(
-                context, 'options')!,
+        options: TencentCloudChatRouter().getArgumentFromMap<TencentCloudChatMessageOptions>(context, 'options')!,
       ),
     );
 
     TencentCloudChatRouter().registerRouter(
       routeName: TencentCloudChatRouteNames.messageInfo,
       builder: (context) => TencentCloudChatMessageInfo(
-        options: TencentCloudChatRouter()
-                .getArgumentFromMap<TencentCloudChatMessageInfoOptions>(
-                    context, 'data') ??
-            TencentCloudChatMessageInfoOptions(),
+        options: TencentCloudChatRouter().getArgumentFromMap<TencentCloudChatMessageInfoOptions>(context, 'data') ?? TencentCloudChatMessageInfoOptions(),
       ),
     );
 
-    TencentCloudChat.instance.dataInstance.messageData.messageBuilder ??=
-        TencentCloudChatMessageBuilders();
+    TencentCloudChat.instance.dataInstance.messageData.messageBuilder ??= TencentCloudChatMessageBuilders();
 
-    TencentCloudChat.instance.dataInstance.messageData.messageController ??=
-        TencentCloudChatMessageControllerGenerator.getInstance();
+    TencentCloudChat.instance.dataInstance.messageData.messageController ??= TencentCloudChatMessageControllerGenerator.getInstance();
 
     return (
       componentEnum: TencentCloudChatComponentsEnum.message,
-      widgetBuilder: ({required Map<String, dynamic> options}) =>
-          TencentCloudChatMessage(
+      widgetBuilder: ({required Map<String, dynamic> options}) => TencentCloudChatMessage(
             options: TencentCloudChatMessageOptions(
               userID: options["userID"],
               groupID: options["groupID"],
               topicID: options["topicID"],
+              targetMessage: options["targetMessage"],
             ),
           ),
     );
@@ -291,7 +239,7 @@ class TencentCloudChatMessageInstance {
   /// This method will be removed in a future version.
   static ({
     TencentCloudChatComponentsEnum componentEnum,
-    TencentCloudChatWidgetBuilder widgetBuilder
+    TencentCloudChatWidgetBuilder widgetBuilder,
   }) register() {
     return TencentCloudChatMessageManager.register();
   }

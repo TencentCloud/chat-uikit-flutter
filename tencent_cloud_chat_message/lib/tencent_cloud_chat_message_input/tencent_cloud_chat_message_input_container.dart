@@ -7,12 +7,17 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_common_defines.dart';
 import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
+import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
+import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
+import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/tuicore/tencent_cloud_chat_core.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_permission_handlers.dart';
+import 'package:tencent_cloud_chat_common/widgets/desktop_popup/operation_key.dart';
+import 'package:tencent_cloud_chat_common/widgets/desktop_popup/tencent_cloud_chat_desktop_popup.dart';
 import 'package:tencent_cloud_chat_common/widgets/group_member_selector/tencent_cloud_chat_group_member_selector.dart';
 import 'package:tencent_cloud_chat_common/widgets/modal/bottom_modal.dart';
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data.dart';
@@ -48,6 +53,13 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
   List<V2TimGroupMemberFullInfo?> _currentFilteredMembersListForMention = [];
   bool _init = false;
   List<V2TimGroupMemberFullInfo?> _groupMemberList = [];
+  TencentCloudChatWidgetBuilder? _searchWidget;
+
+  @override
+  void initState() {
+    super.initState();
+    _searchWidget = TencentCloudChat.instance.dataInstance.basic.componentsMap[TencentCloudChatComponentsEnum.search];
+  }
 
   @override
   void didChangeDependencies() {
@@ -68,14 +80,17 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
     if (offset != null) {
       _dataProvider.setStickerPosition(offset);
     } else {
-      TencentCloudChat.instance.logInstance.console(componentName: "TencentCloudChatMessageInputContainer", logs: "Icon click but the offset is null");
+      TencentCloudChat.instance.logInstance
+          .console(componentName: "TencentCloudChatMessageInputContainer", logs: "Icon click but the offset is null");
     }
   }
 
   @override
   void didUpdateWidget(TencentCloudChatMessageInputContainer oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if ((widget.userID != oldWidget.userID && widget.userID != null) || (widget.topicID != oldWidget.topicID && widget.topicID != null) || (widget.groupID != oldWidget.groupID && widget.groupID != null)) {
+    if ((widget.userID != oldWidget.userID && widget.userID != null) ||
+        (widget.topicID != oldWidget.topicID && widget.topicID != null) ||
+        (widget.groupID != oldWidget.groupID && widget.groupID != null)) {
       _groupMemberList.clear();
       _membersNeedToMention?.clear();
       _specifiedMessageText = null;
@@ -93,8 +108,16 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
     );
     if (!TencentCloudChatPlatformAdapter().isMobile) {
       final defaultOptions = [
-        if (attachmentConfig.enableSendFile) TencentCloudChatMessageGeneralOptionItem(iconAsset: (path: "lib/assets/send_file.svg", package: "tencent_cloud_chat_message"), label: tL10n.file, onTap: _sendFileFromExplorer),
-        if (attachmentConfig.enableSendImage) TencentCloudChatMessageGeneralOptionItem(iconAsset: (path: "lib/assets/send_image.svg", package: "tencent_cloud_chat_message"), label: tL10n.image, onTap: _sendImage),
+        if (attachmentConfig.enableSendFile)
+          TencentCloudChatMessageGeneralOptionItem(
+              iconAsset: (path: "lib/assets/send_file.svg", package: "tencent_cloud_chat_message"),
+              label: tL10n.file,
+              onTap: _sendFileFromExplorer),
+        if (attachmentConfig.enableSendImage)
+          TencentCloudChatMessageGeneralOptionItem(
+              iconAsset: (path: "lib/assets/send_image.svg", package: "tencent_cloud_chat_message"),
+              label: tL10n.image,
+              onTap: _sendImage),
         if (attachmentConfig.enableSendVideo)
           TencentCloudChatMessageGeneralOptionItem(
               iconAsset: (path: "lib/assets/send_video.svg", package: "tencent_cloud_chat_message"),
@@ -103,6 +126,12 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
                     offset: offset,
                     fileType: FileType.video,
                   )),
+        if (attachmentConfig.enableSearch && _searchWidget != null)
+          TencentCloudChatMessageGeneralOptionItem(
+            iconAsset: (path: "lib/assets/message_search.svg", package: "tencent_cloud_chat_message"),
+            label: tL10n.search,
+            onTap: ({Offset? offset}) => _showMessageSearch(),
+          ),
       ];
       final additionalAttachmentOptionsForDesktop = config.additionalInputControlBarOptionsForDesktop(
         userID: _dataProvider.userID,
@@ -110,15 +139,28 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
         topicID: _dataProvider.topicID,
       );
       if (hasStickerPlugin && stickerPluginInstance != null) {
-        defaultOptions.insert(0, TencentCloudChatMessageGeneralOptionItem(iconAsset: (path: "lib/assets/send_face.svg", package: "tencent_cloud_chat_message"), label: tL10n.sticker, onTap: _openStickerPanel));
+        defaultOptions.insert(
+            0,
+            TencentCloudChatMessageGeneralOptionItem(
+                iconAsset: (path: "lib/assets/send_face.svg", package: "tencent_cloud_chat_message"),
+                label: tL10n.sticker,
+                onTap: _openStickerPanel));
       }
       _attachmentOrInputControlBarOptions = [...defaultOptions, ...additionalAttachmentOptionsForDesktop];
     } else {
       final defaultOptions = [
-        if (attachmentConfig.enableSendFile) TencentCloudChatMessageGeneralOptionItem(iconAsset: (path: "lib/assets/send_file.svg", package: "tencent_cloud_chat_message"), label: tL10n.file, onTap: _sendFileFromExplorer),
+        if (attachmentConfig.enableSendFile)
+          TencentCloudChatMessageGeneralOptionItem(
+              iconAsset: (path: "lib/assets/send_file.svg", package: "tencent_cloud_chat_message"),
+              label: tL10n.file,
+              onTap: _sendFileFromExplorer),
         if (attachmentConfig.enableSendMediaFromMobileGallery)
-          TencentCloudChatMessageGeneralOptionItem(iconAsset: (path: "lib/assets/send_image.svg", package: "tencent_cloud_chat_message"), label: tL10n.album, onTap: _sendMediaFromGallery),
-        if (TencentCloudChat.instance.dataInstance.basic.useCallKit) TencentCloudChatMessageGeneralOptionItem(icon: Icons.call, label: tL10n.call, onTap: _startCall),
+          TencentCloudChatMessageGeneralOptionItem(
+              iconAsset: (path: "lib/assets/send_image.svg", package: "tencent_cloud_chat_message"),
+              label: tL10n.album,
+              onTap: _sendMediaFromGallery),
+        if (TencentCloudChat.instance.dataInstance.basic.useCallKit)
+          TencentCloudChatMessageGeneralOptionItem(icon: Icons.call, label: tL10n.call, onTap: _startCall),
       ];
       final additionalAttachmentOptionsForMobile = config.additionalAttachmentOptionsForMobile(
         userID: _dataProvider.userID,
@@ -139,7 +181,8 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
           onTap: () async {
             if (TencentCloudChatUtils.checkString(widget.groupID) != null) {
               final List<V2TimGroupMemberFullInfo> memberInfoList = await showGroupMemberSelector(
-                groupMemberList: _dataProvider.groupMemberList.where((element) => element != null).map((e) => e!).toList(),
+                groupMemberList:
+                    _dataProvider.groupMemberList.where((element) => element != null).map((e) => e!).toList(),
                 context: context,
                 onSelectLabel: tL10n.startCall,
               );
@@ -163,7 +206,8 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
           onTap: () async {
             if (TencentCloudChatUtils.checkString(widget.groupID) != null) {
               final List<V2TimGroupMemberFullInfo> memberInfoList = await showGroupMemberSelector(
-                groupMemberList: _dataProvider.groupMemberList.where((element) => element != null).map((e) => e!).toList(),
+                groupMemberList:
+                    _dataProvider.groupMemberList.where((element) => element != null).map((e) => e!).toList(),
                 context: context,
                 onSelectLabel: tL10n.startCall,
               );
@@ -186,6 +230,29 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
     );
   }
 
+  void _showMessageSearch() {
+    if (_searchWidget != null) {
+      final isDesktopScreen = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop;
+      if (isDesktopScreen) {
+        TencentCloudChatDesktopPopup.showPopupWindow(
+          title: tL10n.search,
+          width: MediaQuery.of(context).size.width * 0.6,
+          height: MediaQuery.of(context).size.height * 0.6,
+          operationKey: TencentCloudChatPopupOperationKey.searchInChat,
+          context: context,
+          child: (closeFunc) => _searchWidget!(
+            options: {
+              "keyWord": "",
+              "userID": widget.userID,
+              "groupID": TencentCloudChatUtils.checkString(widget.topicID) ?? widget.groupID,
+              "closeFunc": closeFunc,
+            },
+          ),
+        );
+      } else {}
+    }
+  }
+
   void _sendMediaFromExplorer({Offset? offset, required FileType fileType}) async {
     if (TencentCloudChatPlatformAdapter().isWeb) {
       try {
@@ -200,7 +267,8 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
         final fileName = pickedFile.name;
         final tempFile = File(pickedFile.path);
 
-        final String type = TencentCloudChatUtils.getFileType(fileName.split(".")[fileName.split(".").length - 1]).split("/")[0];
+        final String type =
+            TencentCloudChatUtils.getFileType(fileName.split(".")[fileName.split(".").length - 1]).split("/")[0];
 
         html.Node? inputElem;
         inputElem = html.document.getElementById("__image_picker_web-file-input")?.querySelector("input");
@@ -219,8 +287,11 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
         debugPrint("_sendFileErr: ${e.toString()}");
       }
     } else {
-      if ((TencentCloudChatPlatformAdapter().isMobile && await TencentCloudChatPermissionHandler.checkPermission("photos", context)) || !TencentCloudChatPlatformAdapter().isMobile) {
-        final FilePickerResult? fileResult = await FilePicker.platform.pickFiles(allowMultiple: !TencentCloudChatPlatformAdapter().isWeb, type: fileType);
+      if ((TencentCloudChatPlatformAdapter().isMobile &&
+              await TencentCloudChatPermissionHandler.checkPermission("photos", context)) ||
+          !TencentCloudChatPlatformAdapter().isMobile) {
+        final FilePickerResult? fileResult = await FilePicker.platform
+            .pickFiles(allowMultiple: !TencentCloudChatPlatformAdapter().isWeb, type: fileType);
 
         for (final file in (fileResult?.files ?? [])) {
           final String fileExtension = file.path.split('.').last.toLowerCase();
@@ -246,7 +317,8 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
         final fileName = pickedFile.name;
         final tempFile = File(pickedFile.path);
 
-        final String type = TencentCloudChatUtils.getFileType(fileName.split(".")[fileName.split(".").length - 1]).split("/")[0];
+        final String type =
+            TencentCloudChatUtils.getFileType(fileName.split(".")[fileName.split(".").length - 1]).split("/")[0];
 
         html.Node? inputElem;
         inputElem = html.document.getElementById("__image_picker_web-file-input")?.querySelector("input");
@@ -265,7 +337,9 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
         debugPrint("_sendFileErr: ${e.toString()}");
       }
     } else {
-      if ((TencentCloudChatPlatformAdapter().isMobile && await TencentCloudChatPermissionHandler.checkPermission("photos", context)) || !TencentCloudChatPlatformAdapter().isMobile) {
+      if ((TencentCloudChatPlatformAdapter().isMobile &&
+              await TencentCloudChatPermissionHandler.checkPermission("photos", context)) ||
+          !TencentCloudChatPlatformAdapter().isMobile) {
         final ImagePicker picker = ImagePicker();
         final pickedFile = await picker.pickMultipleMedia();
 
@@ -287,8 +361,11 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
   void _sendImage({Offset? offset}) async {
     if (TencentCloudChatPlatformAdapter().isWeb) {
       _sendMediaFromExplorer(offset: offset, fileType: FileType.image);
-    } else if ((TencentCloudChatPlatformAdapter().isMobile && await TencentCloudChatPermissionHandler.checkPermission("photos", context)) || !TencentCloudChatPlatformAdapter().isMobile) {
-      final FilePickerResult? fileResult = await FilePicker.platform.pickFiles(allowMultiple: !TencentCloudChatPlatformAdapter().isWeb, type: FileType.image);
+    } else if ((TencentCloudChatPlatformAdapter().isMobile &&
+            await TencentCloudChatPermissionHandler.checkPermission("photos", context)) ||
+        !TencentCloudChatPlatformAdapter().isMobile) {
+      final FilePickerResult? fileResult = await FilePicker.platform
+          .pickFiles(allowMultiple: !TencentCloudChatPlatformAdapter().isWeb, type: FileType.image);
 
       for (final file in (fileResult?.files ?? [])) {
         final String fileExtension = file.path.split('.').last.toLowerCase();
@@ -305,8 +382,11 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
   }
 
   void _sendFileFromExplorer({Offset? offset}) async {
-    if ((TencentCloudChatPlatformAdapter().isMobile && await TencentCloudChatPermissionHandler.checkPermission("storage", context)) || !TencentCloudChatPlatformAdapter().isMobile) {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: !TencentCloudChatPlatformAdapter().isWeb);
+    if ((TencentCloudChatPlatformAdapter().isMobile &&
+            await TencentCloudChatPermissionHandler.checkPermission("storage", context)) ||
+        !TencentCloudChatPlatformAdapter().isMobile) {
+      FilePickerResult? result =
+          await FilePicker.platform.pickFiles(allowMultiple: !TencentCloudChatPlatformAdapter().isWeb);
 
       if (result != null && result.files.isNotEmpty) {
         if (TencentCloudChatPlatformAdapter().isWeb) {
@@ -315,7 +395,8 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
           final fileName = result.files.single.name;
           final fileSize = result.files.single.size;
           if (fileSize > 100 * 1024 * 1024) {
-            TencentCloudChat.instance.callbacks.onSDKFailed("sendMessage", 1020, "The selected file exceeds 100M and the sending is interrupted.");
+            TencentCloudChat.instance.callbacks
+                .onSDKFailed("sendMessage", 1020, "The selected file exceeds 100M and the sending is interrupted.");
             return;
           }
           _sendFileMessage(inputElement: inputElem, fileName: fileName);
@@ -341,7 +422,8 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
   }
 
   void _controllerEventListener() {
-    final current = (_messageController?.userID == widget.userID && TencentCloudChatUtils.checkString(widget.userID) != null) ||
+    final current = (_messageController?.userID == widget.userID &&
+            TencentCloudChatUtils.checkString(widget.userID) != null) ||
         (_messageController?.topicID == widget.topicID && TencentCloudChatUtils.checkString(widget.topicID) != null) ||
         (_messageController?.groupID == widget.groupID && TencentCloudChatUtils.checkString(widget.groupID) != null);
     if (current) {
@@ -356,7 +438,8 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
           }
           break;
         case EventName.mentionGroupMembers:
-          if (_messageController?.groupMembersFullInfo != null && !TencentCloudChatUtils.deepEqual(_messageController!.groupMembersFullInfo, _membersNeedToMention)) {
+          if (_messageController?.groupMembersFullInfo != null &&
+              !TencentCloudChatUtils.deepEqual(_messageController!.groupMembersFullInfo, _membersNeedToMention)) {
             safeSetState(() {
               _membersNeedToMention = _messageController?.groupMembersFullInfo;
             });
@@ -408,7 +491,8 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
       needSetState = true;
     }
 
-    if (!TencentCloudChatUtils.deepEqual(_dataProvider.currentFilteredMembersListForMention, _currentFilteredMembersListForMention)) {
+    if (!TencentCloudChatUtils.deepEqual(
+        _dataProvider.currentFilteredMembersListForMention, _currentFilteredMembersListForMention)) {
       _currentFilteredMembersListForMention = _dataProvider.currentFilteredMembersListForMention;
       needSetState = true;
     }
@@ -454,7 +538,8 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
     _dataProvider.sendVoiceMessage(voicePath, duration);
   }
 
-  Future<List<V2TimGroupMemberFullInfo>> _onChooseGroupMembers({int? maxSelectionAmount, String? onSelectLabel, String? title}) async {
+  Future<List<V2TimGroupMemberFullInfo>> _onChooseGroupMembers(
+      {int? maxSelectionAmount, String? onSelectLabel, String? title}) async {
     final List<V2TimGroupMemberFullInfo> memberList = await showGroupMemberSelector(
       groupMemberList: _dataProvider.groupMemberList.where((element) => element != null).map((e) => e!).toList(),
       context: context,
@@ -467,17 +552,20 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
 
   String currentUserid = TencentCloudChat.instance.dataInstance.basic.currentUser?.userID ?? "";
   bool hasStickerPlugin = TencentCloudChat.instance.dataInstance.basic.hasPlugins("sticker");
-  TencentCloudChatPlugin? stickerPluginInstance = TencentCloudChat.instance.dataInstance.basic.getPlugin("sticker")?.pluginInstance;
+  TencentCloudChatPlugin? stickerPluginInstance =
+      TencentCloudChat.instance.dataInstance.basic.getPlugin("sticker")?.pluginInstance;
 
   @override
   Widget defaultBuilder(BuildContext context) {
     bool isGroupAdmin = false;
     try {
       if (TencentCloudChatUtils.checkString(widget.groupID) != null) {
-        final selfInfo = _dataProvider.groupMemberList.firstWhere((element) => element?.userID == currentUserid && TencentCloudChatUtils.checkString(element?.userID) != null);
+        final selfInfo = _dataProvider.groupMemberList.firstWhere((element) =>
+            element?.userID == currentUserid && TencentCloudChatUtils.checkString(element?.userID) != null);
         if (selfInfo != null) {
           final selfRole = selfInfo.role;
-          isGroupAdmin = (selfRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN || selfRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER);
+          isGroupAdmin = (selfRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN ||
+              selfRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER);
         }
       }
     } catch (e) {
@@ -487,7 +575,8 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
     String showName = _dataProvider.conversation?.showName ?? "";
     if (showName.isEmpty) {
       if (TencentCloudChatUtils.checkString(_dataProvider.groupID) != null) {
-        final String groupShowName = TencentCloudChatUtils.checkString(_dataProvider.groupInfo?.groupName) ?? _dataProvider.groupID ?? "";
+        final String groupShowName =
+            TencentCloudChatUtils.checkString(_dataProvider.groupInfo?.groupName) ?? _dataProvider.groupID ?? "";
         if (groupShowName.isNotEmpty) {
           showName = groupShowName;
         }
@@ -514,7 +603,11 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
                 repliedMessage: _repliedMessage,
                 desktopMentionBoxPositionX: _desktopMentionBoxPositionX,
                 desktopMentionBoxPositionY: _desktopMentionBoxPositionY,
-                groupMemberList: _groupMemberList.where((element) => element != null).map((e) => e!).where((element) => element.userID != currentUserid).toList(),
+                groupMemberList: _groupMemberList
+                    .where((element) => element != null)
+                    .map((e) => e!)
+                    .where((element) => element.userID != currentUserid)
+                    .toList(),
                 activeMentionIndex: _activeMentionIndex,
                 specifiedMessageText: _specifiedMessageText,
                 currentFilteredMembersListForMention: _currentFilteredMembersListForMention,
@@ -537,7 +630,8 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
                 setDesktopMentionBoxPositionX: (value) => _dataProvider.desktopMentionBoxPositionX = value,
                 setDesktopMentionBoxPositionY: (value) => _dataProvider.desktopMentionBoxPositionY = value,
                 setActiveMentionIndex: (value) => _dataProvider.activeMentionIndex = value,
-                setCurrentFilteredMembersListForMention: (value) => _dataProvider.currentFilteredMembersListForMention = value,
+                setCurrentFilteredMembersListForMention: (value) =>
+                    _dataProvider.currentFilteredMembersListForMention = value,
                 closeSticker: () {
                   _dataProvider.closeSticker();
                 },

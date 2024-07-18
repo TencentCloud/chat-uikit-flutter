@@ -48,9 +48,14 @@ public class TencentCloudChatPushApplication extends FlutterApplication {
     }
 
     private void launchMainActivity(boolean showInForeground) {
+        if (TencentCloudChatPushPlugin.instance != null && TencentCloudChatPushPlugin.instance.attachedToEngine) {
+            return;
+        }
+
         Intent intentLaunchMain = this.getPackageManager().getLaunchIntentForPackage(this.getPackageName());
         if (intentLaunchMain != null) {
             intentLaunchMain.putExtra(Extras.SHOW_IN_FOREGROUND, showInForeground);
+            intentLaunchMain.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
             this.startActivity(intentLaunchMain);
         } else {
             Log.e(TAG, "Failed to get launch intent for package: " + this.getPackageName());
@@ -60,7 +65,7 @@ public class TencentCloudChatPushApplication extends FlutterApplication {
     private void scheduleCheckPluginInstanceAndNotifyForOnClick(final String action, final String data) {
         final Handler handler = new Handler(Looper.getMainLooper());
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
+        timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 handler.post(() -> {
@@ -91,6 +96,7 @@ public class TencentCloudChatPushApplication extends FlutterApplication {
                         if (TUIConstants.TIMPush.EVENT_NOTIFY_NOTIFICATION.equals(subKey)) {
                             if (param != null) {
                                 String extString = (String) param.get(TUIConstants.TUIOfflinePush.NOTIFICATION_EXT_KEY);
+                                Log.d(TAG, "onNotifyEvent onclick key = " + key + "subKey = " + subKey + " extString = " + extString);
                                 scheduleCheckPluginInstanceAndNotifyForOnClick(Extras.ON_NOTIFICATION_CLICKED, extString);
                             }
                         }

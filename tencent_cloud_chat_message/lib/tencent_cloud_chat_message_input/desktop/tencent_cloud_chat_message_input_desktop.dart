@@ -119,6 +119,7 @@ class _TencentCloudChatMessageInputDesktopState extends TencentCloudChatState<Te
         final targetMemberLabel = _getShowName(e);
         return (label: targetMemberLabel, userID: e.userID);
       })));
+      _textEditingFocusNode.requestFocus();
     } else if (!TencentCloudChatUtils.deepEqual(widget.inputData.membersNeedToMention, oldWidget.inputData.membersNeedToMention) && widget.inputData.membersNeedToMention != null) {
       _addMentionedUsers(groupMembersInfo: widget.inputData.membersNeedToMention);
     }

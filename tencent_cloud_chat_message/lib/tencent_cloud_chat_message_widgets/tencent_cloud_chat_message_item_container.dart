@@ -44,8 +44,10 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
 
   // This method handles changes in message data.
   void _messageDataHandler(TencentCloudChatMessageData messageData) {
-    final msgID = TencentCloudChatUtils.checkString(widget.message.msgID) ?? TencentCloudChatUtils.checkString(widget.message.id) ?? "";
-    if(TencentCloudChatUtils.checkString(msgID) == null){
+    final msgID = TencentCloudChatUtils.checkString(widget.message.msgID) ??
+        TencentCloudChatUtils.checkString(widget.message.id) ??
+        "";
+    if (TencentCloudChatUtils.checkString(msgID) == null) {
       return;
     }
     final bool isGroup = TencentCloudChatUtils.checkString(widget.message.groupID) != null;
@@ -84,7 +86,8 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
         break;
       case TencentCloudChatMessageDataKeys.sendMessageProgress:
         if (messageData.messageProgressData.containsKey(msgID)) {
-          if (messageData.messageProgressData[msgID] != null && _sendingMessageData != messageData.messageProgressData[msgID]) {
+          if (messageData.messageProgressData[msgID] != null &&
+              _sendingMessageData != messageData.messageProgressData[msgID]) {
             _sendingMessageData = messageData.messageProgressData[msgID];
             setState(() {
               _sendingMessageData = messageData.messageProgressData[msgID];
@@ -126,7 +129,13 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
   Widget build(BuildContext context) {
     String? messageText;
     if (widget.message.status == MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED) {
-      messageText = tL10n.messageRecalled;
+      if (widget.message.revokerInfo != null &&
+          TencentCloudChatUtils.checkString(widget.message.revokerInfo?.userID) != null) {
+        messageText = tL10n.memberRecalledMessage(TencentCloudChatUtils.checkString(widget.message.revokerInfo?.nickName) ??
+            widget.message.revokerInfo!.userID!);
+      } else {
+        messageText = tL10n.messageRecalled;
+      }
     } else {
       switch (widget.message.elemType) {
         case 101:

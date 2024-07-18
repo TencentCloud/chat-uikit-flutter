@@ -189,8 +189,9 @@ class TencentCloudChatGroupProfilAddMemberListState extends TencentCloudChatStat
 
   Widget _buildMemberSilencedItem(V2TimGroupMemberFullInfo item) {
     bool disabled = false;
+    final currentTimeStamp = DateTime.now().millisecondsSinceEpoch;
     if (item.muteUntil != null && item.muteUntil! > 0) {
-      disabled = true;
+      disabled = item.muteUntil! * 1000 > currentTimeStamp;
     }
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Container(

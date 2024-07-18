@@ -14,6 +14,8 @@ import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_pl
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
 import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
+import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/widgets/desktop_column_menu/tencent_cloud_chat_column_menu.dart';
@@ -46,12 +48,16 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
   OverlayEntry? _mobileMenuOverlayEntry;
   OverlayEntry? _desktopMenuOverlayEntry;
 
-  final GlobalKey _messageKey = GlobalKey();
+  final GlobalKey _messageGestureKey = GlobalKey();
+  final GlobalKey? _messageKey = null;
+  final GlobalKey _reactionKey = GlobalKey();
   final GlobalKey _menuKey = GlobalKey();
   bool _showActions = false;
   double? _menuHeight; // Store the actual menu height
   double? _menuWidth;
-  final bool _reactionBarExpanded = false; // Whether the Message Reaction bar is expanded
+
+  double? _reactionHeight; // Store the actual menu height
+  double? _reactionWidth;
   late AnimationController _messageActionsAnimationController;
   late AnimationController _listMessageScaleAnimationController;
   late AnimationController _overlayMessageScaleAnimationController;
@@ -62,11 +68,14 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
   late Animation<double> _overlayMessageScaleAnimation;
   Timer? _messageTapDownTimer;
 
+  String? listenerID;
+
   List<TencentCloudChatMessageGeneralOptionItem> _menuOptions = [];
 
   @override
   void initState() {
     super.initState();
+    _addUIKitListener();
     if (isDesktopScreen) {
       if (TencentCloudChatPlatformAdapter().isMobile) {
         _mobileInit();
@@ -78,6 +87,7 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
 
   @override
   void dispose() {
+    _removeUIKitListener();
     if (isDesktopScreen) {
     } else {
       _mobileDispose();
@@ -94,6 +104,31 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
       _menuHeight = null;
     }
     _menuOptions = newOptions;
+  }
+
+  void _addUIKitListener() {
+    if(widget.data.useMessageReaction){
+      listenerID ??= TencentCloudChat.instance.chatSDKInstance.messageSDK.addUIKitListener(listener: _uikitListener);
+      return;
+    }
+  }
+
+  void _removeUIKitListener() {
+    if(listenerID != null && widget.data.useMessageReaction){
+      TencentCloudChat.instance.chatSDKInstance.messageSDK.removeUIKitListener(listenerID: listenerID!);
+    }
+  }
+
+  void _uikitListener(Map<String, dynamic> data) {
+    if (data.containsKey("eventType")) {
+      if (data["eventType"] == "onClickReactionSelector") {
+        if(!isDesktopScreen){
+          _closeMobileMenu();
+        }else{
+          _removeDesktopMenu();
+        }
+      }
+    }
   }
 
   void _closeMobileMenu() {
@@ -147,38 +182,50 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
   }
 
   // Function to build the Message Reaction bar
-  Widget _buildReactionBar() {
+  Widget _buildReactionBar({GlobalKey? key}) {
+    return TencentCloudChatUtils.checkString(widget.data.message.msgID) != null ? Container(
+      color: Colors.transparent,
+      key: key,
+      child: TencentCloudChatThemeWidget(
+        build: (context, colorTheme, textStyle) {
+          final Map<String, String> data = {};
+          data["msgID"] = widget.data.message.msgID!;
+          data["backgroundColor"] = colorTheme.backgroundColor.value.toString();
+          data["borderColor"] = colorTheme.dividerColor.value.toString();
+          data["platformMode"] = isDesktopScreen ? "desktop" : "mobile";
+          return widget.data.messageReactionPluginInstance?.getWidgetSync(
+            methodName: "messageReactionSelector",
+            data: data,
+          ) ?? const SizedBox(
+            width: 0,
+            height: 0,
+          );
+        },
+      ),
+    ) : const SizedBox(
+      width: 0,
+      height: 0,
+    );
+  }
+
+  Widget _buildDesktopMenu({GlobalKey? key}) {
+    final list = widget.methods.getMenuOptions(selectedText: _selectedText);
     return TencentCloudChatThemeWidget(
-        build: (context, colorTheme, textStyle) => Container(
-              height: _reactionBarExpanded ? 200 : 50, // Adjust height based on _reactionBarExpanded
-              color: colorTheme.backgroundColor,
-              child: _reactionBarExpanded
-                  ? const Column(
-                      children: [
-                        // Add your 4-row panel content here
-                      ],
-                    )
-                  : Row(
-                      children: [
-                        Icon(
-                          Icons.emoji_emotions,
-                          size: textStyle.standardLargeText,
-                        ),
-                        Icon(
-                          Icons.emoji_emotions,
-                          size: textStyle.standardLargeText,
-                        ),
-                        Icon(
-                          Icons.emoji_emotions,
-                          size: textStyle.standardLargeText,
-                        ),
-                        Icon(
-                          Icons.add,
-                          size: textStyle.standardLargeText,
-                        ),
-                      ],
-                    ),
-            ));
+      build: (context, colorTheme, textStyle) => TencentCloudChatColumnMenu(
+        key: key,
+        data: list
+            .map((e) => TencentCloudChatMessageGeneralOptionItem(
+          label: e.label,
+          onTap: ({Offset? offset}) {
+            _removeDesktopMenu();
+            e.onTap();
+          },
+          iconAsset: e.iconAsset,
+          icon: e.icon,
+        ))
+            .toList(),
+      ),
+    );
   }
 
   List<TableRow> _buildMobileMenuItems({
@@ -211,7 +258,7 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
                           ),
                         )
                       : null,
-                  padding: EdgeInsets.all(getSquareSize(10)),
+                  padding: EdgeInsets.symmetric(vertical: getSquareSize(8), horizontal: getSquareSize(12)),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -219,7 +266,7 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
                         e.label,
                         style: TextStyle(
                           decoration: TextDecoration.none,
-                          color: colorTheme.primaryTextColor,
+                          color: colorTheme.primaryTextColor.withOpacity(0.94),
                           fontSize: textStyle.standardText,
                         ),
                       ),
@@ -233,7 +280,7 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
                               width: 16,
                               height: 16,
                               colorFilter: ui.ColorFilter.mode(
-                                colorTheme.primaryColor,
+                                colorTheme.primaryTextColor.withOpacity(0.9),
                                 ui.BlendMode.srcIn,
                               ),
                             );
@@ -243,7 +290,7 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
                             package: e.iconAsset!.package,
                             width: getFontSize(16),
                             height: getFontSize(16),
-                            color: colorTheme.primaryColor,
+                            color: colorTheme.primaryTextColor.withOpacity(0.9),
                           );
                         }
                         if (e.icon != null) {
@@ -276,19 +323,19 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
                 child: Container(
                   key: key,
                   decoration: BoxDecoration(
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0xCCbebebe),
-                        offset: Offset(2, 2),
-                        blurRadius: 10,
-                        spreadRadius: 1,
-                      ),
-                    ],
+                    // boxShadow: const [
+                    //   BoxShadow(
+                    //     color: Color(0xCCbebebe),
+                    //     offset: Offset(2, 2),
+                    //     blurRadius: 10,
+                    //     spreadRadius: 1,
+                    //   ),
+                    // ],
                     border: Border.all(
                       width: 1,
                       color: colorTheme.dividerColor,
                     ),
-                    color: colorTheme.backgroundColor,
+                    color: colorTheme.backgroundColor.withOpacity(0.8),
                     borderRadius: const BorderRadius.all(Radius.circular(10)),
                   ),
                   child: Table(
@@ -306,7 +353,7 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
     if (_mobileMenuOverlayEntry == null) {
       if (_menuHeight == null || _menuWidth == null) {
         // Get the menu height using GlobalKey
-        final RenderBox menuBox = _menuKey.currentContext!.findRenderObject() as RenderBox;
+        final RenderBox menuBox = _reactionKey.currentContext!.findRenderObject() as RenderBox;
         _menuHeight = menuBox.size.height;
         _menuWidth = menuBox.size.width;
       }
@@ -327,22 +374,22 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
         messageOffset = _menuHeight! - availableSpace + 16;
       }
 
-      // TODO: Message Reaction 注意 RTL 适配
       // Calculate the available space and positions for the Message Reaction bar
-      // double reactionBarHeight = widget.useMessageReaction ? 40 : 0;
-      // bool showReactionBarAbove = messagePosition.dy - messageOffset > reactionBarHeight + 16;
-      //
-      // double totalHeight = messageBox.size.height + 16 + _menuHeight! + 16 + reactionBarHeight;
-      //
-      // if (!showReactionBarAbove && totalHeight > screenHeight - messagePosition.dy) {
-      //   messageOffset += (reactionBarHeight + 16);
-      // }
-      //
-      // if (messageOffset == 0) {
-      //   _menuAnimationController.forward();
-      // }
-      //
-      // double reactionBarTop = showReactionBarAbove ? messagePosition.dy - messageOffset - 16 - reactionBarHeight : messagePosition.dy + messageBox.size.height - messageOffset + 32 + _menuHeight!;
+      double reactionBarHeight = widget.data.useMessageReaction ? 54 : 0;
+      double reactionBarWidth = widget.data.useMessageReaction ?  min(800, MediaQuery.of(context).size.width * 0.76) : 0;
+      bool showReactionBarAbove = messagePosition.dy - messageOffset > reactionBarHeight + 16;
+
+      double totalHeight = messageBox.size.height + 16 + _menuHeight! + 16 + reactionBarHeight;
+
+      if (!showReactionBarAbove && totalHeight > screenHeight - messagePosition.dy) {
+        messageOffset += (reactionBarHeight + 16);
+      }
+
+      if (messageOffset == 0) {
+        _menuAnimationController.forward();
+      }
+
+      double reactionBarTop = showReactionBarAbove ? messagePosition.dy - messageOffset - 16 - reactionBarHeight : messagePosition.dy + messageBox.size.height - messageOffset + 32 + _menuHeight!;
 
       double menuTop = messagePosition.dy + messageBox.size.height + 16 - messageOffset;
 
@@ -353,6 +400,14 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
           : ((widget.data.message.isSelf ?? true)
               ? messagePosition.dx
               : messagePosition.dx + messageBox.size.width - _menuWidth!);
+
+      double reactionBarLeft = textDirection == TextDirection.ltr
+          ? ((widget.data.message.isSelf ?? true)
+          ? messagePosition.dx + messageBox.size.width - reactionBarWidth
+          : messagePosition.dx)
+          : ((widget.data.message.isSelf ?? true)
+          ? messagePosition.dx
+          : messagePosition.dx + messageBox.size.width - reactionBarWidth);
 
       Animation<double> messageTopTween = Tween<double>(
         begin: messagePosition.dy,
@@ -433,14 +488,14 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
                               scale: _menuAnimation,
                               child: _buildMobileMenuWidget(),
                             )),
-                        // Positioned(
-                        //   left: messagePosition.dx,
-                        //   top: reactionBarTop,
-                        //   child: ScaleTransition(
-                        //     scale: _menuAnimation,
-                        //     child: _buildReactionBar(),
-                        //   ),
-                        // ),
+                        Positioned(
+                          left: reactionBarLeft,
+                          top: reactionBarTop,
+                          child: ScaleTransition(
+                            scale: _menuAnimation,
+                            child: _buildReactionBar(),
+                          ),
+                        ),
                       ],
                     )));
       });
@@ -508,7 +563,7 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
         Opacity(
           opacity: _showActions ? 0 : 1,
           child: GestureDetector(
-            key: _messageKey,
+            key: _messageGestureKey,
             onTapDown: _onTapDownMessageOnMobile,
             onTapUp: _onTapUpMessageOnMobile,
             onTapCancel: _onTapUpMessageOnMobile,
@@ -516,13 +571,14 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
               scale: _listMessageScaleAnimation,
               child: widget.methods.getMessageItemWidget(
                 renderOnMenuPreview: false,
+                key: _messageKey,
               ),
             ),
           ),
         ),
         Offstage(
           offstage: true,
-          child: _buildMobileMenuWidget(key: _menuKey),
+          child: _buildMobileMenuWidget(key: _reactionKey),
         ),
       ],
     );
@@ -544,12 +600,23 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
       _menuWidth = menuBox.size.width;
     }
 
+    if (_reactionHeight == null || _reactionWidth == null) {
+      // Get the reaction height using GlobalKey
+      final RenderBox reactionBox = _reactionKey.currentContext!.findRenderObject() as RenderBox;
+      _reactionHeight = reactionBox.size.height;
+      _reactionWidth = reactionBox.size.width;
+    }
+
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
     final tapDetails = tapDownDetails;
-    final double dx = min(tapDetails.dx, screenWidth - (_menuWidth ?? 100));
-    final double dy = min(tapDetails.dy as double, screenHeight - (_menuHeight ?? 320)).toDouble();
+
+    final double menuDx = min(tapDetails.dx, screenWidth - (_menuWidth ?? 100));
+    final double menuDy = min(tapDetails.dy as double, screenHeight - (_menuHeight ?? 320)).toDouble();
+
+    final double reactionDx = min(screenWidth - (_reactionWidth ?? 254) , max(tapDetails.dx - (_reactionWidth ?? 254) + _menuWidth, (_reactionWidth ?? 254) + 4));
+    final double reactionDy = min((menuDy - (_reactionHeight ?? 50) - 4), max(tapDetails.dy - (_reactionHeight ?? 50) - 4, 8.toDouble()));
 
     _desktopMenuOverlayEntry = OverlayEntry(
         builder: (context) => TencentCloudChatThemeWidget(
@@ -566,30 +633,12 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
                         color: Colors.transparent,
                       ),
                     ),
-                    Positioned(left: dx, top: dy, child: _buildDesktopMenu())
+                    Positioned(left: menuDx, top: menuDy, child: _buildDesktopMenu()),
+                    Positioned(left: reactionDx, top: reactionDy, child: _buildReactionBar()),
+
                   ],
                 )));
     Overlay.of(context).insert(_desktopMenuOverlayEntry!);
-  }
-
-  Widget _buildDesktopMenu({GlobalKey? key}) {
-    final list = widget.methods.getMenuOptions(selectedText: _selectedText);
-    return TencentCloudChatThemeWidget(
-      build: (context, colorTheme, textStyle) => TencentCloudChatColumnMenu(
-        key: key,
-        data: list
-            .map((e) => TencentCloudChatMessageGeneralOptionItem(
-                  label: e.label,
-                  onTap: ({Offset? offset}) {
-                    _removeDesktopMenu();
-                    e.onTap();
-                  },
-                  iconAsset: e.iconAsset,
-                  icon: e.icon,
-                ))
-            .toList(),
-      ),
-    );
   }
 
   @override
@@ -609,12 +658,19 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
             contextMenuBuilder: (ctx, selectableRegionState) {
               return Container();
             },
-            child: widget.methods.getMessageItemWidget(renderOnMenuPreview: false),
+            child: widget.methods.getMessageItemWidget(
+                renderOnMenuPreview: false,
+              key: _messageKey,
+            ),
           ),
         ),
         Offstage(
           offstage: true,
           child: _buildDesktopMenu(key: _menuKey),
+        ),
+        Offstage(
+          offstage: true,
+          child: _buildReactionBar(key: _reactionKey),
         ),
       ],
     );

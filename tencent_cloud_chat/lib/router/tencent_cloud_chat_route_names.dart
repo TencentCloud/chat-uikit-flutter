@@ -70,4 +70,5 @@ class TencentCloudChatRouteNames {
   static const settingsAbout = 'tuikit:///settings/settingsAbout.component';
   static const homePage = 'tuikit:///homePage.component';
   static const loginPage = 'tuikit:///loginPage.component';
+  static const search = 'tuikit:///search/search.component';
 }

@@ -96,66 +96,72 @@ class _TencentCloudChatMessageMergeState extends TencentCloudChatMessageState<Te
               bottomRight: Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
             ),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.end,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ConstrainedBox(
-                constraints: BoxConstraints(maxWidth: min(maxBubbleWidth * 0.9, maxBubbleWidth - getSquareSize(sentFromSelf ? 128 : 102))),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: textStyle.fontsize_14,
-                            ),
-                          ),
-                          ...((abstractList)
-                              .map(
-                                (e) => Text(
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  ConstrainedBox(
+                    constraints: BoxConstraints(maxWidth: min(maxBubbleWidth * 0.9, maxBubbleWidth - getSquareSize(sentFromSelf ? 128 : 102))),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: textStyle.fontsize_14,
+                                ),
+                              ),
+                              ...((abstractList)
+                                  .map(
+                                    (e) => Text(
                                   e,
                                   textAlign: TextAlign.start,
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
                               )
-                              .toList()
-                              .sublist(0, displayLen)),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 4),
-                                  color: Colors.grey,
-                                  height: 1,
-                                ),
+                                  .toList()
+                                  .sublist(0, displayLen)),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 4),
+                                      color: Colors.grey,
+                                      height: 1,
+                                    ),
+                                  )
+                                ],
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 4),
+                                child: Text(tL10n.chatHistory),
                               )
                             ],
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 4),
-                            child: Text(tL10n.chatHistory),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
-                ),
+                        )
+                      ],
+                    ),
+                  ),
+                  SizedBox(
+                    width: getWidth(4),
+                  ),
+                  if (sentFromSelf) messageStatusIndicator(),
+                  messageTimeIndicator(),
+                ],
               ),
-              SizedBox(
-                width: getWidth(4),
-              ),
-              if (sentFromSelf) messageStatusIndicator(),
-              messageTimeIndicator(),
+              messageReactionList(),
             ],
-          ),
+          )
         ),
       );
     });

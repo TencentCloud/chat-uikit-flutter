@@ -107,13 +107,11 @@ class TencentCloudChatConversationSDK {
         .addConversationListener(listener: conversationListener);
   }
 
-  Future<V2TimConversation> getConversation({String? userID, String? groupID}) async {
-    assert((userID == null) != (groupID == null));
-
-    final conversationID = TencentCloudChatUtils.checkString(userID) != null ? "c2c_$userID" : "group_$groupID";
+  Future<V2TimConversation> getConversation({String? userID, String? groupID, String? conversationID}) async {
+    final convID = conversationID ?? (TencentCloudChatUtils.checkString(userID) != null ? "c2c_$userID" : "group_$groupID");
     final res = await TencentCloudChat.instance.chatSDKInstance.manager
         .getConversationManager()
-        .getConversation(conversationID: conversationID);
+        .getConversation(conversationID: convID);
     if (res.code == 0 && res.data != null) {
       return res.data!;
     }
@@ -125,7 +123,7 @@ class TencentCloudChatConversationSDK {
         userProfile = userProfileRes.data!.first;
       }
       return V2TimConversation(
-        conversationID: conversationID,
+        conversationID: convID,
         userID: TencentCloudChatUtils.checkString(userID),
         faceUrl: TencentCloudChatUtils.checkString(userProfile?.faceUrl),
         showName: TencentCloudChatUtils.checkString(userProfile?.nickName) ??
@@ -143,7 +141,7 @@ class TencentCloudChatConversationSDK {
         groupInfo = groupInfoRes.data!.first.groupInfo;
       }
       return V2TimConversation(
-        conversationID: conversationID,
+        conversationID: convID,
         groupID: groupID,
         groupType: groupInfo?.groupType,
         faceUrl: TencentCloudChatUtils.checkString(groupInfo?.faceUrl),

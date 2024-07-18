@@ -7,6 +7,7 @@ import 'package:collection/collection.dart';
 import 'package:exif/exif.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:hash/hash.dart';
 import 'package:path/path.dart' as p;
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_message_calling_message/tencent_cloud_chat_message_calling_message.dart';
@@ -53,7 +54,8 @@ class TencentCloudChatUtils {
 
   /// This function returns the MIME type based on the given file extension.
   /// Example: getFileType("pdf") returns "application/pdf".
-  static String getFileType(String fileType) {
+  static String getFileType(String file) {
+    final fileType = file.toLowerCase();
     switch (fileType) {
       case "3gp":
         return "video/3gpp";
@@ -193,8 +195,7 @@ class TencentCloudChatUtils {
     }
   }
 
-  static String getMessageSummary(
-      {V2TimMessage? message, int? messageReceiveOption, int? unreadCount, String? draftText, bool needStatus = true}) {
+  static String getMessageSummary({V2TimMessage? message, int? messageReceiveOption, int? unreadCount, String? draftText, bool needStatus = true}) {
     String text = "";
 
     if (message != null) {
@@ -239,7 +240,12 @@ class TencentCloudChatUtils {
         text = tL10n.messageDeleted;
       }
       if (message.status == 6 && needStatus) {
-        text = tL10n.messageRecalled;
+        if (message.revokerInfo != null && TencentCloudChatUtils.checkString(message.revokerInfo?.userID) != null) {
+          text = tL10n.memberRecalledMessage(
+              TencentCloudChatUtils.checkString(message.revokerInfo?.nickName) ?? message.revokerInfo!.userID!);
+        } else {
+          text = tL10n.messageRecalled;
+        }
       }
       if (messageReceiveOption != 0) {
         if (unreadCount != null) {
@@ -306,12 +312,8 @@ class TencentCloudChatUtils {
       List<V2TimGroupMemberInfo?> memberList = (tips.memberList ?? []);
       V2TimGroupMemberInfo opMember = tips.opMember;
 
-      String membersDisplayText = memberList
-          .map((e) => TencentCloudChatUtils.getDisplayNameByV2TimGroupMemberInfo(
-              TencentCloudChatUtils.v2TimGroupMemberInfo2V2TimGroupMemberFullInfo(e)))
-          .join(",");
-      String opMemberDisplayText = TencentCloudChatUtils.getDisplayNameByV2TimGroupMemberInfo(
-          TencentCloudChatUtils.v2TimGroupMemberInfo2V2TimGroupMemberFullInfo(opMember));
+      String membersDisplayText = memberList.map((e) => TencentCloudChatUtils.getDisplayNameByV2TimGroupMemberInfo(TencentCloudChatUtils.v2TimGroupMemberInfo2V2TimGroupMemberFullInfo(e))).join(",");
+      String opMemberDisplayText = TencentCloudChatUtils.getDisplayNameByV2TimGroupMemberInfo(TencentCloudChatUtils.v2TimGroupMemberInfo2V2TimGroupMemberFullInfo(opMember));
 
       switch (type) {
         case 0:
@@ -336,12 +338,10 @@ class TencentCloudChatUtils {
           res = tL10n.opRevokedAdmin(membersDisplayText, opMemberDisplayText);
           break;
         case 7:
-          res = tL10n.opChangedGroupInfo(
-              groupChangeInfo.map((e) => buildGroupChangeInfoText(e)).join(","), opMemberDisplayText);
+          res = tL10n.opChangedGroupInfo(groupChangeInfo.map((e) => buildGroupChangeInfoText(e)).join(","), opMemberDisplayText);
           break;
         case 9:
-          res = tL10n.opChangedMemberInfo(
-              memberChangeInfo.map((e) => buildGroupMemberChangeInfoText(e)).join(","), opMemberDisplayText);
+          res = tL10n.opChangedMemberInfo(memberChangeInfo.map((e) => buildGroupMemberChangeInfoText(e)).join(","), opMemberDisplayText);
           break;
       }
     }
@@ -374,8 +374,7 @@ class TencentCloudChatUtils {
     );
   }
 
-  static RegExp urlReg = RegExp(
-      r"([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/|[wW]{3}.|[wW][aA][pP].|[fF][tT][pP].|[fF][iI][lL][eE].)[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]");
+  static RegExp urlReg = RegExp(r"([hH][tT]{2}[pP]:\/\/|[hH][tT]{2}[pP][sS]:\/\/|[wW]{3}.|[wW][aA][pP].|[fF][tT][pP].|[fF][iI][lL][eE].)[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]");
 
   /// Throttle function that ensures the [callback] function is not called
   /// more often than the specified [duration].
@@ -402,19 +401,23 @@ class TencentCloudChatUtils {
   static String getMessageSenderName(V2TimMessage message) {
     return checkString(message.friendRemark) ?? checkString(message.nickName) ?? checkString(message.sender) ?? "";
   }
-
+  static String getMd5ByString(String data) {
+    return MD5().update(data.codeUnits).digest().join();
+  }
   static Future<ImageExifInfo?> getImageExifInfoByBuffer({
     required Uint8List fileBuffer,
   }) async {
     if (kIsWeb) {
       return null;
     }
+
     final data = await readExifFromBytes(fileBuffer);
+
     String? owidth = data["EXIF ExifImageWidth"]?.printable;
     String? oheight = data["EXIF ExifImageLength"]?.printable;
     bool isRotate = false;
-    String? rotate = data["Image Orientation"]?.printable;
-    if (owidth != null && oheight != null && rotate != null) {
+    String rotate = data["Image Orientation"]?.printable ?? "";
+    if (owidth != null && oheight != null) {
       if (rotate.contains("90") || rotate.contains("270")) {
         isRotate = true;
       }
@@ -589,8 +592,7 @@ class TencentCloudChatUtils {
   /// all values (messageSender, messageAbstract, and messageID) will be returned as null.
   ///
   /// Returns a tuple containing the messageSender, messageAbstract, and messageID.
-  static ({String? messageAbstract, String? messageID, String? messageSender, int? messageSeq, int? messageTimestamp})
-      parseMessageReply(String? jsonString) {
+  static ({String? messageAbstract, String? messageID, String? messageSender, int? messageSeq, int? messageTimestamp}) parseMessageReply(String? jsonString) {
     String? messageSender;
     String? messageAbstract;
     String? messageID;
@@ -757,22 +759,8 @@ class Pertypath {
   ///
   /// Does not [normalize] or [canonicalize] paths.
   String absolute(String part1,
-          [String? part2,
-          String? part3,
-          String? part4,
-          String? part5,
-          String? part6,
-          String? part7,
-          String? part8,
-          String? part9,
-          String? part10,
-          String? part11,
-          String? part12,
-          String? part13,
-          String? part14,
-          String? part15]) =>
-      p.context.absolute(part1, part2, part3, part4, part5, part6, part7, part8, part9, part10, part11, part12, part13,
-          part14, part15);
+          [String? part2, String? part3, String? part4, String? part5, String? part6, String? part7, String? part8, String? part9, String? part10, String? part11, String? part12, String? part13, String? part14, String? part15]) =>
+      p.context.absolute(part1, part2, part3, part4, part5, part6, part7, part8, part9, part10, part11, part12, part13, part14, part15);
 
   /// Gets the part of [path] after the last separator.
   ///
@@ -917,8 +905,7 @@ class Pertypath {
           String? part14,
           String? part15,
           String? part16]) =>
-      p.context.join(part1, part2, part3, part4, part5, part6, part7, part8, part9, part10, part11, part12, part13,
-          part14, part15, part16);
+      p.context.join(part1, part2, part3, part4, part5, part6, part7, part8, part9, part10, part11, part12, part13, part14, part15, part16);
 
   /// Joins the given path parts into a single path using the current platform's
   /// [separator]. Example:

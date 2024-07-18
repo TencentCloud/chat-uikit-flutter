@@ -4,6 +4,7 @@ import 'package:extended_text/extended_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_markdown/src/_functions_io.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
@@ -39,11 +40,24 @@ class _TencentCloudChatMessageTextState extends TencentCloudChatMessageState<Ten
         ? MarkdownBody(
             data: text,
             imageBuilder: (uri, title, alt) {
-              return Image(
+              double? width;
+              double? height;
+              final List<String> parts = uri.path.split('#');
+              if (parts.isEmpty) {
+                return const SizedBox();
+              }
+              if (parts.length == 2) {
+                final List<String> dimensions = parts.last.split('x');
+                if (dimensions.length == 2) {
+                  width = double.tryParse(dimensions[0]);
+                  height = double.tryParse(dimensions[1]);
+                }
+              }
+              return uri.toString().indexOf("resource:") == 0 ? Image(
                 image: AssetImage(uri.path.replaceAll("resource:", ""), package: "tencent_cloud_chat_sticker"),
                 width: 22,
                 height: 22,
-              );
+              ) : kDefaultImageBuilder(uri, null, width, height);
             },
             selectable: false,
             onTapLink: (
@@ -158,6 +172,9 @@ class _TencentCloudChatMessageTextState extends TencentCloudChatMessageState<Ten
                   Radius.circular(getSquareSize(sentFromSelf && !widget.data.showMessageSenderName ? 0 : 16)),
             )),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.end,
           children: [
             if (widget.data.repliedMessageItem != null) widget.data.repliedMessageItem!,
             if (widget.data.repliedMessageItem != null)
@@ -180,7 +197,9 @@ class _TencentCloudChatMessageTextState extends TencentCloudChatMessageState<Ten
                     ],
                   ),
               ],
-            )
+            ),
+
+            messageReactionList(),
           ],
         ),
       );
@@ -244,7 +263,8 @@ class _TencentCloudChatMessageTextState extends TencentCloudChatMessageState<Ten
                       ),
                     ),
                 ],
-              )
+              ),
+              messageReactionList(),
             ],
           ),
         ),

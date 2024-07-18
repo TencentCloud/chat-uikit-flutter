@@ -1,3 +1,11 @@
+## 1.5.0
+
+### General
+
+* Upgraded the underlying Flutter Chat SDK, as well as the iOS and Android Chat SDKs, to version 8.0.
+* Migrated group data storage to a global LRU-optimized cache, improving the integration between TencentCloudChatMessage
+  and TencentCloudChatGroupProfile components.
+
 ## 1.3.0
 
 ### General

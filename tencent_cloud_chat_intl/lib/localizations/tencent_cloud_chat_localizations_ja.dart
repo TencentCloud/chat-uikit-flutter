@@ -1243,4 +1243,77 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
 
   @override
   String get reEdit => '再編集';
+
+  @override
+  String get translate => '翻訳';
+
+  @override
+  String memberRecalledMessage(Object member) {
+    return '$memberがメッセージを取り消しました';
+  }
+
+  @override
+  String get copyFileSuccess => 'ファイルのコピーに成功しました';
+
+  @override
+  String get saveFileSuccess => 'ファイルの保存に成功しました';
+
+  @override
+  String get saveFileFailed => 'ファイルの保存に失敗しました';
+
+  @override
+  String get copyLinkSuccess => 'リンクをコピーしました';
+
+  @override
+  String get copyImageContextMenuBtnText => '画像をコピー';
+
+  @override
+  String get saveToLocalContextMenuBtnText => '名前を付けて保存';
+
+  @override
+  String get copyLinkContextMenuBtnText => 'リンクをコピー';
+
+  @override
+  String get openLinkContextMenuBtnText => '新しいウィンドウで開く';
+
+  @override
+  String get reactionList => 'Reaction List';
+
+  @override
+  String get translatedBy => 'Tencent RTC によって提供される';
+
+  @override
+  String get convertToText => '変換';
+
+  @override
+  String numMessages(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count 件のメッセージ',
+      one: '1 件のメッセージ',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get filterBy => 'フィルター';
+
+  @override
+  String get text => 'テキスト';
+
+  @override
+  String get numMessagesOver99 => '99+ 件のメッセージ';
+
+  @override
+  String get setGroupAnnouncement => 'グループ通知を設定';
+
+  @override
+  String get setNickName => 'グループ名の設定';
+
+  @override
+  String get joinTime => '参加時間';
+
+  @override
+  String get myRoleInGroup => '役割';
 }

@@ -9,6 +9,8 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 
 import com.tencent.chat.flutter.push.tencent_cloud_chat_push.common.Extras;
+import com.tencent.qcloud.tim.push.TIMPushCallback;
+import com.tencent.qcloud.tim.push.TIMPushManager;
 import com.tencent.qcloud.tuicore.TUIConstants;
 import com.tencent.qcloud.tuicore.TUICore;
 import com.tencent.qcloud.tuicore.interfaces.TUIServiceCallback;
@@ -70,8 +72,11 @@ public class TencentCloudChatPushPlugin implements FlutterPlugin, MethodCallHand
             case "disableAutoRegisterPush":
                 disableAutoRegisterPush(call, result);
                 break;
-            case "configFCMPrivateRing":
-                configFCMPrivateRing(call, result);
+            case "setCustomFCMRing":
+                setCustomFCMRing(call, result);
+                break;
+            case "setAndroidCustomConfigFile":
+                setAndroidCustomConfigFile(call, result);
                 break;
             case "setPushBrandId":
                 setPushBrandId(call, result);
@@ -94,8 +99,8 @@ public class TencentCloudChatPushPlugin implements FlutterPlugin, MethodCallHand
             case "setAndroidPushToken":
                 setAndroidPushToken(call, result);
                 break;
-            case "setAndroidCustomTIMPushConfigs":
-                setAndroidCustomTIMPushConfigs(call, result);
+            case "setXiaoMiPushStorageRegion":
+                setXiaoMiPushStorageRegion(call, result);
                 break;
             default:
                 result.notImplemented();
@@ -182,62 +187,58 @@ public class TencentCloudChatPushPlugin implements FlutterPlugin, MethodCallHand
     public void registerPush(@NonNull MethodCall call, @NonNull Result result) {
         Log.d(TAG, "registerPush");
         registeredOnNotificationClickEvent = true;
-        Map<String, String> arguments = (Map<String, String>) call.arguments;
-        String pushConfigJson = arguments.get(Extras.PUSH_CONFIG_JSON);
-
-        String useMethod = (pushConfigJson != null && !pushConfigJson.isEmpty()) ? TUIConstants.TIMPush.METHOD_REGISTER_PUSH_WITH_JSON : TUIConstants.TIMPush.METHOD_REGISTER_PUSH;
-
-        Map<String, Object> param = new HashMap<>();
-        param.put("context", mContext);
-        if (pushConfigJson != null && !pushConfigJson.isEmpty()) {
-            param.put(TUIConstants.TIMPush.REGISTER_PUSH_WITH_JSON_KEY, pushConfigJson);
-        }
-
-        TUICore.callService(TUIConstants.TIMPush.SERVICE_NAME, useMethod, param, new TUIServiceCallback() {
+        TIMPushManager.getInstance().registerPush(mContext, new TIMPushCallback<String>() {
             @Override
-            public void onServiceCallback(int errorCode, String errorMessage, Bundle bundle) {
-                try {
-                    if (errorCode == 0) {
-                        result.success("");
-                    } else {
-                        result.error(String.valueOf(errorCode), errorMessage, errorMessage);
-                    }
-                }catch (Exception e){
-                    Log.d(TAG, errorMessage);
-                }
+            public void onSuccess(String data) {
+                result.success(data);
+            }
+
+            @Override
+            public void onError(int errCode, String errMsg, String data) {
+                result.error(String.valueOf(errCode), errMsg, data);
             }
         });
     }
 
     public void unRegisterPush(@NonNull MethodCall call, @NonNull Result result) {
-        TUICore.callService(TUIConstants.TIMPush.SERVICE_NAME, TUIConstants.TIMPush.METHOD_UNREGISTER_PUSH, null, new TUIServiceCallback() {
+        TIMPushManager.getInstance().unRegisterPush(new TIMPushCallback<String>() {
             @Override
-            public void onServiceCallback(int errorCode, String errorMessage, Bundle bundle) {
-                if (errorCode == 0) {
-                    result.success("");
-                } else {
-                    result.error(String.valueOf(errorCode), errorMessage, errorMessage);
-                }
+            public void onSuccess(String data) {
+                result.success(data);
+            }
+
+            @Override
+            public void onError(int errCode, String errMsg, String data) {
+                result.error(String.valueOf(errCode), errMsg, data);
             }
         });
     }
 
     public void disableAutoRegisterPush(@NonNull MethodCall call, @NonNull Result result) {
-        TUICore.callService(TUIConstants.TIMPush.SERVICE_NAME, TUIConstants.TIMPush.METHOD_DISABLE_AUTO_REGISTER_PUSH, null);
+        TIMPushManager.getInstance().disableAutoRegisterPush();
         result.success("");
     }
 
-    public void configFCMPrivateRing(@NonNull MethodCall call, @NonNull Result result) {
+    public void setCustomFCMRing(@NonNull MethodCall call, @NonNull Result result) {
         Map<String, String> arguments = (Map<String, String>) call.arguments;
         String fcmPushChannelId = arguments.get(Extras.FCM_PUSH_CHANNEL_ID);
         String privateRingName = arguments.get(Extras.PRIVATE_RING_NAME);
         String enableFCMPrivateRing = arguments.get(Extras.ENABLE_FCM_PRIVATE_RING);
+        TIMPushManager.getInstance().setCustomFCMRing(fcmPushChannelId, privateRingName,  Boolean.parseBoolean(enableFCMPrivateRing));
+        result.success("");
+    }
 
-        Map<String, Object> param = new HashMap<>();
-        param.put(TUIConstants.TIMPush.CONFIG_FCM_CHANNEL_ID_KEY, fcmPushChannelId);
-        param.put(TUIConstants.TIMPush.CONFIG_FCM_PRIVATE_RING_NAME_KEY, privateRingName);
-        param.put(TUIConstants.TIMPush.CONFIG_ENABLE_FCM_PRIVATE_RING_KEY, Boolean.valueOf(enableFCMPrivateRing));
-        TUICore.callService(TUIConstants.TIMPush.SERVICE_NAME, TUIConstants.TIMPush.METHOD_CONFIG_FCM_PRIVATE_RING, param);
+    private void setAndroidCustomConfigFile(MethodCall call, Result result) {
+        Map<String, String> arguments = (Map<String, String>) call.arguments;
+        String configs = arguments.get(Extras.ANDROID_CONFIGS);
+        TIMPushManager.getInstance().setCustomConfigFile(configs);
+        result.success("");
+    }
+
+    private void setXiaoMiPushStorageRegion(MethodCall call, Result result) {
+        Map<String, String> arguments = (Map<String, String>) call.arguments;
+        String region = arguments.get(Extras.REGION);
+        TIMPushManager.getInstance().setXiaoMiPushStorageRegion(Integer.parseInt(region));
         result.success("");
     }
 
@@ -280,24 +281,6 @@ public class TencentCloudChatPushPlugin implements FlutterPlugin, MethodCallHand
         param.put(TUIConstants.TIMPush.METHOD_PUSH_BUSSINESS_ID_KEY, Integer.parseInt(businessID != null ? businessID : "0"));
         param.put(TUIConstants.TIMPush.METHOD_PUSH_TOKEN_KEY, pushToken);
         TUICore.callService(TUIConstants.TIMPush.SERVICE_NAME, TUIConstants.TIMPush.METHOD_SET_PUSH_TOKEN, param, new TUIServiceCallback() {
-            @Override
-            public void onServiceCallback(int errorCode, String errorMessage, Bundle bundle) {
-                if (errorCode == 0) {
-                    result.success("");
-                } else {
-                    result.error(String.valueOf(errorCode), errorMessage, errorMessage);
-                }
-            }
-        });
-    }
-
-    private void setAndroidCustomTIMPushConfigs(MethodCall call, Result result) {
-        Map<String, String> arguments = (Map<String, String>) call.arguments;
-        String configs = arguments.get(Extras.ANDROID_CONFIGS);
-
-        Map<String, Object> param = new HashMap<>();
-        param.put(TUIConstants.TIMPush.CUSTOM_TIMPUSH_CONFINGS_KEY, configs);
-        TUICore.callService(TUIConstants.TIMPush.SERVICE_NAME, TUIConstants.TIMPush.METHOD_CUSTOM_TIMPUSH_CONFINGS, param, new TUIServiceCallback() {
             @Override
             public void onServiceCallback(int errorCode, String errorMessage, Bundle bundle) {
                 if (errorCode == 0) {

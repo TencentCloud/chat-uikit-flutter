@@ -1,6 +1,6 @@
 name: tencent_cloud_chat_contact
 description: Tencent Cloud Chat UIKit Contact component provides a customizable contact list, featuring seamless integration with the Message component for an enhanced chat experience.
-version: 1.4.0
+version: 1.5.0+1
 repository: https://github.com/TencentCloud/chat-uikit-flutter/tree/v2/tencent_cloud_chat_contact
 homepage: https://trtc.io/products/chat?utm_source=flutter_pub
 
@@ -18,8 +18,8 @@ platforms:
 dependencies:
   flutter:
     sdk: flutter
-  tencent_cloud_chat: ^1.4.0
-  tencent_cloud_chat_common: ^1.4.0
+  tencent_cloud_chat: ^1.5.0
+  tencent_cloud_chat_common: ^1.5.0
   azlistview_all_platforms: ^2.1.2
 
 dev_dependencies:

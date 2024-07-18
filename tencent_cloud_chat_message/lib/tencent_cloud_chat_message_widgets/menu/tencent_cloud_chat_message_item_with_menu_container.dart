@@ -19,10 +19,12 @@ import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separ
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/forward/tencent_cloud_chat_message_forward_container.dart';
 
 class TencentCloudChatMessageItemWithMenuContainer extends StatefulWidget {
-  final Widget Function({required bool renderOnMenuPreview}) getMessageItemWidget;
+  final Widget Function({required bool renderOnMenuPreview, Key? key}) getMessageItemWidget;
   final bool useMessageReaction;
   final V2TimMessage message;
   final bool isMergeMessage;
+  final bool isTextTranslatePluginEnabled;
+  final bool isSoundToTextPluginEnabled;
 
   const TencentCloudChatMessageItemWithMenuContainer({
     super.key,
@@ -30,6 +32,8 @@ class TencentCloudChatMessageItemWithMenuContainer extends StatefulWidget {
     required this.useMessageReaction,
     required this.message,
     required this.isMergeMessage,
+    required this.isTextTranslatePluginEnabled,
+    required this.isSoundToTextPluginEnabled
   });
 
   @override
@@ -210,6 +214,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState
         TencentCloudChatMessageGeneralOptionItem(
             iconAsset: (path: "lib/assets/copy_message.svg", package: "tencent_cloud_chat_message"),
             label: tL10n.copy,
+            id: "_uikit_copy_message",
             onTap: ({Offset? offset}) {
               final text = _message.textElem?.text ?? "";
               Clipboard.setData(
@@ -219,6 +224,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState
       if (defaultMessageMenuConfig.enableMessageReply)
         TencentCloudChatMessageGeneralOptionItem(
             iconAsset: (path: "lib/assets/reply_message.svg", package: "tencent_cloud_chat_message"),
+            id: "_uikit_reply_message",
             label: config.enableReplyWithMention(
               userID: dataProvider.userID,
               topicID: dataProvider.topicID,
@@ -233,6 +239,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState
         TencentCloudChatMessageGeneralOptionItem(
           iconAsset: (path: "lib/assets/multi_message.svg", package: "tencent_cloud_chat_message"),
           label: tL10n.select,
+          id: "_uikit_multi_message",
           onTap: ({Offset? offset}) {
             Future.delayed(
               const Duration(milliseconds: 150),
@@ -247,6 +254,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState
         TencentCloudChatMessageGeneralOptionItem(
             iconAsset: (path: "lib/assets/forward_message.svg", package: "tencent_cloud_chat_message"),
             label: tL10n.forward,
+            id: "_uikit_forward_message",
             onTap: ({Offset? offset}) {
               if (isDesktopScreen) {
                 TencentCloudChatDesktopPopup.showPopupWindow(
@@ -288,6 +296,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState
         TencentCloudChatMessageGeneralOptionItem(
             iconAsset: (path: "lib/assets/delete_message.svg", package: "tencent_cloud_chat_message"),
             label: tL10n.delete,
+            id: "_uikit_delete_message",
             onTap: ({Offset? offset}) {
               if (isDesktopScreen) {
                 TencentCloudChatDesktopPopup.showSecondaryConfirmDialog(
@@ -357,6 +366,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState
         TencentCloudChatMessageGeneralOptionItem(
             iconAsset: (path: "lib/assets/revoke_message.svg", package: "tencent_cloud_chat_message"),
             label: tL10n.recall,
+            id: "_uikit_revoke_message",
             onTap: ({Offset? offset}) {
               if (isDesktopScreen) {
                 TencentCloudChatDesktopPopup.showSecondaryConfirmDialog(
@@ -396,18 +406,41 @@ class _TencentCloudChatMessageItemWithMenuContainerState
       if (showReadReceipt)
         TencentCloudChatMessageGeneralOptionItem(
             icon: Icons.visibility,
+            id: "_uikit_read_receipt",
             label: isAllRead ? tL10n.allMembersRead : tL10n.memberReadCount(readCount ?? 0),
             onTap: ({Offset? offset}) {}),
+      if (widget.isTextTranslatePluginEnabled) 
+        TencentCloudChatMessageGeneralOptionItem(
+            icon: Icons.translate_outlined,
+            label: tL10n.translate,
+            id: "_uikit_translate",
+            onTap: ({offset})  {
+              dataProvider.translatedMessages = [_message];
+            },
+        ),
+      if (widget.isSoundToTextPluginEnabled)
+        TencentCloudChatMessageGeneralOptionItem(
+            icon: Icons.translate_outlined,
+            label: tL10n.convertToText,
+            id: "_uikit_convert_to_text",
+            onTap: ({offset})  {
+              dataProvider.soundToTextMessages = [_message];
+            },
+        )
     ];
 
     final mergedList = [...defaultMenuOptions, ...additionalOptions];
 
     if (_message.elemType != MessageElemType.V2TIM_ELEM_TYPE_TEXT) {
-      mergedList.removeWhere((element) => element.label == tL10n.copy);
+      mergedList.removeWhere((element) => (element.id == "_uikit_copy_message" || element.id == "_uikit_translate"));
+    }
+
+    if (_message.elemType != MessageElemType.V2TIM_ELEM_TYPE_SOUND) {
+      mergedList.removeWhere((element) => (element.id == "_uikit_convert_to_text"));
     }
 
     if (!(_message.isSelf ?? false)) {
-      mergedList.removeWhere((element) => element.label == tL10n.recall);
+      mergedList.removeWhere((element) => element.id == "_uikit_revoke_message");
     }
 
     if (TencentCloudChatUtils.checkString(selectedText) == null) {
@@ -424,6 +457,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState
                 isMergeMessage: widget.isMergeMessage,
                 inSelectMode: dataProvider.inSelectMode,
                 useMessageReaction: widget.useMessageReaction,
+                messageReactionPluginInstance: dataProvider.messageReactionPluginInstance,
               ),
               methods: MessageItemMenuBuilderMethods(
                 onSelectMessage: () => dataProvider.triggerSelectedMessage(message: _message),

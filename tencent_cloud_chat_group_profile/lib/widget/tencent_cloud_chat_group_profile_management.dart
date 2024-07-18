@@ -1,9 +1,12 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat_common.dart';
+import 'package:tencent_cloud_chat_common/widgets/dialog/tencent_cloud_chat_dialog.dart';
 import 'package:tencent_cloud_chat_common/widgets/operation_bar/tencent_cloud_chat_operation_bar.dart';
 import 'package:tencent_cloud_chat_group_profile/widget/tencent_cloud_chat_group_profile_add_member.dart';
 
@@ -17,10 +20,12 @@ class TencentCloudChatGroupProfileManagement extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => TencentCloudChatGroupProfileManagementState();
+  State<StatefulWidget> createState() =>
+      TencentCloudChatGroupProfileManagementState();
 }
 
-class TencentCloudChatGroupProfileManagementState extends TencentCloudChatState<TencentCloudChatGroupProfileManagement> {
+class TencentCloudChatGroupProfileManagementState
+    extends TencentCloudChatState<TencentCloudChatGroupProfileManagement> {
   bool isMuted = false;
 
   @override
@@ -30,12 +35,54 @@ class TencentCloudChatGroupProfileManagementState extends TencentCloudChatState<
   }
 
   _onGroupMemberMute(bool value) async {
-    final res = await TencentCloudChat.instance.chatSDKInstance.groupSDK.setGroupInfo(groupID: widget.groupInfo.groupID, groupType: widget.groupInfo.groupType, isAllMuted: value);
+    final res = await TencentCloudChat.instance.chatSDKInstance.groupSDK
+        .setGroupInfo(
+            groupID: widget.groupInfo.groupID,
+            groupType: widget.groupInfo.groupType,
+            isAllMuted: value);
     if (res.code == 0) {
       safeSetState(() {
         isMuted = value;
       });
     }
+  }
+
+  @override
+  Widget? desktopBuilder(BuildContext context) {
+    return TencentCloudChatThemeWidget(
+        build: (context, colorTheme, textStyle) => Scaffold(
+                body: Column(
+              children: [
+                Container(
+                  margin: EdgeInsets.only(top: getHeight(8)),
+                  child: Column(children: [
+                    TencentCloudChatOperationBar(
+                      label: tL10n.enabledGroupMute,
+                      operationBarType: OperationBarType.switchControl,
+                      value: isMuted,
+                      onChange: (bool value) {
+                        _onGroupMemberMute(value);
+                      },
+                    ),
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: getWidth(17), vertical: getHeight(7)),
+                      child: Text(
+                        tL10n.onlyGroupOwnerAndAdminsCanSendMessages,
+                        style: TextStyle(fontSize: textStyle.fontsize_12),
+                      ),
+                    ),
+                  ]),
+                ),
+                isMuted
+                    ? Container()
+                    : Expanded(
+                        child: TencentCloudChatGroupProfileAddMuteMember(
+                        groupInfo: widget.groupInfo,
+                        memberList: widget.memberList,
+                      ))
+              ],
+            )));
   }
 
   @override
@@ -64,7 +111,8 @@ class TencentCloudChatGroupProfileManagementState extends TencentCloudChatState<
                       },
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: getWidth(17), vertical: getHeight(7)),
+                      padding: EdgeInsets.symmetric(
+                          horizontal: getWidth(17), vertical: getHeight(7)),
                       child: Text(
                         tL10n.onlyGroupOwnerAndAdminsCanSendMessages,
                         style: TextStyle(fontSize: textStyle.fontsize_12),
@@ -94,31 +142,63 @@ class TencentCloudChatGroupProfileAddMuteMember extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => TencentCloudChatGroupProfileAddMuteMemberState();
+  State<StatefulWidget> createState() =>
+      TencentCloudChatGroupProfileAddMuteMemberState();
 }
 
-class TencentCloudChatGroupProfileAddMuteMemberState extends TencentCloudChatState<TencentCloudChatGroupProfileAddMuteMember> {
+class TencentCloudChatGroupProfileAddMuteMemberState
+    extends TencentCloudChatState<TencentCloudChatGroupProfileAddMuteMember> {
   List<V2TimGroupMemberFullInfo> silencedMember = [];
+  List<V2TimGroupMemberFullInfo> _memberList = [];
 
   @override
   void initState() {
     super.initState();
+    final currentTimeStamp = DateTime.now().millisecondsSinceEpoch;
     for (int i = 0; i < widget.memberList.length; i++) {
-      if (widget.memberList[i].muteUntil != null && widget.memberList[i].muteUntil! > 0) {
-        silencedMember.add(widget.memberList[i]);
+      if (widget.memberList[i].muteUntil != null &&
+          widget.memberList[i].muteUntil! > 0) {
+        final muteUntil = widget.memberList[i].muteUntil! * 1000;
+        if (muteUntil > currentTimeStamp) {
+          silencedMember.add(widget.memberList[i]);
+        }
       }
     }
+    _memberList = widget.memberList;
   }
 
   onChanged(items) {
     safeSetState(() {
+      for (var item in items) {
+        final targetIndex = _memberList.indexWhere((i) => i.userID == item.userID);
+        if (targetIndex != -1) { 
+          _memberList[targetIndex] = item;
+        }
+      }
       silencedMember.addAll(items);
     });
   }
 
-  Widget _buildSilencedMemberItem(V2TimGroupMemberFullInfo info, colorTheme, textStyle) {
+  submitDelete(String userID) async {
+    final res = await TencentCloudChat.instance.chatSDKInstance.groupSDK
+        .muteGroupMember(
+            groupID: widget.groupInfo.groupID, userID: userID, seconds: 0);
+    if (res.code == 0) {
+      safeSetState(() {
+        final targetIndex = _memberList.indexWhere((i) => i.userID == userID);
+        if(targetIndex != -1) {
+          _memberList[targetIndex].muteUntil = 0;
+        }
+        silencedMember.removeWhere((item) => item.userID == userID);
+      });
+    }
+  }
+
+  Widget _buildSilencedMemberItem(
+      V2TimGroupMemberFullInfo info, colorTheme, textStyle) {
     return Container(
-      padding: EdgeInsets.symmetric(vertical: getHeight(5), horizontal: getWidth(16)),
+      padding: EdgeInsets.symmetric(
+          vertical: getHeight(5), horizontal: getWidth(16)),
       width: MediaQuery.of(context).size.width,
       color: colorTheme.inputAreaBackground,
       margin: EdgeInsets.only(bottom: getHeight(1)),
@@ -135,10 +215,47 @@ class TencentCloudChatGroupProfileAddMuteMemberState extends TencentCloudChatSta
         ),
         Text(
           TencentCloudChatUtils.checkString(info.nameCard) ?? info.userID,
-          style: TextStyle(fontSize: textStyle.fontsize_14, color: colorTheme.groupProfileTextColor),
-        )
+          style: TextStyle(
+              fontSize: textStyle.fontsize_14,
+              color: colorTheme.groupProfileTextColor),
+        ),
+        Expanded(
+            child: Align(
+          alignment: Alignment.centerRight,
+          child: GestureDetector(
+              onTap: () {
+                submitDelete(info.userID);
+              },
+              child: const Icon(
+                Icons.remove_circle,
+                color: Colors.red,
+              )),
+        ))
       ]),
     );
+  }
+
+  openSilenceMemberList() {
+    final isDesktop = TencentCloudChatPlatformAdapter().isDesktop;
+    if (isDesktop) {
+      TencentCloudChatDialog.showCustomDialog(
+          context: context,
+          builder: (c) => TencentCloudChatGroupProfileAddSilenceMemberList(
+                groupInfo: widget.groupInfo,
+                memberList: _memberList,
+                onChanged: onChanged,
+              ));
+    } else {
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  TencentCloudChatGroupProfileAddSilenceMemberList(
+                    groupInfo: widget.groupInfo,
+                    memberList: _memberList,
+                    onChanged: onChanged,
+                  )));
+    }
   }
 
   @override
@@ -147,19 +264,11 @@ class TencentCloudChatGroupProfileAddMuteMemberState extends TencentCloudChatSta
         build: (context, colorTheme, textStyle) => Column(
               children: [
                 GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => TencentCloudChatGroupProfileAddSilenceMemberList(
-                                    groupInfo: widget.groupInfo,
-                                    memberList: widget.memberList,
-                                    onChanged: onChanged,
-                                  )));
-                    },
+                    onTap: openSilenceMemberList,
                     child: Container(
                       margin: EdgeInsets.only(bottom: getHeight(1)),
-                      padding: EdgeInsets.symmetric(vertical: getHeight(12), horizontal: getWidth(16)),
+                      padding: EdgeInsets.symmetric(
+                          vertical: getHeight(12), horizontal: getWidth(16)),
                       color: colorTheme.inputAreaBackground,
                       child: Row(children: [
                         Icon(
@@ -172,7 +281,9 @@ class TencentCloudChatGroupProfileAddMuteMemberState extends TencentCloudChatSta
                         ),
                         Text(
                           tL10n.addSilencedMember,
-                          style: TextStyle(fontSize: textStyle.fontsize_14, color: colorTheme.groupProfileAddMemberTextColor),
+                          style: TextStyle(
+                              fontSize: textStyle.fontsize_14,
+                              color: colorTheme.groupProfileAddMemberTextColor),
                         )
                       ]),
                     )),
@@ -181,7 +292,8 @@ class TencentCloudChatGroupProfileAddMuteMemberState extends TencentCloudChatSta
                         shrinkWrap: true,
                         itemCount: silencedMember.length,
                         itemBuilder: (context, index) {
-                          return _buildSilencedMemberItem(silencedMember[index], colorTheme, textStyle);
+                          return _buildSilencedMemberItem(
+                              silencedMember[index], colorTheme, textStyle);
                         }))
               ],
             ));
@@ -200,15 +312,24 @@ class TencentCloudChatGroupProfileAddSilenceMemberList extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => TencentCloudChatGroupProfileAddSilenceMemberListState();
+  State<StatefulWidget> createState() =>
+      TencentCloudChatGroupProfileAddSilenceMemberListState();
 }
 
-class TencentCloudChatGroupProfileAddSilenceMemberListState extends TencentCloudChatState<TencentCloudChatGroupProfileAddSilenceMemberList> {
+class TencentCloudChatGroupProfileAddSilenceMemberListState
+    extends TencentCloudChatState<
+        TencentCloudChatGroupProfileAddSilenceMemberList> {
   submitAdd() async {
     List<V2TimGroupMemberFullInfo> success = [];
     for (int i = 0; i < selectedContacts.length; i++) {
-      final res = await TencentCloudChat.instance.chatSDKInstance.groupSDK.muteGroupMember(groupID: widget.groupInfo.groupID, userID: selectedContacts[i].userID, seconds: 60);
+      final res = await TencentCloudChat.instance.chatSDKInstance.groupSDK
+          .muteGroupMember(
+              groupID: widget.groupInfo.groupID,
+              userID: selectedContacts[i].userID,
+              seconds: 60 * 60 * 24 * 7);
       if (res.code == 0) {
+        final muteUntil = DateTime.now().toUtc().millisecondsSinceEpoch ~/ 1000;
+        selectedContacts[i].muteUntil = muteUntil + 60 * 60 * 24 * 7;
         success.add(selectedContacts[i]);
       }
     }
@@ -218,6 +339,38 @@ class TencentCloudChatGroupProfileAddSilenceMemberListState extends TencentCloud
   List<V2TimGroupMemberFullInfo> selectedContacts = [];
   onChanged(selected) {
     selectedContacts = selected;
+  }
+
+  @override
+  Widget? desktopBuilder(BuildContext context) {
+    return TencentCloudChatThemeWidget(build: (context, colorTheme, textStyle) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () async {
+                submitAdd();
+                Navigator.pop(context);
+              },
+              child: Text(
+                tL10n.confirm,
+                style: const TextStyle(
+                  fontSize: 16,
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: TencentCloudChatGroupProfilAddMemberList(
+              memberList: widget.memberList,
+              onSelectedMemberItemChange: onChanged,
+            ),
+          )
+        ],
+      );
+    });
   }
 
   @override

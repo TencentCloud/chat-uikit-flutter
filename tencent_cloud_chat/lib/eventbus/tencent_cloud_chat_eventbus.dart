@@ -20,7 +20,7 @@ class TencentCloudChatEventBusGenerator {
 /// filter events.
 ///
 class TencentCloudChatEventBus {
-  static final List<String> allowList = ["TencentCloudChatConversationData","TencentCloudChatTheme", "TencentCloudChat"];
+  static final List<String> allowList = ["TencentCloudChatConversationData","TencentCloudChatTheme", "TencentCloudChat", "TencentCloudChatGroupProfileData"];
 
   static final StreamController _streamController = StreamController.broadcast(sync: false);
 
@@ -83,10 +83,8 @@ class TencentCloudChatEventBus {
   ///
   void fire(event, String eventName) {
     if (_subscriptions.containsKey(eventName)) {
-      Future.delayed(Duration.zero, () {
-        _streamController.add(event);
-        _cachedEvent.remove(eventName);
-      });
+      _streamController.add(event);
+      _cachedEvent.remove(eventName);
     } else {
       _cachedEvent.addAll({
         eventName: event,

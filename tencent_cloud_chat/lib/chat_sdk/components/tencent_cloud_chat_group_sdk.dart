@@ -98,11 +98,21 @@ class TencentCloudChatGroupSDK {
       }
     },
     onGroupRecycled: (groupID, opUser) {},
-    onMemberEnter: (groupID, memberList) {},
-    onMemberInfoChanged: (groupID, v2TIMGroupMemberChangeInfoList) {},
-    onMemberInvited: (groupID, opUser, memberList) {},
-    onMemberKicked: (groupID, opUser, memberList) {},
-    onMemberLeave: (groupID, member) {},
+    onMemberEnter: (groupID, memberList) {
+      TencentCloudChat.instance.dataInstance.groupProfile.addGroupMember(groupID, memberList);
+    },
+    onMemberInfoChanged: (groupID, v2TIMGroupMemberChangeInfoList) {
+      TencentCloudChat.instance.dataInstance.groupProfile.updateGroupMemberInfo(groupID, v2TIMGroupMemberChangeInfoList);
+    },
+    onMemberInvited: (groupID, opUser, memberList) {
+      TencentCloudChat.instance.dataInstance.groupProfile.addGroupMember(groupID, memberList);
+    },
+    onMemberKicked: (groupID, opUser, memberList) {
+      TencentCloudChat.instance.dataInstance.groupProfile.deleteGroupMember(groupID, memberList);
+    },
+    onMemberLeave: (groupID, member) {
+      TencentCloudChat.instance.dataInstance.groupProfile.deleteGroupMember(groupID, [member]);
+    },
     onMemberMarkChanged: (groupID, memberIDList, markType, enableMark) {},
     onQuitFromGroup: (groupID) {},
     onReceiveJoinApplication: (groupID, member, opReason) {},
@@ -116,6 +126,13 @@ class TencentCloudChatGroupSDK {
   addGroupListener() async {
     await TencentCloudChat.instance.chatSDKInstance.manager.removeGroupListener(listener: groupListener);
     await TencentCloudChat.instance.chatSDKInstance.manager.addGroupListener(listener: groupListener);
+  }
+
+ Future<V2TimValueCallback<List<V2TimGroupMemberFullInfo>>> getGroupMembersInfo({
+    required String groupID,
+    required List<String> memberList,
+  }) async {
+   return TencentImSDKPlugin.v2TIMManager.getGroupManager().getGroupMembersInfo(groupID: groupID, memberList: memberList);
   }
 
   Future<V2TimCallback> setGroupInfo({
@@ -189,8 +206,8 @@ class TencentCloudChatGroupSDK {
     return res;
   }
 
-  inviteUserToGroup({required String groupID, required List<String> userList}) async {
-    await TencentImSDKPlugin.v2TIMManager.getGroupManager().inviteUserToGroup(
+  Future<V2TimValueCallback<List<V2TimGroupMemberOperationResult>>> inviteUserToGroup({required String groupID, required List<String> userList}) async {
+    return TencentImSDKPlugin.v2TIMManager.getGroupManager().inviteUserToGroup(
           groupID: groupID,
           userList: userList,
         );

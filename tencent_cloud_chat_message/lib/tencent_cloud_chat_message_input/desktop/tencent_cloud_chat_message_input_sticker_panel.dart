@@ -25,8 +25,8 @@ class TencentCloudChatDesktopStickerPanel extends StatefulWidget {
 }
 
 class _TencentCloudChatDesktopStickerPanelState extends TencentCloudChatState<TencentCloudChatDesktopStickerPanel> {
-  Future<Widget> getPannelFromStickerPlugin() async {
-    Widget? wid = await widget.stickerPluginInstance.getWidget(methodName: "stickerPannel");
+  Future<Widget> getPanelFromStickerPlugin() async {
+    Widget? wid = await widget.stickerPluginInstance.getWidget(methodName: "stickerPanel");
     if (wid != null) {
       return wid;
     }
@@ -65,7 +65,7 @@ class _TencentCloudChatDesktopStickerPanelState extends TencentCloudChatState<Te
             ),
           ),
           child: FutureBuilder(
-              future: getPannelFromStickerPlugin(),
+              future: getPanelFromStickerPlugin(),
               builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
                 if (snapshot.connectionState == ConnectionState.done) {
                   return snapshot.data!;

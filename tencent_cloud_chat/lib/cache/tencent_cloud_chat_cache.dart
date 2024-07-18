@@ -48,7 +48,7 @@ class TencentCloudChatCache {
 
     await Hive.initFlutter();
 
-    _box = await Hive.openBox("TCCF");
+    _box = await Hive.openBox("TCCF-$sdkAppID");
 
     console("box path is ${_box!.path}");
 

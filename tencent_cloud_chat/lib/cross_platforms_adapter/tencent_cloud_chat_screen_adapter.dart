@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:universal_html/html.dart' as html;
 
 /// TencentCloudChatUIKitScreenAdapter is a utility class that helps to adapt the UI
 /// for different screen sizes and device types (such as mobile and desktop).
@@ -173,7 +174,19 @@ class TencentCloudChatScreenAdapter {
 
   /// Helper method to get the current device type
   static DeviceScreenType _getDeviceType(BuildContext context) {
-    if (kIsWeb || Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+    if(kIsWeb){
+      final userAgent = html.window.navigator.userAgent.toLowerCase();
+      if (userAgent.contains('mobile') ||
+          userAgent.contains('android') ||
+          userAgent.contains('iphone') ||
+          userAgent.contains('ipad') ||
+          userAgent.contains('tablet')) {
+        return DeviceScreenType.mobile;
+      } else {
+        return DeviceScreenType.desktop;
+      }
+    }
+    if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
       final win = WidgetsBinding.instance.platformDispatcher.views.first;
       final size = win.physicalSize;
       final screenWidth = size.width / win.devicePixelRatio;

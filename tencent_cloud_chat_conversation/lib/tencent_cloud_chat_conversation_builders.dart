@@ -17,7 +17,9 @@ typedef ConversationItemContentBuilder = Widget? Function(
 typedef ConversationItemInfoBuilder = Widget? Function(
     V2TimConversation conversation);
 
-typedef ConversationHeaderBuilder = Widget? Function();
+typedef ConversationHeaderBuilder = Widget? Function({
+  TextEditingController? textEditingController,
+});
 
 class TencentCloudChatConversationBuilders
     extends TencentCloudChatComponentBuilder {
@@ -52,15 +54,18 @@ class TencentCloudChatConversationBuilders
   }
 
   @override
-  (Widget, bool) getConversationHeaderBuilder() {
+  (Widget, bool) getConversationHeaderBuilder({
+    TextEditingController? textEditingController,
+}) {
     Widget? widget;
 
     if (_conversationHeaderBuilder != null) {
-      widget = _conversationHeaderBuilder!();
+      widget = _conversationHeaderBuilder!(
+        textEditingController: textEditingController,);
     }
 
     return (
-      widget ?? const TencentCloudChatConversationAppBar(),
+      widget ?? TencentCloudChatConversationAppBar(textEditingController: textEditingController,),
       widget != null
     );
   }

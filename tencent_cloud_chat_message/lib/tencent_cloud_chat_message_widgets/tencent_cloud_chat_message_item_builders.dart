@@ -50,7 +50,6 @@ class TencentCloudChatMessageItemBuilders {
   }) {
     
     return TencentCloudChatMessageImage(
-      key: UniqueKey(),
       data: data,
       methods: methods,
     );
@@ -74,7 +73,6 @@ class TencentCloudChatMessageItemBuilders {
     required MessageItemBuilderMethods methods,
   }) {
     return TencentCloudChatMessageVideo(
-      key: UniqueKey(),
       data: data,
       methods: methods,
     );
@@ -142,7 +140,6 @@ class TencentCloudChatMessageItemBuilders {
     required MessageItemBuilderMethods methods,
   }) {
     final int messageType = data.message.elemType;
-    Widget renderWidget = Text(tL10n.messageInfo);
 
     final tipsItem = data.message.elemType == 101 || data.message.elemType == MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS;
     final recalledMessage = data.message.status == MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED;
@@ -151,7 +148,7 @@ class TencentCloudChatMessageItemBuilders {
       return getCommonTipsBuilder(
         message: data.message,
         text: data.altText,
-        buttonText: recalledMessage
+        buttonText: (recalledMessage && (data.message.isSelf ?? true))
             ? (
                 text: tL10n.reEdit,
                 onTap: () => methods.setMessageTextWithMentions(
@@ -165,70 +162,61 @@ class TencentCloudChatMessageItemBuilders {
 
     switch (messageType) {
       case MessageElemType.V2TIM_ELEM_TYPE_TEXT:
-        renderWidget = getTextMessageBuilder(
+        return getTextMessageBuilder(
           key: key,
           data: data,
           methods: methods,
         );
-        break;
       case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
-        renderWidget = getImageMessageBuilder(
+        return getImageMessageBuilder(
           key: key,
           data: data,
           methods: methods,
         );
-        break;
       case MessageElemType.V2TIM_ELEM_TYPE_FACE:
-        renderWidget = getFaceMessageBuilder(
+        return getFaceMessageBuilder(
           key: key,
           data: data,
           methods: methods,
         );
-        break;
       case MessageElemType.V2TIM_ELEM_TYPE_FILE:
-        renderWidget = getFileMessageBuilder(
+        return getFileMessageBuilder(
           key: key,
           data: data,
           methods: methods,
         );
-        break;
       case MessageElemType.V2TIM_ELEM_TYPE_LOCATION:
-        renderWidget = getLocationMessageBuilder(
+        return getLocationMessageBuilder(
           key: key,
           data: data,
           methods: methods,
         );
-        break;
       case MessageElemType.V2TIM_ELEM_TYPE_SOUND:
-        renderWidget = getSoundMessageBuilder(
+        return getSoundMessageBuilder(
           key: key,
           data: data,
           methods: methods,
         );
-        break;
       case MessageElemType.V2TIM_ELEM_TYPE_VIDEO:
-        renderWidget = getVideoMessageBuilder(
+        return getVideoMessageBuilder(
           key: key,
           data: data,
           methods: methods,
         );
-        break;
       case MessageElemType.V2TIM_ELEM_TYPE_MERGER:
-        renderWidget = getMergeMessageBuilder(
+        return getMergeMessageBuilder(
           key: key,
           data: data,
           methods: methods,
         );
-        break;
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
-        renderWidget = getCustomMessageBuilder(
+        return getCustomMessageBuilder(
           key: key,
           data: data,
           methods: methods,
         );
-        break;
     }
-    return renderWidget;
+    return Text(tL10n.messageInfo);
   }
 
   static Widget getCommonTipsBuilder({

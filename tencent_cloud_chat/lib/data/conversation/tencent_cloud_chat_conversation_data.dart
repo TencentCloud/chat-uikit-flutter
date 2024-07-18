@@ -13,6 +13,7 @@ enum TencentCloudChatConversationDataKeys {
   totalUnreadCount,
   getDataEnd,
   currentConversation,
+  targetMessage,
   conversationConfig,
   conversationBuilder,
   conversationEventHandlers,
@@ -56,10 +57,14 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
 
   V2TimConversation? get currentConversation => _currentConversation;
 
-  set currentConversation(V2TimConversation? value) {
+  set currentConversation(V2TimConversation? value,) {
     _currentConversation = value;
     notifyListener(TencentCloudChatConversationDataKeys.currentConversation as T);
   }
+
+  /// === Current TargetMessage ===
+  V2TimMessage? currentTargetMessage;
+
 
   /// === Conversation list ===
   List<V2TimConversation> _conversationList = [];

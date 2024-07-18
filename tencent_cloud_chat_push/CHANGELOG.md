@@ -1,3 +1,16 @@
+## 8.0.6897
+
+* Added `setXiaoMiPushStorageRegion` method for XiaoMi devices.
+* Enhanced `registerPush` on Android devices by adding result return.
+* Replaced `androidPushOEMConfig` setting for `registerPush` method with `setAndroidCustomConfigFile` method.
+* Renamed `setAndroidCustomTIMPushConfigs` and `configFCMPrivateRing` to `setAndroidCustomConfigFile` and `setCustomFCMRing`, respectively.
+* Introduced smart detection for available channel strategies.
+* Implemented push registration timeout protection mechanism.
+* Fixed issues with small icon settings.
+* Resolved app launch failure when jump option configuration was set to the home page.
+* Refined device model recognition logic.
+* Boosted code stability and optimization.
+
 ## 7.9.5668+1
 
 * Fixed an issue that may throw an exception during the `registerPush` process.

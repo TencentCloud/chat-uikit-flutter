@@ -3,6 +3,7 @@ import 'package:tencent_cloud_chat/data/contact/tencent_cloud_chat_contact_data.
 import 'package:tencent_cloud_chat/data/conversation/tencent_cloud_chat_conversation_data.dart';
 import 'package:tencent_cloud_chat/data/group_profile/tencent_cloud_chat_group_profile_data.dart';
 import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
+import 'package:tencent_cloud_chat/data/search/tencent_cloud_chat_search_data.dart';
 import 'package:tencent_cloud_chat/data/theme/tencent_cloud_chat_theme.dart';
 import 'package:tencent_cloud_chat/data/user_profile/tencent_cloud_chat_user_profile_data.dart';
 
@@ -38,4 +39,5 @@ class TencentCloudChatData {
   final TencentCloudChatUserProfileData userProfile =
       TencentCloudChatUserProfileData(TencentCloudChatUserProfileDataKeys.none);
   final TencentCloudChatContactData contact = TencentCloudChatContactData(TencentCloudChatContactDataKeys.none);
+  final TencentCloudChatSearchData search = TencentCloudChatSearchData(TencentCloudChatSearchDataKeys.none);
 }

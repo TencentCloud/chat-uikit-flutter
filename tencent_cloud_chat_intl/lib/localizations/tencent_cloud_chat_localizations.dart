@@ -2293,6 +2293,132 @@ abstract class TencentCloudChatLocalizations {
   /// In en, this message translates to:
   /// **'Re-Edit'**
   String get reEdit;
+
+  /// No description provided for @translate.
+  ///
+  /// In en, this message translates to:
+  /// **'Translate'**
+  String get translate;
+
+  /// No description provided for @memberRecalledMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{member} Recalled a Message'**
+  String memberRecalledMessage(Object member);
+
+  /// No description provided for @copyFileSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy File Success'**
+  String get copyFileSuccess;
+
+  /// No description provided for @saveFileSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Save File Success'**
+  String get saveFileSuccess;
+
+  /// No description provided for @saveFileFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Save File Failed'**
+  String get saveFileFailed;
+
+  /// No description provided for @copyLinkSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Link Success'**
+  String get copyLinkSuccess;
+
+  /// No description provided for @copyImageContextMenuBtnText.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Image'**
+  String get copyImageContextMenuBtnText;
+
+  /// No description provided for @saveToLocalContextMenuBtnText.
+  ///
+  /// In en, this message translates to:
+  /// **'Save As'**
+  String get saveToLocalContextMenuBtnText;
+
+  /// No description provided for @copyLinkContextMenuBtnText.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Link'**
+  String get copyLinkContextMenuBtnText;
+
+  /// No description provided for @openLinkContextMenuBtnText.
+  ///
+  /// In en, this message translates to:
+  /// **'Open in New Window'**
+  String get openLinkContextMenuBtnText;
+
+  /// No description provided for @reactionList.
+  ///
+  /// In en, this message translates to:
+  /// **'Reaction List'**
+  String get reactionList;
+
+  /// No description provided for @translatedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Powered by Tencent RTC'**
+  String get translatedBy;
+
+  /// No description provided for @convertToText.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert'**
+  String get convertToText;
+
+  /// No description provided for @numMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1 {1 Message} other {{count} Messages}}'**
+  String numMessages(num count);
+
+  /// No description provided for @filterBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter by'**
+  String get filterBy;
+
+  /// No description provided for @text.
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get text;
+
+  /// No description provided for @numMessagesOver99.
+  ///
+  /// In en, this message translates to:
+  /// **'99+ Messages'**
+  String get numMessagesOver99;
+
+  /// No description provided for @setGroupAnnouncement.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Group Announcement'**
+  String get setGroupAnnouncement;
+
+  /// No description provided for @setNickName.
+  ///
+  /// In en, this message translates to:
+  /// **'Set Group Name Card'**
+  String get setNickName;
+
+  /// No description provided for @joinTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined Time'**
+  String get joinTime;
+
+  /// No description provided for @myRoleInGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get myRoleInGroup;
 }
 
 class _TencentCloudChatLocalizationsDelegate extends LocalizationsDelegate<TencentCloudChatLocalizations> {

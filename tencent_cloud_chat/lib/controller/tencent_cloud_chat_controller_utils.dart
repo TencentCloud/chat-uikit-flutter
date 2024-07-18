@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
+import 'package:tencent_cloud_chat/data/basic/tencent_cloud_chat_basic_data.dart';
 import 'package:tencent_cloud_chat/models/tencent_cloud_chat_callbacks.dart';
 import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
@@ -28,6 +29,7 @@ class TencentCloudChatControllerUtils {
       final ({TencentCloudChatComponentsEnum componentEnum, TencentCloudChatWidgetBuilder widgetBuilder}) component = func();
       TencentCloudChat.instance.dataInstance.basic.addUsedComponent(component);
     }
+    TencentCloudChat.instance.dataInstance.basic.notifyListener(TencentCloudChatBasicDataKeys.addUsedComponent);
   }
 
   static initComponents(TencentCloudChatInitComponentsRelated components) {
@@ -171,7 +173,7 @@ class TencentCloudChatControllerUtils {
         for (var i = 0; i < convKey.length; i++) {
           var keyItem = convKey[i];
           var messageList = TencentCloudChat.instance.cache.getMessageListByConvKey(keyItem);
-          TencentCloudChat.instance.dataInstance.messageData.updateMessageList(messageList: messageList, userID: keyItem.contains("c2c_") ? keyItem : null, groupID: keyItem.contains("group_") ? keyItem : null);
+          TencentCloudChat.instance.dataInstance.messageData.updateMessageList(messageList: messageList, userID: keyItem.contains("c2c_") ? keyItem : null, groupID: keyItem.contains("group_") ? keyItem : null, disableNotify: true);
         }
       }
     }
@@ -185,6 +187,8 @@ class TencentCloudChatControllerUtils {
     TencentCloudChat.instance.chatSDKInstance.contactSDK.getFriendList();
 
     TencentCloudChat.instance.chatSDKInstance.contactSDK.getFriendApplicationList();
+
+    TencentCloudChat.instance.chatSDKInstance.contactSDK.getGroupApplicationList();
 
     TencentCloudChat.instance.chatSDKInstance.contactSDK.getBlockList();
 

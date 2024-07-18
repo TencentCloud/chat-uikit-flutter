@@ -42,7 +42,14 @@ abstract class TencentCloudChatPushPlatform extends PlatformInterface {
     throw UnimplementedError('registerOnAppWakeUpEvent() has not been implemented.');
   }
 
-  Future<TencentCloudChatPushResult> registerPush({String? configJson}) {
+  Future<TencentCloudChatPushResult> setXiaoMiPushStorageRegion({
+    required int region,
+  }) {
+    throw UnimplementedError('setXiaoMiPushStorageRegion() has not been implemented.');
+  }
+
+
+  Future<TencentCloudChatPushResult> registerPush() {
     throw UnimplementedError('registerPush() has not been implemented.');
   }
 
@@ -54,12 +61,12 @@ abstract class TencentCloudChatPushPlatform extends PlatformInterface {
     throw UnimplementedError('disableAutoRegisterPush() has not been implemented.');
   }
 
-  Future<TencentCloudChatPushResult> configFCMPrivateRing({
+  Future<TencentCloudChatPushResult> setCustomFCMRing({
     required String channelId,
     required String ringName,
     required bool enable,
   }) {
-    throw UnimplementedError('configFCMPrivateRing() has not been implemented.');
+    throw UnimplementedError('setCustomFCMRing() has not been implemented.');
   }
 
   Future<TencentCloudChatPushResult> setPushBrandId({required int brandId}) {
@@ -93,9 +100,9 @@ abstract class TencentCloudChatPushPlatform extends PlatformInterface {
     throw UnimplementedError('setAndroidPushToken() has not been implemented.');
   }
 
-  Future<TencentCloudChatPushResult> setAndroidCustomTIMPushConfigs({
+  Future<TencentCloudChatPushResult> setAndroidCustomConfigFile({
     required String configs,
   }) async {
-    throw UnimplementedError('setAndroidCustomTIMPushConfigs() has not been implemented.');
+    throw UnimplementedError('setAndroidCustomConfigFile() has not been implemented.');
   }
 }

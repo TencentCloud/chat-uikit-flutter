@@ -24,12 +24,6 @@ class MockTencentCloudChatPushPlatform with MockPlatformInterfaceMixin implement
   }
 
   @override
-  Future<TencentCloudChatPushResult<int>> getPushBrandId() {
-    // TODO: implement getPushBrandId
-    throw UnimplementedError();
-  }
-
-  @override
   Future<TencentCloudChatPushResult> registerOnNotificationClickedEvent({required Function({required String ext, String? userID, String? groupID}) onNotificationClicked}) {
     // TODO: implement registerOnNotificationClickedEvent
     throw UnimplementedError();
@@ -78,8 +72,8 @@ class MockTencentCloudChatPushPlatform with MockPlatformInterfaceMixin implement
   }
 
   @override
-  Future<TencentCloudChatPushResult> setAndroidCustomTIMPushConfigs({required String configs}) {
-    // TODO: implement setAndroidCustomTIMPushConfigs
+  Future<TencentCloudChatPushResult> registerOnAppWakeUpEvent({required VoidCallback onAppWakeUpEvent}) {
+    // TODO: implement registerOnAppWakeUpEvent
     throw UnimplementedError();
   }
 
@@ -90,10 +84,29 @@ class MockTencentCloudChatPushPlatform with MockPlatformInterfaceMixin implement
   }
 
   @override
-  Future<TencentCloudChatPushResult> registerOnAppWakeUpEvent({required VoidCallback onAppWakeUpEvent}) {
-    // TODO: implement registerOnAppWakeUpEvent
+  Future<TencentCloudChatPushResult> setAndroidCustomConfigFile({required String configs}) {
+    // TODO: implement setAndroidCustomConfigFile
     throw UnimplementedError();
   }
+
+  @override
+  Future<TencentCloudChatPushResult> setXiaoMiPushStorageRegion({required int region}) {
+    // TODO: implement setXiaoMiPushStorageRegion
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<TencentCloudChatPushResult<int>> getPushBrandId() {
+    // TODO: implement getPushBrandId
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<TencentCloudChatPushResult> setCustomFCMRing({required String channelId, required String ringName, required bool enable}) {
+    // TODO: implement setCustomFCMRing
+    throw UnimplementedError();
+  }
+  
 }
 
 void main() {

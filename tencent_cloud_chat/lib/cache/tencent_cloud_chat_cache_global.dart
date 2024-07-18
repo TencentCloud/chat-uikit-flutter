@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:tencent_cloud_chat/cache/tencent_cloud_chat_cache.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 
 class TencentCloudChatCacheGlobal {
   final String _tag = "TencentCloudChatCacheGlobal";
@@ -15,10 +16,10 @@ class TencentCloudChatCacheGlobal {
 
   static bool _inited = false;
 
-  Future<bool> init() async {
+  Future<bool> init(String name) async {
     await Hive.initFlutter();
-
-    _box = await Hive.openBox("TCCFGLOBAL");
+    String md5 = TencentCloudChatUtils.getMd5ByString(name);
+    _box = await Hive.openBox("TCCFGLOBAL-$md5");
 
     console("box path is ${_box!.path}");
 

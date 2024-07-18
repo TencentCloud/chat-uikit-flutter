@@ -1,5 +1,6 @@
 // ignore: implementation_imports
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/widgets.dart';
 import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
 import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
 import 'package:tencent_cloud_chat_sdk/enum/callbacks.dart';
@@ -14,7 +15,9 @@ import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart';
 abstract class TencentCloudChatComponentBuilder {
   get tencentCloudChatMessageItemBuilders => null;
 
-  getConversationHeaderBuilder() {}
+ getConversationHeaderBuilder({
+    TextEditingController? textEditingController,
+  }){}
 
   getConversationItemInfoBuilder(V2TimConversation conversation) {}
 

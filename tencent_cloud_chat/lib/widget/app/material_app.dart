@@ -464,7 +464,7 @@ class TencentCloudChatMaterialApp extends StatefulWidget {
     this.backButtonDispatcher,
     this.routerConfig,
     this.builder,
-    this.title = '',
+    required this.title,
     this.onGenerateTitle,
     this.theme,
     this.darkTheme,
@@ -506,8 +506,7 @@ class _TencentCloudChatMaterialAppState extends State<TencentCloudChatMaterialAp
   TencentCloudChatTextStyle textStyle = TencentCloudChat.instance.dataInstance.theme.textStyle;
 
   // Listener for theme data changes
-  Stream<TencentCloudChatTheme>? themeDataListener =
-      TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatTheme>("TencentCloudChatTheme");
+  Stream<TencentCloudChatTheme>? themeDataListener = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatTheme>("TencentCloudChatTheme");
 
   bool isInitIntl = false;
 
@@ -549,7 +548,8 @@ class _TencentCloudChatMaterialAppState extends State<TencentCloudChatMaterialAp
 
   Future<Locale?> _getLocale(Locale? l) async {
     try {
-      await TencentCloudChatCacheGlobal().init();
+      
+      await TencentCloudChatCacheGlobal().init(widget.title);
       final locale = _initIntl(l);
       return locale;
     } catch (e) {
@@ -564,11 +564,8 @@ class _TencentCloudChatMaterialAppState extends State<TencentCloudChatMaterialAp
         future: _getLocale(widget.locale),
         builder: (context, snapshot) {
           if (isInitIntl || snapshot.data != null) {
-            final themeMode = widget.themeMode ??
-                (theme.brightness != null
-                    ? (theme.brightness == Brightness.light ? ThemeMode.light : ThemeMode.dark)
-                    : null);
-            if(widget.themeMode != null){
+            final themeMode = widget.themeMode ?? (theme.brightness != null ? (theme.brightness == Brightness.light ? ThemeMode.light : ThemeMode.dark) : null);
+            if (widget.themeMode != null) {
               theme.brightnessWithoutFire = themeMode == ThemeMode.light ? Brightness.light : Brightness.dark;
             }
 
@@ -583,10 +580,7 @@ class _TencentCloudChatMaterialAppState extends State<TencentCloudChatMaterialAp
               onGenerateInitialRoutes: widget.onGenerateInitialRoutes,
               onUnknownRoute: widget.onUnknownRoute,
               // onNavigationNotification: widget.onNavigationNotification,
-              navigatorObservers: [
-                ...(widget.navigatorObservers ?? const <NavigatorObserver>[]),
-                TencentCloudChat.instance.navigatorObserver
-              ],
+              navigatorObservers: [...(widget.navigatorObservers ?? const <NavigatorObserver>[]), TencentCloudChat.instance.navigatorObserver],
               builder: widget.builder,
               title: widget.title,
               onGenerateTitle: widget.onGenerateTitle,
@@ -607,8 +601,7 @@ class _TencentCloudChatMaterialAppState extends State<TencentCloudChatMaterialAp
               themeAnimationDuration: widget.themeAnimationDuration,
               themeAnimationCurve: widget.themeAnimationCurve,
               locale: widget.locale ?? snapshot.data,
-              localizationsDelegates:
-                  widget.localizationsDelegates ?? TencentCloudChatLocalizations.localizationsDelegates,
+              localizationsDelegates: widget.localizationsDelegates ?? TencentCloudChatLocalizations.localizationsDelegates,
               localeListResolutionCallback: widget.localeListResolutionCallback,
               localeResolutionCallback: widget.localeResolutionCallback,
               supportedLocales: widget.supportedLocales ?? TencentCloudChatLocalizations.supportedLocales,

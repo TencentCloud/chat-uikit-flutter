@@ -56,7 +56,7 @@ android {
 }
 
 dependencies {
-    implementation 'com.tencent.timpush:timpush:7.9.5668'
-    api "com.tencent.liteav.tuikit:tuicore:7.9.5666"
+    implementation 'com.tencent.timpush:timpush:8.0.6897'
+    api "com.tencent.liteav.tuikit:tuicore:8.0.6897"
 }
 

@@ -28,6 +28,7 @@ class TencentCloudChatMessageSDK {
     OnRecvMessageReadReceipts? onRecvMessageReadReceipts,
     OnRecvMessageExtensionsChanged? onRecvMessageExtensionsChanged,
     OnRecvMessageExtensionsDeleted? onRecvMessageExtensionsDeleted,
+    OnRecvMessageReactionsChanged? onRecvMessageReactionsChanged,
     OnMessageDownloadProgressCallback? onMessageDownloadProgressCallback,
   }) {
     if (advancedMsgListener != null) {
@@ -42,6 +43,7 @@ class TencentCloudChatMessageSDK {
       onRecvMessageModified: onRecvMessageModified,
       onRecvMessageRevoked: onRecvMessageRevoked,
       onRecvC2CReadReceipt: onRecvC2CReadReceipt,
+      onRecvMessageReactionsChanged: onRecvMessageReactionsChanged,
       onRecvMessageExtensionsChanged: onRecvMessageExtensionsChanged,
       onRecvMessageExtensionsDeleted: onRecvMessageExtensionsDeleted,
     );
@@ -76,7 +78,7 @@ class TencentCloudChatMessageSDK {
     final response = res.data;
     TencentCloudChat.instance.logInstance.console(
       componentName: 'GetHistoryMessageList',
-      logs: "getHistoryMessageListResult -- conv: ${groupID ?? userID} - needCount:$count - needCache: $needCache - ResultLength:${res.data?.messageList.length} - period: $timePeriod - begin: $timeBegin",
+      logs: "getHistoryMessageListResult -- conv: ${groupID ?? userID} - needCount:$count - needCache: $needCache - ResultLength:${res.data?.messageList.length} - period: $timePeriod - begin: $timeBegin - lastMsgID:$lastMsgID - lastMsgSeq:$lastMsgSeq",
     );
 
     if (res.code != 0 || response == null) {

@@ -10,6 +10,7 @@ import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.
 import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_download_utils.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/widgets/cacheImage/tencent_cloud_chat_cache_image.dart';
@@ -70,7 +71,7 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
 
   TimVideoCurrentRenderInfo? currentRenderVideoInfo;
 
-  console(String log) {
+  void console(String log) {
     TencentCloudChat.instance.logInstance.console(
       componentName: _tag,
       logs: json.encode(
@@ -85,8 +86,6 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
   int renderRandom = Random().nextInt(100000);
 
   Map<String, dynamic>? setLocalDelayData;
-
-
 
   @override
   void didUpdateWidget(covariant TencentCloudChatMessageVideo oldWidget) {
@@ -170,19 +169,40 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
     return (w, h);
   }
 
+  DownloadMessageQueueData generateDownloadData({
+    required int type,
+    required int conversationType,
+    required String key,
+    V2TimMessage? message,
+    required bool isSnapshot,
+  }) {
+    message ??= widget.data.message;
+    return DownloadMessageQueueData(
+      conversationType: conversationType,
+      msgID: message.msgID ?? "",
+      messageType: MessageElemType.V2TIM_ELEM_TYPE_IMAGE,
+      imageType: type,
+      // download origin image
+      isSnapshot: isSnapshot,
+      key: key,
+      convID: key,
+    );
+  }
+
   addDownloadMessageToQueue({
     bool? isClick,
   }) {
     if (kIsWeb) {
       return;
     }
-    bool hasThumbLocal = hasLocalSnapShot();
+
     bool hasLocal = hasLocalVideo();
 
     if (isSendingMessage()) {
       console("message is sending. download break .");
       return;
     }
+    bool hasThumbLocal = hasLocalSnapShot();
     if (hasThumbLocal && hasLocal) {
       console("message has both thumb and play url. download break .");
       return;
@@ -200,15 +220,12 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
 
     if (!hasLocalSnapShot()) {
       // no snapshot download
-      TencentCloudChat.instance.dataInstance.messageData.addDownloadMessageToQueue(
-        data: DownloadMessageQueueData(
+      TencentCloudChatDownloadUtils.addDownloadMessageToQueue(
+        data: generateDownloadData(
+          type: 0,
           conversationType: conversationType,
-          msgID: widget.data.message.msgID ?? "",
-          messageType: MessageElemType.V2TIM_ELEM_TYPE_VIDEO,
-          imageType: 0,
-          // video message this param is unuse;
-          isSnapshot: isSnapshot,
           key: key,
+          isSnapshot: isSnapshot,
         ),
         isClick: isClick,
       );
@@ -535,27 +552,33 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
                 bottomRight: Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
               ),
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(getSquareSize(16)),
-                topRight: Radius.circular(getSquareSize(16)),
-                bottomLeft: Radius.circular(getSquareSize(sentFromSelf ? 16 : 0)),
-                bottomRight: Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
-              ),
-              child: TencentCloudChatCacheImage(
-                width: getWidth(localDefaultWidth),
-                height: getHeight(localDefaultHeight),
-                url: url,
-                fit: BoxFit.cover,
-                errorWidget: (context, error, stackTrace) {
-                  console("network video render failed. please check the path is right . path: $url");
-                  return getErrorWidget(localDefaultWidth, localDefaultHeight);
-                },
-                progressIndicatorBuilder: (context, child, loadingProgress) {
-                  console("progressIndicatorBuilder");
-                  return loading;
-                },
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(getSquareSize(16)),
+                    topRight: Radius.circular(getSquareSize(16)),
+                    bottomLeft: Radius.circular(getSquareSize(sentFromSelf ? 16 : 0)),
+                    bottomRight: Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
+                  ),
+                  child: TencentCloudChatCacheImage(
+                    width: getWidth(localDefaultWidth),
+                    height: getHeight(localDefaultHeight),
+                    url: url,
+                    fit: BoxFit.cover,
+                    errorWidget: (context, error, stackTrace) {
+                      console("network video render failed. please check the path is right . path: $url");
+                      return getErrorWidget(localDefaultWidth, localDefaultHeight);
+                    },
+                    progressIndicatorBuilder: (context, child, loadingProgress) {
+                      console("progressIndicatorBuilder");
+                      return loading;
+                    },
+                  ),
+                ),
+                messageReactionList(),
+              ],
             ),
           ),
         ),
@@ -602,17 +625,23 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
                   bottomLeft: Radius.circular(getSquareSize(sentFromSelf ? 16 : 0)),
                   bottomRight: Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
                 ),
-                child: Image.file(
-                  fit: BoxFit.cover,
-                  width: fw,
-                  height: fh,
-                  cacheWidth: fw.toInt(),
-                  cacheHeight: fh.toInt(),
-                  File(p),
-                  errorBuilder: (context, error, stackTrace) {
-                    console("local video render failed. please check the path is right . path: $p");
-                    return getErrorWidget(localDefaultWidth, localDefaultHeight);
-                  },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Image.file(
+                      fit: BoxFit.cover,
+                      width: fw,
+                      height: fh,
+                      cacheWidth: fw.toInt(),
+                      cacheHeight: fh.toInt(),
+                      File(p),
+                      errorBuilder: (context, error, stackTrace) {
+                        console("local video render failed. please check the path is right . path: $p");
+                        return getErrorWidget(localDefaultWidth, localDefaultHeight);
+                      },
+                    ),
+                    messageReactionList(),
+                  ],
                 ),
               ),
             ),
@@ -793,10 +822,31 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
 
   downloadCallback(TencentCloudChatMessageData data) {
     if (data.currentUpdatedFields == TencentCloudChatMessageDataKeys.downloadMessage) {
-      if (data.currentDownloadMessage?.msgID.replaceAll("-snap", "") == (widget.data.message.msgID ?? "")) {
-        console("downloading finished:${data.currentDownloadMessage?.downloadFinish}");
+      String key = TencentCloudChatUtils.checkString(widget.data.message.userID) ?? widget.data.message.groupID ?? "";
+      int conversationType = TencentCloudChatUtils.checkString(widget.data.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
+      if (key.isEmpty) {
+        console("add to download queue error. key is empty.");
+        return false;
+      }
+      bool hasThumbLocal = hasLocalSnapShot();
+      bool isSnapshot = false;
+      if (!hasThumbLocal) {
+        isSnapshot = true;
+      }
+      int idx = data.currentDownloadMessage.indexWhere(
+        (ele) =>
+            ele.getUniqueueKey() ==
+            generateDownloadData(
+              type: 0,
+              conversationType: conversationType,
+              key: key,
+              isSnapshot: isSnapshot,
+            ).getUniqueueKey(),
+      );
+
+      if (idx > -1) {
         safeSetState(() {
-          currentdownload = data.currentDownloadMessage;
+          currentdownload = data.currentDownloadMessage[idx];
         });
       }
     }
@@ -807,17 +857,76 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
   }
 
   bool isDownloading() {
-    return TencentCloudChat.instance.dataInstance.messageData.isDownloading(msgID: (widget.data.message.msgID ?? ""));
+    if (TencentCloudChatUtils.checkString(widget.data.message.msgID) != null) {
+      bool hasThumbLocal = hasLocalSnapShot();
+      bool isSnapshot = false;
+      if (!hasThumbLocal) {
+        isSnapshot = true;
+      }
+      String key = TencentCloudChatUtils.checkString(widget.data.message.userID) ?? widget.data.message.groupID ?? "";
+      int conversationType = TencentCloudChatUtils.checkString(widget.data.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
+      if (key.isEmpty) {
+        console("add to download queue error. key is empty.");
+        return false;
+      }
+      return TencentCloudChatDownloadUtils.isDownloading(
+          data: generateDownloadData(
+        type: 0,
+        conversationType: conversationType,
+        key: key,
+        isSnapshot: isSnapshot,
+      ));
+    }
+    return false;
   }
 
   bool isInDownloadQueue() {
-    return TencentCloudChat.instance.dataInstance.messageData.isInDownloadQueue(msgID: (widget.data.message.msgID ?? ""));
+    if (TencentCloudChatUtils.checkString(widget.data.message.msgID) != null) {
+      bool hasThumbLocal = hasLocalSnapShot();
+      bool isSnapshot = false;
+      if (!hasThumbLocal) {
+        isSnapshot = true;
+      }
+      String key = TencentCloudChatUtils.checkString(widget.data.message.userID) ?? widget.data.message.groupID ?? "";
+      int conversationType = TencentCloudChatUtils.checkString(widget.data.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
+      if (key.isEmpty) {
+        console("add to download queue error. key is empty.");
+        return false;
+      }
+      return TencentCloudChatDownloadUtils.isInDownloadQueue(
+        data: generateDownloadData(
+          type: 0,
+          conversationType: conversationType,
+          key: key,
+          isSnapshot: isSnapshot,
+        ),
+      );
+    }
+    return false;
   }
 
   removeFromDownloadQueue() {
     bool inQueue = isInDownloadQueue();
-    if (inQueue == true) {
-      TencentCloudChat.instance.dataInstance.messageData.removeFromDownloadQueue(msgID: (widget.data.message.msgID ?? ""));
+    if (inQueue == true && TencentCloudChatUtils.checkString(widget.data.message.msgID) != null) {
+      bool hasThumbLocal = hasLocalSnapShot();
+      bool isSnapshot = false;
+      if (!hasThumbLocal) {
+        isSnapshot = true;
+      }
+      String key = TencentCloudChatUtils.checkString(widget.data.message.userID) ?? widget.data.message.groupID ?? "";
+      int conversationType = TencentCloudChatUtils.checkString(widget.data.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
+      if (key.isEmpty) {
+        console("add to download queue error. key is empty.");
+        return false;
+      }
+      TencentCloudChatDownloadUtils.removeFromDownloadQueue(
+        data: generateDownloadData(
+          type: 0,
+          conversationType: conversationType,
+          key: key,
+          isSnapshot: isSnapshot,
+        ),
+      );
       safeSetState(() {
         renderRandom = Random().nextInt(10000);
       });
@@ -916,6 +1025,7 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
 
   @override
   Widget defaultBuilder(BuildContext context) {
+    console("render default builder");
     return TencentCloudChatThemeWidget(build: (context, colorTheme, textStyle) {
       return videoLayout(colorTheme, textStyle);
     });

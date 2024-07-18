@@ -6,6 +6,7 @@ import 'package:flutter_list_view/flutter_list_view.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_list_view/message_list/default_builder.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_list_view/message_list/message_list_controller.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_list_view/message_list/position.dart';
@@ -16,11 +17,11 @@ const constLargeUnreadIndex = 100000000000;
 class TencentCloudChatScrollBehavior extends MaterialScrollBehavior {
   @override
   Set<PointerDeviceKind> get dragDevices => {
-    PointerDeviceKind.touch,
-    PointerDeviceKind.trackpad,
-    PointerDeviceKind.stylus,
-    PointerDeviceKind.unknown,
-  };
+        PointerDeviceKind.touch,
+        PointerDeviceKind.trackpad,
+        PointerDeviceKind.stylus,
+        PointerDeviceKind.unknown,
+      };
 }
 
 /// Proudly modified based on https://pub.dev/packages/flutter_chat_list for our needs.
@@ -155,7 +156,8 @@ class MessageListState extends State<MessageList> {
 
   /// Fire refresh temp variable
   double prevScrollOffset = 0;
-  double nextBottomScrollOffset = 100000000000000.0;
+  double? nextBottomScrollOffset;
+  bool startScroll = false;
 
   /// keepPositionOffset will be set to 0 during refresh
   double keepPositionOffset = constKeepPositionOffset;
@@ -303,7 +305,26 @@ class MessageListState extends State<MessageList> {
     }
   }
 
+  void _checkAndLoadMoreMessages() {
+    TencentCloudChatUtils.debounce("_checkAndLoadMoreMessages", () {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        try{
+          if (listViewController.position.maxScrollExtent <= listViewController.position.viewportDimension &&
+              widget.haveMorePreviousData &&
+              widget.msgCount > 0 && !startScroll) {
+            refreshController.requestLoading(needMove: false);
+          }
+        }catch(e){
+          debugPrint(e.toString());
+        }
+      });
+    }, duration: const Duration(milliseconds: 200));
+  }
+
   _handleScrolling() {
+    if (!startScroll) {
+      startScroll = true;
+    }
     widget.closeSticker();
     var offset = listViewController.offset;
     ScrollPosition position = listViewController.position;
@@ -313,7 +334,8 @@ class MessageListState extends State<MessageList> {
     var targetNextOffset = maxScrollExtent - loadNextMessageOffset;
 
     if (widget.haveMorePreviousData && loadNextMessageOffset > 0.0) {
-      if (offset >= targetNextOffset && nextBottomScrollOffset < targetNextOffset) {
+      if (offset >= targetNextOffset &&
+          ((nextBottomScrollOffset == null) || (nextBottomScrollOffset! < targetNextOffset))) {
         SchedulerBinding.instance.addPostFrameCallback((timeStamp) async {
           if (!refreshController.isLoading) {
             await refreshController.requestLoading(needMove: false);
@@ -406,6 +428,7 @@ class MessageListState extends State<MessageList> {
       Future.delayed(const Duration(milliseconds: 50), (() {
         if (mounted) {
           keepPositionOffset = constKeepPositionOffset;
+          startScroll = false;
           setState(() {});
         }
       }));
@@ -486,6 +509,9 @@ class MessageListState extends State<MessageList> {
   }
 
   _renderList() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkAndLoadMoreMessages();
+    });
     return ScrollConfiguration(
       behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
         PointerDeviceKind.touch,
@@ -505,10 +531,10 @@ class MessageListState extends State<MessageList> {
               builder: (context, mode) => widget.loadPreviousProgressBuilder != null
                   ? widget.loadPreviousProgressBuilder!(context, mode)
                   : defaultLoadPreviousProgressBuilder(
-                context,
-                mode,
-                widget.haveMorePreviousData,
-              ),
+                      context,
+                      mode,
+                      widget.haveMorePreviousData,
+                    ),
             ),
             controller: refreshController,
             onRefresh: _onLoadLatestMessages,
@@ -549,7 +575,8 @@ class MessageListState extends State<MessageList> {
         valueListenable: showLastUnreadButton,
         builder: (context, bool showButton, child) {
           if (widget.showUnreadMsgButton && showButton && widget.unreadMsgCount != null) {
-            return unreadMsgButtonBuilder(_scrollToLatestReadMessage, context, widget.unreadMsgCount!, loadingLatestReadMessage);
+            return unreadMsgButtonBuilder(
+                _scrollToLatestReadMessage, context, widget.unreadMsgCount!, loadingLatestReadMessage);
           }
           return Container();
         });
@@ -557,7 +584,8 @@ class MessageListState extends State<MessageList> {
 
   Widget _renderMessagesMentionedMeButton() {
     if (widget.messagesMentionedMe.isNotEmpty) {
-      return messageMentionedMeBuilder(_scrollToLatestMessageMentionedMe, context, widget.messagesMentionedMe.length, loadingMessageMentionedMe);
+      return messageMentionedMeBuilder(
+          _scrollToLatestMessageMentionedMe, context, widget.messagesMentionedMe.length, loadingMessageMentionedMe);
     }
     return Container();
   }

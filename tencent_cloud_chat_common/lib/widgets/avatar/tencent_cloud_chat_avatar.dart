@@ -22,6 +22,7 @@ enum TencentCloudChatAvatarScene {
   custom,
   userProfile,
   settings,
+  searchResult,
 }
 
 /// A customizable avatar widget that can display one or multiple images.

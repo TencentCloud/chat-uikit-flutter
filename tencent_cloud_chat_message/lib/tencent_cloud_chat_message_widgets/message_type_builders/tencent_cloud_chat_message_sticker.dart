@@ -82,32 +82,38 @@ class _TencentCloudChatMessageStickerState extends TencentCloudChatMessageState<
             bottomRight: Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
           ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: maxBubbleWidth - 22,
-                minWidth: 100,
-              ),
-              child: Stack(
-                children: [
-                  Positioned(
-                    child: Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: getStickerWidget(),
-                    ),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: maxBubbleWidth - 22,
+                    minWidth: 100,
                   ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    left: 0,
-                    child: messageInfo(),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 16),
+                          child: getStickerWidget(),
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        left: 0,
+                        child: messageInfo(),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
+            messageReactionList(),
           ],
         ),
       );

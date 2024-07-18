@@ -4,13 +4,23 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:card_swiper/card_swiper.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_clipboard/image_clipboard.dart';
+import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_common_defines.dart';
+import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_code_info.dart';
+import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_download_utils.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
+import 'package:tencent_cloud_chat_common/widgets/desktop_popup/tencent_cloud_chat_desktop_popup.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_viewer/tencent_cloud_chat_message_videoplayer.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_image.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class TencentCloudChatMessageViewer extends StatefulWidget {
   final String convKey;
@@ -139,6 +149,24 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
     );
   }
 
+  generateDownloadData({
+    required int type,
+    required int conversationType,
+    required String key,
+    V2TimMessage? message,
+  }) {
+    return DownloadMessageQueueData(
+      conversationType: conversationType,
+      msgID: message?.msgID ?? "",
+      messageType: MessageElemType.V2TIM_ELEM_TYPE_IMAGE,
+      imageType: type,
+      // download origin image
+      isSnapshot: false,
+      key: key,
+      convID: key,
+    );
+  }
+
   addDownloadMessageToQueue({
     bool? isClick,
     bool? isSnap,
@@ -151,16 +179,8 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
     }
     int type = ImageType.origin.index;
 
-    TencentCloudChat.instance.dataInstance.messageData.addDownloadMessageToQueue(
-      data: DownloadMessageQueueData(
-        conversationType: conversationType,
-        msgID: widget.message.msgID ?? "",
-        messageType: MessageElemType.V2TIM_ELEM_TYPE_IMAGE,
-        imageType: type,
-        // download origin image
-        isSnapshot: false,
-        key: key,
-      ),
+    TencentCloudChatDownloadUtils.addDownloadMessageToQueue(
+      data: generateDownloadData(type: type, conversationType: conversationType, key: key),
       isClick: isClick,
     );
   }
@@ -230,11 +250,159 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
     }
     var message = messages[index];
 
-    return TencentCloudChat.instance.dataInstance.messageData.isDownloading(msgID: message.msgID);
+    String key = widget.convKey;
+    int conversationType = widget.convType;
+    if (key.isEmpty) {
+      console("add to download queue error. key is empty. ");
+      return;
+    }
+    int type = ImageType.origin.index;
+
+    return TencentCloudChatDownloadUtils.isDownloading(
+      data: generateDownloadData(
+        type: type,
+        conversationType: conversationType,
+        key: key,
+        message: message,
+      ),
+    );
+  }
+
+  final imageClipboard = ImageClipboard();
+
+  copyImage(String filePath) async {
+    bool isDesktop = TencentCloudChatPlatformAdapter().isDesktop;
+    final isOnlineImg = filePath.startsWith('http');
+    String targetPath = filePath;
+    File? localFile;
+    if (isOnlineImg && isDesktop) {
+      final response = await http.get(Uri.parse(filePath));
+      final tempDir = await getTemporaryDirectory();
+      localFile = File('${tempDir.path}/temp_image.jpg');
+      await localFile.writeAsBytes(response.bodyBytes);
+      targetPath = localFile.path;
+    }
+    await imageClipboard.copyImage(targetPath);
+    TencentCloudChat.instance.callbacks.onUserNotificationEvent(
+      TencentCloudChatComponentsEnum.message,
+      TencentCloudChatCodeInfo.copyFileCompleted,
+    );
+    if (localFile != null) {
+      localFile.deleteSync();
+    }
+  }
+
+  saveImage(String filePath) async {
+    try {
+      final saveDirectory = await FilePicker.platform.getDirectoryPath();
+      if (saveDirectory == null) {
+        return;
+      }
+      final savePath = '$saveDirectory/${DateTime.now().millisecondsSinceEpoch}.png';
+      if (filePath.startsWith('http')) {
+        http.Response response = await http.get(Uri.parse(filePath));
+        if (response.statusCode == 200) {
+          File file = File(savePath);
+          await file.writeAsBytes(response.bodyBytes);
+          return TencentCloudChat.instance.callbacks.onUserNotificationEvent(
+            TencentCloudChatComponentsEnum.message,
+            TencentCloudChatCodeInfo.saveFileCompleted,
+          );
+        }
+      } else {
+        File sourceFile = File(filePath);
+        if (sourceFile.existsSync()) {
+          File destFile = File(savePath);
+          await sourceFile.copy(destFile.path);
+          return TencentCloudChat.instance.callbacks.onUserNotificationEvent(
+            TencentCloudChatComponentsEnum.message,
+            TencentCloudChatCodeInfo.saveFileCompleted,
+          );
+        }
+      }
+      TencentCloudChat.instance.callbacks.onUserNotificationEvent(
+        TencentCloudChatComponentsEnum.message,
+        TencentCloudChatCodeInfo.saveFileFailed,
+      );
+    } catch (e) {
+      TencentCloudChat.instance.callbacks.onUserNotificationEvent(
+        TencentCloudChatComponentsEnum.message,
+        TencentCloudChatCodeInfo.saveFileFailed,
+      );
+    }
+  }
+
+  copyOnlineUrl(String fileUrl) async {
+    await Clipboard.setData(ClipboardData(text: fileUrl));
+    TencentCloudChat.instance.callbacks.onUserNotificationEvent(
+      TencentCloudChatComponentsEnum.message,
+      TencentCloudChatCodeInfo.copyLinkSuccess,
+    );
+  }
+
+  openUrlInNewWindow(String fileUrl) async {
+    await launchUrl(Uri.parse(fileUrl));
+  }
+
+  handleContextMenu(int type, String data) {
+    switch (type) {
+      case 0:
+        copyImage(data);
+        break;
+      case 1:
+        saveImage(data);
+        break;
+      case 2:
+        copyOnlineUrl(data);
+        break;
+      case 3:
+        openUrlInNewWindow(data);
+        break;
+    }
+    Navigator.of(context).pop();
+  }
+
+  Widget getContextMenuListItem(IconData icon, String text, int type, String data, {bool? isOnline}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Container(
+        height: 40,
+        decoration: const BoxDecoration(
+          border: Border(
+            bottom: BorderSide(
+              color: Colors.black12,
+            ),
+          ),
+        ),
+        child: GestureDetector(
+          onTap: () {
+            handleContextMenu(type, data);
+          },
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: Icon(
+                    icon,
+                    size: 14,
+                  ),
+                ),
+                Expanded(
+                  child: Text(text),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    bool isDesktop = TencentCloudChatPlatformAdapter().isDesktop;
     double w = MediaQuery.of(context).size.width;
     double h = MediaQuery.of(context).size.height;
     double verticalPadding = h * 0.1;
@@ -264,7 +432,7 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
                     children: [
                       Positioned(
                         child: Padding(
-                          padding: TencentCloudChatPlatformAdapter().isDesktop
+                          padding: isDesktop
                               ? EdgeInsets.symmetric(
                                   vertical: verticalPadding,
                                   horizontal: horipadding,
@@ -279,25 +447,105 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
                                   if (widget.isSending) {
                                     var lp = message.imageElem!.path ?? "";
                                     if (lp.isNotEmpty) {
-                                      console("view sending path");
-                                      return Image.file(
-                                        File(lp),
+                                      return GestureDetector(
+                                        onSecondaryTapDown: (details) {
+                                          TencentCloudChatDesktopPopup.showColumnMenu(
+                                            context: context,
+                                            offset: Offset(details.globalPosition.dx, details.globalPosition.dy),
+                                            items: [
+                                              TencentCloudChatMessageGeneralOptionItem(
+                                                  label: tL10n.copyImageContextMenuBtnText,
+                                                  icon: Icons.copy_rounded,
+                                                  onTap: ({Offset? offset}) async {
+                                                    handleContextMenu(0, lp);
+                                                  }),
+                                              if (isDesktop)
+                                                TencentCloudChatMessageGeneralOptionItem(
+                                                    label: tL10n.saveToLocalContextMenuBtnText,
+                                                    icon: Icons.save_alt_rounded,
+                                                    onTap: ({Offset? offset}) async {
+                                                      handleContextMenu(1, lp);
+                                                    }),
+                                            ],
+                                          );
+                                        },
+                                        child: Image.file(
+                                          File(lp),
+                                        ),
                                       );
                                     }
                                   }
                                   var (isOrigin, local) = getImageLocalurl(message.imageElem!);
                                   var originOrl = getImageOnlineOriginUrl(message.imageElem!);
                                   if (local.isNotEmpty) {
-                                    console("view local url is origin $isOrigin");
-                                    return Image.file(
-                                      File(local),
+                                    return GestureDetector(
+                                      onSecondaryTapDown: (details) {
+                                        TencentCloudChatDesktopPopup.showColumnMenu(
+                                          context: context,
+                                          offset: Offset(details.globalPosition.dx, details.globalPosition.dy),
+                                          items: [
+                                            TencentCloudChatMessageGeneralOptionItem(
+                                                label: tL10n.copyImageContextMenuBtnText,
+                                                icon: Icons.copy_rounded,
+                                                onTap: ({Offset? offset}) async {
+                                                  handleContextMenu(0, local);
+                                                }),
+                                            if (isDesktop)
+                                              TencentCloudChatMessageGeneralOptionItem(
+                                                  label: tL10n.saveToLocalContextMenuBtnText,
+                                                  icon: Icons.save_alt_rounded,
+                                                  onTap: ({Offset? offset}) async {
+                                                    handleContextMenu(1, local);
+                                                  }),
+                                            if (TencentCloudChatPlatformAdapter().isWeb && TencentCloudChatUtils.checkString(originOrl) != null)
+                                              TencentCloudChatMessageGeneralOptionItem(
+                                                  label: tL10n.openLinkContextMenuBtnText,
+                                                  icon: Icons.laptop_windows_rounded,
+                                                  onTap: ({Offset? offset}) async {
+                                                    handleContextMenu(3, originOrl);
+                                                  }),
+                                          ],
+                                        );
+                                      },
+                                      child: Image.file(
+                                        File(local),
+                                      ),
                                     );
                                   }
 
                                   if (TencentCloudChatUtils.checkString(originOrl) != null) {
-                                    console("view online origin url");
-                                    return Image.network(
-                                      originOrl,
+                                    return GestureDetector(
+                                      onSecondaryTapDown: (details) {
+                                        TencentCloudChatDesktopPopup.showColumnMenu(
+                                          context: context,
+                                          offset: Offset(details.globalPosition.dx, details.globalPosition.dy),
+                                          items: [
+                                            TencentCloudChatMessageGeneralOptionItem(
+                                                label: tL10n.copyImageContextMenuBtnText,
+                                                icon: Icons.copy_rounded,
+                                                onTap: ({Offset? offset}) async {
+                                                  handleContextMenu(0, originOrl);
+                                                }),
+                                            if (isDesktop)
+                                              TencentCloudChatMessageGeneralOptionItem(
+                                                  label: tL10n.saveToLocalContextMenuBtnText,
+                                                  icon: Icons.save_alt_rounded,
+                                                  onTap: ({Offset? offset}) async {
+                                                    handleContextMenu(1, originOrl);
+                                                  }),
+                                            if (TencentCloudChatPlatformAdapter().isWeb)
+                                              TencentCloudChatMessageGeneralOptionItem(
+                                                  label: tL10n.openLinkContextMenuBtnText,
+                                                  icon: Icons.laptop_windows_rounded,
+                                                  onTap: ({Offset? offset}) async {
+                                                    handleContextMenu(3, originOrl);
+                                                  }),
+                                          ],
+                                        );
+                                      },
+                                      child: Image.network(
+                                        originOrl,
+                                      ),
                                     );
                                   }
                                 }

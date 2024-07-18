@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
+import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
@@ -21,8 +22,8 @@ abstract class TencentCloudChatMessageItemBase extends StatefulWidget {
 
 // This is the state class for TencentCloudChatMessageWidget.
 // It manages the message highlighting animation and listens for changes in message data.
-abstract class TencentCloudChatMessageState<T extends TencentCloudChatMessageItemBase>
-    extends TencentCloudChatState<T> {
+abstract class TencentCloudChatMessageState<T extends TencentCloudChatMessageItemBase> extends TencentCloudChatState<T> {
+  final String _tag = "TencentCloudChatMessageState";
   // A flag indicating whether the message was sent by the current user.
   bool sentFromSelf = false;
 
@@ -37,6 +38,12 @@ abstract class TencentCloudChatMessageState<T extends TencentCloudChatMessageIte
 
   // A flag indicting whether the message was read by others.
   bool showReadByOthersStatus = false;
+
+  final isDesktopScreen = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop;
+  // log for this components
+  void consoleLog(String logs) {
+    TencentCloudChat.instance.logInstance.console(componentName: _tag, logs: logs);
+  }
 
   // This method starts the message highlighting animation.
   void _startMessageHighlightAnimation() {
@@ -135,18 +142,66 @@ abstract class TencentCloudChatMessageState<T extends TencentCloudChatMessageIte
         : Container();
   }
 
+  Widget messageReactionList() {
+    return TencentCloudChatUtils.checkString(widget.data.message.msgID) != null
+        ? TencentCloudChatThemeWidget(
+            build: (context, colorTheme, textStyle) {
+              final Map<String, String> data = {};
+              data["primaryColor"] = colorTheme.primaryColor.value.toString();
+              data["borderColor"] = colorTheme.dividerColor.value.toString();
+              data["textColor"] = colorTheme.secondaryTextColor.value.toString();
+              data["msgID"] = widget.data.message.msgID!;
+              data["platformMode"] = isDesktopScreen ? "desktop" : "mobile";
+              return widget.data.messageReactionPluginInstance?.getWidgetSync(
+                    methodName: "messageReactionList",
+                    data: data,
+                  ) ??
+                  const SizedBox(
+                    width: 0,
+                    height: 0,
+                  );
+            },
+          )
+        : const SizedBox(
+            width: 0,
+            height: 0,
+          );
+  }
+
+  Widget messageReactionSelector() {
+    return TencentCloudChatUtils.checkString(widget.data.message.msgID) != null
+        ? TencentCloudChatThemeWidget(
+            build: (context, colorTheme, textStyle) {
+              final Map<String, String> data = {};
+              data["msgID"] = widget.data.message.msgID!;
+              data["platformMode"] = isDesktopScreen ? "desktop" : "mobile";
+              return widget.data.messageReactionPluginInstance!.getWidgetSync(
+                    methodName: "messageReactionSelector",
+                    data: data,
+                  ) ??
+                  const SizedBox(
+                    width: 0,
+                    height: 0,
+                  );
+            },
+          )
+        : const SizedBox(
+            width: 0,
+            height: 0,
+          );
+  }
+
   // Initialize the state.
   @override
   void initState() {
     super.initState();
     sentFromSelf = widget.data.message.isSelf ?? false;
     isGroupMessage = TencentCloudChatUtils.checkString(widget.data.message.groupID) != null;
-    showReadByOthersStatus = isGroupMessage
-        ? (widget.data.messageReceipt != null && (widget.data.messageReceipt!.readCount ?? 0) > 0)
-        : (widget.data.message.isPeerRead ?? false);
+    showReadByOthersStatus = isGroupMessage ? (widget.data.messageReceipt != null && (widget.data.messageReceipt!.readCount ?? 0) > 0) : (widget.data.message.isPeerRead ?? false);
 
     // Start the message highlighting animation if the message should be highlighted.
     if (widget.data.shouldBeHighlighted) {
+      consoleLog("shouldBeHighlighted true in initstate");
       _startMessageHighlightAnimation();
     }
   }
@@ -158,13 +213,12 @@ abstract class TencentCloudChatMessageState<T extends TencentCloudChatMessageIte
 
     // If the shouldBeHighlighted property has changed to true, start the highlighting animation.
     if (!oldWidget.data.shouldBeHighlighted && widget.data.shouldBeHighlighted) {
+      consoleLog("shouldBeHighlighted true");
       _startMessageHighlightAnimation();
     }
 
     sentFromSelf = widget.data.message.isSelf ?? false;
     isGroupMessage = TencentCloudChatUtils.checkString(widget.data.message.groupID) != null;
-    showReadByOthersStatus = isGroupMessage
-        ? (widget.data.messageReceipt != null && (widget.data.messageReceipt!.readCount ?? 0) > 0)
-        : (widget.data.message.isPeerRead ?? false);
+    showReadByOthersStatus = isGroupMessage ? (widget.data.messageReceipt != null && (widget.data.messageReceipt!.readCount ?? 0) > 0) : (widget.data.message.isPeerRead ?? false);
   }
 }

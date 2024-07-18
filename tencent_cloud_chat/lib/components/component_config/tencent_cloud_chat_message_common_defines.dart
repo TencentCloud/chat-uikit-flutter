@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 class TencentCloudChatMessageGeneralOptionItem {
   final IconData? icon;
   final String label;
+  final String? id;
   final ({String path, String? package})? iconAsset;
 
   /// Not every events include offset data, mainly support on desktop.
   final Function({Offset? offset}) onTap;
 
-  TencentCloudChatMessageGeneralOptionItem({this.iconAsset, this.icon, required this.label, required this.onTap});
+  TencentCloudChatMessageGeneralOptionItem({this.iconAsset, this.icon, required this.label, required this.onTap, this.id});
 }
 
 class TencentCloudChatTimeDividerConfig {
@@ -81,11 +82,15 @@ class TencentCloudChatMessageAttachmentConfig {
   /// Works on all platforms.
   final bool enableSendFile;
 
+  /// Works on Desktop & Web.
+  final bool enableSearch;
+
   TencentCloudChatMessageAttachmentConfig({
     this.enableSendMediaFromMobileGallery = true,
     this.enableSendImage = true,
     this.enableSendVideo = true,
     this.enableSendFile = true,
+    this.enableSearch = true,
   });
 }
 

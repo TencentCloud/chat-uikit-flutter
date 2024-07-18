@@ -9,6 +9,7 @@ import 'package:http/http.dart' as http;
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_download_utils.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/widgets/cacheImage/tencent_cloud_chat_cache_image.dart';
@@ -157,6 +158,25 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
     );
   }
 
+  DownloadMessageQueueData generateDownloadData({
+    required int type,
+    required int conversationType,
+    required String key,
+    V2TimMessage? message,
+  }) {
+    message ??= widget.data.message;
+    return DownloadMessageQueueData(
+      conversationType: conversationType,
+      msgID: message.msgID ?? "",
+      messageType: MessageElemType.V2TIM_ELEM_TYPE_IMAGE,
+      imageType: type,
+      // download origin image
+      isSnapshot: false,
+      key: key,
+      convID: key,
+    );
+  }
+
   addDownloadMessageToQueue({
     bool? isClick,
     bool? isSnap,
@@ -185,16 +205,8 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
         type = ImageType.origin.index;
         console("thumb has been download . download origin local");
       }
-      TencentCloudChat.instance.dataInstance.messageData.addDownloadMessageToQueue(
-        data: DownloadMessageQueueData(
-          conversationType: conversationType,
-          msgID: widget.data.message.msgID!,
-          messageType: MessageElemType.V2TIM_ELEM_TYPE_IMAGE,
-          imageType: type,
-          // download origin image
-          isSnapshot: false,
-          key: key,
-        ),
+      TencentCloudChatDownloadUtils.addDownloadMessageToQueue(
+        data: generateDownloadData(type: type, conversationType: conversationType, key: key),
         isClick: isClick,
       );
     }
@@ -318,8 +330,8 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
         String currentLocalCustomData = widget.data.message.localCustomData ?? "";
         final fileBytes = File(localPath).readAsBytesSync();
 
-        double owidth = 200;
-        double oheight = 266;
+        double owidth = localDefaultWidth;
+        double oheight = localDefaultHeight;
         bool isRotate = false;
         String from = "";
         late Map<String, dynamic> obj;
@@ -779,12 +791,31 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
 
   DownloadMessageQueueData? currentdownload;
 
+
+  
+
+   
+
   downloadCallback(TencentCloudChatMessageData data) {
     if (data.currentUpdatedFields == TencentCloudChatMessageDataKeys.downloadMessage) {
-      if (data.currentDownloadMessage?.msgID == (widget.data.message.msgID)) {
-        console("downloading finished:${data.currentDownloadMessage?.downloadFinish}");
+      String key = TencentCloudChatUtils.checkString(widget.data.message.userID) ?? widget.data.message.groupID ?? "";
+      int conversationType = TencentCloudChatUtils.checkString(widget.data.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
+      if (key.isEmpty) {
+        console("add to download queue error. key is empty.");
+        return false;
+      }
+      bool hasThumbLocal = hasLocalImage();
+      bool hasOriginLocal = hasLocalImage(isOrigin: true);
+      int type = ImageType.thumb.index;
+      if (!hasOriginLocal && hasThumbLocal) {
+        type = ImageType.origin.index;
+        console("thumb has been download . download origin local");
+      }
+      int idx = data.currentDownloadMessage.indexWhere((ele) => ele.getUniqueueKey() == generateDownloadData(type: type, conversationType: conversationType, key: key).getUniqueueKey());
+
+      if (idx > -1) {
         safeSetState(() {
-          currentdownload = data.currentDownloadMessage;
+          currentdownload = data.currentDownloadMessage[idx];
         });
       }
     }
@@ -795,17 +826,62 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
   }
 
   bool isDownloading() {
-    return TencentCloudChat.instance.dataInstance.messageData.isDownloading(msgID: (widget.data.message.msgID));
+    if (TencentCloudChatUtils.checkString(widget.data.message.msgID) != null) {
+      String key = TencentCloudChatUtils.checkString(widget.data.message.userID) ?? widget.data.message.groupID ?? "";
+      int conversationType = TencentCloudChatUtils.checkString(widget.data.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
+      if (key.isEmpty) {
+        console("add to download queue error. key is empty.");
+        return false;
+      }
+      bool hasThumbLocal = hasLocalImage();
+      bool hasOriginLocal = hasLocalImage(isOrigin: true);
+      int type = ImageType.thumb.index;
+      if (!hasOriginLocal && hasThumbLocal) {
+        type = ImageType.origin.index;
+        console("thumb has been download . download origin local");
+      }
+      return TencentCloudChatDownloadUtils.isDownloading(data: generateDownloadData(type: type, conversationType: conversationType, key: key));
+    }
+    return false;
   }
 
   bool isInDownloadQueue() {
-    return TencentCloudChat.instance.dataInstance.messageData.isInDownloadQueue(msgID: (widget.data.message.msgID));
+    if (TencentCloudChatUtils.checkString(widget.data.message.msgID) != null) {
+      String key = TencentCloudChatUtils.checkString(widget.data.message.userID) ?? widget.data.message.groupID ?? "";
+      int conversationType = TencentCloudChatUtils.checkString(widget.data.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
+      if (key.isEmpty) {
+        console("add to download queue error. key is empty.");
+        return false;
+      }
+      bool hasThumbLocal = hasLocalImage();
+      bool hasOriginLocal = hasLocalImage(isOrigin: true);
+      int type = ImageType.thumb.index;
+      if (!hasOriginLocal && hasThumbLocal) {
+        type = ImageType.origin.index;
+        console("thumb has been download . download origin local");
+      }
+      return TencentCloudChatDownloadUtils.isInDownloadQueue(data: generateDownloadData(type: type, conversationType: conversationType, key: key));
+    }
+    return false;
   }
 
   removeFromDownloadQueue() {
     bool inQueue = isInDownloadQueue();
-    if (inQueue == true) {
-      TencentCloudChat.instance.dataInstance.messageData.removeFromDownloadQueue(msgID: (widget.data.message.msgID ?? ""));
+    if (inQueue == true && TencentCloudChatUtils.checkString(widget.data.message.msgID) != null) {
+      String key = TencentCloudChatUtils.checkString(widget.data.message.userID) ?? widget.data.message.groupID ?? "";
+      int conversationType = TencentCloudChatUtils.checkString(widget.data.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
+      if (key.isEmpty) {
+        console("add to download queue error. key is empty.");
+        return false;
+      }
+      bool hasThumbLocal = hasLocalImage();
+      bool hasOriginLocal = hasLocalImage(isOrigin: true);
+      int type = ImageType.thumb.index;
+      if (!hasOriginLocal && hasThumbLocal) {
+        type = ImageType.origin.index;
+        console("thumb has been download . download origin local");
+      }
+      TencentCloudChatDownloadUtils.removeFromDownloadQueue(data: generateDownloadData(type: type, conversationType: conversationType, key: key));
       safeSetState(() {
         renderRandom = Random().nextInt(10000);
       });
@@ -933,32 +1009,38 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
             bottomRight: Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
           ),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: min(maxBubbleWidth * 0.9, maxBubbleWidth - getSquareSize(sentFromSelf ? 128 : 102))),
-              child: Stack(
-                children: [
-                  Positioned(
-                    child: imageLayout(),
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: min(maxBubbleWidth * 0.9, maxBubbleWidth - getSquareSize(sentFromSelf ? 128 : 102))),
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        child: imageLayout(),
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        left: 0,
+                        child: messageInfo(),
+                      ),
+                      if (!TencentCloudChatPlatformAdapter().isWeb)
+                        Positioned(
+                          top: getHeight(4),
+                          left: getWidth(4),
+                          child: downloadStatus(),
+                        )
+                    ],
                   ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    left: 0,
-                    child: messageInfo(),
-                  ),
-                  if (!TencentCloudChatPlatformAdapter().isWeb)
-                    Positioned(
-                      top: getHeight(4),
-                      left: getWidth(4),
-                      child: downloadStatus(),
-                    )
-                ],
-              ),
+                ),
+              ],
             ),
+            messageReactionList(),
           ],
         ),
       );

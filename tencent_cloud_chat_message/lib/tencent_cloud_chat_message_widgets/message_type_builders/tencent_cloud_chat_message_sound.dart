@@ -7,6 +7,7 @@ import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.
 import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_download_utils.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/tencent_cloud_chat_message_item.dart';
@@ -60,6 +61,25 @@ class _TencentCloudChatMessageSoundState extends TencentCloudChatMessageState<Te
 
   int renderRandom = Random().nextInt(100000);
 
+  DownloadMessageQueueData generateDownloadData({
+    required int type,
+    required int conversationType,
+    required String key,
+    V2TimMessage? message,
+  }) {
+    message ??= widget.data.message;
+    return DownloadMessageQueueData(
+      conversationType: conversationType,
+      msgID: message.msgID ?? "",
+      messageType: MessageElemType.V2TIM_ELEM_TYPE_IMAGE,
+      imageType: type,
+      // download origin image
+      isSnapshot: false,
+      key: key,
+      convID: key,
+    );
+  }
+
   addDownloadMessageToQueue({
     bool? isClick,
   }) {
@@ -76,16 +96,8 @@ class _TencentCloudChatMessageSoundState extends TencentCloudChatMessageState<Te
         console("add to download queue error. key is empty.");
         return;
       }
-      TencentCloudChat.instance.dataInstance.messageData.addDownloadMessageToQueue(
-        data: DownloadMessageQueueData(
-          conversationType: conversationType,
-          msgID: widget.data.message.msgID ?? "",
-          messageType: MessageElemType.V2TIM_ELEM_TYPE_SOUND,
-          imageType: 0,
-          // sound message this param is unuse;
-          isSnapshot: false,
-          key: key,
-        ),
+      TencentCloudChatDownloadUtils.addDownloadMessageToQueue(
+        data: generateDownloadData(type: 0, conversationType: conversationType, key: key),
         isClick: isClick,
       );
     }
@@ -359,10 +371,18 @@ class _TencentCloudChatMessageSoundState extends TencentCloudChatMessageState<Te
 
   messageDataChange(TencentCloudChatMessageData data) {
     if (data.currentUpdatedFields == TencentCloudChatMessageDataKeys.downloadMessage) {
-      if (data.currentDownloadMessage?.msgID == (widget.data.message.msgID ?? "")) {
-        console("downloading, finished:${data.currentDownloadMessage?.downloadFinish}");
+      String key = TencentCloudChatUtils.checkString(widget.data.message.userID) ?? widget.data.message.groupID ?? "";
+      int conversationType = TencentCloudChatUtils.checkString(widget.data.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
+      if (key.isEmpty) {
+        console("add to download queue error. key is empty.");
+        return false;
+      }
+
+      int idx = data.currentDownloadMessage.indexWhere((ele) => ele.getUniqueueKey() == generateDownloadData(type: 0, conversationType: conversationType, key: key).getUniqueueKey());
+
+      if (idx > -1) {
         safeSetState(() {
-          currentdownload = data.currentDownloadMessage;
+          currentdownload = data.currentDownloadMessage[idx];
         });
       }
     } else if (data.currentUpdatedFields == TencentCloudChatMessageDataKeys.currentPlayAudioInfo) {
@@ -382,17 +402,41 @@ class _TencentCloudChatMessageSoundState extends TencentCloudChatMessageState<Te
   }
 
   bool isDownloading() {
-    return TencentCloudChat.instance.dataInstance.messageData.isDownloading(msgID: (widget.data.message.msgID ?? ""));
+    if (TencentCloudChatUtils.checkString(widget.data.message.msgID) != null) {
+      String key = TencentCloudChatUtils.checkString(widget.data.message.userID) ?? widget.data.message.groupID ?? "";
+      int conversationType = TencentCloudChatUtils.checkString(widget.data.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
+      if (key.isEmpty) {
+        console("add to download queue error. key is empty.");
+        return false;
+      }
+      return TencentCloudChatDownloadUtils.isDownloading(data: generateDownloadData(type: 0, conversationType: conversationType, key: key));
+    }
+    return false;
   }
 
   bool isInDownloadQueue() {
-    return TencentCloudChat.instance.dataInstance.messageData.isInDownloadQueue(msgID: (widget.data.message.msgID ?? ""));
+    if (TencentCloudChatUtils.checkString(widget.data.message.msgID) != null) {
+      String key = TencentCloudChatUtils.checkString(widget.data.message.userID) ?? widget.data.message.groupID ?? "";
+      int conversationType = TencentCloudChatUtils.checkString(widget.data.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
+      if (key.isEmpty) {
+        console("add to download queue error. key is empty.");
+        return false;
+      }
+      return TencentCloudChatDownloadUtils.isInDownloadQueue(data: generateDownloadData(type: 0, conversationType: conversationType, key: key));
+    }
+    return false;
   }
 
   removeFromDownloadQueue() {
     bool inQueue = isInDownloadQueue();
-    if (inQueue == true) {
-      TencentCloudChat.instance.dataInstance.messageData.removeFromDownloadQueue(msgID: (widget.data.message.msgID ?? ""));
+    if (inQueue == true && TencentCloudChatUtils.checkString(widget.data.message.msgID) != null) {
+      String key = TencentCloudChatUtils.checkString(widget.data.message.userID) ?? widget.data.message.groupID ?? "";
+      int conversationType = TencentCloudChatUtils.checkString(widget.data.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
+      if (key.isEmpty) {
+        console("add to download queue error. key is empty.");
+        return false;
+      }
+      TencentCloudChatDownloadUtils.removeFromDownloadQueue(data: generateDownloadData(type: 0, conversationType: conversationType, key: key));
       safeSetState(() {
         renderRandom = Random().nextInt(10000);
       });
@@ -526,6 +570,7 @@ class _TencentCloudChatMessageSoundState extends TencentCloudChatMessageState<Te
           ),
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -545,7 +590,8 @@ class _TencentCloudChatMessageSoundState extends TencentCloudChatMessageState<Te
                 if (sentFromSelf) messageStatusIndicator(),
                 messageTimeIndicator(),
               ],
-            )
+            ),
+            messageReactionList(),
           ],
         ),
       );
@@ -572,6 +618,7 @@ class _TencentCloudChatMessageSoundState extends TencentCloudChatMessageState<Te
           ),
         ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -591,7 +638,8 @@ class _TencentCloudChatMessageSoundState extends TencentCloudChatMessageState<Te
                 if (sentFromSelf) messageStatusIndicator(),
                 messageTimeIndicator(),
               ],
-            )
+            ),
+            messageReactionList(),
           ],
         ),
       );

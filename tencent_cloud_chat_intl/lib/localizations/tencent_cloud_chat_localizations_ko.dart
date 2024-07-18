@@ -1236,11 +1236,84 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   String get goToSettingsButtonText => '설정으로 이동';
 
   @override
-  String get originalMessageNotFound => 'Original message not found';
+  String get originalMessageNotFound => '기존 메시지 찾을 수 없음';
 
   @override
   String get markAsRead => '읽음으로 표시';
 
   @override
   String get reEdit => '다시 편집';
+
+  @override
+  String get translate => '번역';
+
+  @override
+  String memberRecalledMessage(Object member) {
+    return '$member가 메시지를 철회하였습니다';
+  }
+
+  @override
+  String get copyFileSuccess => '파일 복사 성공';
+
+  @override
+  String get saveFileSuccess => '파일 저장 성공';
+
+  @override
+  String get saveFileFailed => '파일 저장 실패';
+
+  @override
+  String get copyLinkSuccess => '링크 복사 성공';
+
+  @override
+  String get copyImageContextMenuBtnText => '이미지 복사';
+
+  @override
+  String get saveToLocalContextMenuBtnText => '다른 이름으로 저장';
+
+  @override
+  String get copyLinkContextMenuBtnText => '링크 복사';
+
+  @override
+  String get openLinkContextMenuBtnText => '새 창에서 열기';
+
+  @override
+  String get reactionList => 'Reaction List';
+
+  @override
+  String get translatedBy => 'Tencent RTC 에 의해 제공됨';
+
+  @override
+  String get convertToText => '변환';
+
+  @override
+  String numMessages(num count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count개의 메시지',
+      one: '1개의 메시지',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get filterBy => '필터';
+
+  @override
+  String get text => '텍스트';
+
+  @override
+  String get numMessagesOver99 => '99+ 개의 메시지';
+
+  @override
+  String get setGroupAnnouncement => '그룹 공지 설정';
+
+  @override
+  String get setNickName => '그룹 이름 설정';
+
+  @override
+  String get joinTime => '가입 시간';
+
+  @override
+  String get myRoleInGroup => '역할';
 }

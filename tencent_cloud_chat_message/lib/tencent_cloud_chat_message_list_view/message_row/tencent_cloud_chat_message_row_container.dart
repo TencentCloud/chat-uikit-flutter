@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
 import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
 import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
+import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
+import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_code_info.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
@@ -43,6 +45,9 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
 
   late V2TimMessage _message;
 
+  bool _needTranslate = false;
+  bool _needSoundToText = false;
+
   @override
   void initState() {
     super.initState();
@@ -75,7 +80,7 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
 
   // This method handles changes in message data.
   void _messageDataHandler(TencentCloudChatMessageData messageData) {
-    final msgID = _message.msgID ?? "";
+    final msgID = _message.msgID;
     final TencentCloudChatMessageDataKeys messageDataKeys = messageData.currentUpdatedFields;
 
     switch (messageDataKeys) {
@@ -87,6 +92,7 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
             _message = TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate!;
           });
         }
+        break;
       default:
         break;
     }
@@ -95,9 +101,21 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
   void dataProviderListener() {
     /// _isSelected
     final selectMessages = dataProvider.selectedMessages;
+    final translatedTextMessages = dataProvider.translatedMessages;
+    final soundToTextMessages = dataProvider.soundToTextMessages;
+
     final newSelected = selectMessages.any((element) =>
         (TencentCloudChatUtils.checkString(_message.msgID) != null && element.msgID == _message.msgID) ||
         (TencentCloudChatUtils.checkString(_message.id) != null && element.id == _message.id));
+
+    final needTranslated = translatedTextMessages.any((element) =>
+        (TencentCloudChatUtils.checkString(_message.msgID) != null && element.msgID == _message.msgID) ||
+        (TencentCloudChatUtils.checkString(_message.id) != null && element.id == _message.id));
+
+    final needSoundToText = soundToTextMessages.any((element) =>
+        (TencentCloudChatUtils.checkString(_message.msgID) != null && element.msgID == _message.msgID) ||
+        (TencentCloudChatUtils.checkString(_message.id) != null && element.id == _message.id));
+
     if (newSelected != _isSelected) {
       safeSetState(() {
         _isSelected = newSelected;
@@ -111,11 +129,106 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
         _inSelectMode = inSelectMode;
       });
     }
+
+    if (needTranslated && dataProvider.textTranslatePluginInstance != null) {
+      safeSetState(() {
+        _needTranslate = needTranslated;
+      });
+    }
+
+    if (needSoundToText && dataProvider.soundToTextPluginInstance != null) {
+      safeSetState(() {
+        _needSoundToText = needSoundToText;
+      });
+    }
+  }
+
+  Widget? _getTextTranslatedMessageWidget(TencentCloudChatThemeColors colorTheme, TencentCloudChatTextStyle textStyle) {
+    if (_needTranslate) {
+      final plugin = dataProvider.textTranslatePluginInstance as dynamic;
+      final text = _message.textElem?.text;
+      if (text != null) {
+        final sentFromSelf = _message.isSelf ?? false;
+        final padding = EdgeInsets.symmetric(horizontal: getWidth(10), vertical: getHeight(8));
+        final decoration = BoxDecoration(
+            color: (sentFromSelf ? colorTheme.selfMessageBubbleColor : colorTheme.othersMessageBubbleColor),
+            border: Border.all(
+              color: sentFromSelf ? colorTheme.selfMessageBubbleBorderColor : colorTheme.othersMessageBubbleBorderColor,
+            ),
+            borderRadius: const BorderRadius.all(Radius.circular(5)));
+        final translateTextStyle = TextStyle(
+            color: sentFromSelf ? colorTheme.selfMessageTextColor : colorTheme.othersMessageTextColor,
+            fontSize: textStyle.messageBody);
+        final translateBoxStyle = {
+          "boxDecoration": decoration,
+          "boxPadding": padding,
+          "translateTextStyle": translateTextStyle,
+        };
+        plugin.callMethodSync(methodName: "setTranslateBoxStyle", methodValue: translateBoxStyle);
+        final targetLanguage = TencentCloudChatIntl().getCurrentLocale(context).languageCode;
+        final widget = plugin.getWidgetSync(methodName: "getWidget", data: {
+          "text": text,
+          "targetLanguage": targetLanguage,
+        });
+        return widget;
+      }
+    }
+    return null;
+  }
+
+  Widget? _getSoundToTextWidget(TencentCloudChatThemeColors colorTheme, TencentCloudChatTextStyle textStyle) {
+    if (_needSoundToText) {
+      final plugin = dataProvider.soundToTextPluginInstance as dynamic;
+      final msgID = _message.msgID;
+      if (msgID != null) {
+        final sentFromSelf = _message.isSelf ?? false;
+        final padding = EdgeInsets.symmetric(horizontal: getWidth(10), vertical: getHeight(8));
+        final decoration = BoxDecoration(
+            color: (sentFromSelf ? colorTheme.selfMessageBubbleColor : colorTheme.othersMessageBubbleColor),
+            border: Border.all(
+              color: sentFromSelf ? colorTheme.selfMessageBubbleBorderColor : colorTheme.othersMessageBubbleBorderColor,
+            ),
+            borderRadius: const BorderRadius.all(Radius.circular(5)));
+        final translateTextStyle = TextStyle(
+            color: sentFromSelf ? colorTheme.selfMessageTextColor : colorTheme.othersMessageTextColor,
+            fontSize: textStyle.messageBody);
+        final translateBoxStyle = {
+          "boxDecoration": decoration,
+          "boxPadding": padding,
+          "translateTextStyle": translateTextStyle,
+        };
+        plugin.callMethodSync(methodName: "setTranslateBoxStyle", methodValue: translateBoxStyle);
+        final widget = plugin.getWidgetSync(methodName: "getWidget", data: {
+          "msgID": msgID,
+          "language": ""
+        });
+        return widget;
+      }
+    }
+    return null;
+  }
+
+  bool _checkTranslateEnable() {
+    if (dataProvider.textTranslatePluginInstance != null) {
+      final plugin = dataProvider.textTranslatePluginInstance as dynamic;
+      final topicID = dataProvider.topicID;
+      final groupID = dataProvider.groupID;
+      final userID = _message.sender;
+      final text = _message.textElem?.text;
+      final methodValue = {
+        "groupID": groupID,
+        "topicID": topicID,
+        "userID": userID,
+        "message": text,
+      };
+      final result = plugin.callMethodSync(methodName: "checkTranslateEnable", methodValue: methodValue);
+      return result["enable"] ?? false;
+    }
+    return false;
   }
 
   @override
   Widget defaultBuilder(BuildContext context) {
-
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => TencentCloudChatMessageItemContainer(
         message: _message,
@@ -220,6 +333,8 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
                     },
                     loadToSpecificMessage: dataProvider.loadToSpecificMessage),
                 widgets: MessageRowBuilderWidgets(
+                  messageTextTransalteItem: _getTextTranslatedMessageWidget(colorTheme, textStyle),
+                  messageSoundToTextItem: _getSoundToTextWidget(colorTheme, textStyle),
                   messageRowAvatar: dataProvider.messageBuilders?.getMessageRowMessageSenderAvatarBuilder(
                           data: MessageRowMessageSenderAvatarBuilderData(
                             message: _message,
@@ -249,6 +364,9 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
                   messageReplyItem: repliedMessageItem,
                   messageRowTips: (recalledMessage || tipsItem)
                       ? dataProvider.messageBuilders?.getMessageItemBuilder(
+                            key: ((TencentCloudChatUtils.checkString(_message.msgID) ?? _message.id) != null)
+                                ? Key((TencentCloudChatUtils.checkString(_message.msgID) ?? _message.id)!)
+                                : null,
                             data: MessageItemBuilderData(
                               message: _message,
                               userID: dataProvider.userID,
@@ -285,6 +403,7 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
                               altText: text ?? "[${tL10n.message}]",
                               hasStickerPlugin: dataProvider.hasStickerPlugin,
                               stickerPluginInstance: dataProvider.stickerPluginInstance,
+                              messageReactionPluginInstance: dataProvider.messageReactionPluginInstance,
                             ),
                             methods: MessageItemBuilderMethods(
                               clearHighlightFunc: clearHighlightFunc,
@@ -325,15 +444,19 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
                           Container()
                       : null,
                   messageRowMessageItem: TencentCloudChatMessageItemWithMenuContainer(
-                    useMessageReaction: true,
+                    isTextTranslatePluginEnabled: _checkTranslateEnable(),
+                    useMessageReaction: dataProvider.messageReactionPluginInstance != null,
+                    isSoundToTextPluginEnabled: dataProvider.soundToTextPluginInstance != null,
                     message: _message,
                     isMergeMessage: widget.inMergerMessagePreviewMode,
-                    getMessageItemWidget: ({required bool renderOnMenuPreview}) {
+                    getMessageItemWidget: ({required bool renderOnMenuPreview, Key? key}) {
                       return dataProvider.messageBuilders?.getMessageItemBuilder(
+                            key: key,
                             data: MessageItemBuilderData(
                               message: _message,
                               userID: dataProvider.userID,
                               topicID: dataProvider.topicID,
+                              messageReactionPluginInstance: dataProvider.messageReactionPluginInstance,
                               repliedMessageItem: repliedMessageItem,
                               groupID: dataProvider.groupID,
                               renderOnMenuPreview: renderOnMenuPreview,

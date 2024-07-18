@@ -22,7 +22,6 @@ class TencentCloudChatGroupProfileNotificationState
   @override
   initState() {
     super.initState();
-
     notification = widget.groupInfo.notification ?? "";
   }
 
@@ -43,10 +42,11 @@ class TencentCloudChatGroupProfileNotificationState
   }
 
   _onSetGroupNotification(String value) async {
-    final res = await TencentCloudChat.instance.chatSDKInstance.groupSDK.setGroupInfo(
-        groupID: widget.groupInfo.groupID,
-        groupType: widget.groupInfo.groupType,
-        notification: value);
+    final res = await TencentCloudChat.instance.chatSDKInstance.groupSDK
+        .setGroupInfo(
+            groupID: widget.groupInfo.groupID,
+            groupType: widget.groupInfo.groupType,
+            notification: value);
     if (res.code == 0) {
       safeSetState(() {
         notification = value;
@@ -61,7 +61,7 @@ class TencentCloudChatGroupProfileNotificationState
         context: context,
         builder: (context) {
           return CupertinoAlertDialog(
-            title: Text(tL10n.setGroupName),
+            title: Text(tL10n.setGroupAnnouncement),
             content: CupertinoTextField(
               maxLines: null,
               onChanged: (value) {
@@ -85,6 +85,64 @@ class TencentCloudChatGroupProfileNotificationState
             ],
           );
         });
+  }
+
+  @override
+  Widget? desktopBuilder(BuildContext context) {
+    return TencentCloudChatThemeWidget(
+        build: (context, colorTheme, textStyle) => Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: getWidth(16), vertical: getHeight(12)),
+                    child: Text(
+                      notification,
+                      style: TextStyle(
+                          color: colorTheme.groupProfileTextColor,
+                          fontSize: textStyle.fontsize_14),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        GestureDetector(
+                          onTap: () => Navigator.of(context).pop(),
+                          child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: getHeight(16),
+                                  horizontal: getWidth(16)),
+                              child: Text(
+                                tL10n.cancel,
+                                style: TextStyle(
+                                    color: colorTheme
+                                        .groupProfileAddMemberTextColor,
+                                    fontSize: textStyle.fontsize_14),
+                              )),
+                        ),
+                        canEditNotification()
+                            ? GestureDetector(
+                                onTap: onEditNotification,
+                                child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: getHeight(16),
+                                        horizontal: getWidth(16)),
+                                    child: Text(
+                                      tL10n.edit,
+                                      style: TextStyle(
+                                          color: colorTheme
+                                              .groupProfileAddMemberTextColor,
+                                          fontSize: textStyle.fontsize_14),
+                                    )),
+                              )
+                            : Container()
+                      ],
+                    ),
+                  )
+                ]));
   }
 
   @override

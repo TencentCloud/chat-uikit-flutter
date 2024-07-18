@@ -1,0 +1,4 @@
+enum TencentCloudChatSearchMode{
+  global,
+  inChat,
+}

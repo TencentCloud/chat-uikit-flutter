@@ -1,6 +1,18 @@
 {
+  "ar": [
+    "reactionList"
+  ],
+
+  "ja": [
+    "reactionList"
+  ],
+
   "ko": [
-    "originalMessageNotFound"
+    "reactionList"
+  ],
+
+  "zh": [
+    "reactionList"
   ],
 
   "zh_Hans": [
@@ -368,6 +380,31 @@
     "goToSettingsButtonText",
     "originalMessageNotFound",
     "markAsRead",
-    "reEdit"
+    "reEdit",
+    "translate",
+    "memberRecalledMessage",
+    "copyFileSuccess",
+    "saveFileSuccess",
+    "saveFileFailed",
+    "copyLinkSuccess",
+    "copyImageContextMenuBtnText",
+    "saveToLocalContextMenuBtnText",
+    "copyLinkContextMenuBtnText",
+    "openLinkContextMenuBtnText",
+    "reactionList",
+    "translatedBy",
+    "convertToText",
+    "numMessages",
+    "filterBy",
+    "text",
+    "numMessagesOver99",
+    "setGroupAnnouncement",
+    "setNickName",
+    "joinTime",
+    "myRoleInGroup"
+  ],
+
+  "zh_Hant": [
+    "reactionList"
   ]
 }

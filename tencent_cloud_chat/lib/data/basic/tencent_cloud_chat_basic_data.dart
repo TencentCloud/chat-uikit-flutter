@@ -183,7 +183,6 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> with Widget
     _usedComponents.add(component.componentEnum);
     _componentsMap[component.componentEnum] = component.widgetBuilder;
     _usedComponents.toSet().toList();
-    notifyListener(TencentCloudChatBasicDataKeys.addUsedComponent as T);
   }
 
   @override
