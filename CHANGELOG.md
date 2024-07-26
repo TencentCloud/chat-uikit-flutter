@@ -1,3 +1,9 @@
+# 2.7.0
+
+## Breaking Changes
+
+* Upgraded Low-Level Native Chat SDK to 8.0.
+
 # 2.6.0
 
 ## Breaking Changes
