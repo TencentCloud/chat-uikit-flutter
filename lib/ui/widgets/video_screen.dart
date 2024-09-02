@@ -162,7 +162,7 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
         isAsset: true,
       );
     }
-    if (widget.videoElement.videoPath != '' && widget.videoElement.videoPath != null) {
+    if (widget.videoElement.videoPath != '' && widget.videoElement.videoPath != null && File(widget.videoElement.videoPath!).existsSync()) {
       File f = File(widget.videoElement.videoPath!);
       if (f.existsSync()) {
         return await _saveNetworkVideo(

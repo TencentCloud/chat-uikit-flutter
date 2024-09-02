@@ -339,7 +339,6 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
 
     await plugin.getVideoThumbnail(
       srcFile: originFile.path,
-      keepAspectRatio: true,
       destFile: tempPath,
       format: 'jpeg',
       width: 128,
@@ -471,35 +470,6 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
         Permission.microphone.value,
         theme,
       );
-
-      if (PlatformUtils().isAndroid) {
-        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-        if ((androidInfo.version.sdkInt) >= 33) {
-          if (!await Permissions.checkPermission(
-            context,
-            Permission.photos.value,
-            theme,
-          )) {
-            return;
-          }
-        } else {
-          if (!await Permissions.checkPermission(
-            context,
-            Permission.storage.value,
-            theme,
-          )) {
-            return;
-          }
-        }
-      } else {
-        if (!await Permissions.checkPermission(
-          context,
-          Permission.photos.value,
-          theme,
-        )) {
-          return;
-        }
-      }
 
       final convID = widget.conversationID;
       final convType = widget.conversationType;

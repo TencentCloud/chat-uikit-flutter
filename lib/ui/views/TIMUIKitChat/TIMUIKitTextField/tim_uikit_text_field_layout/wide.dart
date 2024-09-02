@@ -619,7 +619,6 @@ class _TIMUIKitTextFieldLayoutWideState extends TIMUIKitState<TIMUIKitTextFieldL
 
       await plugin.getVideoThumbnail(
         srcFile: originFile.path,
-        keepAspectRatio: true,
         destFile: tempPath,
         format: 'jpeg',
         width: 128,
@@ -679,7 +678,6 @@ class _TIMUIKitTextFieldLayoutWideState extends TIMUIKitState<TIMUIKitTextFieldL
             String tempPath = (await getTemporaryDirectory()).path + p.basename(savePath) + ".jpeg";
             await plugin.getVideoThumbnail(
               srcFile: savePath,
-              keepAspectRatio: true,
               destFile: tempPath,
               format: 'jpeg',
               width: 128,

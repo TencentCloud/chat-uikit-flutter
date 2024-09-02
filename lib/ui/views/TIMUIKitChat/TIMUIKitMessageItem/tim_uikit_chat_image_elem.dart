@@ -173,7 +173,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
       if (model.getMessageProgress(widget.message.msgID) == 100) {
         String savePath;
         if (widget.message.imageElem!.path != null &&
-            widget.message.imageElem!.path != '') {
+            widget.message.imageElem!.path != '' && File(widget.message.imageElem!.path!).existsSync()) {
           savePath = widget.message.imageElem!.path!;
         } else {
           savePath = model.getFileMessageLocation(widget.message.msgID);
