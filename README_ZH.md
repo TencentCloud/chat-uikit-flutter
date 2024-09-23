@@ -4,20 +4,10 @@
 
 TUIKit 是基于 Chat SDK 实现的一套 UI 组件，其包含会话、聊天、搜索、关系链、群组、音视频通话等功能，基于 UI 组件您可以像搭积木一样快速搭建起自己的业务逻辑。
 
-## 建议阅读文档目录
+TUIKit 效果图如下所示：
+![img](https://qcloudimg.tencent-cloud.cn/raw/f140dd76be01a65abfb7e6ba2bf50ed5.png)
 
-快速使用本TUIKit组件库建议阅读：
-
-- [TUIKit 组件库](https://trtc.io/zh/document/50059?platform=flutter&product=chat)
-- [集成 TUIKit](https://trtc.io/zh/document/58585?platform=flutter&product=chat&menulabel=uikit)
-
-集成更多高级功能建议阅读：
-
-- [本地搜索](https://trtc.io/zh/document/50036?platform=flutter&product=chat&menulabel=uikit)
-- [离线推送](https://trtc.io/zh/document/50032?platform=flutter&product=chat&menulabel=uikit)
-
-## Widget
-
+TUIKit 主要 Widget 如下：
 - TIMUIKitConversation 会话组件
 - TIMUIKitChat 聊天组件
 - TIMUIKitCore Core 组件
@@ -29,9 +19,9 @@ TUIKit 是基于 Chat SDK 实现的一套 UI 组件，其包含会话、聊天�
 - TIMUIKitNewContact 新的联系人
 - TIMUIKitSearch 搜索
 
-### 截图
-
-![img](https://qcloudimg.tencent-cloud.cn/raw/f140dd76be01a65abfb7e6ba2bf50ed5.png)
+快速使用 TUIKit 组件库建议阅读：
+- [TUIKit 组件库](https://trtc.io/zh/document/50059?platform=flutter&product=chat)
+- [集成 TUIKit](https://trtc.io/zh/document/58585?platform=flutter&product=chat&menulabel=uikit)
 
 ## 国际化
 
@@ -495,3 +485,9 @@ class _ChatV2State extends State<ChatV2> {
 - `TIMUIKitInputTextField`实现发送消息
 
 基础组件可根据业务需要自行更换以及组合。如若需要控制业务层数据,可通过`TIMUIKitChatController`提供的方法。
+
+## 更多阅读
+集成更多高级功能建议阅读：
+
+- [本地搜索](https://trtc.io/zh/document/50036?platform=flutter&product=chat&menulabel=uikit)
+- [离线推送](https://trtc.io/zh/document/50032?platform=flutter&product=chat&menulabel=uikit)
