@@ -2,20 +2,19 @@
 
 # Flutter TUIKit
 
-TUIKit 是基于 IM SDK 实现的一套 UI 组件，其包含会话、聊天、搜索、关系链、群组、音视频通话等功能，基于 UI 组件您可以像搭积木一样快速搭建起自己的业务逻辑。
+TUIKit 是基于 Chat SDK 实现的一套 UI 组件，其包含会话、聊天、搜索、关系链、群组、音视频通话等功能，基于 UI 组件您可以像搭积木一样快速搭建起自己的业务逻辑。
 
 ## 建议阅读文档目录
 
-**快速使用本TUIKit组件库建议阅读：**
+快速使用本TUIKit组件库建议阅读：
 
-- **[图文介绍各组件总览](https://cloud.tencent.com/document/product/269/70747)**
-- **[快速集成本TUIKit至您的Flutter项目](https://cloud.tencent.com/document/product/269/70746)**
+- [TUIKit 组件库](https://trtc.io/zh/document/50059?platform=flutter&product=chat)
+- [集成 TUIKit](https://trtc.io/zh/document/58585?platform=flutter&product=chat&menulabel=uikit)
 
 集成更多高级功能建议阅读：
 
-- [集成本地搜索](https://cloud.tencent.com/document/product/269/79121)
-- [集成离线推送](https://cloud.tencent.com/document/product/269/74605)
-- [集成音视频通话](https://cloud.tencent.com/document/product/269/72485)
+- [本地搜索](https://trtc.io/zh/document/50036?platform=flutter&product=chat&menulabel=uikit)
+- [离线推送](https://trtc.io/zh/document/50032?platform=flutter&product=chat&menulabel=uikit)
 
 ## Widget
 
@@ -38,7 +37,7 @@ TUIKit 是基于 IM SDK 实现的一套 UI 组件，其包含会话、聊天、�
 
 我们默认提供 `简体中文` `繁体中文` `英语` 的语言支持；并允许开发者新增语言包，扩展多语言支持。
 
-如果您需要使用国际化多语言能力，请参考 [腾讯云 IM Flutter TUIKit 国际化指南](https://docs.qq.com/doc/DSVN4aHVpZm1CSEhv?u=c927b5c7e9874f77b40b7549f3fffa57)。
+如果您需要使用国际化多语言能力，请参考 [Flutter TUIKit 国际化指南](https://docs.qq.com/doc/DSVN4aHVpZm1CSEhv?u=c927b5c7e9874f77b40b7549f3fffa57)。
 
 ## TIMUIKitCore
 
@@ -47,11 +46,11 @@ TUIKit 是基于 IM SDK 实现的一套 UI 组件，其包含会话、聊天、�
 `TIMUIKitCore`提供两个静态方法`getInstance` 和 `getSDKInstance`。
 
 - `getInstance`: 返回 `CoreServicesImpl` 实例。
-- `getSDKInstance`: 返回 IM SDK 实例。
+- `getSDKInstance`: 返回 SDK 实例。
 
 `CoreServicesImpl` 为`TIMUIKit` 核心类，包含初始化、登录、登出、获取用户信息等方法。
 
-基础用法如下，先初始化IM，再登录用户：
+基础用法如下，先初始化 SDK，再登录用户：
 
 ```dart
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
@@ -82,13 +81,11 @@ _coreInstance.login(
 
 通过`TIMCallbackType`确定类型。
 
-> 这部分的处理逻辑[可参考我们的 DEMO](https://github.com/TencentCloud/tc-chat-demo-flutter/lib/src/pages/app.dart)，并根据您的需要，自行修改。
-
 #### SDK API 错误（`TIMCallbackType.API_ERROR`）
 
 该场景下，提供 SDK API 原生`errorMsg`及`errorCode`。
 
-[错误码请参考该文档](https://cloud.tencent.com/document/product/269/1671)
+[错误码请参考该文档](https://trtc.io/zh/document/34348?platform=flutter&product=chat&menulabel=uikit)
 
 #### Flutter 报错（`TIMCallbackType.FLUTTER_ERROR`）
 
@@ -282,7 +279,7 @@ _coreInstance.login(
 `TIMUIKitSearch` 为全局搜索组件。全局搜索支持"联系人"/"群组"/"聊天记录"。
 `TIMUIKitSearchMsgDetail` 为会话内搜索组件，可搜索会话内聊天记录。
 
-[详细用法可参考此文档](https://cloud.tencent.com/document/product/269/79121)
+[详细用法可参考此文档](https://trtc.io/zh/document/50036?platform=flutter&product=chat&menulabel=uikit)
 
 ```dart
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
@@ -498,9 +495,3 @@ class _ChatV2State extends State<ChatV2> {
 - `TIMUIKitInputTextField`实现发送消息
 
 基础组件可根据业务需要自行更换以及组合。如若需要控制业务层数据,可通过`TIMUIKitChatController`提供的方法。
-
-
-## 联系我们[](id:contact)
-如果您在接入使用过程中有任何疑问，请加入 QQ 群：788910197 咨询。
-
-![](https://qcloudimg.tencent-cloud.cn/raw/eacb194c77a76b5361b2ae983ae63260.png)
