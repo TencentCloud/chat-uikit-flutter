@@ -210,9 +210,6 @@ class GroupProfileButtonArea extends TIMUIKitStatelessWidget {
             actions: [
               CupertinoActionSheetAction(
                 onPressed: () async {
-                  Navigator.pop(
-                    context,
-                  );
                   final res = await sdkInstance.dismissGroup(groupID: groupID);
                   if (res.code == 0) {
                     await sdkInstance

@@ -747,6 +747,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
     List<V2TimMessage> currentHistoryMsgList = _messageListMap[convID] ?? [];
     if (messageInfo != null) {
       final messageInfoWithSender = messageInfo.sender == null ? tools.setUserInfoForMessage(messageInfo, messageInfo.id!) : messageInfo;
+      messageInfoWithSender.status = MessageStatus.V2TIM_MSG_STATUS_SENDING;
       currentHistoryMsgList = [messageInfoWithSender, ...currentHistoryMsgList];
       setMessageList(convID, currentHistoryMsgList);
       if (loadingMessage[convID] != null && loadingMessage[convID]!.isNotEmpty) {
@@ -799,7 +800,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
 
     if (messageInfo != null) {
       final messageInfoWithSender = messageInfo.sender == null ? tools.setUserInfoForMessage(messageInfo, messageInfo.id ?? textMessageInfo.id ?? "") : messageInfo;
-
+      messageInfoWithSender.status = MessageStatus.V2TIM_MSG_STATUS_SENDING;
       final hasNickName = messageBeenReplied.nickName != null && messageBeenReplied.nickName != "";
       final cloudCustomData = {
         "messageReply": {

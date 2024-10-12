@@ -232,7 +232,7 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
                 : VideoPlayerController.networkUrl(
                     Uri.parse(widget.videoElement.localVideoUrl!),
                   ))
-        : (TencentUtils.checkString(widget.videoElement.videoPath) != null || widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING)
+        : ((TencentUtils.checkString(widget.videoElement.videoPath) != null || widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING) && File(widget.videoElement.videoPath!).existsSync())
             ? VideoPlayerController.file(File(widget.videoElement.videoPath!))
             : (TencentUtils.checkString(widget.videoElement.localVideoUrl) == null)
                 ? VideoPlayerController.networkUrl(

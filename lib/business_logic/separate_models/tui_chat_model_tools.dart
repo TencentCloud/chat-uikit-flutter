@@ -102,7 +102,6 @@ class TUIChatModelTools {
     messageInfo.timestamp =
         (DateTime.now().millisecondsSinceEpoch / 1000).ceil();
     messageInfo.isSelf = true;
-    messageInfo.status = MessageStatus.V2TIM_MSG_STATUS_SENDING;
     messageInfo.id = id;
 
     return messageInfo;

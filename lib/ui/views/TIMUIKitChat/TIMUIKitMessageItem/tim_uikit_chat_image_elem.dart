@@ -64,7 +64,6 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
   final TUIChatGlobalModel model = serviceLocator<TUIChatGlobalModel>();
   final MessageService _messageService = serviceLocator<MessageService>();
   Widget? imageItem;
-  bool isSent = false;
 
   @override
   didUpdateWidget(oldWidget) {
@@ -592,13 +591,6 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     initImages();
   }
 
-  bool isNeedShowLocalPath() {
-    final current = (DateTime.now().millisecondsSinceEpoch / 1000).ceil();
-    final timeStamp = widget.message.timestamp ?? current;
-    return (widget.message.isSelf ?? true) &&
-        (isSent || current - timeStamp < 300);
-  }
-
   Widget? _renderImage(dynamic heroTag, TUITheme theme,
       {V2TimImage? originalImg, V2TimImage? smallImg}) {
 
@@ -623,7 +615,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     }
 
     try {
-      if ((isNeedShowLocalPath() &&
+      if ((widget.message.isSelf! &&
           widget.message.imageElem!.path != null &&
           widget.message.imageElem!.path!.isNotEmpty &&
           File(widget.message.imageElem!.path!).existsSync())) {
@@ -680,9 +672,6 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final theme = value.theme;
-    if (widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING) {
-      isSent = true;
-    }
     final isDesktopScreen =
         TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     final heroTag =

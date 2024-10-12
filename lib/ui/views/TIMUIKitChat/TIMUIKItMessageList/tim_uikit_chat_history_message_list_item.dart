@@ -207,9 +207,6 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
   /// Control avatar hide or show
   final bool showAvatar;
 
-  /// message sending status
-  final bool showMessageSending;
-
   /// message is read status
   final bool showMessageReadRecipt;
 
@@ -283,7 +280,6 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
       this.messageItemBuilder,
       this.onLongPressForOthersHeadPortrait,
       this.showAvatar = true,
-      this.showMessageSending = true,
       this.showMessageReadRecipt = true,
       this.allowLongPress = true,
       this.toolTipsConfig,
@@ -343,8 +339,9 @@ class TipsActionItem extends TIMUIKitStatelessWidget {
   }
 }
 
-class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistoryMessageListItem> with TickerProviderStateMixin {
+class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistoryMessageListItem> with SingleTickerProviderStateMixin {
   SuperTooltip? tooltip;
+  late AnimationController _animationController;
 
   // ignore: unused_field
   final MessageService _messageService = serviceLocator<MessageService>();
@@ -355,6 +352,12 @@ class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistory
   final GlobalKey _key = GlobalKey();
   bool isShowWideToolTip = false;
   TapDownDetails? _tapDetails;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(duration: const Duration(seconds: 1), vsync: this)..repeat();
+  }
 
   closeTooltip() {
     tooltip?.close();
@@ -877,6 +880,7 @@ class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistory
 
   @override
   void dispose() {
+    _animationController.dispose();
     super.dispose();
     if (tooltip?.isOpen ?? false) {
       tooltip?.close();
@@ -1052,11 +1056,28 @@ class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistory
                 },
                 child: Icon(Icons.error, color: theme.cautionColor, size: 18),
               )),
+        if (isSelf && message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING && model.hasSendingMessageID(message.id ?? message.msgID!))
+          FutureBuilder(
+            future: Future.delayed(const Duration(seconds: 1)),
+            builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+              if (snapshot.connectionState == ConnectionState.done && model.hasSendingMessageID(message.id ?? message.msgID!)) {
+                return Container(
+                  padding: const EdgeInsets.only(bottom: 3),
+                  margin: const EdgeInsets.only(right: 6),
+                  child: RotationTransition(
+                    turns: Tween(begin: 0.0, end: 1.0).animate(_animationController),
+                    child: Icon(Icons.rotate_right, color: theme.cautionColor, size: 18),
+                  ),
+                );
+              } else {
+                return Container();
+              }
+            },
+          ),
         if (model.chatConfig.isShowReadingStatus &&
             widget.showMessageReadRecipt &&
             model.conversationType == ConvType.c2c &&
-            isSelf &&
-            (message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC || message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING))
+            isSelf && message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC)
           Container(
             padding: const EdgeInsets.only(bottom: 3),
             margin: const EdgeInsets.only(right: 6),
@@ -1068,8 +1089,7 @@ class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistory
         if (model.chatConfig.isShowGroupReadingStatus &&
             model.chatConfig.isShowGroupMessageReadReceipt &&
             model.conversationType == ConvType.group &&
-            isSelf &&
-            (message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC || message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING))
+            isSelf && message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC)
           TIMUIKitMessageReadReceipt(
             messageItem: widget.message,
             onTapAvatar: widget.onTapForOthersPortrait,

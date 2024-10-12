@@ -265,7 +265,7 @@ class MessageServiceImpl extends MessageService {
 
   @override
   Future<V2TimValueCallback<V2TimMessage>> reSendMessage(
-      {required String msgID, // 自己创建的ID
+      {required String msgID,
       bool? onlineUserOnly}) async {
     final res = await TencentImSDKPlugin.v2TIMManager
         .getMessageManager()

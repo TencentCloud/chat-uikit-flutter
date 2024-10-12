@@ -622,9 +622,9 @@ class TIMUIKitMessageTooltipState
                             alignment:
                                 TUIKitScreenUtils.getFormFactor(context) ==
                                         DeviceType.Mobile
-                                    ? WrapAlignment.spaceBetween
+                                    ? WrapAlignment.start
                                     : WrapAlignment.start,
-                            spacing: 4,
+                            spacing: 12,
                             runSpacing: 8,
                             children: [
                               ..._buildLongPressTipItem(theme, model, message),

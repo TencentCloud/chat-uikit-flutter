@@ -1,3 +1,14 @@
+# 2.7.2
+* Fix the issue where failed messages cannot be resent.
+* Fix the issue where image messages that failed to send are not loaded using the local path.
+* Fix the issue where the screen turns white after dissolving or leaving a group.
+* Optimize the process of sending messages.
+* Optimize the alignment of buttons in the long-press message menu.
+* Limit the version range of the third-party library extended_image.
+
+# 2.7.1
+* Fixed the 'keepAspectRatio' parameter error.
+
 # 2.7.0
 
 ## Breaking Changes
