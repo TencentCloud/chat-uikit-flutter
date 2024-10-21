@@ -33,6 +33,9 @@ class GroupProfileType extends TIMUIKitStatelessWidget {
       case GroupType.Work:
         groupType = TIM_t("工作群");
         break;
+      case GroupType.Community:
+        groupType = TIM_t("社群");
+        break;
       default:
         groupType = TIM_t("未知群");
         break;
@@ -42,22 +45,26 @@ class GroupProfileType extends TIMUIKitStatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
           color: Colors.white,
-          border: isDesktopScreen ? null : Border(
-              bottom: BorderSide(
-                  color:
-                      theme.weakDividerColor ?? CommonColor.weakDividerColor))),
+          border: isDesktopScreen
+              ? null
+              : Border(
+                  bottom: BorderSide(
+                      color: theme.weakDividerColor ??
+                          CommonColor.weakDividerColor))),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             TIM_t("群类型"),
             style: TextStyle(
-                fontSize: isDesktopScreen ? 14 : 16, color: theme.darkTextColor),
+                fontSize: isDesktopScreen ? 14 : 16,
+                color: theme.darkTextColor),
           ),
           Text(
             groupType,
             style: TextStyle(
-                fontSize: isDesktopScreen ? 14 : 16, color: theme.weakTextColor),
+                fontSize: isDesktopScreen ? 14 : 16,
+                color: theme.weakTextColor),
           )
         ],
       ),

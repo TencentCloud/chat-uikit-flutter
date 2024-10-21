@@ -13,7 +13,11 @@ class GroupMessageDisturb extends TIMUIKitStatelessWidget {
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final model = Provider.of<TUIGroupProfileModel>(context);
+    final isShowDisturb = model.groupInfo?.groupType == "Meeting" ? false : true;
     final isDisturb = model.conversation?.recvOpt != 0;
+    if (!isShowDisturb) {
+      return Container();
+    }
     return TIMUIKitOperationItem(
       isEmpty: false,
       operationName: TIM_t("消息免打扰"),

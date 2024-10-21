@@ -529,7 +529,10 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     }
 
     final int selfRole = widget.model.selfMemberInfo?.role ?? 0;
-    final bool canAtAll = (selfRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN || selfRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER);
+    final bool canAtAll = widget.model.chatConfig.isMemberCanAtAll ? true : (selfRole == GroupMemberRoleType
+        .V2TIM_GROUP_MEMBER_ROLE_ADMIN || selfRole
+        ==
+        GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER);
 
     if (isDesktopScreen) {
       (int, String, bool)? changedCharacterRecord = findChangedCharacter(originalText, text);
@@ -860,7 +863,6 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                     backSpaceText: deleteStickerFromText,
                     addStickerToText: addStickerToText,
                     customStickerPanel: widget.customStickerPanel,
-                    forbiddenText: forbiddenText,
                     onChanged: widget.onChanged,
                     backgroundColor: widget.backgroundColor,
                     morePanelConfig: widget.morePanelConfig,
@@ -898,7 +900,6 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                     backSpaceText: deleteStickerFromText,
                     addStickerToText: addStickerToText,
                     customStickerPanel: widget.customStickerPanel,
-                    forbiddenText: forbiddenText,
                     onChanged: widget.onChanged,
                     backgroundColor: widget.backgroundColor,
                     morePanelConfig: widget.morePanelConfig,

@@ -1,3 +1,9 @@
+# 3.0.0
+## Breaking Changes
+* Migrated to Flutter 3.24.0
+## Bug Fixes
+* Fix and optimize some issues
+
 # 2.7.2
 * Fix the issue where failed messages cannot be resent.
 * Fix the issue where image messages that failed to send are not loaded using the local path.
@@ -79,7 +85,6 @@
 ## Bug Fixes
 
 * Fixed an issue on time tag creator.
-* Fixed an issue on Video Message LocalURL.
 
 # 2.3.2
 

@@ -60,6 +60,9 @@ class _TIMUIKitAddGroupState extends TIMUIKitState<TIMUIKitAddGroup> {
       case GroupType.Work:
         groupType = TIM_t("工作群");
         break;
+      case GroupType.Community:
+        groupType = TIM_t("社群");
+        break;
       default:
         groupType = TIM_t("未知群");
         break;
@@ -86,7 +89,6 @@ class _TIMUIKitAddGroupState extends TIMUIKitState<TIMUIKitAddGroup> {
           if (widget.closeFunc != null) {
             widget.closeFunc!();
           }
-          widget.onTapExistGroup(groupID, groupConversation);
           return;
         }
 
@@ -106,7 +108,7 @@ class _TIMUIKitAddGroupState extends TIMUIKitState<TIMUIKitAddGroup> {
             ),
           );
         }else{
-          Navigator.pushReplacement(
+          Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => SendJoinGroupApplication(

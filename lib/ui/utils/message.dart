@@ -37,6 +37,26 @@ class MessageUtils {
     return false;
   }
 
+  static String getCustomGroupCreatedOrDismissedString(V2TimMessage message) {
+    try {
+      final isGroup = message.groupID != null;
+      final isCustomMessage = message.elemType == MessageElemType.V2TIM_ELEM_TYPE_CUSTOM;
+      if (isCustomMessage && isGroup) {
+        final data = message.customElem?.data ?? "";
+        Map<String, dynamic> customMap = jsonDecode(data);
+        if (customMap.containsKey('businessID') && customMap['businessID'] == "group_create") {
+          final content = "${customMap['opUser']}${customMap['content']}";
+          return content;
+        }
+        return "";
+      }
+      return "";
+    } catch (e) {
+      outputLogger.i("getCustomGroupCreatedOrDismissedString json parse error");
+      return "";
+    }
+  }
+
   static Future<String> _getGroupChangeType(V2TimGroupChangeInfo info,
       List<V2TimGroupMemberFullInfo?> groupMemberList) async {
     int? type = info.type;
@@ -139,17 +159,26 @@ class MessageUtils {
         final String? option7 = opUserNickName ?? "";
         final groupChangeInfoList = groupTipsElem.groupChangeInfoList ?? [];
         String changedInfoString = "";
+        bool changedValue = false;
         for (V2TimGroupChangeInfo? element in groupChangeInfoList) {
           final newText = await _getGroupChangeType(element!, groupMemberList);
           changedInfoString +=
               (changedInfoString.isEmpty ? "" : " / ") + newText;
+          changedValue = element!.boolValue ?? false;
         }
         if (changedInfoString.isEmpty) {
           changedInfoString = TIM_t("群资料");
         }
-        displayMessage =
-            TIM_t_para("{{option7}}修改", "$option7修改")(option7: option7) +
-                changedInfoString;
+        if (changedInfoString == TIM_t("全员禁言状态")) {
+          changedInfoString = TIM_t("全员禁言");
+          displayMessage = changedValue == false ? TIM_t_para("{{option7}} 取消", "$option7 取消")(option7: option7) +
+              changedInfoString : TIM_t_para("{{option7}} 开启", "$option7 开启")(option7: option7) +
+              changedInfoString;
+        } else {
+          displayMessage =
+              TIM_t_para("{{option7}}修改", "$option7修改")(option7: option7) +
+                  changedInfoString;
+        }
         break;
       case GroupTipsElemType.V2TIM_GROUP_TIPS_TYPE_QUIT:
         final String? option6 = opUserNickName ?? "";

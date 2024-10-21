@@ -122,6 +122,8 @@ class TUIConversationViewModel extends ChangeNotifier {
       if (!PlatformUtils().isWeb) {
         loadInitConversation();
       }
+    }, onConversationDeleted:(List<String> conversationIDList) {
+      _onConversationDeleted(conversationIDList);
     });
   }
 
@@ -216,6 +218,17 @@ class TUIConversationViewModel extends ChangeNotifier {
       }
     }
 
+    notifyListeners();
+  }
+
+  _onConversationDeleted(List<String> list) {
+    for (int i = 0; i < list.length; i++) {
+      int index = _conversationList.indexWhere((item) => item!.conversationID == list[i]);
+      if (index > -1) {
+        _conversationList.removeAt(index);
+        _conversationList = removeDuplicates<V2TimConversation?>(_conversationList, (item1, item2) => item1?.conversationID == item2?.conversationID);
+      }
+    }
     notifyListeners();
   }
 

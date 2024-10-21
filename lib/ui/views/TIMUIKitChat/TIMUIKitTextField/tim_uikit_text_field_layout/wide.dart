@@ -139,8 +139,6 @@ class TIMUIKitTextFieldLayoutWide extends StatefulWidget {
   /// show send emoji icon
   final bool showSendEmoji;
 
-  final String? forbiddenText;
-
   final VoidCallback onSubmitted;
 
   final VoidCallback goDownBottom;
@@ -175,7 +173,6 @@ class TIMUIKitTextFieldLayoutWide extends StatefulWidget {
       required this.handleSendEditStatus,
       required this.handleAtText,
       this.repliedMessage,
-      this.forbiddenText,
       required this.onSubmitted,
       required this.goDownBottom,
       required this.showSendAudio,
@@ -928,7 +925,6 @@ class _TIMUIKitTextFieldLayoutWideState extends TIMUIKitState<TIMUIKitTextFieldL
             children: [
               _buildRepliedMessage(widget.repliedMessage),
               SizedBox(height: 1, child: Container(color: theme.weakDividerColor ?? Colors.black12)),
-              if (widget.forbiddenText == null)
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
                   child: Row(
@@ -941,23 +937,6 @@ class _TIMUIKitTextFieldLayoutWideState extends TIMUIKitState<TIMUIKitTextFieldL
                 constraints: const BoxConstraints(minHeight: 50),
                 child: Row(
                   children: [
-                    if (widget.forbiddenText != null)
-                      Expanded(
-                          child: Container(
-                        height: 35,
-                        color: widget.backgroundColor ?? theme.desktopChatMessageInputBgColor,
-                        alignment: Alignment.center,
-                        child: Text(
-                          TIM_t(widget.forbiddenText!),
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: theme.weakTextColor,
-                          ),
-                        ),
-                      )),
-                    if (widget.forbiddenText == null)
                       Expanded(
                         child: ExtendedTextField(
                             scrollController: _scrollController,

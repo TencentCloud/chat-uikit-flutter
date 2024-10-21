@@ -49,6 +49,9 @@ class TIMUIKitMessageReadReceipt extends TIMUIKitStatelessWidget {
                         readCount: value?.readCount ?? 0)
                 );
               }else{
+                if (value?.unreadCount == 0) {
+                  return;
+                }
                 Navigator.push(
                     context,
                     MaterialPageRoute(

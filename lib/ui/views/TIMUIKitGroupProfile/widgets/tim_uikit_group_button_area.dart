@@ -94,7 +94,7 @@ class GroupProfileButtonArea extends TIMUIKitStatelessWidget {
                   }
                 },
                 child: Text(
-                  TIM_t("清空聊天记录"),
+                  TIM_t("确定"),
                   style: TextStyle(color: theme.cautionColor),
                 ),
                 isDefaultAction: false,
@@ -157,6 +157,10 @@ class GroupProfileButtonArea extends TIMUIKitStatelessWidget {
                     if (deleteConvRes.code == 0) {
                       model.lifeCycle?.didLeaveGroup();
                     }
+                    onTIMCallback(TIMCallback(
+                        type: TIMCallbackType.INFO,
+                        infoRecommendText: "${TIM_t("您已退出")}${model.groupInfo?.groupName}",
+                        infoCode: 6661402));
                   }
                 },
                 child: Text(

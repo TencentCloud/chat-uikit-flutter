@@ -11,6 +11,7 @@ import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/conversation_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_conversation_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendship_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/listener_model/tui_group_listener_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
@@ -143,6 +144,7 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
   late TIMUIKitConversationController _timuiKitConversationController;
   final TUIThemeViewModel themeViewModel = serviceLocator<TUIThemeViewModel>();
   final TUIFriendShipViewModel friendShipViewModel = serviceLocator<TUIFriendShipViewModel>();
+  final TUIGroupListenerModel groupListenerModel = serviceLocator<TUIGroupListenerModel>();
   late AutoScrollController _autoScrollController;
 
   @override
@@ -289,12 +291,32 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
     final theme = value.theme;
     final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     return MultiProvider(
-        providers: [ChangeNotifierProvider.value(value: model), ChangeNotifierProvider.value(value: friendShipViewModel)],
+        providers: [
+          ChangeNotifierProvider.value(value: model),
+          ChangeNotifierProvider.value(value: friendShipViewModel),
+          ChangeNotifierProvider.value(value: groupListenerModel)],
         builder: (BuildContext context, Widget? w) {
           final _model = Provider.of<TUIConversationViewModel>(context);
           bool haveMoreData = _model.haveMoreData;
           final _friendShipViewModel = Provider.of<TUIFriendShipViewModel>(context);
           _model.lifeCycle = widget.lifeCycle;
+
+          final TUIGroupListenerModel groupListenerModel = Provider.of<TUIGroupListenerModel>(context, listen: true);
+          final NeedUpdate? needUpdate = groupListenerModel.needUpdate;
+          if (needUpdate != null) {
+            groupListenerModel.needUpdate = null;
+            if (needUpdate.updateType == UpdateType.groupDismissed) {
+              onTIMCallback(TIMCallback(
+                  type: TIMCallbackType.INFO,
+                  infoRecommendText: "${needUpdate!.extraData}${TIM_t("已解散")}",
+                  infoCode: 6661402));
+            } else if (needUpdate.updateType == UpdateType.kickedFromGroup) {
+              onTIMCallback(TIMCallback(
+                  type: TIMCallbackType.INFO,
+                  infoRecommendText: "${TIM_t("您已被踢出")}${needUpdate!.extraData}",
+                  infoCode: 6661402));
+            }
+          }
 
           List<V2TimConversation?> filteredConversationList = getFilteredConversation();
 
@@ -344,7 +366,8 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
                                 lastMessageBuilder: widget.lastMessageBuilder,
                                 faceUrl: conversationItem.faceUrl ?? "",
                                 nickName: conversationItem.showName ?? "",
-                                isDisturb: conversationItem.recvOpt != 0,
+                                isDisturb: (conversationItem.groupType == "Meeting" ? false : conversationItem
+                                    .recvOpt != 0),
                                 lastMsg: conversationItem.lastMessage,
                                 isPined: isPined,
                                 groupAtInfoList: conversationItem.groupAtInfoList ?? [],

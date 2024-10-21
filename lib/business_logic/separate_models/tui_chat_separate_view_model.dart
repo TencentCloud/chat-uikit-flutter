@@ -1136,26 +1136,32 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     required List<V2TimConversation> conversationList,
   }) async {
     final selectedMessages = List.from(_multiSelectedMessageList);
+    if (conversationType == ConvType.c2c) {
+      selectedMessages.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    } else if (conversationType == ConvType.group) {
+      selectedMessages.sort((a, b) => a.seq.compareTo(b.seq));
+    }
     for (var conversation in conversationList) {
       final convID = conversation.groupID ?? conversation.userID ?? "";
       final convType = conversation.type;
       for (var message in selectedMessages) {
-        final forwardMessageInfo =
-            await _messageService.createForwardMessage(msgID: message.msgID!);
+        final forwardMessageInfo = await _messageService.createForwardMessage(msgID: message.msgID!);
         final messageInfo = forwardMessageInfo!.messageInfo;
         if (messageInfo != null) {
           tools.setUserInfoForMessage(messageInfo, forwardMessageInfo.id);
           messageInfo.status = MessageStatus.V2TIM_MSG_STATUS_SENDING;
           addSendingMessageID(messageInfo.id);
-          _sendMessage(
-            id: forwardMessageInfo.id!,
-            convID: convID,
-            convType: convType == 1 ? ConvType.c2c : ConvType.group,
-            offlinePushInfo: tools.buildMessagePushInfo(
-                forwardMessageInfo.messageInfo!,
-                convID,
-                convType == 1 ? ConvType.c2c : ConvType.group),
-          );
+          await Future.delayed(Duration(milliseconds: 100), () {
+            _sendMessage(
+              id: forwardMessageInfo.id!,
+              convID: convID,
+              convType: convType == 1 ? ConvType.c2c : ConvType.group,
+              offlinePushInfo: tools.buildMessagePushInfo(
+                  forwardMessageInfo.messageInfo!,
+                  convID,
+                  convType == 1 ? ConvType.c2c : ConvType.group),
+            );
+          });
         }
       }
     }
