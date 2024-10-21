@@ -1,12 +1,12 @@
 name: tencent_cloud_chat_message
 description: A component for displaying a list of messages and dealing with everything related to sending and receiving messages for Tencent Cloud Chat.
-version: 1.5.0
+version: 2.0.0
 repository: https://github.com/TencentCloud/chat-uikit-flutter/tree/v2/tencent_cloud_chat_message
 homepage: https://trtc.io/products/chat?utm_source=flutter_pub
 
 environment:
   sdk: '>=3.1.0 <4.0.0'
-  flutter: ">=3.22.0"
+  flutter: ">=3.24.0"
 
 platforms:
   android:
@@ -40,8 +40,8 @@ dependencies:
   dotted_border: ^2.1.0
   package_info_plus: ^5.0.1
   flutter_markdown: ^0.7.1
-  extended_text: ^13.0.0
-  extended_text_field: ^15.0.0
+  extended_text: ^14.0.0
+  extended_text_field: ^16.0.0
   universal_html: ^2.2.4
   video_player: ^2.8.1
   video_player_media_kit: ^1.0.5
