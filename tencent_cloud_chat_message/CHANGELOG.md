@@ -1,3 +1,7 @@
+## 2.0.0
+## Breaking Changes
+* Migrated to Flutter 3.24.0
+
 ## 1.5.0
 
 ### General
