@@ -171,6 +171,17 @@ class TUIFriendShipViewModel extends ChangeNotifier {
     return;
   }
 
+  Future<bool> isFriend(String userID) async {
+    final List<V2TimFriendInfo> res = await _friendshipServices.getFriendList() ?? [];
+    for (V2TimFriendInfo info in res) {
+      if (info.userID == userID) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   Future<void> loadBlockListData() async {
     final blockListRes = await _friendshipServices.getBlackList();
     _blockList = blockListRes ?? [];

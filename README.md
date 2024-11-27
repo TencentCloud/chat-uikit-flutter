@@ -1,3 +1,6 @@
+#
+It is recommended to download the source code from [pub.dev](https://pub.dev/packages/tencent_cloud_chat_uikit/versions)
+
 ## Product Introduction
 You only need to integrate Chat SDK to easily gain chat, conversation, group capabilities, and you can also communicate with other products such as whiteboards through signaling messages. Chat can cover various business scenarios, support the access and use of various platforms, and fully meet the communication needs.
 

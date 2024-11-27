@@ -125,15 +125,18 @@ class _TIMUIKitHistoryMessageListContainerState
 
   List<V2TimMessage?> historyMessageList = [];
 
-  Future<void> requestForData(String? lastMsgID, LoadDirection direction,
+  Future<bool> requestForData(String? lastMsgID, LoadDirection direction,
       TUIChatSeparateViewModel model,
-      [int? count]) async {
-    if ((direction == LoadDirection.previous && model.haveMoreData) ||
+      [int? count, int? lastSeq]) async {
+    if ((direction == LoadDirection.previous) ||
         (direction == LoadDirection.latest && model.haveMoreLatestData)) {
-      await model.loadChatRecord(
+      return await model.loadChatRecord(
           direction: direction,
           count: count ?? (kIsWeb ? 15 : HistoryMessageDartConstant.getCount),
-          lastMsgID: lastMsgID);
+          lastMsgID: lastMsgID,
+          lastMsgSeq: lastSeq ?? -1,);
+    } else {
+      return false;
     }
   }
 
@@ -203,8 +206,8 @@ class _TIMUIKitHistoryMessageListContainerState
           tongueItemBuilder: widget.tongueItemBuilder,
           initFindingMsg: widget.initFindingMsg,
           messageList: messageList,
-          onLoadMore: (String? a, LoadDirection direction, [int? b]) async {
-            return await requestForData(a, direction, model, b);
+          onLoadMore: (String? a, LoadDirection direction, [int? b, int? lastSeq]) async {
+            return await requestForData(a, direction, model, b, lastSeq);
           },
         );
       },

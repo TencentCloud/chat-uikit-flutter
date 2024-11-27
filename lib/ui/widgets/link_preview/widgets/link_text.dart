@@ -5,6 +5,7 @@ import 'package:extended_text/extended_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/http_text.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/compiler/md_text.dart';
 import 'package:tencent_im_base/base_widgets/tim_stateless_widget.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
@@ -125,7 +126,7 @@ class LinkText extends TIMStatelessWidget {
       }
 
       if (LinkUtils.urlReg.hasMatch(c)) {
-        contentData += '\$' + c + '\$';
+        contentData += HttpText.flag + c + HttpText.flag;
         _contentList.add(TextSpan(
             text: c,
             style: TextStyle(color: LinkUtils.hexToColor("015fff")),
@@ -160,12 +161,12 @@ class LinkText extends TIMStatelessWidget {
   Widget timBuild(BuildContext context) {
     return ExtendedText(_getContentSpan(messageText, context), softWrap: true,
         onSpecialTextTap: (dynamic parameter) {
-      if (parameter.toString().startsWith('\$')) {
+      if (parameter.toString().startsWith(HttpText.flag)) {
         if (onLinkTap != null) {
-          onLinkTap!((parameter.toString()).replaceAll('\$', ''));
+          onLinkTap!((parameter.toString()).replaceAll(HttpText.flag, ''));
         } else {
           LinkUtils.launchURL(
-              context, (parameter.toString()).replaceAll('\$', ''));
+              context, (parameter.toString()).replaceAll(HttpText.flag, ''));
         }
       }
     },

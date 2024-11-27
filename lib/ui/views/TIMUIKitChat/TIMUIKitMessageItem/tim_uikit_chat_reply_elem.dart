@@ -289,13 +289,12 @@ class _TIMUIKitReplyElemState extends TIMUIKitState<TIMUIKitReplyElem> {
   }
 
   void _jumpToRawMsg() {
-    if (rawMessage?.timestamp != null) {
+    if (rawMessage?.status != MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED && rawMessage?.timestamp != null) {
       widget.scrollToIndex(rawMessage);
     } else {
       onTIMCallback(TIMCallback(
           type: TIMCallbackType.INFO,
-          infoRecommendText: TIM_t("无法定位到原消息"),
-          infoCode: 6660401));
+          infoRecommendText: TIM_t("无法定位到原消息")));
     }
   }
 

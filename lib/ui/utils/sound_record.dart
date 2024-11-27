@@ -1,6 +1,5 @@
 import 'dart:async';
 
-// import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_plugin_record_plus/const/play_state.dart';
 import 'package:flutter_plugin_record_plus/const/response.dart';
 import 'package:flutter_plugin_record_plus/index.dart';

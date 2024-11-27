@@ -253,6 +253,7 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
                         true,
                     customEmojiStickerList: widget.customEmojiStickerList,
                     showAtBackground: true,
+                    checkHttpLink: true,
                   )),
           // If the link preview info is available, render the preview card.
           if (_renderPreviewWidget() != null &&

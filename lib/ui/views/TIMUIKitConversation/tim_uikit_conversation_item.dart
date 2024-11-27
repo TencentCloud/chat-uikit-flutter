@@ -31,14 +31,8 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
   final int? convType;
   final bool isCurrent;
 
-  /// Control if shows the identifier that the conversation has a draft text, inputted in previous.
-  /// Also, you'd better specifying the `draftText` field for `TIMUIKitChat`, from the `draftText` in `V2TimConversation`,
-  /// to meet the identifier shows here.
-  final bool isShowDraft;
-
   TIMUIKitConversationItem({
     Key? key,
-    required this.isShowDraft,
     required this.faceUrl,
     required this.nickName,
     required this.lastMsg,
@@ -56,22 +50,20 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
 
   Widget _getShowMsgWidget(BuildContext context) {
     final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
-    if (isShowDraft && draftText != null && draftText != "") {
-      return TIMUIKitDraftText(
-        context: context,
-        draftText: draftText ?? "",
-        fontSize: isDesktopScreen ? 12 : 14,
-      );
-    } else if (lastMsg != null) {
-      if (lastMessageBuilder != null &&
+      if (lastMsg != null && lastMessageBuilder != null &&
           lastMessageBuilder!(lastMsg, groupAtInfoList) != null) {
         return lastMessageBuilder!(lastMsg, groupAtInfoList)!;
       }
+
+    if (lastMsg != null || (draftText != null && draftText != "")) {
       return TIMUIKitLastMsg(
         fontSize: isDesktopScreen ? 12 : 14,
         groupAtInfoList: groupAtInfoList,
         lastMsg: lastMsg,
+        isDisturb: isDisturb,
+        unreadCount: unreadCount,
         context: context,
+        draftText: draftText ?? "",
       );
     }
 
@@ -81,8 +73,7 @@ class TIMUIKitConversationItem extends TIMUIKitStatelessWidget {
   }
 
   bool isHaveSecondLine() {
-    return (isShowDraft && draftText != null && draftText != "") ||
-        (lastMsg != null);
+    return (draftText != null && draftText != "") || (lastMsg != null);
   }
 
   Widget _getTimeStringForChatWidget(BuildContext context, TUITheme theme) {

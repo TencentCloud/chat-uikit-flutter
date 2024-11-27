@@ -263,7 +263,6 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
       return TIMUIKitOperationItem(
         smallCardMode: smallCardMode,
         isEmpty: false,
-        showAllowEditStatus: false,
         operationName: TIM_t("生日"),
         operationRightWidget: Text(formatter.format(date),
             textAlign: isDesktopScreen ? null : TextAlign.end),
@@ -272,7 +271,6 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
       return TIMUIKitOperationItem(
         smallCardMode: smallCardMode,
         isEmpty: false,
-        showAllowEditStatus: false,
         operationName: TIM_t("生日"),
         operationRightWidget:
             Text(TIM_t("未填写"), textAlign: isDesktopScreen ? null : TextAlign.end),

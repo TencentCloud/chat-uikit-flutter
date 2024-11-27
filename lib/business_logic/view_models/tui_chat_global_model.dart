@@ -50,10 +50,12 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
   String localMsgIDListKey = "TUIKit_conversation_list";
 
   late V2TimAdvancedMsgListener advancedMsgListener;
-  int _unreadCountForConversation = 0;
+  int _unreadCountForTongue = 0;
 
   // use for generate a new sliver list to show received message list
   int _receivedNewMessageCount = 0;
+  final List<V2TimMessage> _receivedUnreadMessageList = [];
+
   TIMUIKitChatConfig chatConfig = const TIMUIKitChatConfig();
   List<V2TimGroupApplication>? _groupApplicationList;
   String Function(V2TimMessage message)? _abstractMessageBuilder;
@@ -170,15 +172,23 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
     return _totalUnreadCount;
   }
 
-  int get receivedMessageListCount {
-    return _receivedNewMessageCount;
+  set totalUnReadCount(int newValue) {
+    _totalUnreadCount = newValue;
+    notifyListeners();
   }
+
+  int get receivedNewMessageCount => _receivedNewMessageCount;
 
   set receivedNewMessageCount(int value) {
     _receivedNewMessageCount = value;
   }
 
-  int get unreadCountForConversation => _unreadCountForConversation;
+  int get unreadCountForTongue => _unreadCountForTongue;
+
+  set unreadCountForTongue(int value) {
+    _unreadCountForTongue = value;
+    notifyListeners();
+  }
 
   List<V2TimGroupApplication> get groupApplicationList => _groupApplicationList ?? [];
 
@@ -201,7 +211,13 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
     if (_currentConversationList.isNotEmpty) {
       _currentConversationList.removeLast();
     }
+
+    _receivedUnreadMessageList.clear();
     // notifyListeners();
+  }
+
+  void removeMessageList(String conversationID) {
+    _messageListMap.remove(conversationID);
   }
 
   V2TimMessageReceipt? getMessageReadReceipt(String msgID) {
@@ -248,16 +264,6 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
 
   set groupApplicationList(List<V2TimGroupApplication> value) {
     _groupApplicationList = value;
-  }
-
-  set unreadCountForConversation(int value) {
-    _unreadCountForConversation = value;
-    notifyListeners();
-  }
-
-  set totalUnReadCount(int newValue) {
-    _totalUnreadCount = newValue;
-    notifyListeners();
   }
 
   setChatConfig(TIMUIKitChatConfig config) {
@@ -324,7 +330,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
     notifyListeners();
   }
 
-  clearRecivedNewMessageCount() {
+  clearReceivedNewMessageCount() {
     _receivedNewMessageCount = 0;
   }
 
@@ -523,36 +529,31 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
     _checkFromUserisActive(msgComing);
     final convType = TencentUtils.checkString(newMsg.groupID) != null ? ConvType.group : ConvType.c2c;
     if (convID != null && convID == currentSelectedConv) {
+      // when receive new message in the current chat page, we need to mark the message as read.
+      if (chatConfig.isAutoReportRead) {
+        Future.delayed(const Duration(seconds: 1), () {
+          markMessageAsRead(
+            convID: convID,
+            convType: convType,
+          );
+        });
+      }
+
       final position = getMessageListPosition(convID);
       if (position == HistoryMessagePosition.notShowLatest) {
         return;
       }
-      if (position == HistoryMessagePosition.bottom && unreadCountForConversation == 0) {
-        _unreadCountForConversation = 0;
-        if (chatConfig.isAutoReportRead) {
-          Future.delayed(const Duration(seconds: 1), () {
-            markMessageAsRead(
-              convID: convID,
-              convType: convType,
-            );
-          });
-        }
+      if (position == HistoryMessagePosition.bottom && unreadCountForTongue == 0) {
+        _unreadCountForTongue = 0;
         _receivedNewMessageCount = 0;
         final tempCurrentMsgList = _messageListMap[convID] ?? [];
         _messageListMap[convID] = [newMsg, ...tempCurrentMsgList];
         notifyListeners();
-        final messageID = newMsg.msgID;
-        final needReadReceipt = newMsg.needReadReceipt ?? false;
-        if (needReadReceipt && messageID != null && msgComing.groupID != null && chatConfig.isReportGroupReadingStatus && chatConfig.isAutoReportRead) {
-          // only group message send message read receipt
-          Future.delayed(const Duration(seconds: 1), () {
-            sendMessageReadReceipts([messageID]);
-          });
-        }
       } else {
         if (convID == currentSelectedConv) {
-          unreadCountForConversation++;
+          unreadCountForTongue++;
           _receivedNewMessageCount++;
+          _receivedUnreadMessageList.add(newMsg);
           final currentMsg = _messageListMap[convID] ?? [];
           _messageListMap[convID] = [newMsg, ...currentMsg];
           notifyListeners();
@@ -563,11 +564,6 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
       _messageListMap[convID] = [newMsg, ...tempCurrentMsgList];
       notifyListeners();
     }
-  }
-
-  sendMessageReadReceipts(List<String> messageIDList) async {
-    final res = await _messageService.sendMessageReadReceipts(messageIDList: messageIDList);
-    return res;
   }
 
   onMessageRevoked(String msgID, [String? convID]) {
@@ -581,8 +577,23 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
           targetItem.status = MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED;
           targetItem.id = DateTime.now().millisecondsSinceEpoch.toString();
           activeMessageList[findeIndex] = targetItem;
+
+          bool isUnreadMessage = _receivedUnreadMessageList.any((element) => element.msgID == msgID);
+          if (!(targetItem.isSelf ?? true) && isUnreadMessage) {
+            if (_unreadCountForTongue > 0) {
+              if (_unreadCountForTongue > 0) {
+                _unreadCountForTongue--;
+              }
+              if (_receivedNewMessageCount > 0) {
+                _receivedNewMessageCount--;
+              }
+
+              _receivedUnreadMessageList.removeWhere((element) => element.msgID == targetItem.msgID);
+            }
+          }
         }
       }
+
       _messageListMap[convID ?? currentSelectedConv] = activeMessageList;
       notifyListeners();
     }
@@ -884,15 +895,10 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
   }) async {
     String receiver = convType == ConvType.c2c ? convID : '';
     String groupID = convType == ConvType.group ? convID : '';
-    final oldGroupType = groupType != null ? GroupReceptAllowType.values[groupType.index] : null;
     final sendMsgRes = await _messageService.sendMessage(
         id: id,
         receiver: receiver,
-        needReadReceipt: needReadReceipt ??
-            chatConfig.isShowGroupReadingStatus &&
-                convType == ConvType.group &&
-                ((chatConfig.groupReadReceiptPermissionList != null && chatConfig.groupReadReceiptPermissionList!.contains(groupType)) ||
-                    (chatConfig.groupReadReceiptPermisionList != null && chatConfig.groupReadReceiptPermisionList!.contains(oldGroupType))),
+        needReadReceipt: needReadReceipt ?? chatConfig.isShowReadingStatus,
         groupID: groupID,
         priority: priority,
         localCustomData: localCustomData,
@@ -916,21 +922,25 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
     return sendMsgRes;
   }
 
-  void setMessageList(String conversationID, List<V2TimMessage> messageList, {bool needResetNewMessageCount = true}) {
+  void setMessageList(String conversationID, List<V2TimMessage> messageList, {bool needResetNewMessageCount = true, bool isDeleteMsg = false}) {
     _messageListMap[conversationID] = messageList;
     if (needResetNewMessageCount) {
       _receivedNewMessageCount = 0;
     }
+
+    if (isDeleteMsg) {
+      HistoryMessagePosition position = getMessageListPosition(conversationID);
+      if (position == HistoryMessagePosition.awayTwoScreen) {
+        _historyMessagePositionMap[conversationID] = HistoryMessagePosition.notShowLatest;
+      }
+    }
+
     notifyListeners();
   }
 
   updateMessage(V2TimValueCallback<V2TimMessage> sendMsgRes, String convID, String id, ConvType convType, GroupReceiptAllowType? groupType, ValueChanged<String>? setInputField) {
     List<V2TimMessage> currentHistoryMsgList = _messageListMap[convID] ?? [];
     final V2TimMessage sendMsgResData = sendMsgRes.data as V2TimMessage;
-    if ([80001, 80002].contains(sendMsgRes.code) && sendMsgRes.data?.textElem?.text != null && setInputField != null) {
-      setInputField(sendMsgRes.data!.textElem!.text ?? "");
-    }
-
     final findIdIndex = currentHistoryMsgList.indexWhere((element) => element.id == id);
     final targetIndex = findIdIndex == -1 ? currentHistoryMsgList.indexWhere((element) => element.msgID == sendMsgResData.msgID) : findIdIndex;
     if (targetIndex != -1) {
@@ -941,12 +951,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
     if (loadingMessage[convID] != null && loadingMessage[convID]!.isNotEmpty) {
       loadingMessage[convID]!.removeWhere((element) => element.id == id);
     }
-    final oldGroupType = groupType != null ? GroupReceptAllowType.values[groupType.index] : null;
-    if (chatConfig.isShowGroupReadingStatus &&
-        convType == ConvType.group &&
-        sendMsgRes.data?.msgID != null &&
-        ((chatConfig.groupReadReceiptPermissionList != null && chatConfig.groupReadReceiptPermissionList!.contains(groupType)) ||
-            (chatConfig.groupReadReceiptPermisionList != null && chatConfig.groupReadReceiptPermisionList!.contains(oldGroupType)))) {
+    if (chatConfig.isShowReadingStatus && sendMsgRes.data?.msgID != null) {
       _messageReadReceiptMap[sendMsgRes.data!.msgID!] = V2TimMessageReceipt(timestamp: 0, userID: "", readCount: 0);
     }
     _messageListMap[convID] = currentHistoryMsgList;

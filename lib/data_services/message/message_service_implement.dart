@@ -3,9 +3,11 @@
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_conversation_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/error_message_converter.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
@@ -271,10 +273,12 @@ class MessageServiceImpl extends MessageService {
         .getMessageManager()
         .reSendMessage(msgID: msgID, onlineUserOnly: onlineUserOnly ?? false);
     if (res.code != 0) {
+      String recommendText = ErrorMessageConverter.getErrorMessage(res.code);
       _coreService.callOnCallback(TIMCallback(
           type: TIMCallbackType.API_ERROR,
           errorMsg: res.desc,
-          errorCode: res.code));
+          errorCode: res.code,
+          infoRecommendText: recommendText));
     }
     return res;
   }
@@ -359,10 +363,12 @@ class MessageServiceImpl extends MessageService {
               cloudCustomData: cloudCustomData,
             );
     if (result.code != 0) {
+      String recommendText = ErrorMessageConverter.getErrorMessage(result.code);
       _coreService.callOnCallback(TIMCallback(
           type: TIMCallbackType.API_ERROR,
           errorMsg: result.desc,
-          errorCode: result.code));
+          errorCode: result.code,
+          infoRecommendText: recommendText));
     }
     return result;
   }
@@ -471,7 +477,7 @@ class MessageServiceImpl extends MessageService {
       return TencentImSDKPlugin.v2TIMManager
           .getConversationManager()
           .cleanConversationUnreadMessageCount(
-        conversationID: "c2c_$userID",
+        conversationID: "${TUIConversationViewModel.conversationC2CPrefix}$userID",
         cleanTimestamp: 0,
         cleanSequence: 0,
       );
@@ -486,7 +492,7 @@ class MessageServiceImpl extends MessageService {
       return TencentImSDKPlugin.v2TIMManager
           .getConversationManager()
           .cleanConversationUnreadMessageCount(
-        conversationID: "group_$groupID",
+        conversationID: "${TUIConversationViewModel.conversationGroupPrefix}$groupID",
         cleanTimestamp: 0,
         cleanSequence: 0,
       );

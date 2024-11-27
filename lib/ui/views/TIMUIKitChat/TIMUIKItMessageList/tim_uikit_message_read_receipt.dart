@@ -21,80 +21,91 @@ class TIMUIKitMessageReadReceipt extends TIMUIKitStatelessWidget {
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final TUITheme theme = value.theme;
-    final TUIChatSeparateViewModel model =
-        Provider.of<TUIChatSeparateViewModel>(context, listen: false);
+    final TUIChatSeparateViewModel model = Provider.of<TUIChatSeparateViewModel>(context, listen: false);
     final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
 
     return Selector<TUIChatGlobalModel, V2TimMessageReceipt?>(
       builder: (context, value, child) {
-        // if (value == null || value.unreadCount == 0 && value.readCount == 0) {
-        //   return Container();
-        // }
-        return GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            if ((value?.readCount ?? 0) > 0) {
-              if(isDesktopScreen){
-                TUIKitWidePopup.showPopupWindow(
-                    operationKey: TUIKitWideModalOperationKey.messageReadDetails,
-                    context: context,
-                    width: MediaQuery.of(context).size.width * 0.5,
-                    height: MediaQuery.of(context).size.height * 0.8,
-                    title: TIM_t("消息详情"),
-                    child: (onClose) => MessageReadReceipt(
-                        model: model,
-                        onTapAvatar: onTapAvatar,
-                        messageItem: messageItem,
-                        unreadCount: value?.unreadCount ?? 0,
-                        readCount: value?.readCount ?? 0)
-                );
-              }else{
-                if (value?.unreadCount == 0) {
-                  return;
+        if (model.conversationType == ConvType.c2c) {
+          bool isPeerRead = false;
+          if (value != null) {
+            isPeerRead = value.isPeerRead ?? false;
+          }
+          return Container(
+            padding: const EdgeInsets.only(bottom: 3),
+            margin: const EdgeInsets.only(right: 6),
+            child: Text(
+              isPeerRead ? TIM_t("已读") : TIM_t("未读"),
+              style: TextStyle(color: theme.chatMessageItemUnreadStatusTextColor, fontSize: 12),
+            ),
+          );
+        } else {
+          return GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: () {
+              if ((value?.readCount ?? 0) > 0) {
+                if(isDesktopScreen){
+                  TUIKitWidePopup.showPopupWindow(
+                      operationKey: TUIKitWideModalOperationKey.messageReadDetails,
+                      context: context,
+                      width: MediaQuery.of(context).size.width * 0.5,
+                      height: MediaQuery.of(context).size.height * 0.8,
+                      title: TIM_t("消息详情"),
+                      child: (onClose) => MessageReadReceipt(
+                          model: model,
+                          onTapAvatar: onTapAvatar,
+                          messageItem: messageItem,
+                          unreadCount: value?.unreadCount ?? 0,
+                          readCount: value?.readCount ?? 0)
+                  );
+                } else {
+                  if (value?.unreadCount == 0) {
+                    return;
+                  }
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => MessageReadReceipt(
+                              model: model,
+                              onTapAvatar: onTapAvatar,
+                              messageItem: messageItem,
+                              unreadCount: value?.unreadCount ?? 0,
+                              readCount: value?.readCount ?? 0)));
                 }
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => MessageReadReceipt(
-                            model: model,
-                            onTapAvatar: onTapAvatar,
-                            messageItem: messageItem,
-                            unreadCount: value?.unreadCount ?? 0,
-                            readCount: value?.readCount ?? 0)));
               }
-            }
-          },
-          child: Container(
-            padding: EdgeInsets.only(
-                bottom: 3, right: 6, left: 6, top: isDesktopScreen ? 2 : 6),
-            child: ((value?.unreadCount ?? 0) == 0 && (value?.readCount ?? 0) > 0)
-                ? Icon(
-                    Icons.check_circle_outline,
-                    size: 18,
-                    color: theme.weakTextColor,
-                  )
-                : Container(
-                    width: 14,
-                    height: 14,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                            width: 1.3,
-                            color: (value?.readCount ?? 0) > 0
-                                ? theme.primaryColor!
-                                : theme.weakTextColor!)),
-                    child: (value?.readCount ?? 0) > 0
-                        ? Text(
-                            '${value?.readCount ?? 0}',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontSize: 8, color: theme.primaryColor),
-                          )
-                        : null,
-                  ),
-          ),
-        );
+            },
+            child: Container(
+              padding: EdgeInsets.only(
+                  bottom: 3, right: 6, left: 6, top: isDesktopScreen ? 2 : 6),
+              child: ((value?.unreadCount ?? 0) == 0 && (value?.readCount ?? 0) > 0)
+                  ? Icon(
+                      Icons.check_circle_outline,
+                      size: 18,
+                      color: theme.weakTextColor,
+                    )
+                  : Container(
+                      width: 14,
+                      height: 14,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                              width: 1.3,
+                              color: (value?.readCount ?? 0) > 0
+                                  ? theme.primaryColor!
+                                  : theme.weakTextColor!)),
+                      child: (value?.readCount ?? 0) > 0
+                          ? Text(
+                              '${value?.readCount ?? 0}',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 8, color: theme.primaryColor),
+                            )
+                          : null,
+                    ),
+            ),
+          );
+        }
       },
       selector: (c, model) {
         return model.getMessageReadReceipt(messageItem.msgID ?? "");

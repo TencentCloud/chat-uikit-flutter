@@ -1,3 +1,9 @@
+# 3.1.0
+## Bug Fixes
+* The interface for deleting messages is changed to the interface for deleting cloud messages.
+* C2C messages support read receipts
+* Fix and optimize some issues
+
 # 3.0.0
 ## Breaking Changes
 * Migrated to Flutter 3.24.0

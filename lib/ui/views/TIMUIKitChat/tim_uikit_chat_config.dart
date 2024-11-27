@@ -66,10 +66,12 @@ class TIMUIKitChatConfig {
 
   /// Control if allowed to show reading status for group.
   /// [Default]: true.
+  /// [Deprecated: ] Please use [isShowReadingStatus] instead.
   final bool isShowGroupReadingStatus;
 
   /// Control if allowed to report reading status for group.
   /// [Default]: true.
+  /// [Deprecated: ] Please use [isShowReadingStatus] instead.
   final bool isReportGroupReadingStatus;
 
   /// Control if allowed to show the message operation menu after long pressing message.
@@ -101,12 +103,14 @@ class TIMUIKitChatConfig {
   final bool Function(V2TimMessage message)? isAtWhenReplyDynamic;
 
   /// The main switch of the group read receipt.
+  /// [Deprecated: ] Please use [isShowReadingStatus] instead.
   final bool isShowGroupMessageReadReceipt;
 
-  /// [Deprecated: ] Please use [groupReadReceiptPermissionList] instead.
+  /// [Deprecated: ] not support.
   final List<GroupReceptAllowType>? groupReadReceiptPermisionList;
 
   /// Control which group can send message read receipt.
+  /// [Deprecated: ] not support.
   final List<GroupReceiptAllowType>? groupReadReceiptPermissionList;
 
   /// Control if show self name in group chat.
@@ -271,7 +275,7 @@ class TIMUIKitChatConfig {
       this.isShowSelfNameInGroup = false,
         this.isAtWhenReplyDynamic,
       this.offlinePushInfo,
-      @Deprecated("Please use [isShowGroupReadingStatus] instead")
+      @Deprecated("Please use [isShowReadingStatus] instead")
       this.isShowGroupMessageReadReceipt = true,
       this.upperRecallTime = 120,
       this.isShowOthersNameInGroup = true,
@@ -281,8 +285,9 @@ class TIMUIKitChatConfig {
       this.notificationTitle = "",
       this.notificationIOSSound = "",
       this.isAllowSoundMessage = true,
-      @Deprecated("Please use [groupReadReceiptPermissionList] instead")
+      @Deprecated("not support")
       this.groupReadReceiptPermisionList,
+      @Deprecated("not support")
       this.groupReadReceiptPermissionList,
       this.isAllowEmojiPanel = true,
       this.isAllowShowMorePanel = true,
@@ -294,6 +299,7 @@ class TIMUIKitChatConfig {
       this.isEnableTextSelection,
       this.additionalDesktopMessageHoverBarItem,
       this.isShowGroupReadingStatus = true,
+      @Deprecated("Please use [isShowReadingStatus] instead")
       this.isReportGroupReadingStatus = true,
       this.showC2cMessageEditStatus = true,
       this.additionalDesktopControlBarItems,

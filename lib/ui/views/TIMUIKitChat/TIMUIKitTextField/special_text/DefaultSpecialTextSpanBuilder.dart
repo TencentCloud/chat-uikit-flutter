@@ -13,6 +13,7 @@ class DefaultSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
     this.isUseTencentCloudChatPackage = false,
     this.customEmojiStickerList = const [],
     this.showAtBackground = false,
+    this.checkHttpLink = true,
   });
 
   /// whether show background for @somebody
@@ -21,6 +22,8 @@ class DefaultSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
   final bool isUseQQPackage;
 
   final bool isUseTencentCloudChatPackage;
+
+  final bool checkHttpLink;
 
   final List<CustomEmojiFaceData> customEmojiStickerList;
 
@@ -40,7 +43,7 @@ class DefaultSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
           start: index! - (EmojiText.flag.length - 1),
           isUseQQPackage: isUseQQPackage,
           customEmojiStickerList: customEmojiStickerList);
-    } else if (isStart(flag, HttpText.flag)) {
+    } else if (isStart(flag, HttpText.flag) && checkHttpLink) {
       return HttpText(textStyle, onTap,
           start: index! - (HttpText.flag.length - 1));
     }

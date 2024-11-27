@@ -55,7 +55,7 @@ class TIMUIKitGroupProfile extends StatefulWidget {
 
   /// The callback after user clicking a user,
   /// you may navigating to the specific profile page, or anywhere you want.
-  final Function(String userID, TapDownDetails? tapDetails)? onClickUser;
+  final Function(V2TimGroupMemberFullInfo groupMemberFullInfo, TapDownDetails? tapDetails)? onClickUser;
 
   const TIMUIKitGroupProfile(
       {Key? key,
@@ -154,6 +154,10 @@ class _TIMUIKitGroupProfileState extends TIMUIKitState<TIMUIKitGroupProfile> {
             groupListenerModel.needUpdate = null;
             switch (needUpdate.updateType) {
               case UpdateType.groupInfo:
+                if (needUpdate.groupInfoSubType == GroupChangeInfoType.V2TIM_GROUP_INFO_CHANGE_TYPE_OWNER) {
+                  model.onOwnerChanged(needUpdate.ownerID);
+                }
+
                 model.loadGroupInfo(widget.groupID);
                 break;
               case UpdateType.memberList:

@@ -84,11 +84,11 @@ class _TIMUIKitHistoryMessageListTongueContainerState extends TIMUIKitState<TIMU
       }
     }
 
-    if ((widget.conversation.unreadCount ?? 0) > 20 && !isClickShowPrevious) {
-      return MessageListTongueType.showPrevious;
-    }
+    // if ((widget.conversation.unreadCount ?? 0) > 20 && !isClickShowPrevious) {
+    //   return MessageListTongueType.showPrevious;
+    // }
 
-    if (globalModel.unreadCountForConversation > 0) {
+    if (globalModel.unreadCountForTongue > 0) {
       return MessageListTongueType.showUnread;
     }
 
@@ -116,12 +116,12 @@ class _TIMUIKitHistoryMessageListTongueContainerState extends TIMUIKitState<TIMU
           child: TIMUIKitHistoryMessageListTongue(
             previousCount: widget.conversation.unreadCount ?? 0,
             tongueItemBuilder: widget.tongueItemBuilder,
-            unreadCount: globalModel.unreadCountForConversation,
+            unreadCount: value.item2,
             onClick: () async {
               if (groupAtInfoList != null && groupAtInfoList!.isNotEmpty) {
                 if (groupAtInfoList?.length == 1) {
                   widget.scrollToIndexBySeq(groupAtInfoList![0]!.seq);
-                  widget.model.markMessageAsRead();
+
                   setState(() {
                     groupAtInfoList = [];
                     isFinishJumpToAt = true;
@@ -146,7 +146,7 @@ class _TIMUIKitHistoryMessageListTongueContainerState extends TIMUIKitState<TIMU
                   // TODO: 这里后续加个弹窗提示客户，找消息失败了
                 }
                 // widget.model.loadListForSpecificMessage(seq: count);
-              } else if (value.item1 == HistoryMessagePosition.awayTwoScreen || globalModel.unreadCountForConversation > 0) {
+              } else if (value.item1 == HistoryMessagePosition.awayTwoScreen || value.item2 > 0) {
                 widget.model.showLatestUnread();
                 widget.scrollController.animateTo(
                   widget.scrollController.position.minScrollExtent,
@@ -162,9 +162,9 @@ class _TIMUIKitHistoryMessageListTongueContainerState extends TIMUIKitState<TIMU
         );
       },
       selector: (c, model) {
-        final mesageListPosition = model.getMessageListPosition(widget.model.conversationID);
-        final unreadCountForConversation = model.unreadCountForConversation;
-        return Tuple2(mesageListPosition, unreadCountForConversation);
+        final messageListPosition = model.getMessageListPosition(widget.model.conversationID);
+        final unreadCountForConversation = model.unreadCountForTongue;
+        return Tuple2(messageListPosition, unreadCountForConversation);
       },
     );
   }

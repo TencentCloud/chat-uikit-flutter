@@ -29,6 +29,9 @@ List<T> removeDuplicates<T>(List<T> list, bool Function(T first, T second) isEqu
 }
 
 class TUIConversationViewModel extends ChangeNotifier {
+  static const String conversationC2CPrefix = "c2c_";
+  static const String conversationGroupPrefix = "group_";
+
   final TUISelfInfoViewModel selfInfoViewModel = serviceLocator<TUISelfInfoViewModel>();
   final ConversationService _conversationService = serviceLocator<ConversationService>();
   final FriendshipServices _friendshipServices = serviceLocator<FriendshipServices>();
@@ -63,6 +66,10 @@ class TUIConversationViewModel extends ChangeNotifier {
       _conversationList.sort((a, b) => b!.orderkey!.compareTo(a!.orderkey!));
     }
     return _conversationList;
+  }
+
+  V2TimConversation? getConversation(String conversationID) {
+    return _conversationList.firstWhere((element) => element?.conversationID == conversationID);
   }
 
   String? get scrollToConversation => _scrollToConversation;
@@ -124,6 +131,18 @@ class TUIConversationViewModel extends ChangeNotifier {
       }
     }, onConversationDeleted:(List<String> conversationIDList) {
       _onConversationDeleted(conversationIDList);
+      for (var conversationID in conversationIDList) {
+        String resultID = "";
+        if (conversationID.startsWith(conversationC2CPrefix)) {
+          resultID = conversationID.replaceFirst(conversationC2CPrefix, "");
+        } else if (conversationID.startsWith(conversationGroupPrefix)) {
+          resultID = conversationID.replaceFirst(conversationGroupPrefix, "");
+        }
+
+        if (resultID != "") {
+          _chatGlobalModel.removeMessageList(resultID);
+        }
+      }
     });
   }
 

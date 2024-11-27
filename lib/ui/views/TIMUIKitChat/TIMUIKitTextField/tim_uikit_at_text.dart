@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
+import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 
@@ -17,9 +18,7 @@ class AtText extends StatefulWidget {
   final V2TimGroupInfo? groupInfo;
   final List<V2TimGroupMemberFullInfo?>? groupMemberList;
   final VoidCallback? closeFunc;
-  final Function(
-          V2TimGroupMemberFullInfo memberInfo, TapDownDetails? tapDetails)?
-      onChooseMember;
+  final Function(List<V2TimGroupMemberFullInfo> memberInfo)? onChooseMember;
   final bool canAtAll;
 
   // some Group type cant @all
@@ -42,9 +41,12 @@ class AtText extends StatefulWidget {
 
 class _AtTextState extends TIMUIKitState<AtText> {
   final GroupServices _groupServices = serviceLocator<GroupServices>();
+  final TUISelfInfoViewModel _selfInfoViewModel = serviceLocator<TUISelfInfoViewModel>();
 
   List<V2TimGroupMemberFullInfo?>? groupMemberList;
   List<V2TimGroupMemberFullInfo?>? searchMemberList;
+
+  List<V2TimGroupMemberFullInfo> selectedGroupMemberList = [];
 
   @override
   void initState() {
@@ -58,16 +60,15 @@ class _AtTextState extends TIMUIKitState<AtText> {
     super.dispose();
   }
 
-  _onTapMemberItem(
-      V2TimGroupMemberFullInfo memberInfo, TapDownDetails? tapDetails) {
+  void _submitAtMemberList() {
     if (widget.closeFunc != null) {
       widget.closeFunc!();
     }
 
     if (widget.onChooseMember != null) {
-      widget.onChooseMember!(memberInfo, tapDetails);
+      widget.onChooseMember!(selectedGroupMemberList);
     } else {
-      Navigator.pop(context, memberInfo);
+      Navigator.pop(context, selectedGroupMemberList);
     }
   }
 
@@ -113,13 +114,30 @@ class _AtTextState extends TIMUIKitState<AtText> {
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final TUITheme theme = value.theme;
 
+    V2TimUserFullInfo? loginUserInfo = _selfInfoViewModel.loginInfo;
+    if (loginUserInfo != null) {
+      searchMemberList?.removeWhere((memberInfo) {
+        return memberInfo?.userID == loginUserInfo.userID;
+      });
+    }
+
     Widget mentionedMembersBody() {
       return GroupProfileMemberList(
           groupType: widget.groupType ?? "",
           memberList: searchMemberList ?? [],
-          onTapMemberItem: _onTapMemberItem,
           canAtAll: widget.canAtAll,
+          canSelectMember: true,
           canSlideDelete: false,
+          onSelectedMemberChange: (selectedMemberList) {
+            selectedGroupMemberList = selectedMemberList;
+            bool isAtAllSelected = selectedGroupMemberList.where((element) {
+              return element.userID == GroupProfileMemberList.AT_ALL_USER_ID;
+            }).isNotEmpty;
+
+            if (isAtAllSelected) {
+              _submitAtMemberList();
+            }
+          },
           touchBottomCallBack: () {
             // Get all by once, unnecessary to load more
           },
@@ -168,6 +186,20 @@ class _AtTextState extends TIMUIKitState<AtText> {
                   fontSize: 17,
                 ),
               ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    _submitAtMemberList();
+                  },
+                  child: Text(
+                   TIM_t("确定"),
+                    style: TextStyle(
+                      color: theme.appbarTextColor,
+                      fontSize: 14,
+                    ),
+                  ),
+                )
+              ],
             ),
             body: mentionedMembersBody()));
   }

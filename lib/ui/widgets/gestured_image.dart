@@ -184,7 +184,8 @@ class GesturedImageState extends ExtendedImageGestureState {
     gestureDetails = GestureDetails(
       totalScale: _gestureConfig!.initialScale,
       offset: Offset.zero,
-    )..initialAlignment = _gestureConfig!.initialAlignment;
+      initialAlignment: _gestureConfig!.initialAlignment,
+    );
   }
 
   @override
@@ -433,7 +434,8 @@ class GesturedImageState extends ExtendedImageGestureState {
       _gestureDetails = GestureDetails(
         totalScale: _gestureConfig!.initialScale,
         offset: Offset.zero,
-      )..initialAlignment = _gestureConfig!.initialAlignment;
+        initialAlignment: _gestureConfig!.initialAlignment,
+      );
     }
 
     if (_gestureConfig!.cacheGesture) {

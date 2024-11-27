@@ -243,15 +243,14 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
                   ));
     await player.initialize();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      double w = getVideoWidth();
-      double h = getVideoHeight();
+      double aspectRatio = player.value.aspectRatio;
       ChewieController controller = ChewieController(
           videoPlayerController: player,
           autoPlay: true,
           looping: false,
           showControlsOnInitialize: false,
           allowPlaybackSpeedChanging: false,
-          aspectRatio: w == 0 || h == 0 ? null : w / h,
+          aspectRatio: aspectRatio,
           customControls: VideoCustomControls(downloadFn: () async {
             return await _saveVideo();
           }));

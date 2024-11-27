@@ -143,7 +143,7 @@ class TUIProfileViewModel extends ChangeNotifier {
     }
   }
 
-  Future<V2TimFriendOperationResult?> deleteFriend(String userID) async {
+  Future<V2TimFriendOperationResult?> deleteFriend(String userID, {bool needUpdateData = true}) async {
     if (_lifeCycle?.shouldDeleteFriend != null &&
         await _lifeCycle!.shouldDeleteFriend(userID) == false) {
       return null;
@@ -152,9 +152,13 @@ class TUIProfileViewModel extends ChangeNotifier {
         userIDList: [userID],
         deleteType: FriendTypeEnum.V2TIM_FRIEND_TYPE_BOTH);
     if (res != null) {
-      loadData(userID: userID);
+      _conversationService.deleteConversation(conversationID: "c2c_$userID");
+      if (needUpdateData) {
+        loadData(userID: userID);
+      }
       return res.first;
     }
+
     return null;
   }
 
@@ -171,49 +175,6 @@ class TUIProfileViewModel extends ChangeNotifier {
     return res;
   }
 
-  // 1：男 女：2
-  Future<V2TimCallback> updateGender(int gender) async {
-    final res = await _coreServices.setSelfInfo(
-      userFullInfo: V2TimUserFullInfo.fromJson(
-        {"gender": gender},
-      ),
-    );
-    if (res.code == 0) {
-      _userProfile?.friendInfo!.userProfile!.gender = gender;
-      notifyListeners();
-    }
-
-    return res;
-  }
-
-  Future<V2TimCallback> updateNickName(String nickName) async {
-    final res = await _coreServices.setSelfInfo(
-      userFullInfo: V2TimUserFullInfo.fromJson(
-        {"nickName": nickName},
-      ),
-    );
-
-    if (res.code == 0) {
-      _userProfile?.friendInfo!.userProfile!.nickName = nickName;
-      notifyListeners();
-    }
-
-    return res;
-  }
-
-  Future<V2TimCallback> updateSelfSignature(String selfSignature) async {
-    final res = await _coreServices.setSelfInfo(
-      userFullInfo: V2TimUserFullInfo.fromJson(
-        {"selfSignature": selfSignature},
-      ),
-    );
-    if (res.code == 0) {
-      _userProfile?.friendInfo!.userProfile!.selfSignature = selfSignature;
-      notifyListeners();
-    }
-    return res;
-  }
-
   Future<V2TimFriendOperationResult?> addFriend(String userID) async {
     if (_lifeCycle?.shouldAddFriend != null &&
         await _lifeCycle!.shouldAddFriend(userID) == false) {
@@ -225,6 +186,7 @@ class TUIProfileViewModel extends ChangeNotifier {
       loadData(userID: userID);
       return res.data;
     }
+
     return null;
   }
 
@@ -291,13 +253,14 @@ class TUIProfileViewModel extends ChangeNotifier {
         newSelfInfo,
       ),
     );
+
     if (res.code == 0) {
       newSelfInfo.forEach((key, value) {
         updateUserInfo(key, value);
       });
-
       notifyListeners();
     }
+
     return res;
   }
 }

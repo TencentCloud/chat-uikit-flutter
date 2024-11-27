@@ -8,7 +8,7 @@ class HttpText extends SpecialText {
   HttpText(TextStyle? textStyle, SpecialTextGestureTapCallback? onTap,
       {this.start})
       : super(flag, flag, textStyle, onTap: onTap);
-  static const String flag = '\$';
+  static const String flag = '!@TURL#*&\$';
   final int? start;
   @override
   InlineSpan finishText() {
@@ -30,16 +30,3 @@ class HttpText extends SpecialText {
           });
   }
 }
-
-List<String> dollarList = <String>[
-  '\$Dota2\$',
-  '\$Dota2 Ti9\$',
-  '\$CN dota best dota\$',
-  '\$Flutter\$',
-  '\$CN dev best dev\$',
-  '\$UWP\$',
-  '\$Nevermore\$',
-  '\$FlutterCandies\$',
-  '\$ExtendedImage\$',
-  '\$ExtendedText\$',
-];

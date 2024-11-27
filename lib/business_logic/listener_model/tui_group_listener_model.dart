@@ -3,7 +3,6 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
@@ -15,6 +14,8 @@ class NeedUpdate {
   final String groupID;
   final UpdateType updateType;
   final String extraData;
+  int? groupInfoSubType;
+  String? ownerID;
 
   NeedUpdate(this.groupID, this.updateType, this.extraData);
 }
@@ -44,10 +45,11 @@ class TUIGroupListenerModel extends ChangeNotifier {
       onMemberKicked: (groupID, opUser, memberList) async {
         if (_isLoginUserKickedFromGroup(groupID, memberList)) {
           _deleteGroupConversation(groupID);
+
+          final groupName = await _getGroupName(groupID);
+          _needUpdate = NeedUpdate(groupID, UpdateType.kickedFromGroup, groupName);
+          notifyListeners();
         }
-        final groupName = await _getGroupName(groupID);
-        _needUpdate = NeedUpdate(groupID, UpdateType.kickedFromGroup, groupName);
-        notifyListeners();
       },
       onMemberEnter: (String groupID, List<V2TimGroupMemberInfo> memberList) {
         _needUpdate = NeedUpdate(groupID, UpdateType.memberList, "");
@@ -59,6 +61,12 @@ class TUIGroupListenerModel extends ChangeNotifier {
       },
       onGroupInfoChanged: (groupID, changeInfos) {
         _needUpdate = NeedUpdate(groupID, UpdateType.groupInfo, "");
+        for (V2TimGroupChangeInfo info in changeInfos) {
+          if (info.type == GroupChangeInfoType.V2TIM_GROUP_INFO_CHANGE_TYPE_OWNER) {
+            _needUpdate!.groupInfoSubType = GroupChangeInfoType.V2TIM_GROUP_INFO_CHANGE_TYPE_OWNER;
+            _needUpdate!.ownerID = info.value;
+          }
+        }
         notifyListeners();
       },
       onReceiveJoinApplication:

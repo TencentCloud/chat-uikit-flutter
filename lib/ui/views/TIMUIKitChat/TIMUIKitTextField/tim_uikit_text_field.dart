@@ -192,7 +192,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     return stickerPackageList;
   }
 
-  setCurrentCursor(int? value) {
+  _setCurrentCursor(int? value) {
     currentCursor = value;
   }
 
@@ -203,7 +203,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     return emojiRegex().hasMatch(input);
   }
 
-  void deleteStickerFromText() {
+  void _deleteStickerFromText() {
     String originalText = textEditingController.text;
 
     if (originalText == zeroWidthSpace) {
@@ -239,9 +239,21 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
         focusNode.requestFocus();
       }
     }
+
+    if (originalText.isEmpty && textEditingController.text.isEmpty) {
+      widget.model.repliedMessage = null;
+    }
   }
 
-  void addStickerToText(String sticker) {
+  void _onDeleteText(String oldText) {
+    if (oldText.isEmpty) {
+      if (widget.model.repliedMessage != null) {
+        widget.model.repliedMessage = null;
+      }
+    }
+  }
+
+  void _addStickerToText(String sticker) {
     final currentText = textEditingController.text;
     if (currentCursor != null && currentCursor! > -1 && currentCursor! < currentText.length + 1) {
       final firstString = currentText.substring(0, currentCursor);
@@ -267,13 +279,13 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     String text = textEditingController.text;
     String convID = id ?? widget.conversationID;
     final isTopic = convID.contains("@TOPIC#");
-    String conversationID = isTopic ? convID : ((convType ?? widget.conversationType) == ConvType.c2c ? "c2c_$convID" : "group_$convID");
+    String conversationID = isTopic ? convID : ((convType ?? widget.conversationType) == ConvType.c2c ? "${TUIConversationViewModel.conversationC2CPrefix}$convID" : "${TUIConversationViewModel.conversationGroupPrefix}$convID");
     String draftText = _filterU200b(text);
     return await conversationModel.setConversationDraft(groupID: groupID ?? widget.groupID, isTopic: isTopic, isAllowWeb: widget.model.chatConfig.isUseDraftOnWeb, conversationID: conversationID, draftText: draftText);
   }
 
-// 和onSubmitted一样，只是保持焦点的不同
-  onEmojiSubmitted() {
+  // 和onSubmitted一样，只是保持焦点的不同
+  _onEmojiSubmitted() {
     lastText = "";
     final text = textEditingController.text.trim();
     final convType = widget.conversationType;
@@ -303,8 +315,8 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     currentCursor = null;
   }
 
-// index为emoji的index,data为baseurl+name
-  onCustomEmojiFaceSubmitted(int index, String data) {
+  // index为emoji的index,data为baseurl+name
+  _onCustomEmojiFaceSubmitted(int index, String data) {
     final convType = widget.conversationType;
 
     // This part of the code is written to adapt to the Native side requirements.
@@ -610,19 +622,25 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
         isAddingAtSearchWords = false;
       }
     } else if (textLength > 0 && text[textLength - 1] == "@" && lastText.length < textLength) {
-      V2TimGroupMemberFullInfo? memberInfo = await Navigator.push(
+      List<V2TimGroupMemberFullInfo> selectedAtMemberList = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => AtText(groupMemberList: model.groupMemberList, groupInfo: model.groupInfo, groupID: groupID, canAtAll: canAtAll, groupType: widget.groupType),
         ),
       );
-      final showName = _getShowName(memberInfo);
-      if (memberInfo != null) {
-        mentionedMembersMap["@$showName"] = memberInfo;
-        textEditingController.text = "$text$showName ";
-        lastText = "$text$showName ";
+
+      for (int i = 0; i < selectedAtMemberList.length; ++i) {
+        V2TimGroupMemberFullInfo memberInfo = selectedAtMemberList[i];
+        final showName = _getShowName(memberInfo);
+        if (memberInfo != null) {
+          mentionedMembersMap["@$showName"] = memberInfo;
+          String addAtCharacter = i == 0 ? "" : "@";
+          textEditingController.text = "${textEditingController.text}$addAtCharacter$showName ";
+          lastText = "${textEditingController.text}$addAtCharacter$showName ";
+        }
       }
     }
+
     lastText = textEditingController.text;
   }
 
@@ -858,12 +876,13 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                 context: context,
                 defaultWidget: TIMUIKitTextFieldLayoutNarrow(
                     stickerPackageList: stickerPackageList,
-                    onEmojiSubmitted: onEmojiSubmitted,
-                    onCustomEmojiFaceSubmitted: onCustomEmojiFaceSubmitted,
-                    backSpaceText: deleteStickerFromText,
-                    addStickerToText: addStickerToText,
+                    onEmojiSubmitted: _onEmojiSubmitted,
+                    onCustomEmojiFaceSubmitted: _onCustomEmojiFaceSubmitted,
+                    backSpaceText: _deleteStickerFromText,
+                    addStickerToText: _addStickerToText,
                     customStickerPanel: widget.customStickerPanel,
                     onChanged: widget.onChanged,
+                    onDeleteText: _onDeleteText,
                     backgroundColor: widget.backgroundColor,
                     morePanelConfig: widget.morePanelConfig,
                     repliedMessage: value,
@@ -876,7 +895,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                     conversationType: widget.conversationType,
                     focusNode: focusNode,
                     controller: widget.controller,
-                    setCurrentCursor: setCurrentCursor,
+                    setCurrentCursor: _setCurrentCursor,
                     onCursorChange: _onCursorChange,
                     model: model,
                     handleSendEditStatus: _handleSendEditStatus,
@@ -895,10 +914,10 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                     chatConfig: widget.chatConfig ?? widget.model.chatConfig,
                     theme: theme,
                     currentConversation: widget.currentConversation,
-                    onEmojiSubmitted: onEmojiSubmitted,
-                    onCustomEmojiFaceSubmitted: onCustomEmojiFaceSubmitted,
-                    backSpaceText: deleteStickerFromText,
-                    addStickerToText: addStickerToText,
+                    onEmojiSubmitted: _onEmojiSubmitted,
+                    onCustomEmojiFaceSubmitted: _onCustomEmojiFaceSubmitted,
+                    backSpaceText: _deleteStickerFromText,
+                    addStickerToText: _addStickerToText,
                     customStickerPanel: widget.customStickerPanel,
                     onChanged: widget.onChanged,
                     backgroundColor: widget.backgroundColor,
@@ -913,7 +932,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                     conversationType: widget.conversationType,
                     focusNode: focusNode,
                     controller: widget.controller,
-                    setCurrentCursor: setCurrentCursor,
+                    setCurrentCursor: _setCurrentCursor,
                     onCursorChange: _onCursorChange,
                     model: model,
                     handleSendEditStatus: _handleSendEditStatus,
