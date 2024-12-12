@@ -1,3 +1,9 @@
+# 3.1.0+2
+* Replace the flutter_slidable library with flutter_slidable_plus_plus to solve the compatibility issue of flutter 3.27.0 version.
+
+# 3.1.0+1
+* Upgrade the third-party library version to adapt to Android AGP 8.0.
+
 # 3.1.0
 ## Bug Fixes
 * The interface for deleting messages is changed to the interface for deleting cloud messages.
