@@ -95,17 +95,11 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
         });
       }
     } else {
-      String originalText =
+      String msgShowText =
           await _getLastMsgShowText(widget.lastMsg, widget.context) ?? "";
-      String replaceText = TUIKitStickerConstData.emojiZhNameMap.keys
-          .fold(originalText, (previousValue, key) {
-        return previousValue.replaceAll(
-            key, TIM_t(TUIKitStickerConstData.emojiZhNameMap[key]!));
-      });
-
       if (mounted) {
         setState(() {
-          groupTipsAbstractText = replaceText;
+          groupTipsAbstractText = msgShowText;
         });
       }
     }
@@ -228,31 +222,37 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
                 color: theme.weakTextColor, fontSize: widget.fontSize)),
       if (widget.draftText != null && widget.draftText != "")
         Expanded(
-          child: ExtendedText(
-            groupTipsAbstractText,
-            softWrap: true,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-                height: 1,
-                color: theme.weakTextColor,
-                fontSize: widget.fontSize),
-          ),
+          child: ExtendedText(groupTipsAbstractText,
+              softWrap: true,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  height: 1,
+                  color: theme.weakTextColor,
+                  fontSize: widget.fontSize),
+              specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
+                isUseQQPackage: true,
+                isUseTencentCloudChatPackage: true,
+                showAtBackground: true,
+              )),
         ),
       if (widget.draftText == null ||
           widget.draftText == "" &&
               TencentUtils.checkString(groupTipsAbstractText) != null)
         Expanded(
-          child: ExtendedText(
-            groupTipsAbstractText,
-            softWrap: true,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-                height: 1,
-                color: theme.weakTextColor,
-                fontSize: widget.fontSize),
-          ),
+          child: ExtendedText(groupTipsAbstractText,
+              softWrap: true,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  height: 1,
+                  color: theme.weakTextColor,
+                  fontSize: widget.fontSize),
+              specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
+                isUseQQPackage: true,
+                isUseTencentCloudChatPackage: true,
+                showAtBackground: true,
+              )),
         )
     ]);
   }

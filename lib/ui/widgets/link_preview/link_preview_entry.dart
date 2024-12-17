@@ -12,12 +12,17 @@ class LinkPreviewEntry {
   static LinkPreviewText? getHyperlinksText(String messageText, bool isMarkdown,
       {Function(String)? onLinkTap,
       bool isEnableTextSelection = false,
+      bool isUseQQPackage = false,
       bool isUseTencentCloudChatPackage = false,
+      bool isUseTencentCloudChatPackageOldKeys = false,
       List<CustomEmojiFaceData> customEmojiStickerList = const []}) {
     return ({TextStyle? style}) {
       return isMarkdown
           ? LinkTextMarkdown(
+              isUseQQPackage: isUseQQPackage,
               isUseTencentCloudChatPackage: isUseTencentCloudChatPackage,
+              isUseTencentCloudChatPackageOldKeys:
+                  isUseTencentCloudChatPackageOldKeys,
               customEmojiStickerList: customEmojiStickerList,
               isEnableTextSelection: isEnableTextSelection,
               messageText: addSpaceAfterLeftBracket(
@@ -29,7 +34,10 @@ class LinkPreviewEntry {
               messageText: messageText,
               style: style,
               onLinkTap: onLinkTap,
+              isUseQQPackage: isUseQQPackage,
               isUseTencentCloudChatPackage: isUseTencentCloudChatPackage,
+              isUseTencentCloudChatPackageOldKeys:
+                  isUseTencentCloudChatPackageOldKeys,
               customEmojiStickerList: customEmojiStickerList);
     };
   }

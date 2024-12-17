@@ -28,14 +28,20 @@ class LinkTextMarkdown extends TIMStatelessWidget {
 
   final bool? isEnableTextSelection;
 
+  final bool isUseQQPackage;
+
   final bool isUseTencentCloudChatPackage;
+
+  final bool isUseTencentCloudChatPackageOldKeys;
 
   final List<CustomEmojiFaceData> customEmojiStickerList;
 
   const LinkTextMarkdown(
       {Key? key,
       required this.messageText,
+      this.isUseQQPackage = false,
       this.isUseTencentCloudChatPackage = false,
+      this.isUseTencentCloudChatPackageOldKeys = false,
       this.customEmojiStickerList = const [],
       this.isEnableTextSelection,
       this.onLinkTap,
@@ -81,7 +87,11 @@ class LinkText extends TIMStatelessWidget {
   /// text style for default words
   final TextStyle? style;
 
+  final bool isUseQQPackage;
+
   final bool isUseTencentCloudChatPackage;
+
+  final bool isUseTencentCloudChatPackageOldKeys;
 
   final List<CustomEmojiFaceData> customEmojiStickerList;
 
@@ -93,7 +103,9 @@ class LinkText extends TIMStatelessWidget {
       this.onLinkTap,
       this.isEnableTextSelection,
       this.style,
+      this.isUseQQPackage = false,
       this.isUseTencentCloudChatPackage = false,
+      this.isUseTencentCloudChatPackageOldKeys = false,
       this.customEmojiStickerList = const []})
       : super(key: key);
 
@@ -165,7 +177,10 @@ class LinkText extends TIMStatelessWidget {
     },
         style: style ?? const TextStyle(fontSize: 16.0),
         specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
+          isUseQQPackage: isUseQQPackage,
           isUseTencentCloudChatPackage: isUseTencentCloudChatPackage,
+          isUseTencentCloudChatPackageOldKeys:
+              isUseTencentCloudChatPackageOldKeys,
           customEmojiStickerList: customEmojiStickerList,
           showAtBackground: true,
         ));

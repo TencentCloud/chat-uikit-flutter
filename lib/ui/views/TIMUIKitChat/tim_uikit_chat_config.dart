@@ -24,18 +24,34 @@ class TimeDividerConfig {
 
 /// StickerPanelConfig is a configuration class for the sticker panel component.
 /// It allows customization of specific features such as display options for the
-/// message area, sticker packages, and custom sticker packages.
+/// message area, sticker packages, unicode emoji lists, and custom sticker packages.
 class StickerPanelConfig {
+  /// Determines whether to use the QQ Sticker Package.
+  /// Default value: true
+  final bool useQQStickerPackage;
+
   /// Determines whether to use the Tencent Cloud Chat Sticker Package.
   /// Default value: true
   final bool useTencentCloudChatStickerPackage;
+
+  /// Determines whether to compatible with the Tencent Cloud Chat Sticker Package 3.x version.
+  /// Default value : false
+  final bool useTencentCloudChatStickerPackageOldKeys;
+
+  /// A list of unicode emoji, represented as integers.
+  /// Default value: a list of common Unicode Emojis.
+  /// To exclude Unicode Emoji from the display, pass an empty list.
+  final List<int> unicodeEmojiList;
 
   /// A list of CustomStickerPackage instances, where each instance represents a sticker package.
   /// Default value: an empty list.
   final List<CustomStickerPackage> customStickerPackages;
 
   StickerPanelConfig({
+    this.useQQStickerPackage = true,
     this.useTencentCloudChatStickerPackage = true,
+    this.useTencentCloudChatStickerPackageOldKeys = false,
+    this.unicodeEmojiList = TUIKitStickerConstData.defaultUnicodeEmojiList,
     this.customStickerPackages = const [],
   });
 }

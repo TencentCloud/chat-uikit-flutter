@@ -1,6 +1,10 @@
+# 4.0.1
+* Upgraded the plugin tim_ui_kit_sticker_plugin to 4.0.1.
+* Use the 'useTencentCloudChatStickerPackageOldKeys' parameter in StickerPanelConfig to control whether the emoticon is compatible with version 3.x.
+
 # 4.0.0
 ## Breaking changes
-* Upgraded the plugin tim_ui_kit_sticker_plugin to 4.0.0, no longer supports QQ emoji and unicode emoji.
+* Upgraded the plugin tim_ui_kit_sticker_plugin to 4.0.0.
 * Delete the useQQStickerPackage and unicodeEmojiList parameters in StickerPanelConfig.
 * Delete the isUseDefaultEmoji parameter in TIMUIKitChatConfig.
 * Delete the isUseDefaultEmoji parameter in each widget.

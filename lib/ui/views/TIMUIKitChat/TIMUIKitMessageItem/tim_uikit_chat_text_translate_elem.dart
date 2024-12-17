@@ -122,9 +122,15 @@ class _TIMUIKitTextTranslationElemState
     final textWithLink = LinkPreviewEntry.getHyperlinksText(translateText ?? "",
         widget.chatModel.chatConfig.isSupportMarkdownForTextMessage,
         onLinkTap: widget.chatModel.chatConfig.onTapLink,
+        isUseQQPackage: widget
+                .chatModel.chatConfig.stickerPanelConfig?.useQQStickerPackage ??
+            true,
         isUseTencentCloudChatPackage: widget.chatModel.chatConfig
                 .stickerPanelConfig?.useTencentCloudChatStickerPackage ??
             true,
+        isUseTencentCloudChatPackageOldKeys: widget.chatModel.chatConfig
+                .stickerPanelConfig?.useTencentCloudChatStickerPackageOldKeys ??
+            false,
         customEmojiStickerList: widget.customEmojiStickerList,
         isEnableTextSelection:
             widget.chatModel.chatConfig.isEnableTextSelection ?? false);
@@ -160,12 +166,21 @@ class _TIMUIKitTextTranslationElemState
                                 fontSize: isDesktopScreen ? 14 : 16,
                                 height: widget.chatModel.chatConfig.textHeight),
                         specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
+                          isUseQQPackage: widget.chatModel.chatConfig
+                                  .stickerPanelConfig?.useQQStickerPackage ??
+                              true,
                           isUseTencentCloudChatPackage: widget
                                   .chatModel
                                   .chatConfig
                                   .stickerPanelConfig
                                   ?.useTencentCloudChatStickerPackage ??
                               true,
+                          isUseTencentCloudChatPackageOldKeys: widget
+                                  .chatModel
+                                  .chatConfig
+                                  .stickerPanelConfig
+                                  ?.useTencentCloudChatStickerPackageOldKeys ??
+                              false,
                           customEmojiStickerList: widget.customEmojiStickerList,
                           showAtBackground: true,
                         )),
