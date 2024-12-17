@@ -271,9 +271,6 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
   // open MessageReaction
   final bool? isUseMessageReaction;
 
-  /// Whether to use the default emoji
-  final bool isUseDefaultEmoji;
-
   final List<CustomEmojiFaceData> customEmojiStickerList;
 
   final V2TimGroupMemberFullInfo? groupMemberInfo;
@@ -309,7 +306,6 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
       this.topRowBuilder,
       this.isUseMessageReaction,
       this.bottomRowBuilder,
-      this.isUseDefaultEmoji = false,
       this.customEmojiStickerList = const [],
       this.textFieldController,
       this.onSecondaryTapForOthersPortrait,
@@ -502,7 +498,6 @@ class _TIMUIKItHistoryMessageListItemState
                 fontStyle: widget.themeData?.messageTextStyle,
                 backgroundColor: widget.themeData?.messageBackgroundColor,
                 textPadding: widget.textPadding,
-                isUseDefaultEmoji: widget.isUseDefaultEmoji,
                 customEmojiStickerList: widget.customEmojiStickerList,
                 chatModel: model,
                 isShowMessageReaction: widget.isUseMessageReaction,
@@ -527,7 +522,6 @@ class _TIMUIKItHistoryMessageListItemState
               backgroundColor: widget.themeData?.messageBackgroundColor,
               textPadding: widget.textPadding,
               isShowMessageReaction: widget.isUseMessageReaction,
-              isUseDefaultEmoji: widget.isUseDefaultEmoji,
               customEmojiStickerList: widget.customEmojiStickerList,
             );
       case MessageElemType.V2TIM_ELEM_TYPE_FACE:
@@ -888,17 +882,23 @@ class _TIMUIKItHistoryMessageListItemState
       }
     }
 
-    if (widget.message.status != MessageStatus.V2TIM_MSG_STATUS_SEND_FAIL) {
-      widget.toolTipsConfig?.showReplyMessage = true;
-    } else {
-      widget.toolTipsConfig?.showReplyMessage = false;
+    // 如果配置了显示回复消息，则需要根据消息状态来决定是否可以回复；如果配置了不显示回复消息，则不需要判断消息状态。
+    if ((widget.toolTipsConfig?.showReplyMessage ?? true)) {
+      if (widget.message.status != MessageStatus.V2TIM_MSG_STATUS_SEND_FAIL) {
+        widget.toolTipsConfig?.showReplyMessage = true;
+      } else {
+        widget.toolTipsConfig?.showReplyMessage = false;
+      }
     }
 
-    if (widget.message.status != MessageStatus.V2TIM_MSG_STATUS_SEND_FAIL &&
-        !(widget.message.hasRiskContent ?? false)) {
-      widget.toolTipsConfig?.showForwardMessage = true;
-    } else {
-      widget.toolTipsConfig?.showForwardMessage = false;
+    // 如果配置了显示转发消息，则需要根据消息状态来决定是否可以转发；如果配置了不显示转发消息，则不需要判断消息状态。
+    if ((widget.toolTipsConfig?.showForwardMessage ?? true)) {
+      if (widget.message.status != MessageStatus.V2TIM_MSG_STATUS_SEND_FAIL &&
+          !(widget.message.hasRiskContent ?? false)) {
+        widget.toolTipsConfig?.showForwardMessage = true;
+      } else {
+        widget.toolTipsConfig?.showForwardMessage = false;
+      }
     }
 
     tooltip = SuperTooltip(
@@ -1561,7 +1561,6 @@ class _TIMUIKItHistoryMessageListItemState
                               ),
                               TIMUIKitTextTranslationElem(
                                   message: message,
-                                  isUseDefaultEmoji: widget.isUseDefaultEmoji,
                                   customEmojiStickerList:
                                       widget.customEmojiStickerList,
                                   isFromSelf: message.isSelf ?? true,

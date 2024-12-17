@@ -22,7 +22,6 @@ class TIMUIKitTextTranslationElem extends StatefulWidget {
   final EdgeInsetsGeometry? textPadding;
   final TUIChatSeparateViewModel chatModel;
   final bool? isShowMessageReaction;
-  final bool isUseDefaultEmoji;
   final List<CustomEmojiFaceData> customEmojiStickerList;
 
   const TIMUIKitTextTranslationElem(
@@ -37,7 +36,6 @@ class TIMUIKitTextTranslationElem extends StatefulWidget {
       this.backgroundColor,
       this.textPadding,
       required this.chatModel,
-      this.isUseDefaultEmoji = false,
       this.customEmojiStickerList = const []})
       : super(key: key);
 
@@ -124,10 +122,6 @@ class _TIMUIKitTextTranslationElemState
     final textWithLink = LinkPreviewEntry.getHyperlinksText(translateText ?? "",
         widget.chatModel.chatConfig.isSupportMarkdownForTextMessage,
         onLinkTap: widget.chatModel.chatConfig.onTapLink,
-        isUseQQPackage: (widget.chatModel.chatConfig.stickerPanelConfig
-                    ?.useTencentCloudChatStickerPackage ??
-                true) ||
-            widget.isUseDefaultEmoji,
         isUseTencentCloudChatPackage: widget.chatModel.chatConfig
                 .stickerPanelConfig?.useTencentCloudChatStickerPackage ??
             true,
@@ -166,13 +160,6 @@ class _TIMUIKitTextTranslationElemState
                                 fontSize: isDesktopScreen ? 14 : 16,
                                 height: widget.chatModel.chatConfig.textHeight),
                         specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
-                          isUseQQPackage: (widget
-                                      .chatModel
-                                      .chatConfig
-                                      .stickerPanelConfig
-                                      ?.useTencentCloudChatStickerPackage ??
-                                  true) ||
-                              widget.isUseDefaultEmoji,
                           isUseTencentCloudChatPackage: widget
                                   .chatModel
                                   .chatConfig

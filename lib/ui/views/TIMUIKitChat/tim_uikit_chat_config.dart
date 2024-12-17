@@ -24,29 +24,18 @@ class TimeDividerConfig {
 
 /// StickerPanelConfig is a configuration class for the sticker panel component.
 /// It allows customization of specific features such as display options for the
-/// message area, sticker packages, unicode emoji lists, and custom sticker packages.
+/// message area, sticker packages, and custom sticker packages.
 class StickerPanelConfig {
-  /// Determines whether to use the QQ Sticker Package.
-  /// Default value: true
-  final bool useQQStickerPackage;
-
   /// Determines whether to use the Tencent Cloud Chat Sticker Package.
   /// Default value: true
   final bool useTencentCloudChatStickerPackage;
-
-  /// A list of unicode emoji, represented as integers.
-  /// Default value: a list of common Unicode Emojis.
-  /// To exclude Unicode Emoji from the display, pass an empty list.
-  final List<int> unicodeEmojiList;
 
   /// A list of CustomStickerPackage instances, where each instance represents a sticker package.
   /// Default value: an empty list.
   final List<CustomStickerPackage> customStickerPackages;
 
   StickerPanelConfig({
-    this.useQQStickerPackage = true,
     this.useTencentCloudChatStickerPackage = true,
-    this.unicodeEmojiList = TUIKitStickerConstData.defaultUnicodeEmojiList,
     this.customStickerPackages = const [],
   });
 }
@@ -185,9 +174,6 @@ class TIMUIKitChatConfig {
   /// The default action is opening the link with the default browser of system.
   final void Function(String url)? onTapLink;
 
-  /// Whether to use the default emoji
-  final bool isUseDefaultEmoji;
-
   /// Whether shows avatar on history message list.
   /// [Default]: true.
   final bool isShowAvatar;
@@ -273,7 +259,7 @@ class TIMUIKitChatConfig {
       this.isUseMessageReaction = true,
       this.isShowAvatar = true,
       this.isShowSelfNameInGroup = false,
-        this.isAtWhenReplyDynamic,
+      this.isAtWhenReplyDynamic,
       this.offlinePushInfo,
       @Deprecated("Please use [isShowReadingStatus] instead")
       this.isShowGroupMessageReadReceipt = true,
@@ -285,10 +271,8 @@ class TIMUIKitChatConfig {
       this.notificationTitle = "",
       this.notificationIOSSound = "",
       this.isAllowSoundMessage = true,
-      @Deprecated("not support")
-      this.groupReadReceiptPermisionList,
-      @Deprecated("not support")
-      this.groupReadReceiptPermissionList,
+      @Deprecated("not support") this.groupReadReceiptPermisionList,
+      @Deprecated("not support") this.groupReadReceiptPermissionList,
       this.isAllowEmojiPanel = true,
       this.isAllowShowMorePanel = true,
       this.isShowReadingStatus = true,
@@ -304,6 +288,5 @@ class TIMUIKitChatConfig {
       this.showC2cMessageEditStatus = true,
       this.additionalDesktopControlBarItems,
       this.isAllowLongPressAvatarToAt = true,
-      this.isUseDefaultEmoji = false,
       this.isMemberCanAtAll = false});
 }

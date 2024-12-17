@@ -37,7 +37,6 @@ class TIMUIKitReplyElem extends StatefulWidget {
   final EdgeInsetsGeometry? textPadding;
   final TUIChatSeparateViewModel chatModel;
   final bool? isShowMessageReaction;
-  final bool isUseDefaultEmoji;
   final List<CustomEmojiFaceData> customEmojiStickerList;
 
   const TIMUIKitReplyElem({
@@ -51,7 +50,6 @@ class TIMUIKitReplyElem extends StatefulWidget {
     this.isShowMessageReaction,
     this.backgroundColor,
     this.textPadding,
-    this.isUseDefaultEmoji = false,
     this.customEmojiStickerList = const [],
     required this.chatModel,
   }) : super(key: key);
@@ -94,7 +92,7 @@ class _TIMUIKitReplyElemState extends TIMUIKitState<TIMUIKitReplyElem> {
       }
 
       final messageID = cloudCustomData.messageID;
-      if(PlatformUtils().isWeb){
+      if (PlatformUtils().isWeb) {
         return;
       }
       V2TimMessage? message = await widget.chatModel.findMessage(messageID);
@@ -289,12 +287,12 @@ class _TIMUIKitReplyElemState extends TIMUIKitState<TIMUIKitReplyElem> {
   }
 
   void _jumpToRawMsg() {
-    if (rawMessage?.status != MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED && rawMessage?.timestamp != null) {
+    if (rawMessage?.status != MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED &&
+        rawMessage?.timestamp != null) {
       widget.scrollToIndex(rawMessage);
     } else {
       onTIMCallback(TIMCallback(
-          type: TIMCallbackType.INFO,
-          infoRecommendText: TIM_t("无法定位到原消息")));
+          type: TIMCallbackType.INFO, infoRecommendText: TIM_t("无法定位到原消息")));
     }
   }
 
@@ -370,10 +368,6 @@ class _TIMUIKitReplyElemState extends TIMUIKitState<TIMUIKitReplyElem> {
         widget.message.textElem?.text ?? "",
         widget.chatModel.chatConfig.isSupportMarkdownForTextMessage,
         onLinkTap: widget.chatModel.chatConfig.onTapLink,
-        isUseQQPackage: (widget.chatModel.chatConfig.stickerPanelConfig
-                    ?.useTencentCloudChatStickerPackage ??
-                true) ||
-            widget.isUseDefaultEmoji,
         isUseTencentCloudChatPackage: widget.chatModel.chatConfig
                 .stickerPanelConfig?.useTencentCloudChatStickerPackage ??
             true,
@@ -440,13 +434,6 @@ class _TIMUIKitReplyElemState extends TIMUIKitState<TIMUIKitReplyElem> {
                             fontSize: isDesktopScreen ? 14 : 16,
                             height: widget.chatModel.chatConfig.textHeight),
                     specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
-                      isUseQQPackage: (widget
-                                  .chatModel
-                                  .chatConfig
-                                  .stickerPanelConfig
-                                  ?.useTencentCloudChatStickerPackage ??
-                              true) ||
-                          widget.isUseDefaultEmoji,
                       isUseTencentCloudChatPackage: widget
                               .chatModel
                               .chatConfig

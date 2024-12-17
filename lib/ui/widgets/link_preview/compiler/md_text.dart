@@ -3,15 +3,14 @@ import 'package:tim_ui_kit_sticker_plugin/utils/tim_custom_face_data.dart';
 
 RegExp emojiExp = RegExp(r'\[([\u4e00-\u9fa5A-Za-z0-9]+)\]');
 
-String mdTextCompiler(String originalText, {
-  bool isUseQQPackage = false,
+String mdTextCompiler(
+  String originalText, {
   bool isUseTencentCloudChatPackage = false,
   List<CustomEmojiFaceData> customEmojiStickerList = const [],
 }) {
   String text = originalText;
   final EmojiUtil emojiUtil = EmojiUtil(
       isUseTencentCloudChatPackage: isUseTencentCloudChatPackage,
-      isUseQQPackage: isUseQQPackage,
       customEmojiStickerList: customEmojiStickerList);
 
   text = text.replaceAllMapped(emojiExp, (match) {

@@ -180,7 +180,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
         }
         File f = File(savePath);
         if (f.existsSync()) {
-          var result = await ImageGallerySaver.saveFile(savePath);
+          var result = await ImageGallerySaverPlus.saveFile(savePath);
 
           if (PlatformUtils().isIOS) {
             if (result['isSuccess']) {
@@ -218,7 +218,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
       return;
     }
 
-    var result = await ImageGallerySaver.saveFile(imageUrl);
+    var result = await ImageGallerySaverPlus.saveFile(imageUrl);
 
     if (PlatformUtils().isIOS) {
       if (result['isSuccess']) {

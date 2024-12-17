@@ -8,12 +8,10 @@ class EmojiText extends SpecialText {
   EmojiText(TextStyle? textStyle,
       {this.start,
       this.isUseTencentCloudChatPackage = false,
-      this.isUseQQPackage = false,
       this.customEmojiStickerList = const []})
       : super(EmojiText.flag, ']', textStyle);
   static const String flag = '[';
   final int? start;
-  final bool isUseQQPackage;
   final bool isUseTencentCloudChatPackage;
   final List<CustomEmojiFaceData> customEmojiStickerList;
 
@@ -22,7 +20,6 @@ class EmojiText extends SpecialText {
     final String key = toString();
     final EmojiUtil emojiUtil = EmojiUtil(
         isUseTencentCloudChatPackage: isUseTencentCloudChatPackage,
-        isUseQQPackage: isUseQQPackage,
         customEmojiStickerList: customEmojiStickerList);
 
     if (emojiUtil.emojiMap.containsKey(key)) {
@@ -33,18 +30,7 @@ class EmojiText extends SpecialText {
         size = ts.fontSize! * 1.44;
       }
 
-      if (isUseQQPackage == true &&
-          (emojiUtil.emojiKeyCategoryMap["4349"]?.contains(key) ?? false)) {
-        return ImageSpan(
-            AssetImage(emojiUtil.emojiMap[key]!,
-                package: "tim_ui_kit_sticker_plugin"),
-            actualText: key,
-            imageWidth: size,
-            imageHeight: size,
-            start: start!,
-            // fit: BoxFit.cover,
-            margin: const EdgeInsets.all(0));
-      } else if (isUseTencentCloudChatPackage == true &&
+      if (isUseTencentCloudChatPackage == true &&
           (emojiUtil.emojiKeyCategoryMap["tcc1"]?.contains(key) ?? false)) {
         return ImageSpan(
             AssetImage(emojiUtil.emojiMap[key]!,
@@ -73,8 +59,7 @@ class EmojiText extends SpecialText {
 class EmojiUtil {
   // Private constructor initializing the emoji data
   EmojiUtil._internal(
-      {required this.isUseQQPackage,
-      required this.isUseTencentCloudChatPackage,
+      {required this.isUseTencentCloudChatPackage,
       required this.customEmojiStickerList}) {
     _emojiMap.addAll(loadDefaultEmojis());
 
@@ -83,7 +68,6 @@ class EmojiUtil {
     _emojiKeyCategoryMap["custom"] = customEmojis.$2;
   }
 
-  final bool isUseQQPackage;
   final bool isUseTencentCloudChatPackage;
   final List<CustomEmojiFaceData> customEmojiStickerList;
 
@@ -93,20 +77,12 @@ class EmojiUtil {
     for (final emojiGroup in TUIKitStickerConstData.emojiList) {
       final groupName = emojiGroup.name;
       final keyList = [];
-      if ((isUseQQPackage && groupName == "4349") ||
-          (isUseTencentCloudChatPackage && groupName == "tcc1")) {
+      if (isUseTencentCloudChatPackage && groupName == "tcc1") {
         for (final emoji in emojiGroup.list) {
           String emojiName = emoji.split('.png')[0];
           defaultEmojiMap['[$emojiName]'] =
               '$_emojiFilePath/$groupName/$emojiName.png';
           keyList.add('[$emojiName]');
-
-          if (groupName == "4349") {
-            final zhKey = TUIKitStickerConstData.emojiMapList[emojiName];
-            defaultEmojiMap['[$zhKey]'] =
-                '$_emojiFilePath/$groupName/$emojiName.png';
-            keyList.add('[$zhKey]');
-          }
         }
         _emojiKeyCategoryMap[groupName] = keyList;
       }
@@ -149,11 +125,9 @@ class EmojiUtil {
 
   // Factory constructor to return the singleton instance of EmojiUtil with custom parameters
   factory EmojiUtil(
-      {bool isUseQQPackage = false,
-      bool isUseTencentCloudChatPackage = false,
+      {bool isUseTencentCloudChatPackage = false,
       List<CustomEmojiFaceData> customEmojiStickerList = const []}) {
     return _instance ??= EmojiUtil._internal(
-        isUseQQPackage: isUseQQPackage,
         customEmojiStickerList: customEmojiStickerList,
         isUseTencentCloudChatPackage: isUseTencentCloudChatPackage);
   }

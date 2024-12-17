@@ -1,3 +1,13 @@
+# 4.0.0
+## Breaking changes
+* Upgraded the plugin tim_ui_kit_sticker_plugin to 4.0.0, no longer supports QQ emoji and unicode emoji.
+* Delete the useQQStickerPackage and unicodeEmojiList parameters in StickerPanelConfig.
+* Delete the isUseDefaultEmoji parameter in TIMUIKitChatConfig.
+* Delete the isUseDefaultEmoji parameter in each widget.
+
+## Bug Fixes
+* Solve the problem that showReplyMessage and showForwardMessage in ToolTipsConfig do not take effect after being set to false.
+
 # 3.1.0+2
 * Replace the flutter_slidable library with flutter_slidable_plus_plus to solve the compatibility issue of flutter 3.27.0 version.
 

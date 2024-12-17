@@ -9,7 +9,6 @@ import 'emoji_text.dart';
 
 class DefaultSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
   DefaultSpecialTextSpanBuilder({
-    this.isUseQQPackage = false,
     this.isUseTencentCloudChatPackage = false,
     this.customEmojiStickerList = const [],
     this.showAtBackground = false,
@@ -18,8 +17,6 @@ class DefaultSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
 
   /// whether show background for @somebody
   final bool showAtBackground;
-
-  final bool isUseQQPackage;
 
   final bool isUseTencentCloudChatPackage;
 
@@ -41,7 +38,6 @@ class DefaultSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
       return EmojiText(textStyle,
           isUseTencentCloudChatPackage: isUseTencentCloudChatPackage,
           start: index! - (EmojiText.flag.length - 1),
-          isUseQQPackage: isUseQQPackage,
           customEmojiStickerList: customEmojiStickerList);
     } else if (isStart(flag, HttpText.flag) && checkHttpLink) {
       return HttpText(textStyle, onTap,
