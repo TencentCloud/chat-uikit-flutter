@@ -447,24 +447,25 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                 constraints: const BoxConstraints(minHeight: 50),
                 child: Row(
                   children: [
-                    if (widget.forbiddenText != null)
-                      Expanded(
-                        child: Container(
-                          height: 35,
-                          color: theme.weakBackgroundColor,
-                          alignment: Alignment.center,
-                          child: Text(
-                            TIM_t(widget.forbiddenText!),
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 16,
-                              color: theme.weakTextColor,
-                            ),
-                          ),
-                        ),
-                      ),
-                    if (PlatformUtils().isMobile && widget.showSendAudio && widget.forbiddenText == null)
+                    // if (widget.forbiddenText != null)
+                    //   Expanded(
+                    //     child: Container(
+                    //       height: 35,
+                    //       color: theme.weakBackgroundColor,
+                    //       alignment: Alignment.center,
+                    //       child: Text(
+                    //         TIM_t(widget.forbiddenText!),
+                    //         textAlign: TextAlign.center,
+                    //         style: TextStyle(
+                    //           fontWeight: FontWeight.bold,
+                    //           fontSize: 16,
+                    //           color: theme.weakTextColor,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    if (PlatformUtils().isMobile && widget.showSendAudio)
+                    // if (PlatformUtils().isMobile && widget.showSendAudio && widget.forbiddenText == null)
                       InkWell(
                         onTap: () async {
                           showKeyboard = showSendSoundText;
@@ -491,11 +492,9 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                           width: 28,
                         ),
                       ),
-                    if (widget.forbiddenText == null)
                       const SizedBox(
                         width: 10,
                       ),
-                    if (widget.forbiddenText == null)
                       Expanded(
                         child: showSendSoundText
                             ? SendSoundMessage(builder:widget.soundBuilder, onDownBottom: widget.goDownBottom, conversationID: widget.conversationID, conversationType: widget.conversationType)
@@ -573,11 +572,10 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                             ]
                         ),
                       ),
-                    if (widget.forbiddenText == null)
                       const SizedBox(
                         width: 10,
                       ),
-                    if (widget.showSendEmoji && widget.forbiddenText == null)
+                    if (widget.showSendEmoji)
                       InkWell(
                         onTap: () {
                           _openEmojiPanel();
@@ -593,11 +591,10 @@ class _TIMUIKitTextFieldLayoutNarrowState extends TIMUIKitState<TIMUIKitTextFiel
                           width: 28,
                         ),
                       ),
-                    if (widget.forbiddenText == null)
                       const SizedBox(
                         width: 10,
                       ),
-                    if (widget.showMorePanel && widget.forbiddenText == null && showMoreButton)
+                    if (widget.showMorePanel && showMoreButton)
                       InkWell(
                         onTap: () {
                           // model.sendCustomMessage(data: "a", convID: model.currentSelectedConv, convType: model.currentSelectedConvType == 1 ? ConvType.c2c : ConvType.group);
