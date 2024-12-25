@@ -1,6 +1,7 @@
 import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/error_message_converter.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/optimize_utils.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
@@ -249,10 +250,12 @@ class GroupServicesImpl extends GroupServices {
     final result = await TencentImSDKPlugin.v2TIMManager
         .joinGroup(groupID: groupID, message: message);
     if (result.code != 0) {
+      String recommendText = ErrorMessageConverter.getErrorMessage(result.code);
       _coreService.callOnCallback(TIMCallback(
           type: TIMCallbackType.API_ERROR,
           errorMsg: result.desc,
-          errorCode: result.code));
+          errorCode: result.code,
+          infoRecommendText: recommendText));
     }
     return result;
   }

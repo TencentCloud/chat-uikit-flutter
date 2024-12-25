@@ -24,7 +24,6 @@ class TIMUIKitTextElem extends StatefulWidget {
   final EdgeInsetsGeometry? textPadding;
   final TUIChatSeparateViewModel chatModel;
   final bool? isShowMessageReaction;
-  final bool isUseDefaultEmoji;
   final List<CustomEmojiFaceData> customEmojiStickerList;
 
   const TIMUIKitTextElem(
@@ -39,7 +38,6 @@ class TIMUIKitTextElem extends StatefulWidget {
       this.backgroundColor,
       this.textPadding,
       required this.chatModel,
-      this.isUseDefaultEmoji = false,
       this.customEmojiStickerList = const []})
       : super(key: key);
 
@@ -167,13 +165,15 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
         widget.message.textElem?.text ?? "",
         widget.chatModel.chatConfig.isSupportMarkdownForTextMessage,
         onLinkTap: widget.chatModel.chatConfig.onTapLink,
-        isUseQQPackage: (widget.chatModel.chatConfig.stickerPanelConfig
-                    ?.useTencentCloudChatStickerPackage ??
-                true) ||
-            widget.isUseDefaultEmoji,
+        isUseQQPackage: widget
+                .chatModel.chatConfig.stickerPanelConfig?.useQQStickerPackage ??
+            true,
         isUseTencentCloudChatPackage: widget.chatModel.chatConfig
                 .stickerPanelConfig?.useTencentCloudChatStickerPackage ??
             true,
+        isUseTencentCloudChatPackageOldKeys: widget.chatModel.chatConfig
+                .stickerPanelConfig?.useTencentCloudChatStickerPackageOldKeys ??
+            false,
         customEmojiStickerList: widget.customEmojiStickerList,
         isEnableTextSelection:
             widget.chatModel.chatConfig.isEnableTextSelection ?? false);
@@ -238,21 +238,24 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
                           fontSize: isDesktopScreen ? 14 : 16,
                           height: widget.chatModel.chatConfig.textHeight),
                   specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
-                    isUseQQPackage: (widget
-                                .chatModel
-                                .chatConfig
-                                .stickerPanelConfig
-                                ?.useTencentCloudChatStickerPackage ??
-                            true) ||
-                        widget.isUseDefaultEmoji,
+                    isUseQQPackage: widget.chatModel.chatConfig
+                            .stickerPanelConfig?.useQQStickerPackage ??
+                        true,
                     isUseTencentCloudChatPackage: widget
                             .chatModel
                             .chatConfig
                             .stickerPanelConfig
                             ?.useTencentCloudChatStickerPackage ??
                         true,
+                    isUseTencentCloudChatPackageOldKeys: widget
+                            .chatModel
+                            .chatConfig
+                            .stickerPanelConfig
+                            ?.useTencentCloudChatStickerPackageOldKeys ??
+                        false,
                     customEmojiStickerList: widget.customEmojiStickerList,
                     showAtBackground: true,
+                    checkHttpLink: true,
                   )),
           // If the link preview info is available, render the preview card.
           if (_renderPreviewWidget() != null &&

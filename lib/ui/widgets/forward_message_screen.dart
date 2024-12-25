@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
@@ -53,7 +54,7 @@ class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
   }
 
   List<String> _getAbstractList() {
-    return widget.model.multiSelectedMessageList.map((e) {
+    return widget.model.getSelectedMessageList().map((e) {
       final sender = (e.nickName != null && e.nickName!.isNotEmpty)
           ? e.nickName
           : e.sender;
@@ -62,6 +63,11 @@ class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
   }
 
   handleForwardMessage() async {
+    var confirmResult = await _showConfirmForwardDialog(context);
+    if (confirmResult == null) {
+      return;
+    }
+
     if (widget.isMergerForward) {
       await widget.model.sendMergerMessage(
         conversationList: _conversationList,
@@ -80,6 +86,33 @@ class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
     } else {
       Navigator.pop(context);
     }
+  }
+
+  // 弹出转发确认对话框
+  Future<bool?> _showConfirmForwardDialog(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: Text(TIM_t("您确定进行转发吗？")),
+          actions: [
+            CupertinoDialogAction(
+              child: Text(TIM_t("确定")),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+            CupertinoDialogAction(
+              child: Text(TIM_t("取消")),
+              isDestructiveAction: true,
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override

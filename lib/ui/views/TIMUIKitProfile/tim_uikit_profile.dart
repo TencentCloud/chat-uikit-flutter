@@ -240,51 +240,14 @@ class _TIMUIKitProfileState extends TIMUIKitState<TIMUIKitProfile> {
           }
 
           void handleAddFriend() async {
-            model.addFriend(userInfo.userID).then((res) {
-              if (res == null) {
-                throw Error();
-              }
-              if (res.resultCode == 0) {
-                onTIMCallback(TIMCallback(
-                    type: TIMCallbackType.INFO,
-                    infoRecommendText: TIM_t("好友添加成功"),
-                    infoCode: 6661202));
-              } else if (res.resultCode == 30539) {
-                onTIMCallback(TIMCallback(
-                    type: TIMCallbackType.INFO,
-                    infoRecommendText: TIM_t("好友申请已发出"),
-                    infoCode: 6661203));
-              } else if (res.resultCode == 30515) {
-                onTIMCallback(TIMCallback(
-                    type: TIMCallbackType.INFO,
-                    infoRecommendText: TIM_t("当前用户在黑名单"),
-                    infoCode: 6661204));
-              }
-            }).catchError((error) {
-              onTIMCallback(TIMCallback(
-                  type: TIMCallbackType.INFO,
-                  infoRecommendText: TIM_t("好友添加失败"),
-                  infoCode: 6661205));
-            });
+            model.addFriend(userInfo.userID);
           }
 
-          void handleDeleteFriend() {
-            model.deleteFriend(userInfo.userID).then((res) {
-              if (res == null) {
-                throw Error();
-              }
-              if (res.resultCode != 0 && res.resultCode != null) {
-                onTIMCallback(TIMCallback(
-                    type: TIMCallbackType.INFO,
-                    infoRecommendText: TIM_t("好友删除失败"),
-                    infoCode: 6661207));
-              } else {
-                onTIMCallback(TIMCallback(
-                    type: TIMCallbackType.INFO,
-                    infoRecommendText: TIM_t("好友删除成功"),
-                    infoCode: 6661206));
-              }
-            });
+          Future<void> handleDeleteFriend() async {
+            var result = await model.deleteFriend(userInfo.userID, needUpdateData: false);
+            if (result != null) {
+              Navigator.pop(context);
+            }
           }
 
           List<Widget> _renderWidgetsWithOrder(List<ProfileWidgetEnum> order) {

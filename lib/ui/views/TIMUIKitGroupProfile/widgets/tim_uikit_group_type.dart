@@ -33,6 +33,9 @@ class GroupProfileType extends TIMUIKitStatelessWidget {
       case GroupType.Work:
         groupType = TIM_t("工作群");
         break;
+      case GroupType.Community:
+        groupType = TIM_t("社群");
+        break;
       default:
         groupType = TIM_t("未知群");
         break;

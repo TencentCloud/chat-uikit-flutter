@@ -263,7 +263,6 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
       return TIMUIKitOperationItem(
         smallCardMode: smallCardMode,
         isEmpty: false,
-        showAllowEditStatus: false,
         operationName: TIM_t("生日"),
         operationRightWidget: Text(formatter.format(date),
             textAlign: isDesktopScreen ? null : TextAlign.end),
@@ -272,7 +271,6 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
       return TIMUIKitOperationItem(
         smallCardMode: smallCardMode,
         isEmpty: false,
-        showAllowEditStatus: false,
         operationName: TIM_t("生日"),
         operationRightWidget:
             Text(TIM_t("未填写"), textAlign: isDesktopScreen ? null : TextAlign.end),
@@ -304,7 +302,7 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
               border:
                   Border(bottom: BorderSide(color: theme.weakDividerColor))),
           child: Text(
-            TIM_t("清除好友"),
+            TIM_t("删除好友"),
             style: TextStyle(color: theme.cautionColor, fontSize: 17),
           ),
         ),
@@ -392,7 +390,7 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
           handleDeleteFriend();
         },
         color: theme.cautionColor ?? Colors.red,
-        text: TIM_t("清除好友"),
+        text: TIM_t("删除好友"),
       );
     }
 

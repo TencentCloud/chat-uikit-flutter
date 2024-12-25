@@ -14,12 +14,15 @@ class LinkPreviewEntry {
       bool isEnableTextSelection = false,
       bool isUseQQPackage = false,
       bool isUseTencentCloudChatPackage = false,
+      bool isUseTencentCloudChatPackageOldKeys = false,
       List<CustomEmojiFaceData> customEmojiStickerList = const []}) {
     return ({TextStyle? style}) {
       return isMarkdown
           ? LinkTextMarkdown(
               isUseQQPackage: isUseQQPackage,
               isUseTencentCloudChatPackage: isUseTencentCloudChatPackage,
+              isUseTencentCloudChatPackageOldKeys:
+                  isUseTencentCloudChatPackageOldKeys,
               customEmojiStickerList: customEmojiStickerList,
               isEnableTextSelection: isEnableTextSelection,
               messageText: addSpaceAfterLeftBracket(
@@ -33,6 +36,8 @@ class LinkPreviewEntry {
               onLinkTap: onLinkTap,
               isUseQQPackage: isUseQQPackage,
               isUseTencentCloudChatPackage: isUseTencentCloudChatPackage,
+              isUseTencentCloudChatPackageOldKeys:
+                  isUseTencentCloudChatPackageOldKeys,
               customEmojiStickerList: customEmojiStickerList);
     };
   }

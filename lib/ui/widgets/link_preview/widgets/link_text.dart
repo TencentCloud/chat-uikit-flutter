@@ -5,6 +5,7 @@ import 'package:extended_text/extended_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/http_text.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/compiler/md_text.dart';
 import 'package:tencent_im_base/base_widgets/tim_stateless_widget.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
@@ -31,6 +32,8 @@ class LinkTextMarkdown extends TIMStatelessWidget {
 
   final bool isUseTencentCloudChatPackage;
 
+  final bool isUseTencentCloudChatPackageOldKeys;
+
   final List<CustomEmojiFaceData> customEmojiStickerList;
 
   const LinkTextMarkdown(
@@ -38,6 +41,7 @@ class LinkTextMarkdown extends TIMStatelessWidget {
       required this.messageText,
       this.isUseQQPackage = false,
       this.isUseTencentCloudChatPackage = false,
+      this.isUseTencentCloudChatPackageOldKeys = false,
       this.customEmojiStickerList = const [],
       this.isEnableTextSelection,
       this.onLinkTap,
@@ -48,7 +52,6 @@ class LinkTextMarkdown extends TIMStatelessWidget {
   Widget timBuild(BuildContext context) {
     return MarkdownBody(
       data: mdTextCompiler(messageText,
-          isUseQQPackage: isUseQQPackage,
           isUseTencentCloudChatPackage: isUseTencentCloudChatPackage,
           customEmojiStickerList: customEmojiStickerList),
       selectable: isEnableTextSelection ?? false,
@@ -88,6 +91,8 @@ class LinkText extends TIMStatelessWidget {
 
   final bool isUseTencentCloudChatPackage;
 
+  final bool isUseTencentCloudChatPackageOldKeys;
+
   final List<CustomEmojiFaceData> customEmojiStickerList;
 
   final bool? isEnableTextSelection;
@@ -100,6 +105,7 @@ class LinkText extends TIMStatelessWidget {
       this.style,
       this.isUseQQPackage = false,
       this.isUseTencentCloudChatPackage = false,
+      this.isUseTencentCloudChatPackageOldKeys = false,
       this.customEmojiStickerList = const []})
       : super(key: key);
 
@@ -125,7 +131,7 @@ class LinkText extends TIMStatelessWidget {
       }
 
       if (LinkUtils.urlReg.hasMatch(c)) {
-        contentData += '\$' + c + '\$';
+        contentData += HttpText.flag + c + HttpText.flag;
         _contentList.add(TextSpan(
             text: c,
             style: TextStyle(color: LinkUtils.hexToColor("015fff")),
@@ -160,12 +166,12 @@ class LinkText extends TIMStatelessWidget {
   Widget timBuild(BuildContext context) {
     return ExtendedText(_getContentSpan(messageText, context), softWrap: true,
         onSpecialTextTap: (dynamic parameter) {
-      if (parameter.toString().startsWith('\$')) {
+      if (parameter.toString().startsWith(HttpText.flag)) {
         if (onLinkTap != null) {
-          onLinkTap!((parameter.toString()).replaceAll('\$', ''));
+          onLinkTap!((parameter.toString()).replaceAll(HttpText.flag, ''));
         } else {
           LinkUtils.launchURL(
-              context, (parameter.toString()).replaceAll('\$', ''));
+              context, (parameter.toString()).replaceAll(HttpText.flag, ''));
         }
       }
     },
@@ -173,6 +179,8 @@ class LinkText extends TIMStatelessWidget {
         specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
           isUseQQPackage: isUseQQPackage,
           isUseTencentCloudChatPackage: isUseTencentCloudChatPackage,
+          isUseTencentCloudChatPackageOldKeys:
+              isUseTencentCloudChatPackageOldKeys,
           customEmojiStickerList: customEmojiStickerList,
           showAtBackground: true,
         ));

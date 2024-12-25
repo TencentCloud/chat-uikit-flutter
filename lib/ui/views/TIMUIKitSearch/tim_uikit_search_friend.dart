@@ -66,16 +66,24 @@ class TIMUIKitSearchFriendState extends TIMUIKitState<TIMUIKitSearchFriend> {
           int convIndex = _conversationList
               .indexWhere((item) => conv.friendInfo?.userID == item?.userID);
           V2TimConversation conversation = _conversationList[convIndex]!;
+          late String? showNickName;
+          if (conv.friendInfo?.friendRemark != null && conv.friendInfo?.friendRemark != "") {
+            showNickName = conv.friendInfo?.friendRemark;
+          } else if (conv.friendInfo?.userProfile?.nickName != null && conv.friendInfo?.userProfile?.nickName != "")  {
+            showNickName = conv.friendInfo?.userProfile?.nickName;
+          } else {
+            showNickName = conv.friendInfo?.userID;
+          }
+
           return TIMUIKitSearchItem(
             onClick: () {
               widget.onTapConversation(conversation, null);
             },
             faceUrl: conv.friendInfo?.userProfile?.faceUrl ?? "",
             showName: "",
-            lineOne: conversation.showName ??
-                conversation.userID ??
-                conv.friendInfo?.userID ??
-                "",
+
+            lineOne: conversation.userID!,
+            lineTwo: TIM_t("昵称") + ":" + showNickName!,
           );
         }).toList(),
         _renderShowALl(filteredFriendResultList.length),

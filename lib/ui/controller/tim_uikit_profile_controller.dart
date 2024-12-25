@@ -81,14 +81,28 @@ class TIMUIKitProfileController {
   }
 
   Future<V2TimCallback> updateSelfSignature(String selfSignature) {
-    return model.updateSelfSignature(selfSignature);
+    Map<String, dynamic> infoMap = {"selfSignature": selfSignature};
+    return model.updateSelfInfo(infoMap);
   }
 
   Future<V2TimCallback> updateNickName(String nickName) {
-    return model.updateNickName(nickName);
+    Map<String, dynamic> infoMap = {"nickName": nickName};
+    return model.updateSelfInfo(infoMap);
   }
 
+  /// 1：男 2：女
   Future<V2TimCallback> updateGender(int gender) {
-    return model.updateGender(gender);
+    Map<String, dynamic> infoMap = {"gender": gender};
+    return model.updateSelfInfo(infoMap);
+  }
+
+  Future<V2TimCallback> updateBirthday(int birthday) {
+    Map<String, dynamic> infoMap = {"birthday": birthday};
+    return model.updateSelfInfo(infoMap);
+  }
+
+  Future<V2TimCallback> updateAvatar(String url) {
+    Map<String, dynamic> infoMap = {"faceUrl" : url};
+    return model.updateSelfInfo(infoMap);
   }
 }

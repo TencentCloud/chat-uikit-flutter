@@ -27,6 +27,16 @@ class TimeAgo {
     return (month.length == 1 ? '0' : '') + month + '/' + (date.length == 1 ? '0' : '') + date;
   }
 
+  static String getMonth(DateTime dateTime) {
+    String month = dateTime.month.toString();
+    return (month.length == 1 ? '0' : '') + month;
+  }
+
+  static String getDay(DateTime dateTime) {
+    String day = dateTime.day.toString();
+    return (day.length == 1 ? '0' : '') + day;
+  }
+
   String? getTimeStringForChat(int timeStamp) {
     final DateTime date = DateTime.fromMillisecondsSinceEpoch(timeStamp * 1000);
     final DateTime epochLimit = DateTime.utc(1971);

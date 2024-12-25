@@ -25,7 +25,7 @@ class TUIGroupProfileModel extends ChangeNotifier {
   List<V2TimGroupMemberFullInfo?>? _groupMemberList;
   String _groupMemberListSeq = "0";
   V2TimGroupInfo? _groupInfo;
-  Function(String userID, TapDownDetails? tapDetails)? onClickUser;
+  Function(V2TimGroupMemberFullInfo groupMemberFullInfo, TapDownDetails? tapDetails)? onClickUser;
 
   GroupProfileLifeCycle? get lifeCycle => _lifeCycle;
 
@@ -231,6 +231,33 @@ class TUIGroupProfileModel extends ChangeNotifier {
       notifyListeners();
     }
     return res;
+  }
+
+  void onOwnerChanged(String? userID) {
+    if (userID == null) {
+      return;
+    }
+
+    // 把之前的群主更新为普通成员
+    final preOwnerIndex = _groupMemberList!.indexWhere((e) => e!.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER);
+    if (preOwnerIndex != -1) {
+      final preOwnerElem = _groupMemberList![preOwnerIndex];
+      preOwnerElem?.role = GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_MEMBER;
+
+      print("preOwnerUserID: ${preOwnerElem?.userID}");
+    }
+
+    // 设置新的群主
+    final targetIndex = _groupMemberList!.indexWhere((e) => e!.userID == userID);
+    if (targetIndex != -1) {
+      final targetElem = _groupMemberList![targetIndex];
+      targetElem?.role = GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER;
+      _groupMemberList![targetIndex] = targetElem;
+
+      print("newOwnerUserID: ${targetElem?.userID}");
+    }
+
+    notifyListeners();
   }
 
   bool canInviteMember() {

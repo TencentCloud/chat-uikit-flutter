@@ -71,10 +71,6 @@ class _TIMUIKitAddFriendState extends TIMUIKitState<TIMUIKitAddFriend> {
         if (checkFriend != null) {
           final res = checkFriend.first;
           if (res.resultCode == 0 && res.resultType != 0) {
-            onTIMCallback(TIMCallback(
-                type: TIMCallbackType.INFO,
-                infoRecommendText: TIM_t("该用户已是好友"),
-                infoCode: 6660102));
             widget.onTapAlreadyFriendsItem(userID);
             return;
           }

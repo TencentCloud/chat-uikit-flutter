@@ -203,29 +203,12 @@ class _SendApplicationState extends TIMUIKitState<SendApplication> {
                       return;
                     }
 
-                    final res = await _friendshipServices.addFriend(
+                    _friendshipServices.addFriend(
                         userID: userID,
                         addType: FriendTypeEnum.V2TIM_FRIEND_TYPE_BOTH,
                         remark: remark,
                         addWording: addWording,
                         friendGroup: friendGroup);
-
-                    if (res.code == 0 && res.data?.resultCode == 0) {
-                      onTIMCallback(TIMCallback(
-                          type: TIMCallbackType.INFO,
-                          infoRecommendText: TIM_t("好友添加成功"),
-                          infoCode: 6661202));
-                    } else if (res.code == 0 && res.data?.resultCode == 30539) {
-                      onTIMCallback(TIMCallback(
-                          type: TIMCallbackType.INFO,
-                          infoRecommendText: TIM_t("好友申请已发出"),
-                          infoCode: 6661203));
-                    } else if (res.code == 0 && res.data?.resultCode == 30515) {
-                      onTIMCallback(TIMCallback(
-                          type: TIMCallbackType.INFO,
-                          infoRecommendText: TIM_t("当前用户在黑名单"),
-                          infoCode: 6661204));
-                    }
                   },
                   child: Text(TIM_t("发送"))),
             )

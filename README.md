@@ -1,142 +1,43 @@
-<style>
-.button-9 {
-  appearance: button;
-  backface-visibility: hidden;
-  background-color: #1d52d9;
-  border-radius: 6px;
-  border-width: 0;
-  box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset,rgba(50, 50, 93, .1) 0 2px 5px 0,rgba(0, 0, 0, .07) 0 1px 1px 0;
-  box-sizing: border-box;
-  color: #fff;
-  cursor: pointer;
-  font-family: -apple-system,system-ui,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif;
-  font-size: 100%;
-  height: 44px;
-  line-height: 1.15;
-  margin: 12px 0 0;
-  outline: none;
-  overflow: hidden;
-  padding: 0 20px;
-  position: relative;
-  text-align: center;
-  text-transform: none;
-  transform: translateZ(0);
-  transition: all .2s,box-shadow .08s ease-in;
-  user-select: none;
-  -webkit-user-select: none;
-  touch-action: manipulation;
-}
+# It is recommended to download the source code from [pub.dev](https://pub.dev/packages/tencent_cloud_chat_uikit/versions)
 
-.button-9:disabled {
-  cursor: default;
-}
-
-.button-9:focus {
-  box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset, rgba(50, 50, 93, .2) 0 6px 15px 0, rgba(0, 0, 0, .1) 0 2px 2px 0, rgba(50, 151, 211, .3) 0 0 0 4px;
-}
-
-</style>
-
-<br>
-
-<p align="center">
-  <a href="https://www.tencentcloud.com/products/im?from=pub">
-    <img src="https://qcloudimg.tencent-cloud.cn/raw/429a2f58678a1f5b150c6ae04aa0b569.png" width="320px" alt="Tencent Chat Logo" />
-  </a>
-</p>
-
-<h1 align="center">Tencent Cloud Chat UIKit</h1>
-
-<br>
-
-<p align="center">
-  Globally interconnected In-App Chat, user profile and relationship chains and offline push.
-</p>
-
-<br>
-
-<p align="center">
-More languages:
-  <a href="https://cloud.tencent.com/document/product/269/70747">简体中文-TUIKit介绍</a>
-  <a href="https://cloud.tencent.com/document/product/269/70746">简体中文-快速集成</a>
-</p>
-
-<br>
-
-![](https://qcloudimg.tencent-cloud.cn/image/document/8fd972397eba8f56c8f294c8b042794c.jpg)
-
-<p align="center">
-    TUIKit has Chat SDK, UI components and basic business logic inside. You can choose our pure Chat SDK <a href="https://pub.dev/packages/tencent-cloud-chat-sdk">tencent-cloud-chat-sdk</a> if you tend to build the UI yourself.
-</p>
-
-<a target="_blank" href="https://comm.qq.com/im/doc/flutter/en/TUIKit/readme.html"><button type="button" class="button-9" role="button">
-Official Documentation</button></a>
-
-<br>
+## Product Introduction
+You only need to integrate Chat SDK to easily gain chat, conversation, group capabilities, and you can also communicate with other products such as whiteboards through signaling messages. Chat can cover various business scenarios, support the access and use of various platforms, and fully meet the communication needs.
 
 ## Check Out Our Sample Apps
-
-Experience our Chat and Voice/Video Call modules by trying out our sample apps.
-
-**These apps have been created using the same Flutter project as our SDKs and extensions.**
-
-| Platform | Link | Remark |
-|---------|---------|---------|
-| Android / iOS | <img src="https://qcloudimg.tencent-cloud.cn/raw/e791bd503ae267aa51234ad66e347f10.png" width="140px" alt="Tencent Chat Logo" /> | Scan to download app for both Android and iOS. Automatically identifies platform. |
-| Web | <img src="https://qcloudimg.tencent-cloud.cn/raw/7908cf6f3c16e4059f8f21229d70a918.png" width="140px" alt="Tencent Chat Logo" /> | Supports both desktop and mobile browsers and automatically adjusts its layout accordingly. Same website as link below. |
-| Web | [Visit Now](https://comm.qq.com/flutter/#/) | Supports both desktop and mobile browsers and automatically adjusts its layout accordingly. Same website as previous QR code. |
-| macOS | [Download Now](https://comm.qq.com/im_demo_download/macos_flutter.dmg) | The macOS version of our sample app. Control-click the app icon, then choose "Open" from the shortcut menu. |
-| Windows | [Download Now](https://comm.qq.com/im_demo_download/windows_flutter.appx) | The Windows version of our sample app, which is a UWP (Universal Windows Platform) application. |
-| Linux | Coming Soon... | Will be available later this year. |
-
-**Take a look at the screenshots of
-TUIKit [here](https://www.tencentcloud.com/document/product/1047/50059?from=pub) to get an idea of
-what to expect.**
-
+This document introduces how to quickly run the Chat demo on the iOS platform.
+For the other platforms, please refer to document：
+- [**chat-uikit-android**](https://github.com/TencentCloud/chat-uikit-android)
+- [**chat-uikit-ios**](https://github.com/TencentCloud/chat-uikit-ios)
+- [**chat-uikit-vue**](https://github.com/TencentCloud/chat-uikit-vue)
+- [**chat-uikit-react**](https://github.com/TencentCloud/chat-uikit-react)
+- [**chat-uikit-uniapp**](https://github.com/TencentCloud/chat-uikit-uniapp)
+- [**chat-uikit-wechat**](https://github.com/TencentCloud/chat-uikit-wechat)
+  
 ## Introduction to TUIKit
+Chat SDK comes with TUIKit, which is an official set of UI components that have chat business logic built-in. TUIKit includes components like conversation, chat, relationship chain, and group.
+See [TUIKit Library Overview](https://trtc.io/document/50059?platform=flutter&product=chat&menulabel=uikit) for more details.
 
-Tencent Cloud Chat SDK comes
-with [TUIKit](https://www.tencentcloud.com/document/product/1047/50059?from=pub), which is an
-official set of UI components that have chat business logic built-in. TUIKit includes components
-like conversation, chat, relationship chain, and group.
+Developers can use these UI components to quickly and easily add In-APP chat modules to their mobile applications.
+<img src="https://qcloudimg.tencent-cloud.cn/raw/f140dd76be01a65abfb7e6ba2bf50ed5.png" width="1000"/>
 
-Developers can use these UI components to quickly and easily add In-APP chat modules to their mobile
-applications.
-
-![img](https://qcloudimg.tencent-cloud.cn/raw/f140dd76be01a65abfb7e6ba2bf50ed5.png)
-
-Currently, Flutter [TUIKit](https://www.tencentcloud.com/document/product/1047/50059?from=pub)
+Currently, Flutter TUIKit
 contains the following main components:
 
-- [TIMUIKitCore](https://comm.qq.com/im/doc/flutter/en/TUIKit/TIMUIKitCore/readme.html): Core entry
-- [TIMUIKitConversation](https://www.tencentcloud.com/document/product/1047/50059?from=pub#timuikitconversation):
-  Conversation list
-- [TIMUIKitChat](https://www.tencentcloud.com/document/product/1047/50059?from=pub#timuikitchat):
-  Chat module, includes historical message list and message sending area, with some other features
+- TIMUIKitCore: Core entry
+- TIMUIKitConversation: Conversation list
+- TIMUIKitChat: Chat module, includes historical message list and message sending area, with some other features
   like message reaction and URL preview, etc.
-- [TIMUIKitContact](https://www.tencentcloud.com/document/product/1047/50059?from=pub#relationship-chain-components):
-  Contacts list
-- [TIMUIKitProfile](https://www.tencentcloud.com/document/product/1047/50059?from=pub#timuikitprofile):
-  User profile and relationship management
-- [TIMUIKitGroupProfile](https://www.tencentcloud.com/document/product/1047/50059?from=pub#timuikitgroupprofile):
-  Group profile and management
-- [TIMUIKitGroup](https://www.tencentcloud.com/document/product/1047/50059?from=pub#relationship-chain-components):
-  The list of group self joined
-- [TIMUIKitBlackList](https://www.tencentcloud.com/document/product/1047/50059?from=pub#relationship-chain-components):
-  The list of user been blocked
-- [TIMUIKitNewContact](https://www.tencentcloud.com/document/product/1047/50059?from=pub#relationship-chain-components):
-  New contacts application list
-- [TIMUIKitSearch](https://www.tencentcloud.com/document/product/1047/50036?from=pub): Search
-  globally
-- [TIMUIKitSearchMsgDetail](https://www.tencentcloud.com/document/product/1047/50036?from=pub):
-  Search in specific conversation
+- TIMUIKitContact: Contacts list
+- TIMUIKitProfile: User profile and relationship management
+- TIMUIKitGroupProfile: Group profile and management
+- TIMUIKitGroup: The list of group self joined
+- TIMUIKitBlackList: The list of user been blocked
+- TIMUIKitNewContact: New contacts application list
+- TIMUIKitSearch: Search globally
+- TIMUIKitSearchMsgDetail: Search in specific conversation
 
 In addition to these components, there are other useful components and widgets available to help
 developers meet their business needs, such as group entry application list and group member list.
-
-For the source code of the project shown in the image above, please refer
-to [chat-demo-flutter](https://github.com/TencentCloud/chat-demo-flutter). This project is open
-source and can be directly used by developers.
 
 ## Compatible Platforms
 
@@ -150,29 +51,20 @@ The platforms are compatible with the deployment of our Chat UIKit.
 
 ## Get Started
 
-Please refer to [this document](https://www.tencentcloud.com/document/product/1047/45907?from=pub) for a complete and detailed guide on getting started.
+Please refer to [Run Demo](https://trtc.io/document/45907?platform=flutter&product=chat&menulabel=uikit) for a complete and detailed guide on getting started.
 
 ## Directions
 
 The following guide describes how to quickly build a simple chat application using Flutter TUIKit.
-
 Refer to the appendix if you want to learn about the details and parameters of each widget.
-
-> If you want to directly add Flutter TUIKit to your existing application, refer to [this document](https://www.tencentcloud.com/document/product/1047/51456). You can add the Flutter module to your existing application, code once, and deploy to all platforms. This can significantly reduce the workload of adding chat and call modules to your existing application.
 
 ### Step 0: Create two accounts for testing
 
-Sign up and log in to the [Tencent Cloud Chat console](https://console.tencentcloud.com/im?from=pub).
+Sign up and log in to the [Chat console](https://console.trtc.io/).
 
-Create an application and enter it.
+Create an application and enter it. Click Users and create two accounts.
 
-Select Auxiliary Tools > UserSig Generation and Verification on the left sidebar. Generate two pairs of "UserID" and the corresponding "UserSig," and copy the "key" information. Refer to [this document](https://www.tencentcloud.com/document/product/1047/34580?from=pub#usersig-generation-and-verification).
-
-Tips: You can create "user1" and "user2" here.
-
-> Note:
->
-> The correct way to distribute `UserSig` is to integrate the calculation code for `UserSig` into your server and provide an application-oriented API. When `UserSig` is needed, your application can send a request to the business server for a dynamic `UserSig.` For more information, see [How do I calculate UserSig on the server?](https://www.tencentcloud.com/document/product/1047/34385?from=pub).
+> The correct way to distribute `UserSig` is to integrate the calculation code for `UserSig` into your server and provide an application-oriented API. When `UserSig` is needed, your application can send a request to the business server for a dynamic `UserSig.` For more information, see [How do I calculate UserSig on the server?](https://trtc.io/document/34385?product=chat&menulabel=serverapis).
 
 ### Step 1: Create a Flutter app and add permission configuration
 
@@ -258,7 +150,8 @@ Open `web/index.html` and add the following two lines between `<head>` and `</he
 <script src="./node_modules/tim-js-sdk/tim-js-friendship.js"></script>
 ```
 
-![](https://qcloudimg.tencent-cloud.cn/raw/a4d25e02c546e0878ba59fcda87f9c76.png)
+<img src="https://qcloudimg.tencent-cloud.cn/raw/a4d25e02c546e0878ba59fcda87f9c76.png" width="800"/>
+
 
 ### Step 3: Initialize TUIKit
 
@@ -298,14 +191,13 @@ final CoreServicesImpl _coreInstance = TIMUIKitCore.getInstance();
 _coreInstance.login(userID: userID, userSig: userSig);
 ```
 
-Note: Importing UserSig to your application is only for debugging purposes and cannot be used for the release version. Before publishing your app, you should generate your UserSig from your server. Refer to: <https://www.tencentcloud.com/document/product/1047/34385?from=pub>
+Note: Importing UserSig to your application is only for debugging purposes and cannot be used for the release version. Before publishing your app, you should generate your UserSig from your server. Refer to: [Generate Signature](https://trtc.io/document/34385?product=chat&menulabel=serverapis).
 
 ## Step 5. Implementing the conversation list page
 
 You can use the conversation (channel) list page as the homepage of your Chat module, which includes all conversations with users and groups that have chat records.
 
-```markdown
-![Conversation List Page](https://qcloudimg.tencent-cloud.cn/raw/a27b131d555b1158d150bd9b337c1d9d.png)
+<img src="https://qcloudimg.tencent-cloud.cn/raw/a27b131d555b1158d150bd9b337c1d9d.png" width="300"/>
 
 You can create a `Conversation` class, with `TIMUIKitConversation` as its body, to render the conversation list. You only need to provide the `onTapItem` callback, which allows users to navigate to the Chat page for each conversation. In the next step, we'll introduce the `Chat` class.
 
@@ -345,8 +237,7 @@ class Conversation extends StatelessWidget {
 
 The chat page consists of the main message list and a message sending bar at the bottom.
 
-```markdown
-![Chat Page](https://qcloudimg.tencent-cloud.cn/raw/09b8b9b54fd0caa47069544343eba461.jpg)
+<img src="https://qcloudimg.tencent-cloud.cn/raw/09b8b9b54fd0caa47069544343eba461.jpg" width="600"/>
 
 You can create a `Chat` class, with `TIMUIKitChat` as its body, to render the chat page. We recommend providing an `onTapAvatar` callback function to navigate to the profile page for the current contact, which we'll introduce in the next step.
 
@@ -385,8 +276,7 @@ class Chat extends StatelessWidget {
 
 This page shows the profile of a specific user and maintains the relationship between the current logged-in user and the other user.
 
-```markdown
-![User Profile Page](https://qcloudimg.tencent-cloud.cn/raw/03e88da6f1d63f688d2a8ee446da43ff.png)
+<img src="https://qcloudimg.tencent-cloud.cn/raw/03e88da6f1d63f688d2a8ee446da43ff.png" width="600"/>
 
 You can create a `UserProfile` class, with `TIMUIKitProfile` as its body, to render the user profile page.
 
@@ -424,42 +314,39 @@ Now your app can send and receive messages, display the conversation list, and m
 
 ## FAQs
 
-### Do I need to integrate Chat SDK after integrating TUIKit?
+#### Do I need to integrate Chat SDK after integrating TUIKit?
 
 No. You don't need to integrate Chat SDK again. If you want to use Chat SDK related APIs, you can
 get them via `TIMUIKitCore.getSDKInstance()`. This method is recommended to ensure Chat SDK version
 consistency.
 
-### Why did force quit occur when I sent voice, image, file or other messages?
+#### Why did force quit occur when I sent voice, image, file or other messages?
 
 Check whether you have enabled the **camera**, **mic**, **album**, or other related permissions.
 
 Refers to Step 1 above.
 
-### What should I do if clicking Build And Run for an Android device triggers an error, stating no available device is found?
+#### What should I do if clicking Build And Run for an Android device triggers an error, stating no available device is found?
 
 Check that the device is not occupied by other resources. Alternatively, click Build to generate an
 APK package, drag it to the simulator, and run it.
 
-### What should I do if an error occurs during the first run for an iOS device?
+#### What should I do if an error occurs during the first run for an iOS device?
 
 If an error occurs after the configuration, click **Product > Clean Build Folder** , clean the
 product, and run `pod install` or `flutter run` again.
+<img src="https://qcloudimg.tencent-cloud.cn/raw/d495b2e8be86dac4b430e8f46a15cef4.png" width="800"/>
 
-![](https://qcloudimg.tencent-cloud.cn/raw/d495b2e8be86dac4b430e8f46a15cef4.png)
-
-### What should I do if an error occurs during debugging on a real iOS device when I am wearing an Apple Watch?
-
-![](https://qcloudimg.tencent-cloud.cn/raw/1ffcfe39a18329c86849d7d3b34b9a0e.png)
+#### What should I do if an error occurs during debugging on a real iOS device when I am wearing an Apple Watch?
+<img src="https://qcloudimg.tencent-cloud.cn/raw/1ffcfe39a18329c86849d7d3b34b9a0e.png" width="800"/>
 
 Turn on Airplane Mode on your Apple Watch, and go to **Settings > Bluetooth** on your iPhone to turn
 off Bluetooth.
 
 Restart Xcode (if opened) and run `flutter run` again.
 
-### What should I do when an error occurs on an Android device after TUIKit is imported into the application automatically generated by Flutter?
-
-![](https://qcloudimg.tencent-cloud.cn/raw/d95efdd4ae50f13f38f4c383ca755ae7.png)
+#### What should I do when an error occurs on an Android device after TUIKit is imported into the application automatically generated by Flutter?
+<img src="https://qcloudimg.tencent-cloud.cn/raw/d95efdd4ae50f13f38f4c383ca755ae7.png" width="800"/>
 
 1. Open `android\app\src\main\AndroidManifest.xml` and
    complete `xmlns:tools="http://schemas.android.com/tools" / android:label="@string/android_label" / tools:replace="android:label"`
@@ -496,14 +383,3 @@ For those who require real-time voice and video call capabilities alongside our 
 we highly recommend our dedicated voice and video call UI component package, [tencent\_calls\_uikit](https://pub.dev/packages/tencent_calls_uikit).
 This robust and feature-rich package is specifically designed to complement our existing solution and seamlessly integrate with it, 
 providing a comprehensive, unified communication experience for your users.
-
-## Contact Us
-
-Please do not hesitate to contact us in the following place, if you have any further questions or
-tend to learn more about the use cases.
-
-- Telegram Group: <https://t.me/+1doS9AUBmndhNGNl>
-- WhatsApp Group: <https://chat.whatsapp.com/Gfbxk7rQBqc8Rz4pzzP27A>
-- QQ Group: 788910197, chat in Chinese
-
-Our Website: <https://www.tencentcloud.com/products/im?from=pub>

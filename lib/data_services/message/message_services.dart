@@ -83,7 +83,7 @@ abstract class MessageService {
   });
 
   Future<V2TimValueCallback<V2TimMessage>> reSendMessage(
-      {required String msgID, // 自己创建的ID
+      {required String msgID,
       bool onlineUserOnly});
 
   Future<V2TimValueCallback<V2TimMessageChangeInfo>> modifyMessage(

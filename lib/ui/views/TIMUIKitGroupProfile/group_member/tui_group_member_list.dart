@@ -104,9 +104,9 @@ class GroupProfileMemberListPageState
             memberList: searchMemberList ?? groupProfileModel.groupMemberList,
             removeMember: _kickedOffMember,
             touchBottomCallBack: () {},
-            onTapMemberItem: (friendInfo, details) {
+            onTapMemberItem: (memberInfo, details) {
               if (widget.model.onClickUser != null) {
-                widget.model.onClickUser!(friendInfo.userID, details);
+                widget.model.onClickUser!(memberInfo, details);
               }
             },
           );
@@ -134,9 +134,9 @@ class GroupProfileMemberListPageState
               memberList: searchMemberList ?? groupProfileModel.groupMemberList,
               removeMember: _kickedOffMember,
               touchBottomCallBack: () {},
-              onTapMemberItem: (friendInfo, details) {
+              onTapMemberItem: (memberInfo, details) {
                 if (widget.model.onClickUser != null) {
-                  widget.model.onClickUser!(friendInfo.userID, details);
+                  widget.model.onClickUser!(memberInfo, details);
                 }
               },
             )

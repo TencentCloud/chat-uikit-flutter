@@ -1,3 +1,52 @@
+# 4.0.1
+* Upgraded the plugin tim_ui_kit_sticker_plugin to 4.0.1.
+* Use the 'useTencentCloudChatStickerPackageOldKeys' parameter in StickerPanelConfig to control whether the emoticon is compatible with version 3.x.
+
+# 4.0.0
+## Breaking changes
+* Upgraded the plugin tim_ui_kit_sticker_plugin to 4.0.0.
+* Delete the useQQStickerPackage and unicodeEmojiList parameters in StickerPanelConfig.
+* Delete the isUseDefaultEmoji parameter in TIMUIKitChatConfig.
+* Delete the isUseDefaultEmoji parameter in each widget.
+
+## Bug Fixes
+* Solve the problem that showReplyMessage and showForwardMessage in ToolTipsConfig do not take effect after being set to false.
+
+# 3.1.0+2
+* Replace the flutter_slidable library with flutter_slidable_plus_plus to solve the compatibility issue of flutter 3.27.0 version.
+
+# 3.1.0+1
+* Upgrade the third-party library version to adapt to Android AGP 8.0.
+
+# 3.1.0
+## Bug Fixes
+* The interface for deleting messages is changed to the interface for deleting cloud messages.
+* C2C messages support read receipts
+* Fix and optimize some issues
+
+# 3.0.0
+## Breaking Changes
+* Migrated to Flutter 3.24.0
+## Bug Fixes
+* Fix and optimize some issues
+
+# 2.7.2
+* Fix the issue where failed messages cannot be resent.
+* Fix the issue where image messages that failed to send are not loaded using the local path.
+* Fix the issue where the screen turns white after dissolving or leaving a group.
+* Optimize the process of sending messages.
+* Optimize the alignment of buttons in the long-press message menu.
+* Limit the version range of the third-party library extended_image.
+
+# 2.7.1
+* Fixed the 'keepAspectRatio' parameter error.
+
+# 2.7.0
+
+## Breaking Changes
+
+* Upgraded Low-Level Native Chat SDK to 8.0.
+
 # 2.6.0
 
 ## Breaking Changes
@@ -62,7 +111,6 @@
 ## Bug Fixes
 
 * Fixed an issue on time tag creator.
-* Fixed an issue on Video Message LocalURL.
 
 # 2.3.2
 

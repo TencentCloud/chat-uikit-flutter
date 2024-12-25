@@ -1,6 +1,6 @@
 name: tencent_cloud_chat_uikit
 description: A powerful chat UI component library and business logic for Tencent Cloud Chat, creating seamless in-app chat modules for delightful user experiences.
-version: 2.6.0+1
+version: 4.0.1
 homepage: https://trtc.io/products/chat?utm_source=gfs&utm_medium=link&utm_campaign=%E6%B8%A0%E9%81%93&_channel_track_key=k6WgfCKn
 repository: https://github.com/TencentCloud/chat-uikit-flutter
 documentation: https://comm.qq.com/im/doc/flutter/en/TUIKit/readme.html
@@ -14,39 +14,39 @@ platforms:
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
-  flutter: ">=3.22.0"
+  flutter: ">=3.24.0"
 
 dependencies:
   flutter:
     sdk: flutter
   adaptive_action_sheet: ^2.0.1
   provider: ^6.0.1
-  intl: any
+  intl: ^0.19.0
   get_it: ^7.2.0
   dotted_border: ^2.0.0+2
   flutter_svg: ^2.0.6
   image_picker: ^0.8.5+3
   file_picker: ^5.3.0
   tencent_super_tooltip: ^0.0.1
-  video_player: ^2.7.0
-  chewie: ^1.7.5
-  flutter_slidable: ^3.0.1
-  flutter_plugin_record_plus: ^0.0.16
+  video_player: ^2.9.0
+  chewie: ^1.8.5
+  flutter_slidable_plus_plus: ^0.1.0
+  flutter_plugin_record_plus: ^0.0.19
   azlistview_all_platforms: ^2.1.2
   lpinyin: ^2.0.3
   transparent_image: ^2.0.0
-  image_gallery_saver: ^2.0.1
+  image_gallery_saver_plus: ^3.0.5
   path_provider: ^2.0.8
   cached_network_image: ^3.3.0
   shared_preferences: ^2.0.13
   scroll_to_index: ^2.1.1
-  wechat_assets_picker: ^8.9.0-dev.1
-  wechat_camera_picker: ^4.2.0-dev.2
+  wechat_assets_picker: ^9.3.3
+  wechat_camera_picker: ^4.3.4
   flutter_easyrefresh: ^2.2.1
-  extended_image: ^8.2.0
-  extended_text_field: ^15.0.0
-  extended_text: ^13.0.0
-  package_info_plus: ^4.0.1
+  extended_image: ^9.0.0
+  extended_text_field: ^16.0.0
+  extended_text: ^14.0.0
+  package_info_plus: ^8.0.0
   loading_animation_widget: ^1.1.0+3
   permission_handler: ^10.2.0
   tuple: ^2.0.0
@@ -57,25 +57,25 @@ dependencies:
   http: ^1.0.0
   crypto: ^3.0.2
   collection: ^1.15.0
-  flutter_image_compress: ^1.1.3
+  flutter_image_compress: ^2.3.0
   uuid: ^3.0.6
   open_file: ^3.3.2
   tencent_keyboard_visibility: ^1.0.1
-  tim_ui_kit_sticker_plugin: ^3.1.0
-  tencent_im_base: ^3.3.775297
-  fc_native_video_thumbnail: any
+  tim_ui_kit_sticker_plugin: ^4.0.1
+  tencent_im_base: ^8.0.0
+  fc_native_video_thumbnail: ^0.16.0
   path: ^1.8.1
   tencent_cloud_uikit_core: ^1.6.0
   pasteboard: ^0.2.0
   desktop_drop: ^0.4.4
-  device_info_plus: any
+  device_info_plus: ^10.1.2
   cross_file: ^0.3.3+4
-  csslib: 0.17.2
+  csslib: ^0.17.2
   diff_match_patch: ^0.4.1
   just_audio: ^0.9.34
   markdown: ^7.1.0
   logger: ^2.0.1
-  image_clipboard: ^1.0.0+2
+  visibility_detector: ^0.4.0+2
 
 dev_dependencies:
   flutter_lints: ^1.0.0
@@ -83,9 +83,11 @@ dev_dependencies:
   lints: ^1.0.1
 
 dependency_overrides:
+#   tencent_chat_i18n_tool:
+#     path: ../../../tencent_chat_i18n_tool
 
-  # tencent_chat_i18n_tool:
-  #   path: D:\Project\tencent-chat-i18n-tool
+#  tencent_cloud_chat_sdk:
+#    path: ../../../tencent_cloud_chat_sdk
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

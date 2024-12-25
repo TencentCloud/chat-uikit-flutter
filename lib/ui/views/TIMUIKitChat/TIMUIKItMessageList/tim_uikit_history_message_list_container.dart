@@ -68,9 +68,6 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
   /// tool tips panel configuration, long press message will show tool tips panel
   final ToolTipsConfig? toolTipsConfig;
 
-  /// Whether to use the default emoji
-  final bool isUseDefaultEmoji;
-
   final List<CustomEmojiFaceData> customEmojiStickerList;
 
   final bool isAllowScroll;
@@ -105,7 +102,6 @@ class TIMUIKitHistoryMessageListContainer extends StatefulWidget {
     this.initFindingMsg,
     this.mainHistoryListConfig,
     this.toolTipsConfig,
-    this.isUseDefaultEmoji = false,
     this.customEmojiStickerList = const [],
     this.textFieldController,
     required this.conversation,
@@ -125,15 +121,19 @@ class _TIMUIKitHistoryMessageListContainerState
 
   List<V2TimMessage?> historyMessageList = [];
 
-  Future<void> requestForData(String? lastMsgID, LoadDirection direction,
+  Future<bool> requestForData(String? lastMsgID, LoadDirection direction,
       TUIChatSeparateViewModel model,
-      [int? count]) async {
-    if ((direction == LoadDirection.previous && model.haveMoreData) ||
+      [int? count, int? lastSeq]) async {
+    if ((direction == LoadDirection.previous) ||
         (direction == LoadDirection.latest && model.haveMoreLatestData)) {
-      await model.loadChatRecord(
-          direction: direction,
-          count: count ?? (kIsWeb ? 15 : HistoryMessageDartConstant.getCount),
-          lastMsgID: lastMsgID);
+      return await model.loadChatRecord(
+        direction: direction,
+        count: count ?? (kIsWeb ? 15 : HistoryMessageDartConstant.getCount),
+        lastMsgID: lastMsgID,
+        lastMsgSeq: lastSeq ?? -1,
+      );
+    } else {
+      return false;
     }
   }
 
@@ -179,7 +179,6 @@ class _TIMUIKitHistoryMessageListContainerState
                 textFieldController: widget.textFieldController,
                 userAvatarBuilder: widget.userAvatarBuilder,
                 customEmojiStickerList: widget.customEmojiStickerList,
-                isUseDefaultEmoji: widget.isUseDefaultEmoji,
                 topRowBuilder: _getTopRowBuilder(model),
                 onScrollToIndex: _historyMessageListController.scrollToIndex,
                 onScrollToIndexBegin:
@@ -203,8 +202,9 @@ class _TIMUIKitHistoryMessageListContainerState
           tongueItemBuilder: widget.tongueItemBuilder,
           initFindingMsg: widget.initFindingMsg,
           messageList: messageList,
-          onLoadMore: (String? a, LoadDirection direction, [int? b]) async {
-            return await requestForData(a, direction, model, b);
+          onLoadMore: (String? a, LoadDirection direction,
+              [int? b, int? lastSeq]) async {
+            return await requestForData(a, direction, model, b, lastSeq);
           },
         );
       },

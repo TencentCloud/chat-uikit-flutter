@@ -12,7 +12,7 @@ import 'package:crypto/crypto.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
@@ -64,7 +64,6 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
   final TUIChatGlobalModel model = serviceLocator<TUIChatGlobalModel>();
   final MessageService _messageService = serviceLocator<MessageService>();
   Widget? imageItem;
-  bool isSent = false;
 
   @override
   didUpdateWidget(oldWidget) {
@@ -173,14 +172,15 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
       if (model.getMessageProgress(widget.message.msgID) == 100) {
         String savePath;
         if (widget.message.imageElem!.path != null &&
-            widget.message.imageElem!.path != '') {
+            widget.message.imageElem!.path != '' &&
+            File(widget.message.imageElem!.path!).existsSync()) {
           savePath = widget.message.imageElem!.path!;
         } else {
           savePath = model.getFileMessageLocation(widget.message.msgID);
         }
         File f = File(savePath);
         if (f.existsSync()) {
-          var result = await ImageGallerySaver.saveFile(savePath);
+          var result = await ImageGallerySaverPlus.saveFile(savePath);
 
           if (PlatformUtils().isIOS) {
             if (result['isSuccess']) {
@@ -218,7 +218,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
       return;
     }
 
-    var result = await ImageGallerySaver.saveFile(imageUrl);
+    var result = await ImageGallerySaverPlus.saveFile(imageUrl);
 
     if (PlatformUtils().isIOS) {
       if (result['isSuccess']) {
@@ -592,16 +592,8 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     initImages();
   }
 
-  bool isNeedShowLocalPath() {
-    final current = (DateTime.now().millisecondsSinceEpoch / 1000).ceil();
-    final timeStamp = widget.message.timestamp ?? current;
-    return (widget.message.isSelf ?? true) &&
-        (isSent || current - timeStamp < 300);
-  }
-
   Widget? _renderImage(dynamic heroTag, TUITheme theme,
       {V2TimImage? originalImg, V2TimImage? smallImg}) {
-
     double positionRadio = 1.0;
     if (smallImg?.width != null &&
         smallImg?.height != null &&
@@ -623,7 +615,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
     }
 
     try {
-      if ((isNeedShowLocalPath() &&
+      if ((widget.message.isSelf! &&
           widget.message.imageElem!.path != null &&
           widget.message.imageElem!.path!.isNotEmpty &&
           File(widget.message.imageElem!.path!).existsSync())) {
@@ -680,9 +672,6 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final theme = value.theme;
-    if (widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING) {
-      isSent = true;
-    }
     final isDesktopScreen =
         TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     final heroTag =

@@ -15,8 +15,8 @@ import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
-class GroupMemberTile extends TIMUIKitStatelessWidget {
-  GroupMemberTile({
+class GroupMemberTitle extends TIMUIKitStatelessWidget {
+  GroupMemberTitle({
     Key? key,
   }) : super(key: key);
 
@@ -44,7 +44,7 @@ class GroupMemberTile extends TIMUIKitStatelessWidget {
       return InkWell(
         onTapDown: (details) {
           if (model.onClickUser != null && element?.userID != null) {
-            model.onClickUser!(element!.userID, details);
+            model.onClickUser!(element!, details);
           }
         },
         child: SizedBox(

@@ -14,6 +14,8 @@ import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
 class MultiSelectPanel extends TIMUIKitStatelessWidget {
+  final int forwardMsgNumLimit = 30;
+
   final ConvType conversationType;
 
   MultiSelectPanel({Key? key, required this.conversationType})
@@ -21,6 +23,39 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
 
   _handleForwardMessage(BuildContext context, bool isMergerForward,
       TUIChatSeparateViewModel model) {
+
+    // 是否有选中消息
+    if (model.getSelectedMessageList().isEmpty) {
+      onTIMCallback(TIMCallback(
+          type: TIMCallbackType.INFO,
+          infoRecommendText: TIM_t("请选择要操作的消息！")));
+      return;
+    }
+
+    for (var v2TimMessage in model.getSelectedMessageList()) {
+      // 失败消息不支持转发
+      if (v2TimMessage.status == MessageStatus.V2TIM_MSG_STATUS_SEND_FAIL) {
+        onTIMCallback(TIMCallback(
+            type: TIMCallbackType.INFO,
+            infoRecommendText: TIM_t("发送失败消息不支持转发！")));
+        return;
+      }
+
+      // 投票消息不支持转发
+      if (model.isVoteMessage(v2TimMessage)) {
+        onTIMCallback(TIMCallback(
+          type: TIMCallbackType.INFO,
+          infoRecommendText: TIM_t("投票消息不支持转发！")));
+        return;
+      }
+    }
+
+    // 逐条转发限制在 30 条以内
+    if (!isMergerForward && model.getSelectedMessageList().length > forwardMsgNumLimit) {
+      _showForwardLimitDialog(context);
+      return;
+    }
+
     Navigator.push(
         context,
         MaterialPageRoute(
@@ -29,6 +64,33 @@ class MultiSelectPanel extends TIMUIKitStatelessWidget {
                   isMergerForward: isMergerForward,
                   conversationType: conversationType,
                 )));
+  }
+
+  // 弹出逐条转发超限的对话框
+  Future<bool?> _showForwardLimitDialog(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) {
+        return CupertinoAlertDialog(
+          title: Text(TIM_t("转发消息过多，暂不支持逐条转发")),
+          actions: [
+            CupertinoDialogAction(
+              child: Text(TIM_t("确定")),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+            CupertinoDialogAction(
+              child: Text(TIM_t("取消")),
+              isDestructiveAction: true,
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   _handleForwardMessageWide(BuildContext context, bool isMergerForward,

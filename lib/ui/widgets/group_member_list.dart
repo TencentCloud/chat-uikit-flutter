@@ -2,7 +2,7 @@
 
 import 'package:azlistview_all_platforms/azlistview_all_platforms.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_slidable_plus_plus/flutter_slidable_plus_plus.dart';
 import 'package:lpinyin/lpinyin.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
@@ -15,6 +15,7 @@ import 'package:tencent_cloud_chat_uikit/ui/widgets/radio_button.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
 class GroupProfileMemberList extends StatefulWidget {
+  static String AT_ALL_USER_ID = "__kImSDK_MesssageAtALL__";
   final List<V2TimGroupMemberFullInfo?> memberList;
   final Function(String userID)? removeMember;
   final bool canSlideDelete;
@@ -53,7 +54,7 @@ class GroupProfileMemberList extends StatefulWidget {
 }
 
 class _GroupProfileMemberListState extends TIMUIKitState<GroupProfileMemberList> {
-  List<V2TimGroupMemberFullInfo> selectedMember = [];
+  List<V2TimGroupMemberFullInfo> selectedMemberList = [];
 
   _getShowName(V2TimGroupMemberFullInfo? item) {
     final friendRemark = item?.friendRemark ?? "";
@@ -74,7 +75,8 @@ class _GroupProfileMemberListState extends TIMUIKitState<GroupProfileMemberList>
     for (var i = 0; i < memberList.length; i++) {
       final item = memberList[i];
       final showName = _getShowName(item);
-      if (item?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER || item?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN) {
+      if (item?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER ||
+          item?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN) {
         showList.add(ISuspensionBeanImpl(memberInfo: item, tagIndex: "@"));
       } else {
         String pinyin = PinyinHelper.getPinyinE(showName);
@@ -93,7 +95,12 @@ class _GroupProfileMemberListState extends TIMUIKitState<GroupProfileMemberList>
     if (widget.canAtAll) {
       final canAtGroupType = ["Work", "Public", "Meeting"];
       if (canAtGroupType.contains(widget.groupType)) {
-        showList.insert(0, ISuspensionBeanImpl(memberInfo: V2TimGroupMemberFullInfo(userID: "__kImSDK_MesssageAtALL__", nickName: TIM_t("所有人")), tagIndex: ""));
+        showList.insert(
+            0,
+            ISuspensionBeanImpl(
+                memberInfo:
+                    V2TimGroupMemberFullInfo(userID: GroupProfileMemberList.AT_ALL_USER_ID, nickName: TIM_t("所有人")),
+                tagIndex: ""));
       }
     }
 
@@ -133,19 +140,23 @@ class _GroupProfileMemberListState extends TIMUIKitState<GroupProfileMemberList>
                         child: CheckBoxButton(
                             onChanged: (isChecked) {
                               if (isChecked) {
-                                if (widget.maxSelectNum != null && selectedMember.length >= widget.maxSelectNum!) {
+                                if (widget.maxSelectNum != null && selectedMemberList.length >= widget.maxSelectNum!) {
                                   return;
                                 }
-                                selectedMember.add(memberInfo);
+                                selectedMemberList.add(memberInfo);
                               } else {
-                                selectedMember.remove(memberInfo);
+                                selectedMemberList.removeWhere((element) => element.userID == memberInfo.userID);
                               }
+
                               if (widget.onSelectedMemberChange != null) {
-                                widget.onSelectedMemberChange!(selectedMember);
+                                widget.onSelectedMemberChange!(selectedMemberList);
                               }
                               setState(() {});
                             },
-                            isChecked: selectedMember.contains(memberInfo)),
+                            isChecked: selectedMemberList
+                                .where((element) => element.userID == memberInfo.userID)
+                                .toList()
+                                .isNotEmpty),
                       ),
                     Container(
                       width: isDesktopScreen ? 30 : 36,
@@ -194,17 +205,17 @@ class _GroupProfileMemberListState extends TIMUIKitState<GroupProfileMemberList>
                     widget.onTapMemberItem!(memberInfo, null);
                   }
                   if (widget.canSelectMember) {
-                    final isChecked = selectedMember.contains(memberInfo);
+                    final isChecked = selectedMemberList.contains(memberInfo);
                     if (isChecked) {
-                      selectedMember.remove(memberInfo);
+                      selectedMemberList.remove(memberInfo);
                     } else {
-                      if (widget.maxSelectNum != null && selectedMember.length >= widget.maxSelectNum!) {
+                      if (widget.maxSelectNum != null && selectedMemberList.length >= widget.maxSelectNum!) {
                         return;
                       }
-                      selectedMember.add(memberInfo);
+                      selectedMemberList.add(memberInfo);
                     }
                     if (widget.onSelectedMemberChange != null) {
-                      widget.onSelectedMemberChange!(selectedMember);
+                      widget.onSelectedMemberChange!(selectedMemberList);
                     }
                     setState(() {});
                   }

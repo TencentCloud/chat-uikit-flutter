@@ -8,7 +8,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
@@ -21,7 +21,8 @@ import 'package:universal_html/html.dart' as html;
 import 'package:video_player/video_player.dart';
 
 class VideoScreen extends StatefulWidget {
-  const VideoScreen({required this.message, required this.heroTag, required this.videoElement, Key? key}) : super(key: key);
+  const VideoScreen({required this.message, required this.heroTag, required this.videoElement, Key? key})
+      : super(key: key);
 
   final V2TimMessage message;
   final dynamic heroTag;
@@ -117,27 +118,32 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
         }
         File f = File(savePath);
         if (f.existsSync()) {
-          var result = await ImageGallerySaver.saveFile(savePath);
+          var result = await ImageGallerySaverPlus.saveFile(savePath);
           if (PlatformUtils().isIOS) {
             if (result['isSuccess']) {
-              onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存成功"), infoCode: 6660402));
+              onTIMCallback(
+                  TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存成功"), infoCode: 6660402));
             } else {
-              onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存失败"), infoCode: 6660403));
+              onTIMCallback(
+                  TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存失败"), infoCode: 6660403));
             }
           } else {
             if (result != null) {
-              onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存成功"), infoCode: 6660402));
+              onTIMCallback(
+                  TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存成功"), infoCode: 6660402));
             } else {
-              onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存失败"), infoCode: 6660403));
+              onTIMCallback(
+                  TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存失败"), infoCode: 6660403));
             }
           }
         }
       } else {
-        onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("the message is downloading"), infoCode: -1));
+        onTIMCallback(TIMCallback(
+            type: TIMCallbackType.INFO, infoRecommendText: TIM_t("the message is downloading"), infoCode: -1));
       }
       return;
     }
-    var result = await ImageGallerySaver.saveFile(savePath);
+    var result = await ImageGallerySaverPlus.saveFile(savePath);
     if (PlatformUtils().isIOS) {
       if (result['isSuccess']) {
         onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频保存成功"), infoCode: 6660402));
@@ -162,7 +168,9 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
         isAsset: true,
       );
     }
-    if (widget.videoElement.videoPath != '' && widget.videoElement.videoPath != null) {
+    if (widget.videoElement.videoPath != '' &&
+        widget.videoElement.videoPath != null &&
+        File(widget.videoElement.videoPath!).existsSync()) {
       File f = File(widget.videoElement.videoPath!);
       if (f.existsSync()) {
         return await _saveNetworkVideo(
@@ -221,7 +229,8 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
     }
 
     VideoPlayerController player = PlatformUtils().isWeb
-        ? ((TencentUtils.checkString(widget.videoElement.videoPath) != null) || widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING
+        ? ((TencentUtils.checkString(widget.videoElement.videoPath) != null) ||
+                widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING
             ? VideoPlayerController.networkUrl(
                 Uri.parse(widget.videoElement.videoPath!),
               )
@@ -232,7 +241,9 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
                 : VideoPlayerController.networkUrl(
                     Uri.parse(widget.videoElement.localVideoUrl!),
                   ))
-        : (TencentUtils.checkString(widget.videoElement.videoPath) != null || widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING)
+        : ((TencentUtils.checkString(widget.videoElement.videoPath) != null ||
+                    widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING) &&
+                File(widget.videoElement.videoPath!).existsSync())
             ? VideoPlayerController.file(File(widget.videoElement.videoPath!))
             : (TencentUtils.checkString(widget.videoElement.localVideoUrl) == null)
                 ? VideoPlayerController.networkUrl(
@@ -243,15 +254,14 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
                   ));
     await player.initialize();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      double w = getVideoWidth();
-      double h = getVideoHeight();
+      double aspectRatio = player.value.aspectRatio;
       ChewieController controller = ChewieController(
           videoPlayerController: player,
           autoPlay: true,
           looping: false,
           showControlsOnInitialize: false,
           allowPlaybackSpeedChanging: false,
-          aspectRatio: w == 0 || h == 0 ? null : w / h,
+          aspectRatio: aspectRatio,
           customControls: VideoCustomControls(downloadFn: () async {
             return await _saveVideo();
           }));
@@ -265,7 +275,8 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
 
   @override
   didUpdateWidget(oldWidget) {
-    if (oldWidget.videoElement.videoUrl != widget.videoElement.videoUrl || oldWidget.videoElement.videoPath != widget.videoElement.videoPath) {
+    if (oldWidget.videoElement.videoUrl != widget.videoElement.videoUrl ||
+        oldWidget.videoElement.videoPath != widget.videoElement.videoPath) {
       setVideoPlayerController();
     }
     super.didUpdateWidget(oldWidget);
@@ -328,8 +339,14 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
                     return Hero(
                       tag: widget.heroTag,
                       child: result,
-                      flightShuttleBuilder: (BuildContext flightContext, Animation<double> animation, HeroFlightDirection flightDirection, BuildContext fromHeroContext, BuildContext toHeroContext) {
-                        final Hero hero = (flightDirection == HeroFlightDirection.pop ? fromHeroContext.widget : toHeroContext.widget) as Hero;
+                      flightShuttleBuilder: (BuildContext flightContext,
+                          Animation<double> animation,
+                          HeroFlightDirection flightDirection,
+                          BuildContext fromHeroContext,
+                          BuildContext toHeroContext) {
+                        final Hero hero = (flightDirection == HeroFlightDirection.pop
+                            ? fromHeroContext.widget
+                            : toHeroContext.widget) as Hero;
 
                         return hero.child;
                       },

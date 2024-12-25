@@ -1,6 +1,7 @@
 import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/friendShip/friendship_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/ui/utils/error_message_converter.dart';
 import 'package:tencent_im_base/tencent_im_base.dart';
 
 class FriendshipServicesImpl implements FriendshipServices {
@@ -77,17 +78,34 @@ class FriendshipServicesImpl implements FriendshipServices {
               friendGroup: friendGroup,
               addSource: addSource,
             );
-    if (result.code != 0 ||
-        (result.code == 0 &&
-            result.data?.resultCode != 0 &&
-            result.data?.resultCode != 30539 &&
-            result.data?.resultCode != 30515)) {
+    if (result.code != 0) {
+      _coreService.callOnCallback(TIMCallback(
+        type: TIMCallbackType.API_ERROR,
+        errorMsg: result.desc,
+        errorCode: result.code,
+        infoRecommendText: TIM_t("好友添加失败"),
+      ));
+    } else if (result.code == 0 && result.data?.resultCode != 0) {
+      String recommendText = "";
+      if (result.data != null && result.data!.resultCode != null) {
+        recommendText = ErrorMessageConverter.getErrorMessage(result.data!.resultCode!);
+      }
+
       _coreService.callOnCallback(TIMCallback(
         type: TIMCallbackType.API_ERROR,
         errorMsg: result.code == 0 ? result.data?.resultInfo : result.desc,
         errorCode: result.code == 0 ? result.data?.resultCode : result.code,
+        infoRecommendText: recommendText,
+      ));
+    } else {
+      _coreService.callOnCallback(TIMCallback(
+          type: TIMCallbackType.API_ERROR,
+          errorMsg: result.desc,
+          errorCode: result.code,
+          infoRecommendText: TIM_t("好友添加成功"),
       ));
     }
+
     return result;
   }
 
@@ -118,12 +136,18 @@ class FriendshipServicesImpl implements FriendshipServices {
         .getFriendshipManager()
         .deleteFromFriendList(userIDList: userIDList, deleteType: deleteType);
     if (res.code == 0) {
+      _coreService.callOnCallback(TIMCallback(
+          type: TIMCallbackType.API_ERROR,
+          errorMsg: res.desc,
+          errorCode: res.code,
+          infoRecommendText: TIM_t("好友删除成功")));
       return res.data;
     } else {
       _coreService.callOnCallback(TIMCallback(
           type: TIMCallbackType.API_ERROR,
           errorMsg: res.desc,
-          errorCode: res.code));
+          errorCode: res.code,
+          infoRecommendText: TIM_t("好友删除失败")));
       return null;
     }
   }

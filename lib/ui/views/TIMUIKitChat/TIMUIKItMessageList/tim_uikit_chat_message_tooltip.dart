@@ -5,11 +5,11 @@ import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_clipboard/image_clipboard.dart';
 import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
+import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_select_emoji.dart';
@@ -162,26 +162,6 @@ class TIMUIKitMessageTooltipState
     );
   }
 
-  bool isVoteMessage(V2TimMessage message) {
-    bool isvote = false;
-    V2TimCustomElem? custom = message.customElem;
-
-    if (custom != null) {
-      String? data = custom.data;
-      if (data != null && data.isNotEmpty) {
-        try {
-          Map<String, dynamic> mapData = json.decode(data);
-          if (mapData["businessID"] == "group_poll") {
-            isvote = true;
-          }
-        } catch (err) {
-          // err
-        }
-      }
-    }
-    return isvote;
-  }
-
   bool isAdminCanRecall() {
     if (widget.model.chatConfig.isGroupAdminRecallEnabled) {
       final selfMemberInfo =
@@ -212,6 +192,17 @@ class TIMUIKitMessageTooltipState
         (isDesktopScreen &&
             widget.message.elemType == MessageElemType.V2TIM_ELEM_TYPE_IMAGE &&
             fileBeenDownloaded);
+    bool showTranslation = true;
+    if (widget.message.localCustomData != null) {
+      final LocalCustomDataModel localCustomData = LocalCustomDataModel.fromMap(
+          json.decode(
+              TencentUtils.checkString(widget.message.localCustomData) ??
+                  "{}"));
+      if (localCustomData.translatedText != null &&
+          localCustomData.translatedText != "") {
+        showTranslation = false;
+      }
+    }
 
     final dynamicQuote =
         model.chatConfig.isAtWhenReplyDynamic?.call(widget.message);
@@ -235,7 +226,7 @@ class TIMUIKitMessageTooltipState
             id: "copyMessage",
             iconImageAsset: "images/copy_message.png",
             onClick: () => _onTap("copyMessage", model)),
-      if (shouldShowForwardAction && !isVoteMessage(widget.message))
+      if (shouldShowForwardAction && !model.isVoteMessage(widget.message))
         MessageToolTipItem(
             label: TIM_t("转发"),
             id: "forwardMessage",
@@ -254,15 +245,16 @@ class TIMUIKitMessageTooltipState
           iconImageAsset: "images/multi_message.png",
           onClick: () => _onTap("multiSelect", model)),
       MessageToolTipItem(
-          label: TIM_t("翻译"),
-          id: "translate",
-          iconImageAsset: "images/translate.png",
-          onClick: () => _onTap("translate", model)),
-      MessageToolTipItem(
           label: TIM_t("删除"),
           id: "delete",
           iconImageAsset: "images/delete_message.png",
           onClick: () => _onTap("delete", model)),
+      if (showTranslation)
+        MessageToolTipItem(
+            label: TIM_t("翻译"),
+            id: "translate",
+            iconImageAsset: "images/translate.png",
+            onClick: () => _onTap("translate", model)),
       if (shouldShowRevokeAction)
         MessageToolTipItem(
             label: TIM_t("撤回"),
@@ -414,12 +406,6 @@ class TIMUIKitMessageTooltipState
     } catch (e) {}
   }
 
-  Future<void> copyImageToClipboard(String imagePath) async {
-    ImageClipboard().copyImage(imagePath);
-    // final DesktopClipboard desktopClipboard = DesktopClipboard();
-    // desktopClipboard.copyImage(imagePath);
-  }
-
   _onTap(String operation, TUIChatSeparateViewModel model) async {
     final messageItem = widget.message;
     final msgID = messageItem.msgID as String;
@@ -480,10 +466,10 @@ class TIMUIKitMessageTooltipState
         break;
       case "multiSelect":
         model.updateMultiSelectStatus(true);
-        model.addToMultiSelectedMessageList(widget.message);
+        model.setMessageItemChecked(widget.message, true);
         break;
       case "forwardMessage":
-        model.addToMultiSelectedMessageList(widget.message);
+        model.setMessageItemChecked(widget.message, true);
         Navigator.push(
             context,
             MaterialPageRoute(
@@ -503,13 +489,6 @@ class TIMUIKitMessageTooltipState
                 infoCode: 6660408));
             // ignore: empty_catches
           } catch (e) {}
-        } else if (widget.message.elemType ==
-            MessageElemType.V2TIM_ELEM_TYPE_IMAGE) {
-          final savePath = (TencentUtils.checkString(
-                  widget.message.imageElem!.imageList?[0]?.localUrl) ??
-              TencentUtils.checkString(widget.message.imageElem?.path) ??
-              "");
-          copyImageToClipboard(savePath);
         }
         break;
       case "replyMessage":
@@ -622,9 +601,9 @@ class TIMUIKitMessageTooltipState
                             alignment:
                                 TUIKitScreenUtils.getFormFactor(context) ==
                                         DeviceType.Mobile
-                                    ? WrapAlignment.spaceBetween
+                                    ? WrapAlignment.start
                                     : WrapAlignment.start,
-                            spacing: 4,
+                            spacing: 12,
                             runSpacing: 8,
                             children: [
                               ..._buildLongPressTipItem(theme, model, message),

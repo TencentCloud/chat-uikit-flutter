@@ -6,12 +6,14 @@ RegExp emojiExp = RegExp(r'\[([\u4e00-\u9fa5A-Za-z0-9]+)\]');
 String mdTextCompiler(String originalText, {
   bool isUseQQPackage = false,
   bool isUseTencentCloudChatPackage = false,
+  bool isUseTencentCloudChatPackageOldKeys = false,
   List<CustomEmojiFaceData> customEmojiStickerList = const [],
 }) {
   String text = originalText;
   final EmojiUtil emojiUtil = EmojiUtil(
-      isUseTencentCloudChatPackage: isUseTencentCloudChatPackage,
       isUseQQPackage: isUseQQPackage,
+      isUseTencentCloudChatPackage: isUseTencentCloudChatPackage,
+      isUseTencentCloudChatPackageOldKeys: isUseTencentCloudChatPackageOldKeys,
       customEmojiStickerList: customEmojiStickerList);
 
   text = text.replaceAllMapped(emojiExp, (match) {

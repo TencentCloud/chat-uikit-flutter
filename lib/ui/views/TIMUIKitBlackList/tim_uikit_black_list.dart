@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:flutter_slidable_plus_plus/flutter_slidable_plus_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/block_list_life_cycle.dart';
@@ -88,7 +88,8 @@ class _TIMUIKitBlackListState extends TIMUIKitState<TIMUIKitBlackList> {
                   child: Text(
                     showName,
                     style: TextStyle(
-                        color: theme.black, fontSize: isDesktopScreen ? 14 : 18),
+                        color: theme.black,
+                        fontSize: isDesktopScreen ? 14 : 18),
                   ),
                 )),
                 if (isDesktopScreen)
@@ -131,7 +132,6 @@ class _TIMUIKitBlackListState extends TIMUIKitState<TIMUIKitBlackList> {
   BlackListItemBuilder _getItemBuilder() {
     return widget.itemBuilder ?? _itemBuilder;
   }
-
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
