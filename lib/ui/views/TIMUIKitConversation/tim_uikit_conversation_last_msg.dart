@@ -118,7 +118,7 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
 
   Future<String?> _getLastMsgShowText(
       V2TimMessage? message, BuildContext context) async {
-    final msgType = message!.elemType;
+    final msgType = message?.elemType;
     switch (msgType) {
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
         return TIM_t("[自定义]");
@@ -149,7 +149,7 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
   }
 
   Icon? _getIconByMsgStatus(BuildContext context) {
-    final msgStatus = widget.lastMsg!.status;
+    final msgStatus = widget.lastMsg?.status;
     final theme = Provider.of<TUIThemeViewModel>(context).theme;
     if (msgStatus == MessageStatus.V2TIM_MSG_STATUS_SEND_FAIL) {
       return Icon(Icons.error, color: theme.cautionColor, size: 16);
@@ -191,7 +191,7 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
 
   String _getDraftShowText() {
     final draftShowText = TIM_t("草稿");
-    return '[$draftShowText]';
+    return '[$draftShowText] ';
   }
 
   @override
@@ -222,7 +222,7 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
                 color: theme.weakTextColor, fontSize: widget.fontSize)),
       if (widget.draftText != null && widget.draftText != "")
         Expanded(
-          child: ExtendedText(groupTipsAbstractText,
+          child: ExtendedText(widget.draftText,
               softWrap: true,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
