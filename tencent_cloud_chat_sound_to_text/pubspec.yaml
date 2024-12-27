@@ -1,6 +1,6 @@
 name: tencent_cloud_chat_sound_to_text
 description: "Sound Message Translation Plugin for Tencent Cloud Chat"
-version: 1.0.0
+version: 2.1.0
 homepage:
 
 environment:
@@ -10,8 +10,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  tencent_cloud_chat_intl: ^1.5.0
-  tencent_cloud_chat_sdk: ^8.0.5897
+  tencent_cloud_chat_intl: ^2.1.0
+  tencent_cloud_chat_sdk: ^8.3.6498
+  tencent_cloud_chat: ^2.1.0
+
+dependency_overrides:
+#  tencent_cloud_chat:
+#    path: ../tencent_cloud_chat
+#  tencent_cloud_chat_intl:
+#    path: ../tencent_cloud_chat_intl
 
 dev_dependencies:
   flutter_test:

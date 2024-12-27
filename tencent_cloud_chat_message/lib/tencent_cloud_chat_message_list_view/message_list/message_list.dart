@@ -27,7 +27,7 @@ class TencentCloudChatScrollBehavior extends MaterialScrollBehavior {
 /// Proudly modified based on https://pub.dev/packages/flutter_chat_list for our needs.
 /// Thanks for their contributions.
 class MessageList extends StatefulWidget {
-  const MessageList({
+  MessageList({
     Key? key,
     this.msgCount = 0,
     required this.onMsgKey,
@@ -35,7 +35,7 @@ class MessageList extends StatefulWidget {
     this.latestReadMsgKey,
     this.showUnreadMsgButton = true,
     this.unreadMsgCount = 0,
-    this.unreadMsgButtonPosition = const Position(right: 16, top: 30),
+    this.unreadMsgButtonPosition = const Position(right: 16, bottom: 30),
     this.onLoadMsgsByLatestReadMsgKey,
     this.offsetFromUnreadTipToTop = 50,
     this.haveMorePreviousData = false,
@@ -104,6 +104,8 @@ class MessageList extends StatefulWidget {
   final Widget Function(BuildContext context, LoadStatus? status)? loadPreviousProgressBuilder;
 
   final List<V2TimMessage> messagesMentionedMe;
+  // If showed mentioned me button, do not show unread message count button again.
+  bool isShowedMentionedMeButton = false;
 
   /// Loadmore in end and loadmore in header
   /// [haveMoreLatestData] is used to tell widget there are more messages need load when scroll to first item
@@ -308,13 +310,14 @@ class MessageListState extends State<MessageList> {
   void _checkAndLoadMoreMessages() {
     TencentCloudChatUtils.debounce("_checkAndLoadMoreMessages", () {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        try{
+        try {
           if (listViewController.position.maxScrollExtent <= listViewController.position.viewportDimension &&
               widget.haveMorePreviousData &&
-              widget.msgCount > 0 && !startScroll) {
+              widget.msgCount > 0 &&
+              !startScroll) {
             refreshController.requestLoading(needMove: false);
           }
-        }catch(e){
+        } catch (e) {
           debugPrint(e.toString());
         }
       });
@@ -453,7 +456,6 @@ class MessageListState extends State<MessageList> {
 
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
       listViewController.animateTo(0, duration: const Duration(milliseconds: 200), curve: Curves.bounceInOut);
-      listViewController.animateTo(0, duration: const Duration(milliseconds: 200), curve: Curves.bounceInOut);
     });
   }
 
@@ -570,11 +572,15 @@ class MessageListState extends State<MessageList> {
     );
   }
 
-  Widget _renderLatestReadButton() {
+  Widget _renderUnreadMsgButton() {
     return ValueListenableBuilder(
         valueListenable: showLastUnreadButton,
         builder: (context, bool showButton, child) {
-          if (widget.showUnreadMsgButton && showButton && widget.unreadMsgCount != null) {
+          if (widget.showUnreadMsgButton &&
+              showButton &&
+              widget.unreadMsgCount != null &&
+              widget.messagesMentionedMe.isEmpty &&
+              !widget.isShowedMentionedMeButton) {
             return unreadMsgButtonBuilder(
                 _scrollToLatestReadMessage, context, widget.unreadMsgCount!, loadingLatestReadMessage);
           }
@@ -584,6 +590,7 @@ class MessageListState extends State<MessageList> {
 
   Widget _renderMessagesMentionedMeButton() {
     if (widget.messagesMentionedMe.isNotEmpty) {
+      widget.isShowedMentionedMeButton = true;
       return messageMentionedMeBuilder(
           _scrollToLatestMessageMentionedMe, context, widget.messagesMentionedMe.length, loadingMessageMentionedMe);
     }
@@ -639,7 +646,7 @@ class MessageListState extends State<MessageList> {
             crossAxisAlignment: WrapCrossAlignment.end,
             spacing: 20,
             children: [
-              _renderLatestReadButton(),
+              _renderUnreadMsgButton(),
               _renderMessagesMentionedMeButton(),
             ],
           )),

@@ -5,6 +5,7 @@ import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.d
 import 'package:tencent_cloud_chat_common/builders/tencent_cloud_chat_common_builders.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat_common.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_add_group_info.dart';
+import 'dart:ui';
 
 class TencentCloudChatContactAddGroup extends StatefulWidget {
   const TencentCloudChatContactAddGroup({super.key});
@@ -18,9 +19,16 @@ class TencentCloudChatContactAddGroupState extends TencentCloudChatState<Tencent
   Widget defaultBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => Container(
+        padding: EdgeInsets.only(top: MediaQueryData.fromWindow(window).padding.top),
+        // color: Colors.blue.withOpacity(0.9),
         height: getHeight(800),
-        decoration: BoxDecoration(color: colorTheme.contactAddContactBackgroundColor, borderRadius: BorderRadius.all(Radius.circular(getWidth(10)))),
-        child: const Scaffold(backgroundColor: Colors.transparent, appBar: TencentCloudChatContactAddGroupAppBar(), body: TencentCloudChatContactAddGroupBody()),
+        decoration: BoxDecoration(
+            color: colorTheme.contactAddContactBackgroundColor,
+            borderRadius: BorderRadius.all(Radius.circular(getWidth(10)))),
+        child: const Scaffold(
+            backgroundColor: Colors.transparent,
+            appBar: TencentCloudChatContactAddGroupAppBar(),
+            body: TencentCloudChatContactAddGroupBody()),
       ),
     );
   }
@@ -44,7 +52,10 @@ class TencentCloudChatContactAddGroupAppBarState extends TencentCloudChatState<T
             backgroundColor: Colors.transparent,
             title: Text(
               tL10n.addGroup,
-              style: TextStyle(fontSize: textStyle.fontsize_16, fontWeight: FontWeight.w600, color: colorTheme.contactItemFriendNameColor),
+              style: TextStyle(
+                  fontSize: textStyle.fontsize_16,
+                  fontWeight: FontWeight.w600,
+                  color: colorTheme.contactItemFriendNameColor),
             ),
             centerTitle: true,
             leadingWidth: getWidth(100),
@@ -73,6 +84,7 @@ class TencentCloudChatContactAddGroupBody extends StatefulWidget {
 }
 
 class TencentCloudChatContactAddGroupBodyState extends TencentCloudChatState<TencentCloudChatContactAddGroupBody> {
+  final FocusNode _focusNode = FocusNode();
   bool isSearch = false;
 
   _startSearch() {
@@ -93,7 +105,9 @@ class TencentCloudChatContactAddGroupBodyState extends TencentCloudChatState<Ten
                     padding: EdgeInsets.symmetric(vertical: getHeight(9), horizontal: getWidth(8)),
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: getHeight(8)),
-                      decoration: BoxDecoration(color: colorTheme.contactSearchBackgroundColor, borderRadius: BorderRadius.circular(getSquareSize(4))),
+                      decoration: BoxDecoration(
+                          color: colorTheme.contactSearchBackgroundColor,
+                          borderRadius: BorderRadius.circular(getSquareSize(4))),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -141,26 +155,38 @@ class TencentCloudChatContactAddGroupBodyState extends TencentCloudChatState<Ten
                   child: Row(
                     children: [
                       Container(
-                        decoration: BoxDecoration(color: colorTheme.backgroundColor, borderRadius: BorderRadius.circular(getSquareSize(4))),
-                        width: getWidth(300),
+                        decoration: BoxDecoration(
+                            color: colorTheme.backgroundColor, borderRadius: BorderRadius.circular(getSquareSize(4))),
+                        width: getWidth(280),
                         child: TextField(
                           autofocus: true,
+                          focusNode: _focusNode,
                           controller: _searchID,
                           textAlign: TextAlign.start,
                           onChanged: (String value) {
                             onSearchIDChanged(value);
                           },
                           style: TextStyle(color: colorTheme.contactItemFriendNameColor),
-                          decoration: InputDecoration(contentPadding: EdgeInsets.symmetric(vertical: getHeight(6), horizontal: getWidth(12)), border: InputBorder.none, hintText: tL10n.searchGroupID, isDense: true),
+                          decoration: InputDecoration(
+                              contentPadding: EdgeInsets.symmetric(vertical: getHeight(6), horizontal: getWidth(12)),
+                              border: InputBorder.none,
+                              hintText: tL10n.searchGroupID,
+                              isDense: true),
                           cursorColor: colorTheme.contactSearchCursorColor,
                           cursorRadius: Radius.circular(getSquareSize(2)),
                         ),
                       ),
                       TextButton(
                         style: TextButton.styleFrom(
-                          textStyle: TextStyle(fontSize: textStyle.fontsize_16, fontWeight: FontWeight.w500, color: colorTheme.contactSearchButtonColor),
+                          textStyle: TextStyle(
+                              fontSize: textStyle.fontsize_16,
+                              fontWeight: FontWeight.w500,
+                              color: colorTheme.contactSearchButtonColor),
                         ),
-                        onPressed: _onSearchGroup,
+                        onPressed: () {
+                          _onSearchGroup();
+                          _focusNode.unfocus();
+                        },
                         child: Text(tL10n.search),
                       )
                     ],
@@ -180,6 +206,12 @@ class TencentCloudChatContactAddGroupBodyState extends TencentCloudChatState<Ten
       return afterSearch();
     }
     return beforeSearch();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _focusNode.dispose();
   }
 }
 
@@ -228,7 +260,8 @@ class TencentCloudChatContactAddGroupListItem extends StatefulWidget {
   State<StatefulWidget> createState() => TencentCloudChatContactAddGroupListItemState();
 }
 
-class TencentCloudChatContactAddGroupListItemState extends TencentCloudChatState<TencentCloudChatContactAddGroupListItem> {
+class TencentCloudChatContactAddGroupListItemState
+    extends TencentCloudChatState<TencentCloudChatContactAddGroupListItem> {
   openGroupInfo() {
     showModalBottomSheet<void>(
         barrierColor: Colors.white.withOpacity(0),
@@ -271,7 +304,8 @@ class TencentCloudChatContactAddGroupListItemAvatar extends StatefulWidget {
   State<StatefulWidget> createState() => TencentCloudChatContactAddGroupListItemAvatarState();
 }
 
-class TencentCloudChatContactAddGroupListItemAvatarState extends TencentCloudChatState<TencentCloudChatContactAddGroupListItemAvatar> {
+class TencentCloudChatContactAddGroupListItemAvatarState
+    extends TencentCloudChatState<TencentCloudChatContactAddGroupListItemAvatar> {
   @override
   Widget defaultBuilder(BuildContext context) {
     return Padding(
@@ -297,7 +331,8 @@ class TencentCloudChatContactAddGroupListItemContent extends StatefulWidget {
   State<StatefulWidget> createState() => TencentCloudChatContactAddGroupListItemContentState();
 }
 
-class TencentCloudChatContactAddGroupListItemContentState extends TencentCloudChatState<TencentCloudChatContactAddGroupListItemContent> {
+class TencentCloudChatContactAddGroupListItemContentState
+    extends TencentCloudChatState<TencentCloudChatContactAddGroupListItemContent> {
   @override
   Widget defaultBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(
@@ -308,15 +343,24 @@ class TencentCloudChatContactAddGroupListItemContentState extends TencentCloudCh
               children: [
                 Text(
                   widget.groupInfo.groupName ?? widget.groupInfo.groupID,
-                  style: TextStyle(fontSize: textStyle.fontsize_16, fontWeight: FontWeight.w600, color: colorTheme.contactItemFriendNameColor),
+                  style: TextStyle(
+                      fontSize: textStyle.fontsize_16,
+                      fontWeight: FontWeight.w600,
+                      color: colorTheme.contactItemFriendNameColor),
                 ),
                 Text(
                   'ID:${widget.groupInfo.groupID}',
-                  style: TextStyle(fontSize: textStyle.fontsize_12, fontWeight: FontWeight.w400, color: colorTheme.contactItemFriendNameColor),
+                  style: TextStyle(
+                      fontSize: textStyle.fontsize_12,
+                      fontWeight: FontWeight.w400,
+                      color: colorTheme.contactItemFriendNameColor),
                 ),
                 Text(
                   'Type:${widget.groupInfo.groupType}',
-                  style: TextStyle(fontSize: textStyle.fontsize_12, fontWeight: FontWeight.w400, color: colorTheme.contactItemFriendNameColor),
+                  style: TextStyle(
+                      fontSize: textStyle.fontsize_12,
+                      fontWeight: FontWeight.w400,
+                      color: colorTheme.contactItemFriendNameColor),
                 ),
               ],
             )));

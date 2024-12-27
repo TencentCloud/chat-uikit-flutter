@@ -112,27 +112,18 @@ class _TencentCloudChatMessageInputSelectModeState
         break;
       }
     }
-    final showDeleteForEveryone = isSelf && widget.data.enableMessageDeleteForEveryone;
     TencentCloudChatDialog.showAdaptiveDialog(
       context: context,
       title: Text(tL10n.confirmDeletion),
       content: Text(tL10n.deleteMessageCount(widget.data.messages.length)),
       actions: [
-        if (showDeleteForEveryone)
-          TextButton(
-            onPressed: () {
-              widget.methods.onDeleteForEveryone(widget.data.messages);
-              Navigator.pop(context);
-            },
-            child: Text(tL10n.deleteForEveryone),
-          ),
         if (widget.data.enableMessageDeleteForSelf)
           TextButton(
             onPressed: () {
               widget.methods.onDeleteForMe(widget.data.messages);
               Navigator.pop(context);
             },
-            child: Text(tL10n.deleteForMe),
+            child: Text(tL10n.confirm),
           ),
         TextButton(
           onPressed: () {
@@ -146,7 +137,7 @@ class _TencentCloudChatMessageInputSelectModeState
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    final showDeletion = widget.data.enableMessageDeleteForSelf || widget.data.enableMessageDeleteForEveryone;
+    final showDeletion = widget.data.enableMessageDeleteForSelf;
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => Container(
         color: colorTheme.inputAreaBackground,
@@ -167,7 +158,7 @@ class _TencentCloudChatMessageInputSelectModeState
 
   @override
   Widget tabletAppBuilder(BuildContext context) {
-    final showDeletion = widget.data.enableMessageDeleteForSelf || widget.data.enableMessageDeleteForEveryone;
+    final showDeletion = widget.data.enableMessageDeleteForSelf;
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => Container(
         color: colorTheme.inputAreaBackground,
@@ -193,7 +184,7 @@ class _TencentCloudChatMessageInputSelectModeState
 
   @override
   Widget desktopBuilder(BuildContext context) {
-    final showDeletion = widget.data.enableMessageDeleteForSelf || widget.data.enableMessageDeleteForEveryone;
+    final showDeletion = widget.data.enableMessageDeleteForSelf;
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => Container(
         color: colorTheme.inputAreaBackground,

@@ -2,6 +2,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:tencent_cloud_chat_push/common/common_defines.dart';
+import 'package:tencent_cloud_chat_push/common/tim_push_listener.dart';
 
 import 'tencent_cloud_chat_push_method_channel.dart';
 
@@ -49,7 +50,14 @@ abstract class TencentCloudChatPushPlatform extends PlatformInterface {
   }
 
 
-  Future<TencentCloudChatPushResult> registerPush() {
+  Future<TencentCloudChatPushResult> registerPush({
+    int? sdkAppId,
+    String? appKey,
+  }) {
+    throw UnimplementedError('registerPush() has not been implemented.');
+  }
+
+  Future<TencentCloudChatPushResult> enableBackupChannels() {
     throw UnimplementedError('registerPush() has not been implemented.');
   }
 
@@ -104,5 +112,57 @@ abstract class TencentCloudChatPushPlatform extends PlatformInterface {
     required String configs,
   }) async {
     throw UnimplementedError('setAndroidCustomConfigFile() has not been implemented.');
+  }
+
+  Future<TencentCloudChatPushResult> getRegistrationID() async {
+    throw UnimplementedError('getRegistrationID() has not been implemented.');
+  }
+
+  Future<TencentCloudChatPushResult> setRegistrationID({
+    required String registrationID,
+  }) async {
+    throw UnimplementedError('setRegistrationID() has not been implemented.');
+  }
+
+  Future<void> addPushListener({
+    required TIMPushListener listener,
+  }) async {
+    throw UnimplementedError(
+        'addPushListener() has not been implemented.');
+  }
+
+  Future<void> removePushListener({
+    required TIMPushListener listener,
+  }) async {
+    throw UnimplementedError(
+        'removePushListener() has not been implemented.');
+  }
+
+  Future<TencentCloudChatPushResult> forceUseFCMPushChannel({
+    required bool enable,
+  }) async {
+    throw UnimplementedError('forceUseFCMPushChannel() has not been implemented.');
+  }
+
+  Future<TencentCloudChatPushResult> disablePostNotificationInForeground({
+    required bool disable,
+  }) async {
+    throw UnimplementedError('disablePostNotificationInForeground() has not been implemented.');
+  }
+
+  Future<TencentCloudChatPushResult> createNotificationChannel({
+    required String channelID,
+    required String channelName,
+    String? channelDesc,
+    String? channelSound,
+  }) async {
+    throw UnimplementedError('createNotificationChannel() has not been implemented.');
+  }
+
+  Future<TencentCloudChatPushResult> callExperimentalAPI({
+    required String api,
+    Object? param,
+  }) async {
+    throw UnimplementedError('callExperimentalAPI() has not been implemented.');
   }
 }

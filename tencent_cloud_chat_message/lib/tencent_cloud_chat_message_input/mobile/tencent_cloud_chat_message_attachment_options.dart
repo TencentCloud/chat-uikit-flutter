@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_common_defines.dart';
 import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
@@ -5,6 +7,7 @@ import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_sc
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_builders.dart';
+import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:ui' as ui;
 
@@ -25,6 +28,11 @@ class TencentCloudChatMessageAttachmentOptions {
   }
 
   void dispose() {
+    if (_overlayEntry != null) {
+      _overlayEntry?.remove();
+      _overlayEntry = null;
+    }
+
     _attachmentOptionsAnimationController.dispose();
   }
 
@@ -34,10 +42,11 @@ class TencentCloudChatMessageAttachmentOptions {
       required MAOInternalBuilder? messageAttachmentOptionsBuilder,
       required List<TencentCloudChatMessageGeneralOptionItem> attachmentOptions}) {
     final isMobile = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.mobile;
+    final isArabic = TencentCloudChat.instance.cache.getCachedLocale()?.languageCode == 'ar';
     return SlideTransition(
       position: _attachmentOptionsAnimation.drive(Tween<Offset>(
-        begin: isMobile ? const Offset(-1, 0) : const Offset(0, 0),
-        end: const Offset(0, 0),
+        begin: isMobile ? (isArabic ? const Offset(0, 0) : const Offset(-1, 0)) : const Offset(0, 0),
+        end: isArabic ? const Offset(-1, 0) : const Offset(0, 0),
       )),
       child: SizeTransition(
         sizeFactor: _attachmentOptionsAnimation,
@@ -65,12 +74,7 @@ class TencentCloudChatMessageAttachmentOptions {
     if (_overlayEntry == null) {
       _overlayEntry = OverlayEntry(builder: (BuildContext context) {
         return GestureDetector(
-          onTap: () => toggleAttachmentOptionsOverlay(
-              constraints: constraints,
-              messageAttachmentOptionsBuilder: messageAttachmentOptionsBuilder,
-              context: context,
-              tapDownDetails: tapDownDetails,
-              attachmentOptions: attachmentOptions),
+          onTap: () { _removeEntry(); },
           child: Container(
             color: Colors.transparent,
             child: Stack(

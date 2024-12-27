@@ -8,6 +8,7 @@ import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.
 import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat/tuicore/tencent_cloud_chat_core.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_code_info.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
@@ -15,6 +16,7 @@ import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.d
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data.dart';
 import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data_notifier.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/menu/tencent_cloud_chat_message_item_with_menu_container.dart';
+import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/tencent_cloud_chat_message_item_builders.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/tencent_cloud_chat_message_item_container.dart';
 
 class TencentCloudChatMessageRowContainer extends StatefulWidget {
@@ -85,11 +87,12 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
 
     switch (messageDataKeys) {
       case TencentCloudChatMessageDataKeys.messageNeedUpdate:
-        if (TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate != null &&
-            msgID == TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate?.msgID &&
-            TencentCloudChatUtils.checkString(msgID) != null) {
+        final messageNeedUpdate = TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate;
+        if (messageNeedUpdate != null &&
+            (TencentCloudChatUtils.checkString(msgID) != null && msgID == messageNeedUpdate.msgID)
+        ) {
           safeSetState(() {
-            _message = TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate!;
+            _message = messageNeedUpdate;
           });
         }
         break;
@@ -100,7 +103,7 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
 
   void dataProviderListener() {
     /// _isSelected
-    final selectMessages = dataProvider.selectedMessages;
+    final selectMessages = dataProvider.getSelectedMessages();
     final translatedTextMessages = dataProvider.translatedMessages;
     final soundToTextMessages = dataProvider.soundToTextMessages;
 
@@ -109,12 +112,10 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
         (TencentCloudChatUtils.checkString(_message.id) != null && element.id == _message.id));
 
     final needTranslated = translatedTextMessages.any((element) =>
-        (TencentCloudChatUtils.checkString(_message.msgID) != null && element.msgID == _message.msgID) ||
-        (TencentCloudChatUtils.checkString(_message.id) != null && element.id == _message.id));
+        TencentCloudChatUtils.checkString(_message.msgID) != null && element.msgID == _message.msgID);
 
     final needSoundToText = soundToTextMessages.any((element) =>
-        (TencentCloudChatUtils.checkString(_message.msgID) != null && element.msgID == _message.msgID) ||
-        (TencentCloudChatUtils.checkString(_message.id) != null && element.id == _message.id));
+        TencentCloudChatUtils.checkString(_message.msgID) != null && element.msgID == _message.msgID);
 
     if (newSelected != _isSelected) {
       safeSetState(() {
@@ -130,13 +131,13 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
       });
     }
 
-    if (needTranslated && dataProvider.textTranslatePluginInstance != null) {
+    if (needTranslated && _needTranslate != needTranslated && dataProvider.textTranslatePluginInstance != null) {
       safeSetState(() {
         _needTranslate = needTranslated;
       });
     }
 
-    if (needSoundToText && dataProvider.soundToTextPluginInstance != null) {
+    if (needSoundToText && _needSoundToText != needSoundToText && dataProvider.soundToTextPluginInstance != null) {
       safeSetState(() {
         _needSoundToText = needSoundToText;
       });
@@ -169,12 +170,24 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
         final widget = plugin.getWidgetSync(methodName: "getWidget", data: {
           "text": text,
           "targetLanguage": targetLanguage,
-        });
+          "groupAtUserList": _message.groupAtUserList,
+          "localCustomData": _message.localCustomData ?? '',
+          },
+          onTranslateSuccess: (localCustomData) {
+            _message.localCustomData = localCustomData;
+            // 翻译成功后，需要更新消息的本地自定义数据
+            dataProvider.setLocalCustomData(_message.msgID!, localCustomData);
+          },
+          onTranslateFailed: () {
+
+          });
         return widget;
       }
     }
     return null;
   }
+
+
 
   Widget? _getSoundToTextWidget(TencentCloudChatThemeColors colorTheme, TencentCloudChatTextStyle textStyle) {
     if (_needSoundToText) {
@@ -199,9 +212,18 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
         };
         plugin.callMethodSync(methodName: "setTranslateBoxStyle", methodValue: translateBoxStyle);
         final widget = plugin.getWidgetSync(methodName: "getWidget", data: {
-          "msgID": msgID,
-          "language": ""
-        });
+            "msgID": msgID,
+            "language": "",
+          },
+          onTranslateFailed: () {
+            _needSoundToText = false;
+            dataProvider.handleSoundToTextFailedMessage(msgID);
+          },
+          onTranslateSuccess: () {
+            dataProvider.handleSoundToTextSuccessfulMessage(msgID);
+          },
+          hasFailed: dataProvider.soundToTextFailedMsgIDs.contains(msgID),
+        );
         return widget;
       }
     }
@@ -227,10 +249,37 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
     return false;
   }
 
+  _startVideoCall() async {
+    final useCallKit = TencentCloudChat.instance.dataInstance.basic.useCallKit;
+    if (useCallKit) {
+      if (_message.userID != null) {
+        TencentCloudChatTUICore.videoCall(
+          userids: [_message.userID ?? ""],
+        );
+      }
+    }
+  }
+
+  _startVoiceCall() async {
+    final useCallKit = TencentCloudChat.instance.dataInstance.basic.useCallKit;
+    if (useCallKit) {
+      if (_message.userID != null) {
+        TencentCloudChatTUICore.audioCall(
+          userids: [_message.userID ?? ""],
+        );
+      }
+    }
+  }
+
+  _resendMessage() async {
+    dataProvider.resendMessage(_message);
+  }
+
   @override
   Widget defaultBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => TencentCloudChatMessageItemContainer(
+        key: ValueKey(_message.msgID),
         message: _message,
         messageRowWidth: widget.messageRowWidth,
         inMergerMessagePreviewMode: widget.inMergerMessagePreviewMode,
@@ -242,13 +291,19 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
           String? text,
           SendingMessageData? sendingMessageData,
         ) {
-          final messageReply =
-              TencentCloudChatUtils.parseMessageReply(TencentCloudChatUtils.checkString(_message.cloudCustomData));
-          final tipsItem = _message.elemType == 101 || _message.elemType == MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS;
-          final recalledMessage = _message.status == MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED;
-          if (sendingMessageData?.message != null) {
+          bool excludeFromHistory = false;
+          excludeFromHistory = (_message.isExcludedFromLastMessage ?? false) && (_message.isExcludedFromUnreadCount ?? false);
+          if (excludeFromHistory) {
+            return Container();
+          }
+
+          if (sendingMessageData?.message != null && sendingMessageData?.message.msgID == _message.msgID) {
             _message = sendingMessageData!.message;
           }
+
+          final messageReply =
+              TencentCloudChatUtils.parseMessageReply(TencentCloudChatUtils.checkString(_message.cloudCustomData));
+          final bool isUseTipsBuilder = TencentCloudChatMessageItemBuilders.isShowTipsMessage(_message);
           final repliedMessageItem = (TencentCloudChatUtils.checkString(messageReply.messageID) != null)
               ? dataProvider.messageBuilders?.getMessageReplyViewBuilder(
                   data: MessageReplyViewBuilderData(
@@ -278,6 +333,7 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
                   ),
                 )
               : null;
+
           return dataProvider.messageBuilders?.getMessageRowBuilder(
                 key: Key(_message.msgID ?? _message.id!),
                 data: MessageRowBuilderData(
@@ -318,51 +374,40 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
                   stickerPluginInstance: dataProvider.stickerPluginInstance,
                 ),
                 methods: MessageRowBuilderMethods(
-                    onSelectCurrent: (msg) {
-                      final selectMessages = dataProvider.selectedMessages;
-                      if (selectMessages.any((element) =>
-                          (TencentCloudChatUtils.checkString(msg.msgID) != null && element.msgID == msg.msgID) ||
-                          (TencentCloudChatUtils.checkString(msg.id) != null && element.id == msg.id))) {
-                        selectMessages.removeWhere((element) =>
-                            (TencentCloudChatUtils.checkString(msg.msgID) != null && element.msgID == msg.msgID) ||
-                            (TencentCloudChatUtils.checkString(msg.id) != null && element.id == msg.id));
-                      } else {
-                        selectMessages.add(msg);
-                      }
-                      dataProvider.selectedMessages = selectMessages;
-                    },
+                    onSelectCurrent: (msg) => dataProvider.triggerSelectedMessage(message: msg),
                     loadToSpecificMessage: dataProvider.loadToSpecificMessage),
                 widgets: MessageRowBuilderWidgets(
-                  messageTextTransalteItem: _getTextTranslatedMessageWidget(colorTheme, textStyle),
+                  messageTextTranslateItem: _getTextTranslatedMessageWidget(colorTheme, textStyle),
                   messageSoundToTextItem: _getSoundToTextWidget(colorTheme, textStyle),
                   messageRowAvatar: dataProvider.messageBuilders?.getMessageRowMessageSenderAvatarBuilder(
-                          data: MessageRowMessageSenderAvatarBuilderData(
-                            message: _message,
-                            userID: dataProvider.userID,
-                            groupID: dataProvider.groupID,
-                            topicID: dataProvider.topicID,
-                            messageSenderAvatarURL: _message.faceUrl ?? "",
-                          ),
-                          methods: MessageRowMessageSenderAvatarBuilderMethods(
-                            onCustomUIEventPrimaryTapAvatar:
-                                dataProvider.messageEventHandlers?.uiEventHandlers.onPrimaryTapAvatar,
-                            onCustomUIEventSecondaryTapAvatar:
-                                dataProvider.messageEventHandlers?.uiEventHandlers.onSecondaryTapAvatar,
-                          )) ??
-                      Container(),
+                    data: MessageRowMessageSenderAvatarBuilderData(
+                      message: _message,
+                      userID: dataProvider.userID,
+                      groupID: dataProvider.groupID,
+                      topicID: dataProvider.topicID,
+                      messageSenderAvatarURL: _message.faceUrl ?? "",
+                    ),
+                    methods: MessageRowMessageSenderAvatarBuilderMethods(
+                      onCustomUIEventTapAvatar:
+                          dataProvider.messageEventHandlers?.uiEventHandlers.onTapAvatar,
+                      onCustomUIEventLongPressAvatar:
+                          dataProvider.messageEventHandlers?.uiEventHandlers.onLongPressAvatar,
+                    ),
+                    showOthersAvatar: dataProvider.config.showOthersAvatar(),
+                    showSelfAvatar: dataProvider.config.showSelfAvatar(),
+                  ) ?? Container(),
                   messageRowMessageSenderName: dataProvider.messageBuilders?.getMessageRowMessageSenderNameBuilder(
-                        data: MessageRowMessageSenderNameBuilderData(
-                          message: _message,
-                          userID: dataProvider.userID,
-                          groupID: dataProvider.groupID,
-                          topicID: dataProvider.topicID,
-                          messageSenderName: TencentCloudChatUtils.getMessageSenderName(_message),
-                        ),
-                        methods: MessageRowMessageSenderNameBuilderMethods(),
-                      ) ??
-                      Container(),
+                    data: MessageRowMessageSenderNameBuilderData(
+                      message: _message,
+                      userID: dataProvider.userID,
+                      groupID: dataProvider.groupID,
+                      topicID: dataProvider.topicID,
+                      messageSenderName: TencentCloudChatUtils.getMessageSenderName(_message),
+                      ),
+                    methods: MessageRowMessageSenderNameBuilderMethods(),
+                  ) ?? Container(),
                   messageReplyItem: repliedMessageItem,
-                  messageRowTips: (recalledMessage || tipsItem)
+                  messageRowTips: isUseTipsBuilder
                       ? dataProvider.messageBuilders?.getMessageItemBuilder(
                             key: ((TencentCloudChatUtils.checkString(_message.msgID) ?? _message.id) != null)
                                 ? Key((TencentCloudChatUtils.checkString(_message.msgID) ?? _message.id)!)
@@ -424,21 +469,6 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
                                 topicID: dataProvider.topicID,
                               ),
                               triggerLinkTappedEvent: dataProvider.triggerLinkTappedEvent,
-                              onSelectMessage: () => (msg) {
-                                final selectMessages = dataProvider.selectedMessages;
-                                if (selectMessages.any((element) =>
-                                    (TencentCloudChatUtils.checkString(msg.msgID) != null &&
-                                        element.msgID == msg.msgID) ||
-                                    (TencentCloudChatUtils.checkString(msg.id) != null && element.id == msg.id))) {
-                                  selectMessages.removeWhere((element) =>
-                                      (TencentCloudChatUtils.checkString(msg.msgID) != null &&
-                                          element.msgID == msg.msgID) ||
-                                      (TencentCloudChatUtils.checkString(msg.id) != null && element.id == msg.id));
-                                } else {
-                                  selectMessages.add(msg);
-                                }
-                                dataProvider.selectedMessages = selectMessages;
-                              },
                             ),
                           ) ??
                           Container()
@@ -509,21 +539,9 @@ class _TencentCloudChatMessageRowContainerState extends TencentCloudChatState<Te
                                 group: dataProvider.groupID,
                                 topicID: dataProvider.topicID,
                               ),
-                              onSelectMessage: () => (msg) {
-                                final selectMessages = dataProvider.selectedMessages;
-                                if (selectMessages.any((element) =>
-                                    (TencentCloudChatUtils.checkString(msg.msgID) != null &&
-                                        element.msgID == msg.msgID) ||
-                                    (TencentCloudChatUtils.checkString(msg.id) != null && element.id == msg.id))) {
-                                  selectMessages.removeWhere((element) =>
-                                      (TencentCloudChatUtils.checkString(msg.msgID) != null &&
-                                          element.msgID == msg.msgID) ||
-                                      (TencentCloudChatUtils.checkString(msg.id) != null && element.id == msg.id));
-                                } else {
-                                  selectMessages.add(msg);
-                                }
-                                dataProvider.selectedMessages = selectMessages;
-                              },
+                              startVoiceCall: _startVoiceCall,
+                              startVideoCall: _startVideoCall,
+                              onResendMessage: _resendMessage,
                             ),
                           ) ??
                           Container();

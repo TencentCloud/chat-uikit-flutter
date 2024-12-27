@@ -1,5 +1,10 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat/components/component_options/tencent_cloud_chat_user_profile_options.dart';
+import 'package:tencent_cloud_chat/data/contact/tencent_cloud_chat_contact_data.dart';
+import 'package:tencent_cloud_chat/router/tencent_cloud_chat_navigator.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
@@ -21,9 +26,27 @@ class TencentCloudChatContactBlockList extends StatefulWidget {
 }
 
 class TencentCloudChatContactBlockListState extends TencentCloudChatState<TencentCloudChatContactBlockList> {
+  final Stream<TencentCloudChatContactData<dynamic>>? _contactDataStream =
+      TencentCloudChat.instance.eventBusInstance
+          .on<TencentCloudChatContactData<dynamic>>("TencentCloudChatContactData");
+  late StreamSubscription<TencentCloudChatContactData<dynamic>>?
+      _contactDataSubscription;
+
+  contactDataHandler(TencentCloudChatContactData data) {
+    if (data.currentUpdatedFields == TencentCloudChatContactDataKeys.blockList) {
+      safeSetState(() {});
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _contactDataSubscription = _contactDataStream?.listen(contactDataHandler);
+  }
+
   @override
   Widget defaultBuilder(BuildContext context) {
-    var list = widget.blackList;
+    var list = TencentCloudChat.instance.dataInstance.contact.blockList;
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) {
         return Scaffold(
@@ -65,7 +88,7 @@ class TencentCloudChatContactBlockListState extends TencentCloudChatState<Tencen
 
   @override
   Widget desktopBuilder(BuildContext context) {
-    var list = widget.blackList;
+    var list = TencentCloudChat.instance.dataInstance.contact.blockList;
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) {
         return Scaffold(
@@ -94,6 +117,12 @@ class TencentCloudChatContactBlockListState extends TencentCloudChatState<Tencen
       },
     );
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _contactDataSubscription?.cancel();
+  }
 }
 
 class TencentCloudChatContactBlockListItem extends StatefulWidget {
@@ -108,11 +137,19 @@ class TencentCloudChatContactBlockListItem extends StatefulWidget {
 class TencentCloudChatContactBlockListItemState extends TencentCloudChatState<TencentCloudChatContactBlockListItem> {
   @override
   Widget defaultBuilder(BuildContext context) {
-    return Container(
-        padding: EdgeInsets.symmetric(vertical: getHeight(5), horizontal: getWidth(3)),
-        child: Row(
-          children: [TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactBlockListItemAvatarBuilder(widget.friend), TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactBlockListItemContentBuilder(widget.friend)],
-        ));
+    return InkWell(
+      onTap: () {
+        navigateToUserProfile(context: context, options: TencentCloudChatUserProfileOptions(
+          userID: widget.friend.userID,
+          isNavigatedFromChat: false)
+        );
+      },
+      child: Container(
+          padding: EdgeInsets.symmetric(vertical: getHeight(5), horizontal: getWidth(3)),
+          child: Row(
+            children: [TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactBlockListItemAvatarBuilder(widget.friend), TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactBlockListItemContentBuilder(widget.friend)],
+          )),
+    );
   }
 }
 

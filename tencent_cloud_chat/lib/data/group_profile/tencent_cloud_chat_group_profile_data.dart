@@ -11,18 +11,10 @@ import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart';
 import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
 
-enum TencentCloudChatGroupProfileDataKeys { none, config, builder, membersChange }
+enum TencentCloudChatGroupProfileDataKeys { none, config, builder, membersChange, quitGroup }
 
 class TencentCloudChatGroupProfileData<T> extends TencentCloudChatDataAB<T> {
-  final Map<String, List<String>> _groupNineSquareAvatarCache = Map.from({});
-
   TencentCloudChatGroupProfileData(super.currentUpdatedFields);
-
-  List<String> getGroupNineSquareAvatarCacheByGroupID({
-    required String groupID,
-  }) {
-    return _groupNineSquareAvatarCache[groupID] ?? [];
-  }
 
   /// === Group Profile Config ===
   TencentCloudChatGroupProfileConfig _groupProfileConfig = TencentCloudChatGroupProfileConfig();
@@ -52,8 +44,8 @@ class TencentCloudChatGroupProfileData<T> extends TencentCloudChatDataAB<T> {
   /// === Controller ===
   TencentCloudChatComponentBaseController? groupProfileController;
 
-  final groupMemberListCache = TencentLRUCache<String, List<V2TimGroupMemberFullInfo?>>(capacity: 5);
-  final groupInfoCache = TencentLRUCache<String, V2TimGroupInfo?>(capacity: 5);
+  TencentLRUCache<String, List<V2TimGroupMemberFullInfo?>> groupMemberListCache = TencentLRUCache<String, List<V2TimGroupMemberFullInfo?>>(capacity: 5);
+  TencentLRUCache<String, V2TimGroupInfo?> groupInfoCache = TencentLRUCache<String, V2TimGroupInfo?>(capacity: 5);
 
   setGroupInfo(String? groupID, V2TimGroupInfo? groupInfo) {
     if (groupID != null && groupInfo != null) {
@@ -172,10 +164,6 @@ class TencentCloudChatGroupProfileData<T> extends TencentCloudChatDataAB<T> {
       groupMemberListCache.set(groupID, list);
       updateGroupID = groupID;
       notifyListener(TencentCloudChatGroupProfileDataKeys.membersChange as T);
-      TencentCloudChat.instance.cache.cacheGroupMemberList(
-        groupID,
-        list,
-      );
     }
     return list;
   }
@@ -193,10 +181,32 @@ class TencentCloudChatGroupProfileData<T> extends TencentCloudChatDataAB<T> {
     return (TencentCloudChatUtils.checkString(groupID) != null ? groupMemberListCache.get(groupID!) : []) ?? [];
   }
 
+  void notifyQuitOrDismissGroup(String groupID) {
+    updateGroupID = groupID;
+    notifyListener(TencentCloudChatGroupProfileDataKeys.quitGroup as T);
+  }
+
   @override
   void notifyListener(T key) {
     currentUpdatedFields = key;
-    TencentCloudChat.instance.eventBusInstance.fire(this, "TencentCloudChatGroupProfileData");
+    var event = TencentCloudChatGroupProfileData<T>(key);
+    event.updateGroupID = updateGroupID;
+    event._groupProfileConfig = _groupProfileConfig;
+    event.groupProfileEventHandlers = groupProfileEventHandlers;
+    event._groupProfileBuilder = _groupProfileBuilder;
+    event.groupProfileController = groupProfileController;
+    event.groupMemberListCache = groupMemberListCache;
+    event.groupInfoCache = groupInfoCache;
+
+    TencentCloudChat.instance.eventBusInstance.fire(event, "TencentCloudChatGroupProfileData");
+  }
+
+  @override
+  void clear() {
+    updateGroupID = "";
+    groupMemberListCache.clear();
+    groupInfoCache.clear();
+
   }
 
   @override

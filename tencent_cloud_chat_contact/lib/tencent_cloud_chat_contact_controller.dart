@@ -6,7 +6,6 @@ class TencentCloudChatContactControllerGenerator {
   }
 }
 
-
 class TencentCloudChatContactController extends TencentCloudChatComponentBaseController{
   TencentCloudChatContactController._();
 }

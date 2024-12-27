@@ -1,18 +1,29 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat_common/utils/sdk_const.dart';
 import 'package:tencent_cloud_chat_intl/tencent_cloud_chat_intl.dart';
+import 'package:tencent_cloud_chat_message/common/text_compiler/tencent_cloud_chat_message_text_compiler.dart';
+import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data.dart';
+import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data_notifier.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart';
 import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
+import 'package:tencent_cloud_chat_text_translate/translate_utils.dart';
+import 'package:tencent_cloud_chat_text_translate/translationData.dart';
 
 class TencentCloudChatTranslate extends StatefulWidget {
   final String sourceText;
   final String targetLanguage;
+  List<String> groupAtUserList = [];
+  String localCustomData = '';
   final BoxDecoration? decoration;
   final TextStyle? textStyle;
   final EdgeInsetsGeometry? padding;
-  final Function()? onTranslateSuccess;
+  final Function(String)? onTranslateSuccess;
   final Function()? onTranslateFailed;
-  const TencentCloudChatTranslate(
+  TencentCloudChatTranslate(
       {super.key,
       this.decoration,
       this.textStyle,
@@ -20,7 +31,9 @@ class TencentCloudChatTranslate extends StatefulWidget {
       this.onTranslateSuccess,
       this.onTranslateFailed,
       required this.sourceText,
-      required this.targetLanguage});
+      required this.targetLanguage,
+      required this.groupAtUserList,
+      required this.localCustomData});
 
   @override
   State<TencentCloudChatTranslate> createState() =>
@@ -28,6 +41,7 @@ class TencentCloudChatTranslate extends StatefulWidget {
 }
 
 class _TencentCloudChatTranslateState extends State<TencentCloudChatTranslate> {
+  late TencentCloudChatMessageSeparateDataProvider dataProvider;
   String translatedText = '';
   bool isTranslating = false;
   bool isError = false;
@@ -36,6 +50,12 @@ class _TencentCloudChatTranslateState extends State<TencentCloudChatTranslate> {
   initState() {
     translateText();
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    dataProvider = TencentCloudChatMessageDataProviderInherited.of(context);
   }
 
   @override
@@ -62,10 +82,15 @@ class _TencentCloudChatTranslateState extends State<TencentCloudChatTranslate> {
                             strokeWidth: 1,
                             color: Colors.grey,
                           ))
-                      : Text(
+                      : ExtendedText(
                           translatedText,
+                          specialTextSpanBuilder: TencentCloudChatSpecialTextSpanBuilder(
+                            onTapUrl: (String value) {},
+                            showAtBackground: true,
+                            stickerPluginInstance: dataProvider.stickerPluginInstance,
+                          ),
                           style:
-                              widget.textStyle ?? const TextStyle(fontSize: 14),
+                              widget.textStyle ?? const  TextStyle(fontSize: 14),
                         ),
                   if (!isTranslating) ...[
                     const SizedBox(
@@ -121,34 +146,146 @@ class _TencentCloudChatTranslateState extends State<TencentCloudChatTranslate> {
     );
   }
 
-  translateText() async {
-    setState(() {
-      if (mounted) {
-        isTranslating = true;
-        isError = false;
+  _translateMessage(String originalText, List<String> groupAtUserNicknameList) async {
+    Map<String, List<String>> splitMap = TranslateUtils.splitTextByEmojiAndAtUsers(widget.sourceText, groupAtUserNicknameList);
+    List<String>? toTranslateTextList = splitMap[TranslateUtils.splitTextForTranslation];
+    if (toTranslateTextList == null || toTranslateTextList.isEmpty) {
+      List<String>? splitTextList = splitMap[TranslateUtils.splitText];
+      String translateTextResult = "";
+      if (splitTextList != null) {
+        for (String result in splitTextList) {
+          translateTextResult += result;
+        }
       }
-    });
+
+      try {
+        Map<String, dynamic> jsonMap = jsonDecode(widget.localCustomData);
+        jsonMap["translation"] = translateTextResult;
+        jsonMap["translationViewStatus"] = TranslationData.msgTranslateStatusShown;
+        widget.localCustomData = jsonEncode(jsonMap);
+        widget.onTranslateSuccess!(widget.localCustomData);
+        setState(() {
+          isTranslating = false;
+          translatedText = translateTextResult;
+        });
+        return translateTextResult;
+      } catch (e) {
+        print(e);
+      }
+
+      return translateTextResult;
+    }
+
     final translateResult = await TencentImSDKPlugin.v2TIMManager
         .getMessageManager()
         .translateText(
-            texts: [widget.sourceText],
-            targetLanguage: widget.targetLanguage);
-    isTranslating = false;
+        texts: toTranslateTextList,
+        targetLanguage: widget.targetLanguage);
+
     if (translateResult.code == 0 && translateResult.data != null) {
-      final response = translateResult.data![widget.sourceText] ?? "";
-      setState(() {
-        translatedText = response;
-      });
-      if (widget.onTranslateSuccess != null) {
-        widget.onTranslateSuccess!();
+      Map<String, String>? translateMap = translateResult.data;
+      List<String>? splitTextList = splitMap[TranslateUtils.splitText];
+      List<String>? translationIndexList = splitMap[TranslateUtils.splitTextIndexForTranslation];
+      for (String indexString in translationIndexList!) {
+        int index = int.parse(indexString);
+        String? originText = splitTextList?[index];
+        String? translatedTextResult = translateMap?[originText];
+        if (translatedTextResult!.isNotEmpty) {
+          splitTextList?[index] = translatedTextResult;
+        }
       }
+
+      String translateTextResult = "";
+      for (String result in splitTextList!) {
+        translateTextResult += result;
+      }
+
+      try {
+        Map<String, dynamic> jsonMap;
+        if (widget.localCustomData.isEmpty) {
+          jsonMap = <String, dynamic>{};
+        } else {
+          jsonMap = jsonDecode(widget.localCustomData);
+        }
+
+        jsonMap["translation"] = translateTextResult;
+        jsonMap["translationViewStatus"] = TranslationData.msgTranslateStatusShown;
+        widget.localCustomData = jsonEncode(jsonMap);
+        widget.onTranslateSuccess!(widget.localCustomData);
+        setState(() {
+          isTranslating = false;
+          translatedText = translateTextResult;
+        });
+      } catch (e) {
+        print(e);
+      }
+    }
+  }
+
+  translateText() async {
+    // find translation text and status from localCustomData
+    if (widget.localCustomData.isNotEmpty) {
+      // parse JSON String to Map<String, dynamic>
+      try {
+        Map<String, dynamic> jsonMap = jsonDecode(widget.localCustomData);
+        TranslationData translationData = TranslationData.fromJson(jsonMap);
+        if (translationData.translationViewStatus == TranslationData.msgTranslateStatusHidden) {
+          setState(() {
+            isTranslating = false;
+            translatedText = translationData.translation;
+            jsonMap["translationViewStatus"] = TranslationData.msgTranslateStatusShown;
+            widget.localCustomData = jsonEncode(jsonMap);
+            widget.onTranslateSuccess!(widget.localCustomData);
+          });
+        } else if (translationData.translationViewStatus == TranslationData.msgTranslateStatusShown) {
+          setState(() {
+            isTranslating = false;
+            translatedText = translationData.translation;
+          });
+        }
+        return;
+      } catch (e) {
+        print(e);
+      }
+    }
+
+    List<String> atRealUserIDList = [];
+    List<String> groupAtUserNicknameList = [];
+    List<int> atAllIndexList = [];
+    for (int i = 0; i < widget.groupAtUserList.length; i++) {
+      String userID = widget.groupAtUserList[i];
+      if (userID == SDKConst.sdkAtAllUserID) {
+        atAllIndexList.add(i);
+      } else {
+        atRealUserIDList.add(userID);
+      }
+    }
+
+    if (atRealUserIDList.isEmpty) {
+      for (var index in atAllIndexList) {
+        groupAtUserNicknameList.add(tL10n.atAll);
+      }
+      _translateMessage(widget.sourceText, groupAtUserNicknameList);
     } else {
-      setState(() {
-        isError = true;
-        translatedText = translateResult.desc;
-      });
-      if (widget.onTranslateFailed != null) {
-        widget.onTranslateFailed!();
+      var result = await TencentImSDKPlugin.v2TIMManager.getUsersInfo(userIDList: atRealUserIDList);
+      if (result.code == 0 && result.data != null) {
+        for (var userID in widget.groupAtUserList) {
+          for (V2TimUserFullInfo userFullInfo in result.data!) {
+            if (userID == SDKConst.sdkAtAllUserID) {
+              break;
+            }
+
+            if (userID == userFullInfo.userID) {
+              groupAtUserNicknameList.add(userFullInfo.nickName ?? userFullInfo.userID!);
+              break;
+            }
+          }
+        }
+
+        for (int index in atAllIndexList) {
+          groupAtUserNicknameList.insert(index, tL10n.atAll);
+        }
+        _translateMessage(widget.sourceText, groupAtUserNicknameList);
       }
     }
   }

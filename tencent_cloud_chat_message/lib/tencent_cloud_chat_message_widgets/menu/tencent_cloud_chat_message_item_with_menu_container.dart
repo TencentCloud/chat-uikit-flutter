@@ -52,6 +52,8 @@ class _TencentCloudChatMessageItemWithMenuContainerState
   V2TimMessageReceipt? _messageReceipt;
 
   late V2TimMessage _message;
+  bool _hasTranslate = false;
+  bool _hasConvertToText = false;
 
   // This method handles changes in message data.
   void _messageDataHandler(TencentCloudChatMessageData messageData) {
@@ -83,11 +85,15 @@ class _TencentCloudChatMessageItemWithMenuContainerState
         break;
       case TencentCloudChatMessageDataKeys.sendMessageProgress:
         if (messageData.messageProgressData.containsKey(msgID)) {
-          if (messageData.messageProgressData[msgID] != null) {
             var data = messageData.messageProgressData[msgID];
             if (data != null) {
               _message = data.message;
+              _generateMenuOptions();
             }
+        } else if (TencentCloudChatUtils.checkString(_message.id) != null && _message.id != msgID && messageData.messageProgressData.containsKey(_message.id)) {
+          var data = messageData.messageProgressData[_message.id];
+          if (data != null) {
+            _message = data.message;
             _generateMenuOptions();
           }
         }
@@ -95,11 +101,13 @@ class _TencentCloudChatMessageItemWithMenuContainerState
       case TencentCloudChatMessageDataKeys.currentPlayAudioInfo:
         break;
       case TencentCloudChatMessageDataKeys.messageNeedUpdate:
-        if (TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate != null &&
-            msgID == TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate?.msgID &&
-            TencentCloudChatUtils.checkString(msgID) != null) {
+        final messageNeedUpdate = TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate;
+        if (messageNeedUpdate != null &&(
+            (TencentCloudChatUtils.checkString(msgID) != null && msgID == messageNeedUpdate.msgID) ||
+                (TencentCloudChatUtils.checkString(_message.id) != null && _message.id == messageNeedUpdate.id)
+        )) {
           safeSetState(() {
-            _message = TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate!;
+            _message = messageNeedUpdate;
           });
           _generateMenuOptions();
         }
@@ -120,17 +128,32 @@ class _TencentCloudChatMessageItemWithMenuContainerState
     );
   }
 
-  @override
-  void dispose() {
-    _messageDataSubscription?.cancel();
-    super.dispose();
-  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     dataProvider = TencentCloudChatMessageDataProviderInherited.of(context);
+    dataProvider.addListener(dataProviderListener);
     _generateMenuOptions();
+  }
+
+  @override
+  void dispose() {
+    _messageDataSubscription?.cancel();
+    dataProvider.removeListener(dataProviderListener);
+    super.dispose();
+  }
+
+  void dataProviderListener() {
+    bool latestTranslateState = dataProvider.translatedMessages.any((element) => element.msgID == _message.msgID);
+    bool latestConvertToTextState = dataProvider.soundToTextMessages.any((element) => element.msgID == _message.msgID);
+    if (latestTranslateState != _hasTranslate || latestConvertToTextState != _hasConvertToText) {
+      safeSetState(() {
+        _hasTranslate = latestTranslateState;
+        _hasConvertToText = latestConvertToTextState;
+        _generateMenuOptions();
+      });
+    }
   }
 
   bool _showRecallButton() {
@@ -176,15 +199,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState
     );
 
     // === Message Delete ===
-    final enableMessageDeleteForEveryone = defaultMessageMenuConfig.enableMessageDeleteForEveryone &&
-        config.enableMessageDeleteForEveryone(
-          userID: dataProvider.userID,
-          groupID: dataProvider.groupID,
-          topicID: dataProvider.topicID,
-        );
     final enableMessageDeleteForSelf = defaultMessageMenuConfig.enableMessageDeleteForSelf;
-    final showDeleteForEveryone = (_message.isSelf ?? false) && enableMessageDeleteForEveryone;
-    final showMessageDelete = showDeleteForEveryone || enableMessageDeleteForSelf;
 
     // === Group Message Read Receipt ===
     final useReadReceipt = defaultMessageMenuConfig.enableGroupMessageReceipt &&
@@ -221,24 +236,24 @@ class _TencentCloudChatMessageItemWithMenuContainerState
                 ClipboardData(text: selectedText ?? text),
               );
             }),
-      if (defaultMessageMenuConfig.enableMessageReply)
+      if (defaultMessageMenuConfig.enableMessageQuote && _message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC)
         TencentCloudChatMessageGeneralOptionItem(
-            iconAsset: (path: "lib/assets/reply_message.svg", package: "tencent_cloud_chat_message"),
-            id: "_uikit_reply_message",
-            label: config.enableReplyWithMention(
+            iconAsset: (path: "lib/assets/quote_message.svg", package: "tencent_cloud_chat_message"),
+            id: "_uikit_quote_message",
+            label: config.enableQuoteWithMention(
               userID: dataProvider.userID,
               topicID: dataProvider.topicID,
               groupID: dataProvider.groupID,
             )
-                ? tL10n.reply
-                : tL10n.quote,
+                ? tL10n.quote
+                : tL10n.reply,
             onTap: ({Offset? offset}) {
-              dataProvider.repliedMessage = _message;
+              dataProvider.quotedMessage = _message;
             }),
       if (defaultMessageMenuConfig.enableMessageSelect)
         TencentCloudChatMessageGeneralOptionItem(
           iconAsset: (path: "lib/assets/multi_message.svg", package: "tencent_cloud_chat_message"),
-          label: tL10n.select,
+          label: tL10n.multiSelect,
           id: "_uikit_multi_message",
           onTap: ({Offset? offset}) {
             Future.delayed(
@@ -250,7 +265,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState
             );
           },
         ),
-      if (defaultMessageMenuConfig.enableMessageForward)
+      if (defaultMessageMenuConfig.enableMessageForward && _message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC)
         TencentCloudChatMessageGeneralOptionItem(
             iconAsset: (path: "lib/assets/forward_message.svg", package: "tencent_cloud_chat_message"),
             label: tL10n.forward,
@@ -292,7 +307,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState
                 );
               }
             }),
-      if (showMessageDelete)
+      if (enableMessageDeleteForSelf)
         TencentCloudChatMessageGeneralOptionItem(
             iconAsset: (path: "lib/assets/delete_message.svg", package: "tencent_cloud_chat_message"),
             label: tL10n.delete,
@@ -304,7 +319,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState
                   context: context,
                   title: tL10n.confirmDeletion,
                   text: tL10n.askDeleteThisMessage,
-                  width: (showDeleteForEveryone && enableMessageDeleteForSelf) ? 600 : 400,
+                  width: enableMessageDeleteForSelf ? 600 : 400,
                   height: 200,
                   actions: [
                     (
@@ -312,20 +327,12 @@ class _TencentCloudChatMessageItemWithMenuContainerState
                       label: tL10n.cancel,
                       type: TencentCloudChatDesktopPopupActionButtonType.secondary,
                     ),
-                    if (showDeleteForEveryone)
-                      (
-                        onTap: () {
-                          dataProvider.deleteMessagesForEveryone(messages: [_message]);
-                        },
-                        label: tL10n.deleteForEveryone,
-                        type: TencentCloudChatDesktopPopupActionButtonType.primary,
-                      ),
                     if (enableMessageDeleteForSelf)
                       (
                         onTap: () {
                           dataProvider.deleteMessagesForMe(messages: [_message]);
                         },
-                        label: tL10n.deleteForMe,
+                        label: tL10n.confirm,
                         type: TencentCloudChatDesktopPopupActionButtonType.primary,
                       ),
                   ],
@@ -336,21 +343,13 @@ class _TencentCloudChatMessageItemWithMenuContainerState
                   title: Text(tL10n.confirmDeletion),
                   content: Text(tL10n.askDeleteThisMessage),
                   actions: [
-                    if (showDeleteForEveryone)
-                      TextButton(
-                        onPressed: () {
-                          dataProvider.deleteMessagesForEveryone(messages: [_message]);
-                          Navigator.pop(context);
-                        },
-                        child: Text(tL10n.deleteForEveryone),
-                      ),
                     if (enableMessageDeleteForSelf)
                       TextButton(
                         onPressed: () {
                           dataProvider.deleteMessagesForMe(messages: [_message]);
                           Navigator.pop(context);
                         },
-                        child: Text(tL10n.deleteForMe),
+                        child: Text(tL10n.confirm),
                       ),
                     TextButton(
                       onPressed: () {
@@ -403,13 +402,14 @@ class _TencentCloudChatMessageItemWithMenuContainerState
                 );
               }
             }),
-      if (showReadReceipt)
+      if (showReadReceipt && _message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC)
         TencentCloudChatMessageGeneralOptionItem(
             icon: Icons.visibility,
             id: "_uikit_read_receipt",
             label: isAllRead ? tL10n.allMembersRead : tL10n.memberReadCount(readCount ?? 0),
             onTap: ({Offset? offset}) {}),
-      if (widget.isTextTranslatePluginEnabled) 
+      if (widget.isTextTranslatePluginEnabled && _message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC &&
+          !_hasTranslate)
         TencentCloudChatMessageGeneralOptionItem(
             icon: Icons.translate_outlined,
             label: tL10n.translate,
@@ -418,7 +418,8 @@ class _TencentCloudChatMessageItemWithMenuContainerState
               dataProvider.translatedMessages = [_message];
             },
         ),
-      if (widget.isSoundToTextPluginEnabled)
+      if (widget.isSoundToTextPluginEnabled && _message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC &&
+          !_hasConvertToText)
         TencentCloudChatMessageGeneralOptionItem(
             icon: Icons.translate_outlined,
             label: tL10n.convertToText,

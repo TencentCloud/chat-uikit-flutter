@@ -69,66 +69,7 @@ class TencentCloudChatGroupSDK {
     return null;
   }
 
-  final V2TimGroupListener groupListener = V2TimGroupListener(
-    onAllGroupMembersMuted: (groupID, isMute) {},
-    onApplicationProcessed: (groupID, opUser, isAgreeJoin, opReason) {},
-    onGrantAdministrator: (groupID, opUser, memberList) {},
-    onGroupAttributeChanged: (groupID, groupAttributeMap) {},
-    onGroupCounterChanged: (groupID, key, newValue) {},
-    onGroupCreated: (groupID) {},
-    onGroupDismissed: (groupID, opUser) {},
-    onGroupInfoChanged: (groupID, changeInfos) {
-      List<V2TimConversation> conversationList = TencentCloudChat.instance.dataInstance.conversation.conversationList;
-      int index = conversationList.indexWhere((element) => element.conversationID == "group_${groupID}");
-      if (index > -1) {
-        V2TimConversation conversation = conversationList[index];
-        for (int i = 0; i < changeInfos.length; i++) {
-          switch (changeInfos[i].type) {
-            case 1:
-              conversation.showName = changeInfos[i].value;
-              break;
-            case 4:
-              conversation.faceUrl = changeInfos[i].value;
-              break;
-            default:
-              break;
-          }
-        }
-        TencentCloudChat.instance.dataInstance.conversation.buildConversationList([conversation], "onGroupInfoChanged");
-      }
-    },
-    onGroupRecycled: (groupID, opUser) {},
-    onMemberEnter: (groupID, memberList) {
-      TencentCloudChat.instance.dataInstance.groupProfile.addGroupMember(groupID, memberList);
-    },
-    onMemberInfoChanged: (groupID, v2TIMGroupMemberChangeInfoList) {
-      TencentCloudChat.instance.dataInstance.groupProfile.updateGroupMemberInfo(groupID, v2TIMGroupMemberChangeInfoList);
-    },
-    onMemberInvited: (groupID, opUser, memberList) {
-      TencentCloudChat.instance.dataInstance.groupProfile.addGroupMember(groupID, memberList);
-    },
-    onMemberKicked: (groupID, opUser, memberList) {
-      TencentCloudChat.instance.dataInstance.groupProfile.deleteGroupMember(groupID, memberList);
-    },
-    onMemberLeave: (groupID, member) {
-      TencentCloudChat.instance.dataInstance.groupProfile.deleteGroupMember(groupID, [member]);
-    },
-    onMemberMarkChanged: (groupID, memberIDList, markType, enableMark) {},
-    onQuitFromGroup: (groupID) {},
-    onReceiveJoinApplication: (groupID, member, opReason) {},
-    onReceiveRESTCustomData: (groupID, customData) {},
-    onRevokeAdministrator: (groupID, opUser, memberList) {},
-    onTopicCreated: (groupID, topicID) {},
-    onTopicDeleted: (groupID, topicIDList) {},
-    onTopicInfoChanged: (groupID, topicInfo) {},
-  );
-
-  addGroupListener() async {
-    await TencentCloudChat.instance.chatSDKInstance.manager.removeGroupListener(listener: groupListener);
-    await TencentCloudChat.instance.chatSDKInstance.manager.addGroupListener(listener: groupListener);
-  }
-
- Future<V2TimValueCallback<List<V2TimGroupMemberFullInfo>>> getGroupMembersInfo({
+  Future<V2TimValueCallback<List<V2TimGroupMemberFullInfo>>> getGroupMembersInfo({
     required String groupID,
     required List<String> memberList,
   }) async {
@@ -186,24 +127,6 @@ class TencentCloudChatGroupSDK {
     V2TimCallback setGroupReceiveMessageOptRes =
         await TencentImSDKPlugin.v2TIMManager.getMessageManager().setGroupReceiveMessageOpt(groupID: groupID, opt: opt);
     return setGroupReceiveMessageOptRes;
-  }
-
-  Future<V2TimCallback> clearGroupHistoryMessage({required String groupID}) async {
-    V2TimCallback clearGroupHistoryMessageRes =
-        await TencentImSDKPlugin.v2TIMManager.getMessageManager().clearGroupHistoryMessage(groupID: groupID);
-    return clearGroupHistoryMessageRes;
-  }
-
-  Future<V2TimCallback> quitGroup({required String groupID}) async {
-    V2TimCallback res = await TencentImSDKPlugin.v2TIMManager.quitGroup(
-      groupID: groupID,
-    );
-    return res;
-  }
-
-  Future<V2TimCallback> dismissGroup({required String groupID}) async {
-    V2TimCallback res = await TencentImSDKPlugin.v2TIMManager.dismissGroup(groupID: groupID);
-    return res;
   }
 
   Future<V2TimValueCallback<List<V2TimGroupMemberOperationResult>>> inviteUserToGroup({required String groupID, required List<String> userList}) async {

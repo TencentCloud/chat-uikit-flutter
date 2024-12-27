@@ -270,6 +270,8 @@ class TencentCloudChatMessageBuilders extends TencentCloudChatComponentBuilder {
     MessageRowMessageSenderAvatarBuilderWidgets? widgets,
     required MessageRowMessageSenderAvatarBuilderData data,
     required MessageRowMessageSenderAvatarBuilderMethods methods,
+    bool showOthersAvatar = false,
+    bool showSelfAvatar = false,
   }) {
     Widget? widget;
 
@@ -281,6 +283,8 @@ class TencentCloudChatMessageBuilders extends TencentCloudChatComponentBuilder {
               messageRowMessageSenderAvatarView: TencentCloudChatMessageRowMessageSenderAvatar(
                 data: data,
                 methods: methods,
+                showOthersAvatar: showOthersAvatar,
+                showSelfAvatar: showSelfAvatar,
               ),
             ),
         data: data,
@@ -293,6 +297,8 @@ class TencentCloudChatMessageBuilders extends TencentCloudChatComponentBuilder {
           key: key,
           data: data,
           methods: methods,
+          showOthersAvatar: showOthersAvatar,
+          showSelfAvatar: showSelfAvatar,
         );
   }
 
@@ -608,9 +614,9 @@ class TencentCloudChatMessageBuilders extends TencentCloudChatComponentBuilder {
         methods: methods,
         widgets: widgets ??
             MessageInputBuilderWidgets(
-                messageInput: TencentCloudChatMessageInput(
-              data: data,
-              methods: methods,
+              messageInput: TencentCloudChatMessageInput(
+                data: data,
+                methods: methods,
             )),
       );
     }

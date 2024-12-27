@@ -138,7 +138,7 @@ class TencentCloudChatStickerTabState extends State<TencentCloudChatStickerTab> 
                   height: 40,
                   width: 40,
                   decoration: BoxDecoration(
-                    color: showActiveStyle ? const Color(0XFFF4F7FD) : Colors.transparent,
+                    color: showActiveStyle ? const Color.fromARGB(255, 230, 230, 230) : Colors.transparent,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   margin: EdgeInsets.only(right: isLastIndex ? 0 : 10),
@@ -171,6 +171,11 @@ class TencentCloudChatStickerContent extends StatefulWidget {
 
 class TencentCloudChatStickerContentState extends State<TencentCloudChatStickerContent> {
   sendStickerMessage(int type, String name, int stickerIndex) {
+    if (name.startsWith('[') && name.endsWith(']')) {
+      var adjustName = name.substring(1, name.length -1);
+      name = adjustName.toLowerCase().startsWith('tuiemoji') ? name : adjustName;
+    }
+
     TencentImSDKPlugin.v2TIMManager.emitUIKitListener(
       data: Map<String, dynamic>.from(
         {

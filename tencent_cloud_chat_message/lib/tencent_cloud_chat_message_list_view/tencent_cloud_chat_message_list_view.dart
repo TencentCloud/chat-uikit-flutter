@@ -166,7 +166,7 @@ class _TencentCloudChatMessageListViewState extends TencentCloudChatState<Tencen
                 itemBuilder: (BuildContext context, int index) {
                   V2TimMessage message = widget.data.messageList[index];
                   return TencentCloudChatMessageRowContainer(
-                    // key: ((TencentCloudChatUtils.checkString(message.msgID) ?? message.id) != null) ? Key((TencentCloudChatUtils.checkString(message.msgID) ?? message.id)!) : null,
+                    key: ValueKey(message.msgID),
                     messageRowWidth: _maxWidth!,
                     message: message,
                     inMergerMessagePreviewMode: false,

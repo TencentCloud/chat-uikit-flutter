@@ -17,24 +17,28 @@ class TencentCloudChatContactSDK {
           .buildApplicationList(applicationList, 'onFriendApplicationListAdded');
     },
     onBlackListAdd: (blockList) {
-      TencentCloudChat.instance.dataInstance.contact.buildBlockList(blockList, 'onBlakcListAdd');
+      TencentCloudChat.instance.dataInstance.contact.buildBlockList(blockList, 'onBlackListAdd');
     },
     onBlackListDeleted: (blockList) {
-      TencentCloudChat.instance.dataInstance.contact.deleteFromBlockList(blockList, 'onBloackListDeleted');
+      TencentCloudChat.instance.dataInstance.contact.deleteFromBlockList(blockList, 'onBlackListDeleted');
     },
     onFriendApplicationListDeleted: (applicationList) {
       TencentCloudChat.instance.dataInstance.contact
-          .deleteApplicationList(applicationList, 'onFriendApplicationListAdded');
+          .deleteApplicationList(applicationList, 'onFriendApplicationListDeleted');
     },
     onFriendApplicationListRead: () {},
     onFriendInfoChanged: (contactList) {
       TencentCloudChat.instance.dataInstance.contact.buildFriendList(contactList, 'onFriendInfoChanged');
+      TencentCloudChat.instance.dataInstance.messageData.onFriendInfoChanged(contactList);
     },
     onFriendListAdded: (contactList) {
       TencentCloudChat.instance.dataInstance.contact.buildFriendList(contactList, 'onFriendListAdded');
+      TencentCloudChat.instance.dataInstance.contact
+          .deleteApplicationList(contactList.map((e) => e.userID).toList(), 'onFriendApplicationListDeleted');
     },
     onFriendListDeleted: (contactList) {
       TencentCloudChat.instance.dataInstance.contact.deleteFromFriendList(contactList, 'onFriendListDeleted');
+      TencentCloudChat.instance.chatSDKInstance.conversationSDK.deleteConversation(conversationIDList: contactList.map((e) => 'c2c_$e').toList(), clearMessage: true);
     },
   );
 
@@ -85,8 +89,6 @@ class TencentCloudChatContactSDK {
     V2TimValueCallback<V2TimFriendApplicationResult> getFriendApplicationListRes =
         await TencentCloudChat.instance.chatSDKInstance.manager.getFriendshipManager().getFriendApplicationList();
     if (getFriendApplicationListRes.code == 0) {
-      TencentCloudChat.instance.dataInstance.contact
-          .setApplicationUnreadCount(getFriendApplicationListRes.data!.unreadCount!);
       if (getFriendApplicationListRes.data!.friendApplicationList != null &&
           getFriendApplicationListRes.data!.friendApplicationList!.isNotEmpty) {
         List<V2TimFriendApplication> friendApplicationList = [];
@@ -100,7 +102,7 @@ class TencentCloudChatContactSDK {
             }
           }
         }
-        TencentCloudChat.instance.dataInstance.contact.setApplicationUnreadCount(friendApplicationList.length);
+        TencentCloudChat.instance.dataInstance.contact.setApplicationUnreadCount(friendApplicationList);
         TencentCloudChat.instance.dataInstance.contact
             .buildApplicationList(friendApplicationList, 'getFriendApplicationList');
       }
@@ -164,7 +166,7 @@ class TencentCloudChatContactSDK {
     if (res.code == 0 && res.data != null) {}
   }
 
-  Future<void> addFriend(String userID, String? remark, String? friendGroup, String? addWording, String? addSource,
+  Future<V2TimValueCallback<V2TimFriendOperationResult>> addFriend(String userID, String? remark, String? friendGroup, String? addWording, String? addSource,
       FriendTypeEnum? type) async {
     String r = remark ?? "";
     String fg = friendGroup ?? "";
@@ -174,10 +176,7 @@ class TencentCloudChatContactSDK {
     V2TimValueCallback<V2TimFriendOperationResult> res = await TencentCloudChat.instance.chatSDKInstance.manager
         .getFriendshipManager()
         .addFriend(userID: userID, remark: r, friendGroup: fg, addWording: wording, addSource: source, addType: t);
-    if (res.code == 0 && res.data != null) {
-      TencentCloudChat.instance.dataInstance.contact
-          .setAddFriendCode(res.data!.resultCode ?? -1, res.data!.userID ?? "");
-    }
+    return res;
   }
 
   Future<void> deleteConversation(String conversationID) async {
@@ -189,7 +188,7 @@ class TencentCloudChatContactSDK {
     }
   }
 
-  Future<void> deleteFromFriendList(List<String> userIDList, FriendTypeEnum? deleteType) async {
+  Future<V2TimValueCallback<List<V2TimFriendOperationResult>>> deleteFromFriendList(List<String> userIDList, FriendTypeEnum? deleteType) async {
     FriendTypeEnum type = deleteType ?? FriendTypeEnum.V2TIM_FRIEND_TYPE_BOTH;
     V2TimValueCallback<List<V2TimFriendOperationResult>> res = await TencentCloudChat.instance.chatSDKInstance.manager
         .getFriendshipManager()
@@ -201,6 +200,8 @@ class TencentCloudChatContactSDK {
       });
       TencentCloudChat.instance.dataInstance.contact.deleteFromFriendList(contactList, "deleteFromFriendList");
     }
+
+    return res;
   }
 
   Future<void> getFriendGroup(List<String>? groupNameList) async {
@@ -212,10 +213,10 @@ class TencentCloudChatContactSDK {
     }
   }
 
-  Future<void> joinGroup(String groupID, String message, GroupType? groupType) async {
-    V2TimCallback res =
+  Future<V2TimCallback> joinGroup(String groupID, String message) async {
+    V2TimCallback result =
         await TencentCloudChat.instance.chatSDKInstance.manager.joinGroup(groupID: groupID, message: message);
-    if (res.code == 0) {}
+    return result;
   }
 
   Future<void> getGroupApplicationList() async {
@@ -331,16 +332,17 @@ class TencentCloudChatContactSDK {
     return 0;
   }
 
-  Future<void> addToBlackList({required List<String> userIDList}) async {
+  Future<V2TimValueCallback<List<V2TimFriendOperationResult>>> addToBlackList({required List<String> userIDList}) async {
     V2TimValueCallback<List<V2TimFriendOperationResult>> addToBlackListRes = await TencentCloudChat
         .instance.chatSDKInstance.manager
         .getFriendshipManager()
         .addToBlackList(userIDList: userIDList //需要加入黑名单的好友id列表
             );
-    if (addToBlackListRes.code == 0) {}
+
+    return addToBlackListRes;
   }
 
-  Future<void> deleteFromBlackList({required List<String> userIDList}) async {
+  Future<V2TimValueCallback<List<V2TimFriendOperationResult>>> deleteFromBlackList({required List<String> userIDList}) async {
     V2TimValueCallback<List<V2TimFriendOperationResult>> deleteFromBlackListRes = await TencentCloudChat
         .instance.chatSDKInstance.manager
         .getFriendshipManager()
@@ -355,5 +357,7 @@ class TencentCloudChatContactSDK {
         TencentCloudChat.instance.dataInstance.contact.deleteFromBlockList(contactList, "deleteFromBlockList");
       }
     }
+
+    return deleteFromBlackListRes;
   }
 }

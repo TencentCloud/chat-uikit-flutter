@@ -5,6 +5,7 @@ class TencentCloudChatUserProfileOptions {
   final V2TimUserFullInfo? userFullInfo;
   final VoidCallback? startVoiceCall;
   final VoidCallback? startVideoCall;
+  bool? isNavigatedFromChat = true;
 
   // Constructor for TencentCloudChatUserProfileOptions.
   TencentCloudChatUserProfileOptions({
@@ -12,6 +13,7 @@ class TencentCloudChatUserProfileOptions {
     this.userFullInfo,
     this.startVoiceCall,
     this.startVideoCall,
+    this.isNavigatedFromChat,
   });
 
   // Converts the TencentCloudChatMessageOptions object to a map.
@@ -26,6 +28,7 @@ class TencentCloudChatUserProfileOptions {
     return TencentCloudChatUserProfileOptions(
         userID: map['userID'] as String,
         startVideoCall: map['startVideoCall'] as VoidCallback,
-        startVoiceCall: map['startVoiceCall'] as VoidCallback);
+        startVoiceCall: map['startVoiceCall'] as VoidCallback,
+        isNavigatedFromChat: map['isNavigatedFromChat'] ?? true);
   }
 }

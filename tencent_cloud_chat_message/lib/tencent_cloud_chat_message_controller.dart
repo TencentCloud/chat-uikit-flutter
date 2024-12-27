@@ -27,7 +27,6 @@ class TencentCloudChatMessageControllerGenerator {
 /// - scrollToSpecificMessage: Enables scrolling to a specific message in the list.
 /// - sendMessage: Allows for sending a message and automatically adds it to the message list UI.
 class TencentCloudChatMessageController extends TencentCloudChatComponentBaseController {
-
   /// Updates the message widgets,
   /// causing them to re-render in the widget tree.
   void updateMessages({
@@ -125,6 +124,7 @@ class TencentCloudChatMessageController extends TencentCloudChatComponentBaseCon
     TencentCloudChatMessageConfig? config,
     @Deprecated("This hook is for internal use only in the UIKit and should not be specified manually.")
     BeforeMessageSending? beforeMessageSendingHook,
+    bool? isResend = false,
   }) async {
     return TencentCloudChatMessageDataTools.sendMessage(
       createdMessage: createdMessage,
@@ -137,7 +137,14 @@ class TencentCloudChatMessageController extends TencentCloudChatComponentBaseCon
       needReadReceipt: needReadReceipt,
       config: config,
       beforeMessageSendingHook: beforeMessageSendingHook,
+      isResend: isResend,
     );
+  }
+
+  void setDraft(String conversationID, String draft) {
+    TencentCloudChat.instance.chatSDKInstance.manager
+        .getConversationManager()
+        .setConversationDraft(conversationID: conversationID, draftText: draft);
   }
 
   EventName? eventName;

@@ -104,7 +104,7 @@ class _TencentCloudChatAvatarState extends TencentCloudChatState<TencentCloudCha
   }
 
   List<String> _generateImageList(List<String?> originalList) {
-    return originalList.map((e) => TencentCloudChatUtils.checkString(e) != null ? e! : "https://comm.qq.com/im/static-files/im-demo/im_virtual_customer.png").toList();
+    return originalList.map((e) => TencentCloudChatUtils.checkString(e) != null ? e! : "images/default_user_icon.png").toList();
   }
 
   Widget _buildImage(String imagePath, double width, double height) {
@@ -115,12 +115,26 @@ class _TencentCloudChatAvatarState extends TencentCloudChatState<TencentCloudCha
           placeholderBuilder: (BuildContext context) => SizedBox(
             width: width,
             height: height,
+            child: Image.asset(
+              "images/default_user_icon.png",
+              package: 'tencent_cloud_chat_common',
+              width: width,
+              height: height,
+              fit: BoxFit.cover,),
           ),
           width: width,
           height: height,
         );
       }
       return CachedNetworkImage(
+        placeholder: (context, url) {
+          return Image.asset(
+            "images/default_user_icon.png",
+            package: 'tencent_cloud_chat_common',
+            width: width,
+            height: height,
+            fit: BoxFit.cover,);
+        },
         imageUrl: imagePath,
         width: width,
         height: height,
@@ -133,15 +147,9 @@ class _TencentCloudChatAvatarState extends TencentCloudChatState<TencentCloudCha
         },
       );
     } else {
-      // if (imagePath.endsWith("svg")) {
-      //   return SvgPicture.file(
-      //     File(imagePath),
-      //     width: width,
-      //     height: height,
-      //   );
-      // }
-      return Image.file(
-        File(imagePath),
+      return Image.asset(
+        imagePath,
+        package: 'tencent_cloud_chat_common',
         width: width,
         height: height,
         fit: BoxFit.cover,

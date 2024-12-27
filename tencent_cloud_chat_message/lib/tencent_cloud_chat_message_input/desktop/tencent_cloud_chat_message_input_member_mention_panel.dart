@@ -4,6 +4,7 @@ import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat_common.dart';
+import 'package:tencent_cloud_chat_common/utils/sdk_const.dart';
 
 class TencentCloudChatDesktopMemberMentionPanel extends StatefulWidget {
   /// messageList widget scroll controller
@@ -78,7 +79,7 @@ class _TencentCloudChatDesktopMemberMentionPanelState
                     return AutoScrollTag(key: ValueKey(index), controller: widget.atMemberPanelScroll, index: index);
                   }
                   final showName = _getShowName(memberItem);
-                  final isAtAll = memberItem.userID == "__kImSDK_MesssageAtALL__";
+                  final isAtAll = memberItem.userID == SDKConst.sdkAtAllUserID;
                   return AutoScrollTag(
                     key: ValueKey(index),
                     controller: widget.atMemberPanelScroll,

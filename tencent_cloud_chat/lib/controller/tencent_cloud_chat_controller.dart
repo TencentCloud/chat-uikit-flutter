@@ -57,16 +57,15 @@ class TencentCloudChatCoreController {
 
       if (config?.userConfig != null) {
         TencentCloudChat.instance.dataInstance.basic.updateUseUserOnlineStatus(config!.userConfig!);
-            }
+      }
 
-            await TencentCloudChat.instance.cache.init(sdkAppID: options.sdkAppID, currentLoginUserId: options.userID);
-
-        if (TencentCloudChatPlatformAdapter().isWeb) {
-          await TencentImSDKPlugin.v2TIMManager.initSDK(
+      if (TencentCloudChatPlatformAdapter().isWeb) {
+        await TencentImSDKPlugin.v2TIMManager.initSDK(
             sdkAppID: options.sdkAppID,
             loglevel: LogLevelEnum.V2TIM_LOG_INFO,
-            listener: TencentCloudChat.instance.callbacks.defaultV2TimSDKListener ?? options.sdkListener ?? V2TimSDKListener(),
-        );
+            listener: TencentCloudChat.instance.callbacks.defaultV2TimSDKListener ??
+                options.sdkListener ??
+                V2TimSDKListener());
 
         TencentCloudChatControllerUtils.initComponents(components);
 
@@ -75,6 +74,10 @@ class TencentCloudChatCoreController {
           userSig: options.userSig,
         );
         if (res.code == 0) {
+          TencentCloudChatControllerUtils.clearData();
+          TencentCloudChat.instance.dataInstance.basic.updateLoginStatus(
+            status: true,
+          );
           TencentCloudChatControllerUtils.cacheEnvData(options.userID);
           TencentCloudChatControllerUtils.initCallService();
           TencentCloudChatControllerUtils.initPreloadData();
@@ -91,6 +94,10 @@ class TencentCloudChatCoreController {
           options.userSig,
           TUICallback(
             onSuccess: () async {
+              TencentCloudChatControllerUtils.clearData();
+              TencentCloudChat.instance.dataInstance.basic.updateLoginStatus(
+                status: true,
+              );
               TencentCloudChatControllerUtils.cacheEnvData(options.userID);
               TencentCloudChatControllerUtils.initCallService();
               TencentCloudChatControllerUtils.initPreloadData();
@@ -133,7 +140,7 @@ class TencentCloudChatCoreController {
       final completer = Completer<bool>();
       await TUILogin.instance.logout(TUICallback(
         onSuccess: () async {
-          TencentCloudChat.instance.reset();
+          TencentCloudChatControllerUtils.clearData();
           removeGlobalCallback(callbacks: _currentCallbackMountOnInit);
           logoutSuccess = true;
           hasInitialized = false;
@@ -146,10 +153,10 @@ class TencentCloudChatCoreController {
       ));
       return completer.future;
     } else {
-      if(shouldUnInitSDK){
+      if (shouldUnInitSDK) {
         TencentImSDKPlugin.v2TIMManager.unInitSDK();
       }
-      TencentCloudChat.instance.reset();
+      TencentCloudChatControllerUtils.clearData();
       removeGlobalCallback(callbacks: _currentCallbackMountOnInit);
       hasInitialized = false;
       TUICore.instance.notifyEvent(logoutSuccessEvent);
@@ -214,11 +221,11 @@ class TencentCloudChatCoreController {
     TencentCloudChatIntl().init(context);
   }
 
-  void addGlobalCallback({required TencentCloudChatCallbacks callbacks}){
+  void addGlobalCallback({required TencentCloudChatCallbacks callbacks}) {
     TencentCloudChatControllerUtils.addCallback(callbacks);
   }
 
-  void removeGlobalCallback({TencentCloudChatCallbacks? callbacks}){
+  void removeGlobalCallback({TencentCloudChatCallbacks? callbacks}) {
     TencentCloudChatControllerUtils.removeCallback(callbacks);
   }
 }

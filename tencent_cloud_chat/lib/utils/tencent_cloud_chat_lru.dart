@@ -23,4 +23,8 @@ class TencentLRUCache<K, V> {
   void remove(K key) {
     _cache.remove(key);
   }
+
+  void clear() {
+    _cache.clear();
+  }
 }

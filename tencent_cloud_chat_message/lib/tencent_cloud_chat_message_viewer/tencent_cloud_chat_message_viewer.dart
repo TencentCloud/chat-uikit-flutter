@@ -1,5 +1,3 @@
-// ignore_for_file: unused_local_variable
-
 import 'dart:convert';
 import 'dart:io';
 
@@ -12,7 +10,6 @@ import 'package:image_clipboard/image_clipboard.dart';
 import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_common_defines.dart';
 import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
-import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_code_info.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_download_utils.dart';
@@ -46,6 +43,11 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
   bool isLoading = true;
   late SwiperController controller;
   int index = 0;
+  final Map<String, GlobalKey> _videoPlayerKeys = {};
+
+  GlobalKey getVideoPlayerKey(String msgId) {
+    return _videoPlayerKeys.putIfAbsent(msgId, () => GlobalKey());
+  }
 
   getMessageFromCoreData({
     required String msgID,
@@ -121,7 +123,7 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
       var image = imageList[i];
       if (image != null) {
         if (image.type == ImageType.origin.index) {
-          origin = image.localUrl ?? "";
+          origin = imageElem.path ?? image.localUrl ?? "";
           isOrigin = true;
         }
         if (image.type == ImageType.thumb.index) {
@@ -362,44 +364,6 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
     Navigator.of(context).pop();
   }
 
-  Widget getContextMenuListItem(IconData icon, String text, int type, String data, {bool? isOnline}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Container(
-        height: 40,
-        decoration: const BoxDecoration(
-          border: Border(
-            bottom: BorderSide(
-              color: Colors.black12,
-            ),
-          ),
-        ),
-        child: GestureDetector(
-          onTap: () {
-            handleContextMenu(type, data);
-          },
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: Icon(
-                    icon,
-                    size: 14,
-                  ),
-                ),
-                Expanded(
-                  child: Text(text),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     bool isDesktop = TencentCloudChatPlatformAdapter().isDesktop;
@@ -416,10 +380,8 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
 
     return GestureDetector(
       onTap: closeViewer,
-      onDoubleTap: () {},
-      child: Scaffold(
-        backgroundColor: const Color.fromRGBO(255, 255, 255, 0),
-        body: SafeArea(
+      child: Container(
+        color: Colors.black,
           child: Center(
             child: isLoading
                 ? const SizedBox(
@@ -430,8 +392,7 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
                 : Stack(
                     alignment: Alignment.center,
                     children: [
-                      Positioned(
-                        child: Padding(
+                        Padding(
                           padding: isDesktop
                               ? EdgeInsets.symmetric(
                                   vertical: verticalPadding,
@@ -511,9 +472,7 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
                                         File(local),
                                       ),
                                     );
-                                  }
-
-                                  if (TencentCloudChatUtils.checkString(originOrl) != null) {
+                                  } else if (TencentCloudChatUtils.checkString(originOrl) != null) {
                                     return GestureDetector(
                                       onSecondaryTapDown: (details) {
                                         TencentCloudChatDesktopPopup.showColumnMenu(
@@ -551,6 +510,7 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
                                 }
                               } else if (message.elemType == MessageElemType.V2TIM_ELEM_TYPE_VIDEO) {
                                 return TencentCloudChatMessageVideoPlayer(
+                                  key: getVideoPlayerKey(message.msgID!),
                                   message: message,
                                   controller: true,
                                   isSending: widget.isSending,
@@ -578,7 +538,6 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
                             },
                           ),
                         ),
-                      ),
                       if (TencentCloudChatPlatformAdapter().isDesktop && hasLeft())
                         Positioned(
                           left: 20,
@@ -649,7 +608,6 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
                   ),
           ),
         ),
-      ),
-    );
+      );
   }
 }

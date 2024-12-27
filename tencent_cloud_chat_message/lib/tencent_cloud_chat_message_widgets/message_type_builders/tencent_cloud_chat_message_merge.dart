@@ -48,16 +48,13 @@ class _TencentCloudChatMessageMergeState extends TencentCloudChatMessageState<Te
   }
 
   onTapDown(TapDownDetails details) {
-    if (widget.data.inSelectMode) {
-      widget.methods.onSelectMessage();
-    } else {
+    if (!widget.data.inSelectMode) {
       onTapDownTime = DateTime.now().millisecondsSinceEpoch;
     }
   }
 
   onTapUp(TapUpDetails details) {
     if (widget.data.inSelectMode) {
-      widget.methods.onSelectMessage();
       return;
     }
     int onTapUpTime = DateTime.now().millisecondsSinceEpoch;
@@ -99,65 +96,53 @@ class _TencentCloudChatMessageMergeState extends TencentCloudChatMessageState<Te
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text(
+                title,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: textStyle.fontsize_12,
+                  color: colorTheme.othersMessageTextColor,
+                ),
+              ),
+              ...((abstractList)
+                  .map(
+                    (e) => Text(
+                  e,
+                  textAlign: TextAlign.start,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: textStyle.fontsize_12,
+                    color: colorTheme.othersMessageTextColor.withOpacity(0.5),
+                  ),
+                ),
+              ).toList().sublist(0, displayLen)),
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                color: Colors.grey.withOpacity(0.3),
+                height: 1,
+              ),
               Row(
                 mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  ConstrainedBox(
-                    constraints: BoxConstraints(maxWidth: min(maxBubbleWidth * 0.9, maxBubbleWidth - getSquareSize(sentFromSelf ? 128 : 102))),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                title,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: textStyle.fontsize_14,
-                                ),
-                              ),
-                              ...((abstractList)
-                                  .map(
-                                    (e) => Text(
-                                  e,
-                                  textAlign: TextAlign.start,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              )
-                                  .toList()
-                                  .sublist(0, displayLen)),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(vertical: 4),
-                                      color: Colors.grey,
-                                      height: 1,
-                                    ),
-                                  )
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 4),
-                                child: Text(tL10n.chatHistory),
-                              )
-                            ],
-                          ),
-                        )
-                      ],
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Text(
+                      tL10n.chatHistory,
+                      style: TextStyle(
+                        fontSize: textStyle.fontsize_12,
+                        color: colorTheme.othersMessageTextColor.withOpacity(0.5),
+                      )
                     ),
                   ),
-                  SizedBox(
-                    width: getWidth(4),
+                  const Expanded(
+                    flex: 1,
+                    child: Spacer(), // 添加空白区域
                   ),
                   if (sentFromSelf) messageStatusIndicator(),
                   messageTimeIndicator(),
-                ],
+                ]
               ),
               messageReactionList(),
             ],

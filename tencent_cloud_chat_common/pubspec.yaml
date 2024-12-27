@@ -1,6 +1,6 @@
 name: tencent_cloud_chat_common
 description: Tencent Cloud Chat Common Widgets offers a collection of versatile and reusable components, designed to streamline development and ensure UI consistency across mobile and desktop environments.
-version: 1.5.0
+version: 2.1.0
 repository: https://github.com/TencentCloud/chat-uikit-flutter/tree/v2/tencent_cloud_chat_common
 homepage: https://trtc.io/products/chat?utm_source=flutter_pub
 
@@ -19,8 +19,7 @@ dependencies:
   flutter:
     sdk: flutter
   cached_network_image: ^3.2.3
-  tencent_cloud_chat: ^1.5.0
-  tencent_cloud_chat_intl: ^1.5.0
+  tencent_cloud_chat: ^2.1.0
   pull_to_refresh_flutter3: ^2.0.2
   shimmer: ^3.0.0
   extended_image: ^8.1.1
@@ -28,6 +27,12 @@ dependencies:
   flutter_svg: ^2.0.7
   permission_handler: ^11.3.0
   device_info_plus: ^9.1.2
+
+dependency_overrides:
+#  tencent_cloud_chat:
+#    path: ../tencent_cloud_chat
+#  tencent_cloud_chat_intl:
+#    path: ../tencent_cloud_chat_intl
 
 dev_dependencies:
   flutter_test:

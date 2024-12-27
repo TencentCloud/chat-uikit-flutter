@@ -4,6 +4,7 @@ import 'package:tencent_cloud_chat_common/widgets/desktop_popup/operation_key.da
 import 'package:tencent_cloud_chat_common/widgets/desktop_popup/tencent_cloud_chat_desktop_popup.dart';
 import 'package:tencent_cloud_chat_intl/tencent_cloud_chat_intl.dart';
 import 'package:tencent_cloud_chat_message_reaction/widgets/reaction_detail/reaction_detail.dart';
+import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
 
 class TencentCloudChatMessageReactionListDetailItem extends StatelessWidget {
   final String msgID;
@@ -34,6 +35,14 @@ class TencentCloudChatMessageReactionListDetailItem extends StatelessWidget {
           color: Color(borderColor).withOpacity(0.36),
           child: InkWell(
             onTap: () {
+              TencentImSDKPlugin.v2TIMManager.emitUIKitListener(
+                data: Map<String, dynamic>.from(
+                  {
+                    "eventType": "onShowMessageReactionDetail",
+                  },
+                ),
+              );
+
               if (platformMode == 'desktop') {
                 TencentCloudChatDesktopPopup.showPopupWindow(
                   title: tL10n.reactionList,

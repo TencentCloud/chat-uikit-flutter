@@ -141,48 +141,22 @@ class TencentCloudChatControllerUtils {
     }
   }
 
+  static clearData() {
+    TencentCloudChat.instance.dataInstance.basic.clear();
+    TencentCloudChat.instance.dataInstance.contact.clear();
+    TencentCloudChat.instance.dataInstance.conversation.clear();
+    TencentCloudChat.instance.dataInstance.groupProfile.clear();
+    TencentCloudChat.instance.dataInstance.userProfile.clear();
+    TencentCloudChat.instance.dataInstance.messageData.clear();
+    TencentCloudChat.instance.dataInstance.search.clear();
+  }
+
   static initPreloadData() {
-    _initConversationData();
-    _initMessageData();
     _initContactData();
-  }
-
-  static _initConversationData() async {
-    List<V2TimConversation> convList = TencentCloudChat.instance.cache.getConversationListFromCache();
-    if (convList.isNotEmpty) {
-      TencentCloudChat.instance.dataInstance.conversation.updateIsGetDataEnd(true);
-      TencentCloudChat.instance.dataInstance.conversation.conversationList = convList;
-      TencentCloudChat.instance.dataInstance.conversation.buildConversationList(convList, "getConversationListFromCache");
-    }
-
-    TencentCloudChat.instance.chatSDKInstance.conversationSDK.getConversationList(seq: "0");
-
-    try {
-      await TencentCloudChat.instance.chatSDKInstance.conversationSDK.subscribeUnreadMessageCountByFilter();
-    } catch (e) {
-      debugPrint(e.toString());
-    }
-
-    TencentCloudChat.instance.chatSDKInstance.conversationSDK.addConversationListener();
-  }
-
-  static _initMessageData() async {
-    if (TencentCloudChat.instance.dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.message)) {
-      List<String> convKey = TencentCloudChat.instance.cache.getAllConvKey();
-      if (convKey.isNotEmpty) {
-        for (var i = 0; i < convKey.length; i++) {
-          var keyItem = convKey[i];
-          var messageList = TencentCloudChat.instance.cache.getMessageListByConvKey(keyItem);
-          TencentCloudChat.instance.dataInstance.messageData.updateMessageList(messageList: messageList, userID: keyItem.contains("c2c_") ? keyItem : null, groupID: keyItem.contains("group_") ? keyItem : null, disableNotify: true);
-        }
-      }
-    }
   }
 
   static _initContactData() async {
     TencentCloudChat.instance.chatSDKInstance.contactSDK.addFriendListener();
-
-    TencentCloudChat.instance.chatSDKInstance.groupSDK.addGroupListener();
 
     TencentCloudChat.instance.chatSDKInstance.contactSDK.getFriendList();
 

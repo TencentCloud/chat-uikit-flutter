@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
@@ -35,7 +34,7 @@ class TencentCloudChatMessageInputMobile extends StatefulWidget {
 }
 
 class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<TencentCloudChatMessageInputMobile>
-    with TickerProviderStateMixin {
+    with TickerProviderStateMixin{
   final GlobalKey<TooltipState> micTooltipKey = GlobalKey<TooltipState>();
   final TencentCloudChatMessageAttachmentOptions _messageAttachmentOptions = TencentCloudChatMessageAttachmentOptions();
   final GlobalKey<TencentCloudChatMessageInputRecordingState> _recordingWidgetKey = GlobalKey();
@@ -62,11 +61,16 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
   @override
   void initState() {
     super.initState();
-    _addTextInputEvent();
+    WidgetsBinding.instance.addObserver(this);
     if (listenerUUID.isNotEmpty) {
       removeUIKitListener();
     }
+
     listenerUUID = addUIKitListener();
+    _textEditingController.text = widget.inputData.specifiedMessageText ?? "";
+    _inputText = widget.inputData.specifiedMessageText ?? "";
+    // must add input event after _textEditingController.text
+    _addTextInputEvent();
   }
 
   void uikitListener(Map<String, dynamic> data) {
@@ -96,6 +100,8 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
   @override
   void dispose() {
     super.dispose();
+    _messageAttachmentOptions.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     _removeTextInputEvent();
     removeUIKitListener();
   }
@@ -103,6 +109,7 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
   @override
   void didUpdateWidget(covariant TencentCloudChatMessageInputMobile oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _textEditingFocusNode.unfocus();
 
     if (widget.inputData.specifiedMessageText != oldWidget.inputData.specifiedMessageText) {
       _textEditingController.text = widget.inputData.specifiedMessageText ?? "";
@@ -281,6 +288,14 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
       }
     }
 
+    if (_inputText == newText) {
+      if (_inputText.isEmpty) {
+        /// Update draft
+        _updateDraft(_inputText);
+      }
+      return;
+    }
+
     /// Dealing with mentioning member in group
     if (TencentCloudChatUtils.checkString(widget.inputData.groupID) != null) {
       final compareResult = TencentCloudChatUtils.compareString(_inputText, newText);
@@ -298,14 +313,16 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
         }).toList();
         final mentionText = mentionTextList.join();
 
-        /// Insert mentionText after the "@" character
-        final updatedText = newText.replaceRange(compareResult.index, compareResult.index + 1, mentionText);
-        _textEditingController.text = updatedText;
-        _textEditingController.selection = TextSelection.collapsed(offset: compareResult.index + mentionText.length);
+        if (memberList.isNotEmpty) {
+          /// Insert mentionText after the "@" character
+          final updatedText = newText.replaceRange(compareResult.index, compareResult.index + 1, mentionText);
+          _textEditingController.text = updatedText;
+          _textEditingController.selection = TextSelection.collapsed(offset: compareResult.index + mentionText.length);
+        }
       } else if (!compareResult.isAddText) {
         final atIndex = _inputText.lastIndexOf('@', max(0, compareResult.index - 1));
         final removedLabelList = [];
-        if (atIndex != -1) {
+        if (atIndex != -1 && compareResult.character != '@' && compareResult.index > (atIndex + 1)) {
           removedLabelList.add(_inputText.substring(atIndex + 1, compareResult.index));
 
           int spaceIndex = compareResult.index;
@@ -336,6 +353,25 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
 
     /// End
     _inputText = _textEditingController.text;
+
+    /// Update draft
+    _updateDraft(_inputText);
+  }
+
+  void _updateDraft(String draftText) {
+    if ((widget.inputData.userID == null || widget.inputData.userID!.isEmpty) &&
+        (widget.inputData.groupID == null || widget.inputData.groupID!.isEmpty)) {
+      return;
+    }
+
+    String conversationID = "";
+    if (widget.inputData.userID != null && widget.inputData.userID!.isNotEmpty) {
+      conversationID = "c2c_${widget.inputData.userID}";
+    } else if (widget.inputData.groupID != null && widget.inputData.groupID!.isNotEmpty) {
+      conversationID = "group_${widget.inputData.groupID}";
+    }
+
+    (widget.inputMethods.controller as TencentCloudChatMessageController).setDraft(conversationID, _inputText);
   }
 
   Widget _buildInputTextField() {
@@ -379,6 +415,12 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
                     icon: Icons.add_circle_outline_rounded,
                     onTapDown: (details) {
                       _textEditingFocusNode.unfocus();
+                      if (_showStickerPanel) {
+                        safeSetState(() {
+                          _showStickerPanel = false;
+                        });
+                      }
+
                       _messageAttachmentOptions.toggleAttachmentOptionsOverlay(
                         constraints: constraints,
                         context: context,
@@ -394,11 +436,19 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
                   ),
                   _buildInputAreaIcon(
                     icon: Icons.camera_alt_outlined,
-                    onTapDown: (_) => TencentCloudChatMessageCamera.showCameraOptions(
-                      context: context,
-                      onSendImage: widget.inputMethods.sendImageMessage,
-                      onSendVideo: widget.inputMethods.sendVideoMessage,
-                    ),
+                    onTapDown: (_) {
+                      if (_showStickerPanel) {
+                        safeSetState(() {
+                          _showStickerPanel = false;
+                        });
+                      }
+
+                      TencentCloudChatMessageCamera.showCameraOptions(
+                        context: context,
+                        onSendImage: widget.inputMethods.sendImageMessage,
+                        onSendVideo: widget.inputMethods.sendVideoMessage,
+                      );
+                    } 
                   ),
                   SizedBox(
                     width: getSquareSize(8),
@@ -416,19 +466,7 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
                       children: [
                         // Input field for the message.
                         Expanded(
-                          child: TencentCloudChatPlatformAdapter().isWeb
-                              ? _buildInputTextField()
-                              : KeyboardVisibilityBuilder(builder: (ctx, visibility) {
-                                  if (visibility != _showKeyboard) {
-                                    _showKeyboard = visibility;
-                                    TencentCloudChatUtils.debounce("KeyboardVisibilityBuilder", () {
-                                      if (!visibility) {
-                                        _textEditingFocusNode.unfocus();
-                                      }
-                                    });
-                                  }
-                                  return _buildInputTextField();
-                                }),
+                          child: _buildInputTextField(),
                         ),
                         if (widget.inputData.hasStickerPlugin)
                           GestureDetector(
@@ -523,22 +561,22 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
     if (_showStickerPanel) {
       return getHeight(280);
     }
-    if (_showKeyboard) {
-      final currentKeyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-      double originHeight = TencentCloudChat.instance.dataInstance.basic.keyboardHeight ?? getHeight(280);
-      if (currentKeyboardHeight > -1) {
-        if (currentKeyboardHeight >= originHeight) {
-          originHeight = currentKeyboardHeight;
-        }
-        TencentCloudChatUtils.debounce("setCurrentKeyboardHeight", () {
-          TencentCloudChat.instance.dataInstance.basic.keyboardHeight = currentKeyboardHeight;
-        });
-      }
-      final height = originHeight != 0 ? originHeight : currentKeyboardHeight;
-      final actualHeight = height + (_bottomPadding! > 8 ? getSquareSize(16) : getSquareSize(0));
-
-      return actualHeight;
-    }
+    // if (_showKeyboard) {
+    //   final currentKeyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    //   double originHeight = TencentCloudChat.instance.dataInstance.basic.keyboardHeight ?? getHeight(280);
+    //   if (currentKeyboardHeight > -1) {
+    //     if (currentKeyboardHeight >= originHeight) {
+    //       originHeight = currentKeyboardHeight;
+    //     }
+    //     TencentCloudChatUtils.debounce("setCurrentKeyboardHeight", () {
+    //       TencentCloudChat.instance.dataInstance.basic.keyboardHeight = currentKeyboardHeight;
+    //     }, duration: const Duration(seconds: 1));
+    //   }
+    //   final height = originHeight != 0 ? originHeight : currentKeyboardHeight;
+    //   final actualHeight = height + (_bottomPadding! > 8 ? getSquareSize(16) : getSquareSize(0));
+    //
+    //   return actualHeight;
+    // }
     return _bottomPadding ?? 0.0;
   }
 

@@ -94,7 +94,7 @@ class _TencentCloudChatMessageHeaderContainerState
     }
 
     /// _selectAmount
-    final selectAmount = dataProvider.selectedMessages.length;
+    final selectAmount = dataProvider.getSelectedMessages().length;
     if (selectAmount != _selectAmount) {
       setState(() {
         _selectAmount = selectAmount;

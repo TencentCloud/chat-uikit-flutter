@@ -1,3 +1,14 @@
+## 2.1.0
+
+### General
+* Optimize multiple issues.
+
+## 1.6.0
+
+### General
+
+* Added support to Customer Service Plug-in.
+
 ## 1.5.0
 
 ### General

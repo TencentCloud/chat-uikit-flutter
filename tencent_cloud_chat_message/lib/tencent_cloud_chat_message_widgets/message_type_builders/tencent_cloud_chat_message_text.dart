@@ -36,9 +36,10 @@ class _TencentCloudChatMessageTextState extends TencentCloudChatMessageState<Ten
       stickerPluginInstance: widget.data.stickerPluginInstance,
       text: widget.data.message.textElem?.text,
     );
+    String adjustText = text == '*' ? '\\*' : text;
     return widget.data.enableParseMarkdown
         ? MarkdownBody(
-            data: text,
+            data: adjustText,
             imageBuilder: (uri, title, alt) {
               double? width;
               double? height;

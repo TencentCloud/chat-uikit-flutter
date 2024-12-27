@@ -533,7 +533,6 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
 
   Widget renderOnlineVideo(TencentCloudChatThemeColors colorTheme, TencentCloudChatTextStyle textStyle, String url) {
     console("render online video snapshot $url");
-    var loading = getLoadingWidget(localDefaultWidth, localDefaultHeight);
     return Stack(
       alignment: AlignmentDirectional.center,
       children: [
@@ -555,41 +554,51 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(getSquareSize(16)),
-                    topRight: Radius.circular(getSquareSize(16)),
-                    bottomLeft: Radius.circular(getSquareSize(sentFromSelf ? 16 : 0)),
-                    bottomRight: Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
-                  ),
-                  child: TencentCloudChatCacheImage(
-                    width: getWidth(localDefaultWidth),
-                    height: getHeight(localDefaultHeight),
-                    url: url,
-                    fit: BoxFit.cover,
-                    errorWidget: (context, error, stackTrace) {
-                      console("network video render failed. please check the path is right . path: $url");
-                      return getErrorWidget(localDefaultWidth, localDefaultHeight);
-                    },
-                    progressIndicatorBuilder: (context, child, loadingProgress) {
-                      console("progressIndicatorBuilder");
-                      return loading;
-                    },
-                  ),
+                Stack(
+                  children:[
+                    ClipRRect(
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(getSquareSize(16)),
+                        topRight: Radius.circular(getSquareSize(16)),
+                        bottomLeft: Radius.circular(getSquareSize(sentFromSelf ? 16 : 0)),
+                        bottomRight: Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
+                      ),
+                      child: TencentCloudChatCacheImage(
+                        width: getWidth(localDefaultWidth),
+                        height: getHeight(localDefaultHeight),
+                        url: url,
+                        fit: BoxFit.cover,
+                        errorWidget: (context, error, stackTrace) {
+                          console("network video render failed. please check the path is right . path: $url");
+                          return getErrorWidget(localDefaultWidth, localDefaultHeight);
+                        },
+                        progressIndicatorBuilder: (context, child, loadingProgress) {
+                          console("progressIndicatorBuilder");
+                          return getLoadingWidget(localDefaultWidth, localDefaultHeight);
+                        },
+                      ),
+                    ),
+                    Positioned(
+                          top: 0,
+                          bottom: 0,
+                          right: 0,
+                          left: 0,
+                          child: Center(
+                            child: downloadStatus(colorTheme, textStyle),
+                          ),
+                        ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      left: 0,
+                      child: messageInfo(),
+                    ),
+                  ] 
                 ),
                 messageReactionList(),
               ],
             ),
           ),
-        ),
-        Positioned(
-          child: downloadStatus(colorTheme, textStyle),
-        ),
-        Positioned(
-          bottom: 6,
-          right: 0,
-          left: 0,
-          child: messageInfo(),
         ),
       ],
     );
@@ -628,32 +637,42 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Image.file(
-                      fit: BoxFit.cover,
-                      width: fw,
-                      height: fh,
-                      cacheWidth: fw.toInt(),
-                      cacheHeight: fh.toInt(),
-                      File(p),
-                      errorBuilder: (context, error, stackTrace) {
-                        console("local video render failed. please check the path is right . path: $p");
-                        return getErrorWidget(localDefaultWidth, localDefaultHeight);
-                      },
+                    Stack(
+                      children: [
+                        Image.file(
+                          fit: BoxFit.cover,
+                          width: fw,
+                          height: fh,
+                          cacheWidth: fw.toInt(),
+                          cacheHeight: fh.toInt(),
+                          File(p),
+                          errorBuilder: (context, error, stackTrace) {
+                            console("local video render failed. please check the path is right . path: $p");
+                            return getErrorWidget(localDefaultWidth, localDefaultHeight);
+                          },
+                        ),
+                        Positioned(
+                          top: 0,
+                          bottom: 0,
+                          right: 0,
+                          left: 0,
+                          child: Center(
+                            child: downloadStatus(colorTheme, textStyle),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          left: 0,
+                          child: messageInfo(),
+                        ),
+                      ],
                     ),
                     messageReactionList(),
                   ],
                 ),
               ),
             ),
-          ),
-          Positioned(
-            child: downloadStatus(colorTheme, textStyle),
-          ),
-          Positioned(
-            bottom: 6,
-            right: 0,
-            left: 0,
-            child: messageInfo(),
           ),
         ],
       ),
@@ -734,34 +753,34 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
   }
 
   showVideo() {
-    String convkey = TencentCloudChatUtils.checkString(widget.data.message.userID) ?? widget.data.message.groupID ?? "";
+    String convKey = TencentCloudChatUtils.checkString(widget.data.message.userID) ?? widget.data.message.groupID ?? "";
     int conversationType = TencentCloudChatUtils.checkString(widget.data.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
-    showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return TencentCloudChatMessageViewer(
-          convKey: convkey,
-          message: widget.data.message,
-          convType: conversationType,
-          isSending: widget.data.message.status == 1,
-        );
-      },
+    Navigator.of(context).push(
+      PageRouteBuilder(
+        opaque: false,
+        pageBuilder: (BuildContext context, _, __) {
+          return TencentCloudChatMessageViewer(
+            key: ValueKey(widget.data.message.msgID),
+            convKey: convKey,
+            message: widget.data.message,
+            convType: conversationType,
+            isSending: widget.data.message.status == 1,
+          );
+        },
+      ),
     );
   }
 
   int onTapDownTime = 0;
 
   onTapDown(TapDownDetails details) {
-    if (widget.data.inSelectMode) {
-      widget.methods.onSelectMessage();
-    } else {
+    if (!widget.data.inSelectMode) {
       onTapDownTime = DateTime.now().millisecondsSinceEpoch;
     }
   }
 
   onTapUp(TapUpDetails details) {
     if (widget.data.inSelectMode) {
-      widget.methods.onSelectMessage();
       return;
     }
     int onTapUpTime = DateTime.now().millisecondsSinceEpoch;

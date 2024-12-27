@@ -86,11 +86,11 @@ class TencentCloudChatDownloadUtils {
           isSnapshot: isSnapshot,
         )
         .then((value) {
+      currentDownloadingList.removeWhere((ele) => ele.getUniqueueKey() == "${msgID}_${imageType}_$isSnapshot");
       if (value.code == 0) {
-        console("start downlaod message  success ($msgID) ${value.toJson()}");
+        console("start download message success ($msgID) ${value.toJson()}");
       } else {
-        currentDownloadingList.removeWhere((ele) => ele.getUniqueueKey() == "${msgID}_${imageType}_$isSnapshot");
-        console("start downlaod message failed ($msgID) ${value.toJson()}");
+        console("start download message failed ($msgID) ${value.toJson()}");
       }
     });
   }
@@ -101,7 +101,11 @@ class TencentCloudChatDownloadUtils {
     bool res = false;
     if (downloadQueue.containsKey(data.convID)) {
       if (downloadQueue[data.convID] != null) {
-        console(downloadQueue[data.convID]!.first.getUniqueueKey());
+        List<DownloadMessageQueueData> queueData = downloadQueue[data.convID]!;
+        if (queueData != null && queueData.isNotEmpty) {
+          console(downloadQueue[data.convID]!.first.getUniqueueKey());
+        }
+
         if (downloadQueue[data.convID]!.indexWhere((ele) => ele.getUniqueueKey() == data.getUniqueueKey()) > -1) {
           res = true;
         }
@@ -240,7 +244,7 @@ class TencentCloudChatDownloadUtils {
         console("current download queue convIDs is ${json.encode(convIDs)}");
         int indexForConvID = currentDownloadingList.indexWhere((ele) => ele.convID == convID);
         if (indexForConvID > -1) {
-          console("$convID has downloding message. break. the message is ${currentDownloadingList[indexForConvID].path}");
+          console("$convID has downloading message. break. the message is ${currentDownloadingList[indexForConvID].path}");
           continue;
         }
         if (convDownloadList.isNotEmpty) {

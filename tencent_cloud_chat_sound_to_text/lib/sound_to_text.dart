@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
+import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_code_info.dart';
 import 'package:tencent_cloud_chat_intl/tencent_cloud_chat_intl.dart';
-import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
 
 class TencentCloudChatTranslate extends StatefulWidget {
   final String msgID;
@@ -29,6 +31,7 @@ class _TencentCloudChatTranslateState extends State<TencentCloudChatTranslate> {
   String translatedText = '';
   bool isTranslating = false;
   bool isError = false;
+  bool isInvisible = false;
 
   @override
   initState() {
@@ -38,7 +41,7 @@ class _TencentCloudChatTranslateState extends State<TencentCloudChatTranslate> {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return isInvisible ? const SizedBox() : Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         Flexible(
@@ -124,6 +127,7 @@ class _TencentCloudChatTranslateState extends State<TencentCloudChatTranslate> {
       if (mounted) {
         isTranslating = true;
         isError = false;
+        isInvisible = false;
       }
     });
     print("【【【msgID: ${widget.msgID}】】】${widget.language}");
@@ -132,19 +136,28 @@ class _TencentCloudChatTranslateState extends State<TencentCloudChatTranslate> {
         .convertVoiceToText(msgID: widget.msgID, language: widget.language);
 
     isTranslating = false;
-    if (translateResult.code == 0 && translateResult.data != null) {
-      final response = translateResult.data ?? "";
+    if (translateResult.code == 0 && translateResult.data != null && translateResult.data!.isNotEmpty) {
       setState(() {
-        translatedText = response;
+        translatedText = translateResult.data!;
       });
       if (widget.onTranslateSuccess != null) {
         widget.onTranslateSuccess!();
       }
     } else {
-      setState(() {
-        isError = true;
-        translatedText = translateResult.desc;
-      });
+      if (mounted) {
+        TencentCloudChat.instance.callbacks.onUserNotificationEvent(
+          TencentCloudChatComponentsEnum.contact,
+          TencentCloudChatUserNotificationEvent(
+            eventCode: translateResult.code,
+            text: tL10n.convertTextFailed,
+        ));
+
+        setState(() {
+          isInvisible = true;
+          isError = true;
+          translatedText = translateResult.desc;
+        });
+      }
       if (widget.onTranslateFailed != null) {
         widget.onTranslateFailed!();
       }

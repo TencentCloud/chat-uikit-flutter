@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
+import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
+import 'package:tencent_cloud_chat_common/widgets/dialog/tencent_cloud_chat_dialog.dart';
 
 // This widget represents a single chat message in Tencent Cloud Chat.
 abstract class TencentCloudChatMessageItemBase extends StatefulWidget {
@@ -83,22 +85,63 @@ abstract class TencentCloudChatMessageState<T extends TencentCloudChatMessageIte
     });
   }
 
+  Widget _renderSendingStatus(TencentCloudChatThemeColors colorTheme) {
+      return Container(
+        margin: const EdgeInsets.only(right: 6),
+        width: 12.0,
+        height: 12.0,
+        child: CircularProgressIndicator(
+          strokeWidth: 1.0,
+          color: colorTheme.secondaryTextColor,
+        ),
+      );
+  }
+
+  void _showResendDialog() {
+    TencentCloudChatDialog.showAdaptiveDialog(
+      context: context,
+      title: Text(tL10n.resendTips),
+      actions: <Widget>[
+        TextButton(
+          child: Text(tL10n.cancel),
+          onPressed: () =>
+              Navigator.of(context).pop(), // 关闭对话框
+        ),
+        TextButton(
+          child: Text(tL10n.confirm),
+          onPressed: () {
+            //关闭对话框并返回true
+            Navigator.of(context).pop(true);
+            widget.methods.onResendMessage?.call();
+          },
+        ),
+      ],
+    );
+  }
+
   Widget messageStatusIndicator() {
-    return widget.data.showMessageStatusIndicator
+    return GestureDetector(
+      onTap: () {
+        if (widget.data.message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_FAIL) {
+          _showResendDialog();
+        }
+      },
+      child: widget.data.showMessageStatusIndicator
         ? TencentCloudChatThemeWidget(
             build: (context, colorTheme, textStyle) {
               IconData? iconData;
               Color? iconColor = colorTheme.messageStatusIconColor;
-              double iconSize = textStyle.standardSmallText;
+              double iconSize = textStyle.standardText;
+
+              if (widget.data.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING) {
+                return _renderSendingStatus(colorTheme);
+              }
 
               switch (widget.data.message.status) {
                 case MessageStatus.V2TIM_MSG_STATUS_SEND_FAIL:
                   iconData = Icons.error;
                   iconColor = colorTheme.error;
                   break;
-                case MessageStatus.V2TIM_MSG_STATUS_SENDING:
-                  iconData = Icons.done;
-                  iconColor = colorTheme.secondaryTextColor;
                 case MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC:
                   iconData = showReadByOthersStatus ? Icons.done_all : Icons.done;
                   break;
@@ -119,7 +162,8 @@ abstract class TencentCloudChatMessageState<T extends TencentCloudChatMessageIte
               );
             },
           )
-        : Container();
+        : Container(),
+    );
   }
 
   Widget messageTimeIndicator({
@@ -221,4 +265,5 @@ abstract class TencentCloudChatMessageState<T extends TencentCloudChatMessageIte
     isGroupMessage = TencentCloudChatUtils.checkString(widget.data.message.groupID) != null;
     showReadByOthersStatus = isGroupMessage ? (widget.data.messageReceipt != null && (widget.data.messageReceipt!.readCount ?? 0) > 0) : (widget.data.message.isPeerRead ?? false);
   }
+
 }

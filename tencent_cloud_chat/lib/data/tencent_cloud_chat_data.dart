@@ -14,10 +14,6 @@ class TencentCloudChatDataManager {
     instance ??= TencentCloudChatData._();
     return instance!;
   }
-
-  static void resetInstance() {
-    instance = null;
-  }
 }
 
 /// A class that manages the core data for TencentCloudChat .

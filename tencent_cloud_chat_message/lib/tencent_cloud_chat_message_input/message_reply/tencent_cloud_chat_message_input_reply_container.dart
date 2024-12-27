@@ -31,7 +31,7 @@ class _TencentCloudChatMessageInputReplyContainerState
             repliedMessage: widget.repliedMessage,
           ),
           methods: MessageInputReplyBuilderMethods(
-            onCancel: () => dataProvider.repliedMessage = null,
+            onCancel: () => dataProvider.quotedMessage = null,
             onClickReply: () =>
                 TencentCloudChat.instance.dataInstance.messageData.messageHighlighted = widget.repliedMessage,
           ),

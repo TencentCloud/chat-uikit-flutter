@@ -156,7 +156,7 @@ class TencentCloudChatContactGroupItemState extends TencentCloudChatState<Tencen
               groupID: widget.group.groupID,
             ),
           );
-        }else{
+        } else {
           final conv = await TencentCloudChat.instance.chatSDKInstance.conversationSDK.getConversation(
             groupID: widget.group.groupID,
           );

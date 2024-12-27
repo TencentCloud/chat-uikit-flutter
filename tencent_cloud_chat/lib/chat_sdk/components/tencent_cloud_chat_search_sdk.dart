@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:collection/collection.dart';
+import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 
@@ -63,6 +64,9 @@ class TencentCloudChatSearchSDK {
   }
 
   Future<List<V2TimFriendInfoResult>> searchContacts(String keyword) async {
+    if (TencentCloudChatPlatformAdapter().isWeb) {
+      return [];
+    }
     final res = await TencentCloudChat.instance.chatSDKInstance.manager.v2TIMFriendshipManager.searchFriends(
       searchParam: V2TimFriendSearchParam(
         keywordList: [
@@ -74,6 +78,9 @@ class TencentCloudChatSearchSDK {
   }
 
   Future<List<V2TimGroupInfo>> searchGroups(String keyword) async {
+    if (TencentCloudChatPlatformAdapter().isWeb) {
+      return [];
+    }
     final res = await TencentCloudChat.instance.chatSDKInstance.manager.v2TIMGroupManager.searchGroups(
       searchParam: V2TimGroupSearchParam(
         keywordList: [
@@ -86,16 +93,18 @@ class TencentCloudChatSearchSDK {
 
   Future<(int?, String?, List<TencentCloudChatSearchResultItemData>, String?)> searchMessages(
       {required String keyword, String? conversationID, List<int>? messageTypeList, String? cursor}) async {
-    final localRes = TencentCloudChatUtils.checkString(cursor) != null ? null : await TencentCloudChat.instance.chatSDKInstance.manager.v2TIMMessageManager.searchLocalMessages(
-      searchParam: V2TimMessageSearchParam(
-        conversationID: conversationID,
-        type: KeywordListMatchType.V2TIM_KEYWORD_LIST_MATCH_TYPE_OR.index,
-        messageTypeList: (messageTypeList ?? []).isNotEmpty ? messageTypeList! : null,
-        keywordList: [
-          keyword,
-        ],
-      ),
-    );
+    final localRes = (TencentCloudChatUtils.checkString(cursor) != null || TencentCloudChatPlatformAdapter().isWeb)
+        ? null
+        : await TencentCloudChat.instance.chatSDKInstance.manager.v2TIMMessageManager.searchLocalMessages(
+            searchParam: V2TimMessageSearchParam(
+              conversationID: conversationID,
+              type: KeywordListMatchType.V2TIM_KEYWORD_LIST_MATCH_TYPE_OR.index,
+              messageTypeList: (messageTypeList ?? []).isNotEmpty ? messageTypeList! : null,
+              keywordList: [
+                keyword,
+              ],
+            ),
+          );
 
     final cloudRes = await TencentCloudChat.instance.chatSDKInstance.manager.v2TIMMessageManager.searchCloudMessages(
       searchParam: V2TimMessageSearchParam(
@@ -152,6 +161,11 @@ class TencentCloudChatSearchSDK {
         );
       }
     });
-    return (localRes?.data?.totalCount, localRes?.data?.searchCursor, searchResultConversationList, cloudRes.data?.searchCursor);
+    return (
+      localRes?.data?.totalCount,
+      localRes?.data?.searchCursor,
+      searchResultConversationList,
+      cloudRes.data?.searchCursor
+    );
   }
 }

@@ -88,9 +88,11 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
         if (messageData.messageProgressData.containsKey(msgID)) {
           if (messageData.messageProgressData[msgID] != null &&
               _sendingMessageData != messageData.messageProgressData[msgID]) {
-            _sendingMessageData = messageData.messageProgressData[msgID];
             setState(() {
               _sendingMessageData = messageData.messageProgressData[msgID];
+              if (_sendingMessageData!.isSendComplete) {
+                TencentCloudChat.instance.dataInstance.messageData.messageProgressData.remove(msgID);
+              }
             });
           }
         }
@@ -157,8 +159,14 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
           break;
         case MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS:
           messageText = TencentCloudChatUtils.buildGroupTipsText(widget.message.groupTipsElem);
+          break;
+        case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
+          if (widget.message.customElem != null) {
+            messageText = TencentCloudChatUtils.buildCallingText(widget.message);
+          }
+          break;
         default:
-        // TODO
+          break;
       }
     }
 

@@ -237,7 +237,7 @@ class _TencentCloudChatMessageSoundState extends TencentCloudChatMessageState<Te
           safeSetState(() {
             isErrorMessage = true;
           });
-          console("get messame online url return. by no sound elem  please check.");
+          console("get message online url return. by no sound elem  please check.");
         }
       }
     } else {
@@ -251,16 +251,13 @@ class _TencentCloudChatMessageSoundState extends TencentCloudChatMessageState<Te
   int onTapDownTime = 0;
 
   onTapDown(TapDownDetails details) {
-    if (widget.data.inSelectMode) {
-      widget.methods.onSelectMessage();
-    } else {
+    if (!widget.data.inSelectMode) {
       onTapDownTime = DateTime.now().millisecondsSinceEpoch;
     }
   }
 
   onTapUp(TapUpDetails details) {
     if (widget.data.inSelectMode) {
-      widget.methods.onSelectMessage();
       return;
     }
     int onTapUpTime = DateTime.now().millisecondsSinceEpoch;
@@ -318,7 +315,8 @@ class _TencentCloudChatMessageSoundState extends TencentCloudChatMessageState<Te
     String key = TencentCloudChatUtils.checkString(widget.data.message.userID) ?? widget.data.message.groupID ?? "";
     int conversationType = TencentCloudChatUtils.checkString(widget.data.message.userID) == null ? ConversationType.V2TIM_GROUP : ConversationType.V2TIM_C2C;
     bool isPlaying = TencentCloudChat.instance.dataInstance.messageData.isPlaying(msgID: (widget.data.message.msgID ?? ""));
-    bool isPause = TencentCloudChat.instance.dataInstance.messageData.isPlaying(msgID: (widget.data.message.msgID ?? ""));
+    bool isPause = TencentCloudChat.instance.dataInstance.messageData.isPause(msgID: (widget.data.message.msgID ?? ""));
+
     if (isPlaying) {
       return await TencentCloudChat.instance.dataInstance.messageData.pauseAudio();
     }
@@ -388,7 +386,7 @@ class _TencentCloudChatMessageSoundState extends TencentCloudChatMessageState<Te
     } else if (data.currentUpdatedFields == TencentCloudChatMessageDataKeys.currentPlayAudioInfo) {
       if (data.currentPlayAudioInfo != null) {
         if (data.currentPlayAudioInfo!.playInfo.msgID == (widget.data.message.msgID ?? "")) {
-          console("current video playing  progress :${data.currentPlayAudioInfo!.progress} isCompleted:${data.currentPlayAudioInfo!.isCompleted}isPaused: ${data.currentPlayAudioInfo!.isPaused}");
+          console("current audio playing progress :${data.currentPlayAudioInfo!.progress}, isCompleted:${data.currentPlayAudioInfo!.isCompleted}, isPaused: ${data.currentPlayAudioInfo!.isPaused}");
           safeSetState(() {
             currentPlayAudioInfo = data.currentPlayAudioInfo;
           });
@@ -475,7 +473,7 @@ class _TencentCloudChatMessageSoundState extends TencentCloudChatMessageState<Te
     if (currentPlayAudioInfo == null) {
       return false;
     }
-    if (currentPlayAudioInfo!.progress < 1) {
+    if (!currentPlayAudioInfo!.isCompleted) {
       if (currentPlayAudioInfo!.isPaused) {
         return false;
       } else {

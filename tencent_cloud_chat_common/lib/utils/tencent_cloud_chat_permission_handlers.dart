@@ -13,7 +13,14 @@ class TencentCloudChatPermissionHandler {
       case 'microphone':
         return Permission.microphone;
       case 'storage':
-        return Permission.storage;
+        if (TencentCloudChatPlatformAdapter().isAndroid) {
+          final androidInfo = await DeviceInfoPlugin().androidInfo;
+          if (androidInfo.version.sdkInt <= 32) {
+            return Permission.storage;
+          } else {
+            return Permission.manageExternalStorage;
+          }
+        }
       case 'photos':
         if (TencentCloudChatPlatformAdapter().isAndroid) {
           final androidInfo = await DeviceInfoPlugin().androidInfo;
@@ -37,10 +44,10 @@ class TencentCloudChatPermissionHandler {
       if (requestResult.isDenied || requestResult.isPermanentlyDenied) {
         final permission = TencentCloudChat.instance.cache.getPermission();
         final exist = permission.contains(permissionString);
-        if( !exist ){
+        if (!exist) {
           TencentCloudChat.instance.cache.cachePermission(permissionString);
           return false;
-        }else{
+        } else {
           TencentCloudChatDialog.showAdaptiveDialog(
             context: context,
             title: Text(tL10n.permissionDeniedTitle),
@@ -63,11 +70,10 @@ class TencentCloudChatPermissionHandler {
           );
           return false;
         }
-
       }
 
       /// Special case for `microphone`
-      if(permission == Permission.microphone && (prevStatus.isDenied || prevStatus.isPermanentlyDenied) ){
+      if (permission == Permission.microphone && (prevStatus.isDenied || prevStatus.isPermanentlyDenied)) {
         return false;
       }
 

@@ -174,7 +174,12 @@ abstract class TencentCloudChatComponentBuilder {
 
   getUserProfileContentBuilder({required V2TimUserFullInfo userFullInfo}) {}
 
-  getUserProfileChatButtonBuilder({required V2TimUserFullInfo userFullInfo, VoidCallback? startVideoCall, VoidCallback? startVoiceCall}) {}
+  getUserProfileChatButtonBuilder({
+    required V2TimUserFullInfo userFullInfo,
+    VoidCallback? startVideoCall,
+    VoidCallback? startVoiceCall,
+    bool? isNavigatedFromChat
+  }) {}
 
   getUserProfileStateButtonBuilder({required V2TimUserFullInfo userFullInfo}) {}
 

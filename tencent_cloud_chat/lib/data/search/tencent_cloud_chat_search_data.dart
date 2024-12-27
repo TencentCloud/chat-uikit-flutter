@@ -50,12 +50,22 @@ class TencentCloudChatSearchData<T> extends TencentCloudChatDataAB<T> {
 
   @override
   void notifyListener(T key) {
-    currentUpdatedFields = key;
-    TencentCloudChat.instance.eventBusInstance.fire(this, "TencentCloudChatSearchData");
+    var event = TencentCloudChatSearchData<T>(key);
+    event._searchConfig = _searchConfig;
+    event.searchEventHandlers = searchEventHandlers;
+    event._searchBuilder = _searchBuilder;
+    event.searchController = searchController;
+
+    TencentCloudChat.instance.eventBusInstance.fire(event, "TencentCloudChatSearchData");
   }
 
   @override
   Map<String, dynamic> toJson() {
     return Map<String, dynamic>.from({});
+  }
+
+  @override
+  void clear() {
+
   }
 }

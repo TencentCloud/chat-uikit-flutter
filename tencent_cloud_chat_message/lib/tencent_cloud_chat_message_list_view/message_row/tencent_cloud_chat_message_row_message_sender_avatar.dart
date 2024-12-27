@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat/components/component_options/tencent_cloud_chat_user_profile_options.dart';
 import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
+import 'package:tencent_cloud_chat/router/tencent_cloud_chat_navigator.dart';
+import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/builders/tencent_cloud_chat_common_builders.dart';
 import 'package:tencent_cloud_chat_common/widgets/avatar/tencent_cloud_chat_avatar.dart';
@@ -9,8 +12,10 @@ import 'package:tencent_cloud_chat_common/widgets/avatar/tencent_cloud_chat_avat
 class TencentCloudChatMessageRowMessageSenderAvatar extends StatefulWidget {
   final MessageRowMessageSenderAvatarBuilderData data;
   final MessageRowMessageSenderAvatarBuilderMethods methods;
+  bool showOthersAvatar = false;
+  bool showSelfAvatar = false;
 
-  const TencentCloudChatMessageRowMessageSenderAvatar({super.key, required this.data, required this.methods});
+  TencentCloudChatMessageRowMessageSenderAvatar({super.key, required this.data, required this.methods, required this.showOthersAvatar, required this.showSelfAvatar});
 
   @override
   State<TencentCloudChatMessageRowMessageSenderAvatar> createState() =>
@@ -20,6 +25,19 @@ class TencentCloudChatMessageRowMessageSenderAvatar extends StatefulWidget {
 class _TencentCloudChatMessageRowMessageSenderAvatarState
     extends TencentCloudChatState<TencentCloudChatMessageRowMessageSenderAvatar> {
   TapDownDetails? _tapDownDetails;
+
+  void _onTapAvatar() {
+    if (TencentCloudChatUtils.checkString(widget.data.message.sender) != null) {
+      if ( (!(widget.data.message.isSelf ?? true) && widget.showOthersAvatar) ) {
+        navigateToUserProfile(context: context, options: TencentCloudChatUserProfileOptions(userID: widget.data.message.sender!));
+      }
+    }
+  }
+
+  void _onLongPressAvatar() {
+
+  }
+
 
   @override
   Widget defaultBuilder(BuildContext context) {
@@ -35,17 +53,22 @@ class _TencentCloudChatMessageRowMessageSenderAvatarState
       }),
       onTap: () {
         if (_tapDownDetails != null) {
-          widget.methods.onCustomUIEventPrimaryTapAvatar?.call(
-            message: widget.data.message,
-            tapDownDetails: _tapDownDetails!,
-            userID: widget.data.userID,
-            groupID: widget.data.groupID,
-          );
+          if (widget.methods.onCustomUIEventTapAvatar != null) {
+            widget.methods.onCustomUIEventTapAvatar?.call(
+              message: widget.data.message,
+              tapDownDetails: _tapDownDetails!,
+              userID: widget.data.userID,
+              groupID: widget.data.groupID,
+            );
+          } else {
+            _onTapAvatar();
+          }
         }
       },
+
       onLongPress: () {
         if (touchScreen && _tapDownDetails != null) {
-          widget.methods.onCustomUIEventSecondaryTapAvatar?.call(
+          widget.methods.onCustomUIEventLongPressAvatar?.call(
             message: widget.data.message,
             tapDownDetails: _tapDownDetails!,
             userID: widget.data.userID,
@@ -53,16 +76,7 @@ class _TencentCloudChatMessageRowMessageSenderAvatarState
           );
         }
       },
-      onSecondaryTap: () {
-        if (!touchScreen && _tapDownDetails != null) {
-          widget.methods.onCustomUIEventSecondaryTapAvatar?.call(
-            message: widget.data.message,
-            tapDownDetails: _tapDownDetails!,
-            userID: widget.data.userID,
-            groupID: widget.data.groupID,
-          );
-        }
-      },
+
       child: TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
         scene: (widget.data.message.isSelf ?? true)
             ? TencentCloudChatAvatarScene.messageListForSelf

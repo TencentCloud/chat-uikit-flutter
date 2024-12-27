@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat/components/component_options/tencent_cloud_chat_message_options.dart';
 import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
 import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
+import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat/router/tencent_cloud_chat_navigator.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
@@ -40,9 +41,9 @@ class TencentCloudChatContactItemState extends TencentCloudChatState<TencentClou
           );
           TencentCloudChat.instance.dataInstance.conversation.currentConversation = conv;
         }
-        }
       }
     }
+  }
 
 
   @override
@@ -81,18 +82,51 @@ class TencentCloudChatContactItemAvatar extends StatefulWidget {
 }
 
 class TencentCloudChatContactItemAvatarState extends TencentCloudChatState<TencentCloudChatContactItemAvatar> {
+  TencentCloudChatThemeColors colorTheme = TencentCloudChat.instance.dataInstance.theme.colorTheme;
+
   @override
   Widget defaultBuilder(BuildContext context) {
     return Padding(
         padding: EdgeInsets.symmetric(
           horizontal: getWidth(13),
         ),
-        child: TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
-          scene: TencentCloudChatAvatarScene.contacts,
-          imageList: [widget.friend.userProfile?.faceUrl],
+        child: SizedBox(
           width: getSquareSize(40),
           height: getSquareSize(40),
-          borderRadius: getSquareSize(34),
+          child: Stack(
+            children: [
+              Positioned(
+                left: 0,
+                top: 0,
+                child: TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
+                  scene: TencentCloudChatAvatarScene.contacts,
+                  imageList: [widget.friend.userProfile?.faceUrl],
+                  width: getSquareSize(40),
+                  height: getSquareSize(40),
+                  borderRadius: getSquareSize(34),
+                ),
+              ),
+              if (TencentCloudChat.instance.dataInstance.basic.userConfig.useUserOnlineStatus ?? true)
+                Positioned(
+                  bottom: 0,
+                  right: 0,
+                  child: SizedBox(
+                    width: getSquareSize(10),
+                    height: getSquareSize(10),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: TencentCloudChat.instance.dataInstance.contact.getOnlineStatusByUserId(userID: widget.friend.userID) ?colorTheme.conversationItemUserStatusBgColor : Colors.transparent,
+                        borderRadius: BorderRadius.all(
+                          Radius.circular(
+                            getSquareSize(5),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ]
+          ),
         ));
   }
 }

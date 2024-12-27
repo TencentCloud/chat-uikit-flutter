@@ -22,7 +22,9 @@ class TencentCloudChatContactAddGroupInfoState extends TencentCloudChatState<Ten
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Container(
             height: getHeight(775),
-            decoration: BoxDecoration(color: colorTheme.contactAddContactInfoBackgroundColor, borderRadius: BorderRadius.all(Radius.circular(getWidth(10)))),
+            decoration: BoxDecoration(
+                color: colorTheme.contactAddContactInfoBackgroundColor,
+                borderRadius: BorderRadius.all(Radius.circular(getWidth(10)))),
             child: Scaffold(
               backgroundColor: Colors.transparent,
               appBar: const TencentCloudChatContactAddContactsInfoAppBar(),
@@ -40,7 +42,8 @@ class TencentCloudChatContactAddGroupInfoBody extends StatefulWidget {
   State<StatefulWidget> createState() => TencentCloudChatContactAddGroupInfoBodyState();
 }
 
-class TencentCloudChatContactAddGroupInfoBodyState extends TencentCloudChatState<TencentCloudChatContactAddGroupInfoBody> {
+class TencentCloudChatContactAddGroupInfoBodyState
+    extends TencentCloudChatState<TencentCloudChatContactAddGroupInfoBody> {
   String verification = "";
 
   _getToastIcon(bool check) {
@@ -60,24 +63,50 @@ class TencentCloudChatContactAddGroupInfoBodyState extends TencentCloudChatState
             ));
   }
 
-  sendAddGroupApplication() {
-    if (widget.groupInfo.groupType == "Work") {
-      TencentCloudChat.instance.callbacks.onUserNotificationEvent.call(
-        TencentCloudChatComponentsEnum.contact,
-        TencentCloudChatCodeInfo.cannotSendApplicationToWorkGroup,
-      );
-    } else if (widget.groupInfo.groupType == "Public") {
-      TencentCloudChat.instance.callbacks.onUserNotificationEvent.call(
-        TencentCloudChatComponentsEnum.contact,
-        TencentCloudChatCodeInfo.groupJoinedPermissionNeeded,
-      );
-      TencentCloudChat.instance.chatSDKInstance.contactSDK.joinGroup(widget.groupInfo.groupID, verification, widget.groupInfo.groupType as GroupType);
+  sendAddGroupApplication() async {
+    var result =
+        await TencentCloudChat.instance.chatSDKInstance.contactSDK.joinGroup(widget.groupInfo.groupID, verification);
+    if (result.code == 0) {
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
     } else {
-      TencentCloudChat.instance.callbacks.onUserNotificationEvent.call(
-        TencentCloudChatComponentsEnum.contact,
-        TencentCloudChatCodeInfo.groupJoined,
-      );
-      TencentCloudChat.instance.chatSDKInstance.contactSDK.joinGroup(widget.groupInfo.groupID, verification, widget.groupInfo.groupType as GroupType);
+      if (result.code == 10007) {
+        TencentCloudChat.instance.callbacks.onUserNotificationEvent(
+            TencentCloudChatComponentsEnum.contact,
+            TencentCloudChatUserNotificationEvent(
+              eventCode: result.code,
+              text: tL10n.addGroupPermissionDeny,
+            ));
+      } else if (result.code == 10013) {
+        TencentCloudChat.instance.callbacks.onUserNotificationEvent(
+            TencentCloudChatComponentsEnum.contact,
+            TencentCloudChatUserNotificationEvent(
+              eventCode: result.code,
+              text: tL10n.addGroupAlreadyMember,
+            ));
+      } else if (result.code == 10010) {
+        TencentCloudChat.instance.callbacks.onUserNotificationEvent(
+            TencentCloudChatComponentsEnum.contact,
+            TencentCloudChatUserNotificationEvent(
+              eventCode: result.code,
+              text: tL10n.addGroupNotFound,
+            ));
+      } else if (result.code == 10014) {
+        TencentCloudChat.instance.callbacks.onUserNotificationEvent(
+            TencentCloudChatComponentsEnum.contact,
+            TencentCloudChatUserNotificationEvent(
+              eventCode: result.code,
+              text: tL10n.addGroupFullMember,
+            ));
+      } else {
+        TencentCloudChat.instance.callbacks.onUserNotificationEvent(
+            TencentCloudChatComponentsEnum.contact,
+            TencentCloudChatUserNotificationEvent(
+              eventCode: result.code,
+              text: result.desc,
+            ));
+      }
     }
   }
 

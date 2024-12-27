@@ -6,6 +6,8 @@ import 'package:intl/intl.dart' as intl;
 
 import 'tencent_cloud_chat_localizations.dart';
 
+// ignore_for_file: type=lint
+
 /// The translations for Japanese (`ja`).
 class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   TencentCloudChatLocalizationsJa([String locale = 'ja']) : super(locale);
@@ -187,7 +189,7 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   String get forward => '転送';
 
   @override
-  String get multiSelect => '選択';
+  String get multiSelect => '多肢選択';
 
   @override
   String get select => '選択';
@@ -281,16 +283,13 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   String get message => 'メッセージ';
 
   @override
-  String get doNotDisturb => 'ミュート';
+  String get doNotDisturb => 'メッセージを邪魔しないでください';
 
   @override
   String get mute => 'ミュート';
 
   @override
-  String get topChat => 'ピン';
-
-  @override
-  String get pin => 'ピン';
+  String get pin => '固定されたチャット';
 
   @override
   String get blackUser => 'ユーザーをブロック';
@@ -738,12 +737,6 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   String get confirmDeletion => '削除の確認';
 
   @override
-  String get deleteForEveryone => 'すべての人に削除';
-
-  @override
-  String get deleteForMe => '私に削除';
-
-  @override
   String get askDeleteThisMessage => 'このメッセージを削除しますか？';
 
   @override
@@ -945,10 +938,10 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   String get changedGroupCustomInfo => 'グループのカスタム情報を変更しました';
 
   @override
-  String get enabledGroupMute => 'グループ全体のミュートを有効にしました';
+  String get enabledGroupMute => 'メンバー全員を禁止する';
 
   @override
-  String get disabledGroupMute => 'グループ全体のミュートを無効にしました';
+  String get disabledGroupMute => 'すべてのメンバーの禁止を解除する';
 
   @override
   String changedGroupMessageReceptionTo(Object setting) {
@@ -1039,7 +1032,7 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   String get searchMembers => 'メンバーを検索';
 
   @override
-  String get startCall => '通話を開始';
+  String get startCall => '通話を開始する';
 
   @override
   String get clear => 'クリア';
@@ -1074,7 +1067,7 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   String get restartAppForLanguage => '言語の変更を適用するには、アプリを再起動してください';
 
   @override
-  String get deleteAllMessages => 'すべてのメッセージを削除';
+  String get deleteAllMessages => 'チャット履歴をクリアする';
 
   @override
   String get downloading => 'ダウンロード中...';
@@ -1089,10 +1082,10 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   String get messageRecallConfirmation => 'このメッセージを取り消してもよろしいですか？';
 
   @override
-  String get quit => '退出';
+  String get quit => 'グループチャットを終了する';
 
   @override
-  String get quitAndDelete => '退出して削除';
+  String get dissolve => 'グループを解散する';
 
   @override
   String get setGroupName => 'グループ名の設定';
@@ -1316,4 +1309,383 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
 
   @override
   String get myRoleInGroup => '役割';
+
+  @override
+  String get chooseAvatar => 'アバターを選択';
+
+  @override
+  String get friendLimit => '友達の数がシステムの制限に達しました';
+
+  @override
+  String get otherFriendLimit => '相手の友達数がシステムの上限に達しています';
+
+  @override
+  String get inBlacklist => 'ブラックリストに友達として追加される';
+
+  @override
+  String get setInBlacklist => '相手からブラックリストに登録されている';
+
+  @override
+  String get forbidAddFriend => '相手が友達追加を禁止されている';
+
+  @override
+  String get waitAgreeFriend => '友達からのレビューと承認を待っています';
+
+  @override
+  String get haveBeFriend => '相手はすでにあなたの友達です';
+
+  @override
+  String get contactAddFailed => '追加に失敗しました';
+
+  @override
+  String get addGroupPermissionDeny => 'グループへの参加は禁止です';
+
+  @override
+  String get addGroupAlreadyMember => 'すでにグループメンバーです';
+
+  @override
+  String get addGroupNotFound => 'グループが存在しません';
+
+  @override
+  String get addGroupFullMember => 'グループは満員です';
+
+  @override
+  String get joinedTip => 'あなたはグループに参加しました:';
+
+  @override
+  String get quitGroupTip => 'このグループを退会してもよろしいですか?';
+
+  @override
+  String get dismissGroupTip => '本当にこのグループを解散しますか？';
+
+  @override
+  String get kickedOffTips => 'オフラインにされました';
+
+  @override
+  String get userSigExpiredTips => 'ユーザーの署名の有効期限が切れています';
+
+  @override
+  String get convertTextFailed => 'テキストの変換に失敗しました';
+
+  @override
+  String get deleteFriendSuccess => '友達を正常に削除しました';
+
+  @override
+  String get deleteFriendFailed => '友達の削除に失敗しました';
+
+  @override
+  String get clearMsgTip => 'チャット履歴を消去しますか?';
+
+  @override
+  String get sendMsg => 'メッセージを送信';
+
+  @override
+  String get groupMemberMute => 'メッセージは禁止されているため送信できません。送信者が禁止されているかどうかを確認してください。';
+
+  @override
+  String get forwardFailedTip => '失敗したメッセージの転送はサポートされていません。';
+
+  @override
+  String get fileTooLarge => 'ファイルサイズが制限を超えています';
+
+  @override
+  String get invalidApplication => 'フレンド申請無効';
+
+  @override
+  String get atMeTips => '誰かが私に来て';
+
+  @override
+  String get atAllTips => '@みんな';
+
+  @override
+  String get forwardVoteFailedTip => '投票メッセージは転送をサポートしていません。';
+
+  @override
+  String get forwardOneByOneLimitNumberTip => '転送されたメッセージが多すぎます。現時点では、1 つずつの転送はサポートされていません。';
+
+  @override
+  String get modifyRemark => '修改备注';
+
+  @override
+  String banned(Object targetUser, Object time) {
+    return '$targetUser 禁止された $time';
+  }
+
+  @override
+  String cancelBanned(Object targetUser) {
+    return '$targetUser の禁止が解除されました';
+  }
+
+  @override
+  String get day => '日';
+
+  @override
+  String get hour => '時';
+
+  @override
+  String get min => '分';
+
+  @override
+  String get second => '秒';
+
+  @override
+  String get setFailed => 'セットアップに失敗しました';
+
+  @override
+  String get callRejectCaller => '相手が拒否しました';
+
+  @override
+  String get callRejectCallee => '拒否されました';
+
+  @override
+  String get callCancelCaller => 'キャンセル';
+
+  @override
+  String get callCancelCallee => '相手がキャンセルした';
+
+  @override
+  String get stopCallTip => '通話時間:';
+
+  @override
+  String get callTimeoutCaller => '相手からの応答がありません';
+
+  @override
+  String get callTimeoutCallee => '相手がキャンセルした';
+
+  @override
+  String get callLineBusyCaller => '相手は忙しいです';
+
+  @override
+  String get callLineBusyCallee => '相手がキャンセルした';
+
+  @override
+  String get acceptCall => '答えた';
+
+  @override
+  String get callingSwitchToAudio => 'ビデオから音声へ';
+
+  @override
+  String get callingSwitchToAudioAccept => 'ビデオから音声への変換を確認する';
+
+  @override
+  String get invalidCommand => '認識できない呼び出しコマンド';
+
+  @override
+  String get groupCallSend => 'グループ通話が始まりました';
+
+  @override
+  String get groupCallEnd => '通話が終了しました';
+
+  @override
+  String get groupCallNoAnswer => '答えはありません';
+
+  @override
+  String get groupCallReject => 'グループ通話を拒否する';
+
+  @override
+  String get groupCallAccept => '答え';
+
+  @override
+  String get groupCallConfirmSwitchToAudio => '動画を音声に変換することに同意する';
+
+  @override
+  String get callkitInPeerBlacklist => 'ユーザーはブラックリストに登録され、通話が開始できませんでした。';
+
+  @override
+  String get resendTips => '再送信してもよろしいですか?';
+
+  @override
+  String get logoutTip => 'ログアウトしてもよろしいですか?';
+
+  @override
+  String get sendFileLimit => '選択できるファイルは 9 個までです';
+
+  @override
+  String get atAll => 'みんな';
+
+  @override
+  String get tuiEmojiSmile => '[微笑]';
+
+  @override
+  String get tuiEmojiExpect => '[期待]';
+
+  @override
+  String get tuiEmojiBlink => '[ウィンク]';
+
+  @override
+  String get tuiEmojiGuffaw => '[大笑い]';
+
+  @override
+  String get tuiEmojiKindSmile => '[おばさん笑い]';
+
+  @override
+  String get tuiEmojiHaha => '[ははは]';
+
+  @override
+  String get tuiEmojiCheerful => '[楽しい]';
+
+  @override
+  String get tuiEmojiSpeechless => '[呆れ]';
+
+  @override
+  String get tuiEmojiAmazed => '[驚き]';
+
+  @override
+  String get tuiEmojiSorrow => '[悲しみ]';
+
+  @override
+  String get tuiEmojiComplacent => '[得意げ]';
+
+  @override
+  String get tuiEmojiSilly => '[バカ]';
+
+  @override
+  String get tuiEmojiLustful => '[色気]';
+
+  @override
+  String get tuiEmojiGiggle => '[にこにこ笑い]';
+
+  @override
+  String get tuiEmojiKiss => '[キス]';
+
+  @override
+  String get tuiEmojiWail => '[大泣き]';
+
+  @override
+  String get tuiEmojiTearsLaugh => '[泣き笑い]';
+
+  @override
+  String get tuiEmojiTrapped => '[困った]';
+
+  @override
+  String get tuiEmojiMask => '[マスク]';
+
+  @override
+  String get tuiEmojiFear => '[恐怖]';
+
+  @override
+  String get tuiEmojiBareTeeth => '[牙をむく]';
+
+  @override
+  String get tuiEmojiFlareUp => '[怒り]';
+
+  @override
+  String get tuiEmojiYawn => '[あくび]';
+
+  @override
+  String get tuiEmojiTact => '[機知]';
+
+  @override
+  String get tuiEmojiStareyes => '[星目]';
+
+  @override
+  String get tuiEmojiShutUp => '[黙れ]';
+
+  @override
+  String get tuiEmojiSigh => '[ため息]';
+
+  @override
+  String get tuiEmojiHehe => '[へへ]';
+
+  @override
+  String get tuiEmojiSilent => '[静か]';
+
+  @override
+  String get tuiEmojiSurprised => '[驚喜]';
+
+  @override
+  String get tuiEmojiAskance => '[白目]';
+
+  @override
+  String get tuiEmojiOk => '[OK]';
+
+  @override
+  String get tuiEmojiShit => '[うんち]';
+
+  @override
+  String get tuiEmojiMonster => '[モンスター]';
+
+  @override
+  String get tuiEmojiDaemon => '[悪魔]';
+
+  @override
+  String get tuiEmojiRage => '[悪魔の怒り]';
+
+  @override
+  String get tuiEmojiFool => '[ダメ]';
+
+  @override
+  String get tuiEmojiPig => '[豚]';
+
+  @override
+  String get tuiEmojiCow => '[牛]';
+
+  @override
+  String get tuiEmojiAi => '[AI]';
+
+  @override
+  String get tuiEmojiSkull => '[骸骨]';
+
+  @override
+  String get tuiEmojiBombs => '[爆弾]';
+
+  @override
+  String get tuiEmojiCoffee => '[コーヒー]';
+
+  @override
+  String get tuiEmojiCake => '[ケーキ]';
+
+  @override
+  String get tuiEmojiBeer => '[ビール]';
+
+  @override
+  String get tuiEmojiFlower => '[花]';
+
+  @override
+  String get tuiEmojiWatermelon => '[スイカ]';
+
+  @override
+  String get tuiEmojiRich => '[お金持ち]';
+
+  @override
+  String get tuiEmojiHeart => '[ハート]';
+
+  @override
+  String get tuiEmojiMoon => '[月]';
+
+  @override
+  String get tuiEmojiSun => '[太陽]';
+
+  @override
+  String get tuiEmojiStar => '[星]';
+
+  @override
+  String get tuiEmojiRedPacket => '[レッドパケット]';
+
+  @override
+  String get tuiEmojiCelebrate => '[祝賀]';
+
+  @override
+  String get tuiEmojiBless => '[福]';
+
+  @override
+  String get tuiEmojiFortune => '[発財]';
+
+  @override
+  String get tuiEmojiConvinced => '[納得]';
+
+  @override
+  String get tuiEmojiProhibit => '[禁止]';
+
+  @override
+  String get tuiEmoji666 => '[666]';
+
+  @override
+  String get tuiEmoji857 => '[857]';
+
+  @override
+  String get tuiEmojiKnife => '[ナイフ]';
+
+  @override
+  String get tuiEmojiLike => '[いいね]';
 }

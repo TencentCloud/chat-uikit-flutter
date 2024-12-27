@@ -1,6 +1,6 @@
 library tencent_cloud_chat;
 
-import 'package:tencent_cloud_chat/cache/tencent_cloud_chat_cache.dart';
+import 'package:tencent_cloud_chat/cache/tencent_cloud_chat_cache_global.dart';
 import 'package:tencent_cloud_chat/chat_sdk/tencent_cloud_chat_sdk.dart';
 import 'package:tencent_cloud_chat/controller/tencent_cloud_chat_controller.dart';
 import 'package:tencent_cloud_chat/data/tencent_cloud_chat_data.dart';
@@ -157,10 +157,6 @@ class TencentCloudChat {
 
   static TencentCloudChat get instance => _instance;
 
-  void reset() {
-    TencentCloudChatDataManager.resetInstance();
-  }
-
   final TencentCloudChatCallbacksTrigger callbacks = TencentCloudChatCallbacksTriggerGenerator.getInstance();
 
   final TencentCloudChatCoreController chatController = TencentCloudChatCoreControllerGenerator.getInstance();
@@ -169,16 +165,13 @@ class TencentCloudChat {
 
   final TencentCloudChatLog logInstance = TencentCloudChatLogGenerator.getInstance();
 
-  final TencentCloudChatData dataInstance =
-  TencentCloudChatDataManager.getInstance();
+  final TencentCloudChatData dataInstance = TencentCloudChatDataManager.getInstance();
 
   final TencentCloudChatEventBus eventBusInstance = TencentCloudChatEventBusGenerator.getInstance();
 
   final TencentCloudChatSDK chatSDKInstance = TencentCloudChatSDKGenerator.getInstance();
 
-  final TencentCloudChatCache cache =
-      TencentCloudChatCacheGenerator.getInstance();
+  final TencentCloudChatCacheGlobal cache = TencentCloudChatCacheGlobal.instance;
 
-  final TencentCloudChatObserver navigatorObserver =
-  TencentCloudChatObserver.getInstance();
+  final TencentCloudChatObserver navigatorObserver = TencentCloudChatObserver.getInstance();
 }

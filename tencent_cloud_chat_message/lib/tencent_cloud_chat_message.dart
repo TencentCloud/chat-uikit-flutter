@@ -122,6 +122,24 @@ class _TencentCloudChatMessageState extends TencentCloudChatState<TencentCloudCh
       _messageSeparateDataProvider.config = TencentCloudChat.instance.dataInstance.messageData.messageConfig;
       setState(() {});
     }
+
+    if (data.currentUpdatedFields == TencentCloudChatMessageDataKeys.userStatusChange && (TencentCloudChat.instance.dataInstance.basic.userConfig.useUserOnlineStatus ?? true) &&
+        widget.options?.userID != null && data.userStatusChangeSet.contains(widget.options?.userID)) {
+      safeSetState(() {});
+    }
+
+    if (data.currentUpdatedFields == TencentCloudChatMessageDataKeys.friendInfoChange && widget.options?.userID != null && data.friendInfoChangeSet.contains(widget.options?.userID)) {
+      _messageSeparateDataProvider.unInit();
+      _messageSeparateDataProvider.init(
+        userID: widget.options?.userID,
+        groupID: widget.options?.groupID,
+        topicID: widget.options?.topicID,
+        config: widget.config,
+        eventHandlers: widget.eventHandlers,
+        controller: null,
+        builders: widget.builders,
+      );
+    }
   }
 
   @override
@@ -151,6 +169,7 @@ class _TencentCloudChatMessageState extends TencentCloudChatState<TencentCloudCh
                 userID: widget.options!.userID,
                 groupID: widget.options!.groupID,
                 topicID: widget.options!.topicID,
+                draftText: widget.options!.draftText,
               ),
             ),
           )

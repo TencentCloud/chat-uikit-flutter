@@ -5,13 +5,14 @@ class TencentCloudChatMessageOptions {
   final String? groupID;
   final String? topicID;
   final V2TimMessage? targetMessage;
+  final String? draftText;
 
   // Constructor for TencentCloudChatMessageOptions.
   //
   // [userID]: The user ID for a one-to-one conversation.
   // [groupID]: The group ID for a group conversation.
   // [topicID]: The topicID for a topic, within a community group conversation.
-  TencentCloudChatMessageOptions( {this.userID, this.topicID, this.groupID, this.targetMessage, });
+  TencentCloudChatMessageOptions( {this.userID, this.topicID, this.groupID, this.targetMessage, this.draftText, });
 
   // Converts the TencentCloudChatMessageOptions object to a map.
   Map<String, dynamic> toMap() {
@@ -20,6 +21,7 @@ class TencentCloudChatMessageOptions {
       'groupID': groupID,
       'topicID': topicID,
       'targetMessage': targetMessage,
+      'draftText': draftText,
     };
   }
 
@@ -30,6 +32,7 @@ class TencentCloudChatMessageOptions {
       groupID: map['groupID'] as String?,
       topicID: map['topicID'] as String?,
       targetMessage: map['targetMessage'] as V2TimMessage?,
+      draftText: map['draftText'] as String?,
     );
   }
 }

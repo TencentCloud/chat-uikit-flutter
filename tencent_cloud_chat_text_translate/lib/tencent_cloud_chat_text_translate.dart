@@ -19,24 +19,24 @@ class TencentCloudChatTextTranslate extends TencentCloudChatPlugin {
   static bool Function(
           String? groupID, String? userID, String? topicID, String? text)?
       _enableTranslate;
-  static Function()? _onTranslateSuccess;
+  static Function(String)? _onTranslateSuccess;
   static Function()? _onTranslateFailed;
 
   TencentCloudChatTextTranslate._internal();
   factory TencentCloudChatTextTranslate({
     String? sourceLanguage,
-    String? targetLanguate,
+    String? targetLanguage,
     BoxDecoration? boxDecoration,
     TextStyle? translateTextStyle,
     EdgeInsetsGeometry? boxPadding,
     Function()? onTranslateFailed,
-    Function()? onTranslateSuccess,
+    Function(String)? onTranslateSuccess,
     bool Function(
             String? groupID, String? userID, String? topicID, String? text)?
         enableTranslate,
   }) {
     _sourceLanguage = sourceLanguage;
-    _targetLanguate = targetLanguate;
+    _targetLanguate = targetLanguage;
     _decoration = boxDecoration;
     _textStyle = translateTextStyle;
     _padding = boxPadding;
@@ -118,17 +118,24 @@ class TencentCloudChatTextTranslate extends TencentCloudChatPlugin {
   @override
   Widget? getWidgetSync(
       {required String methodName,
-      Map<String, String>? data,
-      Map<String, TencentCloudChatPluginTapFn>? fns}) {
+      Map<String, dynamic>? data,
+      Map<String, TencentCloudChatPluginTapFn>? fns,
+      Function(String)? onTranslateSuccess,
+      Function()? onTranslateFailed,}) {
     final {
       "text": text,
       "targetLanguage": targetLanguage,
+      "groupAtUserList": groupAtUserList,
+      "localCustomData": localCustomData,
     } = data ?? {};
+
     return TencentCloudChatTranslate(
-        onTranslateFailed: _onTranslateFailed,
-        onTranslateSuccess: _onTranslateSuccess,
+        onTranslateFailed: onTranslateFailed,
+        onTranslateSuccess: onTranslateSuccess,
         sourceText: text,
         targetLanguage: _targetLanguate ?? targetLanguage,
+        groupAtUserList: groupAtUserList,
+        localCustomData: localCustomData,
         decoration: _decoration,
         padding: _padding,
         textStyle: _textStyle);

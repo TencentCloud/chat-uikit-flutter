@@ -1,6 +1,33 @@
+## 2.1.0
+
+### General
+* Optimize multiple issues.
+
+## 2.0.1
+
+### General
+* Support draft capability.
+
 ## 2.0.0
+
 ## Breaking Changes
 * Migrated to Flutter 3.24.0
+
+## 1.6.1
+
+### General
+
+* Fixed the issue of repeated messages on the web side.
+
+## 1.6.0
+
+### General
+
+* Added support to Customer Service Plug-in.
+
+### Message (TencentCloudChatMessage)
+
+* Improved message list on Web.
 
 ## 1.5.0
 

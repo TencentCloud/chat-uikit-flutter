@@ -98,25 +98,35 @@ class _TencentCloudChatMessageHeaderProfileImageState
   @override
   Widget defaultBuilder(BuildContext context) {
     return GestureDetector(
-      onTap: TencentCloudChatUtils.checkString(widget.conversation?.userID) !=
-              null
-          ? () => navigateToUserProfile(
-                context: context,
-                options: TencentCloudChatUserProfileOptions(
-                  userID: widget.conversation!.userID!,
-                  startVideoCall: widget.startVideoCall,
-                  startVoiceCall: widget.startVoiceCall,
-                ),
-              )
-          : TencentCloudChatUtils.checkString(widget.conversation?.groupID) !=
-                  null
-              ? () => navigateToGroupProfile(
-                    context: context,
-                    options: TencentCloudChatGroupProfileOptions(
-                      groupID: widget.conversation!.groupID!,
-                    ),
-                  )
-              : null,
+      onTap: () async {
+        if (mounted) {
+          if (TencentCloudChatUtils.checkString(widget.conversation?.userID) != null) {
+            Object? result = await navigateToUserProfile(
+              context: context,
+              options: TencentCloudChatUserProfileOptions(
+                userID: widget.conversation!.userID!,
+                startVideoCall: widget.startVideoCall,
+                startVoiceCall: widget.startVoiceCall,
+              ),
+            );
+
+            if (result != null && (result is bool && result == true) && mounted) {
+              Navigator.pop(context);
+            }
+          } else if (TencentCloudChatUtils.checkString(widget.conversation?.groupID) != null) {
+            Object? result = await navigateToGroupProfile(
+              context: context,
+              options: TencentCloudChatGroupProfileOptions(
+                groupID: widget.conversation!.groupID!,
+              ),
+            );
+
+            if (result != null && (result is bool && result == true) && mounted) {
+              Navigator.pop(context);
+            }
+          }
+        }
+      },
       child: TencentCloudChatCommonBuilders.getCommonAvatarBuilder(
         scene: TencentCloudChatAvatarScene.messageHeader,
         imageList: getConversationFaceURL(widget.conversation),

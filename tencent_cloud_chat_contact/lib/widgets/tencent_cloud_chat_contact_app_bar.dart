@@ -9,6 +9,7 @@ enum AddContact { addFriend, addGroup }
 
 class TencentCloudChatContactAppBar extends StatefulWidget {
   final String? title;
+
   const TencentCloudChatContactAppBar({super.key, this.title});
 
   @override
@@ -16,7 +17,6 @@ class TencentCloudChatContactAppBar extends StatefulWidget {
 }
 
 class TencentCloudChatContactAppBarState extends TencentCloudChatState<TencentCloudChatContactAppBar> {
-
   @override
   Widget tabletAppBuilder(BuildContext context) {
     return Padding(
@@ -27,14 +27,12 @@ class TencentCloudChatContactAppBarState extends TencentCloudChatState<TencentCl
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-        bottom: getHeight(14),
-      ),
-      child: Column(
-        children: [TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAppBarNameBuilder(), const TencentCloudChatAppBarSearchItem()],
-      ),
-    );
+    return Column(
+        children: [
+          TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAppBarNameBuilder(),
+          const TencentCloudChatAppBarSearchItem()
+        ],
+      );
   }
 
   @override
@@ -67,6 +65,7 @@ class TencentCloudChatContactAppBarState extends TencentCloudChatState<TencentCl
 
 class TencentCloudChatContactAppBarName extends StatefulWidget {
   final String? title;
+
   const TencentCloudChatContactAppBarName({super.key, this.title});
 
   @override
@@ -75,6 +74,7 @@ class TencentCloudChatContactAppBarName extends StatefulWidget {
 
 class TencentCloudChatContactAppBarNameState extends TencentCloudChatState<TencentCloudChatContactAppBarName> {
   AddContact? selectedMenu;
+
   addContacts() {
     showModalBottomSheet<void>(
         barrierColor: Colors.white.withOpacity(0),
@@ -102,18 +102,16 @@ class TencentCloudChatContactAppBarNameState extends TencentCloudChatState<Tence
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => Row(
         children: [
-          Container(
-            width: getWidth(14),
-          ),
           Expanded(
-              child: Text(
-            widget.title ?? tL10n.contacts,
-            style: TextStyle(color: colorTheme.contactItemFriendNameColor, fontSize: textStyle.fontsize_34, fontWeight: FontWeight.w600),
-          )),
+              child: Text(widget.title ?? tL10n.contacts,
+                  style: TextStyle(
+                      color: colorTheme.contactItemFriendNameColor,
+                      fontSize: textStyle.fontsize_34,
+                      fontWeight: FontWeight.w600))),
           MenuAnchor(
             builder: (BuildContext context, MenuController controller, Widget? child) {
               return IconButton(
-                icon: Icon(Icons.person_add_alt, size: getSquareSize(20), color: colorTheme.contactAppBarIconColor),
+                icon: Icon(Icons.maps_ugc_outlined, size: getSquareSize(20), color: colorTheme.contactAppBarIconColor),
                 onPressed: () {
                   if (controller.isOpen) {
                     controller.close();
@@ -124,9 +122,11 @@ class TencentCloudChatContactAppBarNameState extends TencentCloudChatState<Tence
                 tooltip: 'Show menu',
               );
             },
-            menuChildren: [MenuItemButton(onPressed: addContacts, child: Text(tL10n.addContact)), MenuItemButton(onPressed: addGroup, child: Text(tL10n.addGroup))],
+            menuChildren: [
+              MenuItemButton(onPressed: addContacts, child: Text(tL10n.addContact)),
+              MenuItemButton(onPressed: addGroup, child: Text(tL10n.addGroup))
+            ],
           ),
-          IconButton(onPressed: addGroup, icon: Icon(Icons.maps_ugc_outlined, size: getSquareSize(20), color: colorTheme.contactAppBarIconColor)),
         ],
       ),
     );
@@ -140,12 +140,15 @@ class TencentCloudChatContactAppBarNameState extends TencentCloudChatState<Tence
           Expanded(
               child: Text(
             widget.title ?? tL10n.contacts,
-            style: TextStyle(color: colorTheme.contactItemFriendNameColor, fontSize: textStyle.fontsize_24 + 4, fontWeight: FontWeight.w600),
+            style: TextStyle(
+                color: colorTheme.contactItemFriendNameColor,
+                fontSize: textStyle.fontsize_24 + 4,
+                fontWeight: FontWeight.w600),
           )),
           MenuAnchor(
             builder: (BuildContext context, MenuController controller, Widget? child) {
               return IconButton(
-                icon: Icon(Icons.person_add_alt, size: getSquareSize(20), color: colorTheme.contactAppBarIconColor),
+                icon: Icon(Icons.maps_ugc_outlined, size: getSquareSize(20), color: colorTheme.contactAppBarIconColor),
                 onPressed: () {
                   if (controller.isOpen) {
                     controller.close();
@@ -156,9 +159,11 @@ class TencentCloudChatContactAppBarNameState extends TencentCloudChatState<Tence
                 tooltip: 'Show menu',
               );
             },
-            menuChildren: [MenuItemButton(onPressed: addContacts, child: Text(tL10n.addContact)), MenuItemButton(onPressed: addGroup, child: Text(tL10n.addGroup))],
+            menuChildren: [
+              MenuItemButton(onPressed: addContacts, child: Text(tL10n.addContact)),
+              MenuItemButton(onPressed: addGroup, child: Text(tL10n.addGroup))
+            ],
           ),
-          IconButton(onPressed: addGroup, icon: Icon(Icons.maps_ugc_outlined, size: getSquareSize(20), color: colorTheme.contactAppBarIconColor)),
         ],
       ),
     );

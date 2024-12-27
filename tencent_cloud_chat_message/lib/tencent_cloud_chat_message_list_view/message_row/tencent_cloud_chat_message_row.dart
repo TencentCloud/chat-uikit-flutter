@@ -10,6 +10,7 @@ import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat_common.dart';
+import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/tencent_cloud_chat_message_item_builders.dart';
 
 class TencentCloudChatMessageRow extends StatefulWidget {
   final MessageRowBuilderData data;
@@ -24,10 +25,12 @@ class TencentCloudChatMessageRow extends StatefulWidget {
   });
 
   @override
-  State<TencentCloudChatMessageRow> createState() => _TencentCloudChatMessageRowState();
+  State<TencentCloudChatMessageRow> createState() =>
+      _TencentCloudChatMessageRowState();
 }
 
-class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentCloudChatMessageRow> {
+class _TencentCloudChatMessageRowState
+    extends TencentCloudChatState<TencentCloudChatMessageRow> {
   late V2TimMessage _message;
 
   @override
@@ -39,7 +42,8 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
   @override
   void didUpdateWidget(covariant TencentCloudChatMessageRow oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_message != widget.data.message && widget.data.message != oldWidget.data.message) {
+    if (_message != widget.data.message &&
+        widget.data.message != oldWidget.data.message) {
       _message = widget.data.message;
     }
   }
@@ -89,13 +93,15 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
                         crossAxisAlignment: widget.data.showMessageSenderName ? CrossAxisAlignment.start : CrossAxisAlignment.end,
                         mainAxisAlignment: (widget.data.message.isSelf ?? true) ? MainAxisAlignment.end : MainAxisAlignment.start,
                         children: [
-                          if ((!(widget.data.message.isSelf ?? true)) && widget.data.showOthersAvatar)
+                          if ((!(widget.data.message.isSelf ?? true)) &&
+                              widget.data.showOthersAvatar)
                             GestureDetector(
                               onTap: TencentCloudChatUtils.checkString(widget.data.message.sender) != null
                                   ? () => navigateToUserProfile(context: context, options: TencentCloudChatUserProfileOptions(userID: widget.data.message.sender!))
                                   : null,
                               child: Container(
-                                margin: EdgeInsets.symmetric(horizontal: getSquareSize(10)),
+                                margin: EdgeInsets.symmetric(
+                                    horizontal: getSquareSize(10)),
                                 child: widget.widgets.messageRowAvatar,
                               ),
                             ),
@@ -104,16 +110,19 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
                             children: [
                               if (widget.data.showMessageSenderName) widget.widgets.messageRowMessageSenderName,
                               ConstrainedBox(
-                                constraints: BoxConstraints(maxWidth: widget.data.messageRowWidth * 0.8),
-                                child: widget.widgets.messageRowMessageItem ?? Container(),
+                                constraints: BoxConstraints(
+                                    maxWidth:
+                                        widget.data.messageRowWidth * 0.8),
+                                child: widget.widgets.messageRowMessageItem ??
+                                    Container(),
                               ),
-                              if (widget.widgets.messageTextTransalteItem != null) ...[
+                              if (widget.widgets.messageTextTranslateItem != null) ...[
                                 const SizedBox(
                                   height: 4,
                                 ),
                                 ConstrainedBox(
                                   constraints: BoxConstraints(maxWidth: min(widget.data.messageRowWidth * 0.8 * 0.9, widget.data.messageRowWidth * 0.8 - getSquareSize((_message.isSelf ?? false) ? 128 : 102))),
-                                  child: widget.widgets.messageTextTransalteItem ?? Container(),
+                                  child: widget.widgets.messageTextTranslateItem ?? Container(),
                                 )
                               ],
                               if (widget.widgets.messageSoundToTextItem != null) ...[
@@ -127,12 +136,15 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
                               ],
                             ],
                           ),
-                          if ((widget.data.message.isSelf ?? true) && widget.data.showSelfAvatar)
+                          if ((widget.data.message.isSelf ?? true) &&
+                              widget.data.showSelfAvatar)
                             Container(
-                              margin: EdgeInsets.symmetric(horizontal: getSquareSize(10)),
+                              margin: EdgeInsets.symmetric(
+                                  horizontal: getSquareSize(10)),
                               child: widget.widgets.messageRowAvatar,
                             ),
-                          if ((widget.data.message.isSelf ?? true) && !widget.data.showSelfAvatar)
+                          if ((widget.data.message.isSelf ?? true) &&
+                              !widget.data.showSelfAvatar)
                             const SizedBox(
                               width: 10,
                             ),
@@ -157,9 +169,33 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
     if (cloudCustomData["deleteForEveryone"] == true) {
       return Container();
     }
-  
-    final tipsItem = widget.data.message.elemType == 101 || widget.data.message.elemType == MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS;
-    final isRecalled = widget.data.message.status == MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED;
+
+    if (widget.data.message.elemType ==
+        MessageElemType.V2TIM_ELEM_TYPE_CUSTOM) {
+      if (widget.data.message.customElem != null) {
+        if (widget.data.message.customElem!.data != null) {
+          String? data = widget.data.message.customElem!.data!;
+          try {
+            Map<String, dynamic> jsonData = json.decode(data);
+            var isCustomerServicePlugin =
+                jsonData["customerServicePlugin"] ?? "";
+            if (isCustomerServicePlugin == 0) {
+              List<String> srcWhiteList = [
+                '9',
+              ];
+              if (srcWhiteList.contains(jsonData["src"]) &&
+                  widget.widgets.messageRowMessageItem != null) {
+                return widget.widgets.messageRowMessageItem!;
+              }
+            }
+          } catch (err) {
+            return Container();
+          }
+        }
+      }
+    }
+
+    final bool isUseTipsBuilder = TencentCloudChatMessageItemBuilders.isShowTipsMessage(_message);
 
     final avatarWidget = Container(
       margin: EdgeInsets.symmetric(horizontal: getSquareSize(10)),
@@ -167,14 +203,12 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
     );
 
     return TencentCloudChatThemeWidget(
-      build: (context, colorTheme, textStyle) => AnimatedContainer(
+      build: (context, colorTheme, textStyle) => Container(
         margin: EdgeInsets.only(
           bottom: getSquareSize(16),
         ),
         padding: EdgeInsets.only(right: getSquareSize(6), left: getSquareSize(6)),
-        color: (widget.data.isSelected && widget.data.inSelectMode) ? colorTheme.messageBeenChosenBackgroundColor : Colors.transparent,
-        duration: const Duration(milliseconds: 300),
-        child: (tipsItem || isRecalled)
+        child: (isUseTipsBuilder)
             ? Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.max,
@@ -183,7 +217,7 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
                 ],
               )
             : GestureDetector(
-                onTap: widget.data.inSelectMode
+                onTap: widget.data.inSelectMode // tap row
                     ? () {
                         widget.methods.onSelectCurrent(_message);
                       }
@@ -198,63 +232,63 @@ class _TencentCloudChatMessageRowState extends TencentCloudChatState<TencentClou
                         offstage: !widget.data.inSelectMode,
                         child: Checkbox(
                           value: widget.data.isSelected,
-                          visualDensity: const VisualDensity(vertical: -4, horizontal: 0),
+                          visualDensity:
+                              const VisualDensity(vertical: -4, horizontal: 0),
                           activeColor: colorTheme.primaryColor,
                           checkColor: colorTheme.backgroundColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50),
                           ),
-                          onChanged: (bool? value) {
+                          onChanged: (bool? value) { // tap checkbox
                             widget.methods.onSelectCurrent(_message);
                           },
                         ),
                       ),
                       Expanded(
                           child: Row(
-                        crossAxisAlignment: widget.data.showMessageSenderName ? CrossAxisAlignment.start : CrossAxisAlignment.end,
-                        mainAxisAlignment: (widget.data.message.isSelf ?? true) ? MainAxisAlignment.end : MainAxisAlignment.start,
-                        children: [
-                          if ((widget.data.message.isSelf ?? true) || (!(widget.data.message.isSelf ?? true)) && widget.data.showOthersAvatar)
-                            GestureDetector(
-                              onTap: ((!(widget.data.message.isSelf ?? true)) && widget.data.showOthersAvatar && TencentCloudChatUtils.checkString(widget.data.message.sender) != null)
-                                  ? () => navigateToUserProfile(context: context, options: TencentCloudChatUserProfileOptions(userID: widget.data.message.sender!))
-                                  : null,
-                              child: Opacity(
-                                opacity: ((!(widget.data.message.isSelf ?? true)) && widget.data.showOthersAvatar) ? 1 : 0,
-                                child: avatarWidget,
-                              ),
-                            ),
-                          Expanded(
-                              child: Column(
-                            crossAxisAlignment: (widget.data.message.isSelf ?? true) ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                            crossAxisAlignment: widget.data.showMessageSenderName ? CrossAxisAlignment.start : CrossAxisAlignment.end,
+                            mainAxisAlignment: (widget.data.message.isSelf ?? true) ? MainAxisAlignment.end : MainAxisAlignment.start,
                             children: [
-                              if (widget.data.showMessageSenderName) widget.widgets.messageRowMessageSenderName,
-                              widget.widgets.messageRowMessageItem ?? Container(),
-                              if (widget.widgets.messageTextTransalteItem != null) ...[
-                                const SizedBox(
-                                  height: 4,
+                              if ((widget.data.message.isSelf ?? true) || (!(widget.data.message.isSelf ?? true)) && widget.data.showOthersAvatar)
+                                Opacity(
+                                  opacity: ((!(widget.data.message.isSelf ?? true)) && widget.data.showOthersAvatar) ? 1 : 0,
+                                  child: avatarWidget,
                                 ),
-                                widget.widgets.messageTextTransalteItem ?? Container()
-                              ],
-                              if (widget.widgets.messageSoundToTextItem != null) ...[
-                                const SizedBox(
-                                  height: 4,
+                              Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: (widget.data.message.isSelf ?? true) ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                                    children: [
+                                      if (widget.data.showMessageSenderName) widget.widgets.messageRowMessageSenderName,
+                                      widget.widgets.messageRowMessageItem ?? Container(),
+                                      if (widget.widgets.messageTextTranslateItem != null) ...[
+                                        const SizedBox(
+                                          height: 4,
+                                        ),
+                                        widget.widgets.messageTextTranslateItem ?? Container()
+                                      ],
+                                      if (widget.widgets.messageSoundToTextItem != null) ...[
+                                        const SizedBox(
+                                          height: 4,
+                                        ),
+                                        widget.widgets.messageSoundToTextItem ?? Container()
+                                      ],
+                                    ],
+                                  )),
+                              if (!(widget.data.message.isSelf ?? true) || ((widget.data.message.isSelf ?? true) && widget.data.showSelfAvatar))
+                                Opacity(
+                                  opacity: ((widget.data.message.isSelf ?? true) &&
+                                          widget.data.showSelfAvatar)
+                                      ? 1
+                                      : 0,
+                                  child: avatarWidget,
                                 ),
-                                widget.widgets.messageSoundToTextItem ?? Container()
-                              ],
+                              if ((widget.data.message.isSelf ?? true) &&
+                                  !widget.data.showSelfAvatar)
+                                const SizedBox(
+                                  width: 10,
+                                ),
                             ],
-                          )),
-                          if (!(widget.data.message.isSelf ?? true) || ((widget.data.message.isSelf ?? true) && widget.data.showSelfAvatar))
-                            Opacity(
-                              opacity: ((widget.data.message.isSelf ?? true) && widget.data.showSelfAvatar) ? 1 : 0,
-                              child: avatarWidget,
-                            ),
-                          if ((widget.data.message.isSelf ?? true) && !widget.data.showSelfAvatar)
-                            const SizedBox(
-                              width: 10,
-                            ),
-                        ],
-                      ))
+                          ))
                     ],
                   ),
                 ),

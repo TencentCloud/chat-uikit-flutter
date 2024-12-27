@@ -32,21 +32,19 @@ class _TencentCloudChatMessageInputSelectModeContainerState
 
     return TencentCloudChatMessageDataProviderInherited.of(context).messageBuilders?.getMessageInputSelectBuilder(
               data: MessageInputSelectBuilderData(
-                enableMessageDeleteForEveryone: config.enableMessageDeleteForEveryone(
-                      userID: dataProvider.userID,
-                      groupID: dataProvider.groupID,
-                      topicID: dataProvider.topicID,
-                    ) &&
-                    defaultMessageSelectionOperationsConfig.enableMessageDeleteForEveryone,
                 enableMessageForwardIndividually:
                     defaultMessageSelectionOperationsConfig.enableMessageForwardIndividually,
                 enableMessageForwardCombined: defaultMessageSelectionOperationsConfig.enableMessageForwardCombined,
                 enableMessageDeleteForSelf: defaultMessageSelectionOperationsConfig.enableMessageDeleteForSelf,
-                messages: dataProvider.selectedMessages,
+                messages: dataProvider.getSelectedMessages(),
               ),
               methods: MessageInputSelectBuilderMethods(
                 onMessagesForward: (TencentCloudChatForwardType type) {
-                  final messages = dataProvider.selectedMessages;
+                  final messages = dataProvider.getSelectedMessages();
+                  if (!dataProvider.checkMessagesForward(type, messages)) {
+                    return;
+                  }
+
                   final isDesktopScreen = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop;
                   if (isDesktopScreen) {
                     TencentCloudChatDesktopPopup.showPopupWindow(
@@ -88,12 +86,6 @@ class _TencentCloudChatMessageInputSelectModeContainerState
                   dataProvider.inSelectMode = false;
                   Future.delayed(const Duration(milliseconds: 10), () {
                     dataProvider.deleteMessagesForMe(messages: messages);
-                  });
-                },
-                onDeleteForEveryone: (messages) {
-                  dataProvider.inSelectMode = false;
-                  Future.delayed(const Duration(milliseconds: 10), () {
-                    dataProvider.deleteMessagesForEveryone(messages: messages);
                   });
                 },
               ),

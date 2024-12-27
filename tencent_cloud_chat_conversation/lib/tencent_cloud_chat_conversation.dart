@@ -94,6 +94,7 @@ class TencentCloudChatConversationState extends TencentCloudChatState<TencentClo
             _globalSearchWidget = searchWidget;
           });
           if (_globalSearchWidget != null) {
+            _textEditingController.removeListener(_searchTextListenerHandler);
             _textEditingController.addListener(_searchTextListenerHandler);
           } else {
             _textEditingController.removeListener(_searchTextListenerHandler);
@@ -120,6 +121,7 @@ class TencentCloudChatConversationState extends TencentCloudChatState<TencentClo
   void dispose() {
     _conversationDataSubscription?.cancel();
     _textEditingController.removeListener(_searchTextListenerHandler);
+    _textEditingController.dispose();
     super.dispose();
   }
 
@@ -189,25 +191,37 @@ class TencentCloudChatConversationState extends TencentCloudChatState<TencentClo
       return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Scaffold(
           appBar: AppBar(
-            backgroundColor: colorTheme.contactBackgroundColor,
+            backgroundColor: colorTheme.backgroundColor,
             title: header?.$1,
+            scrolledUnderElevation: 0.0,
           ),
           body: Column(
             children: [
               if (includeSearch)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  color: colorTheme.backgroundColor,
+                  padding: const EdgeInsets.only(
+                    left: 16,
+                    right: 16,
+                    bottom: 16,
+                  ),
                   child: TencentCloudChatAppBarSearchItem(
                     textEditingController: _textEditingController,
                   ),
                 ),
+              if (includeSearch)
+                Divider(
+                  height: 1,
+                  color: colorTheme.dividerColor,
+                ),
               (TencentCloudChatUtils.checkString(_searchText) != null && _globalSearchWidget != null)
                   ? Expanded(
                       child: _globalSearchWidget!(
-                      options: {
-                        "keyWord": _searchText,
-                      },
-                    ))
+                        options: {
+                          "keyWord": _searchText,
+                        },
+                      ),
+                    )
                   : const Expanded(
                       child: TencentCloudChatConversationList(),
                     ),
@@ -251,7 +265,7 @@ class TencentCloudChatConversationManager {
   /// Utilize the provided control methods.
   static TencentCloudChatConversationController get controller {
     TencentCloudChat.instance.dataInstance.conversation.conversationController ??=
-        TencentCloudChatConversationControllerGenerator.getInstance();
+        TencentCloudChatConversationController.instance;
     return TencentCloudChat.instance.dataInstance.conversation.conversationController
         as TencentCloudChatConversationController;
   }
@@ -287,7 +301,9 @@ class TencentCloudChatConversationManager {
     TencentCloudChat.instance.dataInstance.conversation.conversationBuilder ??= TencentCloudChatConversationBuilders();
 
     TencentCloudChat.instance.dataInstance.conversation.conversationController ??=
-        TencentCloudChatConversationControllerGenerator.getInstance();
+        TencentCloudChatConversationController.instance;
+
+    TencentCloudChatConversationController.instance.init();
 
     return (
       componentEnum: TencentCloudChatComponentsEnum.conversation,

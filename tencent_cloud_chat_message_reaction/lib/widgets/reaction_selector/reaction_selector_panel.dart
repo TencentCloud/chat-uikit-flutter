@@ -29,20 +29,20 @@ class TencentCloudMessageReactionSelectorPanel extends StatelessWidget {
         TencentCloudChatMessageReaction.instance.reactionData.messageReactionLabelToAsset;
     final ScrollController scrollController = ScrollController();
 
-    void addMessageReaction(String reactionID) {
-      TencentImSDKPlugin.v2TIMManager.getMessageManager().addMessageReaction(
-        msgID: msgID,
-        reactionID: reactionID,
-      );
-
+    void updateMessageReaction(String reactionID) {
       final reactionMap = TencentCloudChatMessageReaction.instance.reactionData.messageReactionMap;
-      final targetMessage = reactionMap[msgID] ?? [];
-      final targetReactionIndex = targetMessage.indexWhere((e) => e.reactionID == reactionID);
+      final targetMessageReactionList = reactionMap[msgID] ?? [];
+      final targetReactionIndex = targetMessageReactionList.indexWhere((e) => e.reactionID == reactionID);
+      bool hasReactedBySelf = false;
       V2TimMessageReaction? targetReaction;
 
       if (targetReactionIndex > -1) {
-        if (!targetMessage[targetReactionIndex].reactedByMyself) {
-          targetReaction = targetMessage[targetReactionIndex];
+        targetReaction = targetMessageReactionList[targetReactionIndex];
+        hasReactedBySelf = targetReaction.reactedByMyself;
+        if (hasReactedBySelf) {
+          targetReaction.reactedByMyself = false;
+          targetReaction.totalUserCount = targetReaction.totalUserCount - 1;
+        } else {
           targetReaction.reactedByMyself = true;
           targetReaction.totalUserCount = targetReaction.totalUserCount + 1;
         }
@@ -54,14 +54,25 @@ class TencentCloudMessageReactionSelectorPanel extends StatelessWidget {
           partialUserList: [],
         );
       }
-      if (targetReaction != null) {
-        TencentCloudChatMessageReaction.instance.reactionData.onReceivedMessageReactionChanged([
-          V2TIMMessageReactionChangeInfo(
-            messageID: msgID,
-            reactionList: [targetReaction],
-          ),
-        ], true);
+
+      if (hasReactedBySelf) {
+        TencentImSDKPlugin.v2TIMManager.getMessageManager().removeMessageReaction(
+          msgID: msgID,
+          reactionID: reactionID,
+        );
+      } else {
+        TencentImSDKPlugin.v2TIMManager.getMessageManager().addMessageReaction(
+          msgID: msgID,
+          reactionID: reactionID,
+        );
       }
+
+      TencentCloudChatMessageReaction.instance.reactionData.onReceivedMessageReactionChanged([
+        V2TIMMessageReactionChangeInfo(
+          messageID: msgID,
+          reactionList: [targetReaction],
+        ),
+      ], true);
     }
 
     if (platformMode == "desktop") {
@@ -95,7 +106,7 @@ class TencentCloudMessageReactionSelectorPanel extends StatelessWidget {
                     return TencentCloudChatReactionSelectorItemDesktop(
                       index: index,
                       onTap: (){
-                        addMessageReaction(messageReactionStickerList[index]);
+                        updateMessageReaction(messageReactionStickerList[index]);
                         TencentImSDKPlugin.v2TIMManager.emitUIKitListener(
                           data: Map<String, dynamic>.from(
                             {
@@ -141,7 +152,7 @@ class TencentCloudMessageReactionSelectorPanel extends StatelessWidget {
                           left: index == 0 ? 12 : 0),
                       child: InkWell(
                         onTap: () {
-                          addMessageReaction(messageReactionStickerList[index]);
+                          updateMessageReaction(messageReactionStickerList[index]);
                           TencentImSDKPlugin.v2TIMManager.emitUIKitListener(
                             data: Map<String, dynamic>.from(
                               {

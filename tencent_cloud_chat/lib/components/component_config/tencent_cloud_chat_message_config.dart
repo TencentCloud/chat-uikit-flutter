@@ -62,7 +62,7 @@ class TencentCloudChatMessageConfig {
   /// If set to true, the message context menu will display a `Reply` option, which, when used in group chats, will automatically mention (@) the sender of the original message.
   /// If set to false, the message context menu will display a `Quote` option, without automatically mentioning (@) the sender of the original message.
   /// [Default]: true
-  TencentCloudChatMessageValueConfig<bool> _enableReplyWithMention;
+  TencentCloudChatMessageValueConfig<bool> _enableQuoteWithMention;
 
   /// The offline push info for sending message, fields with null specify will use default configurations.
   TencentCloudChatMessageValueConfigWithMessage<OfflinePushInfo> _messageOfflinePushInfo;
@@ -169,7 +169,7 @@ class TencentCloudChatMessageConfig {
         _showOthersAvatar = showOthersAvatar ?? createDefaultValue(true),
         _mentionGroupAdminAndOwnerOnly = mentionGroupAdminAndOwnerOnly ?? createDefaultValue(false),
         _enableParseMarkdown = enableParseMarkdown ?? createDefaultValue(false),
-        _enableReplyWithMention = enableReplyWithMention ?? createDefaultValue(true),
+        _enableQuoteWithMention = enableReplyWithMention ?? createDefaultValue(true),
         _enableAutoReportReadStatusForComingMessages =
             enableAutoReportReadStatusForComingMessages ?? createDefaultValue(true),
         _showMessageTimeIndicator = showMessageTimeIndicator ?? createDefaultValue(true),
@@ -244,7 +244,7 @@ class TencentCloudChatMessageConfig {
         enableAutoReportReadStatusForComingMessages ?? createDefaultValue(true);
     _mentionGroupAdminAndOwnerOnly = mentionGroupAdminAndOwnerOnly ?? createDefaultValue(false);
     _enableMessageDeleteForEveryone = enableMessageDeleteForEveryone ?? _enableMessageDeleteForEveryone;
-    _enableReplyWithMention = enableReplyWithMention ?? createDefaultValue(true);
+    _enableQuoteWithMention = enableReplyWithMention ?? createDefaultValue(true);
     _attachmentConfig = attachmentConfig ??
         createDefaultValue<TencentCloudChatMessageAttachmentConfig>(TencentCloudChatMessageAttachmentConfig());
     _messageOfflinePushInfo = messageOfflinePushInfo ?? _messageOfflinePushInfo;
@@ -264,7 +264,7 @@ class TencentCloudChatMessageConfig {
     TencentCloudChat.instance.dataInstance.messageData.notifyListener(TencentCloudChatMessageDataKeys.config);
   }
 
-  TencentCloudChatMessageValueConfig<bool> get enableReplyWithMention => _enableReplyWithMention;
+  TencentCloudChatMessageValueConfig<bool> get enableQuoteWithMention => _enableQuoteWithMention;
 
   TencentCloudChatMessageValueConfig<bool> get showOthersAvatar => _showOthersAvatar;
 

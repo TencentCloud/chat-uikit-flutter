@@ -1,6 +1,6 @@
 name: tencent_cloud_chat_conversation
 description: Tencent Cloud Chat UIKit Conversation component offers a versatile conversation list with customization options, seamlessly adapting to both desktop and mobile environments for an enhanced chat experience.
-version: 1.5.0
+version: 2.1.0
 repository: https://github.com/TencentCloud/chat-uikit-flutter/tree/v2/tencent_cloud_chat_conversation
 homepage: https://trtc.io/products/chat?utm_source=flutter_pub
 
@@ -20,19 +20,16 @@ dependencies:
     sdk: flutter
   adaptive_action_sheet: ^2.0.3
   flutter_swipe_action_cell: ^3.1.2
-  tencent_cloud_chat: ^1.5.0
-  tencent_cloud_chat_common: ^1.5.0
-
+  tencent_cloud_chat: ^2.1.0
+  tencent_cloud_chat_common: ^2.1.0
 
 dependency_overrides:
-  tencent_cloud_chat_common:
-    path: ../tencent_cloud_chat_common
-  tencent_cloud_chat_intl:
-    path: ../tencent_cloud_chat_intl
-  tencent_cloud_chat:
-    path: ../tencent_cloud_chat
-
-
+#  tencent_cloud_chat_common:
+#    path: ../tencent_cloud_chat_common
+#  tencent_cloud_chat_intl:
+#    path: ../tencent_cloud_chat_intl
+#  tencent_cloud_chat:
+#    path: ../tencent_cloud_chat
 
 dev_dependencies:
   flutter_test:

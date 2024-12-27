@@ -22,6 +22,7 @@ enum TencentCloudChatBasicDataKeys {
 class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> with WidgetsBindingObserver {
   TencentCloudChatBasicData(super.currentUpdatedFields);
 
+  @override
   void clear() {
     _hasLoggedIn = false;
     _currentUser = null;
@@ -143,12 +144,11 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> with Widget
   V2TimUserFullInfo? _currentUser;
 
   V2TimUserFullInfo? get currentUser {
-    return TencentCloudChat.instance.cache.getCurrentLoginUserInfo() ?? _currentUser;
+    return _currentUser;
   }
 
   void updateCurrentUserInfo({required V2TimUserFullInfo userFullInfo}) {
     _currentUser = userFullInfo;
-    TencentCloudChat.instance.cache.cacheCurrentLoginUserInfo(userFullInfo);
     notifyListener(TencentCloudChatBasicDataKeys.selfInfo as T);
   }
 
@@ -195,6 +195,20 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> with Widget
   @override
   void notifyListener(T key) {
     currentUpdatedFields = key;
-    TencentCloudChat.instance.eventBusInstance.fire(this, "TencentCloudChatBasicData");
+    var event = TencentCloudChatBasicData<T>(key);
+    event.appLifecycleState = appLifecycleState;
+    event._useCallKit = _useCallKit;
+    event._hasInitialized = _hasInitialized;
+    event._hasLoggedIn = _hasLoggedIn;
+    event._sdkappid = _sdkappid;
+    event.plugins = plugins;
+    event._userConfig.useUserOnlineStatus = _userConfig.useUserOnlineStatus;
+    event._userConfig.autoDownloadMultimediaMessage = _userConfig.autoDownloadMultimediaMessage;
+    event._currentUser = _currentUser;
+    event._version = _version;
+    event._usedComponents = _usedComponents;
+    event._componentsMap.addAll(_componentsMap);
+
+    TencentCloudChat.instance.eventBusInstance.fire(event, "TencentCloudChatBasicData");
   }
 }

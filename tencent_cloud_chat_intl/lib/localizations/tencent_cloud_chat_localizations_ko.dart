@@ -6,6 +6,8 @@ import 'package:intl/intl.dart' as intl;
 
 import 'tencent_cloud_chat_localizations.dart';
 
+// ignore_for_file: type=lint
+
 /// The translations for Korean (`ko`).
 class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   TencentCloudChatLocalizationsKo([String locale = 'ko']) : super(locale);
@@ -187,7 +189,7 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   String get forward => '전달';
 
   @override
-  String get multiSelect => '선택';
+  String get multiSelect => '객관식';
 
   @override
   String get select => '선택';
@@ -281,16 +283,13 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   String get message => '메시지';
 
   @override
-  String get doNotDisturb => '무음';
+  String get doNotDisturb => '메시지를 방해하지 마세요';
 
   @override
   String get mute => '무음';
 
   @override
-  String get topChat => '고정';
-
-  @override
-  String get pin => '고정';
+  String get pin => '고정된 채팅';
 
   @override
   String get blackUser => '사용자 차단';
@@ -738,12 +737,6 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   String get confirmDeletion => '삭제 확인';
 
   @override
-  String get deleteForEveryone => '모두에게 삭제';
-
-  @override
-  String get deleteForMe => '나만 삭제';
-
-  @override
   String get askDeleteThisMessage => '이 메시지를 삭제하시겠습니까?';
 
   @override
@@ -945,10 +938,10 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   String get changedGroupCustomInfo => '그룹 사용자 정의 정보 변경';
 
   @override
-  String get enabledGroupMute => '그룹 전체 음소거 활성화';
+  String get enabledGroupMute => '모든 회원 금지';
 
   @override
-  String get disabledGroupMute => '그룹 전체 음소거 비활성화';
+  String get disabledGroupMute => '모든 회원 차단 해제';
 
   @override
   String changedGroupMessageReceptionTo(Object setting) {
@@ -1074,7 +1067,7 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   String get restartAppForLanguage => '언어 변경 사항을 적용하려면 앱을 다시 시작하십시오';
 
   @override
-  String get deleteAllMessages => '모든 메시지 삭제';
+  String get deleteAllMessages => '채팅 기록 지우기';
 
   @override
   String get downloading => '다운로드 중...';
@@ -1089,10 +1082,10 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   String get messageRecallConfirmation => '이 메시지를 철회하시겠습니까?';
 
   @override
-  String get quit => '그룹에서 나가기';
+  String get quit => '그룹 채팅 종료';
 
   @override
-  String get quitAndDelete => '나가기 및 삭제';
+  String get dissolve => '그룹을 해체하다';
 
   @override
   String get setGroupName => '그룹 이름 설정';
@@ -1316,4 +1309,383 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
 
   @override
   String get myRoleInGroup => '역할';
+
+  @override
+  String get chooseAvatar => '아바타 선택';
+
+  @override
+  String get friendLimit => '귀하의 친구 수가 시스템 한도에 도달했습니다.';
+
+  @override
+  String get otherFriendLimit => '상대방의 친구 수가 시스템 한도에 도달했습니다.';
+
+  @override
+  String get inBlacklist => '블랙리스트에 친구로 추가됨';
+
+  @override
+  String get setInBlacklist => '상대방에 의해 블랙리스트에 등록되었습니다.';
+
+  @override
+  String get forbidAddFriend => '상대방이 친구를 추가할 수 없도록 차단되었습니다.';
+
+  @override
+  String get waitAgreeFriend => '친구들의 검토와 승인을 기다리는 중';
+
+  @override
+  String get haveBeFriend => '그 사람은 이미 당신의 친구입니다.';
+
+  @override
+  String get contactAddFailed => '추가 실패';
+
+  @override
+  String get addGroupPermissionDeny => '그룹 가입이 금지되어 있습니다.';
+
+  @override
+  String get addGroupAlreadyMember => '이미 그룹 회원입니다.';
+
+  @override
+  String get addGroupNotFound => '그룹이 존재하지 않습니다';
+
+  @override
+  String get addGroupFullMember => '그룹이 가득 찼습니다.';
+
+  @override
+  String get joinedTip => '다음 그룹에 가입하셨습니다.';
+
+  @override
+  String get quitGroupTip => '이 그룹에서 탈퇴하시겠습니까?';
+
+  @override
+  String get dismissGroupTip => '이 그룹을 확실히 해체하시겠습니까?';
+
+  @override
+  String get kickedOffTips => '당신은 오프라인에서 추방되었습니다';
+
+  @override
+  String get userSigExpiredTips => '사용자 서명이 만료되었습니다';
+
+  @override
+  String get convertTextFailed => '텍스트 변환 실패';
+
+  @override
+  String get deleteFriendSuccess => '친구를 삭제했습니다.';
+
+  @override
+  String get deleteFriendFailed => '친구를 삭제하지 못했습니다.';
+
+  @override
+  String get clearMsgTip => '채팅 기록을 지우시겠습니까?';
+
+  @override
+  String get sendMsg => '메시지 보내기';
+
+  @override
+  String get groupMemberMute => '차단된 메시지이므로 보낼 수 없습니다. 보낸 사람이 차단되었는지 확인하세요.';
+
+  @override
+  String get forwardFailedTip => '실패한 메시지 전달은 지원되지 않습니다!';
+
+  @override
+  String get fileTooLarge => '파일 크기가 한도를 초과했습니다.';
+
+  @override
+  String get invalidApplication => '친구 신청이 유효하지 않습니다';
+
+  @override
+  String get atMeTips => '누군가 @ 나';
+
+  @override
+  String get atAllTips => '@모든 사람';
+
+  @override
+  String get forwardVoteFailedTip => '투표 메시지는 전달을 지원하지 않습니다!';
+
+  @override
+  String get forwardOneByOneLimitNumberTip => '전달된 메시지가 너무 많습니다. 현재는 하나씩 전달하는 기능이 지원되지 않습니다.';
+
+  @override
+  String get modifyRemark => '修改备注';
+
+  @override
+  String banned(Object targetUser, Object time) {
+    return '$targetUser 금지된 $time';
+  }
+
+  @override
+  String cancelBanned(Object targetUser) {
+    return '$targetUser님의 차단이 해제되었습니다';
+  }
+
+  @override
+  String get day => '일';
+
+  @override
+  String get hour => '시간';
+
+  @override
+  String get min => '분';
+
+  @override
+  String get second => '초';
+
+  @override
+  String get setFailed => '설정 실패';
+
+  @override
+  String get callRejectCaller => '상대방이 거부함';
+
+  @override
+  String get callRejectCallee => '거부됨';
+
+  @override
+  String get callCancelCaller => '취소';
+
+  @override
+  String get callCancelCallee => '상대방이 취소했습니다.';
+
+  @override
+  String get stopCallTip => '통화 시간:';
+
+  @override
+  String get callTimeoutCaller => '상대방의 응답이 없습니다.';
+
+  @override
+  String get callTimeoutCallee => '상대방이 취소했습니다.';
+
+  @override
+  String get callLineBusyCaller => '상대방이 바빠요';
+
+  @override
+  String get callLineBusyCallee => '상대방이 취소했습니다.';
+
+  @override
+  String get acceptCall => '답변됨';
+
+  @override
+  String get callingSwitchToAudio => '영상에서 연설로';
+
+  @override
+  String get callingSwitchToAudioAccept => '음성으로 영상 확인';
+
+  @override
+  String get invalidCommand => '인식할 수 없는 호출 명령';
+
+  @override
+  String get groupCallSend => '그룹통화가 시작되었습니다';
+
+  @override
+  String get groupCallEnd => '통화가 종료되었습니다';
+
+  @override
+  String get groupCallNoAnswer => '답변 없음';
+
+  @override
+  String get groupCallReject => '그룹 통화 거부';
+
+  @override
+  String get groupCallAccept => '답변';
+
+  @override
+  String get groupCallConfirmSwitchToAudio => '영상을 음성으로 변환하는 데 동의합니다.';
+
+  @override
+  String get callkitInPeerBlacklist => '통화를 시작하지 못했습니다. 사용자가 블랙리스트에 있으므로 통화를 시작할 수 없습니다.';
+
+  @override
+  String get resendTips => '다시 보내시겠습니까?';
+
+  @override
+  String get logoutTip => '정말로 로그아웃하시겠습니까?';
+
+  @override
+  String get sendFileLimit => '9개의 파일만 선택할 수 있습니다.';
+
+  @override
+  String get atAll => '모든 사람';
+
+  @override
+  String get tuiEmojiSmile => '[미소]';
+
+  @override
+  String get tuiEmojiExpect => '[기대]';
+
+  @override
+  String get tuiEmojiBlink => '[눈짓]';
+
+  @override
+  String get tuiEmojiGuffaw => '[큰 웃음]';
+
+  @override
+  String get tuiEmojiKindSmile => '[이모티콘 웃음]';
+
+  @override
+  String get tuiEmojiHaha => '[하하하]';
+
+  @override
+  String get tuiEmojiCheerful => '[즐거움]';
+
+  @override
+  String get tuiEmojiSpeechless => '[말문이 막혀]';
+
+  @override
+  String get tuiEmojiAmazed => '[놀라움]';
+
+  @override
+  String get tuiEmojiSorrow => '[슬픔]';
+
+  @override
+  String get tuiEmojiComplacent => '[만족]';
+
+  @override
+  String get tuiEmojiSilly => '[바보 같음]';
+
+  @override
+  String get tuiEmojiLustful => '[음란]';
+
+  @override
+  String get tuiEmojiGiggle => '[어린아이처럼 웃음]';
+
+  @override
+  String get tuiEmojiKiss => '[키스]';
+
+  @override
+  String get tuiEmojiWail => '[비명]';
+
+  @override
+  String get tuiEmojiTearsLaugh => '[울면서 웃음]';
+
+  @override
+  String get tuiEmojiTrapped => '[곤란함]';
+
+  @override
+  String get tuiEmojiMask => '[마스크]';
+
+  @override
+  String get tuiEmojiFear => '[공포]';
+
+  @override
+  String get tuiEmojiBareTeeth => '[이를 드러냄]';
+
+  @override
+  String get tuiEmojiFlareUp => '[분노]';
+
+  @override
+  String get tuiEmojiYawn => '[잠옷]';
+
+  @override
+  String get tuiEmojiTact => '[기지]';
+
+  @override
+  String get tuiEmojiStareyes => '[별눈]';
+
+  @override
+  String get tuiEmojiShutUp => '[입 다물기]';
+
+  @override
+  String get tuiEmojiSigh => '[한숨]';
+
+  @override
+  String get tuiEmojiHehe => '[헤헤]';
+
+  @override
+  String get tuiEmojiSilent => '[조용]';
+
+  @override
+  String get tuiEmojiSurprised => '[놀라움]';
+
+  @override
+  String get tuiEmojiAskance => '[불만의 눈길]';
+
+  @override
+  String get tuiEmojiOk => '[확인]';
+
+  @override
+  String get tuiEmojiShit => '[똥]';
+
+  @override
+  String get tuiEmojiMonster => '[몬스터]';
+
+  @override
+  String get tuiEmojiDaemon => '[악마]';
+
+  @override
+  String get tuiEmojiRage => '[악마의 분노]';
+
+  @override
+  String get tuiEmojiFool => '[바보]';
+
+  @override
+  String get tuiEmojiPig => '[돼지]';
+
+  @override
+  String get tuiEmojiCow => '[소]';
+
+  @override
+  String get tuiEmojiAi => '[AI]';
+
+  @override
+  String get tuiEmojiSkull => '[해골]';
+
+  @override
+  String get tuiEmojiBombs => '[폭탄]';
+
+  @override
+  String get tuiEmojiCoffee => '[커피]';
+
+  @override
+  String get tuiEmojiCake => '[케이크]';
+
+  @override
+  String get tuiEmojiBeer => '[맥주]';
+
+  @override
+  String get tuiEmojiFlower => '[꽃]';
+
+  @override
+  String get tuiEmojiWatermelon => '[수박]';
+
+  @override
+  String get tuiEmojiRich => '[부자]';
+
+  @override
+  String get tuiEmojiHeart => '[하트]';
+
+  @override
+  String get tuiEmojiMoon => '[달]';
+
+  @override
+  String get tuiEmojiSun => '[태양]';
+
+  @override
+  String get tuiEmojiStar => '[별]';
+
+  @override
+  String get tuiEmojiRedPacket => '[빨간 봉투]';
+
+  @override
+  String get tuiEmojiCelebrate => '[축하]';
+
+  @override
+  String get tuiEmojiBless => '[복]';
+
+  @override
+  String get tuiEmojiFortune => '[행운]';
+
+  @override
+  String get tuiEmojiConvinced => '[동의]';
+
+  @override
+  String get tuiEmojiProhibit => '[금지]';
+
+  @override
+  String get tuiEmoji666 => '[666]';
+
+  @override
+  String get tuiEmoji857 => '[857]';
+
+  @override
+  String get tuiEmojiKnife => '[칼]';
+
+  @override
+  String get tuiEmojiLike => '[좋아요]';
 }

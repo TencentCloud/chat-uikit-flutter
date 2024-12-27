@@ -14,6 +14,8 @@ import 'tencent_cloud_chat_localizations_ja.dart';
 import 'tencent_cloud_chat_localizations_ko.dart';
 import 'tencent_cloud_chat_localizations_zh.dart';
 
+// ignore_for_file: type=lint
+
 /// Callers can lookup localized strings with an instance of TencentCloudChatLocalizations
 /// returned by `TencentCloudChatLocalizations.of(context)`.
 ///
@@ -593,7 +595,7 @@ abstract class TencentCloudChatLocalizations {
   /// No description provided for @doNotDisturb.
   ///
   /// In en, this message translates to:
-  /// **'Mute'**
+  /// **'Mute Notifications'**
   String get doNotDisturb;
 
   /// No description provided for @mute.
@@ -601,12 +603,6 @@ abstract class TencentCloudChatLocalizations {
   /// In en, this message translates to:
   /// **'Mute'**
   String get mute;
-
-  /// No description provided for @topChat.
-  ///
-  /// In en, this message translates to:
-  /// **'Pin'**
-  String get topChat;
 
   /// No description provided for @pin.
   ///
@@ -1424,18 +1420,6 @@ abstract class TencentCloudChatLocalizations {
   /// **'Confirm Deletion'**
   String get confirmDeletion;
 
-  /// No description provided for @deleteForEveryone.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete for everyone'**
-  String get deleteForEveryone;
-
-  /// No description provided for @deleteForMe.
-  ///
-  /// In en, this message translates to:
-  /// **'Delete for me'**
-  String get deleteForMe;
-
   /// No description provided for @askDeleteThisMessage.
   ///
   /// In en, this message translates to:
@@ -1757,13 +1741,13 @@ abstract class TencentCloudChatLocalizations {
   /// No description provided for @enabledGroupMute.
   ///
   /// In en, this message translates to:
-  /// **'Enabled group-wide mute'**
+  /// **'muted all members'**
   String get enabledGroupMute;
 
   /// No description provided for @disabledGroupMute.
   ///
   /// In en, this message translates to:
-  /// **'Disabled group-wide mute'**
+  /// **'unmuted all members'**
   String get disabledGroupMute;
 
   /// No description provided for @changedGroupMessageReceptionTo.
@@ -1967,7 +1951,7 @@ abstract class TencentCloudChatLocalizations {
   /// No description provided for @deleteAllMessages.
   ///
   /// In en, this message translates to:
-  /// **'Delete All Messages'**
+  /// **'Clear Chat History'**
   String get deleteAllMessages;
 
   /// No description provided for @downloading.
@@ -1997,14 +1981,14 @@ abstract class TencentCloudChatLocalizations {
   /// No description provided for @quit.
   ///
   /// In en, this message translates to:
-  /// **'Quit'**
+  /// **'Leave'**
   String get quit;
 
-  /// No description provided for @quitAndDelete.
+  /// No description provided for @dissolve.
   ///
   /// In en, this message translates to:
-  /// **'Quit and Delete'**
-  String get quitAndDelete;
+  /// **'Disband Group'**
+  String get dissolve;
 
   /// No description provided for @setGroupName.
   ///
@@ -2419,6 +2403,756 @@ abstract class TencentCloudChatLocalizations {
   /// In en, this message translates to:
   /// **'Role'**
   String get myRoleInGroup;
+
+  /// No description provided for @chooseAvatar.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose Avatar'**
+  String get chooseAvatar;
+
+  /// No description provided for @friendLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'The number of your contacts exceeds the limit.'**
+  String get friendLimit;
+
+  /// No description provided for @otherFriendLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'The number of the other user\'s contacts exceeds the limit.'**
+  String get otherFriendLimit;
+
+  /// No description provided for @inBlacklist.
+  ///
+  /// In en, this message translates to:
+  /// **'You have blocked this user.'**
+  String get inBlacklist;
+
+  /// No description provided for @setInBlacklist.
+  ///
+  /// In en, this message translates to:
+  /// **'You have been blocked.'**
+  String get setInBlacklist;
+
+  /// No description provided for @forbidAddFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'This user has disabled contact request.'**
+  String get forbidAddFriend;
+
+  /// No description provided for @waitAgreeFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'Request sent'**
+  String get waitAgreeFriend;
+
+  /// No description provided for @haveBeFriend.
+  ///
+  /// In en, this message translates to:
+  /// **'You two are already contacts of each other.'**
+  String get haveBeFriend;
+
+  /// No description provided for @contactAddFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed'**
+  String get contactAddFailed;
+
+  /// No description provided for @addGroupPermissionDeny.
+  ///
+  /// In en, this message translates to:
+  /// **'Prohibited from Joining'**
+  String get addGroupPermissionDeny;
+
+  /// No description provided for @addGroupAlreadyMember.
+  ///
+  /// In en, this message translates to:
+  /// **'The user is a group member'**
+  String get addGroupAlreadyMember;
+
+  /// No description provided for @addGroupNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'The group does not exist'**
+  String get addGroupNotFound;
+
+  /// No description provided for @addGroupFullMember.
+  ///
+  /// In en, this message translates to:
+  /// **'The number of group members has reached the limit'**
+  String get addGroupFullMember;
+
+  /// No description provided for @joinedTip.
+  ///
+  /// In en, this message translates to:
+  /// **'You have joined the group: '**
+  String get joinedTip;
+
+  /// No description provided for @quitGroupTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave the group?'**
+  String get quitGroupTip;
+
+  /// No description provided for @dismissGroupTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Disband the group?'**
+  String get dismissGroupTip;
+
+  /// No description provided for @kickedOffTips.
+  ///
+  /// In en, this message translates to:
+  /// **'You have been kicked off'**
+  String get kickedOffTips;
+
+  /// No description provided for @userSigExpiredTips.
+  ///
+  /// In en, this message translates to:
+  /// **'UserSig is expired'**
+  String get userSigExpiredTips;
+
+  /// No description provided for @convertTextFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to convert text'**
+  String get convertTextFailed;
+
+  /// No description provided for @deleteFriendSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Friend deleted successfully'**
+  String get deleteFriendSuccess;
+
+  /// No description provided for @deleteFriendFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete friend'**
+  String get deleteFriendFailed;
+
+  /// No description provided for @clearMsgTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clear the chat history?'**
+  String get clearMsgTip;
+
+  /// No description provided for @sendMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Send a message'**
+  String get sendMsg;
+
+  /// No description provided for @groupMemberMute.
+  ///
+  /// In en, this message translates to:
+  /// **'This user is blocked from posting and thus cannot send messages. Check whether the sender is blocked from posting.'**
+  String get groupMemberMute;
+
+  /// No description provided for @forwardFailedTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to forward failed messages.'**
+  String get forwardFailedTip;
+
+  /// No description provided for @fileTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'File size exceeds the limit.'**
+  String get fileTooLarge;
+
+  /// No description provided for @invalidApplication.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid friend application'**
+  String get invalidApplication;
+
+  /// No description provided for @atMeTips.
+  ///
+  /// In en, this message translates to:
+  /// **'Someone @ me'**
+  String get atMeTips;
+
+  /// No description provided for @atAllTips.
+  ///
+  /// In en, this message translates to:
+  /// **'@All'**
+  String get atAllTips;
+
+  /// No description provided for @forwardVoteFailedTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Voting messages cannot be forwarded!'**
+  String get forwardVoteFailedTip;
+
+  /// No description provided for @forwardOneByOneLimitNumberTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to forward the messages one by one because there are too many messages.'**
+  String get forwardOneByOneLimitNumberTip;
+
+  /// No description provided for @modifyRemark.
+  ///
+  /// In en, this message translates to:
+  /// **'Modify remark'**
+  String get modifyRemark;
+
+  /// No description provided for @banned.
+  ///
+  /// In en, this message translates to:
+  /// **'{targetUser} has been banned {time}'**
+  String banned(Object targetUser, Object time);
+
+  /// No description provided for @cancelBanned.
+  ///
+  /// In en, this message translates to:
+  /// **'{targetUser} has been unbanned'**
+  String cancelBanned(Object targetUser);
+
+  /// No description provided for @day.
+  ///
+  /// In en, this message translates to:
+  /// **'day'**
+  String get day;
+
+  /// No description provided for @hour.
+  ///
+  /// In en, this message translates to:
+  /// **'hour'**
+  String get hour;
+
+  /// No description provided for @min.
+  ///
+  /// In en, this message translates to:
+  /// **'minute'**
+  String get min;
+
+  /// No description provided for @second.
+  ///
+  /// In en, this message translates to:
+  /// **'second'**
+  String get second;
+
+  /// No description provided for @setFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to set'**
+  String get setFailed;
+
+  /// No description provided for @callRejectCaller.
+  ///
+  /// In en, this message translates to:
+  /// **'Call declined by user'**
+  String get callRejectCaller;
+
+  /// No description provided for @callRejectCallee.
+  ///
+  /// In en, this message translates to:
+  /// **'Declined'**
+  String get callRejectCallee;
+
+  /// No description provided for @callCancelCaller.
+  ///
+  /// In en, this message translates to:
+  /// **'Canceled'**
+  String get callCancelCaller;
+
+  /// No description provided for @callCancelCallee.
+  ///
+  /// In en, this message translates to:
+  /// **'Call canceled by caller'**
+  String get callCancelCallee;
+
+  /// No description provided for @stopCallTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Duration:'**
+  String get stopCallTip;
+
+  /// No description provided for @callTimeoutCaller.
+  ///
+  /// In en, this message translates to:
+  /// **'Call was not answered'**
+  String get callTimeoutCaller;
+
+  /// No description provided for @callTimeoutCallee.
+  ///
+  /// In en, this message translates to:
+  /// **'Call canceled by caller'**
+  String get callTimeoutCallee;
+
+  /// No description provided for @callLineBusyCaller.
+  ///
+  /// In en, this message translates to:
+  /// **'Line busy'**
+  String get callLineBusyCaller;
+
+  /// No description provided for @callLineBusyCallee.
+  ///
+  /// In en, this message translates to:
+  /// **'Call canceled by caller'**
+  String get callLineBusyCallee;
+
+  /// No description provided for @acceptCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Answered'**
+  String get acceptCall;
+
+  /// No description provided for @callingSwitchToAudio.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch to voice call'**
+  String get callingSwitchToAudio;
+
+  /// No description provided for @callingSwitchToAudioAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm video to voice'**
+  String get callingSwitchToAudioAccept;
+
+  /// No description provided for @invalidCommand.
+  ///
+  /// In en, this message translates to:
+  /// **'invalid command'**
+  String get invalidCommand;
+
+  /// No description provided for @groupCallSend.
+  ///
+  /// In en, this message translates to:
+  /// **'initiated a group call'**
+  String get groupCallSend;
+
+  /// No description provided for @groupCallEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'End group call'**
+  String get groupCallEnd;
+
+  /// No description provided for @groupCallNoAnswer.
+  ///
+  /// In en, this message translates to:
+  /// **'no answer'**
+  String get groupCallNoAnswer;
+
+  /// No description provided for @groupCallReject.
+  ///
+  /// In en, this message translates to:
+  /// **' declined call'**
+  String get groupCallReject;
+
+  /// No description provided for @groupCallAccept.
+  ///
+  /// In en, this message translates to:
+  /// **' answered'**
+  String get groupCallAccept;
+
+  /// No description provided for @groupCallConfirmSwitchToAudio.
+  ///
+  /// In en, this message translates to:
+  /// **' confirm to audio call'**
+  String get groupCallConfirmSwitchToAudio;
+
+  /// No description provided for @callkitInPeerBlacklist.
+  ///
+  /// In en, this message translates to:
+  /// **'The identifier is in blacklist. Failed to send this message!'**
+  String get callkitInPeerBlacklist;
+
+  /// No description provided for @resendTips.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to resend?'**
+  String get resendTips;
+
+  /// No description provided for @logoutTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Log out now?'**
+  String get logoutTip;
+
+  /// No description provided for @sendFileLimit.
+  ///
+  /// In en, this message translates to:
+  /// **'You can only select 9 files'**
+  String get sendFileLimit;
+
+  /// No description provided for @atAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get atAll;
+
+  /// No description provided for @tuiEmojiSmile.
+  ///
+  /// In en, this message translates to:
+  /// **'[Smile]'**
+  String get tuiEmojiSmile;
+
+  /// No description provided for @tuiEmojiExpect.
+  ///
+  /// In en, this message translates to:
+  /// **'[Expect]'**
+  String get tuiEmojiExpect;
+
+  /// No description provided for @tuiEmojiBlink.
+  ///
+  /// In en, this message translates to:
+  /// **'[Blink]'**
+  String get tuiEmojiBlink;
+
+  /// No description provided for @tuiEmojiGuffaw.
+  ///
+  /// In en, this message translates to:
+  /// **'[Guffaw]'**
+  String get tuiEmojiGuffaw;
+
+  /// No description provided for @tuiEmojiKindSmile.
+  ///
+  /// In en, this message translates to:
+  /// **'[Kind Smile]'**
+  String get tuiEmojiKindSmile;
+
+  /// No description provided for @tuiEmojiHaha.
+  ///
+  /// In en, this message translates to:
+  /// **'[Haha]'**
+  String get tuiEmojiHaha;
+
+  /// No description provided for @tuiEmojiCheerful.
+  ///
+  /// In en, this message translates to:
+  /// **'[Cheerful]'**
+  String get tuiEmojiCheerful;
+
+  /// No description provided for @tuiEmojiSpeechless.
+  ///
+  /// In en, this message translates to:
+  /// **'[Speechless]'**
+  String get tuiEmojiSpeechless;
+
+  /// No description provided for @tuiEmojiAmazed.
+  ///
+  /// In en, this message translates to:
+  /// **'[Amazed]'**
+  String get tuiEmojiAmazed;
+
+  /// No description provided for @tuiEmojiSorrow.
+  ///
+  /// In en, this message translates to:
+  /// **'[Sorrow]'**
+  String get tuiEmojiSorrow;
+
+  /// No description provided for @tuiEmojiComplacent.
+  ///
+  /// In en, this message translates to:
+  /// **'[Complacent]'**
+  String get tuiEmojiComplacent;
+
+  /// No description provided for @tuiEmojiSilly.
+  ///
+  /// In en, this message translates to:
+  /// **'[Silly]'**
+  String get tuiEmojiSilly;
+
+  /// No description provided for @tuiEmojiLustful.
+  ///
+  /// In en, this message translates to:
+  /// **'[Lustful]'**
+  String get tuiEmojiLustful;
+
+  /// No description provided for @tuiEmojiGiggle.
+  ///
+  /// In en, this message translates to:
+  /// **'[Giggle]'**
+  String get tuiEmojiGiggle;
+
+  /// No description provided for @tuiEmojiKiss.
+  ///
+  /// In en, this message translates to:
+  /// **'[Kiss]'**
+  String get tuiEmojiKiss;
+
+  /// No description provided for @tuiEmojiWail.
+  ///
+  /// In en, this message translates to:
+  /// **'[Wail]'**
+  String get tuiEmojiWail;
+
+  /// No description provided for @tuiEmojiTearsLaugh.
+  ///
+  /// In en, this message translates to:
+  /// **'[Tears Laugh]'**
+  String get tuiEmojiTearsLaugh;
+
+  /// No description provided for @tuiEmojiTrapped.
+  ///
+  /// In en, this message translates to:
+  /// **'[Trapped]'**
+  String get tuiEmojiTrapped;
+
+  /// No description provided for @tuiEmojiMask.
+  ///
+  /// In en, this message translates to:
+  /// **'[Mask]'**
+  String get tuiEmojiMask;
+
+  /// No description provided for @tuiEmojiFear.
+  ///
+  /// In en, this message translates to:
+  /// **'[Fear]'**
+  String get tuiEmojiFear;
+
+  /// No description provided for @tuiEmojiBareTeeth.
+  ///
+  /// In en, this message translates to:
+  /// **'[Bare Teeth]'**
+  String get tuiEmojiBareTeeth;
+
+  /// No description provided for @tuiEmojiFlareUp.
+  ///
+  /// In en, this message translates to:
+  /// **'[Flare Up]'**
+  String get tuiEmojiFlareUp;
+
+  /// No description provided for @tuiEmojiYawn.
+  ///
+  /// In en, this message translates to:
+  /// **'[Yawn]'**
+  String get tuiEmojiYawn;
+
+  /// No description provided for @tuiEmojiTact.
+  ///
+  /// In en, this message translates to:
+  /// **'[Tact]'**
+  String get tuiEmojiTact;
+
+  /// No description provided for @tuiEmojiStareyes.
+  ///
+  /// In en, this message translates to:
+  /// **'[Stareyes]'**
+  String get tuiEmojiStareyes;
+
+  /// No description provided for @tuiEmojiShutUp.
+  ///
+  /// In en, this message translates to:
+  /// **'[Shut Up]'**
+  String get tuiEmojiShutUp;
+
+  /// No description provided for @tuiEmojiSigh.
+  ///
+  /// In en, this message translates to:
+  /// **'[Sigh]'**
+  String get tuiEmojiSigh;
+
+  /// No description provided for @tuiEmojiHehe.
+  ///
+  /// In en, this message translates to:
+  /// **'[Hehe]'**
+  String get tuiEmojiHehe;
+
+  /// No description provided for @tuiEmojiSilent.
+  ///
+  /// In en, this message translates to:
+  /// **'[Silent]'**
+  String get tuiEmojiSilent;
+
+  /// No description provided for @tuiEmojiSurprised.
+  ///
+  /// In en, this message translates to:
+  /// **'[Surprised]'**
+  String get tuiEmojiSurprised;
+
+  /// No description provided for @tuiEmojiAskance.
+  ///
+  /// In en, this message translates to:
+  /// **'[Askance]'**
+  String get tuiEmojiAskance;
+
+  /// No description provided for @tuiEmojiOk.
+  ///
+  /// In en, this message translates to:
+  /// **'[OK]'**
+  String get tuiEmojiOk;
+
+  /// No description provided for @tuiEmojiShit.
+  ///
+  /// In en, this message translates to:
+  /// **'[Shit]'**
+  String get tuiEmojiShit;
+
+  /// No description provided for @tuiEmojiMonster.
+  ///
+  /// In en, this message translates to:
+  /// **'[Monster]'**
+  String get tuiEmojiMonster;
+
+  /// No description provided for @tuiEmojiDaemon.
+  ///
+  /// In en, this message translates to:
+  /// **'[Daemon]'**
+  String get tuiEmojiDaemon;
+
+  /// No description provided for @tuiEmojiRage.
+  ///
+  /// In en, this message translates to:
+  /// **'[Rage]'**
+  String get tuiEmojiRage;
+
+  /// No description provided for @tuiEmojiFool.
+  ///
+  /// In en, this message translates to:
+  /// **'[Fool]'**
+  String get tuiEmojiFool;
+
+  /// No description provided for @tuiEmojiPig.
+  ///
+  /// In en, this message translates to:
+  /// **'[Pig]'**
+  String get tuiEmojiPig;
+
+  /// No description provided for @tuiEmojiCow.
+  ///
+  /// In en, this message translates to:
+  /// **'[Cow]'**
+  String get tuiEmojiCow;
+
+  /// No description provided for @tuiEmojiAi.
+  ///
+  /// In en, this message translates to:
+  /// **'[AI]'**
+  String get tuiEmojiAi;
+
+  /// No description provided for @tuiEmojiSkull.
+  ///
+  /// In en, this message translates to:
+  /// **'[Skull]'**
+  String get tuiEmojiSkull;
+
+  /// No description provided for @tuiEmojiBombs.
+  ///
+  /// In en, this message translates to:
+  /// **'[Bombs]'**
+  String get tuiEmojiBombs;
+
+  /// No description provided for @tuiEmojiCoffee.
+  ///
+  /// In en, this message translates to:
+  /// **'[Coffee]'**
+  String get tuiEmojiCoffee;
+
+  /// No description provided for @tuiEmojiCake.
+  ///
+  /// In en, this message translates to:
+  /// **'[Cake]'**
+  String get tuiEmojiCake;
+
+  /// No description provided for @tuiEmojiBeer.
+  ///
+  /// In en, this message translates to:
+  /// **'[Beer]'**
+  String get tuiEmojiBeer;
+
+  /// No description provided for @tuiEmojiFlower.
+  ///
+  /// In en, this message translates to:
+  /// **'[Flower]'**
+  String get tuiEmojiFlower;
+
+  /// No description provided for @tuiEmojiWatermelon.
+  ///
+  /// In en, this message translates to:
+  /// **'[Watermelon]'**
+  String get tuiEmojiWatermelon;
+
+  /// No description provided for @tuiEmojiRich.
+  ///
+  /// In en, this message translates to:
+  /// **'[Rich]'**
+  String get tuiEmojiRich;
+
+  /// No description provided for @tuiEmojiHeart.
+  ///
+  /// In en, this message translates to:
+  /// **'[Heart]'**
+  String get tuiEmojiHeart;
+
+  /// No description provided for @tuiEmojiMoon.
+  ///
+  /// In en, this message translates to:
+  /// **'[Moon]'**
+  String get tuiEmojiMoon;
+
+  /// No description provided for @tuiEmojiSun.
+  ///
+  /// In en, this message translates to:
+  /// **'[Sun]'**
+  String get tuiEmojiSun;
+
+  /// No description provided for @tuiEmojiStar.
+  ///
+  /// In en, this message translates to:
+  /// **'[Star]'**
+  String get tuiEmojiStar;
+
+  /// No description provided for @tuiEmojiRedPacket.
+  ///
+  /// In en, this message translates to:
+  /// **'[Red Packet]'**
+  String get tuiEmojiRedPacket;
+
+  /// No description provided for @tuiEmojiCelebrate.
+  ///
+  /// In en, this message translates to:
+  /// **'[Celebrate]'**
+  String get tuiEmojiCelebrate;
+
+  /// No description provided for @tuiEmojiBless.
+  ///
+  /// In en, this message translates to:
+  /// **'[Bless]'**
+  String get tuiEmojiBless;
+
+  /// No description provided for @tuiEmojiFortune.
+  ///
+  /// In en, this message translates to:
+  /// **'[Fortune]'**
+  String get tuiEmojiFortune;
+
+  /// No description provided for @tuiEmojiConvinced.
+  ///
+  /// In en, this message translates to:
+  /// **'[Convinced]'**
+  String get tuiEmojiConvinced;
+
+  /// No description provided for @tuiEmojiProhibit.
+  ///
+  /// In en, this message translates to:
+  /// **'[Prohibit]'**
+  String get tuiEmojiProhibit;
+
+  /// No description provided for @tuiEmoji666.
+  ///
+  /// In en, this message translates to:
+  /// **'[666]'**
+  String get tuiEmoji666;
+
+  /// No description provided for @tuiEmoji857.
+  ///
+  /// In en, this message translates to:
+  /// **'[857]'**
+  String get tuiEmoji857;
+
+  /// No description provided for @tuiEmojiKnife.
+  ///
+  /// In en, this message translates to:
+  /// **'[Knife]'**
+  String get tuiEmojiKnife;
+
+  /// No description provided for @tuiEmojiLike.
+  ///
+  /// In en, this message translates to:
+  /// **'[Like]'**
+  String get tuiEmojiLike;
 }
 
 class _TencentCloudChatLocalizationsDelegate extends LocalizationsDelegate<TencentCloudChatLocalizations> {

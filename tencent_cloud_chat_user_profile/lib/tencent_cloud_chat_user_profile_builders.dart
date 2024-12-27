@@ -13,7 +13,8 @@ typedef UserProfileContentBuilder = Widget? Function(
 typedef UserProfileChatButtonBuilder = Widget? Function(
     {required V2TimUserFullInfo userFullInfo,
     VoidCallback? startVideoCall,
-    VoidCallback? startVoiceCall});
+    VoidCallback? startVoiceCall,
+    bool? isNavigatedFromChat});
 
 typedef UserProfileStateButtonBuilder = Widget? Function(
     {required V2TimUserFullInfo userFullInfo});
@@ -83,19 +84,23 @@ class TencentCloudChatUserProfileBuilders
   Widget getUserProfileChatButtonBuilder(
       {required V2TimUserFullInfo userFullInfo,
       VoidCallback? startVideoCall,
-      VoidCallback? startVoiceCall}) {
+      VoidCallback? startVoiceCall,
+      bool? isNavigatedFromChat}) {
     Widget? widget;
     if (_userProfileChatButtonBuilder != null) {
       widget = _userProfileChatButtonBuilder!(
           userFullInfo: userFullInfo,
           startVideoCall: startVideoCall,
-          startVoiceCall: startVoiceCall);
+          startVoiceCall: startVoiceCall,
+          isNavigatedFromChat: isNavigatedFromChat
+      );
     }
     return widget ??
         TencentCloudChatUserProfileChatButton(
           userFullInfo: userFullInfo,
           startVideoCall: startVideoCall,
           startVoiceCall: startVoiceCall,
+          isNavigatedFromChat: isNavigatedFromChat
         );
   }
 

@@ -16,7 +16,6 @@ enum TencentCloudChatContactDataKeys {
   applicationCount,
   applicationCode,
   userStatusList,
-  addFriendCode,
   deleteConversationCode,
   friendGroup,
   groupApplicationList,
@@ -63,11 +62,13 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
 
   void buildApplicationList(List<V2TimFriendApplication> applicationList, String action) {
     for (var element in applicationList) {
-      var index = _applicationList.indexWhere((ele) => element.userID == ele.userID);
-      if (index > -1) {
-        _applicationList[index] = element;
-      } else {
-        _applicationList.add(element);
+      if (element.type == 1) {
+        var index = _applicationList.indexWhere((ele) => element.userID == ele.userID);
+        if (index > -1) {
+          _applicationList[index] = element;
+        } else {
+          _applicationList.add(element);
+        }
       }
     }
     console(
@@ -166,13 +167,21 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
   }
 
   void deleteFromFriendList(List<String> contactList, String action) {
+    bool needNotify = false;
     for (var element in contactList) {
       var index = _contactList.indexWhere((ele) => ele.userID == element);
       if (index > -1) {
         _contactList.removeAt(index);
+        needNotify = true;
       }
     }
-    notifyListener(TencentCloudChatContactDataKeys.contactList as T);
+  
+    if (needNotify) {
+      console(
+        logs: "$action deleteFromFriendList ${contactList.length} deleted. total contactList length is ${_contactList.length}",
+      );
+      notifyListener(TencentCloudChatContactDataKeys.contactList as T);
+    }
   }
 
   /// === user online status ===
@@ -190,15 +199,15 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
   /// === total application unread count ===
   int _applicationUnreadCount = 0;
 
-  /// === add friend result code and friend ID ===
-  int _addFriendCode = 0;
-  String _addFriendID = "";
-
   /// === delete conversation result code ===
   int _deleteConversationCode = 0;
 
-  void setApplicationUnreadCount(int count) {
-    _applicationUnreadCount = count;
+  void setApplicationUnreadCount(List<V2TimFriendApplication>? applicationList) {
+    List<V2TimFriendApplication> filteredList = [];
+    if (applicationList != null && applicationList.length > 0) {
+      filteredList = applicationList.where((e) => e.type == 1).toList();
+    }
+    _applicationUnreadCount = filteredList.length;
     notifyListener(TencentCloudChatContactDataKeys.applicationCount as T);
   }
 
@@ -223,10 +232,6 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
   int get applicationCode => _applicationCode;
 
   String get applicationUserID => _applicationUserID;
-
-  int get addFriendCode => _addFriendCode;
-
-  String get addFriendID => _addFriendID;
 
   int get deleteConversationCode => _deleteConversationCode;
 
@@ -255,12 +260,6 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
           "$action buildUserStatusList ${_userStatus.length} changed. total userStatus length is ${_userStatus.length}",
     );
     notifyListener(TencentCloudChatContactDataKeys.userStatusList as T);
-  }
-
-  void setAddFriendCode(int code, String userID) {
-    _addFriendCode = code;
-    _addFriendID = userID;
-    notifyListener(TencentCloudChatContactDataKeys.addFriendCode as T);
   }
 
   void setDeleteConversationCode(int code) {
@@ -302,8 +301,43 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
 
   @override
   void notifyListener(T key) {
-    currentUpdatedFields = key;
-    TencentCloudChat.instance.eventBusInstance.fire(this, "TencentCloudChatContactData");
+    var event = TencentCloudChatContactData<T>(key);
+    event._contactConfig = _contactConfig;
+    event.contactEventHandlers = contactEventHandlers;
+    event._contactBuilder = _contactBuilder;
+    event.contactController = contactController;
+    event._applicationList.addAll(_applicationList);
+    event.responseType = responseType;
+    event.applicationType = applicationType;
+    event._applicationCode = _applicationCode;
+    event._applicationUserID = _applicationUserID;
+    event._groupList.addAll(_groupList);
+    event._blockList.addAll(_blockList);
+    event._contactList.addAll(_contactList);
+    event._userStatus.addAll(_userStatus);
+    event._friendGroup.addAll(_friendGroup);
+    event._groupApplicationList.addAll(_groupApplicationList);
+    event._searchUserList.addAll(_searchUserList);
+    event._applicationUnreadCount = _applicationUnreadCount;
+    event._deleteConversationCode = _deleteConversationCode;
+
+    TencentCloudChat.instance.eventBusInstance.fire(event, "TencentCloudChatContactData");
+  }
+
+  @override
+  void clear() {
+    _applicationList.clear();
+    _groupList.clear();
+    _blockList.clear();
+    _contactList.clear();
+    _userStatus.clear();
+    _friendGroup.clear();
+    _groupApplicationList.clear();
+    _searchUserList.clear();
+    _applicationUnreadCount = 0;
+    _deleteConversationCode = 0;
+    _applicationCode = 0;
+    _applicationUserID = "";
   }
 
   @override

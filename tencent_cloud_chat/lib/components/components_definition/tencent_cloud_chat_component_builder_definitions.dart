@@ -119,19 +119,23 @@ class MessageItemBuilderData {
 }
 
 class MessageItemBuilderMethods {
-  final VoidCallback onSelectMessage;
   final VoidCallback clearHighlightFunc;
   final ValueChanged<String> triggerLinkTappedEvent;
+  final VoidCallback? startVoiceCall;
+  final VoidCallback? startVideoCall;
+  final VoidCallback? onResendMessage;
   final Function({
     required String messageText,
     required List<String> groupMembersNeedToMention,
   }) setMessageTextWithMentions;
 
   MessageItemBuilderMethods({
-    required this.onSelectMessage,
     required this.clearHighlightFunc,
     required this.triggerLinkTappedEvent,
     required this.setMessageTextWithMentions,
+    this.startVoiceCall,
+    this.startVideoCall,
+    this.onResendMessage,
   });
 }
 
@@ -207,14 +211,12 @@ class MessageInputSelectBuilderWidgets {
 
 class MessageInputSelectBuilderData {
   final List<V2TimMessage> messages;
-  final bool enableMessageDeleteForEveryone;
   final bool enableMessageForwardIndividually;
   final bool enableMessageForwardCombined;
   final bool enableMessageDeleteForSelf;
 
   MessageInputSelectBuilderData({
     required this.messages,
-    required this.enableMessageDeleteForEveryone,
     required this.enableMessageForwardIndividually,
     required this.enableMessageForwardCombined,
     required this.enableMessageDeleteForSelf,
@@ -223,12 +225,10 @@ class MessageInputSelectBuilderData {
 
 class MessageInputSelectBuilderMethods {
   final ValueChanged<List<V2TimMessage>> onDeleteForMe;
-  final ValueChanged<List<V2TimMessage>> onDeleteForEveryone;
   final ValueChanged<TencentCloudChatForwardType> onMessagesForward;
 
   MessageInputSelectBuilderMethods({
     required this.onDeleteForMe,
-    required this.onDeleteForEveryone,
     required this.onMessagesForward,
   });
 }
@@ -473,7 +473,6 @@ class MessageListViewBuilderMethods {
     int? seq,
   }) loadToSpecificMessage;
 
-  final ValueChanged<List<V2TimMessage>> onSelectMessages;
   final ValueChanged<V2TimMessage> highlightMessage;
 
   /// TencentCloudChatMessageController
@@ -486,7 +485,6 @@ class MessageListViewBuilderMethods {
     required this.loadToLatestMessage,
     required this.loadMoreMessages,
     required this.loadToSpecificMessage,
-    required this.onSelectMessages,
     required this.highlightMessage,
     required this.controller,
     required this.getMessageList,
@@ -558,11 +556,7 @@ class MessageInputBuilderMethods {
   final Function({String? videoPath, dynamic inputElement}) sendVideoMessage;
   final Function({String? filePath, String? fileName, dynamic inputElement}) sendFileMessage;
   final Function({required String voicePath, required int duration}) sendVoiceMessage;
-  final Future<List<V2TimGroupMemberFullInfo>> Function({
-    int? maxSelectionAmount,
-    String? title,
-    String? onSelectLabel,
-  }) onChooseGroupMembers;
+  final Future<List<V2TimGroupMemberFullInfo>> Function() onChooseGroupMembers;
 
   /// TencentCloudChatMessageController
   final Object controller;
@@ -622,12 +616,12 @@ class MessageRowMessageSenderAvatarBuilderData {
 }
 
 class MessageRowMessageSenderAvatarBuilderMethods {
-  final OnTapMessageRelated? onCustomUIEventPrimaryTapAvatar;
-  final OnTapMessageRelated? onCustomUIEventSecondaryTapAvatar;
+  final OnTapMessageRelated? onCustomUIEventTapAvatar;
+  final OnTapMessageRelated? onCustomUIEventLongPressAvatar;
 
   MessageRowMessageSenderAvatarBuilderMethods({
-    this.onCustomUIEventPrimaryTapAvatar,
-    this.onCustomUIEventSecondaryTapAvatar,
+    this.onCustomUIEventTapAvatar,
+    this.onCustomUIEventLongPressAvatar,
   });
 }
 
@@ -667,14 +661,14 @@ class MessageRowBuilderWidgets {
 
   final Widget? messageReplyItem;
 
-  final Widget? messageTextTransalteItem;
+  final Widget? messageTextTranslateItem;
 
   final Widget? messageSoundToTextItem;
 
   MessageRowBuilderWidgets({
     required this.messageRowAvatar,
     this.messageRowMessageItem,
-    this.messageTextTransalteItem,
+    this.messageTextTranslateItem,
     required this.messageRowMessageSenderName,
     this.messageRowTips,
     this.messageReplyItem,

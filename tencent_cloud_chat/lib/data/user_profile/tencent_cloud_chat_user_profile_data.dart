@@ -9,8 +9,6 @@ enum TencentCloudChatUserProfileDataKeys { none, config, builder }
 class TencentCloudChatUserProfileData<T> extends TencentCloudChatDataAB<T> {
   TencentCloudChatUserProfileData(super.currentUpdatedFields);
 
-  String onlineStatus = "";
-
   /// === User Profile Config ===
   TencentCloudChatUserProfileConfig _userProfileConfig = TencentCloudChatUserProfileConfig();
 
@@ -43,5 +41,10 @@ class TencentCloudChatUserProfileData<T> extends TencentCloudChatDataAB<T> {
   @override
   Map<String, dynamic> toJson() {
     throw UnimplementedError();
+  }
+
+  @override
+  void clear() {
+
   }
 }

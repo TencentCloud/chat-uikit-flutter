@@ -1,11 +1,11 @@
 name: tencent_cloud_chat_message
 description: A component for displaying a list of messages and dealing with everything related to sending and receiving messages for Tencent Cloud Chat.
-version: 2.0.0
+version: 2.1.0
 repository: https://github.com/TencentCloud/chat-uikit-flutter/tree/v2/tencent_cloud_chat_message
 homepage: https://trtc.io/products/chat?utm_source=flutter_pub
 
 environment:
-  sdk: '>=3.1.0 <4.0.0'
+  sdk: '>=3.0.0 <4.0.0'
   flutter: ">=3.24.0"
 
 platforms:
@@ -18,6 +18,7 @@ platforms:
 dependencies:
   flutter:
     sdk: flutter
+  cached_network_image: ^3.2.3
   image_picker: ^0.8.9
   record: ^5.0.5
   record_android: '>=1.1.0 <=1.2.1'
@@ -25,14 +26,13 @@ dependencies:
   file_picker: ^6.1.1
   pull_to_refresh: ^2.0.0
   flutter_list_view: ^1.1.18
-  tencent_cloud_chat: ^1.5.0
-  tencent_cloud_chat_common: ^1.5.0
+  tencent_cloud_chat: ^2.1.0
+  tencent_cloud_chat_common: ^2.1.0
   http: ^1.1.0
   card_swiper: ^3.0.1
   better_player_plus: ^1.0.5
   open_file: ^3.3.2
   haptic_feedback: ^0.4.2
-  vibration: ^1.8.4
   scroll_to_index: ^3.0.1
   pasteboard: ^0.2.0
   url_launcher: ^6.2.2
@@ -43,16 +43,21 @@ dependencies:
   extended_text: ^14.0.0
   extended_text_field: ^16.0.0
   universal_html: ^2.2.4
-  video_player: ^2.8.1
-  video_player_media_kit: ^1.0.5
-  media_kit_libs_android_video: ^1.3.6
-  media_kit_libs_ios_video: ^1.1.4
-  media_kit_libs_macos_video: ^1.1.4
-  media_kit_libs_windows_video: ^1.0.9
   flutter_svg: ^2.0.7
   flutter_keyboard_visibility: ^6.0.0
   vector_math: ^2.1.4
   image_clipboard: ^1.1.0+1
+  azlistview_all_platforms: ^2.1.2
+  lpinyin: ^2.0.3
+  device_info_plus: ^9.1.2
+
+dependency_overrides:
+#  tencent_cloud_chat:
+#    path: ../tencent_cloud_chat
+#  tencent_cloud_chat_common:
+#    path: ../tencent_cloud_chat_common
+#  tencent_cloud_chat_intl:
+#    path: ../tencent_cloud_chat_intl
 
 dev_dependencies:
   flutter_test:

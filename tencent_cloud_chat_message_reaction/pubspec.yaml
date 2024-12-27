@@ -1,6 +1,6 @@
 name: tencent_cloud_chat_message_reaction
 description: Message Reaction Plugin for Tencent Cloud Chat.
-version: 1.5.0
+version: 2.1.0
 repository: https://github.com/TencentCloud/chat-uikit-flutter/tree/v2/tencent_cloud_chat_message_reaction
 homepage: https://trtc.io/products/chat?utm_source=flutter_pub
 
@@ -11,11 +11,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  tencent_cloud_chat_sdk: ^8.0.5897
   cached_network_image: ^3.2.3
-  tencent_cloud_chat_intl: ^1.5.0
-  tencent_cloud_chat_common: ^1.5.0
-  tencent_cloud_chat_sticker: ^1.1.0
+  tencent_cloud_chat_common: ^2.1.0
+  tencent_cloud_chat_intl: ^2.1.0
+  tencent_cloud_chat_sticker: ^2.1.0
+  tencent_cloud_chat_sdk: ^8.3.6498
 
 dev_dependencies:
   flutter_test:

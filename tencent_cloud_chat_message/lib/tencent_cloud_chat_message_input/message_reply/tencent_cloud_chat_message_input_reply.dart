@@ -38,25 +38,6 @@ class _TencentCloudChatMessageInputReplyState extends TencentCloudChatState<Tenc
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
-                  IconButton(
-                    onPressed: widget.methods.onClickReply,
-                    icon: Icon(
-                      Icons.reply_outlined,
-                      color: colorTheme.primaryColor,
-                      size: textStyle.fontsize_24,
-                    ),
-                  ),
-                  SizedBox(
-                    width: getWidth(12),
-                  ),
-                  Container(
-                    color: colorTheme.primaryColor,
-                    width: 1,
-                    height: getHeight(36),
-                  ),
-                  SizedBox(
-                    width: getWidth(12),
-                  ),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,7 +45,7 @@ class _TencentCloudChatMessageInputReplyState extends TencentCloudChatState<Tenc
                       mainAxisSize: MainAxisSize.max,
                       children: [
                         Text(
-                          tL10n.replyTo(widget.data.repliedMessage?.sender ?? ""),
+                          widget.data.repliedMessage?.nickName ?? widget.data.repliedMessage?.sender ?? '',
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                           style: TextStyle(

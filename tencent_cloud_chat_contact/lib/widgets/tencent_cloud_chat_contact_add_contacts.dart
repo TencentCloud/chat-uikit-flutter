@@ -7,6 +7,7 @@ import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.d
 import 'package:tencent_cloud_chat_common/builders/tencent_cloud_chat_common_builders.dart';
 import 'package:tencent_cloud_chat_common/widgets/avatar/tencent_cloud_chat_avatar.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_contact_add_contacts_info.dart';
+import 'dart:ui';
 
 class TencentCloudChatContactAddContacts extends StatefulWidget {
   const TencentCloudChatContactAddContacts({super.key});
@@ -20,8 +21,11 @@ class TencentCloudChatContactAddContactsState extends TencentCloudChatState<Tenc
   Widget defaultBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Container(
+              padding: EdgeInsets.only(top: MediaQueryData.fromWindow(window).padding.top),
               height: getHeight(800),
-              decoration: BoxDecoration(color: colorTheme.contactAddContactBackgroundColor, borderRadius: BorderRadius.all(Radius.circular(getWidth(10)))),
+              decoration: BoxDecoration(
+                  color: colorTheme.contactAddContactBackgroundColor,
+                  borderRadius: BorderRadius.all(Radius.circular(getWidth(10)))),
               child: const Scaffold(
                 backgroundColor: Colors.transparent,
                 appBar: TencentCloudChatContactAddContactsAppBar(),
@@ -41,7 +45,8 @@ class TencentCloudChatContactAddContactsAppBar extends StatefulWidget implements
   Size get preferredSize => const Size(15, 50);
 }
 
-class TencentCloudChatContactAddContactsAppBarState extends TencentCloudChatState<TencentCloudChatContactAddContactsAppBar> {
+class TencentCloudChatContactAddContactsAppBarState
+    extends TencentCloudChatState<TencentCloudChatContactAddContactsAppBar> {
   @override
   Widget defaultBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(
@@ -49,7 +54,10 @@ class TencentCloudChatContactAddContactsAppBarState extends TencentCloudChatStat
             backgroundColor: Colors.transparent,
             title: Text(
               tL10n.addContact,
-              style: TextStyle(fontSize: textStyle.fontsize_16, fontWeight: FontWeight.w600, color: colorTheme.contactItemFriendNameColor),
+              style: TextStyle(
+                  fontSize: textStyle.fontsize_16,
+                  fontWeight: FontWeight.w600,
+                  color: colorTheme.contactItemFriendNameColor),
             ),
             centerTitle: true,
             leadingWidth: getWidth(100),
@@ -98,7 +106,9 @@ class TencentCloudChatContactAddContactBodyState extends TencentCloudChatState<T
                     padding: EdgeInsets.symmetric(vertical: getHeight(9), horizontal: getWidth(8)),
                     child: Container(
                       padding: EdgeInsets.symmetric(vertical: getHeight(8)),
-                      decoration: BoxDecoration(color: colorTheme.contactSearchBackgroundColor, borderRadius: BorderRadius.circular(getSquareSize(4))),
+                      decoration: BoxDecoration(
+                          color: colorTheme.contactSearchBackgroundColor,
+                          borderRadius: BorderRadius.circular(getSquareSize(4))),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -168,7 +178,9 @@ class TencentCloudChatContactAddContactSearchBar extends StatefulWidget {
   State<StatefulWidget> createState() => TencentCloudChatContactAddContactSearchBarState();
 }
 
-class TencentCloudChatContactAddContactSearchBarState extends TencentCloudChatState<TencentCloudChatContactAddContactSearchBar> {
+class TencentCloudChatContactAddContactSearchBarState
+    extends TencentCloudChatState<TencentCloudChatContactAddContactSearchBar> {
+  final FocusNode _focusNode = FocusNode();
   final TextEditingController _searchID = TextEditingController();
   String searchID = "";
 
@@ -189,31 +201,46 @@ class TencentCloudChatContactAddContactSearchBarState extends TencentCloudChatSt
               child: Row(
                 children: [
                   Container(
-                    decoration: BoxDecoration(color: colorTheme.backgroundColor, borderRadius: BorderRadius.circular(getSquareSize(4))),
-                    width: getWidth(300),
+                    decoration: BoxDecoration(
+                        color: colorTheme.backgroundColor, borderRadius: BorderRadius.circular(getSquareSize(4))),
+                    width: getWidth(280),
                     child: TextField(
                       autofocus: true,
+                      focusNode: _focusNode,
                       controller: _searchID,
                       textAlign: TextAlign.start,
                       onChanged: (String value) {
                         onSearchIDChanged(value);
                       },
                       style: TextStyle(color: colorTheme.contactItemFriendNameColor),
-                      decoration: InputDecoration(contentPadding: EdgeInsets.symmetric(vertical: getHeight(6), horizontal: getWidth(12)), border: InputBorder.none, hintText: 'Search User ID', isDense: true),
+                      decoration: InputDecoration(
+                          contentPadding: EdgeInsets.symmetric(vertical: getHeight(6), horizontal: getWidth(12)),
+                          border: InputBorder.none,
+                          hintText: 'Search User ID',
+                          isDense: true),
                       cursorColor: colorTheme.contactSearchCursorColor,
                       cursorRadius: Radius.circular(getSquareSize(2)),
                     ),
                   ),
                   TextButton(
                     style: TextButton.styleFrom(
-                      textStyle: TextStyle(fontSize: textStyle.fontsize_16, fontWeight: FontWeight.w500, color: colorTheme.contactSearchButtonColor),
+                      textStyle: TextStyle(
+                          fontSize: textStyle.fontsize_16,
+                          fontWeight: FontWeight.w500,
+                          color: colorTheme.contactSearchButtonColor),
                     ),
                     onPressed: _searchUser,
-                    child: const Text('Search'),
+                    child: Text(tL10n.search),
                   )
                 ],
               ),
             ));
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _focusNode.dispose();
   }
 }
 
@@ -268,7 +295,8 @@ class TencentCloudChatContactAddContactListItem extends StatefulWidget {
   State<StatefulWidget> createState() => TencentCloudChatContactAddContactListItemState();
 }
 
-class TencentCloudChatContactAddContactListItemState extends TencentCloudChatState<TencentCloudChatContactAddContactListItem> {
+class TencentCloudChatContactAddContactListItemState
+    extends TencentCloudChatState<TencentCloudChatContactAddContactListItem> {
   openContactsInfo() {
     showModalBottomSheet<void>(
         barrierColor: Colors.white.withOpacity(0),
@@ -289,7 +317,12 @@ class TencentCloudChatContactAddContactListItemState extends TencentCloudChatSta
               color: colorTheme.backgroundColor,
               margin: EdgeInsets.only(top: getHeight(10)),
               padding: EdgeInsets.symmetric(vertical: getHeight(10), horizontal: getWidth(3)),
-              child: Row(children: [TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAddContactListItemAvatarBuilder(widget.userFullInfo), TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAddContactListItemContentBuilder(widget.userFullInfo)]),
+              child: Row(children: [
+                TencentCloudChat.instance.dataInstance.contact.contactBuilder
+                    ?.getContactAddContactListItemAvatarBuilder(widget.userFullInfo),
+                TencentCloudChat.instance.dataInstance.contact.contactBuilder
+                    ?.getContactAddContactListItemContentBuilder(widget.userFullInfo)
+              ]),
             )));
   }
 }
@@ -303,7 +336,8 @@ class TencentCloudChatContactAddContactListItemAvatar extends StatefulWidget {
   State<StatefulWidget> createState() => TencentCloudChatContactAddContactListItemAvatarState();
 }
 
-class TencentCloudChatContactAddContactListItemAvatarState extends TencentCloudChatState<TencentCloudChatContactAddContactListItemAvatar> {
+class TencentCloudChatContactAddContactListItemAvatarState
+    extends TencentCloudChatState<TencentCloudChatContactAddContactListItemAvatar> {
   @override
   Widget defaultBuilder(BuildContext context) {
     return Padding(
@@ -332,7 +366,8 @@ class TencentCloudChatChontactAddContactListItemContent extends StatefulWidget {
   State<StatefulWidget> createState() => TencentCloudChatContactsAddContactListItemContentState();
 }
 
-class TencentCloudChatContactsAddContactListItemContentState extends TencentCloudChatState<TencentCloudChatChontactAddContactListItemContent> {
+class TencentCloudChatContactsAddContactListItemContentState
+    extends TencentCloudChatState<TencentCloudChatChontactAddContactListItemContent> {
   getNickName() {
     String nick = "";
     if (widget.userFullInfo.nickName != null && widget.userFullInfo.nickName!.isNotEmpty) {
@@ -347,15 +382,24 @@ class TencentCloudChatContactsAddContactListItemContentState extends TencentClou
   Widget defaultBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Expanded(
-                child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-              Text(
-                getNickName(),
-                style: TextStyle(fontSize: textStyle.fontsize_16, fontWeight: FontWeight.w600, color: colorTheme.contactItemFriendNameColor),
-              ),
-              Text(
-                'ID:${widget.userFullInfo.userID}',
-                style: TextStyle(fontSize: textStyle.fontsize_12, fontWeight: FontWeight.w400, color: colorTheme.contactItemFriendNameColor),
-              ),
-            ])));
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                  Text(
+                    getNickName(),
+                    style: TextStyle(
+                        fontSize: textStyle.fontsize_16,
+                        fontWeight: FontWeight.w600,
+                        color: colorTheme.contactItemFriendNameColor),
+                  ),
+                  Text(
+                    'ID:${widget.userFullInfo.userID}',
+                    style: TextStyle(
+                        fontSize: textStyle.fontsize_12,
+                        fontWeight: FontWeight.w400,
+                        color: colorTheme.contactItemFriendNameColor),
+                  ),
+                ])));
   }
 }

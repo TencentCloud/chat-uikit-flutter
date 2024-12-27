@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 import 'dart:ui' as ui;
+import 'package:tencent_cloud_chat_common/utils/sdk_const.dart';
 import 'package:universal_html/html.dart' as html;
 
 import 'package:extended_text_field/extended_text_field.dart';
@@ -285,7 +286,7 @@ class _TencentCloudChatMessageInputDesktopState extends TencentCloudChatState<Te
 
         if (widget.inputData.isGroupAdmin && showAtMemberList.isNotEmpty && keyword.isEmpty) {
           showAtMemberList = [
-            V2TimGroupMemberFullInfo(userID: "__kImSDK_MesssageAtALL__", nickName: tL10n.all),
+            V2TimGroupMemberFullInfo(userID: SDKConst.sdkAtAllUserID, nickName: tL10n.all),
             ...showAtMemberList,
           ];
         }

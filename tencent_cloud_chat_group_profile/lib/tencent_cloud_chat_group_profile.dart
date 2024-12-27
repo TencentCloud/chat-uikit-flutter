@@ -250,17 +250,6 @@ class TencentCloudChatGroupProfileManager {
         .groupProfileBuilder as TencentCloudChatGroupProfileBuilders;
   }
 
-  /// Retrieves the controller for controlling `TencentCloudChatGroupProfile` components,
-  /// applying to all instances.
-  /// Utilize the provided control methods.
-  static TencentCloudChatGroupProfileController get controller {
-    TencentCloudChat
-            .instance.dataInstance.groupProfile.groupProfileController ??=
-        TencentCloudChatGroupProfileControllerGenerator.getInstance();
-    return TencentCloudChat.instance.dataInstance.groupProfile
-        .groupProfileController as TencentCloudChatGroupProfileController;
-  }
-
   /// Enables dynamic updating of configurations for all instances.
   /// Call the `setConfigs` method and pass any configurations to be modified,
   /// which will replace the previous configuration and apply changes immediately.
@@ -293,7 +282,9 @@ class TencentCloudChatGroupProfileManager {
 
     TencentCloudChat
             .instance.dataInstance.groupProfile.groupProfileController ??=
-        TencentCloudChatGroupProfileControllerGenerator.getInstance();
+        TencentCloudChatGroupProfileController.instance;
+
+    TencentCloudChatGroupProfileController.instance.init();
 
     TencentCloudChatRouter().registerRouter(
       routeName: TencentCloudChatRouteNames.groupProfile,
@@ -314,16 +305,5 @@ class TencentCloudChatGroupProfileManager {
                 groupID: options["groupID"]),
           ),
     );
-  }
-}
-
-class TencentCloudChatGroupProfileInstance {
-  /// Use `TencentCloudChatGroupProfileManager.register` instead.
-  /// This method will be removed in a future version.
-  static ({
-    TencentCloudChatComponentsEnum componentEnum,
-    TencentCloudChatWidgetBuilder widgetBuilder
-  }) register() {
-    return TencentCloudChatGroupProfileManager.register();
   }
 }

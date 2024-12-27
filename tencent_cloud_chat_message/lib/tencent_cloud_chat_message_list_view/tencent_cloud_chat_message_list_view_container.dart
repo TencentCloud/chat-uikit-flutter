@@ -42,7 +42,7 @@ class _TencentCloudChatMessageListViewContainerState extends TencentCloudChatSta
     final TencentCloudChatMessageDataKeys messageDataKeys = messageData.currentUpdatedFields;
     final updateUserID = TencentCloudChatUtils.checkString(messageData.currentOperateUserID);
     final updateGroupID = TencentCloudChatUtils.checkString(messageData.currentOperateGroupID);
-    final isCurrentConversation = ((updateUserID == widget.userID) && updateUserID != null) || ((updateGroupID == (TencentCloudChatUtils.checkString(widget.topicID) ?? widget.groupID)) && updateGroupID != null);
+    final isCurrentConversation = (updateUserID != null && (updateUserID == widget.userID)) || (updateGroupID != null && (updateGroupID == (TencentCloudChatUtils.checkString(widget.topicID) ?? widget.groupID)));
     TencentCloudChat.instance.logInstance.console(
         componentName: 'TencentCloudChatMessageListViewContainer',
         logs:
@@ -52,6 +52,17 @@ class _TencentCloudChatMessageListViewContainerState extends TencentCloudChatSta
       case TencentCloudChatMessageDataKeys.messageHighlighted:
         break;
       case TencentCloudChatMessageDataKeys.messageNeedUpdate:
+        final messageNeedUpdate = messageData.messageNeedUpdate!;
+        int index = _messageList.indexWhere((element) => TencentCloudChatUtils.checkString(element.msgID) != null && element.msgID == messageNeedUpdate.msgID);
+        if (index == -1 && TencentCloudChatUtils.checkString(messageNeedUpdate.id) != null && messageNeedUpdate.id != messageNeedUpdate.msgID) {
+          index = _messageList.indexWhere((element) => element.id == messageNeedUpdate.id);
+        }
+
+        if (index > -1) {
+          safeSetState(() {
+            _messageList[index] = messageNeedUpdate;
+          });
+        }
         break;
       case TencentCloudChatMessageDataKeys.none:
         break;
@@ -154,6 +165,7 @@ class _TencentCloudChatMessageListViewContainerState extends TencentCloudChatSta
         "didUpdateWidget add _messageDataHandler start ${_messageDataStream != null}");
     if(_messageDataStream == null){
       _messageDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatMessageData>("TencentCloudChatMessageData");
+      _messageDataSubscription?.cancel();
       _messageDataSubscription = _messageDataStream?.listen(_messageDataHandler);
     }
     if ((widget.userID != oldWidget.userID && !(TencentCloudChatUtils.checkString(widget.userID) == null && TencentCloudChatUtils.checkString(oldWidget.userID) == null)) ||
@@ -244,23 +256,12 @@ class _TencentCloudChatMessageListViewContainerState extends TencentCloudChatSta
     return TencentCloudChatMessageDataProviderInherited.of(context).messageBuilders?.getMessageListViewBuilder(
               key: _messageListKey,
               methods: MessageListViewBuilderMethods(
-                loadToLatestMessage: _loadToLatestMessage,
+              loadToLatestMessage: _loadToLatestMessage,
                 controller: dataProvider.messageController,
                 highlightMessage: (message) => TencentCloudChat.instance.dataInstance.messageData.messageHighlighted = message,
                 loadToSpecificMessage: dataProvider.loadToSpecificMessage,
                 loadMoreMessages: _loadMoreMessage,
                 getMessageList: dataProvider.getMessageListForRender,
-                onSelectMessages: (List<V2TimMessage> value) {
-                  final selectMessages = dataProvider.selectedMessages;
-                  for (var msg in value) {
-                    if (selectMessages.any((element) => (TencentCloudChatUtils.checkString(msg.msgID) != null && element.msgID == msg.msgID) || (TencentCloudChatUtils.checkString(msg.id) != null && element.id == msg.id))) {
-                      selectMessages.removeWhere((element) => (TencentCloudChatUtils.checkString(msg.msgID) != null && element.msgID == msg.msgID) || (TencentCloudChatUtils.checkString(msg.id) != null && element.id == msg.id));
-                    } else {
-                      selectMessages.add(msg);
-                    }
-                  }
-                  dataProvider.selectedMessages = selectMessages;
-                },
                 closeSticker: closeSticker,
               ),
               data: MessageListViewBuilderData(

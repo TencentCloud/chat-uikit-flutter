@@ -3,8 +3,10 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_download_utils.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_permission_handlers.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:http/http.dart' as http;
 import 'package:open_file/open_file.dart';
@@ -309,16 +311,13 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
   int onTapDownTime = 0;
 
   onTapDown(TapDownDetails details) {
-    if (widget.data.inSelectMode) {
-      widget.methods.onSelectMessage();
-    } else {
+    if (!widget.data.inSelectMode) {
       onTapDownTime = DateTime.now().millisecondsSinceEpoch;
     }
   }
 
   onTapUp(TapUpDetails details) {
     if (widget.data.inSelectMode) {
-      widget.methods.onSelectMessage();
       return;
     }
     int onTapUpTime = DateTime.now().millisecondsSinceEpoch;
@@ -373,6 +372,17 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
       }
       return;
     }
+
+    if (TencentCloudChatPlatformAdapter().isAndroid) {
+      final DeviceInfoPlugin packageInfo = DeviceInfoPlugin();
+      AndroidDeviceInfo androidInfo = await packageInfo.androidInfo;
+      if ((androidInfo.version.sdkInt) <= 32) {
+        if (!await TencentCloudChatPermissionHandler.checkPermission('storage', context)) {
+          return;
+        }
+      }
+    }
+
     if (widget.data.message.status == 1) {
       if (TencentCloudChatUtils.checkString(widget.data.message.fileElem!.path) != null) {
         if (File(widget.data.message.fileElem!.path!).existsSync()) {
@@ -380,7 +390,10 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
         }
       }
     }
-    if (hasLocalFile()) {
+
+    if (TencentCloudChatUtils.checkString(getLocalPath()) != null) {
+      return await OpenFile.open(getLocalPath());
+    } else if (hasLocalFile()) {
       return await OpenFile.open(getLocalUrl());
     } else {
       console("message has not local path . download first");

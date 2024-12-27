@@ -1,3 +1,34 @@
+## 8.3.6498+1
+
+* To resolve the issue of the main function being initialized twice
+
+## 8.3.6498
+
+* Add a notification bar click event listener method onNotificationClicked.
+* Add a method createNotificationChannel to support creating notification channels.
+
+## 8.2.6325
+
+* Add support for the feature of non-persistent push messages.
+* FCM supports custom redirection upon clicking the notification bar.
+* Optimize the log printing functionality before registering for push notifications.
+
+## 8.1.6907
+
+* Resolve database concurrency issues.
+
+## 8.1.6906
+
+* Resolve the issue of Push user login type error.
+* Fix the issue where APNs fails to receive push notifications due to proxy failure.
+* Optimize the issue where APNs offline pass-through messages with an empty Ext do not trigger the click event callback.
+* Resolve the issue of abnormal callback when parsing notifications in the foreground state for APNs.
+* Optimize the issue of FCM data empty message pop-up.
+
+## 8.1.6107
+
+* Upgrade under layer Push SDK to 8.1.
+
 ## 8.0.6897
 
 * Added `setXiaoMiPushStorageRegion` method for XiaoMi devices.

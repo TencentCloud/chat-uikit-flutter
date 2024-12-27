@@ -65,7 +65,6 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
   /// === Current TargetMessage ===
   V2TimMessage? currentTargetMessage;
 
-
   /// === Conversation list ===
   List<V2TimConversation> _conversationList = [];
 
@@ -125,9 +124,9 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
         _conversationList = [...pinnedConversation, ..._conversationList];
         // ignore: empty_catches
       } catch (e) {}
-    }else{
+    } else {
       _conversationList.sort(
-            (a, b) {
+        (a, b) {
           int aR = a.orderkey ?? 0;
           int bR = b.orderkey ?? 0;
           return bR.compareTo(aR);
@@ -137,7 +136,6 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
     console(
         logs:
             "$action buildConversationList ${convList.length} conv changed. total conv length is ${_conversationList.length}");
-    TencentCloudChat.instance.cache.cacheConversationList(_conversationList);
     notifyListener(TencentCloudChatConversationDataKeys.conversationList as T);
   }
 
@@ -150,10 +148,59 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
     notifyListener(TencentCloudChatConversationDataKeys.conversationList as T);
   }
 
+  bool _isConversationHidden(String convID) {
+    var index = _conversationList.indexWhere((conv) => convID == conv.conversationID);
+    if (index != -1) {
+      // V2TIM_CONVERSATION_MARK_TYPE_HIDE = 0x1 << 3
+      return _conversationList[index].markList?.contains(8) ?? false;
+    }
+
+    return false;
+  }
+
+  void unhideConversation({String? userID, String? groupID}) {
+    String convID = '';
+    if (userID != null && userID.isNotEmpty) {
+      convID = 'c2c_$userID';
+    } else if (groupID != null && groupID.isNotEmpty) {
+      convID = 'group_$groupID';
+    }
+
+    if (convID.isNotEmpty && _isConversationHidden(convID)) {
+      TencentCloudChat.instance.chatSDKInstance.manager
+          .getConversationManager()
+          .markConversation(markType: 8, enableMark: false, conversationIDList: [convID]);
+    }
+  }
+
   @override
   void notifyListener(T key) {
-    currentUpdatedFields = key;
-    TencentCloudChat.instance.eventBusInstance.fire(this, "TencentCloudChatConversationData");
+    var event = TencentCloudChatConversationData<T>(key);
+    event._conversationConfig = _conversationConfig;
+    event.conversationEventHandlers = conversationEventHandlers;
+    event._conversationBuilder = _conversationBuilder;
+    event.conversationController = conversationController;
+    event._currentConversation = _currentConversation;
+    event.currentTargetMessage = currentTargetMessage;
+    event._conversationList = _conversationList;
+    event.currentGetConversationListSeq = currentGetConversationListSeq;
+    event.getConversationListCount = getConversationListCount;
+    event.isGetConversationFinished = isGetConversationFinished;
+    event._totalUnreadCount = _totalUnreadCount;
+    event._isGetDataEnd = _isGetDataEnd;
+
+    TencentCloudChat.instance.eventBusInstance.fire(event, "TencentCloudChatConversationData");
+  }
+
+  @override
+  void clear() {
+    _currentConversation = null;
+    currentTargetMessage = null;
+    _conversationList = [];
+    currentGetConversationListSeq = "0";
+    isGetConversationFinished = false;
+    _totalUnreadCount = 0;
+    _isGetDataEnd = false;
   }
 
   @override

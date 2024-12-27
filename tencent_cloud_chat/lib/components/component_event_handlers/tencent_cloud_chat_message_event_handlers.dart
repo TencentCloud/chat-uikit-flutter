@@ -42,9 +42,9 @@ class TencentCloudChatMessageEventHandlers {
 class TencentCloudChatMessageUIEventHandlers {
   bool Function({required String link})? _onTapLink;
 
-  OnTapMessageRelated? _onPrimaryTapAvatar;
+  OnTapMessageRelated? _onTapAvatar;
 
-  OnTapMessageRelated? _onSecondaryTapAvatar;
+  OnTapMessageRelated? _onLongPressTapAvatar;
 
   // OnTapMessageRelated? _onPrimaryTapMessage;
   //
@@ -52,13 +52,13 @@ class TencentCloudChatMessageUIEventHandlers {
 
   TencentCloudChatMessageUIEventHandlers({
     bool Function({required String link})? onTapLink,
-    OnTapMessageRelated? onPrimaryTapAvatar,
-    OnTapMessageRelated? onSecondaryTapAvatar,
+    OnTapMessageRelated? onTapAvatar,
+    OnTapMessageRelated? onLongPressTapAvatar,
     // OnTapMessageRelated? onPrimaryTapMessage,
     // OnTapMessageRelated? onSecondaryTapMessage,
   })  : _onTapLink = onTapLink,
-        _onPrimaryTapAvatar = onPrimaryTapAvatar,
-        _onSecondaryTapAvatar = onSecondaryTapAvatar;
+        _onTapAvatar = onTapAvatar,
+        _onLongPressTapAvatar = onLongPressTapAvatar;
 
   // _onPrimaryTapMessage = onPrimaryTapMessage,
   // _onSecondaryTapMessage = onSecondaryTapMessage;
@@ -71,17 +71,17 @@ class TencentCloudChatMessageUIEventHandlers {
     // OnTapMessageRelated? onSecondaryTapMessage,
   }) {
     _onTapLink = onTapLink ?? _onTapLink;
-    _onPrimaryTapAvatar = onPrimaryTapAvatar ?? _onPrimaryTapAvatar;
-    _onSecondaryTapAvatar = onSecondaryTapAvatar ?? _onSecondaryTapAvatar;
+    _onTapAvatar = onPrimaryTapAvatar ?? _onTapAvatar;
+    _onLongPressTapAvatar = onSecondaryTapAvatar ?? _onLongPressTapAvatar;
     // _onPrimaryTapMessage = onPrimaryTapMessage;
     // _onSecondaryTapMessage = onSecondaryTapMessage;
   }
 
   bool Function({required String link})? get onTapLink => _onTapLink;
 
-  OnTapMessageRelated? get onPrimaryTapAvatar => _onPrimaryTapAvatar;
+  OnTapMessageRelated? get onTapAvatar => _onTapAvatar;
 
-  OnTapMessageRelated? get onSecondaryTapAvatar => _onSecondaryTapAvatar;
+  OnTapMessageRelated? get onLongPressAvatar => _onLongPressTapAvatar;
 
 // OnTapMessageRelated? get onPrimaryTapMessage => _onPrimaryTapMessage;
 //

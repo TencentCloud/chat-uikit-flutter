@@ -1,3 +1,8 @@
+## 2.1.0
+
+### General
+* Optimize multiple issues.
+
 ## 1.5.0
 
 ### General

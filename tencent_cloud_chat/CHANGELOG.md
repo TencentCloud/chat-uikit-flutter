@@ -1,3 +1,36 @@
+## 2.1.0
+
+### General
+* Optimize multiple issues.
+
+## 2.0.0
+
+### General
+* Change `onPrimaryTapAvatar`, and `onSecondaryTapAvatar` to `onTapAvatar`, and `onLongPressAvatar` in TencentCloudChatMessageUIEventHandlers.
+* Delete `deleteMessagesForEveryone` method.
+
+## 1.6.2
+
+### General
+
+* Support draft capability.
+
+## 1.6.1
+
+### General
+
+* Fixed the issue of repeated messages on the web side.
+
+## 1.6.0
+
+### General
+
+* Added support to Customer Service Plug-in.
+
+### Message (TencentCloudChatMessage)
+
+* Improved message list on Web.
+
 ## 1.5.0
 
 ### General

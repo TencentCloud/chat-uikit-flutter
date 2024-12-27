@@ -1,23 +1,26 @@
 import UIKit
-import TIMPush
 import Flutter
 
-public class TencentCloudChatPushFlutterModal: NSObject {
-    public static let shared = TencentCloudChatPushFlutterModal()
+@objc public class TencentCloudChatPushFlutterModal: NSObject {
+    @objc public static let shared = TencentCloudChatPushFlutterModal()
 
-    public var busId: Int32 = 0
+    @objc public var busId: Int32 = 0
     
     private override init() {
             super.init()
         }
     
-    public var kAPNSApplicationGroupID: String = ""
+    @objc  public var kAPNSApplicationGroupID: String = ""
 
-    public func offlinePushCertificateID() -> Int32 {
+    @objc  public func businessID() -> Int32 {
         return busId
     }
 
-    public func applicationGroupID() -> String! {
+    @objc  public func offlinePushCertificateID() -> Int32 {
+        return busId
+    }
+
+    @objc  public func applicationGroupID() -> String! {
         return kAPNSApplicationGroupID
     }
 }

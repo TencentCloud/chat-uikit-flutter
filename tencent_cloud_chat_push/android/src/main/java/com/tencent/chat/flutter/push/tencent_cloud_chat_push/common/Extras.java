@@ -15,4 +15,13 @@ public interface Extras {
 
     String FLUTTER_ENGINE = "tencent_cloud_chat_push_flutter_engine";
     String SHOW_IN_FOREGROUND = "show_in_foreground";
+    String SDK_APP_ID = "sdkAppId";
+    String APP_KEY = "appKey";
+    String REGISTRATION_ID = "registrationID";
+    String DISABLE_POST_NOTIFICATION_IN_FOREGROUND = "disablePostNotificationInForeground";
+    String FORCE_USE_FCM_PUSH_CHANNEL = "forceUseFCMPushChannel";
+    String CHANNEL_ID = "channel_id";
+    String CHANNEL_NAME = "channel_name";
+    String CHANNEL_DESC = "channel_desc";
+    String CHANNEL_SOUND = "channel_sound";
 }

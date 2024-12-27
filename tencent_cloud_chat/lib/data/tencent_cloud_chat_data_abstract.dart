@@ -10,6 +10,8 @@ abstract class TencentCloudChatDataAB<T> {
 
   void notifyListener(T key);
 
+  void clear();
+
   late T currentUpdatedFields;
 
   TencentCloudChatDataAB(this.currentUpdatedFields);

@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_message_calling_message/tencent_cloud_chat_message_calling_message.dart';
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_custom.dart';
+import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_custom_c2c_call.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_file.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_image.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_merge.dart';
@@ -48,7 +50,6 @@ class TencentCloudChatMessageItemBuilders {
     required MessageItemBuilderData data,
     required MessageItemBuilderMethods methods,
   }) {
-    
     return TencentCloudChatMessageImage(
       data: data,
       methods: methods,
@@ -61,6 +62,18 @@ class TencentCloudChatMessageItemBuilders {
     required MessageItemBuilderMethods methods,
   }) {
     return TencentCloudChatMessageCustom(
+      key: key,
+      data: data,
+      methods: methods,
+    );
+  }
+
+  static Widget getCustomC2CCallBuilder({
+    Key? key,
+    required MessageItemBuilderData data,
+    required MessageItemBuilderMethods methods,
+  }) {
+    return TencentCloudChatMessageCustomC2CCall(
       key: key,
       data: data,
       methods: methods,
@@ -140,15 +153,14 @@ class TencentCloudChatMessageItemBuilders {
     required MessageItemBuilderMethods methods,
   }) {
     final int messageType = data.message.elemType;
+    final bool isUseTipsBuilder = isShowTipsMessage(data.message);
+    bool isRecalledMessage = data.message.status == MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED;
 
-    final tipsItem = data.message.elemType == 101 || data.message.elemType == MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS;
-    final recalledMessage = data.message.status == MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED;
-
-    if (tipsItem || recalledMessage) {
+    if (isUseTipsBuilder) {
       return getCommonTipsBuilder(
         message: data.message,
         text: data.altText,
-        buttonText: (recalledMessage && (data.message.isSelf ?? true))
+        buttonText: (isRecalledMessage && (data.message.isSelf ?? true))
             ? (
                 text: tL10n.reEdit,
                 onTap: () => methods.setMessageTextWithMentions(
@@ -210,11 +222,22 @@ class TencentCloudChatMessageItemBuilders {
           methods: methods,
         );
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
-        return getCustomMessageBuilder(
-          key: key,
-          data: data,
-          methods: methods,
-        );
+        CallingMessage? callingMessage = CallingMessage.getCallMessage(data.message);
+        if (callingMessage != null &&
+            callingMessage.isCallingSignal &&
+            callingMessage.participantType == CallParticipantType.c2c) {
+          return getCustomC2CCallBuilder(
+            key: key,
+            data: data,
+            methods: methods,
+          );
+        } else {
+          return getCustomMessageBuilder(
+            key: key,
+            data: data,
+            methods: methods,
+          );
+        }
     }
     return Text(tL10n.messageInfo);
   }
@@ -243,5 +266,25 @@ class TencentCloudChatMessageItemBuilders {
       data: data,
       methods: methods,
     );
+  }
+
+  static bool isShowTipsMessage(V2TimMessage message) {
+    bool isGroupTipsItem = message.elemType == 101 || message.elemType == MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS;
+    bool isRecalledMessage = message.status == MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED;
+    bool isGroupCallMessage = false;
+    if (message.elemType == MessageElemType.V2TIM_ELEM_TYPE_CUSTOM) {
+      final callingMessage = CallingMessage.getCallMessage(message);
+      if (callingMessage != null &&
+          callingMessage.isCallingSignal &&
+          callingMessage.participantType == CallParticipantType.group) {
+        isGroupCallMessage = true;
+      }
+    }
+
+    if (isGroupTipsItem || isRecalledMessage || isGroupCallMessage) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

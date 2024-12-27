@@ -6,6 +6,8 @@ import 'package:intl/intl.dart' as intl;
 
 import 'tencent_cloud_chat_localizations.dart';
 
+// ignore_for_file: type=lint
+
 /// The translations for Arabic (`ar`).
 class TencentCloudChatLocalizationsAr extends TencentCloudChatLocalizations {
   TencentCloudChatLocalizationsAr([String locale = 'ar']) : super(locale);
@@ -187,7 +189,7 @@ class TencentCloudChatLocalizationsAr extends TencentCloudChatLocalizations {
   String get forward => 'إعادة توجيه';
 
   @override
-  String get multiSelect => 'تحديد';
+  String get multiSelect => 'التحديد المتعدد';
 
   @override
   String get select => 'تحديد';
@@ -281,16 +283,13 @@ class TencentCloudChatLocalizationsAr extends TencentCloudChatLocalizations {
   String get message => 'رسالة';
 
   @override
-  String get doNotDisturb => 'كتم';
+  String get doNotDisturb => 'عدم الإزعاج';
 
   @override
   String get mute => 'كتم';
 
   @override
-  String get topChat => 'تثبيت';
-
-  @override
-  String get pin => 'تثبيت';
+  String get pin => 'تثبيت المحادثة';
 
   @override
   String get blackUser => 'حظر المستخدم';
@@ -738,12 +737,6 @@ class TencentCloudChatLocalizationsAr extends TencentCloudChatLocalizations {
   String get confirmDeletion => 'تأكيد الحذف';
 
   @override
-  String get deleteForEveryone => 'حذف للجميع';
-
-  @override
-  String get deleteForMe => 'حذف بالنسبة لي';
-
-  @override
   String get askDeleteThisMessage => 'حذف هذه الرسالة؟';
 
   @override
@@ -945,10 +938,10 @@ class TencentCloudChatLocalizationsAr extends TencentCloudChatLocalizations {
   String get changedGroupCustomInfo => 'تغيير معلومات المجموعة المخصصة';
 
   @override
-  String get enabledGroupMute => 'تمكين كتم الصوت للمجموعة';
+  String get enabledGroupMute => 'قام بحظر الدردشة لجميع أعضاء المجموعة';
 
   @override
-  String get disabledGroupMute => 'تعطيل كتم الصوت للمجموعة';
+  String get disabledGroupMute => 'قام بإلغاء حظر الدردشة لجميع أعضاء المجموعة';
 
   @override
   String changedGroupMessageReceptionTo(Object setting) {
@@ -1039,7 +1032,7 @@ class TencentCloudChatLocalizationsAr extends TencentCloudChatLocalizations {
   String get searchMembers => 'البحث عن أعضاء';
 
   @override
-  String get startCall => 'بدء المكالمة';
+  String get startCall => 'بدء مكالمة';
 
   @override
   String get clear => 'مسح';
@@ -1074,7 +1067,7 @@ class TencentCloudChatLocalizationsAr extends TencentCloudChatLocalizations {
   String get restartAppForLanguage => 'يرجى إعادة تشغيل التطبيق لتفعيل تغيير اللغة';
 
   @override
-  String get deleteAllMessages => 'حذف جميع الرسائل';
+  String get deleteAllMessages => 'مسح سجل الدردشة';
 
   @override
   String get downloading => 'جارٍ التنزيل...';
@@ -1089,10 +1082,10 @@ class TencentCloudChatLocalizationsAr extends TencentCloudChatLocalizations {
   String get messageRecallConfirmation => 'هل أنت متأكد من أنك تريد استرجاع هذه الرسالة؟';
 
   @override
-  String get quit => 'مغادرة المجموعة';
+  String get quit => 'الخروج من المحادثة الجماعية';
 
   @override
-  String get quitAndDelete => 'إنهاء وحذف';
+  String get dissolve => 'حل المجموعة';
 
   @override
   String get setGroupName => 'تعيين اسم المجموعة';
@@ -1316,4 +1309,383 @@ class TencentCloudChatLocalizationsAr extends TencentCloudChatLocalizations {
 
   @override
   String get myRoleInGroup => 'الدور';
+
+  @override
+  String get chooseAvatar => 'اختيار الصورة الرمزية';
+
+  @override
+  String get friendLimit => 'لقد وصلت إلى الحد الأقصى لعدد الأصدقاء في النظام';
+
+  @override
+  String get otherFriendLimit => 'لقد وصل الشخص المطلوب إلى الحد الأقصى لعدد الأصدقاء في النظام';
+
+  @override
+  String get inBlacklist => 'الشخص المطلوب موجود في القائمة السوداء الخاصة بك';
+
+  @override
+  String get setInBlacklist => 'لقد تم إضافتك إلى القائمة السوداء من قبل الشخص المطلوب';
+
+  @override
+  String get forbidAddFriend => 'الشخص المطلوب قد منع إضافة الأصدقاء';
+
+  @override
+  String get waitAgreeFriend => 'في انتظار موافقة الصديق';
+
+  @override
+  String get haveBeFriend => 'الشخص المطلوب هو بالفعل صديقك';
+
+  @override
+  String get contactAddFailed => 'فشل الإضافة';
+
+  @override
+  String get addGroupPermissionDeny => 'منع الانضمام';
+
+  @override
+  String get addGroupAlreadyMember => 'أنت بالفعل عضو في المجموعة';
+
+  @override
+  String get addGroupNotFound => 'المجموعة غير موجودة';
+
+  @override
+  String get addGroupFullMember => 'المجموعة ممتلئة بالأعضاء';
+
+  @override
+  String get joinedTip => 'لقد انضممت إلى المجموعة: ';
+
+  @override
+  String get quitGroupTip => 'هل تريد بالتأكيد الخروج من هذه المجموعة؟';
+
+  @override
+  String get dismissGroupTip => 'هل تريد بالتأكيد حل هذه المجموعة؟';
+
+  @override
+  String get kickedOffTips => 'لقد تم طردك حاليا';
+
+  @override
+  String get userSigExpiredTips => 'انتهت صلاحية توقيع المستخدم';
+
+  @override
+  String get convertTextFailed => 'فشل تحويل النص';
+
+  @override
+  String get deleteFriendSuccess => 'تم حذف الصديق بنجاح';
+
+  @override
+  String get deleteFriendFailed => 'فشل في حذف الصديق';
+
+  @override
+  String get clearMsgTip => 'هل تريد بالتأكيد مسح سجل الدردشة؟';
+
+  @override
+  String get sendMsg => 'إرسال رسالة';
+
+  @override
+  String get groupMemberMute => 'لا يمكن إرسال الرسالة لأنها محظورة. يرجى التحقق مما إذا كان المرسل قد تم حظره.';
+
+  @override
+  String get forwardFailedTip => 'لا يمكن تحويل الرسائل التي فشلت في الإرسال!';
+
+  @override
+  String get fileTooLarge => 'حجم الملف يتجاوز الحد المسموح به';
+
+  @override
+  String get invalidApplication => 'طلب الصداقة غير صالح';
+
+  @override
+  String get atMeTips => 'شخص @ انا';
+
+  @override
+  String get atAllTips => '@الجميع';
+
+  @override
+  String get forwardVoteFailedTip => 'رسائل التصويت لا تدعم إعادة التوجيه!';
+
+  @override
+  String get forwardOneByOneLimitNumberTip => 'تم تحويل الرسائل بكمية كبيرة جدًا، لا يمكن تحويلها تلو الأخرى.';
+
+  @override
+  String get modifyRemark => 'تعديل الملاحظات';
+
+  @override
+  String banned(Object targetUser, Object time) {
+    return 'تم حظر $targetUser لمدة $time';
+  }
+
+  @override
+  String cancelBanned(Object targetUser) {
+    return '$targetUser غير محظور';
+  }
+
+  @override
+  String get day => 'أيام';
+
+  @override
+  String get hour => 'ساعة';
+
+  @override
+  String get min => 'دقيقة';
+
+  @override
+  String get second => 'ثانية';
+
+  @override
+  String get setFailed => 'فشل الإعداد';
+
+  @override
+  String get callRejectCaller => 'تم رفضه من الطرف الآخ';
+
+  @override
+  String get callRejectCallee => 'تم الرفض';
+
+  @override
+  String get callCancelCaller => 'تم الإلغاء';
+
+  @override
+  String get callCancelCallee => 'تم الإلغاء من الطرف الآخر';
+
+  @override
+  String get stopCallTip => 'مدة المكالمة:';
+
+  @override
+  String get callTimeoutCaller => 'لا يوجد رد من الطرف الآخر';
+
+  @override
+  String get callTimeoutCallee => 'تم الإلغاء من الطرف الآخر';
+
+  @override
+  String get callLineBusyCaller => 'الخط مشغول عند الطرف الآخر';
+
+  @override
+  String get callLineBusyCallee => 'تم الإلغاء من الطرف الآخر';
+
+  @override
+  String get acceptCall => 'تم الرد';
+
+  @override
+  String get callingSwitchToAudio => 'تحويل الفيديو إلى صوتي';
+
+  @override
+  String get callingSwitchToAudioAccept => 'تأكيد تحويل الفيديو إلى صوتي';
+
+  @override
+  String get invalidCommand => 'أمر المكالمة غير معروف';
+
+  @override
+  String get groupCallSend => 'تم بدء مكالمة جماعية';
+
+  @override
+  String get groupCallEnd => 'تم إنهاء المكالمة';
+
+  @override
+  String get groupCallNoAnswer => 'لم يتم الرد';
+
+  @override
+  String get groupCallReject => 'رفض مكالمة جماعية ';
+
+  @override
+  String get groupCallAccept => 'قبل المكالمة ';
+
+  @override
+  String get groupCallConfirmSwitchToAudio => 'تأكيد تحويل الفيديو إلى صوتي ';
+
+  @override
+  String get callkitInPeerBlacklist => 'فشلت المكالمة ، المستخدم في القائمة السوداء ، ممنوع الإطلاق.';
+
+  @override
+  String get resendTips => 'هل تريد إعادة الإرسال؟';
+
+  @override
+  String get logoutTip => 'هل أنت متأكد من أنك تريد تسجيل الخروج؟';
+
+  @override
+  String get sendFileLimit => 'يمكنك تحديد 9 ملفات فقط';
+
+  @override
+  String get atAll => 'الجميع';
+
+  @override
+  String get tuiEmojiSmile => '[ابتسامة]';
+
+  @override
+  String get tuiEmojiExpect => '[توقع]';
+
+  @override
+  String get tuiEmojiBlink => '[غمز]';
+
+  @override
+  String get tuiEmojiGuffaw => '[ضحكة عالية]';
+
+  @override
+  String get tuiEmojiKindSmile => '[ابتسامة لطيفة]';
+
+  @override
+  String get tuiEmojiHaha => '[هاها]';
+
+  @override
+  String get tuiEmojiCheerful => '[مرح]';
+
+  @override
+  String get tuiEmojiSpeechless => '[بلا كلمات]';
+
+  @override
+  String get tuiEmojiAmazed => '[مدهش]';
+
+  @override
+  String get tuiEmojiSorrow => '[حزن]';
+
+  @override
+  String get tuiEmojiComplacent => '[راض]';
+
+  @override
+  String get tuiEmojiSilly => '[ضحكة غبية]';
+
+  @override
+  String get tuiEmojiLustful => '[شهواني]';
+
+  @override
+  String get tuiEmojiGiggle => '[قهقهة]';
+
+  @override
+  String get tuiEmojiKiss => '[قبلة]';
+
+  @override
+  String get tuiEmojiWail => '[بكاء]';
+
+  @override
+  String get tuiEmojiTearsLaugh => '[ضحك حتى الدموع]';
+
+  @override
+  String get tuiEmojiTrapped => '[محاصر]';
+
+  @override
+  String get tuiEmojiMask => '[قناع]';
+
+  @override
+  String get tuiEmojiFear => '[خوف]';
+
+  @override
+  String get tuiEmojiBareTeeth => '[أسنان عارية]';
+
+  @override
+  String get tuiEmojiFlareUp => '[غضب]';
+
+  @override
+  String get tuiEmojiYawn => '[تثاؤب]';
+
+  @override
+  String get tuiEmojiTact => '[دهاء]';
+
+  @override
+  String get tuiEmojiStareyes => '[عيون النجوم]';
+
+  @override
+  String get tuiEmojiShutUp => '[أغلق فمك]';
+
+  @override
+  String get tuiEmojiSigh => '[تنهد]';
+
+  @override
+  String get tuiEmojiHehe => '[ههه]';
+
+  @override
+  String get tuiEmojiSilent => '[صامت]';
+
+  @override
+  String get tuiEmojiSurprised => '[متفاجئ]';
+
+  @override
+  String get tuiEmojiAskance => '[نظرة جانبية]';
+
+  @override
+  String get tuiEmojiOk => '[حسنا]';
+
+  @override
+  String get tuiEmojiShit => '[براز]';
+
+  @override
+  String get tuiEmojiMonster => '[وحش]';
+
+  @override
+  String get tuiEmojiDaemon => '[شيطان]';
+
+  @override
+  String get tuiEmojiRage => '[غضب]';
+
+  @override
+  String get tuiEmojiFool => '[أحمق]';
+
+  @override
+  String get tuiEmojiPig => '[خنزير]';
+
+  @override
+  String get tuiEmojiCow => '[بقرة]';
+
+  @override
+  String get tuiEmojiAi => '[الذكاء الصناعي]';
+
+  @override
+  String get tuiEmojiSkull => '[جمجمة]';
+
+  @override
+  String get tuiEmojiBombs => '[قنابل]';
+
+  @override
+  String get tuiEmojiCoffee => '[قهوة]';
+
+  @override
+  String get tuiEmojiCake => '[كعكة]';
+
+  @override
+  String get tuiEmojiBeer => '[بيرة]';
+
+  @override
+  String get tuiEmojiFlower => '[زهرة]';
+
+  @override
+  String get tuiEmojiWatermelon => '[بطيخ]';
+
+  @override
+  String get tuiEmojiRich => '[غني]';
+
+  @override
+  String get tuiEmojiHeart => '[قلب]';
+
+  @override
+  String get tuiEmojiMoon => '[قمر]';
+
+  @override
+  String get tuiEmojiSun => '[شمس]';
+
+  @override
+  String get tuiEmojiStar => '[نجمة]';
+
+  @override
+  String get tuiEmojiRedPacket => '[حزمة حمراء]';
+
+  @override
+  String get tuiEmojiCelebrate => '[احتفال]';
+
+  @override
+  String get tuiEmojiBless => '[بركة]';
+
+  @override
+  String get tuiEmojiFortune => '[ثروة]';
+
+  @override
+  String get tuiEmojiConvinced => '[مقتنع]';
+
+  @override
+  String get tuiEmojiProhibit => '[ممنوع]';
+
+  @override
+  String get tuiEmoji666 => '[666]';
+
+  @override
+  String get tuiEmoji857 => '[857]';
+
+  @override
+  String get tuiEmojiKnife => '[سكين]';
+
+  @override
+  String get tuiEmojiLike => '[أعجبني]';
 }

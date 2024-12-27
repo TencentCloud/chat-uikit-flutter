@@ -130,6 +130,7 @@ class _TencentCloudChatUserProfileState extends TencentCloudChatState<TencentClo
                   userFullInfo: userFullInfo,
                   startVideoCall: widget.options!.startVideoCall,
                   startVoiceCall: widget.options!.startVoiceCall,
+                  isNavigatedFromChat: widget.options!.isNavigatedFromChat ?? true,
                 )
               : Container();
         },

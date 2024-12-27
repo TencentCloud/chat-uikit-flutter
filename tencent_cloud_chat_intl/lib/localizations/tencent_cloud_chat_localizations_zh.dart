@@ -6,6 +6,8 @@ import 'package:intl/intl.dart' as intl;
 
 import 'tencent_cloud_chat_localizations.dart';
 
+// ignore_for_file: type=lint
+
 /// The translations for Chinese (`zh`).
 class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
   TencentCloudChatLocalizationsZh([String locale = 'zh']) : super(locale);
@@ -281,16 +283,13 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
   String get message => '消息';
 
   @override
-  String get doNotDisturb => '静音';
+  String get doNotDisturb => '消息免打扰';
 
   @override
   String get mute => '静音';
 
   @override
-  String get topChat => '置顶';
-
-  @override
-  String get pin => '置顶';
+  String get pin => '置顶聊天';
 
   @override
   String get blackUser => '拉黑用户';
@@ -498,7 +497,7 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
   String get declined => '已拒绝';
 
   @override
-  String get confirm => '确认';
+  String get confirm => '确定';
 
   @override
   String get contactRequest => '联系人请求';
@@ -738,12 +737,6 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
   String get confirmDeletion => '确认删除';
 
   @override
-  String get deleteForEveryone => '为所有人删除';
-
-  @override
-  String get deleteForMe => '为我删除';
-
-  @override
   String get askDeleteThisMessage => '删除这条消息？';
 
   @override
@@ -945,10 +938,10 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
   String get changedGroupCustomInfo => '更改群组自定义信息';
 
   @override
-  String get enabledGroupMute => '启用了群组全员禁言';
+  String get enabledGroupMute => '禁言全员';
 
   @override
-  String get disabledGroupMute => '关闭了群组全员禁言';
+  String get disabledGroupMute => '取消禁言全员';
 
   @override
   String changedGroupMessageReceptionTo(Object setting) {
@@ -1039,7 +1032,7 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
   String get searchMembers => '搜索成员';
 
   @override
-  String get startCall => '开始通话';
+  String get startCall => '发起通话';
 
   @override
   String get clear => '清除';
@@ -1074,7 +1067,7 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
   String get restartAppForLanguage => '请重启应用以使语言更改生效';
 
   @override
-  String get deleteAllMessages => '删除所有消息';
+  String get deleteAllMessages => '清除聊天记录';
 
   @override
   String get downloading => '下载中...';
@@ -1089,10 +1082,10 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
   String get messageRecallConfirmation => '你确定要撤回这条消息吗？';
 
   @override
-  String get quit => '退出';
+  String get quit => '退出群聊';
 
   @override
-  String get quitAndDelete => '退出并删除';
+  String get dissolve => '解散该群';
 
   @override
   String get setGroupName => '设置群组名称';
@@ -1316,6 +1309,385 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
 
   @override
   String get myRoleInGroup => '角色';
+
+  @override
+  String get chooseAvatar => '选择头像';
+
+  @override
+  String get friendLimit => '您的好友数已达系统上限';
+
+  @override
+  String get otherFriendLimit => '对方的好友数已达系统上限';
+
+  @override
+  String get inBlacklist => '被加好友在自己的黑名单中';
+
+  @override
+  String get setInBlacklist => '您已被被对方设置为黑名单';
+
+  @override
+  String get forbidAddFriend => '对方已禁止加好友';
+
+  @override
+  String get waitAgreeFriend => '等待好友审核同意';
+
+  @override
+  String get haveBeFriend => '对方已是您的好友';
+
+  @override
+  String get contactAddFailed => '添加失败';
+
+  @override
+  String get addGroupPermissionDeny => '禁止加群';
+
+  @override
+  String get addGroupAlreadyMember => '已经是群成员';
+
+  @override
+  String get addGroupNotFound => '群组不存在';
+
+  @override
+  String get addGroupFullMember => '群已满员';
+
+  @override
+  String get joinedTip => '您已加入群:';
+
+  @override
+  String get quitGroupTip => '您确认退出该群？';
+
+  @override
+  String get dismissGroupTip => '您确认解散该群?';
+
+  @override
+  String get kickedOffTips => '您已被踢下线';
+
+  @override
+  String get userSigExpiredTips => '用户签名已经过期';
+
+  @override
+  String get convertTextFailed => '转换文本失败';
+
+  @override
+  String get deleteFriendSuccess => '删除好友成功';
+
+  @override
+  String get deleteFriendFailed => '删除好友失败';
+
+  @override
+  String get clearMsgTip => '确认清除聊天记录？';
+
+  @override
+  String get sendMsg => '发送消息';
+
+  @override
+  String get groupMemberMute => '因被禁言而不能发送消息，请检查发送者是否被设置禁言。';
+
+  @override
+  String get forwardFailedTip => '发送失败消息不支持转发！';
+
+  @override
+  String get fileTooLarge => '文件大小超出了限制';
+
+  @override
+  String get invalidApplication => '好友申请失效';
+
+  @override
+  String get atMeTips => '有人@我';
+
+  @override
+  String get atAllTips => '@所有人';
+
+  @override
+  String get forwardVoteFailedTip => '投票消息不支持转发！';
+
+  @override
+  String get forwardOneByOneLimitNumberTip => '转发消息过多，暂不支持逐条转发';
+
+  @override
+  String get modifyRemark => '修改备注';
+
+  @override
+  String banned(Object targetUser, Object time) {
+    return '$targetUser 被禁言 $time';
+  }
+
+  @override
+  String cancelBanned(Object targetUser) {
+    return '$targetUser 被取消禁言';
+  }
+
+  @override
+  String get day => '天';
+
+  @override
+  String get hour => '小时';
+
+  @override
+  String get min => '分';
+
+  @override
+  String get second => '秒';
+
+  @override
+  String get setFailed => '设置失败';
+
+  @override
+  String get callRejectCaller => '对方已拒绝';
+
+  @override
+  String get callRejectCallee => '已拒绝';
+
+  @override
+  String get callCancelCaller => '已取消';
+
+  @override
+  String get callCancelCallee => '对方已取消';
+
+  @override
+  String get stopCallTip => '通话时长：';
+
+  @override
+  String get callTimeoutCaller => '对方无应答';
+
+  @override
+  String get callTimeoutCallee => '对方已取消';
+
+  @override
+  String get callLineBusyCaller => '对方忙线中';
+
+  @override
+  String get callLineBusyCallee => '对方已取消';
+
+  @override
+  String get acceptCall => '已接听';
+
+  @override
+  String get callingSwitchToAudio => '视频转语音';
+
+  @override
+  String get callingSwitchToAudioAccept => '确认视频转语音';
+
+  @override
+  String get invalidCommand => '不能识别的通话指令';
+
+  @override
+  String get groupCallSend => '发起了群通话';
+
+  @override
+  String get groupCallEnd => '通话结束';
+
+  @override
+  String get groupCallNoAnswer => '未接听';
+
+  @override
+  String get groupCallReject => '拒绝群通话';
+
+  @override
+  String get groupCallAccept => '接听';
+
+  @override
+  String get groupCallConfirmSwitchToAudio => '同意视频转语音';
+
+  @override
+  String get callkitInPeerBlacklist => '发起通话失败，用户在黑名单中，禁止发起！';
+
+  @override
+  String get resendTips => '确定重发吗？';
+
+  @override
+  String get logoutTip => '您确定要退出登录么？';
+
+  @override
+  String get sendFileLimit => '你只能选择9个文件';
+
+  @override
+  String get atAll => '所有人';
+
+  @override
+  String get tuiEmojiSmile => '[微笑]';
+
+  @override
+  String get tuiEmojiExpect => '[期待]';
+
+  @override
+  String get tuiEmojiBlink => '[眨眼]';
+
+  @override
+  String get tuiEmojiGuffaw => '[大笑]';
+
+  @override
+  String get tuiEmojiKindSmile => '[姨母笑]';
+
+  @override
+  String get tuiEmojiHaha => '[哈哈哈]';
+
+  @override
+  String get tuiEmojiCheerful => '[愉快]';
+
+  @override
+  String get tuiEmojiSpeechless => '[无语]';
+
+  @override
+  String get tuiEmojiAmazed => '[惊讶]';
+
+  @override
+  String get tuiEmojiSorrow => '[悲伤]';
+
+  @override
+  String get tuiEmojiComplacent => '[得意]';
+
+  @override
+  String get tuiEmojiSilly => '[傻了]';
+
+  @override
+  String get tuiEmojiLustful => '[色]';
+
+  @override
+  String get tuiEmojiGiggle => '[憨笑]';
+
+  @override
+  String get tuiEmojiKiss => '[亲亲]';
+
+  @override
+  String get tuiEmojiWail => '[大哭]';
+
+  @override
+  String get tuiEmojiTearsLaugh => '[哭笑]';
+
+  @override
+  String get tuiEmojiTrapped => '[困]';
+
+  @override
+  String get tuiEmojiMask => '[口罩]';
+
+  @override
+  String get tuiEmojiFear => '[恐惧]';
+
+  @override
+  String get tuiEmojiBareTeeth => '[龇牙]';
+
+  @override
+  String get tuiEmojiFlareUp => '[发怒]';
+
+  @override
+  String get tuiEmojiYawn => '[打哈欠]';
+
+  @override
+  String get tuiEmojiTact => '[机智]';
+
+  @override
+  String get tuiEmojiStareyes => '[星星眼]';
+
+  @override
+  String get tuiEmojiShutUp => '[闭嘴]';
+
+  @override
+  String get tuiEmojiSigh => '[叹气]';
+
+  @override
+  String get tuiEmojiHehe => '[呵呵]';
+
+  @override
+  String get tuiEmojiSilent => '[收声]';
+
+  @override
+  String get tuiEmojiSurprised => '[惊喜]';
+
+  @override
+  String get tuiEmojiAskance => '[白眼]';
+
+  @override
+  String get tuiEmojiOk => '[OK]';
+
+  @override
+  String get tuiEmojiShit => '[便便]';
+
+  @override
+  String get tuiEmojiMonster => '[怪兽]';
+
+  @override
+  String get tuiEmojiDaemon => '[恶魔]';
+
+  @override
+  String get tuiEmojiRage => '[恶魔怒]';
+
+  @override
+  String get tuiEmojiFool => '[衰]';
+
+  @override
+  String get tuiEmojiPig => '[猪]';
+
+  @override
+  String get tuiEmojiCow => '[牛]';
+
+  @override
+  String get tuiEmojiAi => '[AI]';
+
+  @override
+  String get tuiEmojiSkull => '[骷髅]';
+
+  @override
+  String get tuiEmojiBombs => '[炸弹]';
+
+  @override
+  String get tuiEmojiCoffee => '[咖啡]';
+
+  @override
+  String get tuiEmojiCake => '[蛋糕]';
+
+  @override
+  String get tuiEmojiBeer => '[啤酒]';
+
+  @override
+  String get tuiEmojiFlower => '[花]';
+
+  @override
+  String get tuiEmojiWatermelon => '[瓜]';
+
+  @override
+  String get tuiEmojiRich => '[壕]';
+
+  @override
+  String get tuiEmojiHeart => '[爱心]';
+
+  @override
+  String get tuiEmojiMoon => '[月亮]';
+
+  @override
+  String get tuiEmojiSun => '[太阳]';
+
+  @override
+  String get tuiEmojiStar => '[星星]';
+
+  @override
+  String get tuiEmojiRedPacket => '[红包]';
+
+  @override
+  String get tuiEmojiCelebrate => '[庆祝]';
+
+  @override
+  String get tuiEmojiBless => '[福]';
+
+  @override
+  String get tuiEmojiFortune => '[发]';
+
+  @override
+  String get tuiEmojiConvinced => '[服]';
+
+  @override
+  String get tuiEmojiProhibit => '[禁]';
+
+  @override
+  String get tuiEmoji666 => '[666]';
+
+  @override
+  String get tuiEmoji857 => '[857]';
+
+  @override
+  String get tuiEmojiKnife => '[刀]';
+
+  @override
+  String get tuiEmojiLike => '[赞]';
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -1506,7 +1878,7 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
   String get forward => '轉發';
 
   @override
-  String get multiSelect => '揀選';
+  String get multiSelect => '多選';
 
   @override
   String get select => '揀選';
@@ -1600,16 +1972,13 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
   String get message => '訊息';
 
   @override
-  String get doNotDisturb => '免打擾';
+  String get doNotDisturb => '消息免打擾';
 
   @override
   String get mute => '靜音';
 
   @override
-  String get topChat => '置頂';
-
-  @override
-  String get pin => '置頂';
+  String get pin => '置頂聊天';
 
   @override
   String get blackUser => '封鎖用戶';
@@ -1817,7 +2186,7 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
   String get declined => '已拒絕';
 
   @override
-  String get confirm => '確認';
+  String get confirm => '確定';
 
   @override
   String get contactRequest => '聯絡人請求';
@@ -2057,12 +2426,6 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
   String get confirmDeletion => '確認刪除';
 
   @override
-  String get deleteForEveryone => '為所有人刪除';
-
-  @override
-  String get deleteForMe => '僅為我刪除';
-
-  @override
   String get askDeleteThisMessage => '確定刪除此訊息嗎？';
 
   @override
@@ -2264,10 +2627,10 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
   String get changedGroupCustomInfo => '更改群組自定義信息';
 
   @override
-  String get enabledGroupMute => '啟用群組全員禁言';
+  String get enabledGroupMute => '禁言全員';
 
   @override
-  String get disabledGroupMute => '禁用群組全員禁言';
+  String get disabledGroupMute => '取消禁言全員';
 
   @override
   String changedGroupMessageReceptionTo(Object setting) {
@@ -2358,7 +2721,7 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
   String get searchMembers => '搜索成員';
 
   @override
-  String get startCall => '開始通話';
+  String get startCall => '發起通話';
 
   @override
   String get clear => '清除';
@@ -2393,7 +2756,7 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
   String get restartAppForLanguage => '請重新啟動應用程式以使語言變更生效';
 
   @override
-  String get deleteAllMessages => '刪除所有訊息';
+  String get deleteAllMessages => '清除聊天記錄';
 
   @override
   String get downloading => '下載中...';
@@ -2408,10 +2771,7 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
   String get messageRecallConfirmation => '您確定要撤回這條訊息嗎？';
 
   @override
-  String get quit => '退出';
-
-  @override
-  String get quitAndDelete => '退出並刪除';
+  String get quit => '退出群聊';
 
   @override
   String get setGroupName => '設置群組名稱';
@@ -2632,4 +2992,383 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
 
   @override
   String get myRoleInGroup => '角色';
+
+  @override
+  String get chooseAvatar => '選擇頭像';
+
+  @override
+  String get friendLimit => '您的好友數已達系統上限';
+
+  @override
+  String get otherFriendLimit => '對方的好友數已達系統上限';
+
+  @override
+  String get inBlacklist => '被加好友在自己的黑名單中';
+
+  @override
+  String get setInBlacklist => '您已被被對方設置為黑名單';
+
+  @override
+  String get forbidAddFriend => '對方已禁止加好友';
+
+  @override
+  String get waitAgreeFriend => '等待好友審核同意';
+
+  @override
+  String get haveBeFriend => '對方已是您的好友';
+
+  @override
+  String get contactAddFailed => '添加失敗';
+
+  @override
+  String get addGroupPermissionDeny => '禁止加群';
+
+  @override
+  String get addGroupAlreadyMember => '已經是群成員';
+
+  @override
+  String get addGroupNotFound => '群組不存在';
+
+  @override
+  String get addGroupFullMember => '群已滿員';
+
+  @override
+  String get joinedTip => '您已加入群:';
+
+  @override
+  String get quitGroupTip => '您確認退出該群？';
+
+  @override
+  String get dismissGroupTip => '您確認解散該群?';
+
+  @override
+  String get kickedOffTips => '您已被踢下線';
+
+  @override
+  String get userSigExpiredTips => '使用者簽名已過期';
+
+  @override
+  String get convertTextFailed => '轉換文字失敗';
+
+  @override
+  String get deleteFriendSuccess => '刪除好友成功';
+
+  @override
+  String get deleteFriendFailed => '刪除好友失敗';
+
+  @override
+  String get clearMsgTip => '確認清除聊天記錄？';
+
+  @override
+  String get sendMsg => '发送消息';
+
+  @override
+  String get groupMemberMute => '因被禁言而不能發送消息，請檢查發送者是否被設置禁言。';
+
+  @override
+  String get forwardFailedTip => '發送失敗訊息不支持轉發！';
+
+  @override
+  String get fileTooLarge => '文件大小超出了限制';
+
+  @override
+  String get invalidApplication => '好友申請失效';
+
+  @override
+  String get atMeTips => '有人@我';
+
+  @override
+  String get atAllTips => '@所有人';
+
+  @override
+  String get forwardVoteFailedTip => '投票訊息不支援轉發！';
+
+  @override
+  String get forwardOneByOneLimitNumberTip => '轉發訊息過多，暫不支持逐條轉發';
+
+  @override
+  String get modifyRemark => '修改备注';
+
+  @override
+  String banned(Object targetUser, Object time) {
+    return '$targetUser 被禁言 $time';
+  }
+
+  @override
+  String cancelBanned(Object targetUser) {
+    return '$targetUser 被取消禁言';
+  }
+
+  @override
+  String get day => '天';
+
+  @override
+  String get hour => '小時';
+
+  @override
+  String get min => '分';
+
+  @override
+  String get second => '秒';
+
+  @override
+  String get setFailed => '設置失敗';
+
+  @override
+  String get callRejectCaller => '對方已拒絕';
+
+  @override
+  String get callRejectCallee => '已拒絕';
+
+  @override
+  String get callCancelCaller => '已取消';
+
+  @override
+  String get callCancelCallee => '對方已取消';
+
+  @override
+  String get stopCallTip => '通話時長：';
+
+  @override
+  String get callTimeoutCaller => '對方無應答';
+
+  @override
+  String get callTimeoutCallee => '對方已取消';
+
+  @override
+  String get callLineBusyCaller => '對方忙線中';
+
+  @override
+  String get callLineBusyCallee => '對方已取消';
+
+  @override
+  String get acceptCall => '已接聽';
+
+  @override
+  String get callingSwitchToAudio => '視頻轉語音';
+
+  @override
+  String get callingSwitchToAudioAccept => '確認視頻轉語音';
+
+  @override
+  String get invalidCommand => '不能識別的通話指令';
+
+  @override
+  String get groupCallSend => '發起了群通話';
+
+  @override
+  String get groupCallEnd => '通話結束';
+
+  @override
+  String get groupCallNoAnswer => '未接聽';
+
+  @override
+  String get groupCallReject => '拒絕群通話';
+
+  @override
+  String get groupCallAccept => '接聽';
+
+  @override
+  String get groupCallConfirmSwitchToAudio => '同意視頻轉語音';
+
+  @override
+  String get callkitInPeerBlacklist => '發起通話失敗，用戶在黑名單中，禁止發起！';
+
+  @override
+  String get resendTips => '確定重發嗎？';
+
+  @override
+  String get logoutTip => '您確定要退出登錄嗎？';
+
+  @override
+  String get sendFileLimit => '你只能選擇9個文件';
+
+  @override
+  String get atAll => '所有人';
+
+  @override
+  String get tuiEmojiSmile => '[微笑]';
+
+  @override
+  String get tuiEmojiExpect => '[期待]';
+
+  @override
+  String get tuiEmojiBlink => '[眨眼]';
+
+  @override
+  String get tuiEmojiGuffaw => '[大笑]';
+
+  @override
+  String get tuiEmojiKindSmile => '[姨母笑]';
+
+  @override
+  String get tuiEmojiHaha => '[哈哈哈]';
+
+  @override
+  String get tuiEmojiCheerful => '[愉快]';
+
+  @override
+  String get tuiEmojiSpeechless => '[無語]';
+
+  @override
+  String get tuiEmojiAmazed => '[驚訝]';
+
+  @override
+  String get tuiEmojiSorrow => '[悲傷]';
+
+  @override
+  String get tuiEmojiComplacent => '[得意]';
+
+  @override
+  String get tuiEmojiSilly => '[傻了]';
+
+  @override
+  String get tuiEmojiLustful => '[色]';
+
+  @override
+  String get tuiEmojiGiggle => '[憨笑]';
+
+  @override
+  String get tuiEmojiKiss => '[親親]';
+
+  @override
+  String get tuiEmojiWail => '[大哭]';
+
+  @override
+  String get tuiEmojiTearsLaugh => '[哭笑]';
+
+  @override
+  String get tuiEmojiTrapped => '[困]';
+
+  @override
+  String get tuiEmojiMask => '[口罩]';
+
+  @override
+  String get tuiEmojiFear => '[恐懼]';
+
+  @override
+  String get tuiEmojiBareTeeth => '[齜牙]';
+
+  @override
+  String get tuiEmojiFlareUp => '[發怒]';
+
+  @override
+  String get tuiEmojiYawn => '[打哈欠]';
+
+  @override
+  String get tuiEmojiTact => '[機智]';
+
+  @override
+  String get tuiEmojiStareyes => '[星星眼]';
+
+  @override
+  String get tuiEmojiShutUp => '[閉嘴]';
+
+  @override
+  String get tuiEmojiSigh => '[嘆氣]';
+
+  @override
+  String get tuiEmojiHehe => '[呵呵]';
+
+  @override
+  String get tuiEmojiSilent => '[收聲]';
+
+  @override
+  String get tuiEmojiSurprised => '[驚喜]';
+
+  @override
+  String get tuiEmojiAskance => '[白眼]';
+
+  @override
+  String get tuiEmojiOk => '[OK]';
+
+  @override
+  String get tuiEmojiShit => '[便便]';
+
+  @override
+  String get tuiEmojiMonster => '[怪獸]';
+
+  @override
+  String get tuiEmojiDaemon => '[惡魔]';
+
+  @override
+  String get tuiEmojiRage => '[惡魔怒]';
+
+  @override
+  String get tuiEmojiFool => '[衰]';
+
+  @override
+  String get tuiEmojiPig => '[豬]';
+
+  @override
+  String get tuiEmojiCow => '[牛]';
+
+  @override
+  String get tuiEmojiAi => '[AI]';
+
+  @override
+  String get tuiEmojiSkull => '[骷髏]';
+
+  @override
+  String get tuiEmojiBombs => '[炸彈]';
+
+  @override
+  String get tuiEmojiCoffee => '[咖啡]';
+
+  @override
+  String get tuiEmojiCake => '[蛋糕]';
+
+  @override
+  String get tuiEmojiBeer => '[啤酒]';
+
+  @override
+  String get tuiEmojiFlower => '[花]';
+
+  @override
+  String get tuiEmojiWatermelon => '[瓜]';
+
+  @override
+  String get tuiEmojiRich => '[壕]';
+
+  @override
+  String get tuiEmojiHeart => '[愛心]';
+
+  @override
+  String get tuiEmojiMoon => '[月亮]';
+
+  @override
+  String get tuiEmojiSun => '[太陽]';
+
+  @override
+  String get tuiEmojiStar => '[星星]';
+
+  @override
+  String get tuiEmojiRedPacket => '[红包]';
+
+  @override
+  String get tuiEmojiCelebrate => '[慶祝]';
+
+  @override
+  String get tuiEmojiBless => '[福]';
+
+  @override
+  String get tuiEmojiFortune => '[發]';
+
+  @override
+  String get tuiEmojiConvinced => '[服]';
+
+  @override
+  String get tuiEmojiProhibit => '[禁]';
+
+  @override
+  String get tuiEmoji666 => '[666]';
+
+  @override
+  String get tuiEmoji857 => '[857]';
+
+  @override
+  String get tuiEmojiKnife => '[刀]';
+
+  @override
+  String get tuiEmojiLike => '[讚]';
 }

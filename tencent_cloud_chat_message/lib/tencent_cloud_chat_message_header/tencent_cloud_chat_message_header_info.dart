@@ -63,7 +63,7 @@ class _TencentCloudChatMessageHeaderInfoState
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    final infoDetaile = _getInfoDetailed(widget.conversation);
+    final infoDetail = _getInfoDetailed(widget.conversation);
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,13 +86,13 @@ class _TencentCloudChatMessageHeaderInfoState
                     ))
                   ],
                 ),
-                if (widget.showUserOnlineStatus && TencentCloudChatUtils.checkString(infoDetaile) != null)
+                if (widget.showUserOnlineStatus && TencentCloudChatUtils.checkString(infoDetail) != null)
                   Expanded(
                     child: Row(
                       children: [
                         Expanded(
                             child: Text(
-                              infoDetaile,
+                              infoDetail,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                               fontSize: textStyle.standardSmallText,

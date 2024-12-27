@@ -56,7 +56,9 @@ class TencentCloudChatConversationListState extends TencentCloudChatState<Tencen
         _conversationList = conversationList;
       });
     } else if (data.currentUpdatedFields == TencentCloudChatConversationDataKeys.getDataEnd) {
+      final conversationList = data.conversationList;
       safeSetState(() {
+        _conversationList = conversationList;
         _getDataEnd = data.isGetDataEnd;
       });
     }

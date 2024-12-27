@@ -197,4 +197,31 @@ class TencentCloudChatIntl extends ChangeNotifier {
     return MaterialLocalizations.of(context).formatCompactDate(dateTime);
   }
 
+  static String formatSeconds(int seconds) {
+    String timeStr = '$seconds${tL10n.second}';
+
+    if (seconds > 60) {
+      int second = seconds % 60;
+      int min = seconds ~/ 60;
+      timeStr = '$min${tL10n.min}$second${tL10n.second}';
+
+      if (min > 60) {
+        min = (seconds ~/ 60) % 60;
+        int hour = (seconds ~/ 60) ~/ 60;
+        timeStr = '$hour${tL10n.hour}$min${tL10n.min}$second${tL10n.second}';
+
+        if (hour % 24 == 0) {
+          int day = ((seconds ~/ 60) ~/ 60) ~/ 24;
+          timeStr = '$day${tL10n.day}';
+        } else if (hour > 24) {
+          hour = ((seconds ~/ 60) ~/ 60) % 24;
+          int day = ((seconds ~/ 60) ~/ 60) ~/ 24;
+          timeStr = '$day${tL10n.day}$hour${tL10n.hour}$min${tL10n.min}$second${tL10n.second}';
+        }
+      }
+    }
+
+    return timeStr;
+  }
+
 }

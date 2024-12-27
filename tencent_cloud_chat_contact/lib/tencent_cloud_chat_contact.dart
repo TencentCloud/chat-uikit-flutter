@@ -102,6 +102,9 @@ class TencentCloudChatContactState
             TencentCloudChatContactDataKeys.builder ||
         data.currentUpdatedFields == TencentCloudChatContactDataKeys.config) {
       safeSetState(() {});
+    } else if (data.currentUpdatedFields ==
+            TencentCloudChatContactDataKeys.userStatusList) {
+      safeSetState(() {});
     }
   }
 

@@ -19,14 +19,20 @@ class TencentCloudChatContactAddContactsInfo extends StatefulWidget {
   State<StatefulWidget> createState() => TencentCloudChatContactAddContactsInfoState();
 }
 
-class TencentCloudChatContactAddContactsInfoState extends TencentCloudChatState<TencentCloudChatContactAddContactsInfo> {
+class TencentCloudChatContactAddContactsInfoState
+    extends TencentCloudChatState<TencentCloudChatContactAddContactsInfo> {
   @override
   Widget defaultBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Container(
               height: getHeight(775),
-              decoration: BoxDecoration(color: colorTheme.contactAddContactInfoBackgroundColor, borderRadius: BorderRadius.all(Radius.circular(getWidth(10)))),
-              child: Scaffold(backgroundColor: Colors.transparent, appBar: const TencentCloudChatContactAddContactsInfoAppBar(), body: TencentCloudChatContactAddContactsInfoBody(userFullInfo: widget.userFullInfo)),
+              decoration: BoxDecoration(
+                  color: colorTheme.contactAddContactInfoBackgroundColor,
+                  borderRadius: BorderRadius.all(Radius.circular(getWidth(10)))),
+              child: Scaffold(
+                  backgroundColor: Colors.transparent,
+                  appBar: const TencentCloudChatContactAddContactsInfoAppBar(),
+                  body: TencentCloudChatContactAddContactsInfoBody(userFullInfo: widget.userFullInfo)),
             ));
   }
 }
@@ -41,7 +47,8 @@ class TencentCloudChatContactAddContactsInfoAppBar extends StatefulWidget implem
   Size get preferredSize => const Size(15, 81);
 }
 
-class TencentCloudChatContactAddContactsInfoAppBarState extends TencentCloudChatState<TencentCloudChatContactAddContactsInfoAppBar> {
+class TencentCloudChatContactAddContactsInfoAppBarState
+    extends TencentCloudChatState<TencentCloudChatContactAddContactsInfoAppBar> {
   @override
   Widget defaultBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(
@@ -49,7 +56,10 @@ class TencentCloudChatContactAddContactsInfoAppBarState extends TencentCloudChat
             backgroundColor: Colors.transparent,
             title: Text(
               tL10n.info,
-              style: TextStyle(fontSize: textStyle.fontsize_16, fontWeight: FontWeight.w600, color: colorTheme.contactItemFriendNameColor),
+              style: TextStyle(
+                  fontSize: textStyle.fontsize_16,
+                  fontWeight: FontWeight.w600,
+                  color: colorTheme.contactItemFriendNameColor),
             ),
             centerTitle: true,
             leadingWidth: getWidth(100),
@@ -82,9 +92,9 @@ class TencentCloudChatContactAddContactsInfoBody extends StatefulWidget {
   State<StatefulWidget> createState() => TencentCloudChatContactAddContactsInfoBodyState();
 }
 
-class TencentCloudChatContactAddContactsInfoBodyState extends TencentCloudChatState<TencentCloudChatContactAddContactsInfoBody> {
+class TencentCloudChatContactAddContactsInfoBodyState
+    extends TencentCloudChatState<TencentCloudChatContactAddContactsInfoBody> {
   bool showDetailAddInfo = false;
-
 
   _getToastIcon(bool check) {
     if (check) {
@@ -113,27 +123,69 @@ class TencentCloudChatContactAddContactsInfoBodyState extends TencentCloudChatSt
   String remark = "";
   String friendGroup = "";
 
-  sendAddFriendApplication() {
+  void notifyUserEvent(int errorCode, String toast) {
+    TencentCloudChat.instance.callbacks.onUserNotificationEvent(
+        TencentCloudChatComponentsEnum.contact,
+        TencentCloudChatUserNotificationEvent(
+          eventCode: errorCode,
+          text: toast,
+        )
+    );
+  }
+
+  sendAddFriendApplication() async {
     if (friendGroup.isEmpty || friendGroup == tL10n.none) {
       friendGroup = "";
     }
-    TencentCloudChat.instance.chatSDKInstance.contactSDK.addFriend(widget.userFullInfo.userID ?? "", remark, friendGroup, verification, "flutter", FriendTypeEnum.V2TIM_FRIEND_TYPE_BOTH);
-    int code = TencentCloudChat.instance.dataInstance.contact.addFriendCode;
-    if (code == 0) {
-      TencentCloudChat.instance.callbacks.onUserNotificationEvent.call(
-        TencentCloudChatComponentsEnum.contact,
-        TencentCloudChatCodeInfo.contactAddedSuccessfully,
-      );
-    } else if (code == 30539) {
-      TencentCloudChat.instance.callbacks.onUserNotificationEvent.call(
-        TencentCloudChatComponentsEnum.contact,
-        TencentCloudChatCodeInfo.contactRequestSent,
-      );
+    var result = await TencentCloudChat.instance.chatSDKInstance.contactSDK.addFriend(widget.userFullInfo.userID ?? "",
+        remark, friendGroup, verification, "flutter", FriendTypeEnum.V2TIM_FRIEND_TYPE_BOTH);
+    if (result.code != 0) {
+      notifyUserEvent(result.code, tL10n.contactAddFailed);
     } else {
-      TencentCloudChat.instance.callbacks.onUserNotificationEvent.call(
-        TencentCloudChatComponentsEnum.contact,
-        TencentCloudChatCodeInfo.cannotAddContact,
-      );
+      if (result.data == null || result.data!.resultCode == null) {
+        return;
+      }
+
+      int errorCode = result.data!.resultCode!;
+      String toast = '';
+      switch (errorCode) {
+        case 0:
+          toast = tL10n.contactAddedSuccessfully;
+          break;
+
+        case 30010:
+          toast = tL10n.friendLimit;
+          break;
+
+        case 30014:
+          toast = tL10n.otherFriendLimit;
+          break;
+
+        case 30515:
+          toast = tL10n.inBlacklist;
+          break;
+
+        case 30516:
+          toast = tL10n.forbidAddFriend;
+          break;
+
+        case 30525:
+          toast = tL10n.inBlacklist;
+          break;
+
+        case 30539:
+          toast = tL10n.waitAgreeFriend;
+          break;
+
+        case 30015:
+          toast = tL10n.haveBeFriend;
+          break;
+        
+        default:
+          break;
+      }
+
+      notifyUserEvent(errorCode, toast);
     }
   }
 
@@ -158,13 +210,19 @@ class TencentCloudChatContactAddContactsInfoBodyState extends TencentCloudChatSt
   Widget getAddFriendInfoWidget() {
     if (showDetailAddInfo == false) {
       return Row(
-        children: [TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAddContactInfoButtonBuilder(widget.userFullInfo, openContactsDetailInfo)],
+        children: [
+          TencentCloudChat.instance.dataInstance.contact.contactBuilder
+              ?.getContactAddContactInfoButtonBuilder(widget.userFullInfo, openContactsDetailInfo)
+        ],
       );
     } else {
       return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAddContactsInfoVerificationBuilder(getVerification),
-        TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAddContactsInfoRemarksAndGroupBuilder(getRemarks, getFriendGroup),
-        TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAddContactsDetailInfoSendButton(sendAddFriendApplication)
+        TencentCloudChat.instance.dataInstance.contact.contactBuilder
+            ?.getContactAddContactsInfoVerificationBuilder(getVerification),
+        TencentCloudChat.instance.dataInstance.contact.contactBuilder
+            ?.getContactAddContactsInfoRemarksAndGroupBuilder(getRemarks, getFriendGroup),
+        TencentCloudChat.instance.dataInstance.contact.contactBuilder
+            ?.getContactAddContactsDetailInfoSendButton(sendAddFriendApplication)
       ]);
     }
   }
@@ -172,24 +230,26 @@ class TencentCloudChatContactAddContactsInfoBodyState extends TencentCloudChatSt
   @override
   Widget defaultBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(
-        build: (context, colorTheme, textStyle) => ListView(children: [
-              Container(
-                  color: colorTheme.contactApplicationBackgroundColor,
-                  child: Center(
-                      child: Column(
-                    children: [
-                      Container(
-                        padding: EdgeInsets.symmetric(vertical: getHeight(10), horizontal: getWidth(16)),
-                        color: colorTheme.contactBackgroundColor,
-                        child: Row(children: [
-                          TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAddContactInfoAvatarBuilder(widget.userFullInfo),
-                          TencentCloudChat.instance.dataInstance.contact.contactBuilder?.getContactAddContactInfoContentBuilder(widget.userFullInfo),
-                        ]),
-                      ),
-                      getAddFriendInfoWidget()
-                    ],
-                  )))
-            ]));
+      build: (context, colorTheme, textStyle) => ListView(children: [
+        Container(
+            color: colorTheme.contactApplicationBackgroundColor,
+            child: Center(
+              child: Column(
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(vertical: getHeight(10), horizontal: getWidth(16)),
+                    color: colorTheme.contactBackgroundColor,
+                    child: Row(children: [
+                      TencentCloudChat.instance.dataInstance.contact.contactBuilder
+                          ?.getContactAddContactInfoAvatarBuilder(widget.userFullInfo),
+                      TencentCloudChat.instance.dataInstance.contact.contactBuilder
+                          ?.getContactAddContactInfoContentBuilder(widget.userFullInfo),
+                    ]),
+                  ),
+                  getAddFriendInfoWidget()
+                ],
+            )))
+          ]));
   }
 }
 
@@ -205,7 +265,8 @@ class TencentCloudChatContactAddContactsInfoAvatar extends StatefulWidget {
   State<StatefulWidget> createState() => TencentCloudChatContactAddContactsInfoAvatarState();
 }
 
-class TencentCloudChatContactAddContactsInfoAvatarState extends TencentCloudChatState<TencentCloudChatContactAddContactsInfoAvatar> {
+class TencentCloudChatContactAddContactsInfoAvatarState
+    extends TencentCloudChatState<TencentCloudChatContactAddContactsInfoAvatar> {
   @override
   Widget defaultBuilder(BuildContext context) {
     return Padding(
@@ -229,7 +290,8 @@ class TencentCloudChatContactAddContactsInfoContent extends StatefulWidget {
   State<StatefulWidget> createState() => TencentCloudChatContactAddContactsInfoContentState();
 }
 
-class TencentCloudChatContactAddContactsInfoContentState extends TencentCloudChatState<TencentCloudChatContactAddContactsInfoContent> {
+class TencentCloudChatContactAddContactsInfoContentState
+    extends TencentCloudChatState<TencentCloudChatContactAddContactsInfoContent> {
   @override
   Widget defaultBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(
@@ -238,9 +300,21 @@ class TencentCloudChatContactAddContactsInfoContentState extends TencentCloudCha
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Text(widget.userFullInfo.nickName ?? widget.userFullInfo.userID ?? "", style: TextStyle(fontSize: textStyle.fontsize_16, fontWeight: FontWeight.w600, color: colorTheme.contactItemFriendNameColor)),
-                Text("ID: ${widget.userFullInfo.userID}", style: TextStyle(color: colorTheme.contactItemFriendNameColor, fontSize: textStyle.fontsize_12, fontWeight: FontWeight.w400)),
-                Text("${tL10n.signature}: ${widget.userFullInfo.selfSignature}", style: TextStyle(color: colorTheme.contactItemFriendNameColor, fontSize: textStyle.fontsize_12, fontWeight: FontWeight.w400)),
+                Text(widget.userFullInfo.nickName ?? widget.userFullInfo.userID ?? "",
+                    style: TextStyle(
+                        fontSize: textStyle.fontsize_16,
+                        fontWeight: FontWeight.w600,
+                        color: colorTheme.contactItemFriendNameColor)),
+                Text("ID: ${widget.userFullInfo.userID}",
+                    style: TextStyle(
+                        color: colorTheme.contactItemFriendNameColor,
+                        fontSize: textStyle.fontsize_12,
+                        fontWeight: FontWeight.w400)),
+                Text("${tL10n.signature}: ${widget.userFullInfo.selfSignature}",
+                    style: TextStyle(
+                        color: colorTheme.contactItemFriendNameColor,
+                        fontSize: textStyle.fontsize_12,
+                        fontWeight: FontWeight.w400)),
               ],
             )));
   }
@@ -260,7 +334,8 @@ class TencentCloudChatContactAddContactsInfoButton extends StatefulWidget {
   State<StatefulWidget> createState() => TencentCloudChatContactAddContactsInfoButtonState();
 }
 
-class TencentCloudChatContactAddContactsInfoButtonState extends TencentCloudChatState<TencentCloudChatContactAddContactsInfoButton> {
+class TencentCloudChatContactAddContactsInfoButtonState
+    extends TencentCloudChatState<TencentCloudChatContactAddContactsInfoButton> {
   onClickAddContact() {
     if (widget.showDetailAddInfo != null) {
       widget.showDetailAddInfo!();
@@ -279,7 +354,10 @@ class TencentCloudChatContactAddContactsInfoButtonState extends TencentCloudChat
                   onTap: onClickAddContact,
                   child: Text(
                     tL10n.addContact,
-                    style: TextStyle(color: colorTheme.contactAgreeButtonColor, fontSize: textStyle.fontsize_16, fontWeight: FontWeight.w400),
+                    style: TextStyle(
+                        color: colorTheme.contactAgreeButtonColor,
+                        fontSize: textStyle.fontsize_16,
+                        fontWeight: FontWeight.w400),
                   )),
             ));
   }
@@ -294,7 +372,8 @@ class TencentCloudChatContactAddContactsInfoVerification extends StatefulWidget 
   State<StatefulWidget> createState() => TencentCloudChatContactAddContactsInfoVerificationState();
 }
 
-class TencentCloudChatContactAddContactsInfoVerificationState extends TencentCloudChatState<TencentCloudChatContactAddContactsInfoVerification> {
+class TencentCloudChatContactAddContactsInfoVerificationState
+    extends TencentCloudChatState<TencentCloudChatContactAddContactsInfoVerification> {
   final TextEditingController _verificationController = TextEditingController();
 
   @override
@@ -341,13 +420,15 @@ class TencentCloudChatContactAddContactsInfoRemarksAndGroup extends StatefulWidg
   final Function onRemarksChanged;
   final Function onFriendGroupChanged;
 
-  const TencentCloudChatContactAddContactsInfoRemarksAndGroup({super.key, required this.onRemarksChanged, required this.onFriendGroupChanged});
+  const TencentCloudChatContactAddContactsInfoRemarksAndGroup(
+      {super.key, required this.onRemarksChanged, required this.onFriendGroupChanged});
 
   @override
   State<StatefulWidget> createState() => TencentCloudChatContactAddContactsInfoRemarksAndGroupState();
 }
 
-class TencentCloudChatContactAddContactsInfoRemarksAndGroupState extends TencentCloudChatState<TencentCloudChatContactAddContactsInfoRemarksAndGroup> {
+class TencentCloudChatContactAddContactsInfoRemarksAndGroupState
+    extends TencentCloudChatState<TencentCloudChatContactAddContactsInfoRemarksAndGroup> {
   final TextEditingController _nickNameController = TextEditingController();
 
   List<String> friendGroup = [tL10n.none];
@@ -381,7 +462,9 @@ class TencentCloudChatContactAddContactsInfoRemarksAndGroupState extends Tencent
               ),
               Container(
                   padding: EdgeInsets.symmetric(vertical: getHeight(5), horizontal: getWidth(16)),
-                  decoration: BoxDecoration(color: colorTheme.backgroundColor, border: Border(bottom: BorderSide(color: colorTheme.contactItemTabItemBorderColor))),
+                  decoration: BoxDecoration(
+                      color: colorTheme.backgroundColor,
+                      border: Border(bottom: BorderSide(color: colorTheme.contactItemTabItemBorderColor))),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -426,7 +509,10 @@ class TencentCloudChatContactAddContactsInfoRemarksAndGroupState extends Tencent
                             Icons.arrow_forward_ios_rounded,
                             size: getSquareSize(12),
                           ),
-                          style: TextStyle(fontSize: textStyle.fontsize_16, fontWeight: FontWeight.w400, color: colorTheme.contactItemFriendNameColor),
+                          style: TextStyle(
+                              fontSize: textStyle.fontsize_16,
+                              fontWeight: FontWeight.w400,
+                              color: colorTheme.contactItemFriendNameColor),
                           elevation: 16,
                           isDense: true,
                           isExpanded: true,
@@ -461,7 +547,8 @@ class TencentCloudChatContactAddContactsDetailInfoSendButton extends StatefulWid
   State<StatefulWidget> createState() => TencentCloudChatContactAddContactsDetailInfoSendButtonState();
 }
 
-class TencentCloudChatContactAddContactsDetailInfoSendButtonState extends TencentCloudChatState<TencentCloudChatContactAddContactsDetailInfoSendButton> {
+class TencentCloudChatContactAddContactsDetailInfoSendButtonState
+    extends TencentCloudChatState<TencentCloudChatContactAddContactsDetailInfoSendButton> {
   onTapSendButton() {
     widget.addFriend();
   }
@@ -478,7 +565,10 @@ class TencentCloudChatContactAddContactsDetailInfoSendButtonState extends Tencen
                 onTap: onTapSendButton,
                 child: Text(
                   tL10n.send,
-                  style: TextStyle(color: colorTheme.contactAgreeButtonColor, fontSize: textStyle.fontsize_16, fontWeight: FontWeight.w400),
+                  style: TextStyle(
+                      color: colorTheme.contactAgreeButtonColor,
+                      fontSize: textStyle.fontsize_16,
+                      fontWeight: FontWeight.w400),
                 ),
               ),
             ));

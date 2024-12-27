@@ -6,6 +6,8 @@ import 'package:intl/intl.dart' as intl;
 
 import 'tencent_cloud_chat_localizations.dart';
 
+// ignore_for_file: type=lint
+
 /// The translations for English (`en`).
 class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   TencentCloudChatLocalizationsEn([String locale = 'en']) : super(locale);
@@ -281,13 +283,10 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get message => 'Message';
 
   @override
-  String get doNotDisturb => 'Mute';
+  String get doNotDisturb => 'Mute Notifications';
 
   @override
   String get mute => 'Mute';
-
-  @override
-  String get topChat => 'Pin';
 
   @override
   String get pin => 'Pin';
@@ -738,12 +737,6 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get confirmDeletion => 'Confirm Deletion';
 
   @override
-  String get deleteForEveryone => 'Delete for everyone';
-
-  @override
-  String get deleteForMe => 'Delete for me';
-
-  @override
   String get askDeleteThisMessage => 'Delete this message?';
 
   @override
@@ -945,10 +938,10 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get changedGroupCustomInfo => 'Changed group custom info';
 
   @override
-  String get enabledGroupMute => 'Enabled group-wide mute';
+  String get enabledGroupMute => 'muted all members';
 
   @override
-  String get disabledGroupMute => 'Disabled group-wide mute';
+  String get disabledGroupMute => 'unmuted all members';
 
   @override
   String changedGroupMessageReceptionTo(Object setting) {
@@ -1074,7 +1067,7 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get restartAppForLanguage => 'Please restart the app for the language change to take effect';
 
   @override
-  String get deleteAllMessages => 'Delete All Messages';
+  String get deleteAllMessages => 'Clear Chat History';
 
   @override
   String get downloading => 'Downloading...';
@@ -1089,10 +1082,10 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get messageRecallConfirmation => 'Are you sure you want to recall this message?';
 
   @override
-  String get quit => 'Quit';
+  String get quit => 'Leave';
 
   @override
-  String get quitAndDelete => 'Quit and Delete';
+  String get dissolve => 'Disband Group';
 
   @override
   String get setGroupName => 'set Group Name';
@@ -1322,4 +1315,383 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
 
   @override
   String get myRoleInGroup => 'Role';
+
+  @override
+  String get chooseAvatar => 'Choose Avatar';
+
+  @override
+  String get friendLimit => 'The number of your contacts exceeds the limit.';
+
+  @override
+  String get otherFriendLimit => 'The number of the other user\'s contacts exceeds the limit.';
+
+  @override
+  String get inBlacklist => 'You have blocked this user.';
+
+  @override
+  String get setInBlacklist => 'You have been blocked.';
+
+  @override
+  String get forbidAddFriend => 'This user has disabled contact request.';
+
+  @override
+  String get waitAgreeFriend => 'Request sent';
+
+  @override
+  String get haveBeFriend => 'You two are already contacts of each other.';
+
+  @override
+  String get contactAddFailed => 'Failed';
+
+  @override
+  String get addGroupPermissionDeny => 'Prohibited from Joining';
+
+  @override
+  String get addGroupAlreadyMember => 'The user is a group member';
+
+  @override
+  String get addGroupNotFound => 'The group does not exist';
+
+  @override
+  String get addGroupFullMember => 'The number of group members has reached the limit';
+
+  @override
+  String get joinedTip => 'You have joined the group: ';
+
+  @override
+  String get quitGroupTip => 'Leave the group?';
+
+  @override
+  String get dismissGroupTip => 'Disband the group?';
+
+  @override
+  String get kickedOffTips => 'You have been kicked off';
+
+  @override
+  String get userSigExpiredTips => 'UserSig is expired';
+
+  @override
+  String get convertTextFailed => 'Failed to convert text';
+
+  @override
+  String get deleteFriendSuccess => 'Friend deleted successfully';
+
+  @override
+  String get deleteFriendFailed => 'Failed to delete friend';
+
+  @override
+  String get clearMsgTip => 'Are you sure you want to clear the chat history?';
+
+  @override
+  String get sendMsg => 'Send a message';
+
+  @override
+  String get groupMemberMute => 'This user is blocked from posting and thus cannot send messages. Check whether the sender is blocked from posting.';
+
+  @override
+  String get forwardFailedTip => 'Unable to forward failed messages.';
+
+  @override
+  String get fileTooLarge => 'File size exceeds the limit.';
+
+  @override
+  String get invalidApplication => 'Invalid friend application';
+
+  @override
+  String get atMeTips => 'Someone @ me';
+
+  @override
+  String get atAllTips => '@All';
+
+  @override
+  String get forwardVoteFailedTip => 'Voting messages cannot be forwarded!';
+
+  @override
+  String get forwardOneByOneLimitNumberTip => 'Unable to forward the messages one by one because there are too many messages.';
+
+  @override
+  String get modifyRemark => 'Modify remark';
+
+  @override
+  String banned(Object targetUser, Object time) {
+    return '$targetUser has been banned $time';
+  }
+
+  @override
+  String cancelBanned(Object targetUser) {
+    return '$targetUser has been unbanned';
+  }
+
+  @override
+  String get day => 'day';
+
+  @override
+  String get hour => 'hour';
+
+  @override
+  String get min => 'minute';
+
+  @override
+  String get second => 'second';
+
+  @override
+  String get setFailed => 'Failed to set';
+
+  @override
+  String get callRejectCaller => 'Call declined by user';
+
+  @override
+  String get callRejectCallee => 'Declined';
+
+  @override
+  String get callCancelCaller => 'Canceled';
+
+  @override
+  String get callCancelCallee => 'Call canceled by caller';
+
+  @override
+  String get stopCallTip => 'Duration:';
+
+  @override
+  String get callTimeoutCaller => 'Call was not answered';
+
+  @override
+  String get callTimeoutCallee => 'Call canceled by caller';
+
+  @override
+  String get callLineBusyCaller => 'Line busy';
+
+  @override
+  String get callLineBusyCallee => 'Call canceled by caller';
+
+  @override
+  String get acceptCall => 'Answered';
+
+  @override
+  String get callingSwitchToAudio => 'Switch to voice call';
+
+  @override
+  String get callingSwitchToAudioAccept => 'Confirm video to voice';
+
+  @override
+  String get invalidCommand => 'invalid command';
+
+  @override
+  String get groupCallSend => 'initiated a group call';
+
+  @override
+  String get groupCallEnd => 'End group call';
+
+  @override
+  String get groupCallNoAnswer => 'no answer';
+
+  @override
+  String get groupCallReject => ' declined call';
+
+  @override
+  String get groupCallAccept => ' answered';
+
+  @override
+  String get groupCallConfirmSwitchToAudio => ' confirm to audio call';
+
+  @override
+  String get callkitInPeerBlacklist => 'The identifier is in blacklist. Failed to send this message!';
+
+  @override
+  String get resendTips => 'Are you sure you want to resend?';
+
+  @override
+  String get logoutTip => 'Log out now?';
+
+  @override
+  String get sendFileLimit => 'You can only select 9 files';
+
+  @override
+  String get atAll => 'All';
+
+  @override
+  String get tuiEmojiSmile => '[Smile]';
+
+  @override
+  String get tuiEmojiExpect => '[Expect]';
+
+  @override
+  String get tuiEmojiBlink => '[Blink]';
+
+  @override
+  String get tuiEmojiGuffaw => '[Guffaw]';
+
+  @override
+  String get tuiEmojiKindSmile => '[Kind Smile]';
+
+  @override
+  String get tuiEmojiHaha => '[Haha]';
+
+  @override
+  String get tuiEmojiCheerful => '[Cheerful]';
+
+  @override
+  String get tuiEmojiSpeechless => '[Speechless]';
+
+  @override
+  String get tuiEmojiAmazed => '[Amazed]';
+
+  @override
+  String get tuiEmojiSorrow => '[Sorrow]';
+
+  @override
+  String get tuiEmojiComplacent => '[Complacent]';
+
+  @override
+  String get tuiEmojiSilly => '[Silly]';
+
+  @override
+  String get tuiEmojiLustful => '[Lustful]';
+
+  @override
+  String get tuiEmojiGiggle => '[Giggle]';
+
+  @override
+  String get tuiEmojiKiss => '[Kiss]';
+
+  @override
+  String get tuiEmojiWail => '[Wail]';
+
+  @override
+  String get tuiEmojiTearsLaugh => '[Tears Laugh]';
+
+  @override
+  String get tuiEmojiTrapped => '[Trapped]';
+
+  @override
+  String get tuiEmojiMask => '[Mask]';
+
+  @override
+  String get tuiEmojiFear => '[Fear]';
+
+  @override
+  String get tuiEmojiBareTeeth => '[Bare Teeth]';
+
+  @override
+  String get tuiEmojiFlareUp => '[Flare Up]';
+
+  @override
+  String get tuiEmojiYawn => '[Yawn]';
+
+  @override
+  String get tuiEmojiTact => '[Tact]';
+
+  @override
+  String get tuiEmojiStareyes => '[Stareyes]';
+
+  @override
+  String get tuiEmojiShutUp => '[Shut Up]';
+
+  @override
+  String get tuiEmojiSigh => '[Sigh]';
+
+  @override
+  String get tuiEmojiHehe => '[Hehe]';
+
+  @override
+  String get tuiEmojiSilent => '[Silent]';
+
+  @override
+  String get tuiEmojiSurprised => '[Surprised]';
+
+  @override
+  String get tuiEmojiAskance => '[Askance]';
+
+  @override
+  String get tuiEmojiOk => '[OK]';
+
+  @override
+  String get tuiEmojiShit => '[Shit]';
+
+  @override
+  String get tuiEmojiMonster => '[Monster]';
+
+  @override
+  String get tuiEmojiDaemon => '[Daemon]';
+
+  @override
+  String get tuiEmojiRage => '[Rage]';
+
+  @override
+  String get tuiEmojiFool => '[Fool]';
+
+  @override
+  String get tuiEmojiPig => '[Pig]';
+
+  @override
+  String get tuiEmojiCow => '[Cow]';
+
+  @override
+  String get tuiEmojiAi => '[AI]';
+
+  @override
+  String get tuiEmojiSkull => '[Skull]';
+
+  @override
+  String get tuiEmojiBombs => '[Bombs]';
+
+  @override
+  String get tuiEmojiCoffee => '[Coffee]';
+
+  @override
+  String get tuiEmojiCake => '[Cake]';
+
+  @override
+  String get tuiEmojiBeer => '[Beer]';
+
+  @override
+  String get tuiEmojiFlower => '[Flower]';
+
+  @override
+  String get tuiEmojiWatermelon => '[Watermelon]';
+
+  @override
+  String get tuiEmojiRich => '[Rich]';
+
+  @override
+  String get tuiEmojiHeart => '[Heart]';
+
+  @override
+  String get tuiEmojiMoon => '[Moon]';
+
+  @override
+  String get tuiEmojiSun => '[Sun]';
+
+  @override
+  String get tuiEmojiStar => '[Star]';
+
+  @override
+  String get tuiEmojiRedPacket => '[Red Packet]';
+
+  @override
+  String get tuiEmojiCelebrate => '[Celebrate]';
+
+  @override
+  String get tuiEmojiBless => '[Bless]';
+
+  @override
+  String get tuiEmojiFortune => '[Fortune]';
+
+  @override
+  String get tuiEmojiConvinced => '[Convinced]';
+
+  @override
+  String get tuiEmojiProhibit => '[Prohibit]';
+
+  @override
+  String get tuiEmoji666 => '[666]';
+
+  @override
+  String get tuiEmoji857 => '[857]';
+
+  @override
+  String get tuiEmojiKnife => '[Knife]';
+
+  @override
+  String get tuiEmojiLike => '[Like]';
 }

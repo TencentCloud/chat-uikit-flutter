@@ -78,4 +78,11 @@ class TencentCloudChatPushUtils {
       groupID: groupID,
     );
   }
+
+  static Map<String, dynamic> formatJson(Map? jsonSrc) {
+    if (jsonSrc != null) {
+      return Map<String, dynamic>.from(jsonSrc);
+    }
+    return Map<String, dynamic>.from({});
+  }
 }

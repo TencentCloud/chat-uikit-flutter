@@ -83,16 +83,20 @@ class TencentCloudChatMessageInputRecordingState extends TencentCloudChatState<T
       final recordingDirectory = Pertypath().join(directory.path, 'tencent_cloud_chat', 'recordings');
       await Directory(recordingDirectory).create(recursive: true);
       final uuid = DateTime.now().millisecondsSinceEpoch;
-      final path = Pertypath().join(recordingDirectory, '$uuid.wav');
+      final path = Pertypath().join(recordingDirectory, '$uuid.m4a');
 
-      const encoder = AudioEncoder.wav;
+      const encoder = AudioEncoder.aacLc;
       final isSupported = await _audioRecorder!.isEncoderSupported(
         encoder,
       );
       debugPrint('${encoder.name} supported: $isSupported');
       final devs = await _audioRecorder!.listInputDevices();
       debugPrint(devs.toString());
-      const config = RecordConfig(encoder: encoder);
+      const androidConfig = AndroidRecordConfig(
+          useLegacy: true,
+          audioSource: AndroidAudioSource.mic
+      );
+      const config = RecordConfig(encoder: encoder, androidConfig: androidConfig);
 
       // Start recording to file
       await _audioRecorder!.start(config, path: path);
@@ -136,8 +140,9 @@ class TencentCloudChatMessageInputRecordingState extends TencentCloudChatState<T
         _recordingDuration += 10;
         _recordingProgress = _recordingDuration / maxDuration;
       });
-
-      if (_recordingDuration >= maxDuration) {
+      
+      final adjustMaxDuration = maxDuration - 800;
+      if (_recordingDuration >= adjustMaxDuration) {
         timer.cancel();
         stopRecording(cancel: false);
       }

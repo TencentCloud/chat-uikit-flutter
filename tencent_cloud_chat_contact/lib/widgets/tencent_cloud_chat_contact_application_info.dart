@@ -1,9 +1,11 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
 import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
 import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
 import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_code_info.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/builders/tencent_cloud_chat_common_builders.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat_common.dart';
@@ -256,6 +258,18 @@ class TencentCloudChatContactApplicationInfoButtonState extends TencentCloudChat
         ContactApplicationResult res = ContactApplicationResult(result: tL10n.accepted, userID: widget.application.userID);
         widget.resultFunction!(res);
       }
+    } else {
+      TencentCloudChat.instance.callbacks.onUserNotificationEvent(
+        TencentCloudChatComponentsEnum.contact,
+        TencentCloudChatUserNotificationEvent(
+          eventCode: code,
+          text: tL10n.invalidApplication,
+        )
+      );
+
+      // After success, delete the application proactively (IMSDK does not give notification of application deletion in such case)
+      TencentCloudChat.instance.dataInstance.contact
+          .deleteApplicationList([widget.application.userID], 'onFriendApplicationListDeleted');
     }
   }
 
@@ -272,6 +286,17 @@ class TencentCloudChatContactApplicationInfoButtonState extends TencentCloudChat
         ContactApplicationResult res = ContactApplicationResult(result: tL10n.declined, userID: widget.application.userID);
         widget.resultFunction!(res);
       }
+    } else {
+      TencentCloudChat.instance.callbacks.onUserNotificationEvent(
+        TencentCloudChatComponentsEnum.contact,
+        TencentCloudChatUserNotificationEvent(
+          eventCode: code,
+          text: tL10n.invalidApplication,
+        )
+      );
+
+      TencentCloudChat.instance.dataInstance.contact
+          .deleteApplicationList([widget.application.userID], 'onFriendApplicationListDeleted');
     }
   }
 

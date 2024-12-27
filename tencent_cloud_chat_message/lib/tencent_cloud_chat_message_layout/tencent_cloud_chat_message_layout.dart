@@ -30,7 +30,7 @@ class _TencentCloudChatMessageLayoutState extends TencentCloudChatState<TencentC
   Widget defaultBuilder(BuildContext context) {
     return Scaffold(
       appBar: widget.widgets.header,
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
       body: Column(
         children: [
           Expanded(
@@ -50,7 +50,7 @@ class _TencentCloudChatMessageLayoutState extends TencentCloudChatState<TencentC
   @override
   Widget desktopBuilder(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      // resizeToAvoidBottomInset: false,
       appBar: widget.widgets.header,
       body: DropTarget(
           onDragDone: (detail) {
@@ -80,13 +80,13 @@ class _TencentCloudChatMessageLayoutState extends TencentCloudChatState<TencentC
               Column(
                 children: [
                   Expanded(
-                      child: GestureDetector(
-                    onTap: () {
-                      FocusScope.of(context).unfocus();
-                      widget.methods.closeSticker();
-                      // widget.methods;
-                    },
-                    child: widget.widgets.messageListView,
+                    child: GestureDetector(
+                      onTap: () {
+                        FocusScope.of(context).unfocus();
+                        widget.methods.closeSticker();
+                        // widget.methods;
+                      },
+                      child: widget.widgets.messageListView,
                   )),
                   widget.widgets.messageInput,
                 ],

@@ -283,4 +283,10 @@ class _TencentCloudChatGroupMemberSelectorState extends TencentCloudChatState<Te
       ),
     );
   }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 }

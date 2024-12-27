@@ -18,7 +18,7 @@ import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_download_utils.dart'
 import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
 
 // This enum represents the different data keys for the message data.
-enum TencentCloudChatMessageDataKeys { none, messageHighlighted, messageReadReceipts, messageList, downloadMessage, sendMessageProgress, currentPlayAudioInfo, messageNeedUpdate, config, builder }
+enum TencentCloudChatMessageDataKeys { none, messageHighlighted, messageReadReceipts, messageList, downloadMessage, sendMessageProgress, currentPlayAudioInfo, messageNeedUpdate, config, builder, userStatusChange, friendInfoChange, networkConnectSuccess }
 
 /// An enumeration of load direction of message data
 enum TencentCloudChatMessageLoadDirection { previous, latest }
@@ -228,6 +228,12 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
     }
   }
 
+  /// === user id set of user status change ===
+  Set<String?> userStatusChangeSet = {};
+
+  /// === friend user id set of friend info change ===
+  Set<String?> friendInfoChangeSet = {};
+
   // Constructor for TencentCloudChatMessageData
   TencentCloudChatMessageData(super.currentUpdatedFields);
 
@@ -241,15 +247,26 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
       onRecvMessageModified: onReceiveMessageModified,
       onRecvC2CReadReceipt: onReceiveC2CMessageReadReceipts,
       onRecvMessageRevoked: onReceiveMessageRecalled,
+      onRecvMessageRevokedWithInfo: onRecvMessageRevokedWithInfo,
     );
     player = AudioPlayer();
     player!.setVolume(1);
     player!.onPlayerStateChanged.listen(
-      (event) {
-        console(logs: "onPlayerStateChanged ${event.name}");
-        if (event == PlayerState.completed) {
+      (PlayerState state) {
+        console(logs: "onPlayerStateChanged ${state.name}, messageID: ${_audioPlayInfo?.msgID}");
+        if (state == PlayerState.playing) {
+          updateCurrentAudioPlayInfo(isCompleted: false, progress: _currentPlayAudioInfo?.progress ?? 0, isPaused: false);
+        } else if (state == PlayerState.paused) {
+          updateCurrentAudioPlayInfo(isCompleted: false, progress: _currentPlayAudioInfo?.progress ?? 0, isPaused: true);
+        } else if (state == PlayerState.stopped) {
+          // When receiving this event, _currentPlayAudioInfo may be changed
+          // No notifications should be sent at this time
+        } else if (state == PlayerState.completed) {
+          player!.seek(Duration.zero);
           updateCurrentAudioPlayInfo(isCompleted: true, progress: 1);
-          playNextVideo();
+          Future.delayed(const Duration(milliseconds: 1500), () async {
+            playNextAudio(_audioPlayInfo!.msgID);
+          });
         }
       },
       onDone: () {
@@ -276,8 +293,8 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
       (event) {
         if (_audioPlayInfo != null) {
           if (_audioPlayInfo!.totalSecond != 0 && event.inMilliseconds != 0) {
-            console(logs: "onPositionChanged ${event.inMilliseconds} ${_audioPlayInfo!.totalSecond}");
-            updateCurrentAudioPlayInfo(isCompleted: false, progress: event.inMilliseconds / (_audioPlayInfo!.totalSecond * 1000), isPaused: player?.state == PlayerState.paused);
+            console(logs: "onPositionChanged (ms) ${event.inMilliseconds} / ${_audioPlayInfo!.totalSecond * 1000}, isPaused: ${player!.state == PlayerState.paused}, messageID: ${_audioPlayInfo?.msgID}");
+            updateCurrentAudioPlayInfo(isCompleted: false, progress: event.inMilliseconds / (_audioPlayInfo!.totalSecond * 1000), isPaused: player!.state == PlayerState.paused);
           }
         }
       },
@@ -321,64 +338,60 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
 
   Map<String, V2TimMessageReceipt> get messageReadReceiptMap => _messageReadReceiptMap;
 
-  final Map<String, SendingMessageData> _messageProgressData = {};
+  Map<String, SendingMessageData> _messageProgressData = {};
 
   Map<String, SendingMessageData> get messageProgressData => _messageProgressData;
 
-  set messageReadReceiptMap(Map<String, V2TimMessageReceipt> value) {
-    _messageReadReceiptMap = value;
-    notifyListener(TencentCloudChatMessageDataKeys.messageReadReceipts as T);
+  /// function for checking whether the conditions for automatically playing audio are satisfied
+  bool checkAutoPlayConditions(String msgID) {
+    return _audioPlayInfo != null && _currentPlayAudioInfo != null && _audioPlayInfo!.msgID == msgID && _currentPlayAudioInfo!.isCompleted;
   }
 
-  /// function for playing next video
-  playNextVideo() async {
-    Future.delayed(const Duration(seconds: 1), () async {
-      if (_audioPlayInfo != null && _currentPlayAudioInfo != null) {
-        String convKey = _audioPlayInfo!.convKey;
-        int convType = _audioPlayInfo!.convType;
-        String msgID = _audioPlayInfo!.msgID;
-        _audioPlayInfo = null;
-        _currentPlayAudioInfo = null;
-        var messageList = getMessageList(key: convKey);
-        var idx = messageList.indexWhere((element) => element.msgID == msgID);
-        if (idx > -1) {
-          var leftMessageList = messageList.getRange(0, idx).toList().reversed.toList();
-          var nextindex = leftMessageList.indexWhere((element) => element.elemType == MessageElemType.V2TIM_ELEM_TYPE_SOUND);
-          if (nextindex > -1) {
-            var nextSoundMessage = leftMessageList[nextindex];
-            if (nextSoundMessage.soundElem != null) {
-              var soundElem = nextSoundMessage.soundElem!;
-              late AudioPlayType type;
-              String p = "";
-              int totalSecond = soundElem.duration ?? 0;
-              String nextMsgId = nextSoundMessage.msgID ?? "";
-              if (TencentCloudChatUtils.checkString(soundElem.localUrl) != null || TencentCloudChatUtils.checkString(soundElem.path) != null) {
-                type = AudioPlayType.path;
-                if (TencentCloudChatUtils.checkString(soundElem.localUrl) != null) {
-                  p = soundElem.localUrl!;
-                } else {
-                  p = soundElem.path!;
-                }
+  /// function for playing next audio
+  playNextAudio(String msgID) async {
+    if (checkAutoPlayConditions(msgID)) {
+      String convKey = _audioPlayInfo!.convKey;
+      int convType = _audioPlayInfo!.convType;
+      String msgID = _audioPlayInfo!.msgID;
+      var messageList = getMessageList(key: convKey);
+      var idx = messageList.indexWhere((element) => element.msgID == msgID);
+      if (idx > -1) {
+        var leftMessageList = messageList.getRange(0, idx).toList().reversed.toList();
+        var nextIndex = leftMessageList.indexWhere((element) => element.elemType == MessageElemType.V2TIM_ELEM_TYPE_SOUND);
+        if (nextIndex > -1) {
+          var nextSoundMessage = leftMessageList[nextIndex];
+          if (nextSoundMessage.soundElem != null) {
+            var soundElem = nextSoundMessage.soundElem!;
+            late AudioPlayType type;
+            String p = "";
+            int totalSecond = soundElem.duration ?? 0;
+            String nextMsgId = nextSoundMessage.msgID ?? "";
+            if (TencentCloudChatUtils.checkString(soundElem.localUrl) != null || TencentCloudChatUtils.checkString(soundElem.path) != null) {
+              type = AudioPlayType.path;
+              if (TencentCloudChatUtils.checkString(soundElem.localUrl) != null) {
+                p = soundElem.localUrl!;
               } else {
-                type = AudioPlayType.online;
-                var urlRes = await TencentCloudChat.instance.chatSDKInstance.messageSDK.getMessageOnlineUrl(msgID: msgID);
-                if (urlRes != null) {
-                  if (urlRes.soundElem != null) {
-                    if (TencentCloudChatUtils.checkString(urlRes.soundElem!.url) != null) {
-                      p = urlRes.soundElem!.url!;
-                    }
+                p = soundElem.path!;
+              }
+            } else {
+              type = AudioPlayType.online;
+              var urlRes = await TencentCloudChat.instance.chatSDKInstance.messageSDK.getMessageOnlineUrl(msgID: nextMsgId);
+              if (urlRes != null) {
+                if (urlRes.soundElem != null) {
+                  if (TencentCloudChatUtils.checkString(urlRes.soundElem!.url) != null) {
+                    p = urlRes.soundElem!.url!;
                   }
                 }
               }
-              if (p.isNotEmpty && totalSecond > 0 && nextMsgId.isNotEmpty) {
-                console(logs: "start play next video");
-                await playAudio(source: AudioPlayInfo(type: type, path: p, msgID: nextMsgId, totalSecond: totalSecond, convKey: convKey, convType: convType));
-              }
+            }
+            if (checkAutoPlayConditions(msgID) && p.isNotEmpty && totalSecond > 0 && nextMsgId.isNotEmpty) {
+              console(logs: "start play next audio, messageID: $nextMsgId");
+              await playAudio(source: AudioPlayInfo(type: type, path: p, msgID: nextMsgId, totalSecond: totalSecond, convKey: convKey, convType: convType));
             }
           }
         }
       }
-    });
+    }
   }
 
   /// function for updating currently played audio information
@@ -470,15 +483,18 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
     required AudioPlayInfo source,
   }) async {
     if (player?.state == PlayerState.playing) {
-      console(logs: "audio playing stop first");
+      console(logs: "audio playing stop first, stop messageID: ${_audioPlayInfo?.msgID}");
+      await player?.stop();
+      updateCurrentAudioPlayInfo(isCompleted: false, progress: _currentPlayAudioInfo?.progress ?? 0, isPaused: true);
+      player!.seek(Duration.zero);
       _audioPlayInfo = null;
       _currentPlayAudioInfo = null;
-      await player?.stop();
     }
-    console(logs: "current audio path: ${source.path}");
+    console(logs: "current messageID: ${source.msgID}, audio path: ${source.path}");
+
+    var allowext = ["mp3", 'wav', 'm4a'];
     if (source.type == AudioPlayType.path) {
       File f = File(source.path);
-      var allowext = ["mp3", 'wav'];
       var type = source.path.split(".").last.toLowerCase();
       var typeArr = type.split('?');
 
@@ -490,14 +506,18 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
       }
       if (f.existsSync()) {
         _audioPlayInfo = source;
-        console(logs: "start play audio");
+        _currentPlayAudioInfo = CurrentPlayAudioInfo(
+          progress: 0,
+          playInfo: source,
+          isCompleted: false,
+          isPaused: false,
+        );
+        console(logs: "start play audio, messageID: ${source.msgID}");
         await player?.play(DeviceFileSource(source.path));
       } else {
         console(logs: "audio play by path. path not exists");
       }
     } else {
-      var allowext = ["mp3", 'wav'];
-
       var type = source.path.split(".").last.toLowerCase();
       var typeArr = type.split('?');
 
@@ -509,6 +529,12 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
         return console(logs: "the audio type:$type is not allowed ");
       }
       _audioPlayInfo = source;
+      _currentPlayAudioInfo = CurrentPlayAudioInfo(
+        progress: 0,
+        playInfo: source,
+        isCompleted: false,
+        isPaused: false,
+      );
       await player?.play(UrlSource(source.path));
     }
   }
@@ -516,20 +542,20 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
   /// function for resuming audio
   resumeAudio() async {
     if (player?.state == PlayerState.paused) {
-      console(logs: "audio resume");
+      console(logs: "audio resume, messageID: ${_audioPlayInfo?.msgID}");
       await player?.resume();
     } else {
-      console(logs: "no audio playing. ignore. current state is ${player?.state.name}");
+      console(logs: "current state is ${player?.state.name}, no need to resume");
     }
   }
 
   /// function for pausing audio
   pauseAudio() async {
     if (player?.state == PlayerState.playing) {
-      console(logs: "audio pause");
+      console(logs: "audio pause, messageID: ${_audioPlayInfo?.msgID}");
       await player?.pause();
     } else {
-      console(logs: "no audio playing. ignore. current state is ${player?.state.name}");
+      console(logs: "current state is ${player?.state.name}, no need to pause");
     }
   }
 
@@ -537,11 +563,14 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
   stopPlayAudio() async {
     try {
       if (player?.state == PlayerState.playing) {
+        console(logs: "audio stop, messageID: ${_audioPlayInfo?.msgID}");
+        await player?.stop();
+        updateCurrentAudioPlayInfo(isCompleted: false, progress: _currentPlayAudioInfo?.progress ?? 0, isPaused: true);
+        player!.seek(Duration.zero);
         _audioPlayInfo = null;
         _currentPlayAudioInfo = null;
-        await player?.stop();
       } else {
-        console(logs: "no audio playing. ignore. current state is ${player?.state.name}");
+        console(logs: "current state is ${player?.state.name}, no need to stop");
       }
     } catch (e) {
       if (kDebugMode) {
@@ -561,6 +590,7 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
           progress: progress,
           isSendComplete: isSendComplete,
         );
+
         notifyListener(TencentCloudChatMessageDataKeys.sendMessageProgress as T);
       }
     }
@@ -708,6 +738,20 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
     }
   }
 
+  void clearMessageList({String? userID, String? groupID}) {
+    if (userID != null) {
+      _messageListMap.remove(userID);
+    } else if (groupID != null) {
+      _messageListMap.remove(groupID);
+    }
+
+    notifyListener(
+      TencentCloudChatMessageDataKeys.messageList as T,
+      userID: userID,
+      groupID: groupID,
+    );
+  }
+
   /// Callback for receiving message was modified
   /// function(V2TimMessage)
   void onReceiveMessageModified(V2TimMessage newMessage) {
@@ -721,11 +765,12 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
       messageList.replaceRange(index, index + 1, [newMessage]);
       // Update the message list in the data store.
       messageNeedUpdate = newMessage;
+
       updateMessageList(
         userID: newMessage.userID,
         groupID: newMessage.groupID,
         messageList: messageList,
-        disableNotify: false,
+        disableNotify: true,
       );
     }
   }
@@ -733,10 +778,16 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
   /// Callback for receiving message was recalled
   /// function(V2TimMessage)
   void onReceiveMessageRecalled(String msgID) async {
+    // replaced with onRecvMessageRevokedWithInfo
+  }
+
+  void onRecvMessageRevokedWithInfo(String msgID, V2TimUserFullInfo operateUser, String reason) async {
     final findRes = await TencentCloudChat.instance.chatSDKInstance.messageSDK.findMessages(msgIds: [msgID]);
     if (findRes.code == 0 && findRes.data != null && findRes.data!.isNotEmpty && findRes.data?.first != null) {
       final V2TimMessage targetMessage = findRes.data!.first;
       targetMessage.status = MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED;
+      targetMessage.revokerInfo = operateUser;
+      targetMessage.revokeReason = reason;
 
       String conversationID = TencentCloudChatUtils.checkString(targetMessage.groupID) ?? TencentCloudChatUtils.checkString(targetMessage.userID) ?? "";
       List<V2TimMessage> messageList = getMessageList(key: conversationID);
@@ -751,6 +802,7 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
           messageList: messageList,
           disableNotify: true,
         );
+
         messageNeedUpdate = targetMessage;
       }
     }
@@ -772,13 +824,37 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
 
         // Ensure the message list doesn't exceed the maximum message count.
         if (messageList.length > maxMessageCount) {
-          messageList.removeLast();
+          messageList = messageList.take(maxMessageCount).toList();
+          final key = TencentCloudChatUtils.checkString(newMessage.groupID) ?? TencentCloudChatUtils.checkString(newMessage.userID) ?? "";
+          _messageListStatusMap[key]!.haveMorePreviousData = true;
         }
 
         // Update the message list in the data store.
         updateMessageList(userID: newMessage.userID, groupID: newMessage.groupID, messageList: messageList);
       }
     }
+  }
+
+  /// Callback for user status change
+  /// function(V2TimMessage)
+  void onUserStatusChanged(List<V2TimUserStatus> userStatusList) {
+    userStatusChangeSet = userStatusList.map((e) => e.userID).toSet();
+
+    notifyListener(TencentCloudChatMessageDataKeys.userStatusChange as T);
+  }
+
+  /// Callback for friend info change
+  /// function(V2TimMessage)
+  void onFriendInfoChanged(List<V2TimFriendInfo> friendInfoList) {
+    friendInfoChangeSet = friendInfoList.map((e) => e.userID).toSet();
+
+    notifyListener(TencentCloudChatMessageDataKeys.friendInfoChange as T);
+  }
+
+  /// Callback for network connect success
+  /// function(V2TimMessage)
+  void onConnectSuccess() {
+    notifyListener(TencentCloudChatMessageDataKeys.networkConnectSuccess as T);
   }
 
   /// function for loading list to specific message
@@ -1015,7 +1091,7 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
     }
 
     // Ensure the message list doesn't exceed the maximum message count.
-    if (messageList.length > maxMessageCount && !(TencentCloudChatPlatformAdapter().isWeb && TencentCloudChatUtils.checkString(userID) != null)) {
+    if (messageList.length > maxMessageCount && !(TencentCloudChatPlatformAdapter().isWeb)) {
       final messageListStatus = getMessageListStatus(userID: userID, groupID: TencentCloudChatUtils.checkString(topicID) ?? groupID);
       int removeCount = messageList.length - maxMessageCount;
       final removeStart = direction == TencentCloudChatMessageLoadDirection.previous ? 0 : messageList.length - removeCount;
@@ -1050,15 +1126,13 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
           }));
     }
 
-    Future.delayed(const Duration(seconds: 0), () {
-      updateMessageList(
-        topicID: topicID,
-        userID: userID,
-        groupID: groupID,
-        messageList: messageList,
-      );
-    });
-    return response.isFinished;
+    updateMessageList(
+      topicID: topicID,
+      userID: userID,
+      groupID: groupID,
+      messageList: messageList,
+    );
+    return TencentCloudChatPlatformAdapter().isWeb ? (response.messageList.isEmpty || response.isFinished) : response.isFinished;
   }
 
   /// ==== Message Highlight ====
@@ -1365,9 +1439,38 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
 
   @override
   void notifyListener(T key, {String? userID, String? groupID}) {
-    currentUpdatedFields = key;
-    currentOperateUserID = userID;
-    currentOperateGroupID = groupID;
-    TencentCloudChat.instance.eventBusInstance.fire(this, "TencentCloudChatMessageData");
+    var event = TencentCloudChatMessageData<T>(key);
+    event.currentOperateUserID = userID;
+    event.currentOperateGroupID = groupID;
+    event._messageHighlighted = _messageHighlighted;
+    event._messageListMap = _messageListMap;
+    event._messageListStatusMap = _messageListStatusMap;
+    event._messageNeedUpdate = _messageNeedUpdate;
+    event._messageProgressData = _messageProgressData;
+    event._messageReadReceiptMap = _messageReadReceiptMap;
+    event._audioPlayInfo = _audioPlayInfo;
+    event._currentPlayAudioInfo = _currentPlayAudioInfo;
+    event._currentDownloadMessage = _currentDownloadMessage;
+    event.userStatusChangeSet = userStatusChangeSet;
+    event.friendInfoChangeSet = friendInfoChangeSet;
+
+    TencentCloudChat.instance.eventBusInstance.fire(event, "TencentCloudChatMessageData");
+  }
+
+  @override
+  void clear() {
+    _currentDownloadMessage = [];
+    currentOperateUserID = "";
+    currentOperateGroupID = "";
+    _currentPlayAudioInfo = null;
+    _audioPlayInfo = null;
+    _messageNeedUpdate = null;
+    userStatusChangeSet.clear();
+    friendInfoChangeSet.clear();
+    _messageReadReceiptMap.clear();
+    _messageProgressData.clear();
+    _messageListMap.clear();
+    _messageListStatusMap.clear();
+    _messageHighlighted = null;
   }
 }

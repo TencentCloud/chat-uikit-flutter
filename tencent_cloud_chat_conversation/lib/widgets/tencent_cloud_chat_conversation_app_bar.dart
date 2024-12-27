@@ -21,7 +21,7 @@ class TencentCloudChatConversationAppBar extends StatefulWidget {
 
 class TencentCloudChatConversationAppBarState extends TencentCloudChatState<TencentCloudChatConversationAppBar> {
   final Stream<TencentCloudChatBasicData<dynamic>>? _basicDataStream =
-  TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatBasicData<dynamic>>("TencentCloudChatBasicData");
+      TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatBasicData<dynamic>>("TencentCloudChatBasicData");
   StreamSubscription<TencentCloudChatBasicData<dynamic>>? _basicDataSubscription;
 
   bool includeSearch =
@@ -36,10 +36,10 @@ class TencentCloudChatConversationAppBarState extends TencentCloudChatState<Tenc
   void _addBasicEventListener() {
     _basicDataSubscription = _basicDataStream?.listen((event) {
       if (event.currentUpdatedFields == TencentCloudChatBasicDataKeys.addUsedComponent) {
-       safeSetState(() {
-         includeSearch =
-             TencentCloudChat.instance.dataInstance.basic.usedComponents.contains(TencentCloudChatComponentsEnum.search);
-       });
+        safeSetState(() {
+          includeSearch = TencentCloudChat.instance.dataInstance.basic.usedComponents
+              .contains(TencentCloudChatComponentsEnum.search);
+        });
       }
     });
   }
@@ -54,9 +54,8 @@ class TencentCloudChatConversationAppBarState extends TencentCloudChatState<Tenc
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(bottom: getWidth(15)),
-      child: const TencentCloudChatConversationAppBarName(),
+    return TencentCloudChatThemeWidget(
+      build: (context, colorTheme, textStyle) => const TencentCloudChatConversationAppBarName(),
     );
   }
 
@@ -111,9 +110,6 @@ class TencentCloudChatConversationAppBarNameState
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Row(
               children: [
-                Container(
-                  width: getWidth(8),
-                ),
                 Expanded(
                     child: Text(
                   tL10n.chat,
@@ -143,34 +139,51 @@ class TencentCloudChatAppBarSearchItem extends StatefulWidget {
 }
 
 class TencentCloudChatAppBarSearchItemState extends State<TencentCloudChatAppBarSearchItem> {
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void initState() {
+    super.initState();
+    widget.textEditingController.addListener(_textEditingControllerListener);
+  }
+
+  void _textEditingControllerListener() {
+    if (widget.textEditingController.text.isEmpty) {
+      _focusNode.unfocus();
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.textEditingController.removeListener(_textEditingControllerListener);
+  }
+
   @override
   Widget build(BuildContext context) {
     return TextField(
+      focusNode: _focusNode,
       maxLines: 1,
       controller: widget.textEditingController,
-      style: const TextStyle(fontSize: 12),
+      style: const TextStyle(fontSize: 14),
       decoration: InputDecoration(
         hintText: tL10n.search,
         filled: true,
         isDense: true,
-        hintStyle: const TextStyle(fontSize: 12),
+        hintStyle: const TextStyle(fontSize: 14),
         prefixIcon: const Icon(Icons.search),
         suffixIcon: widget.textEditingController.text.isNotEmpty
             ? IconButton(
                 icon: const Icon(Icons.clear),
                 onPressed: () {
-                  setState(() {
-                    widget.textEditingController.clear();
-                  });
+                  widget.textEditingController.clear();
+                  _focusNode.unfocus();
                 },
               )
             : null,
         border: const OutlineInputBorder(borderSide: BorderSide.none),
         contentPadding: const EdgeInsets.all(0),
       ),
-      onChanged: (value) {
-        setState(() {});
-      },
     );
   }
 }

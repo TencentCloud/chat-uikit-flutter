@@ -74,14 +74,19 @@ class TencentCloudChatSoundToText extends TencentCloudChatPlugin {
   Widget? getWidgetSync(
       {required String methodName,
       Map<String, String>? data,
-      Map<String, TencentCloudChatPluginTapFn>? fns}) {
+      Map<String, TencentCloudChatPluginTapFn>? fns,
+      Function()? onTranslateFailed,
+      Function()? onTranslateSuccess,
+      bool? hasFailed = false,}) {
     final {
       "msgID": msgID,
       "language": language,
     } = data ?? {};
+
     return TencentCloudChatTranslate(
-        onTranslateFailed: _onTranslateFailed,
-        onTranslateSuccess: _onTranslateSuccess,
+        key: hasFailed! ? UniqueKey() : null,
+        onTranslateFailed: onTranslateFailed ?? _onTranslateFailed,
+        onTranslateSuccess: onTranslateSuccess ?? _onTranslateSuccess,
         language: language ?? _sourceLanguage,
         msgID: msgID,
         decoration: _decoration,

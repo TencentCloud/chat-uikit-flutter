@@ -1632,12 +1632,15 @@ class _SelectableRegionContainerDelegate extends MultiSelectableSelectionContain
       case SelectionEventType.startEdgeUpdate:
         _hasReceivedStartEvent.add(selectable);
         ensureChildUpdated(selectable);
+        break;
       case SelectionEventType.endEdgeUpdate:
         _hasReceivedEndEvent.add(selectable);
         ensureChildUpdated(selectable);
+        break;
       case SelectionEventType.clear:
         _hasReceivedStartEvent.remove(selectable);
         _hasReceivedEndEvent.remove(selectable);
+        break;
       case SelectionEventType.selectAll:
       case SelectionEventType.selectWord:
         break;
@@ -1646,6 +1649,9 @@ class _SelectableRegionContainerDelegate extends MultiSelectableSelectionContain
         _hasReceivedStartEvent.add(selectable);
         _hasReceivedEndEvent.add(selectable);
         ensureChildUpdated(selectable);
+        break;
+      default:
+        break;
     }
     return super.dispatchSelectionEventToChild(selectable, event);
   }
@@ -2373,21 +2379,29 @@ abstract class MultiSelectableSelectionContainerDelegate extends SelectionContai
       case SelectionEventType.endEdgeUpdate:
         _extendSelectionInProgress = false;
         result = handleSelectionEdgeUpdate(event as SelectionEdgeUpdateEvent);
+        break;
       case SelectionEventType.clear:
         _extendSelectionInProgress = false;
         result = handleClearSelection(event as ClearSelectionEvent);
+        break;
       case SelectionEventType.selectAll:
         _extendSelectionInProgress = false;
         result = handleSelectAll(event as SelectAllSelectionEvent);
+        break;
       case SelectionEventType.selectWord:
         _extendSelectionInProgress = false;
         result = handleSelectWord(event as SelectWordSelectionEvent);
+        break;
       case SelectionEventType.granularlyExtendSelection:
         _extendSelectionInProgress = true;
         result = handleGranularlyExtendSelection(event as GranularlyExtendSelectionEvent);
+        break;
       case SelectionEventType.directionallyExtendSelection:
         _extendSelectionInProgress = true;
         result = handleDirectionallyExtendSelection(event as DirectionallyExtendSelectionEvent);
+        break;
+      default:
+        break;
     }
     _isHandlingSelectionEvent = false;
     _updateSelectionGeometry();
