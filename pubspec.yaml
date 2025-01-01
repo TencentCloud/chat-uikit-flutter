@@ -28,7 +28,8 @@ dependencies:
   image_picker: ^0.8.9
   file_picker: ^5.3.0
   tencent_super_tooltip: ^0.0.1
-  video_player: ^2.9.0
+  video_player: ^2.9.2
+  better_player_plus: ^1.0.5
   chewie: ^1.8.5
   flutter_slidable_plus_plus: ^0.1.0
   flutter_plugin_record_plus: ^0.0.19

@@ -1,6 +1,7 @@
 // ignore_for_file: unused_field, avoid_print, unused_import
 
 import 'dart:io';
+import 'package:better_player_plus/better_player_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:fc_native_video_thumbnail/fc_native_video_thumbnail.dart';
 import 'package:flutter/foundation.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
@@ -99,7 +101,8 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
   final ScrollController _scrollController = ScrollController();
   final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
 
-  VideoPlayerController? _videoPlayerController;
+  // 创建AudioPlayer对象
+  late BetterPlayerController _betterPlayerController;
 
   @override
   void initState() {
@@ -110,6 +113,7 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
           isInstallCallkit = value;
         });
       });
+      _betterPlayerController = BetterPlayerController(const BetterPlayerConfiguration());
     }
   }
 
@@ -149,8 +153,8 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
               margin: const EdgeInsets.only(bottom: 4),
               decoration: const BoxDecoration(
                   color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(5))),
-              child: SvgPicture.asset(
-                "images/screen.svg",
+              child: Image.asset(
+                "images/video_tape.png",
                 package: 'tencent_cloud_chat_uikit',
                 height: 64,
                 width: 64,
@@ -365,8 +369,9 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
             convID: convID,
             convType: convType),
         context);
+
     // 释放资源
-    _videoPlayerController?.dispose();
+    _betterPlayerController.dispose();
   }
 
   _sendImageMessage(TUIChatSeparateViewModel model, TUITheme theme) async {
@@ -509,11 +514,22 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
             model.sendImageMessage(imagePath: originFile.path, convID: convID, convType: convType),
             context);
       } else {
-        _videoPlayerController = VideoPlayerController.file(File(originFile.path))
-          ..initialize().then((_) {
-            _sendVideoMessage(originFile!.path,
-                _videoPlayerController?.value.duration.inSeconds ?? 10, size, model);
-          });
+        // 监听视频准备完成事件
+        _betterPlayerController.addEventsListener((event) {
+          if (event.betterPlayerEventType == BetterPlayerEventType.initialized) {
+            // 获取视频时长（单位：秒）
+            int durationInSeconds = _betterPlayerController.videoPlayerController?.value.duration?.inSeconds ?? 0;
+            _sendVideoMessage(originFile!.path, durationInSeconds, size, model);
+          }
+        });
+
+        // 加载视频源
+        _betterPlayerController.setupDataSource(
+          BetterPlayerDataSource(
+            BetterPlayerDataSourceType.file,
+            originFile.path, // 替换为你的视频 URL
+          ),
+        );
       }
     } catch (error) {
       outputLogger.i("err: $error");

@@ -20,6 +20,8 @@ import 'package:tencent_cloud_chat_uikit/ui/widgets/video_custom_control.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:video_player/video_player.dart';
 
+import '../views/TIMUIKitChat/TIMUIKitMessageItem/tencent_cloud_chat_message_viewer/tencent_cloud_chat_message_videoplayer.dart';
+
 class VideoScreen extends StatefulWidget {
   const VideoScreen({required this.message, required this.heroTag, required this.videoElement, Key? key})
       : super(key: key);
@@ -33,11 +35,8 @@ class VideoScreen extends StatefulWidget {
 }
 
 class _VideoScreenState extends TIMUIKitState<VideoScreen> {
-  late VideoPlayerController videoPlayerController;
-  late ChewieController chewieController;
   GlobalKey<ExtendedImageSlidePageState> slidePagekey = GlobalKey<ExtendedImageSlidePageState>();
   final TUIChatGlobalModel model = serviceLocator<TUIChatGlobalModel>();
-  bool isInit = false;
 
   @override
   initState() {
@@ -266,9 +265,6 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
             return await _saveVideo();
           }));
       setState(() {
-        videoPlayerController = player;
-        chewieController = controller;
-        isInit = true;
       });
     });
   }
@@ -287,10 +283,6 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
     ]);
-    if (isInit) {
-      videoPlayerController.dispose();
-      chewieController.dispose();
-    }
     super.dispose();
   }
 
@@ -327,31 +319,10 @@ class _VideoScreenState extends TIMUIKitState<VideoScreen> {
                   }
                   return null;
                 },
-                child: ExtendedImageSlidePageHandler(
-                  child: Container(
-                      color: Colors.black,
-                      child: isInit
-                          ? Chewie(
-                              controller: chewieController,
-                            )
-                          : const Center(child: CircularProgressIndicator(color: Colors.white))),
-                  heroBuilderForSlidingPage: (Widget result) {
-                    return Hero(
-                      tag: widget.heroTag,
-                      child: result,
-                      flightShuttleBuilder: (BuildContext flightContext,
-                          Animation<double> animation,
-                          HeroFlightDirection flightDirection,
-                          BuildContext fromHeroContext,
-                          BuildContext toHeroContext) {
-                        final Hero hero = (flightDirection == HeroFlightDirection.pop
-                            ? fromHeroContext.widget
-                            : toHeroContext.widget) as Hero;
-
-                        return hero.child;
-                      },
-                    );
-                  },
+                child: TencentCloudChatMessageVideoPlayer(
+                  message: widget.message,
+                  controller: true,
+                  isSending: widget.message.status == MessageStatus.V2TIM_MSG_STATUS_SENDING,
                 )),
           ));
     }));
