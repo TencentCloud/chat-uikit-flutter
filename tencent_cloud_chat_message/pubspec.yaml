@@ -19,7 +19,7 @@ dependencies:
   flutter:
     sdk: flutter
   cached_network_image: ^3.2.3
-  image_picker: ^0.8.9
+  image_picker: ">=0.8.9 <2.0.0"
   record: ^5.0.5
   record_android: '>=1.1.0 <=1.2.1'
   fc_native_video_thumbnail: ^0.7.0
@@ -49,7 +49,7 @@ dependencies:
   image_clipboard: ^1.1.0+1
   azlistview_all_platforms: ^2.1.2
   lpinyin: ^2.0.3
-  device_info_plus: ^9.1.2
+  device_info_plus: ">=9.1.2 <12.0.0"
 
 dependency_overrides:
 #  tencent_cloud_chat:
