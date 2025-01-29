@@ -1,6 +1,8 @@
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/base_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
+typedef FutureVoidCallback = Future<void> Function();
+
 class ChatLifeCycle {
   /// Before a new message will be added to historical message list from long connection.
   /// You may not render this message by return null.
@@ -11,7 +13,7 @@ class ChatLifeCycle {
 
   /// Before a new message will be sent.
   /// Returns null can block the message from sending.
-  Future<V2TimMessage?> Function(V2TimMessage message, [V2TimMessage? repliedMessage]) messageWillSend;
+  FutureVoidCallback? messageWillSend;
 
   /// After a new message been sent.
   MessageFunctionNullCallback messageDidSend;
@@ -43,7 +45,7 @@ class ChatLifeCycle {
     this.shouldDeleteMessage = DefaultLifeCycle.defaultAsyncBooleanSolution,
     this.messageDidSend = DefaultLifeCycle.defaultNullCallbackSolution,
     this.didGetHistoricalMessageList = DefaultLifeCycle.defaultMessageListSolution,
-    this.messageWillSend = DefaultLifeCycle.defaultTwoMessagesSolution,
+    this.messageWillSend,
     this.modifiedMessageWillMount = DefaultLifeCycle.defaultMessageSolution,
     this.newMessageWillMount = DefaultLifeCycle.defaultMessageSolution,
     this.messageShouldMount = DefaultLifeCycle.defaultBooleanSolution,
