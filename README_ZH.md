@@ -8,7 +8,7 @@ TUIKit 效果图如下所示：
 ![img](https://qcloudimg.tencent-cloud.cn/raw/f140dd76be01a65abfb7e6ba2bf50ed5.png)
 
 快速集成 TUIKit 组件请参考视频：
-[<img src="https://im.sdk.qcloud.com/tools/resource/GitHubResource/build_ios_chat_app.png" width="800"/>](https://www.youtube.com/watch?v=lawzmfW9vls)
+[<img src="https://im.sdk.qcloud.com/tools/resource/GitHubResource/build_flutter_chat_app.png" width="800"/>](https://www.youtube.com/watch?v=lawzmfW9vls)
 
 TUIKit 主要 Widget 如下：
 - TIMUIKitConversation 会话组件

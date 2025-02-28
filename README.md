@@ -5,7 +5,7 @@ You only need to integrate Chat SDK to easily gain chat, conversation, group cap
 
 ## Check Out Our Sample Apps
 This document introduces how to quickly run the Chat demo on the iOS platform.
-[<img src="https://im.sdk.qcloud.com/tools/resource/GitHubResource/build_ios_chat_app.png" width="800"/>](https://www.youtube.com/watch?v=lawzmfW9vls)
+[<img src="https://im.sdk.qcloud.com/tools/resource/GitHubResource/build_flutter_chat_app.png" width="800"/>](https://www.youtube.com/watch?v=lawzmfW9vls)
 
 For the other platforms, please refer to document：
 - [**chat-uikit-android**](https://github.com/TencentCloud/chat-uikit-android)
