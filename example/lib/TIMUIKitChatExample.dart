@@ -64,7 +64,6 @@ class TIMUIKitChatExample extends StatelessWidget {
       config: const TIMUIKitChatConfig(
         // 仅供演示，非全部配置项，实际使用中，可只传和默认项不同的参数，无需传入所有开关
         isAllowClickAvatar: true,
-        isUseDefaultEmoji: true,
         isAllowLongPressMessage: true,
         isShowReadingStatus: true,
         isShowGroupReadingStatus: true,

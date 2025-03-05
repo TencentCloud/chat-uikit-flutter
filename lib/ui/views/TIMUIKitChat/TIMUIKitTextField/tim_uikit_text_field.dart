@@ -24,6 +24,8 @@ import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_text_field_layout/narrow.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_text_field_layout/wide.dart';
 
+import 'tim_uikit_send_sound_message.dart';
+
 enum MuteStatus { none, me, all }
 
 typedef CustomStickerPanel = Widget Function({
@@ -100,6 +102,24 @@ class TIMUIKitInputTextField extends StatefulWidget {
 
   final String? groupID;
 
+  /// 图标颜色
+  final Color? iconColor;
+
+  /// 语音组件构建器
+  final SoundBuilderCallback? soundBuilder;
+
+  /// 自定义输入框的 Decoration
+  final InputDecoration? inputDecoration;
+
+  /// 表情面板背景颜色
+  final Color? stickerPanelBackgroundColor;
+
+  /// 表情面板内边距
+  final EdgeInsetsGeometry? stickerPanelPadding;
+
+  /// 更多面板边框
+  final BoxBorder? morePanelBorder;
+
   const TIMUIKitInputTextField(
       {Key? key,
       required this.conversationID,
@@ -122,7 +142,13 @@ class TIMUIKitInputTextField extends StatefulWidget {
       this.groupType,
       this.atMemberPanelScroll,
       this.groupID,
-      this.chatConfig})
+      this.chatConfig,
+      this.iconColor,
+      this.soundBuilder,
+      this.inputDecoration,
+      this.stickerPanelBackgroundColor,
+      this.stickerPanelPadding,
+      this.morePanelBorder})
       : super(key: key);
 
   @override
@@ -999,6 +1025,11 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
             return TUIKitScreenUtils.getDeviceWidget(
                 context: context,
                 defaultWidget: TIMUIKitTextFieldLayoutNarrow(
+                    morePanelBorder: widget.morePanelBorder,
+                    stickerPanelPadding: widget.stickerPanelPadding,
+                    stickerPanelBackgroundColor: widget.stickerPanelBackgroundColor,
+                    inputDecoration: widget.inputDecoration,
+                    soundBuilder: widget.soundBuilder,
                     stickerPackageList: stickerPackageList,
                     onEmojiSubmitted: _onEmojiSubmitted,
                     onCustomEmojiFaceSubmitted: _onCustomEmojiFaceSubmitted,
@@ -1008,6 +1039,7 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                     onChanged: widget.onChanged,
                     onDeleteText: _onDeleteText,
                     backgroundColor: widget.backgroundColor,
+                    iconColor: widget.iconColor,
                     morePanelConfig: widget.morePanelConfig,
                     repliedMessage: value,
                     currentCursor: currentCursor,

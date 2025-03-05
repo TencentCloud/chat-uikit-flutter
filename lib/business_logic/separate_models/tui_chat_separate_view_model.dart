@@ -685,6 +685,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     String? localCustomData,
     bool? isEditStatusMessage = false,
   }) async {
+    if (lifeCycle?.messageWillSend != null) await lifeCycle!.messageWillSend!();
     String receiver = convType == ConvType.c2c ? convID : '';
     String groupID = convType == ConvType.group ? convID : '';
     if (convType == ConvType.group && _groupType == null) {
@@ -1149,6 +1150,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
   sendForwardMessage({
     required List<V2TimConversation> conversationList,
   }) async {
+    if (lifeCycle?.messageWillSend != null) await lifeCycle!.messageWillSend!();
     final selectedMessages = getSelectedMessageList();
     for (var conversation in conversationList) {
       final convID = conversation.groupID ?? conversation.userID ?? "";
@@ -1195,6 +1197,7 @@ class TUIChatSeparateViewModel extends ChangeNotifier {
     required List<String> abstractList,
     required BuildContext context,
   }) async {
+    if (lifeCycle?.messageWillSend != null) await lifeCycle!.messageWillSend!();
     final List<String> msgIDList = getSelectedMessageList()
         .map((e) => e.msgID ?? "")
         .where((element) => element != "")

@@ -30,6 +30,8 @@ import 'TIMUIKItMessageList/TIMUIKitTongue/tim_uikit_chat_history_message_list_t
 import 'TIMUIKItMessageList/tim_uikit_chat_history_message_list_config.dart';
 import 'TIMUIKItMessageList/tim_uikit_history_message_list_container.dart';
 
+import 'TIMUIKitTextField/tim_uikit_send_sound_message.dart';
+
 class TIMUIKitChat extends StatefulWidget {
   int startTime = 0;
   int endTime = 0;
@@ -167,6 +169,27 @@ class TIMUIKitChat extends StatefulWidget {
   /// additional network requests to fetch the group member information internally.
   List<V2TimGroupMemberFullInfo?>? groupMemberList;
 
+  /// 输入框区域背景颜色
+  final Color? inputPanelBackgroundColor;
+
+  /// 输入框区域图标颜色
+  final Color? inputIconColor;
+
+  /// 语音组件构建器
+  final SoundBuilderCallback? inputSoundBuilder;
+
+  /// 自定义输入框的 Decoration
+  final InputDecoration? inputDecoration;
+
+  /// 表情面板背景颜色
+  final Color? stickerPanelBackgroundColor;
+
+  /// 表情面板内边距
+  final EdgeInsetsGeometry? stickerPanelPadding;
+
+  /// 更多面板边框
+  final BoxBorder? morePanelBorder;
+
   TIMUIKitChat(
       {Key? key,
       this.groupID,
@@ -206,7 +229,14 @@ class TIMUIKitChat extends StatefulWidget {
       this.customAppBar,
       this.inputTopBuilder,
       this.onSecondaryTapAvatar,
-      this.customMessageHoverBarOnDesktop})
+      this.customMessageHoverBarOnDesktop,
+      this.inputPanelBackgroundColor,
+      this.inputIconColor,
+      this.inputSoundBuilder,
+      this.inputDecoration,
+      this.stickerPanelBackgroundColor,
+      this.stickerPanelPadding,
+      this.morePanelBorder})
       : super(key: key) {
     startTime = DateTime.now().millisecondsSinceEpoch;
   }
@@ -577,6 +607,13 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
                                   : (widget.textFieldBuilder != null
                                       ? widget.textFieldBuilder!(context)
                                       : TIMUIKitInputTextField(
+                                          morePanelBorder: widget.morePanelBorder,
+                                          stickerPanelPadding: widget.stickerPanelPadding,
+                                          stickerPanelBackgroundColor: widget.stickerPanelBackgroundColor,
+                                          inputDecoration: widget.inputDecoration,
+                                          soundBuilder: widget.inputSoundBuilder,
+                                          backgroundColor: widget.inputPanelBackgroundColor,
+                                          iconColor: widget.inputIconColor,
                                           chatConfig: widget.config,
                                           groupID: widget.groupID,
                                           atMemberPanelScroll:
