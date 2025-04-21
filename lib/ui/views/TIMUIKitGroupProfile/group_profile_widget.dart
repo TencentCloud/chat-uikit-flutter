@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
 
 enum GroupProfileWidgetEnum {
   /// The detail card for group.

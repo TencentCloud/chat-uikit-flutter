@@ -1,4 +1,18 @@
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tencent_cloud_chat_sdk/enum/V2TimGroupListener.dart';
+import 'package:tencent_cloud_chat_sdk/enum/group_application_type_enum.dart';
+import 'package:tencent_cloud_chat_sdk/enum/group_member_filter_enum.dart';
+import 'package:tencent_cloud_chat_sdk/enum/group_member_role_enum.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_application_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_info_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_operation_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_search_param.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_search_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_search_param.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart';
 
 abstract class GroupServices {
   Future<List<V2TimGroupInfo>?> getJoinedGroupList();

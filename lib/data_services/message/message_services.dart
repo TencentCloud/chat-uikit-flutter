@@ -1,4 +1,21 @@
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tencent_cloud_chat_sdk/enum/V2TimAdvancedMsgListener.dart';
+import 'package:tencent_cloud_chat_sdk/enum/V2TimSimpleMsgListener.dart';
+import 'package:tencent_cloud_chat_sdk/enum/get_group_message_read_member_list_filter.dart';
+import 'package:tencent_cloud_chat_sdk/enum/history_msg_get_type_enum.dart';
+import 'package:tencent_cloud_chat_sdk/enum/message_priority_enum.dart';
+import 'package:tencent_cloud_chat_sdk/enum/offlinePushInfo.dart';
+import 'package:tencent_cloud_chat_sdk/enum/receive_message_opt_enum.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_message_read_member_list.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_change_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_list_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_online_url.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_receipt.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_search_param.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_search_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_msg_create_info_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart';
 
 class MessageListResponse {
   final bool haveMoreData;
@@ -71,7 +88,8 @@ abstract class MessageService {
       bool needReadReceipt = false,
       OfflinePushInfo? offlinePushInfo,
       String? cloudCustomData, // 云自定义消息字段，只能在消息发送前添加
-      String? localCustomData});
+      String? localCustomData,
+      bool isExcludedFromContentModeration});
 
   Future<V2TimValueCallback<V2TimMessage>> sendReplyMessage({
     required String id, // 自己创建的ID

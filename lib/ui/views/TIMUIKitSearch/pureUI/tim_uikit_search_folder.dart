@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/theme/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/theme/color.dart';
 
 class TIMUIKitSearchFolder extends TIMUIKitStatelessWidget {
   final String folderName;

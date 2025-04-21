@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
+import 'package:tencent_cloud_chat_uikit/theme/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/theme/color.dart';
 
 class TIMUIKitProfileUserInfoCardWide extends TIMUIKitStatelessWidget {
   /// User info

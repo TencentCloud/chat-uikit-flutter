@@ -1,7 +1,12 @@
+import 'package:tencent_cloud_chat_sdk/enum/V2TimConversationListener.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation_result.dart';
+import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_callback.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/conversation/conversation_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
 
 class ConversationServicesImpl extends ConversationService {
   final CoreServicesImpl _coreService = serviceLocator<CoreServicesImpl>();
@@ -114,7 +119,7 @@ class ConversationServicesImpl extends ConversationService {
       {required String convID}) async {
     final result = await TencentImSDKPlugin.v2TIMManager
         .getConversationManager()
-        .getConversationListByConversaionIds(conversationIDList: [convID]);
+        .getConversationListByConversationIds(conversationIDList: [convID]);
     if (result.code != 0) {
       _coreService.callOnCallback(TIMCallback(
           type: TIMCallbackType.API_ERROR,

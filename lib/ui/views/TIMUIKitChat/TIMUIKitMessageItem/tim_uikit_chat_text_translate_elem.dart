@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
@@ -43,14 +45,12 @@ class TIMUIKitTextTranslationElem extends StatefulWidget {
   State<StatefulWidget> createState() => _TIMUIKitTextTranslationElemState();
 }
 
-class _TIMUIKitTextTranslationElemState
-    extends TIMUIKitState<TIMUIKitTextTranslationElem> {
+class _TIMUIKitTextTranslationElemState extends TIMUIKitState<TIMUIKitTextTranslationElem> {
   bool isShowJumpState = false;
   bool isShining = false;
 
   _showJumpColor() {
-    if ((widget.chatModel.jumpMsgID != widget.message.msgID) &&
-        (widget.message.msgID?.isNotEmpty ?? true)) {
+    if ((widget.chatModel.jumpMsgID != widget.message.msgID) && (widget.message.msgID?.isNotEmpty ?? true)) {
       return;
     }
     isShining = true;
@@ -78,8 +78,7 @@ class _TIMUIKitTextTranslationElemState
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final theme = value.theme;
-    final isDesktopScreen =
-        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     final borderRadius = widget.isFromSelf
         ? const BorderRadius.only(
             topLeft: Radius.circular(10),
@@ -98,61 +97,49 @@ class _TIMUIKitTextTranslationElemState
           _showJumpColor();
         });
       } else {
-        if ((widget.chatModel.jumpMsgID == widget.message.msgID) &&
-            (widget.message.msgID?.isNotEmpty ?? false)) {
+        if ((widget.chatModel.jumpMsgID == widget.message.msgID) && (widget.message.msgID?.isNotEmpty ?? false)) {
           widget.clearJump();
         }
       }
     }
 
     final defaultStyle = widget.isFromSelf
-        ? (theme.chatMessageItemFromSelfBgColor ??
-            theme.lightPrimaryMaterialColor.shade50)
+        ? (theme.chatMessageItemFromSelfBgColor ?? theme.lightPrimaryMaterialColor.shade50)
         : (theme.chatMessageItemFromOthersBgColor);
 
-    final backgroundColor = isShowJumpState
-        ? const Color.fromRGBO(245, 166, 35, 1)
-        : (defaultStyle ?? widget.backgroundColor);
+    final backgroundColor =
+        isShowJumpState ? const Color.fromRGBO(245, 166, 35, 1) : (defaultStyle ?? widget.backgroundColor);
 
-    final LocalCustomDataModel localCustomData = LocalCustomDataModel.fromMap(
-        json.decode(
-            TencentUtils.checkString(widget.message.localCustomData) ?? "{}"));
+    final LocalCustomDataModel localCustomData =
+        LocalCustomDataModel.fromMap(json.decode(TencentUtils.checkString(widget.message.localCustomData) ?? "{}"));
     final String? translateText = localCustomData.translatedText;
 
-    final textWithLink = LinkPreviewEntry.getHyperlinksText(translateText ?? "",
-        widget.chatModel.chatConfig.isSupportMarkdownForTextMessage,
+    final textWithLink = LinkPreviewEntry.getHyperlinksText(
+        translateText ?? "", widget.chatModel.chatConfig.isSupportMarkdownForTextMessage,
         onLinkTap: widget.chatModel.chatConfig.onTapLink,
-        isUseQQPackage: widget
-                .chatModel.chatConfig.stickerPanelConfig?.useQQStickerPackage ??
-            true,
-        isUseTencentCloudChatPackage: widget.chatModel.chatConfig
-                .stickerPanelConfig?.useTencentCloudChatStickerPackage ??
-            true,
-        isUseTencentCloudChatPackageOldKeys: widget.chatModel.chatConfig
-                .stickerPanelConfig?.useTencentCloudChatStickerPackageOldKeys ??
-            false,
+        isUseQQPackage: widget.chatModel.chatConfig.stickerPanelConfig?.useQQStickerPackage ?? true,
+        isUseTencentCloudChatPackage:
+            widget.chatModel.chatConfig.stickerPanelConfig?.useTencentCloudChatStickerPackage ?? true,
+        isUseTencentCloudChatPackageOldKeys:
+            widget.chatModel.chatConfig.stickerPanelConfig?.useTencentCloudChatStickerPackageOldKeys ?? false,
         customEmojiStickerList: widget.customEmojiStickerList,
-        isEnableTextSelection:
-            widget.chatModel.chatConfig.isEnableTextSelection ?? false);
+        isEnableTextSelection: widget.chatModel.chatConfig.isEnableTextSelection ?? false);
 
     return TencentUtils.checkString(translateText) != null
         ? Container(
             margin: const EdgeInsets.only(top: 6),
-            padding:
-                widget.textPadding ?? EdgeInsets.all(isDesktopScreen ? 12 : 10),
+            padding: widget.textPadding ?? EdgeInsets.all(isDesktopScreen ? 12 : 10),
             decoration: BoxDecoration(
               color: backgroundColor,
               borderRadius: widget.borderRadius ?? borderRadius,
             ),
-            constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.6),
+            constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.6),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // If the [elemType] is text message, it will not be null here.
                 // You can render the widget from extension directly, with a [TextStyle] optionally.
-                widget.chatModel.chatConfig.urlPreviewType !=
-                        UrlPreviewType.none
+                widget.chatModel.chatConfig.urlPreviewType != UrlPreviewType.none
                     ? textWithLink!(
                         style: widget.fontStyle ??
                             TextStyle(
@@ -163,23 +150,13 @@ class _TIMUIKitTextTranslationElemState
                         softWrap: true,
                         style: widget.fontStyle ??
                             TextStyle(
-                                fontSize: isDesktopScreen ? 14 : 16,
-                                height: widget.chatModel.chatConfig.textHeight),
+                                fontSize: isDesktopScreen ? 14 : 16, height: widget.chatModel.chatConfig.textHeight),
                         specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
-                          isUseQQPackage: widget.chatModel.chatConfig
-                                  .stickerPanelConfig?.useQQStickerPackage ??
-                              true,
-                          isUseTencentCloudChatPackage: widget
-                                  .chatModel
-                                  .chatConfig
-                                  .stickerPanelConfig
-                                  ?.useTencentCloudChatStickerPackage ??
-                              true,
+                          isUseQQPackage: widget.chatModel.chatConfig.stickerPanelConfig?.useQQStickerPackage ?? true,
+                          isUseTencentCloudChatPackage:
+                              widget.chatModel.chatConfig.stickerPanelConfig?.useTencentCloudChatStickerPackage ?? true,
                           isUseTencentCloudChatPackageOldKeys: widget
-                                  .chatModel
-                                  .chatConfig
-                                  .stickerPanelConfig
-                                  ?.useTencentCloudChatStickerPackageOldKeys ??
+                                  .chatModel.chatConfig.stickerPanelConfig?.useTencentCloudChatStickerPackageOldKeys ??
                               false,
                           customEmojiStickerList: widget.customEmojiStickerList,
                           showAtBackground: true,
@@ -200,8 +177,7 @@ class _TIMUIKitTextTranslationElemState
                     ),
                     Text(
                       TIM_t("翻译完成"),
-                      style: const TextStyle(
-                          color: Color(0x72282c34), fontSize: 10),
+                      style: const TextStyle(color: Color(0x72282c34), fontSize: 10),
                     )
                   ],
                 )

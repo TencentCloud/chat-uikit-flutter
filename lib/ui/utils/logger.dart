@@ -1,6 +1,4 @@
-
-
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 
 final outputLogger = TencentCloudChatLog();

@@ -111,7 +111,7 @@ class EmojiUtil {
           String emojiName = emoji.split('.png')[0];
           String compatibleEmojiName = emojiName;
           if (isUseTencentCloudChatPackageOldKeys) {
-            // 兼容旧版本的 key 值
+            // use old emoji keys in 3.x version
             compatibleEmojiName = getCompatibleEmojiName(emojiName);
           }
 

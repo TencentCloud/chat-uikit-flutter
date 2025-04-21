@@ -1,7 +1,15 @@
 import 'dart:math';
 
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tencent_cloud_chat_sdk/enum/V2TimFriendshipListener.dart';
+import 'package:tencent_cloud_chat_sdk/enum/friend_application_type_enum.dart';
+import 'package:tencent_cloud_chat_sdk/enum/friend_response_type_enum.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_application.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_operation_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_status.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/block_list_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/friend_list_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/new_contact_life_cycle.dart';

@@ -1,4 +1,7 @@
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tencent_cloud_chat_sdk/enum/V2TimConversationListener.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation_result.dart';
 
 abstract class ConversationService {
   Future<V2TimConversationResult?> getConversationList({

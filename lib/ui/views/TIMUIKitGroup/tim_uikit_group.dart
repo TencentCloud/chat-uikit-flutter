@@ -2,17 +2,19 @@ import 'package:azlistview_all_platforms/azlistview_all_platforms.dart';
 import 'package:flutter/material.dart';
 import 'package:lpinyin/lpinyin.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart';
+import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/listener_model/tui_group_listener_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendship_view_model.dart';
-
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/az_list_view.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/theme/color.dart';
+import 'package:tencent_cloud_chat_uikit/theme/tui_theme_view_model.dart';
 
 typedef GroupItemBuilder = Widget Function(
     BuildContext context, V2TimGroupInfo groupInfo);
@@ -92,7 +94,7 @@ class _TIMUIKitGroupState extends TIMUIKitState<TIMUIKitGroup> {
                 faceUrl: groupInfo.faceUrl,
               );
               final res = await TencentImSDKPlugin
-                  .v2TIMManager.v2ConversationManager
+                  .v2TIMManager.getConversationManager()
                   .getConversation(
                       conversationID: "group_${groupInfo.groupID}");
               if (res.code == 0 && res.data != null) {

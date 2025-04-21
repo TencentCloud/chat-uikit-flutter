@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable_plus_plus/flutter_slidable_plus_plus.dart';
 import 'package:lpinyin/lpinyin.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
+import 'package:tencent_cloud_chat_sdk/enum/group_member_role.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/optimize_utils.dart';
@@ -12,7 +15,9 @@ import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/az_list_view.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/radio_button.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tencent_cloud_chat_uikit/theme/color.dart';
+import 'package:tencent_cloud_chat_uikit/theme/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/theme/tui_theme_view_model.dart';
 
 class GroupProfileMemberList extends StatefulWidget {
   static String AT_ALL_USER_ID = "__kImSDK_MesssageAtALL__";
@@ -75,8 +80,7 @@ class _GroupProfileMemberListState extends TIMUIKitState<GroupProfileMemberList>
     for (var i = 0; i < memberList.length; i++) {
       final item = memberList[i];
       final showName = _getShowName(item);
-      if (item?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER ||
-          item?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN) {
+      if (item?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER || item?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN) {
         showList.add(ISuspensionBeanImpl(memberInfo: item, tagIndex: "@"));
       } else {
         String pinyin = PinyinHelper.getPinyinE(showName);
@@ -95,12 +99,7 @@ class _GroupProfileMemberListState extends TIMUIKitState<GroupProfileMemberList>
     if (widget.canAtAll) {
       final canAtGroupType = ["Work", "Public", "Meeting"];
       if (canAtGroupType.contains(widget.groupType)) {
-        showList.insert(
-            0,
-            ISuspensionBeanImpl(
-                memberInfo:
-                    V2TimGroupMemberFullInfo(userID: GroupProfileMemberList.AT_ALL_USER_ID, nickName: TIM_t("所有人")),
-                tagIndex: ""));
+        showList.insert(0, ISuspensionBeanImpl(memberInfo: V2TimGroupMemberFullInfo(userID: GroupProfileMemberList.AT_ALL_USER_ID, nickName: TIM_t("所有人")), tagIndex: ""));
       }
     }
 
@@ -153,10 +152,8 @@ class _GroupProfileMemberListState extends TIMUIKitState<GroupProfileMemberList>
                               }
                               setState(() {});
                             },
-                            isChecked: selectedMemberList
-                                .where((element) => element.userID == memberInfo.userID)
-                                .toList()
-                                .isNotEmpty),
+                            isChecked: selectedMemberList.where((element) => element.userID == memberInfo.userID).toList().isNotEmpty
+                        ),
                       ),
                     Container(
                       width: isDesktopScreen ? 30 : 36,

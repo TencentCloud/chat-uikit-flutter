@@ -32,9 +32,7 @@ class DefaultSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
 
   @override
   SpecialText? createSpecialText(String flag,
-      {TextStyle? textStyle,
-      SpecialTextGestureTapCallback? onTap,
-      int? index}) {
+      {TextStyle? textStyle, SpecialTextGestureTapCallback? onTap, int? index}) {
     if (flag == '') {
       return null;
     }
@@ -43,14 +41,12 @@ class DefaultSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
     if (isStart(flag, EmojiText.flag)) {
       return EmojiText(textStyle,
           isUseTencentCloudChatPackage: isUseTencentCloudChatPackage,
-          isUseTencentCloudChatPackageOldKeys:
-              isUseTencentCloudChatPackageOldKeys,
+          isUseTencentCloudChatPackageOldKeys: isUseTencentCloudChatPackageOldKeys,
           isUseQQPackage: isUseQQPackage,
           start: index! - (EmojiText.flag.length - 1),
           customEmojiStickerList: customEmojiStickerList);
     } else if (isStart(flag, HttpText.flag) && checkHttpLink) {
-      return HttpText(textStyle, onTap,
-          start: index! - (HttpText.flag.length - 1));
+      return HttpText(textStyle, onTap, start: index! - (HttpText.flag.length - 1));
     }
     return null;
   }

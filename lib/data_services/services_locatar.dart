@@ -16,7 +16,7 @@ import 'package:tencent_cloud_chat_uikit/data_services/message/message_service_i
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_search_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
-import 'package:tencent_im_base/theme/tui_theme_view_model.dart';
+import 'package:tencent_cloud_chat_uikit/theme/tui_theme_view_model.dart';
 
 final serviceLocator = GetIt.instance;
 bool boolIsInitailized = false;

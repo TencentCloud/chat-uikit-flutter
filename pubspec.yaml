@@ -1,6 +1,6 @@
 name: tencent_cloud_chat_uikit
 description: A powerful chat UI component library and business logic for Tencent Cloud Chat, creating seamless in-app chat modules for delightful user experiences.
-version: 4.0.1
+version: 4.0.5
 homepage: https://trtc.io/products/chat?utm_source=gfs&utm_medium=link&utm_campaign=%E6%B8%A0%E9%81%93&_channel_track_key=k6WgfCKn
 repository: https://github.com/TencentCloud/chat-uikit-flutter
 documentation: https://comm.qq.com/im/doc/flutter/en/TUIKit/readme.html
@@ -19,6 +19,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  tencent_cloud_chat_sdk: ^8.5.6864+6
+  tim_ui_kit_sticker_plugin: ^4.0.2
+  tencent_chat_i18n_tool: ^2.3.8
   adaptive_action_sheet: ^2.0.1
   provider: ^6.0.1
   intl: ^0.19.0
@@ -28,8 +31,9 @@ dependencies:
   image_picker: ^0.8.5+3
   file_picker: ^5.3.0
   tencent_super_tooltip: ^0.0.1
-  video_player: ^2.9.0
-  chewie: ^1.8.5
+  better_player_plus: '>=1.0.4 <=1.0.5'
+  video_player: ^2.9.2
+  chewie: '>=1.8.4 <=1.8.5'
   flutter_slidable_plus_plus: ^0.1.0
   flutter_plugin_record_plus: ^0.0.19
   azlistview_all_platforms: ^2.1.2
@@ -61,8 +65,6 @@ dependencies:
   uuid: ^3.0.6
   open_file: ^3.3.2
   tencent_keyboard_visibility: ^1.0.1
-  tim_ui_kit_sticker_plugin: ^4.0.1
-  tencent_im_base: ^8.0.0
   fc_native_video_thumbnail: ^0.16.0
   path: ^1.8.1
   tencent_cloud_uikit_core: ^1.6.0

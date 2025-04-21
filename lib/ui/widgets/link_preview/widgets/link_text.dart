@@ -5,9 +5,9 @@ import 'package:extended_text/extended_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_stateless_widget.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/http_text.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/compiler/md_text.dart';
-import 'package:tencent_im_base/base_widgets/tim_stateless_widget.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/special_text/DefaultSpecialTextSpanBuilder.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/common/utils.dart';
 import 'package:markdown/markdown.dart' as md;
@@ -179,8 +179,7 @@ class LinkText extends TIMStatelessWidget {
         specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
           isUseQQPackage: isUseQQPackage,
           isUseTencentCloudChatPackage: isUseTencentCloudChatPackage,
-          isUseTencentCloudChatPackageOldKeys:
-              isUseTencentCloudChatPackageOldKeys,
+          isUseTencentCloudChatPackageOldKeys: isUseTencentCloudChatPackageOldKeys,
           customEmojiStickerList: customEmojiStickerList,
           showAtBackground: true,
         ));

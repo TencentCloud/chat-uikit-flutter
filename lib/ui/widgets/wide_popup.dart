@@ -5,13 +5,18 @@ import 'dart:io';
 import 'package:chewie/chewie.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
+import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/drag_widget.dart';
+import 'package:tencent_cloud_chat_uikit/theme/tui_theme.dart';
+import 'package:tencent_cloud_chat_uikit/theme/color.dart';
 import 'package:video_player/video_player.dart';
+
+typedef BuildContentFunction = Widget Function(BuildContext context);
 
 class TUIKitWidePopup {
   static OverlayEntry? entry;
@@ -82,7 +87,9 @@ class TUIKitWidePopup {
 
     final isUseMaterialAlert = (offset == null);
 
-    final Widget contentWidget = Container(
+    // ignore: prefer_function_declarations_over_variables
+    final BuildContentFunction buildContent = (BuildContext contentContext) => Container(
+      key:UniqueKey(),
       width: width,
       height: height,
       decoration: BoxDecoration(
@@ -129,7 +136,9 @@ class TUIKitWidePopup {
                       }
                       isShow = false;
                       if (offset == null) {
-                        Navigator.pop(context);
+                        if (contentContext.mounted) {
+                          Navigator.pop(contentContext);
+                        }
                       } else {
                         entry?.remove();
                         entry = null;
@@ -151,7 +160,7 @@ class TUIKitWidePopup {
             Expanded(child: child(() {
               isShow = false;
               if (isUseMaterialAlert) {
-                Navigator.pop(context);
+                Navigator.pop(contentContext);
               } else {
                 entry?.remove();
                 entry = null;
@@ -161,7 +170,7 @@ class TUIKitWidePopup {
             child(() {
               isShow = false;
               if (isUseMaterialAlert) {
-                Navigator.pop(context);
+                Navigator.pop(contentContext);
               } else {
                 entry?.remove();
                 entry = null;
@@ -180,7 +189,7 @@ class TUIKitWidePopup {
                           onPressed: () {
                             isShow = false;
                             if (isUseMaterialAlert) {
-                              Navigator.pop(context);
+                              Navigator.pop(contentContext);
                             } else {
                               entry?.remove();
                               entry = null;
@@ -199,7 +208,7 @@ class TUIKitWidePopup {
                           onPressed: () {
                             isShow = false;
                             if (isUseMaterialAlert) {
-                              Navigator.pop(context);
+                              Navigator.pop(contentContext);
                             } else {
                               entry?.remove();
                               entry = null;
@@ -222,7 +231,7 @@ class TUIKitWidePopup {
       return showDialog(
           barrierDismissible: true,
           context: context,
-          builder: (context) {
+          builder: (dialogContext) {
             return WillPopScope(
                 child: AlertDialog(
                   surfaceTintColor: Colors.transparent,
@@ -230,7 +239,7 @@ class TUIKitWidePopup {
                   backgroundColor: Colors.transparent,
                   titlePadding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
                   contentPadding: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-                  content: contentWidget,
+                  content: buildContent(dialogContext),
                 ),
                 onWillPop: () {
                   isShow = false;
@@ -243,7 +252,7 @@ class TUIKitWidePopup {
       return;
     }
 
-    entry = OverlayEntry(builder: (BuildContext context) {
+    entry = OverlayEntry(builder: (BuildContext overlayContext) {
       return Material(
         color: Colors.transparent,
         child: TUIKitDragArea(
@@ -256,7 +265,7 @@ class TUIKitWidePopup {
               }
             },
             initOffset: offset,
-            child: contentWidget),
+            child: buildContent(overlayContext)),
       );
     });
     Overlay.of(context).insert(entry!);

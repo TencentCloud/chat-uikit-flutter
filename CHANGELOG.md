@@ -1,3 +1,22 @@
+# 4.0.5
+* Upgrade tencent_cloud_chat_sdk to the minimum version 8.5.6864+6.
+* Changed the SDK interface call from getConversationListByConversaionIds to getConversationListByConversationIds.
+
+# 4.0.4
+* Remove the import of tencent_im_base plugin.
+* Upgrade tencent_cloud_chat_sdk to the minimum version 8.5.6864+4.
+* Fix compilation issues in tim_uikit_group.dart, tui_group_listener_model.dart, tui_conversation_view_model.dart.
+
+# 4.0.3
+* Fix compilation issues on Flutter 3.27.1
+
+# 4.0.2
+* Optimize the display of group notification page.
+* Optimize the display of read receipt page.
+* TIMUIKitChatController sendMessage interface supports isExcludedFromContentModeration parameter.
+* Fixed abnormal playback and recording of videos on Huawei P30.
+* Optimize the display of tips messages when they are too long.
+
 # 4.0.1
 * Upgraded the plugin tim_ui_kit_sticker_plugin to 4.0.1.
 * Use the 'useTencentCloudChatStickerPackageOldKeys' parameter in StickerPanelConfig to control whether the emoticon is compatible with version 3.x.

@@ -1,12 +1,10 @@
 library tencent_cloud_chat_uikit;
 
-import 'package:tencent_im_base/tencent_im_base.dart';
-
+import 'package:tencent_cloud_chat_sdk/manager/v2_tim_manager.dart';
+import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'data_services/core/core_services_implements.dart';
 export 'data_services/core/core_services_implements.dart';
-export 'package:tencent_im_base/theme/tui_theme.dart';
-export 'package:tencent_im_base/theme/color.dart';
 
 // Sticker
 export 'package:tim_ui_kit_sticker_plugin/tim_ui_kit_sticker_plugin.dart';
@@ -34,7 +32,6 @@ export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitAppBar/ti
 export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageList/tim_uikit_chat_history_message_list.dart';
 export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_text_field.dart';
 export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitGroup/tim_uikit_group_application_list.dart';
-export 'package:tencent_im_base/tencent_im_base.dart';
 export 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/models/link_preview_content.dart';
 export 'package:tencent_cloud_chat_uikit/ui/widgets/column_menu.dart';
 export 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitProfile/widget/tim_uikit_profile_userinfo_card/tim_uikit_profile_userinfo_card.dart';

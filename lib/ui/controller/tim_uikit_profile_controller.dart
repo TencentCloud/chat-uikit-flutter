@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_operation_result.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_profile_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/text_input_bottom_sheet.dart';
+
+import 'package:tencent_cloud_chat_uikit/theme/tui_theme.dart';
 
 class TIMUIKitProfileController {
   late TUIProfileViewModel model;

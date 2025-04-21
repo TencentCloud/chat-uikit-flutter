@@ -1,3 +1,5 @@
+import 'package:tencent_cloud_chat_sdk/enum/offlinePushInfo.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
@@ -275,7 +277,7 @@ class TIMUIKitChatConfig {
       this.isUseMessageReaction = true,
       this.isShowAvatar = true,
       this.isShowSelfNameInGroup = false,
-      this.isAtWhenReplyDynamic,
+        this.isAtWhenReplyDynamic,
       this.offlinePushInfo,
       @Deprecated("Please use [isShowReadingStatus] instead")
       this.isShowGroupMessageReadReceipt = true,
@@ -287,8 +289,10 @@ class TIMUIKitChatConfig {
       this.notificationTitle = "",
       this.notificationIOSSound = "",
       this.isAllowSoundMessage = true,
-      @Deprecated("not support") this.groupReadReceiptPermisionList,
-      @Deprecated("not support") this.groupReadReceiptPermissionList,
+      @Deprecated("not support")
+      this.groupReadReceiptPermisionList,
+      @Deprecated("not support")
+      this.groupReadReceiptPermissionList,
       this.isAllowEmojiPanel = true,
       this.isAllowShowMorePanel = true,
       this.isShowReadingStatus = true,

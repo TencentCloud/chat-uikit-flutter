@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable_plus_plus/flutter_slidable_plus_plus.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/block_list_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendship_view_model.dart';
-
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
-import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
-
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
+import 'package:tencent_cloud_chat_uikit/theme/color.dart';
+import 'package:tencent_cloud_chat_uikit/theme/tui_theme_view_model.dart';
 
 typedef BlackListItemBuilder = Widget Function(
     BuildContext context, V2TimFriendInfo friendInfo);
@@ -88,8 +89,7 @@ class _TIMUIKitBlackListState extends TIMUIKitState<TIMUIKitBlackList> {
                   child: Text(
                     showName,
                     style: TextStyle(
-                        color: theme.black,
-                        fontSize: isDesktopScreen ? 14 : 18),
+                        color: theme.black, fontSize: isDesktopScreen ? 14 : 18),
                   ),
                 )),
                 if (isDesktopScreen)
@@ -132,6 +132,7 @@ class _TIMUIKitBlackListState extends TIMUIKitState<TIMUIKitBlackList> {
   BlackListItemBuilder _getItemBuilder() {
     return widget.itemBuilder ?? _itemBuilder;
   }
+
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {

@@ -1,6 +1,7 @@
 // ignore_for_file: unused_field, avoid_print, unused_import
 
 import 'dart:io';
+import 'package:better_player_plus/better_player_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:fc_native_video_thumbnail/fc_native_video_thumbnail.dart';
 import 'package:flutter/foundation.dart';
@@ -10,9 +11,11 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_call_invite_list.dart';
-import 'package:wechat_camera_picker/wechat_camera_picker.dart';
+import 'package:video_player/video_player.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
@@ -22,7 +25,6 @@ import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/permission.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/intl_camer_picker.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 
@@ -30,6 +32,10 @@ import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'dart:typed_data';
 import 'package:universal_html/html.dart' as html;
 import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
+
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_callback.dart';
+import 'package:tencent_cloud_chat_uikit/theme/color.dart';
+import 'package:tencent_cloud_chat_uikit/theme/tui_theme.dart';
 
 class MorePanelConfig {
   static final int FILE_MAX_SIZE = 100 * 1024 * 1024;
@@ -65,8 +71,7 @@ class MorePanelItem {
   final Widget icon;
   final Function(BuildContext context)? onTap;
 
-  MorePanelItem(
-      {this.onTap, required this.icon, required this.id, required this.title});
+  MorePanelItem({this.onTap, required this.icon, required this.id, required this.title});
 }
 
 class MorePanel extends StatefulWidget {
@@ -78,11 +83,7 @@ class MorePanel extends StatefulWidget {
 
   final MorePanelConfig? morePanelConfig;
 
-  const MorePanel(
-      {required this.conversationID,
-      required this.conversationType,
-      Key? key,
-      this.morePanelConfig})
+  const MorePanel({required this.conversationID, required this.conversationType, Key? key, this.morePanelConfig})
       : super(key: key);
 
   @override
@@ -91,8 +92,7 @@ class MorePanel extends StatefulWidget {
 
 class _MorePanelState extends TIMUIKitState<MorePanel> {
   final ImagePicker _picker = ImagePicker();
-  final TUISelfInfoViewModel _selfInfoViewModel =
-      serviceLocator<TUISelfInfoViewModel>();
+  final TUISelfInfoViewModel _selfInfoViewModel = serviceLocator<TUISelfInfoViewModel>();
   Uint8List? fileContent;
   String? fileName;
   File? tempFile;
@@ -101,6 +101,8 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
   bool isInstallCallkit = false;
   final ScrollController _scrollController = ScrollController();
   final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
+  late BetterPlayerController _betterPlayerController;
 
   @override
   void initState() {
@@ -111,33 +113,13 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
           isInstallCallkit = value;
         });
       });
+      _betterPlayerController = BetterPlayerController(const BetterPlayerConfiguration());
     }
   }
 
   List<MorePanelItem> itemList(TUIChatSeparateViewModel model, TUITheme theme) {
     final config = widget.morePanelConfig ?? MorePanelConfig();
     return [
-      if (PlatformUtils().isMobile)
-        MorePanelItem(
-            id: "screen",
-            title: TIM_t("拍摄"),
-            onTap: (c) {
-              _onFeatureTap("screen", c, model, theme);
-            },
-            icon: Container(
-              height: 64,
-              width: 64,
-              margin: const EdgeInsets.only(bottom: 4),
-              decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
-              child: SvgPicture.asset(
-                "images/screen.svg",
-                package: 'tencent_cloud_chat_uikit',
-                height: 64,
-                width: 64,
-              ),
-            )),
       if (!PlatformUtils().isWeb)
         MorePanelItem(
             id: "photo",
@@ -154,11 +136,47 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
               height: 64,
               width: 64,
               margin: const EdgeInsets.only(bottom: 4),
-              decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
+              decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(5))),
               child: SvgPicture.asset(
                 "images/photo.svg",
+                package: 'tencent_cloud_chat_uikit',
+                height: 64,
+                width: 64,
+              ),
+            )),
+      if (PlatformUtils().isMobile)
+        MorePanelItem(
+            id: "take_photo",
+            title: TIM_t("拍照"),
+            onTap: (c) {
+              _onFeatureTap("take_photo", c, model, theme);
+            },
+            icon: Container(
+              height: 64,
+              width: 64,
+              margin: const EdgeInsets.only(bottom: 4),
+              decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(5))),
+              child: SvgPicture.asset(
+                "images/screen.svg",
+                package: 'tencent_cloud_chat_uikit',
+                height: 64,
+                width: 64,
+              ),
+            )),
+      if (PlatformUtils().isMobile)
+        MorePanelItem(
+            id: "take_video",
+            title: TIM_t("录像"),
+            onTap: (c) {
+              _onFeatureTap("take_video", c, model, theme);
+            },
+            icon: Container(
+              height: 64,
+              width: 64,
+              margin: const EdgeInsets.only(bottom: 4),
+              decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(5))),
+              child: Image.asset(
+                "images/take_video.png",
                 package: 'tencent_cloud_chat_uikit',
                 height: 64,
                 width: 64,
@@ -180,9 +198,7 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
               height: 64,
               width: 64,
               margin: const EdgeInsets.only(bottom: 4),
-              decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
+              decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(5))),
               child: SvgPicture.asset(
                 "images/photo.svg",
                 package: 'tencent_cloud_chat_uikit',
@@ -206,11 +222,8 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
               height: 64,
               width: 64,
               margin: const EdgeInsets.only(bottom: 4),
-              decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
-              child:
-                  Icon(Icons.video_file, color: hexToColor("5c6168"), size: 26),
+              decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(5))),
+              child: Icon(Icons.video_file, color: hexToColor("5c6168"), size: 26),
             )),
       MorePanelItem(
           id: "file",
@@ -227,9 +240,7 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
             height: 64,
             width: 64,
             margin: const EdgeInsets.only(bottom: 4),
-            decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(5))),
+            decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(5))),
             child: SvgPicture.asset(
               "images/file.svg",
               package: 'tencent_cloud_chat_uikit',
@@ -253,9 +264,7 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
               height: 64,
               width: 64,
               margin: const EdgeInsets.only(bottom: 4),
-              decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
+              decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(5))),
               child: SvgPicture.asset(
                 "images/video-call.svg",
                 package: 'tencent_cloud_chat_uikit',
@@ -279,9 +288,7 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
               height: 64,
               width: 64,
               margin: const EdgeInsets.only(bottom: 4),
-              decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
+              decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.all(Radius.circular(5))),
               child: SvgPicture.asset(
                 "images/voice-call.svg",
                 package: 'tencent_cloud_chat_uikit',
@@ -320,28 +327,21 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
     }).toList();
   }
 
-  _sendVideoMessage(AssetEntity asset, int size, TUIChatSeparateViewModel model) async {
+  _sendVideoMessage(String originFilePath, int duration, int size, TUIChatSeparateViewModel model) async {
     if (size >= MorePanelConfig.VIDEO_MAX_SIZE) {
-      onTIMCallback(TIMCallback(
-          type: TIMCallbackType.INFO,
-          infoRecommendText: TIM_t("文件大小超出了限制")));
+      onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("文件大小超出了限制")));
       return;
     }
 
     final plugin = FcNativeVideoThumbnail();
-    final originFile = await asset.originFile;
 
-    final duration = asset.videoDuration.inSeconds;
-    final filePath = originFile!.path;
     final convID = widget.conversationID;
     final convType = widget.conversationType;
 
-    String tempPath = (await getTemporaryDirectory()).path +
-        p.basename(originFile.path) +
-        ".jpeg";
+    String tempPath = (await getTemporaryDirectory()).path + p.basename(originFilePath) + ".jpeg";
 
     await plugin.getVideoThumbnail(
-      srcFile: originFile.path,
+      srcFile: originFilePath,
       destFile: tempPath,
       format: 'jpeg',
       width: 1280,
@@ -350,11 +350,7 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
     );
     MessageUtils.handleMessageError(
         model.sendVideoMessage(
-            videoPath: filePath,
-            duration: duration,
-            snapshotPath: tempPath,
-            convID: convID,
-            convType: convType),
+            videoPath: originFilePath, duration: duration, snapshotPath: tempPath, convID: convID, convType: convType),
         context);
   }
 
@@ -414,46 +410,34 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
             if (filePath != null) {
               if (type == AssetType.image) {
                 if (size >= MorePanelConfig.IMAGE_MAX_SIZE) {
-                  onTIMCallback(TIMCallback(
-                      type: TIMCallbackType.INFO,
-                      infoRecommendText: TIM_t("文件大小超出了限制")));
+                  onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("文件大小超出了限制")));
                   return;
                 }
 
                 MessageUtils.handleMessageError(
-                    model.sendImageMessage(
-                        imagePath: filePath,
-                        convID: convID,
-                        convType: convType),
-                    context);
+                    model.sendImageMessage(imagePath: filePath, convID: convID, convType: convType), context);
               }
 
               if (type == AssetType.video) {
-                _sendVideoMessage(asset, size, model);
+                _sendVideoMessage(originFile!.path, asset.videoDuration.inSeconds, size, model);
               }
             }
           }
         }
       } else {
-        FilePickerResult? result =
-            await FilePicker.platform.pickFiles(type: FileType.media);
+        FilePickerResult? result = await FilePicker.platform.pickFiles(type: FileType.media);
         if (result != null && result.files.isNotEmpty) {
           File file = File(result.files.single.path!);
           final String savePath = file.path;
-          final String type = TencentUtils.getFileType(
-                  savePath.split(".")[savePath.split(".").length - 1])
-              .split("/")[0];
+          final String type =
+              TencentUtils.getFileType(savePath.split(".")[savePath.split(".").length - 1]).split("/")[0];
 
           if (type == "image") {
             MessageUtils.handleMessageError(
-                model.sendImageMessage(
-                    imagePath: savePath, convID: convID, convType: convType),
-                context);
+                model.sendImageMessage(imagePath: savePath, convID: convID, convType: convType), context);
           } else if (type == "video") {
             MessageUtils.handleMessageError(
-                model.sendVideoMessage(
-                    videoPath: savePath, convID: convID, convType: convType),
-                context);
+                model.sendVideoMessage(videoPath: savePath, convID: convID, convType: convType), context);
           }
         } else {
           throw TypeError();
@@ -464,10 +448,7 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
     }
   }
 
-  _sendImageFromCamera(
-    TUIChatSeparateViewModel model,
-    TUITheme theme,
-  ) async {
+  _sendImageFromCamera(TUIChatSeparateViewModel model, TUITheme theme, {required isVideo}) async {
     try {
       if (!await Permissions.checkPermission(
         context,
@@ -484,34 +465,41 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
 
       final convID = widget.conversationID;
       final convType = widget.conversationType;
-      final pickedFile = await CameraPicker.pickFromCamera(context,
-          pickerConfig: CameraPickerConfig(
-              enableRecording: true,
-              textDelegate: IntlCameraPickerTextDelegate()));
-      final originFile = await pickedFile?.originFile;
-      if (originFile != null) {
-        final type = pickedFile!.type;
-        final size = await originFile!.length();
-        if (type == AssetType.image) {
-          if (size >= MorePanelConfig.IMAGE_MAX_SIZE) {
-            onTIMCallback(TIMCallback(
-                type: TIMCallbackType.INFO,
-                infoRecommendText: TIM_t("文件大小超出了限制")));
-            return;
-          }
-
-          MessageUtils.handleMessageError(
-              model.sendImageMessage(
-                  imagePath: originFile.path,
-                  convID: convID,
-                  convType: convType),
-              context);
-        }
-        if (type == AssetType.video) {
-          _sendVideoMessage(pickedFile, size, model);
-        }
+      final ImagePicker picker = ImagePicker();
+      XFile? originFile;
+      if (isVideo) {
+        originFile = await picker.pickVideo(source: ImageSource.camera);
       } else {
-        // Toast.showToast(ToastType.fail, TIM_t("图片不能为空"), context);
+        originFile = await picker.pickImage(source: ImageSource.camera);
+      }
+      final size = await originFile!.length();
+      if (!isVideo) {
+        if (size >= MorePanelConfig.IMAGE_MAX_SIZE) {
+          onTIMCallback(
+              TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("文件大小超出了限制")));
+          return;
+        }
+
+        MessageUtils.handleMessageError(
+            model.sendImageMessage(imagePath: originFile.path, convID: convID, convType: convType),
+            context);
+      } else {
+        // 监听视频准备完成事件
+        _betterPlayerController.addEventsListener((event) {
+          if (event.betterPlayerEventType == BetterPlayerEventType.initialized) {
+            // 获取视频时长（单位：秒）
+            int durationInSeconds = _betterPlayerController.videoPlayerController?.value.duration?.inSeconds ?? 0;
+            _sendVideoMessage(originFile!.path, durationInSeconds, size, model);
+          }
+        });
+
+        // 加载视频源
+        _betterPlayerController.setupDataSource(
+          BetterPlayerDataSource(
+            BetterPlayerDataSourceType.file,
+            originFile.path, // 替换为你的视频 URL
+          ),
+        );
       }
     } catch (error) {
       outputLogger.i("err: $error");
@@ -527,17 +515,12 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
       fileContent = imageContent;
 
       html.Node? inputElem;
-      inputElem = html.document
-          .getElementById("__image_picker_web-file-input")
-          ?.querySelector("input");
+      inputElem = html.document.getElementById("__image_picker_web-file-input")?.querySelector("input");
       final convID = widget.conversationID;
       final convType = widget.conversationType;
       MessageUtils.handleMessageError(
           model.sendImageMessage(
-              inputElement: inputElem,
-              imagePath: tempFile?.path,
-              convID: convID,
-              convType: convType),
+              inputElement: inputElem, imagePath: tempFile?.path, convID: convID, convType: convType),
           context);
     } catch (e) {
       outputLogger.i("_sendFileErr: ${e.toString()}");
@@ -553,25 +536,18 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
       fileContent = videoContent;
 
       if (fileName!.split(".")[fileName!.split(".").length - 1] != "mp4") {
-        onTIMCallback(TIMCallback(
-            type: TIMCallbackType.INFO,
-            infoRecommendText: TIM_t("视频消息仅限 mp4 格式"),
-            infoCode: 6660412));
+        onTIMCallback(
+            TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("视频消息仅限 mp4 格式"), infoCode: 6660412));
         return;
       }
 
       html.Node? inputElem;
-      inputElem = html.document
-          .getElementById("__image_picker_web-file-input")
-          ?.querySelector("input");
+      inputElem = html.document.getElementById("__image_picker_web-file-input")?.querySelector("input");
       final convID = widget.conversationID;
       final convType = widget.conversationType;
       MessageUtils.handleMessageError(
           model.sendVideoMessage(
-              inputElement: inputElem,
-              videoPath: tempFile?.path,
-              convID: convID,
-              convType: convType),
+              inputElement: inputElem, videoPath: tempFile?.path, convID: convID, convType: convType),
           context);
     } catch (e) {
       outputLogger.i("_sendFileErr: ${e.toString()}");
@@ -589,43 +565,29 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
       if (result != null && result.files.isNotEmpty) {
         if (PlatformUtils().isWeb) {
           html.Node? inputElem;
-          inputElem = html.document
-              .getElementById("__file_picker_web-file-input")
-              ?.querySelector("input");
+          inputElem = html.document.getElementById("__file_picker_web-file-input")?.querySelector("input");
           fileName = result.files.single.name;
 
           MessageUtils.handleMessageError(
-              model.sendFileMessage(
-                  inputElement: inputElem,
-                  fileName: fileName,
-                  convID: convID,
-                  convType: convType),
+              model.sendFileMessage(inputElement: inputElem, fileName: fileName, convID: convID, convType: convType),
               context);
           return;
         }
 
         String? option2 = result.files.single.path ?? "";
-        outputLogger
-            .i(TIM_t_para("选择成功{{option2}}", "选择成功$option2")(option2: option2));
+        outputLogger.i(TIM_t_para("选择成功{{option2}}", "选择成功$option2")(option2: option2));
 
         File file = File(result.files.single.path!);
         final int size = file.lengthSync();
         if (size >= MorePanelConfig.FILE_MAX_SIZE) {
-          onTIMCallback(TIMCallback(
-              type: TIMCallbackType.INFO,
-              infoRecommendText: TIM_t("文件大小超出了限制")));
+          onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("文件大小超出了限制")));
           return;
         }
 
         final String savePath = file.path;
 
         MessageUtils.handleMessageError(
-            model.sendFileMessage(
-                filePath: savePath,
-                size: size,
-                convID: convID,
-                convType: convType),
-            context);
+            model.sendFileMessage(filePath: savePath, size: size, convID: convID, convType: convType), context);
       } else {
         throw TypeError();
       }
@@ -644,8 +606,11 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
       case "photo":
         _sendImageMessage(model, theme);
         break;
-      case "screen":
-        _sendImageFromCamera(model, theme);
+      case "take_photo":
+        _sendImageFromCamera(model, theme, isVideo: false);
+        break;
+      case "take_video":
+        _sendImageFromCamera(model, theme, isVideo: true);
         break;
       case "file":
         _sendFile(model, theme);
@@ -673,14 +638,12 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
       bool hasMicrophonePermission = false;
       if (type == TYPE_VIDEO) {
         hasCameraPermission = await Permissions.checkPermission(context, Permission.camera.value);
-        hasMicrophonePermission = await Permissions.checkPermission(
-            context, Permission.microphone.value);
+        hasMicrophonePermission = await Permissions.checkPermission(context, Permission.microphone.value);
         if (!hasCameraPermission || !hasMicrophonePermission) {
           return;
         }
       } else {
-        hasMicrophonePermission = await Permissions.checkPermission(
-            context, Permission.microphone.value);
+        hasMicrophonePermission = await Permissions.checkPermission(context, Permission.microphone.value);
         if (!hasMicrophonePermission) {
           return;
         }
@@ -702,9 +665,7 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
         _tUICore.callService(TUICALLKIT_SERVICE_NAME, METHOD_NAME_CALL, {
           PARAM_NAME_TYPE: type,
           PARAM_NAME_USERIDS: inviteMember,
-          PARAM_NAME_GROUPID: widget.conversationType == ConvType.group
-              ? widget.conversationID
-              : ""
+          PARAM_NAME_GROUPID: widget.conversationType == ConvType.group ? widget.conversationID : ""
         });
       }
     } else {
@@ -717,10 +678,15 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
   }
 
   @override
+  void dispose() {
+    _betterPlayerController?.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final TUITheme theme = value.theme;
-    final TUIChatSeparateViewModel model =
-        Provider.of<TUIChatSeparateViewModel>(context);
+    final TUIChatSeparateViewModel model = Provider.of<TUIChatSeparateViewModel>(context);
     final screenWidth = MediaQuery.of(context).size.width;
     return Container(
       height: 248,
@@ -757,15 +723,12 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
                                   height: 64,
                                   width: 64,
                                   margin: const EdgeInsets.only(bottom: 4),
-                                  decoration: const BoxDecoration(
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(5))),
+                                  decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5))),
                                   child: item.icon,
                                 ),
                                 Text(
                                   item.title,
-                                  style: TextStyle(
-                                      fontSize: 12, color: theme.darkTextColor),
+                                  style: TextStyle(fontSize: 12, color: theme.darkTextColor),
                                 )
                               ],
                             ),

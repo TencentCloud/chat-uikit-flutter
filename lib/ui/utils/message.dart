@@ -2,12 +2,25 @@
 
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
+import 'package:tencent_cloud_chat_sdk/enum/group_change_info_type.dart';
+import 'package:tencent_cloud_chat_sdk/enum/group_tips_elem_type.dart';
+import 'package:tencent_cloud_chat_sdk/enum/message_elem_type.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_change_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_tips_elem.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_image.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart';
+import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/time.dart';
 import 'package:collection/collection.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
+import 'package:tencent_cloud_chat_uikit/theme/tui_theme.dart';
 
 class MessageUtils {
   // 判断CallingData的方式和Trtc的方法一致
@@ -274,7 +287,7 @@ class MessageUtils {
 
   static Widget wrapMessageTips(Widget child, TUITheme? theme) {
     return Container(
-        margin: const EdgeInsets.symmetric(vertical: 10), child: child);
+        margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 30), child: child);
   }
 
   static String getAbstractMessageAsync(V2TimMessage message,

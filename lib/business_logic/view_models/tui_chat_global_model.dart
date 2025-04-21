@@ -1,5 +1,4 @@
 // ignore_for_file: avoid_print, unnecessary_getters_setters, unused_element
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -7,6 +6,21 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tencent_cloud_chat_sdk/enum/V2TimAdvancedMsgListener.dart';
+import 'package:tencent_cloud_chat_sdk/enum/history_msg_get_type_enum.dart';
+import 'package:tencent_cloud_chat_sdk/enum/message_elem_type.dart';
+import 'package:tencent_cloud_chat_sdk/enum/message_priority_enum.dart';
+import 'package:tencent_cloud_chat_sdk/enum/message_status.dart';
+import 'package:tencent_cloud_chat_sdk/enum/offlinePushInfo.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_custom_elem.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_application.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_image.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_download_progress.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_receipt.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_msg_create_info_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_class.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/chat_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_model_tools.dart';
@@ -773,6 +787,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
         needReadReceipt: needReadReceipt,
         cloudCustomData: cloudCustomData,
         localCustomData: localCustomData,
+        isExcludedFromContentModeration: messageInfo.isExcludedFromContentModeration ?? false,
         convID: convID,
         setInputField: setInputField,
         id: messageInfo.id as String,
@@ -892,6 +907,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
     bool? needReadReceipt,
     String? cloudCustomData,
     String? localCustomData,
+    bool isExcludedFromContentModeration = false,
   }) async {
     String receiver = convType == ConvType.c2c ? convID : '';
     String groupID = convType == ConvType.group ? convID : '';
@@ -904,6 +920,7 @@ class TUIChatGlobalModel extends ChangeNotifier implements TIMUIKitClass {
         localCustomData: localCustomData,
         isExcludedFromUnreadCount: isExcludedFromUnreadCount ?? false,
         offlinePushInfo: offlinePushInfo,
+        isExcludedFromContentModeration: isExcludedFromContentModeration,
         onlineUserOnly: onlineUserOnly ?? false,
         cloudCustomData: cloudCustomData ??
             json.encode({

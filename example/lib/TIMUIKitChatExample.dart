@@ -3,6 +3,7 @@
 import 'package:example/TIMUIKitGroupProfileExample.dart';
 import 'package:example/TIMUIKitProfileExample.dart';
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
 class TIMUIKitChatExample extends StatelessWidget {
@@ -64,7 +65,6 @@ class TIMUIKitChatExample extends StatelessWidget {
       config: const TIMUIKitChatConfig(
         // 仅供演示，非全部配置项，实际使用中，可只传和默认项不同的参数，无需传入所有开关
         isAllowClickAvatar: true,
-        isUseDefaultEmoji: true,
         isAllowLongPressMessage: true,
         isShowReadingStatus: true,
         isShowGroupReadingStatus: true,

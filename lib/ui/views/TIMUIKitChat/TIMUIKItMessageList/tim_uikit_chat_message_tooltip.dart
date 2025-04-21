@@ -7,13 +7,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:open_file/open_file.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
+import 'package:tencent_cloud_chat_sdk/enum/group_member_role.dart';
+import 'package:tencent_cloud_chat_sdk/enum/message_elem_type.dart';
+import 'package:tencent_cloud_chat_sdk/enum/message_status.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitMessageItem/TIMUIKitMessageReaction/tim_uikit_message_reaction_select_emoji.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
@@ -24,6 +29,10 @@ import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKItMessageLi
 import 'package:tencent_cloud_chat_uikit/ui/widgets/forward_message_screen.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path/path.dart' as path;
+
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_callback.dart';
+import 'package:tencent_cloud_chat_uikit/theme/color.dart';
+import 'package:tencent_cloud_chat_uikit/theme/tui_theme.dart';
 
 class TIMUIKitMessageTooltip extends StatefulWidget {
   /// tool tips panel configuration, long press message will show tool tips panel
@@ -195,14 +204,12 @@ class TIMUIKitMessageTooltipState
     bool showTranslation = true;
     if (widget.message.localCustomData != null) {
       final LocalCustomDataModel localCustomData = LocalCustomDataModel.fromMap(
-          json.decode(
-              TencentUtils.checkString(widget.message.localCustomData) ??
-                  "{}"));
-      if (localCustomData.translatedText != null &&
-          localCustomData.translatedText != "") {
+          json.decode(TencentUtils.checkString(widget.message.localCustomData) ?? "{}"));
+      if (localCustomData.translatedText != null && localCustomData.translatedText != "") {
         showTranslation = false;
       }
     }
+
 
     final dynamicQuote =
         model.chatConfig.isAtWhenReplyDynamic?.call(widget.message);

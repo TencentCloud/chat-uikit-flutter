@@ -3,13 +3,32 @@
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:tencent_cloud_chat_sdk/enum/V2TimAdvancedMsgListener.dart';
+import 'package:tencent_cloud_chat_sdk/enum/V2TimSimpleMsgListener.dart';
+import 'package:tencent_cloud_chat_sdk/enum/get_group_message_read_member_list_filter.dart';
+import 'package:tencent_cloud_chat_sdk/enum/history_msg_get_type_enum.dart';
+import 'package:tencent_cloud_chat_sdk/enum/message_priority_enum.dart';
+import 'package:tencent_cloud_chat_sdk/enum/offlinePushInfo.dart';
+import 'package:tencent_cloud_chat_sdk/enum/receive_message_opt_enum.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_message_read_member_list.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_change_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_list_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_online_url.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_receipt.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_search_param.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_search_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_msg_create_info_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart';
+import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_callback.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_conversation_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/error_message_converter.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
 
 class MessageServiceImpl extends MessageService {
   final CoreServicesImpl _coreService = serviceLocator<CoreServicesImpl>();
@@ -349,6 +368,7 @@ class MessageServiceImpl extends MessageService {
     OfflinePushInfo? offlinePushInfo,
     String? cloudCustomData,
     String? localCustomData,
+    bool isExcludedFromContentModeration = false,
   }) async {
     final result =
         await TencentImSDKPlugin.v2TIMManager.getMessageManager().sendMessage(
@@ -361,6 +381,7 @@ class MessageServiceImpl extends MessageService {
               needReadReceipt: needReadReceipt,
               localCustomData: localCustomData,
               cloudCustomData: cloudCustomData,
+              isExcludedFromContentModeration: isExcludedFromContentModeration,
             );
     if (result.code != 0) {
       String recommendText = ErrorMessageConverter.getErrorMessage(result.code);

@@ -17,6 +17,10 @@ import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_image.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_uikit/base_widgets/tim_callback.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
@@ -24,6 +28,7 @@ import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_glo
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
+import 'package:tencent_cloud_chat_uikit/theme/tui_theme.dart';
 import 'package:tencent_cloud_chat_uikit/ui/constants/history_message_constant.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/logger.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/message.dart';
@@ -172,8 +177,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
       if (model.getMessageProgress(widget.message.msgID) == 100) {
         String savePath;
         if (widget.message.imageElem!.path != null &&
-            widget.message.imageElem!.path != '' &&
-            File(widget.message.imageElem!.path!).existsSync()) {
+            widget.message.imageElem!.path != '' && File(widget.message.imageElem!.path!).existsSync()) {
           savePath = widget.message.imageElem!.path!;
         } else {
           savePath = model.getFileMessageLocation(widget.message.msgID);
@@ -594,6 +598,7 @@ class _TIMUIKitImageElem extends TIMUIKitState<TIMUIKitImageElem> {
 
   Widget? _renderImage(dynamic heroTag, TUITheme theme,
       {V2TimImage? originalImg, V2TimImage? smallImg}) {
+
     double positionRadio = 1.0;
     if (smallImg?.width != null &&
         smallImg?.height != null &&

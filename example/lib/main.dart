@@ -1,14 +1,21 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat_sdk/enum/V2TimSDKListener.dart';
+import 'package:tencent_cloud_chat_sdk/enum/log_level_enum.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'TIMUIKitAddFriendExample.dart';
 import 'TIMUIKitAddGroupExample.dart';
 import 'TIMUIKitBlackListExample.dart';
+import 'TIMUIKitChatExample.dart';
 import 'TIMUIKitContactExample.dart';
+import 'TIMUIKitConversationExample.dart';
 import 'TIMUIKitGroupExample.dart';
 import 'TIMUIKitGroupProfileExample.dart';
 import 'TIMUIKitNewContactExample.dart';
+import 'TIMUIKitProfileExample.dart';
 import 'TIMUIKitSearchExample.dart';
 
 void main() {

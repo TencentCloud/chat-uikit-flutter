@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_im_base/tencent_im_base.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/common/utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/widgets/link_preview.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/widgets/link_text.dart';
@@ -21,8 +21,7 @@ class LinkPreviewEntry {
           ? LinkTextMarkdown(
               isUseQQPackage: isUseQQPackage,
               isUseTencentCloudChatPackage: isUseTencentCloudChatPackage,
-              isUseTencentCloudChatPackageOldKeys:
-                  isUseTencentCloudChatPackageOldKeys,
+              isUseTencentCloudChatPackageOldKeys: isUseTencentCloudChatPackageOldKeys,
               customEmojiStickerList: customEmojiStickerList,
               isEnableTextSelection: isEnableTextSelection,
               messageText: addSpaceAfterLeftBracket(
@@ -36,8 +35,7 @@ class LinkPreviewEntry {
               onLinkTap: onLinkTap,
               isUseQQPackage: isUseQQPackage,
               isUseTencentCloudChatPackage: isUseTencentCloudChatPackage,
-              isUseTencentCloudChatPackageOldKeys:
-                  isUseTencentCloudChatPackageOldKeys,
+              isUseTencentCloudChatPackageOldKeys: isUseTencentCloudChatPackageOldKeys,
               customEmojiStickerList: customEmojiStickerList);
     };
   }
