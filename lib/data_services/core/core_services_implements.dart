@@ -148,7 +148,11 @@ class CoreServicesImpl implements CoreServices {
               _loginInfo = info;
             },
             onUserSigExpired: listener.onUserSigExpired));
-    return result.data;
+    if (result.code == 0) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /// This method is used for init the TUIKit after you initialized the IM SDK from Native SDK.

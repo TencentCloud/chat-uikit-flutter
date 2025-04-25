@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:tencent_cloud_chat_sdk/models/v2_tim_callback.dart';
 import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_operation_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_profile_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/text_input_bottom_sheet.dart';
 
@@ -84,28 +85,33 @@ class TIMUIKitProfileController {
   }
 
   Future<V2TimCallback> updateSelfSignature(String selfSignature) {
-    Map<String, dynamic> infoMap = {"selfSignature": selfSignature};
-    return model.updateSelfInfo(infoMap);
+    V2TimUserFullInfo userFullInfo = V2TimUserFullInfo();
+    userFullInfo.selfSignature = selfSignature;
+    return model.updateSelfInfo(userFullInfo);
   }
 
   Future<V2TimCallback> updateNickName(String nickName) {
-    Map<String, dynamic> infoMap = {"nickName": nickName};
-    return model.updateSelfInfo(infoMap);
+    V2TimUserFullInfo userFullInfo = V2TimUserFullInfo();
+    userFullInfo.nickName = nickName;
+    return model.updateSelfInfo(userFullInfo);
   }
 
   /// 1：男 2：女
   Future<V2TimCallback> updateGender(int gender) {
-    Map<String, dynamic> infoMap = {"gender": gender};
-    return model.updateSelfInfo(infoMap);
+    V2TimUserFullInfo userFullInfo = V2TimUserFullInfo();
+    userFullInfo.gender = gender;
+    return model.updateSelfInfo(userFullInfo);
   }
 
   Future<V2TimCallback> updateBirthday(int birthday) {
-    Map<String, dynamic> infoMap = {"birthday": birthday};
-    return model.updateSelfInfo(infoMap);
+    V2TimUserFullInfo userFullInfo = V2TimUserFullInfo();
+    userFullInfo.birthday = birthday;
+    return model.updateSelfInfo(userFullInfo);
   }
 
   Future<V2TimCallback> updateAvatar(String url) {
-    Map<String, dynamic> infoMap = {"faceUrl" : url};
-    return model.updateSelfInfo(infoMap);
+    V2TimUserFullInfo userFullInfo = V2TimUserFullInfo();
+    userFullInfo.faceUrl = url;
+    return model.updateSelfInfo(userFullInfo);
   }
 }

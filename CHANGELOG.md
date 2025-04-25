@@ -1,3 +1,7 @@
+# 4.0.6
+* Solve the updateSelfInfo exception problem.
+* The success of calling the initSDK interface is determined by the code of the return value. Avoid inaccurate judgment when calling the interface multiple times.
+
 # 4.0.5
 * Upgrade tencent_cloud_chat_sdk to the minimum version 8.5.6864+6.
 * Changed the SDK interface call from getConversationListByConversaionIds to getConversationListByConversationIds.
@@ -19,12 +23,11 @@
 
 # 4.0.1
 * Upgraded the plugin tim_ui_kit_sticker_plugin to 4.0.1.
-* Use the 'useTencentCloudChatStickerPackageOldKeys' parameter in StickerPanelConfig to control whether the emoticon is compatible with version 3.x.
+* Add the 'useTencentCloudChatStickerPackageOldKeys' parameter in StickerPanelConfig to control whether the emoticon is compatible with version 3.x.
 
 # 4.0.0
 ## Breaking changes
 * Upgraded the plugin tim_ui_kit_sticker_plugin to 4.0.0.
-* Delete the useQQStickerPackage and unicodeEmojiList parameters in StickerPanelConfig.
 * Delete the isUseDefaultEmoji parameter in TIMUIKitChatConfig.
 * Delete the isUseDefaultEmoji parameter in each widget.
 
