@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_friend_info.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/friend_list_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendship_view_model.dart';
@@ -48,7 +49,6 @@ class _TIMUIKitContactState extends TIMUIKitState<TIMUIKitContact> {
   final TUIFriendShipViewModel model = serviceLocator<TUIFriendShipViewModel>();
   String currentItem = "";
 
-
   @override
   void dispose() {
     super.dispose();
@@ -72,13 +72,13 @@ class _TIMUIKitContactState extends TIMUIKitState<TIMUIKitContact> {
             emptyBuilder: widget.emptyBuilder,
             isShowOnlineStatus: widget.isShowOnlineStatus,
             contactList: memberList,
-            onTapItem: (item){
-              if(isDesktopScreen){
+            onTapItem: (item) {
+              if (isDesktopScreen) {
                 setState(() {
                   currentItem = item.userID;
                 });
               }
-              if(widget.onTapItem != null){
+              if (widget.onTapItem != null) {
                 widget.onTapItem!(item);
               }
             },

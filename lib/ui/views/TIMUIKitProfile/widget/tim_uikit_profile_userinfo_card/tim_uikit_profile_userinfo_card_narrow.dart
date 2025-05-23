@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_user_full_info.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
@@ -19,8 +20,9 @@ class TIMUIKitProfileUserInfoCardNarrow extends TIMUIKitStatelessWidget {
       {Key? key,
       this.onClickAvatar,
       this.userInfo,
-      @Deprecated("This info card can no longer navigate to default personal profile page automatically, please deal with it manually.")
-          this.isJumpToPersonalProfile = false,
+      @Deprecated(
+          "This info card can no longer navigate to default personal profile page automatically, please deal with it manually.")
+      this.isJumpToPersonalProfile = false,
       this.showArrowRightIcon = false})
       : super(key: key);
 
@@ -32,9 +34,8 @@ class TIMUIKitProfileUserInfoCardNarrow extends TIMUIKitStatelessWidget {
     final signature = userInfo?.selfSignature;
     final showName = nickName != "" ? nickName : userInfo?.userID;
     final option1 = signature;
-    final signatureText = option1 != null
-        ? TIM_t_para("个性签名: {{option1}}", "个性签名: $option1")(option1: option1)
-        : TIM_t("暂无个性签名");
+    final signatureText =
+        option1 != null ? TIM_t_para("个性签名: {{option1}}", "个性签名: $option1")(option1: option1) : TIM_t("暂无个性签名");
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
@@ -76,25 +77,20 @@ class TIMUIKitProfileUserInfoCardNarrow extends TIMUIKitStatelessWidget {
                     children: [
                       Text(
                         "ID:  ",
-                        style:
-                            TextStyle(fontSize: 13, color: theme.weakTextColor),
+                        style: TextStyle(fontSize: 13, color: theme.weakTextColor),
                       ),
                       SelectableText(
                         userInfo?.userID ?? "",
-                        style:
-                            TextStyle(fontSize: 13, color: theme.weakTextColor),
+                        style: TextStyle(fontSize: 13, color: theme.weakTextColor),
                       ),
                     ],
                   ),
                 ),
-                SelectableText(signatureText,
-                    style: TextStyle(fontSize: 13, color: theme.weakTextColor))
+                SelectableText(signatureText, style: TextStyle(fontSize: 13, color: theme.weakTextColor))
               ],
             ),
           ),
-          showArrowRightIcon
-              ? const Icon(Icons.keyboard_arrow_right)
-              : Container()
+          showArrowRightIcon ? const Icon(Icons.keyboard_arrow_right) : Container()
         ],
       ),
     );

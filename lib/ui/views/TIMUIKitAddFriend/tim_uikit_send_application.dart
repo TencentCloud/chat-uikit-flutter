@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
 import 'package:tencent_cloud_chat_sdk/enum/friend_type_enum.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_user_full_info.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
@@ -20,11 +21,7 @@ class SendApplication extends StatefulWidget {
   final AddFriendLifeCycle? lifeCycle;
 
   const SendApplication(
-      {Key? key,
-      this.lifeCycle,
-      required this.friendInfo,
-      required this.model,
-      this.isShowDefaultGroup = false})
+      {Key? key, this.lifeCycle, required this.friendInfo, required this.model, this.isShowDefaultGroup = false})
       : super(key: key);
 
   @override
@@ -38,21 +35,18 @@ class _SendApplicationState extends TIMUIKitState<SendApplication> {
   @override
   void initState() {
     super.initState();
-    final showName =
-        widget.model.loginInfo?.nickName ?? widget.model.loginInfo?.userID;
+    final showName = widget.model.loginInfo?.nickName ?? widget.model.loginInfo?.userID;
     _verficationController.text = "我是: $showName";
   }
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final TUITheme theme = value.theme;
-    final FriendshipServices _friendshipServices =
-        serviceLocator<FriendshipServices>();
+    final FriendshipServices _friendshipServices = serviceLocator<FriendshipServices>();
 
     final faceUrl = widget.friendInfo.faceUrl ?? "";
     final userID = widget.friendInfo.userID ?? "";
-    final String showName = ((widget.friendInfo.nickName != null &&
-                widget.friendInfo.nickName!.isNotEmpty)
+    final String showName = ((widget.friendInfo.nickName != null && widget.friendInfo.nickName!.isNotEmpty)
             ? widget.friendInfo.nickName
             : userID) ??
         "";
@@ -81,26 +75,22 @@ class _SendApplicationState extends TIMUIKitState<SendApplication> {
                     children: [
                       Text(
                         showName,
-                        style:
-                            TextStyle(color: theme.darkTextColor, fontSize: 18),
+                        style: TextStyle(color: theme.darkTextColor, fontSize: 18),
                       ),
                       const SizedBox(
                         height: 4,
                       ),
                       Text(
                         "ID: $userID",
-                        style:
-                            TextStyle(fontSize: 13, color: theme.weakTextColor),
+                        style: TextStyle(fontSize: 13, color: theme.weakTextColor),
                       ),
                       const SizedBox(
                         height: 4,
                       ),
                       if (TencentUtils.checkString(option2) != null)
                         Text(
-                          TIM_t_para("个性签名: {{option2}}", "个性签名: $option2")(
-                              option2: option2),
-                          style: TextStyle(
-                              fontSize: 13, color: theme.weakTextColor),
+                          TIM_t_para("个性签名: {{option2}}", "个性签名: $option2")(option2: option2),
+                          style: TextStyle(fontSize: 13, color: theme.weakTextColor),
                         ),
                     ],
                   )
@@ -171,20 +161,17 @@ class _SendApplicationState extends TIMUIKitState<SendApplication> {
             if (widget.isShowDefaultGroup == true)
               Container(
                 color: theme.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       TIM_t("分组"),
-                      style:
-                          TextStyle(color: theme.darkTextColor, fontSize: 16),
+                      style: TextStyle(color: theme.darkTextColor, fontSize: 16),
                     ),
                     Text(
                       TIM_t("我的好友"),
-                      style:
-                          TextStyle(color: theme.darkTextColor, fontSize: 16),
+                      style: TextStyle(color: theme.darkTextColor, fontSize: 16),
                     )
                   ],
                 ),
@@ -200,8 +187,7 @@ class _SendApplicationState extends TIMUIKitState<SendApplication> {
                     final friendGroup = TIM_t("我的好友");
 
                     if (widget.lifeCycle?.shouldAddFriend != null &&
-                        await widget.lifeCycle!.shouldAddFriend(userID, remark,
-                                friendGroup, addWording, context) ==
+                        await widget.lifeCycle!.shouldAddFriend(userID, remark, friendGroup, addWording, context) ==
                             false) {
                       return;
                     }

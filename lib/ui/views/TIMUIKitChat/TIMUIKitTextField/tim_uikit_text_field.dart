@@ -9,9 +9,12 @@ import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
 import 'package:tencent_cloud_chat_sdk/enum/group_member_role.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
@@ -167,7 +170,11 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
           baseUrl: "assets/custom_face_resource/${tccEmojiSet.name}",
           isEmoji: tccEmojiSet.isEmoji,
           isDefaultEmoji: true,
-          stickerList: tccEmojiSet.list.asMap().keys.map((idx) => CustomSticker(index: idx, name: tccEmojiSet.list[idx])).toList(),
+          stickerList: tccEmojiSet.list
+              .asMap()
+              .keys
+              .map((idx) => CustomSticker(index: idx, name: tccEmojiSet.list[idx]))
+              .toList(),
           menuItem: CustomSticker(
             index: 0,
             name: tccEmojiSet.icon,
@@ -181,7 +188,8 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
           baseUrl: "assets/custom_face_resource/${qqEmojiSet.name}",
           isEmoji: qqEmojiSet.isEmoji,
           isDefaultEmoji: true,
-          stickerList: qqEmojiSet.list.asMap().keys.map((idx) => CustomSticker(index: idx, name: qqEmojiSet.list[idx])).toList(),
+          stickerList:
+              qqEmojiSet.list.asMap().keys.map((idx) => CustomSticker(index: idx, name: qqEmojiSet.list[idx])).toList(),
           menuItem: CustomSticker(
             index: 0,
             name: qqEmojiSet.icon,
@@ -192,7 +200,8 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
       final defEmojiList = TUIKitStickerConstData.defaultUnicodeEmojiList.map((emojiItem) {
         return CustomSticker(index: 0, name: emojiItem.toString(), unicode: emojiItem);
       }).toList();
-      stickerPackageList.add(CustomStickerPackage(name: "defaultEmoji", stickerList: defEmojiList, menuItem: defEmojiList[0]));
+      stickerPackageList
+          .add(CustomStickerPackage(name: "defaultEmoji", stickerList: defEmojiList, menuItem: defEmojiList[0]));
     }
 
     stickerPackageList.addAll(stickerConfig.customStickerPackages);
@@ -242,7 +251,8 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
       textEditingController.text = text;
 
       if (TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop) {
-        textEditingController.selection = TextSelection.fromPosition(TextPosition(offset: currentCursor ?? textEditingController.text.length));
+        textEditingController.selection =
+            TextSelection.fromPosition(TextPosition(offset: currentCursor ?? textEditingController.text.length));
         focusNode.requestFocus();
       }
     }
@@ -273,7 +283,8 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     }
 
     if (TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop) {
-      textEditingController.selection = TextSelection.fromPosition(TextPosition(offset: currentCursor ?? textEditingController.text.length));
+      textEditingController.selection =
+          TextSelection.fromPosition(TextPosition(offset: currentCursor ?? textEditingController.text.length));
       focusNode.requestFocus();
     }
   }
@@ -286,9 +297,18 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     String text = textEditingController.text;
     String convID = id ?? widget.conversationID;
     final isTopic = convID.contains("@TOPIC#");
-    String conversationID = isTopic ? convID : ((convType ?? widget.conversationType) == ConvType.c2c ? "${TUIConversationViewModel.conversationC2CPrefix}$convID" : "${TUIConversationViewModel.conversationGroupPrefix}$convID");
+    String conversationID = isTopic
+        ? convID
+        : ((convType ?? widget.conversationType) == ConvType.c2c
+            ? "${TUIConversationViewModel.conversationC2CPrefix}$convID"
+            : "${TUIConversationViewModel.conversationGroupPrefix}$convID");
     String draftText = _filterU200b(text);
-    return await conversationModel.setConversationDraft(groupID: groupID ?? widget.groupID, isTopic: isTopic, isAllowWeb: widget.model.chatConfig.isUseDraftOnWeb, conversationID: conversationID, draftText: draftText);
+    return await conversationModel.setConversationDraft(
+        groupID: groupID ?? widget.groupID,
+        isTopic: isTopic,
+        isAllowWeb: widget.model.chatConfig.isUseDraftOnWeb,
+        conversationID: conversationID,
+        draftText: draftText);
   }
 
   // 和onSubmitted一样，只是保持焦点的不同
@@ -346,9 +366,13 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     }
 
     if (widget.model.repliedMessage != null) {
-      MessageUtils.handleMessageError(widget.model.sendFaceMessage(index: groupID, data: data, convID: widget.conversationID, convType: convType), context);
+      MessageUtils.handleMessageError(
+          widget.model.sendFaceMessage(index: groupID, data: data, convID: widget.conversationID, convType: convType),
+          context);
     } else {
-      MessageUtils.handleMessageError(widget.model.sendFaceMessage(index: groupID, data: data, convID: widget.conversationID, convType: convType), context);
+      MessageUtils.handleMessageError(
+          widget.model.sendFaceMessage(index: groupID, data: data, convID: widget.conversationID, convType: convType),
+          context);
     }
   }
 
@@ -368,11 +392,22 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     final convType = widget.conversationType;
     if (text.isNotEmpty && text != zeroWidthSpace) {
       if (widget.model.repliedMessage != null) {
-        MessageUtils.handleMessageError(widget.model.sendReplyMessage(text: text, convID: widget.conversationID, convType: convType, atUserIDList: getUserIdFromMemberInfoMap()), context);
+        MessageUtils.handleMessageError(
+            widget.model.sendReplyMessage(
+                text: text,
+                convID: widget.conversationID,
+                convType: convType,
+                atUserIDList: getUserIdFromMemberInfoMap()),
+            context);
       } else if (mentionedMembersMap.isNotEmpty) {
-        widget.model.sendTextAtMessage(text: text, convType: widget.conversationType, convID: widget.conversationID, atUserList: getUserIdFromMemberInfoMap());
+        widget.model.sendTextAtMessage(
+            text: text,
+            convType: widget.conversationType,
+            convID: widget.conversationID,
+            atUserList: getUserIdFromMemberInfoMap());
       } else {
-        MessageUtils.handleMessageError(widget.model.sendTextMessage(text: text, convID: widget.conversationID, convType: convType), context);
+        MessageUtils.handleMessageError(
+            widget.model.sendTextMessage(text: text, convID: widget.conversationID, convType: convType), context);
       }
       textEditingController.clear();
       currentCursor = null;
@@ -414,7 +449,10 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
   }
 
   String _getShowName(V2TimGroupMemberFullInfo? item) {
-    return TencentUtils.checkStringWithoutSpace(item?.nameCard) ?? TencentUtils.checkStringWithoutSpace(item?.nickName) ?? TencentUtils.checkStringWithoutSpace(item?.userID) ?? "";
+    return TencentUtils.checkStringWithoutSpace(item?.nameCard) ??
+        TencentUtils.checkStringWithoutSpace(item?.nickName) ??
+        TencentUtils.checkStringWithoutSpace(item?.userID) ??
+        "";
   }
 
   mentionMemberInMessage(String? userID, String? nickName) {
@@ -558,10 +596,10 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     }
 
     final int selfRole = widget.model.selfMemberInfo?.role ?? 0;
-    final bool canAtAll = widget.model.chatConfig.isMemberCanAtAll ? true : (selfRole == GroupMemberRoleType
-        .V2TIM_GROUP_MEMBER_ROLE_ADMIN || selfRole
-        ==
-        GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER);
+    final bool canAtAll = widget.model.chatConfig.isMemberCanAtAll
+        ? true
+        : (selfRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN ||
+            selfRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER);
 
     if (isDesktopScreen) {
       (int, String, bool)? changedCharacterRecord = findChangedCharacter(originalText, text);
@@ -598,7 +636,10 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
                       "")
                   .toLowerCase();
               keyword ??= "";
-              return element != null && showName.contains(keyword!.toLowerCase()) && TencentUtils.checkString(showName) != null && element.userID != widget.model.selfMemberInfo?.userID;
+              return element != null &&
+                  showName.contains(keyword!.toLowerCase()) &&
+                  TencentUtils.checkString(showName) != null &&
+                  element.userID != widget.model.selfMemberInfo?.userID;
             })
             .whereType<V2TimGroupMemberFullInfo>()
             .toList();
@@ -626,7 +667,10 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
 
         keyword ??= "";
         if (canAtAll && showAtMemberList.isNotEmpty && keyword!.isEmpty) {
-          showAtMemberList = [V2TimGroupMemberFullInfo(userID: "__kImSDK_MesssageAtALL__", nickName: TIM_t("所有人")), ...showAtMemberList];
+          showAtMemberList = [
+            V2TimGroupMemberFullInfo(userID: "__kImSDK_MesssageAtALL__", nickName: TIM_t("所有人")),
+            ...showAtMemberList
+          ];
         }
 
         model.activeAtIndex = 0;
@@ -642,7 +686,12 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
       List<V2TimGroupMemberFullInfo> selectedAtMemberList = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => AtText(groupMemberList: model.groupMemberList, groupInfo: model.groupInfo, groupID: groupID, canAtAll: canAtAll, groupType: widget.groupType),
+          builder: (context) => AtText(
+              groupMemberList: model.groupMemberList,
+              groupInfo: model.groupInfo,
+              groupID: groupID,
+              canAtAll: canAtAll,
+              groupType: widget.groupType),
         ),
       );
 
@@ -687,14 +736,16 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
   KeyEventResult handleDesktopKeyEvent(FocusNode node, RawKeyEvent event) {
     final activeIndex = widget.model.activeAtIndex;
     final showMemberList = widget.model.showAtMemberList;
-    final isPressEnter = (event.physicalKey == PhysicalKeyboardKey.enter) || (event.physicalKey == PhysicalKeyboardKey.numpadEnter);
+    final isPressEnter =
+        (event.physicalKey == PhysicalKeyboardKey.enter) || (event.physicalKey == PhysicalKeyboardKey.numpadEnter);
     if (event.runtimeType == RawKeyDownEvent) {
       if (event.physicalKey == PhysicalKeyboardKey.backspace) {
         if (textEditingController.text.isEmpty && lastText.isEmpty) {
           widget.model.repliedMessage = null;
           return KeyEventResult.handled;
         }
-      } else if ((event.isShiftPressed || event.isAltPressed || event.isControlPressed || event.isMetaPressed) && isPressEnter) {
+      } else if ((event.isShiftPressed || event.isAltPressed || event.isControlPressed || event.isMetaPressed) &&
+          isPressEnter) {
         final offset = textEditingController.selection.baseOffset;
         textEditingController.text = '${lastText.substring(0, offset)}\n${lastText.substring(offset)}';
         textEditingController.selection = TextSelection.fromPosition(TextPosition(offset: offset + 1));
@@ -766,7 +817,8 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     } else if (actionType == ActionType.setTextField) {
       final newText = widget.controller?.inputText ?? "";
       textEditingController.text = newText;
-      textEditingController.selection = TextSelection.fromPosition(TextPosition(offset: textEditingController.text.length));
+      textEditingController.selection =
+          TextSelection.fromPosition(TextPosition(offset: textEditingController.text.length));
       lastText = textEditingController.text;
       focusNode.requestFocus();
       return;
@@ -784,7 +836,8 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     super.didUpdateWidget(oldWidget);
     if (widget.conversationID != oldWidget.conversationID) {
       mentionedMembersMap.clear();
-      handleSetDraftText(id: oldWidget.conversationID, convType: oldWidget.conversationType, groupID: oldWidget.groupID);
+      handleSetDraftText(
+          id: oldWidget.conversationID, convType: oldWidget.conversationType, groupID: oldWidget.groupID);
       if (oldWidget.initText != widget.initText) {
         textEditingController.text = widget.initText ?? "";
       } else {
@@ -810,7 +863,8 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
   Future<bool> getMemberMuteStatus(String userID) async {
     // Get the mute state of the members recursively
     if (widget.model.groupMemberList?.any((item) => (item?.userID == userID)) ?? false) {
-      final int muteUntil = widget.model.groupMemberList?.firstWhere((item) => (item?.userID == userID))?.muteUntil ?? 0;
+      final int muteUntil =
+          widget.model.groupMemberList?.firstWhere((item) => (item?.userID == userID))?.muteUntil ?? 0;
       return muteUntil * 1000 > DateTime.now().millisecondsSinceEpoch;
     } else {
       return false;
@@ -823,7 +877,8 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
     }
 
     final int selfRole = widget.model.selfMemberInfo?.role ?? 0;
-    final bool willNotBeenMuted = (selfRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN || selfRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER);
+    final bool willNotBeenMuted = (selfRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN ||
+        selfRole == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER);
 
     if (widget.conversationType == ConvType.group && !willNotBeenMuted) {
       if ((model.groupInfo?.isAllMuted ?? false) && muteStatus != MuteStatus.all) {
@@ -832,13 +887,17 @@ class _InputTextFieldState extends TIMUIKitState<TIMUIKitInputTextField> {
             muteStatus = MuteStatus.all;
           });
         });
-      } else if (selfModel.loginInfo?.userID != null && await getMemberMuteStatus(selfModel.loginInfo!.userID!) && muteStatus != MuteStatus.me) {
+      } else if (selfModel.loginInfo?.userID != null &&
+          await getMemberMuteStatus(selfModel.loginInfo!.userID!) &&
+          muteStatus != MuteStatus.me) {
         Future.delayed(const Duration(seconds: 0), () {
           setState(() {
             muteStatus = MuteStatus.me;
           });
         });
-      } else if (!(model.groupInfo?.isAllMuted ?? false) && !(selfModel.loginInfo?.userID != null && await getMemberMuteStatus(selfModel.loginInfo!.userID!)) && muteStatus != MuteStatus.none) {
+      } else if (!(model.groupInfo?.isAllMuted ?? false) &&
+          !(selfModel.loginInfo?.userID != null && await getMemberMuteStatus(selfModel.loginInfo!.userID!)) &&
+          muteStatus != MuteStatus.none) {
         Future.delayed(const Duration(seconds: 0), () {
           setState(() {
             muteStatus = MuteStatus.none;

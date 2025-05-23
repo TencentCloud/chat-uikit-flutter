@@ -1,5 +1,6 @@
 import 'package:tencent_cloud_chat_sdk/enum/offlinePushInfo.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
@@ -130,8 +131,7 @@ class TIMUIKitChatConfig {
 
   /// Configuration for offline push.
   /// If this field is specified, `notificationTitle`, `notificationOPPOChannelID`, `notificationIOSSound`, `notificationAndroidSound`, `notificationBody` and `notificationExt` will not work.
-  final OfflinePushInfo? Function(
-      V2TimMessage message, String convID, ConvType convType)? offlinePushInfo;
+  final OfflinePushInfo? Function(V2TimMessage message, String convID, ConvType convType)? offlinePushInfo;
 
   /// The title shows in push notification
   final String notificationTitle;
@@ -151,13 +151,11 @@ class TIMUIKitChatConfig {
 
   /// The body content shows in push notification.
   /// Returning `null` means using default body in this case.
-  final String? Function(
-      V2TimMessage message, String convID, ConvType convType)? notificationBody;
+  final String? Function(V2TimMessage message, String convID, ConvType convType)? notificationBody;
 
   /// External information (String) for notification message, recommend used for jumping to target conversation with JSON format,
   /// Returning `null` means using default ext in this case.
-  final String? Function(
-      V2TimMessage message, String convID, ConvType convType)? notificationExt;
+  final String? Function(V2TimMessage message, String convID, ConvType convType)? notificationExt;
 
   /// The type of URL preview level, none preview, only hyperlink in text, or shows a preview card for website.
   /// [Default]: UrlPreviewType.previewCardAndHyperlink.
@@ -277,10 +275,9 @@ class TIMUIKitChatConfig {
       this.isUseMessageReaction = true,
       this.isShowAvatar = true,
       this.isShowSelfNameInGroup = false,
-        this.isAtWhenReplyDynamic,
+      this.isAtWhenReplyDynamic,
       this.offlinePushInfo,
-      @Deprecated("Please use [isShowReadingStatus] instead")
-      this.isShowGroupMessageReadReceipt = true,
+      @Deprecated("Please use [isShowReadingStatus] instead") this.isShowGroupMessageReadReceipt = true,
       this.upperRecallTime = 120,
       this.isShowOthersNameInGroup = true,
       this.urlPreviewType = UrlPreviewType.onlyHyperlink,
@@ -289,10 +286,8 @@ class TIMUIKitChatConfig {
       this.notificationTitle = "",
       this.notificationIOSSound = "",
       this.isAllowSoundMessage = true,
-      @Deprecated("not support")
-      this.groupReadReceiptPermisionList,
-      @Deprecated("not support")
-      this.groupReadReceiptPermissionList,
+      @Deprecated("not support") this.groupReadReceiptPermisionList,
+      @Deprecated("not support") this.groupReadReceiptPermissionList,
       this.isAllowEmojiPanel = true,
       this.isAllowShowMorePanel = true,
       this.isShowReadingStatus = true,
@@ -303,8 +298,7 @@ class TIMUIKitChatConfig {
       this.isEnableTextSelection,
       this.additionalDesktopMessageHoverBarItem,
       this.isShowGroupReadingStatus = true,
-      @Deprecated("Please use [isShowReadingStatus] instead")
-      this.isReportGroupReadingStatus = true,
+      @Deprecated("Please use [isShowReadingStatus] instead") this.isReportGroupReadingStatus = true,
       this.showC2cMessageEditStatus = true,
       this.additionalDesktopControlBarItems,
       this.isAllowLongPressAvatarToAt = true,

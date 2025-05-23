@@ -8,8 +8,10 @@ import 'package:provider/provider.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
 import 'package:tencent_cloud_chat_sdk/enum/message_elem_type.dart';
 import 'package:tencent_cloud_chat_sdk/enum/message_status.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_at_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_at_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_at_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
@@ -205,13 +207,13 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
       if (widget.groupAtInfoList.isNotEmpty)
         Text(_getAtMessage(), style: TextStyle(color: theme.cautionColor, fontSize: widget.fontSize)),
       if (widget.draftText != null && widget.draftText != "")
-        Text(_getDraftShowText(), style: TextStyle(color: theme.conversationItemDraftTextColor, fontSize: widget.fontSize)),
+        Text(_getDraftShowText(),
+            style: TextStyle(color: theme.conversationItemDraftTextColor, fontSize: widget.fontSize)),
       if (disturbUnreadCountInfo != "")
         Text(disturbUnreadCountInfo, style: TextStyle(color: theme.weakTextColor, fontSize: widget.fontSize)),
       if (widget.draftText != null && widget.draftText != "")
         Expanded(
-          child: ExtendedText(
-              groupTipsAbstractText,
+          child: ExtendedText(groupTipsAbstractText,
               softWrap: true,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -220,23 +222,20 @@ class _TIMUIKitLastMsgState extends TIMUIKitState<TIMUIKitLastMsg> {
                 isUseQQPackage: true,
                 isUseTencentCloudChatPackage: true,
                 showAtBackground: true,
-              )
-          ),
+              )),
         ),
       if (widget.draftText == null || widget.draftText == "" && TencentUtils.checkString(groupTipsAbstractText) != null)
         Expanded(
-          child: ExtendedText(
-            groupTipsAbstractText,
-            softWrap: true,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(height: 1, color: theme.weakTextColor, fontSize: widget.fontSize),
-            specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
-              isUseQQPackage: true,
-              isUseTencentCloudChatPackage: true,
-              showAtBackground: true,
-            )
-          ),
+          child: ExtendedText(groupTipsAbstractText,
+              softWrap: true,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(height: 1, color: theme.weakTextColor, fontSize: widget.fontSize),
+              specialTextSpanBuilder: DefaultSpecialTextSpanBuilder(
+                isUseQQPackage: true,
+                isUseTencentCloudChatPackage: true,
+                showAtBackground: true,
+              )),
         )
     ]);
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_full_info.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
@@ -36,28 +37,21 @@ class TIMUIKitMessageReactionDetail extends StatefulWidget {
   State<StatefulWidget> createState() => TIMUIKitMessageReactionDetailState();
 }
 
-class TIMUIKitMessageReactionDetailState
-    extends TIMUIKitState<TIMUIKitMessageReactionDetail>
+class TIMUIKitMessageReactionDetailState extends TIMUIKitState<TIMUIKitMessageReactionDetail>
     with TickerProviderStateMixin {
-  final TUISelfInfoViewModel selfInfoModel =
-      serviceLocator<TUISelfInfoViewModel>();
+  final TUISelfInfoViewModel selfInfoModel = serviceLocator<TUISelfInfoViewModel>();
 
-  Widget getUserItem(
-      String userID, TUITheme theme, Function(String userID, TapDownDetails tapDetails)? onTapAvatar) {
+  Widget getUserItem(String userID, TUITheme theme, Function(String userID, TapDownDetails tapDetails)? onTapAvatar) {
     V2TimGroupMemberFullInfo? memberInfo;
     String showName = userID;
     try {
-      memberInfo =
-          widget.memberList?.firstWhere((element) => element?.userID == userID);
+      memberInfo = widget.memberList?.firstWhere((element) => element?.userID == userID);
       if (memberInfo != null) {
-        if (memberInfo.friendRemark != null &&
-            memberInfo.friendRemark!.isNotEmpty) {
+        if (memberInfo.friendRemark != null && memberInfo.friendRemark!.isNotEmpty) {
           showName = memberInfo.friendRemark!;
-        } else if (memberInfo.nameCard != null &&
-            memberInfo.nameCard!.isNotEmpty) {
+        } else if (memberInfo.nameCard != null && memberInfo.nameCard!.isNotEmpty) {
           showName = memberInfo.nameCard!;
-        } else if (memberInfo.nickName != null &&
-            memberInfo.nickName!.isNotEmpty) {
+        } else if (memberInfo.nickName != null && memberInfo.nickName!.isNotEmpty) {
           showName = memberInfo.nickName!;
         } else {
           showName = memberInfo.userID;
@@ -77,10 +71,7 @@ class TIMUIKitMessageReactionDetailState
       },
       child: Container(
         decoration: BoxDecoration(
-            border: Border(
-                bottom: BorderSide(
-                    color: theme.weakDividerColor ??
-                        CommonColor.weakDividerColor))),
+            border: Border(bottom: BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
         child: Row(
           children: [
             Container(
@@ -168,14 +159,12 @@ class TIMUIKitMessageReactionDetailState
                   labelColor: theme.primaryColor,
                   labelStyle: const TextStyle(fontWeight: FontWeight.bold),
                   unselectedLabelColor: hexToColor("62626b"),
-                  unselectedLabelStyle:
-                      const TextStyle(fontWeight: FontWeight.normal),
+                  unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
                   indicatorSize: TabBarIndicatorSize.label,
                   indicatorColor: theme.primaryColor ?? hexToColor("62626b"),
                   tabs: [
                     ...widget.stickerList.map((element) {
-                      return stickerItem(element,
-                          widget.messageReaction[element.toString()].length);
+                      return stickerItem(element, widget.messageReaction[element.toString()].length);
                     })
                   ],
                 ),
@@ -183,8 +172,7 @@ class TIMUIKitMessageReactionDetailState
               Expanded(
                   child: TabBarView(
                       children: widget.stickerList
-                          .map((int sticker) => getStickerNameList(
-                              sticker, theme, widget.onTapAvatar))
+                          .map((int sticker) => getStickerNameList(sticker, theme, widget.onTapAvatar))
                           .toList()))
             ],
           ),

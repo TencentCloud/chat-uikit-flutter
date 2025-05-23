@@ -17,8 +17,10 @@ import 'package:pasteboard/pasteboard.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
@@ -933,56 +935,55 @@ class _TIMUIKitTextFieldLayoutWideState extends TIMUIKitState<TIMUIKitTextFieldL
             children: [
               _buildRepliedMessage(widget.repliedMessage),
               SizedBox(height: 1, child: Container(color: theme.weakDividerColor ?? Colors.black12)),
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: generateControlBar(widget.model, theme),
-                  ),
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: generateControlBar(widget.model, theme),
                 ),
+              ),
               Container(
                 padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
                 constraints: const BoxConstraints(minHeight: 50),
                 child: Row(
                   children: [
-                      Expanded(
-                        child: ExtendedTextField(
-                            scrollController: _scrollController,
-                            autofocus: true,
-                            maxLines: widget.chatConfig.desktopMessageInputFieldLines,
-                            minLines: widget.chatConfig.desktopMessageInputFieldLines,
-                            focusNode: widget.focusNode,
-                            onChanged: debounceFunc,
-                            keyboardType: TextInputType.multiline,
-                            onEditingComplete: () {
-                              //   // widget.onSubmitted();
-                            },
-                            textAlignVertical: TextAlignVertical.top,
-                            style: const TextStyle(fontSize: 14),
-                            decoration: InputDecoration(
-                              hoverColor: Colors.transparent,
-                              border: InputBorder.none,
-                              hintStyle: const TextStyle(
-                                color: Color(0xffAEA4A3),
-                              ),
-                              fillColor: widget.backgroundColor ??
-                                  theme.desktopChatMessageInputBgColor ??
-                                  hexToColor("fafafa"),
-                              filled: true,
-                              isDense: true,
-                              hintText: widget.hintText ?? '',
+                    Expanded(
+                      child: ExtendedTextField(
+                          scrollController: _scrollController,
+                          autofocus: true,
+                          maxLines: widget.chatConfig.desktopMessageInputFieldLines,
+                          minLines: widget.chatConfig.desktopMessageInputFieldLines,
+                          focusNode: widget.focusNode,
+                          onChanged: debounceFunc,
+                          keyboardType: TextInputType.multiline,
+                          onEditingComplete: () {
+                            //   // widget.onSubmitted();
+                          },
+                          textAlignVertical: TextAlignVertical.top,
+                          style: const TextStyle(fontSize: 14),
+                          decoration: InputDecoration(
+                            hoverColor: Colors.transparent,
+                            border: InputBorder.none,
+                            hintStyle: const TextStyle(
+                              color: Color(0xffAEA4A3),
                             ),
-                            controller: widget.textEditingController,
-                            specialTextSpanBuilder: PlatformUtils().isWeb
-                                ? null
-                                : DefaultSpecialTextSpanBuilder(
-                                    isUseTencentCloudChatPackage:
-                                        widget.model.chatConfig.stickerPanelConfig?.useTencentCloudChatStickerPackage ??
-                                            true,
-                                    customEmojiStickerList: widget.customEmojiStickerList,
-                                    showAtBackground: true,
-                                  )),
-                      ),
+                            fillColor:
+                                widget.backgroundColor ?? theme.desktopChatMessageInputBgColor ?? hexToColor("fafafa"),
+                            filled: true,
+                            isDense: true,
+                            hintText: widget.hintText ?? '',
+                          ),
+                          controller: widget.textEditingController,
+                          specialTextSpanBuilder: PlatformUtils().isWeb
+                              ? null
+                              : DefaultSpecialTextSpanBuilder(
+                                  isUseTencentCloudChatPackage:
+                                      widget.model.chatConfig.stickerPanelConfig?.useTencentCloudChatStickerPackage ??
+                                          true,
+                                  customEmojiStickerList: widget.customEmojiStickerList,
+                                  showAtBackground: true,
+                                )),
+                    ),
                   ],
                 ),
               ),

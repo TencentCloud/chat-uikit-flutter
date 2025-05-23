@@ -3,8 +3,10 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_sound_elem.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_sound_elem.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_sound_elem.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
@@ -95,7 +97,8 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
       }
       if (!PlatformUtils().isWeb) {
         if (widget.message.soundElem!.localUrl == null || widget.message.soundElem!.localUrl == '') {
-          _messageService.downloadMessage(msgID: widget.message.msgID!, messageType: 4, imageType: 0, isSnapshot: false);
+          _messageService.downloadMessage(
+              msgID: widget.message.msgID!, messageType: 4, imageType: 0, isSnapshot: false);
         }
       }
     }
@@ -172,11 +175,21 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final theme = value.theme;
 
-    final backgroundColor = widget.isFromSelf ? (theme.chatMessageItemFromSelfBgColor ?? theme.lightPrimaryMaterialColor.shade50) : (theme.chatMessageItemFromOthersBgColor);
+    final backgroundColor = widget.isFromSelf
+        ? (theme.chatMessageItemFromSelfBgColor ?? theme.lightPrimaryMaterialColor.shade50)
+        : (theme.chatMessageItemFromOthersBgColor);
 
     final borderRadius = widget.isFromSelf
-        ? const BorderRadius.only(topLeft: Radius.circular(10), topRight: Radius.circular(2), bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10))
-        : const BorderRadius.only(topLeft: Radius.circular(2), topRight: Radius.circular(10), bottomLeft: Radius.circular(10), bottomRight: Radius.circular(10));
+        ? const BorderRadius.only(
+            topLeft: Radius.circular(10),
+            topRight: Radius.circular(2),
+            bottomLeft: Radius.circular(10),
+            bottomRight: Radius.circular(10))
+        : const BorderRadius.only(
+            topLeft: Radius.circular(2),
+            topRight: Radius.circular(10),
+            bottomLeft: Radius.circular(10),
+            bottomRight: Radius.circular(10));
     if (widget.isShowJump) {
       if (!isShining) {
         Future.delayed(Duration.zero, () {

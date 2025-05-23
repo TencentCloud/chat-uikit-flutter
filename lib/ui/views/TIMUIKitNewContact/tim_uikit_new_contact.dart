@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_application.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_application.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_friend_application.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/new_contact_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendship_view_model.dart';
@@ -13,8 +14,7 @@ import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 import 'package:tencent_cloud_chat_uikit/theme/color.dart';
 import 'package:tencent_cloud_chat_uikit/theme/tui_theme_view_model.dart';
 
-typedef NewContactItemBuilder = Widget Function(
-    BuildContext context, V2TimFriendApplication applicationInfo);
+typedef NewContactItemBuilder = Widget Function(BuildContext context, V2TimFriendApplication applicationInfo);
 
 class TIMUIKitNewContact extends StatefulWidget {
   /// the callback when accept friend request
@@ -33,12 +33,7 @@ class TIMUIKitNewContact extends StatefulWidget {
   final NewContactLifeCycle? lifeCycle;
 
   const TIMUIKitNewContact(
-      {Key? key,
-      this.lifeCycle,
-      this.onAccept,
-      this.onRefuse,
-      this.emptyBuilder,
-      this.itemBuilder})
+      {Key? key, this.lifeCycle, this.onAccept, this.onRefuse, this.emptyBuilder, this.itemBuilder})
       : super(key: key);
 
   @override
@@ -49,28 +44,22 @@ class _TIMUIKitNewContactState extends TIMUIKitState<TIMUIKitNewContact> {
   late TUIFriendShipViewModel model = serviceLocator<TUIFriendShipViewModel>();
 
   _getShowName(V2TimFriendApplication item) {
-    return TencentUtils.checkString(item.nickname) ??
-        TencentUtils.checkString(item.userID);
+    return TencentUtils.checkString(item.nickname) ?? TencentUtils.checkString(item.userID);
   }
 
-  Widget _itemBuilder(
-      BuildContext context, V2TimFriendApplication applicationInfo) {
+  Widget _itemBuilder(BuildContext context, V2TimFriendApplication applicationInfo) {
     final theme = Provider.of<TUIThemeViewModel>(context).theme;
     final showName = _getShowName(applicationInfo);
     final faceUrl = applicationInfo.faceUrl ?? "";
     final applicationText = applicationInfo.addWording ?? "";
-    final isDesktopScreen =
-        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
 
     return Material(
       color: theme.wideBackgroundColor,
       child: InkWell(
         onTap: () {},
         child: Container(
-          padding: EdgeInsets.only(
-              top: isDesktopScreen ? 6 : 10,
-              left: 16,
-              right: isDesktopScreen ? 16 : 0),
+          padding: EdgeInsets.only(top: isDesktopScreen ? 6 : 10, left: 16, right: isDesktopScreen ? 16 : 0),
           child: Row(
             children: [
               Container(
@@ -86,27 +75,19 @@ class _TIMUIKitNewContactState extends TIMUIKitState<TIMUIKitNewContact> {
                   child: Container(
                 padding: const EdgeInsets.only(top: 10, bottom: 20),
                 decoration: BoxDecoration(
-                    border: Border(
-                        bottom: BorderSide(
-                            color: theme.weakDividerColor ??
-                                CommonColor.weakDividerColor))),
+                    border: Border(bottom: BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Padding(
-                      padding: EdgeInsets.only(
-                          top: (applicationText.isNotEmpty && isDesktopScreen)
-                              ? 10
-                              : 0),
+                      padding: EdgeInsets.only(top: (applicationText.isNotEmpty && isDesktopScreen) ? 10 : 0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
                             showName,
-                            style: TextStyle(
-                                color: theme.darkTextColor,
-                                fontSize: isDesktopScreen ? 14 : 18),
+                            style: TextStyle(color: theme.darkTextColor, fontSize: isDesktopScreen ? 14 : 18),
                           ),
                           if (applicationText.isNotEmpty && isDesktopScreen)
                             const SizedBox(
@@ -115,8 +96,7 @@ class _TIMUIKitNewContactState extends TIMUIKitState<TIMUIKitNewContact> {
                           if (applicationText.isNotEmpty && isDesktopScreen)
                             Text(
                               applicationText,
-                              style: TextStyle(
-                                  color: theme.weakTextColor, fontSize: 12),
+                              style: TextStyle(color: theme.weakTextColor, fontSize: 12),
                             ),
                         ],
                       ),
@@ -126,15 +106,11 @@ class _TIMUIKitNewContactState extends TIMUIKitState<TIMUIKitNewContact> {
                       margin: const EdgeInsets.only(right: 8),
                       child: InkWell(
                         child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
                               color: theme.primaryColor,
-                              border: Border.all(
-                                  width: 1,
-                                  color: theme.weakTextColor ??
-                                      CommonColor.weakTextColor)),
+                              border: Border.all(width: 1, color: theme.weakTextColor ?? CommonColor.weakTextColor)),
                           child: Text(
                             TIM_t("同意"),
                             style: TextStyle(
@@ -163,12 +139,8 @@ class _TIMUIKitNewContactState extends TIMUIKitState<TIMUIKitNewContact> {
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(8),
                                 color: Colors.white,
-                                border: Border.all(
-                                    width: 1,
-                                    color: theme.weakTextColor ??
-                                        CommonColor.weakTextColor)),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 14, vertical: 6),
+                                border: Border.all(width: 1, color: theme.weakTextColor ?? CommonColor.weakTextColor)),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                             child: Text(
                               TIM_t("拒绝"),
                               style: TextStyle(

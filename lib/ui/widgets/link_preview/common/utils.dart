@@ -2,7 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:link_preview_generator_for_us/link_preview_generator.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
 import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/link_preview/common/extensions.dart';
@@ -47,30 +48,24 @@ class LinkUtils {
   }
 
   /// Get the URL preview information
-  static Future<List<LocalCustomDataModel>> getURLPreview(
-      List<String> urlMatches) async {
+  static Future<List<LocalCustomDataModel>> getURLPreview(List<String> urlMatches) async {
     // Request for preview information for all URL links synchronously
-    final List<LocalCustomDataModel> urlPreview =
-    await Future.wait(urlMatches.map((e) async {
+    final List<LocalCustomDataModel> urlPreview = await Future.wait(urlMatches.map((e) async {
       String url = e;
       if (!e.contains("http")) {
         url = 'http://$e';
       }
       final WebInfo info = await LinkPreviewForUs.scrapeFromURL(url);
 
-      return LocalCustomDataModel(
-          url: e,
-          title: info.title,
-          image: info.image,
-          description: info.description);
+      return LocalCustomDataModel(url: e, title: info.title, image: info.image, description: info.description);
     }));
 
     return urlPreview;
   }
 
   /// save the link info to local and call updating the message on UI, only works with [onUpdateMessage]
-  static Future<void> saveToLocalAndUpdate(V2TimMessage message,
-      LocalCustomDataModel previewItem, ValueChanged<V2TimMessage> onUpdateMessage) async {
+  static Future<void> saveToLocalAndUpdate(
+      V2TimMessage message, LocalCustomDataModel previewItem, ValueChanged<V2TimMessage> onUpdateMessage) async {
     if (message.msgID != null) {
       String saveInfo = LinkPreviewEntry.linkInfoToString(previewItem);
       final currentInfo = message.localCustomData;
@@ -83,7 +78,7 @@ class LinkUtils {
         saveInfo = json.encode(data);
       }
       message.localCustomData = saveInfo;
-      if(saveInfo != currentInfo){
+      if (saveInfo != currentInfo) {
         final result = await TencentImSDKPlugin.v2TIMManager.v2TIMMessageManager
             .setLocalCustomData(msgID: message.msgID!, localCustomData: saveInfo);
         if (result.code == 0) {

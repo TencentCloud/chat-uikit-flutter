@@ -4,7 +4,8 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_full_info.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_group_profile_model.dart';
@@ -87,7 +88,8 @@ class GroupMemberTitle extends TIMUIKitStatelessWidget {
     return [];
   }
 
-  void navigateToMemberList(BuildContext context, TUIGroupProfileModel model, List<V2TimGroupMemberFullInfo?> memberList) {
+  void navigateToMemberList(
+      BuildContext context, TUIGroupProfileModel model, List<V2TimGroupMemberFullInfo?> memberList) {
     final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     if (!isDesktopScreen) {
       Navigator.push(
@@ -134,7 +136,10 @@ class GroupMemberTitle extends TIMUIKitStatelessWidget {
         children: [
           Container(
             padding: const EdgeInsets.only(bottom: 12),
-            decoration: isDesktopScreen ? null : BoxDecoration(border: Border(bottom: BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
+            decoration: isDesktopScreen
+                ? null
+                : BoxDecoration(
+                    border: Border(bottom: BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
             child: InkWell(
               onTap: () async {
                 navigateToMemberList(context, model, memberList);

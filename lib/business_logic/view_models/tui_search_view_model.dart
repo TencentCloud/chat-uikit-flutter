@@ -2,31 +2,34 @@
 
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info_result.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_search_param.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_search_param.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_search_param.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_search_result_item.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info_result.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_friend_info_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_search_param.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_friend_search_param.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_search_param.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_search_param.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_search_param.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message_search_param.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_search_result_item.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message_search_result_item.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/friendShip/friendship_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/message/message_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/conversation/conversation_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
 
-enum KeywordListMatchType {
-  V2TIM_KEYWORD_LIST_MATCH_TYPE_OR,
-  V2TIM_KEYWORD_LIST_MATCH_TYPE_AND
-}
+enum KeywordListMatchType { V2TIM_KEYWORD_LIST_MATCH_TYPE_OR, V2TIM_KEYWORD_LIST_MATCH_TYPE_AND }
 
 class TUISearchViewModel extends ChangeNotifier {
-  final FriendshipServices _friendshipServices =
-      serviceLocator<FriendshipServices>();
+  final FriendshipServices _friendshipServices = serviceLocator<FriendshipServices>();
   final MessageService _messageService = serviceLocator<MessageService>();
-  final ConversationService _conversationService =
-      serviceLocator<ConversationService>();
+  final ConversationService _conversationService = serviceLocator<ConversationService>();
   final GroupServices _groupServices = serviceLocator<GroupServices>();
 
   List<V2TimFriendInfoResult>? friendList = [];
@@ -43,8 +46,7 @@ class TUISearchViewModel extends ChangeNotifier {
   List<V2TimConversation?> conversationList = [];
 
   Future<List<V2TimConversation?>?> initConversationMsg() async {
-    final conversationResult = await _conversationService.getConversationList(
-        nextSeq: "0", count: 500);
+    final conversationResult = await _conversationService.getConversationList(nextSeq: "0", count: 500);
     final conversationListData = conversationResult?.conversationList;
     conversationList = conversationListData ?? [];
     notifyListeners();
@@ -60,21 +62,20 @@ class TUISearchViewModel extends ChangeNotifier {
   }
 
   void searchFriendByKey(String searchKey) async {
-    final searchResult = await _friendshipServices.searchFriends(
-        searchParam: V2TimFriendSearchParam(keywordList: [searchKey]));
+    final searchResult =
+        await _friendshipServices.searchFriends(searchParam: V2TimFriendSearchParam(keywordList: [searchKey]));
     friendList = searchResult;
     notifyListeners();
   }
 
   void searchGroupByKey(String searchKey) async {
-    final searchResult = await _groupServices.searchGroups(
-        searchParam: V2TimGroupSearchParam(keywordList: [searchKey]));
+    final searchResult =
+        await _groupServices.searchGroups(searchParam: V2TimGroupSearchParam(keywordList: [searchKey]));
     groupList = searchResult.data ?? [];
     notifyListeners();
   }
 
-  void getMsgForConversation(
-      String keyword, String conversationId, int page) async {
+  void getMsgForConversation(String keyword, String conversationId, int page) async {
     void clearData() {
       currentMsgListForConversation = [];
       totalMsgInConversationCount = 0;
@@ -98,8 +99,7 @@ class TUISearchViewModel extends ChangeNotifier {
       type: KeywordListMatchType.V2TIM_KEYWORD_LIST_MATCH_TYPE_OR.index,
     ));
     if (searchResult.code == 0 && searchResult.data != null) {
-      final messageSearchResultItems = searchResult
-          .data!.messageSearchResultItems!
+      final messageSearchResultItems = searchResult.data!.messageSearchResultItems!
           .firstWhereOrNull((element) => element.conversationID == conversationId);
       totalMsgInConversationCount = messageSearchResultItems?.messageCount ?? 0;
       currentMsgListForConversation = [

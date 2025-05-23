@@ -5,10 +5,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:tencent_chat_i18n_tool/tools/i18n_tool.dart';
 import 'package:tencent_cloud_chat_sdk/enum/V2TimSDKListener.dart';
 import 'package:tencent_cloud_chat_sdk/enum/log_level_enum.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_callback.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_status.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_callback.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_user_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_status.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_user_status.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_value_callback.dart';
 import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_setting_model.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/common_utils.dart';
@@ -38,8 +42,7 @@ class LoginInfo {
   final int sdkAppID;
   final V2TimUserFullInfo? loginUser;
 
-  LoginInfo(
-      {this.sdkAppID = 0, this.userSig = "", this.userID = "", this.loginUser});
+  LoginInfo({this.sdkAppID = 0, this.userSig = "", this.userID = "", this.loginUser});
 }
 
 class CoreServicesImpl implements CoreServices {
@@ -56,11 +59,7 @@ class CoreServicesImpl implements CoreServices {
   }
 
   LoginInfo get loginInfo {
-    return LoginInfo(
-        sdkAppID: _sdkAppID,
-        userID: _userID,
-        userSig: _userSig,
-        loginUser: _loginInfo);
+    return LoginInfo(sdkAppID: _sdkAppID, userID: _userID, userSig: _userSig, loginUser: _loginInfo);
   }
 
   EmptyAvatarBuilder? _emptyAvatarBuilder;
@@ -74,8 +73,7 @@ class CoreServicesImpl implements CoreServices {
   }
 
   setGlobalConfig(TIMUIKitConfig? config) {
-    final TUISelfInfoViewModel selfInfoViewModel =
-        serviceLocator<TUISelfInfoViewModel>();
+    final TUISelfInfoViewModel selfInfoViewModel = serviceLocator<TUISelfInfoViewModel>();
     final TUISettingModel settingModel = serviceLocator<TUISettingModel>();
     selfInfoViewModel.globalConfig = config;
     settingModel.init();
@@ -185,14 +183,10 @@ class CoreServicesImpl implements CoreServices {
   }
 
   void addInitListener() {
-    final TUIFriendShipViewModel tuiFriendShipViewModel =
-        serviceLocator<TUIFriendShipViewModel>();
-    final TUIConversationViewModel tuiConversationViewModel =
-        serviceLocator<TUIConversationViewModel>();
-    final TUIChatGlobalModel tuiChatViewModel =
-        serviceLocator<TUIChatGlobalModel>();
-    final TUIGroupListenerModel tuiGroupListenerModel =
-        serviceLocator<TUIGroupListenerModel>();
+    final TUIFriendShipViewModel tuiFriendShipViewModel = serviceLocator<TUIFriendShipViewModel>();
+    final TUIConversationViewModel tuiConversationViewModel = serviceLocator<TUIConversationViewModel>();
+    final TUIChatGlobalModel tuiChatViewModel = serviceLocator<TUIChatGlobalModel>();
+    final TUIGroupListenerModel tuiGroupListenerModel = serviceLocator<TUIGroupListenerModel>();
 
     tuiFriendShipViewModel.addFriendListener();
     tuiConversationViewModel.setConversationListener();
@@ -201,14 +195,10 @@ class CoreServicesImpl implements CoreServices {
   }
 
   void removeListener() {
-    final TUIFriendShipViewModel tuiFriendShipViewModel =
-        serviceLocator<TUIFriendShipViewModel>();
-    final TUIConversationViewModel tuiConversationViewModel =
-        serviceLocator<TUIConversationViewModel>();
-    final TUIChatGlobalModel tuiChatViewModel =
-        serviceLocator<TUIChatGlobalModel>();
-    final TUIGroupListenerModel tuiGroupListenerModel =
-        serviceLocator<TUIGroupListenerModel>();
+    final TUIFriendShipViewModel tuiFriendShipViewModel = serviceLocator<TUIFriendShipViewModel>();
+    final TUIConversationViewModel tuiConversationViewModel = serviceLocator<TUIConversationViewModel>();
+    final TUIChatGlobalModel tuiChatViewModel = serviceLocator<TUIChatGlobalModel>();
+    final TUIGroupListenerModel tuiGroupListenerModel = serviceLocator<TUIGroupListenerModel>();
 
     tuiFriendShipViewModel.removeFriendshipListener();
     tuiConversationViewModel.removeConversationListener();
@@ -222,28 +212,22 @@ class CoreServicesImpl implements CoreServices {
         onCallback!(callbackValue);
       });
     } else {
-      outputLogger.i(
-          "TUIKit Callback: ${callbackValue.type} - ${callbackValue.stackTrace}");
+      outputLogger.i("TUIKit Callback: ${callbackValue.type} - ${callbackValue.stackTrace}");
     }
   }
 
   initDataModel() {
-    final TUIFriendShipViewModel tuiFriendShipViewModel =
-        serviceLocator<TUIFriendShipViewModel>();
-    final TUIConversationViewModel tuiConversationViewModel =
-        serviceLocator<TUIConversationViewModel>();
+    final TUIFriendShipViewModel tuiFriendShipViewModel = serviceLocator<TUIFriendShipViewModel>();
+    final TUIConversationViewModel tuiConversationViewModel = serviceLocator<TUIConversationViewModel>();
 
     tuiFriendShipViewModel.initFriendShipModel();
     tuiConversationViewModel.initConversation();
   }
 
   clearData() {
-    final TUIFriendShipViewModel tuiFriendShipViewModel =
-        serviceLocator<TUIFriendShipViewModel>();
-    final TUIConversationViewModel tuiConversationViewModel =
-        serviceLocator<TUIConversationViewModel>();
-    final TUIChatGlobalModel tuiChatViewModel =
-        serviceLocator<TUIChatGlobalModel>();
+    final TUIFriendShipViewModel tuiFriendShipViewModel = serviceLocator<TUIFriendShipViewModel>();
+    final TUIConversationViewModel tuiConversationViewModel = serviceLocator<TUIConversationViewModel>();
+    final TUIChatGlobalModel tuiChatViewModel = serviceLocator<TUIChatGlobalModel>();
 
     tuiFriendShipViewModel.clearData();
     tuiConversationViewModel.clearData();
@@ -252,19 +236,17 @@ class CoreServicesImpl implements CoreServices {
 
   updateUserStatusList(List<V2TimUserStatus> newUserStatusList) {
     try {
-      final TUISelfInfoViewModel selfInfoViewModel =
-          serviceLocator<TUISelfInfoViewModel>();
+      final TUISelfInfoViewModel selfInfoViewModel = serviceLocator<TUISelfInfoViewModel>();
       if (selfInfoViewModel.globalConfig?.isShowOnlineStatus == false) {
         return;
       }
 
-      final TUIFriendShipViewModel tuiFriendShipViewModel =
-          serviceLocator<TUIFriendShipViewModel>();
+      final TUIFriendShipViewModel tuiFriendShipViewModel = serviceLocator<TUIFriendShipViewModel>();
       final currentUserStatusList = tuiFriendShipViewModel.userStatusList;
 
       for (int i = 0; i < newUserStatusList.length; i++) {
-        final int indexInCurrentUserList = currentUserStatusList.indexWhere(
-            (element) => element.userID == newUserStatusList[i].userID);
+        final int indexInCurrentUserList =
+            currentUserStatusList.indexWhere((element) => element.userID == newUserStatusList[i].userID);
         if (indexInCurrentUserList == -1) {
           currentUserStatusList.add(newUserStatusList[i]);
         } else {
@@ -284,16 +266,12 @@ class CoreServicesImpl implements CoreServices {
   }) async {
     _userID = userID;
     _userSig = userSig;
-    V2TimCallback result = await TencentImSDKPlugin.v2TIMManager
-        .login(userID: userID, userSig: userSig);
+    V2TimCallback result = await TencentImSDKPlugin.v2TIMManager.login(userID: userID, userSig: userSig);
     if (!PlatformUtils().isWeb) {
       didLoginSuccess();
     }
     if (result.code != 0) {
-      callOnCallback(TIMCallback(
-          type: TIMCallbackType.API_ERROR,
-          errorCode: result.code,
-          errorMsg: result.desc));
+      callOnCallback(TIMCallback(type: TIMCallbackType.API_ERROR, errorCode: result.code, errorMsg: result.desc));
     }
     return result;
   }
@@ -307,8 +285,7 @@ class CoreServicesImpl implements CoreServices {
     initDataModel();
 
     if (TencentUtils.checkString(_userID) == null) {
-      V2TimValueCallback<String> getLoginUserRes =
-          await TencentImSDKPlugin.v2TIMManager.getLoginUser();
+      V2TimValueCallback<String> getLoginUserRes = await TencentImSDKPlugin.v2TIMManager.getLoginUser();
       if (getLoginUserRes.code == 0) {
         _userID = getLoginUserRes.data ?? "";
       }
@@ -326,18 +303,15 @@ class CoreServicesImpl implements CoreServices {
       if (res.code == 0 &&
           res.data != null &&
           res.data!.isNotEmpty &&
-          res.data!.firstWhereOrNull((element) => element.userID == _userID) !=
-              null) {
+          res.data!.firstWhereOrNull((element) => element.userID == _userID) != null) {
         success = true;
       } else {
         await Future.delayed(const Duration(seconds: 2));
       }
     }
 
-    _loginInfo =
-        res?.data!.firstWhereOrNull((element) => element.userID == _userID);
-    final TUISelfInfoViewModel selfInfoViewModel =
-        serviceLocator<TUISelfInfoViewModel>();
+    _loginInfo = res?.data!.firstWhereOrNull((element) => element.userID == _userID);
+    final TUISelfInfoViewModel selfInfoViewModel = serviceLocator<TUISelfInfoViewModel>();
     if (_loginInfo != null) {
       selfInfoViewModel.setLoginInfo(_loginInfo);
     }
@@ -389,9 +363,7 @@ class CoreServicesImpl implements CoreServices {
     bool isTPNSToken = false,
     int? businessID,
   }) {
-    return TencentImSDKPlugin.v2TIMManager
-        .getOfflinePushManager()
-        .setOfflinePushConfig(
+    return TencentImSDKPlugin.v2TIMManager.getOfflinePushManager().setOfflinePushConfig(
           businessID: businessID?.toDouble() ?? 0,
           token: token,
           isTPNSToken: isTPNSToken,
@@ -402,8 +374,7 @@ class CoreServicesImpl implements CoreServices {
   Future<V2TimCallback> setSelfInfo({
     required V2TimUserFullInfo userFullInfo,
   }) {
-    return TencentImSDKPlugin.v2TIMManager
-        .setSelfInfo(userFullInfo: userFullInfo);
+    return TencentImSDKPlugin.v2TIMManager.setSelfInfo(userFullInfo: userFullInfo);
   }
 
   @override
@@ -434,16 +405,11 @@ class CoreServicesImpl implements CoreServices {
   }
 
   @override
-  Future<V2TimCallback> setOfflinePushStatus(
-      {required AppStatus status, int? totalCount}) {
+  Future<V2TimCallback> setOfflinePushStatus({required AppStatus status, int? totalCount}) {
     if (status == AppStatus.foreground) {
-      return TencentImSDKPlugin.v2TIMManager
-          .getOfflinePushManager()
-          .doForeground();
+      return TencentImSDKPlugin.v2TIMManager.getOfflinePushManager().doForeground();
     } else {
-      return TencentImSDKPlugin.v2TIMManager
-          .getOfflinePushManager()
-          .doBackground(unreadCount: totalCount ?? 0);
+      return TencentImSDKPlugin.v2TIMManager.getOfflinePushManager().doBackground(unreadCount: totalCount ?? 0);
     }
   }
 

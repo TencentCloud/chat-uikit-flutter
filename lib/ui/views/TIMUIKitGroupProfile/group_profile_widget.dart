@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_full_info.dart';
 
 enum GroupProfileWidgetEnum {
   /// The detail card for group.
@@ -63,15 +65,14 @@ enum GroupProfileWidgetEnum {
 
 class GroupProfileWidgetBuilder {
   /// The detail card for group.
-  Widget Function(V2TimGroupInfo groupInfo,
-      Function(String updateGroupName)? updateGroupName)? detailCard;
+  Widget Function(V2TimGroupInfo groupInfo, Function(String updateGroupName)? updateGroupName)? detailCard;
 
   /// The tile shows the members in the group.
   Widget Function(List<V2TimGroupMemberFullInfo?> memberList)? memberListTile;
 
   /// The entrance to the page editing the group notice.
-  Widget Function(String currentNotice, Function() toDefaultNoticeEditPage,
-      Function(String newNotice) setGroupNotice)? groupNotice;
+  Widget Function(String currentNotice, Function() toDefaultNoticeEditPage, Function(String newNotice) setGroupNotice)?
+      groupNotice;
 
   /// The entrance to the page managing the group.
   /// Works only for group owner and group admin.
@@ -89,47 +90,37 @@ class GroupProfileWidgetBuilder {
 
   /// Shows and modify the mode or options users add the group.
   /// Includes "0: disallow group joining", "1: admin approval" and "2: automatic approval".
-  Widget Function(int groupAddOptType, Function(int addOpt) handleActionTap)?
-      groupJoiningModeBar;
+  Widget Function(int groupAddOptType, Function(int addOpt) handleActionTap)? groupJoiningModeBar;
 
   /// Shows and modify the nickname for user in a specific group,
   /// only shows and used in this group, as the name card here.
-  Widget Function(String nameCard, Function(String newName) setNameCard)?
-      nameCardBar;
+  Widget Function(String nameCard, Function(String newName) setNameCard)? nameCardBar;
 
   /// The switch of if mute the message notification from a specific group.
-  Widget Function(bool isMute, Function(bool isMute) setMute)?
-      muteGroupMessageBar;
+  Widget Function(bool isMute, Function(bool isMute) setMute)? muteGroupMessageBar;
 
   /// The switch of if pin this group to the top in conversation list.
-  Widget Function(bool isPined, Function(bool isMute) pinedConversation)?
-      pinedConversationBar;
+  Widget Function(bool isPined, Function(bool isMute) pinedConversation)? pinedConversationBar;
 
   /// The button area, includes
   /// "clear chat history", "transfer group owner", "disband group" and "quit group"
   /// as default.
-  Widget Function(V2TimGroupInfo groupInfo,
-      List<V2TimGroupMemberFullInfo?> groupMemberList)? buttonArea;
+  Widget Function(V2TimGroupInfo groupInfo, List<V2TimGroupMemberFullInfo?> groupMemberList)? buttonArea;
 
   /// Custom area, you may define anything you want here.
-  Widget Function(V2TimGroupInfo groupInfo,
-      List<V2TimGroupMemberFullInfo?> groupMemberList)? customBuilderOne;
+  Widget Function(V2TimGroupInfo groupInfo, List<V2TimGroupMemberFullInfo?> groupMemberList)? customBuilderOne;
 
   /// Custom area, you may define anything you want here.
-  Widget Function(V2TimGroupInfo groupInfo,
-      List<V2TimGroupMemberFullInfo?> groupMemberList)? customBuilderTwo;
+  Widget Function(V2TimGroupInfo groupInfo, List<V2TimGroupMemberFullInfo?> groupMemberList)? customBuilderTwo;
 
   /// Custom area, you may define anything you want here.
-  Widget Function(V2TimGroupInfo groupInfo,
-      List<V2TimGroupMemberFullInfo?> groupMemberList)? customBuilderThree;
+  Widget Function(V2TimGroupInfo groupInfo, List<V2TimGroupMemberFullInfo?> groupMemberList)? customBuilderThree;
 
   /// Custom area, you may define anything you want here.
-  Widget Function(V2TimGroupInfo groupInfo,
-      List<V2TimGroupMemberFullInfo?> groupMemberList)? customBuilderFour;
+  Widget Function(V2TimGroupInfo groupInfo, List<V2TimGroupMemberFullInfo?> groupMemberList)? customBuilderFour;
 
   /// Custom area, you may define anything you want here.
-  Widget Function(V2TimGroupInfo groupInfo,
-      List<V2TimGroupMemberFullInfo?> groupMemberList)? customBuilderFive;
+  Widget Function(V2TimGroupInfo groupInfo, List<V2TimGroupMemberFullInfo?> groupMemberList)? customBuilderFive;
 
   GroupProfileWidgetBuilder(
       {this.detailCard,

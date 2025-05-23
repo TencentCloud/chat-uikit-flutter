@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_application.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_application.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_application.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
@@ -14,25 +15,19 @@ enum ApplicationStatus {
 class TIMUIKitGroupApplicationListItem extends StatefulWidget {
   final V2TimGroupApplication applicationInfo;
 
-  const TIMUIKitGroupApplicationListItem(
-      {Key? key, required this.applicationInfo})
-      : super(key: key);
+  const TIMUIKitGroupApplicationListItem({Key? key, required this.applicationInfo}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() =>
-      TIMUIKitGroupApplicationListItemState();
+  State<StatefulWidget> createState() => TIMUIKitGroupApplicationListItemState();
 }
 
-class TIMUIKitGroupApplicationListItemState
-    extends TIMUIKitState<TIMUIKitGroupApplicationListItem> {
+class TIMUIKitGroupApplicationListItemState extends TIMUIKitState<TIMUIKitGroupApplicationListItem> {
   ApplicationStatus applicationStatus = ApplicationStatus.none;
-
 
   String _getUserName() {
     if (widget.applicationInfo.fromUserNickName != null &&
         widget.applicationInfo.fromUserNickName!.isNotEmpty &&
-        widget.applicationInfo.fromUserNickName !=
-            widget.applicationInfo.fromUser) {
+        widget.applicationInfo.fromUserNickName != widget.applicationInfo.fromUser) {
       return "${widget.applicationInfo.fromUserNickName} (${widget.applicationInfo.fromUser})";
     } else {
       return "${widget.applicationInfo.fromUser}";
@@ -55,26 +50,18 @@ class TIMUIKitGroupApplicationListItemState
               width: 40,
               child: Avatar(
                   faceUrl: widget.applicationInfo.fromUserFaceUrl ?? "",
-                  showName: widget.applicationInfo.fromUserNickName ??
-                      widget.applicationInfo.fromUser ??
-                      ""),
+                  showName: widget.applicationInfo.fromUserNickName ?? widget.applicationInfo.fromUser ?? ""),
             ),
           ),
           Column(
             children: [
               Text(
                 _getUserName(),
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: theme.darkTextColor),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: theme.darkTextColor),
               ),
               Text(
                 _getUserName(),
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: theme.darkTextColor),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: theme.darkTextColor),
               ),
             ],
           )

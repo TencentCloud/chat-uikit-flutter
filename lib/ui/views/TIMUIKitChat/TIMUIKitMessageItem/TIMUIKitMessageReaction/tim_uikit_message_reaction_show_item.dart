@@ -4,10 +4,14 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_change_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_change_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message_change_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_value_callback.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
@@ -45,8 +49,7 @@ class TIMUIKitMessageReactionShowItem extends TIMUIKitStatelessWidget {
       Key? key})
       : super(key: key);
 
-  final TUISelfInfoViewModel selfInfoModel =
-      serviceLocator<TUISelfInfoViewModel>();
+  final TUISelfInfoViewModel selfInfoModel = serviceLocator<TUISelfInfoViewModel>();
   final MessageService _messageService = serviceLocator<MessageService>();
 
   clickOnCurrentSticker() async {
@@ -68,21 +71,20 @@ class TIMUIKitMessageReactionShowItem extends TIMUIKitStatelessWidget {
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final theme = value.theme;
     final option1 = nameList.length;
-    final TUIChatSeparateViewModel model =
-        Provider.of<TUIChatSeparateViewModel>(context);
+    final TUIChatSeparateViewModel model = Provider.of<TUIChatSeparateViewModel>(context);
 
     final List<String> userIDs = [];
     for (final user in nameList) {
-      final V2TimGroupMemberFullInfo? memberInfo = memberList
-          .firstWhereOrNull((element) => element?.userID == user && TencentUtils.checkString(user) != null);
-      if((memberInfo == null || TencentUtils.checkString(memberInfo.userID) == null) && TencentUtils.checkString(user.toString()) != null){
+      final V2TimGroupMemberFullInfo? memberInfo =
+          memberList.firstWhereOrNull((element) => element?.userID == user && TencentUtils.checkString(user) != null);
+      if ((memberInfo == null || TencentUtils.checkString(memberInfo.userID) == null) &&
+          TencentUtils.checkString(user.toString()) != null) {
         userIDs.add(user.toString());
       }
     }
-    if(userIDs.isNotEmpty){
+    if (userIDs.isNotEmpty) {
       model.getUserShowName(userIDs);
     }
-
 
     return LayoutBuilder(builder: (context, constraints) {
       return Container(
@@ -101,14 +103,11 @@ class TIMUIKitMessageReactionShowItem extends TIMUIKitStatelessWidget {
             InkWell(
               onTap: clickOnCurrentSticker,
               child: Container(
-                margin: EdgeInsets.only(
-                    bottom: (!PlatformUtils().isIOS) ? 4 : 2,
-                    top: (!PlatformUtils().isIOS) ? 4 : 0),
+                margin:
+                    EdgeInsets.only(bottom: (!PlatformUtils().isIOS) ? 4 : 2, top: (!PlatformUtils().isIOS) ? 4 : 0),
                 child: Text(
                   String.fromCharCode(sticker),
-                  style: TextStyle(
-                      fontSize: (!PlatformUtils().isIOS) ? 12 : 16,
-                      color: hexToColor("f9453d")),
+                  style: TextStyle(fontSize: (!PlatformUtils().isIOS) ? 12 : 16, color: hexToColor("f9453d")),
                 ),
               ),
             ),
@@ -135,8 +134,7 @@ class TIMUIKitMessageReactionShowItem extends TIMUIKitStatelessWidget {
                     onShowDetail(sticker);
                   },
                   child: Text(
-                    TIM_t_para("...共{{option1}}人", "...共$option1人")(
-                        option1: option1),
+                    TIM_t_para("...共{{option1}}人", "...共$option1人")(option1: option1),
                     style: TextStyle(fontSize: 12, color: hexToColor("616669")),
                   ),
                 ),
@@ -145,36 +143,33 @@ class TIMUIKitMessageReactionShowItem extends TIMUIKitStatelessWidget {
                     String showName = e;
                     if (memberList.isNotEmpty) {
                       try {
-                        final V2TimGroupMemberFullInfo? memberInfo = memberList
-                            .firstWhere((element) => element?.userID == e);
+                        final V2TimGroupMemberFullInfo? memberInfo =
+                            memberList.firstWhere((element) => element?.userID == e);
                         if (memberInfo != null) {
-                          if (memberInfo.friendRemark != null &&
-                              memberInfo.friendRemark!.isNotEmpty) {
+                          if (memberInfo.friendRemark != null && memberInfo.friendRemark!.isNotEmpty) {
                             showName = memberInfo.friendRemark!;
-                          } else if (memberInfo.nameCard != null &&
-                              memberInfo.nameCard!.isNotEmpty) {
+                          } else if (memberInfo.nameCard != null && memberInfo.nameCard!.isNotEmpty) {
                             showName = memberInfo.nameCard!;
-                          } else if (memberInfo.nickName != null &&
-                              memberInfo.nickName!.isNotEmpty) {
+                          } else if (memberInfo.nickName != null && memberInfo.nickName!.isNotEmpty) {
                             showName = memberInfo.nickName!;
                           } else {
                             showName = memberInfo.userID;
                           }
-                        }else{
+                        } else {
                           final String? data = model.groupUserShowName[e];
-                          if(TencentUtils.checkString(data) != null){
+                          if (TencentUtils.checkString(data) != null) {
                             showName = data ?? e;
                           }
                         }
                       } catch (error) {
                         final String? data = model.groupUserShowName[e];
-                        if(TencentUtils.checkString(data) != null){
+                        if (TencentUtils.checkString(data) != null) {
                           showName = data ?? e;
                         }
                       }
-                    }else{
+                    } else {
                       final String? data = model.groupUserShowName[e];
-                      if(TencentUtils.checkString(data) != null){
+                      if (TencentUtils.checkString(data) != null) {
                         showName = data ?? e;
                       }
                     }
@@ -188,8 +183,7 @@ class TIMUIKitMessageReactionShowItem extends TIMUIKitStatelessWidget {
                       },
                       child: Text(
                         showName,
-                        style: TextStyle(
-                            fontSize: 12, color: hexToColor("616669")),
+                        style: TextStyle(fontSize: 12, color: hexToColor("616669")),
                       ),
                     );
                   })

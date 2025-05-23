@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
 import 'package:tencent_cloud_chat_sdk/enum/group_type.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_info.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
@@ -23,14 +25,11 @@ class TIMUIKitAddGroup extends StatefulWidget {
   final AddGroupLifeCycle? lifeCycle;
 
   /// Navigate to group chat, if user is already a member of the current group.
-  final Function(String groupID, V2TimConversation conversation)
-      onTapExistGroup;
+  final Function(String groupID, V2TimConversation conversation) onTapExistGroup;
 
   final VoidCallback? closeFunc;
 
-  const TIMUIKitAddGroup(
-      {Key? key, this.lifeCycle, required this.onTapExistGroup, this.closeFunc})
-      : super(key: key);
+  const TIMUIKitAddGroup({Key? key, this.lifeCycle, required this.onTapExistGroup, this.closeFunc}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _TIMUIKitAddGroupState();
@@ -39,10 +38,8 @@ class TIMUIKitAddGroup extends StatefulWidget {
 class _TIMUIKitAddGroupState extends TIMUIKitState<TIMUIKitAddGroup> {
   final TextEditingController _controller = TextEditingController();
   final GroupServices _groupServices = serviceLocator<GroupServices>();
-  final ConversationService _conversationService =
-      serviceLocator<ConversationService>();
-  final TUIFriendShipViewModel friendShipViewModel =
-      serviceLocator<TUIFriendShipViewModel>();
+  final ConversationService _conversationService = serviceLocator<ConversationService>();
+  final TUIFriendShipViewModel friendShipViewModel = serviceLocator<TUIFriendShipViewModel>();
   List<V2TimGroupInfo>? _addedGroupList;
   List<V2TimGroupInfo>? groupResult = [];
   final FocusNode _focusNode = FocusNode();
@@ -79,24 +76,19 @@ class _TIMUIKitAddGroupState extends TIMUIKitState<TIMUIKitAddGroup> {
     final groupID = groupInfo.groupID;
     final showName = groupInfo.groupName ?? groupID;
     final groupType = _getGroupType(groupInfo.groupType);
-    final isDesktopScreen =
-        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     return InkWell(
       onTap: () async {
-        final V2TimConversation? groupConversation =
-            await getGroupConversation(groupID);
+        final V2TimConversation? groupConversation = await getGroupConversation(groupID);
         if (groupConversation != null) {
-          onTIMCallback(TIMCallback(
-              type: TIMCallbackType.INFO,
-              infoRecommendText: TIM_t("您已是群成员"),
-              infoCode: 6660202));
+          onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("您已是群成员"), infoCode: 6660202));
           if (widget.closeFunc != null) {
             widget.closeFunc!();
           }
           return;
         }
 
-        if(isDesktopScreen){
+        if (isDesktopScreen) {
           if (widget.closeFunc != null) {
             widget.closeFunc!();
           }
@@ -107,20 +99,19 @@ class _TIMUIKitAddGroupState extends TIMUIKitState<TIMUIKitAddGroup> {
             height: MediaQuery.of(context).size.width * 0.4,
             title: TIM_t("添加群聊"),
             child: (closeFuncSendApplication) => SendJoinGroupApplication(
-                lifeCycle: widget.lifeCycle,
-                groupInfo: groupInfo,
+              lifeCycle: widget.lifeCycle,
+              groupInfo: groupInfo,
             ),
           );
-        }else{
+        } else {
           Navigator.push(
               context,
               MaterialPageRoute(
                   builder: (context) => SendJoinGroupApplication(
-                    lifeCycle: widget.lifeCycle,
-                    groupInfo: groupInfo,
-                  )));
+                        lifeCycle: widget.lifeCycle,
+                        groupInfo: groupInfo,
+                      )));
         }
-
       },
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -156,24 +147,19 @@ class _TIMUIKitAddGroupState extends TIMUIKitState<TIMUIKitAddGroup> {
     );
   }
 
-  List<Widget> _searchResultBuilder(
-      List<V2TimGroupInfo>? searchResult, TUITheme theme) {
+  List<Widget> _searchResultBuilder(List<V2TimGroupInfo>? searchResult, TUITheme theme) {
     final noResult = searchResult != null && searchResult.isEmpty;
     if (noResult) {
       return [
         Container(
           margin: const EdgeInsets.only(top: 20),
           child: Center(
-            child: Text(TIM_t("该群聊不存在"),
-                style: TextStyle(color: theme.weakTextColor, fontSize: 14)),
+            child: Text(TIM_t("该群聊不存在"), style: TextStyle(color: theme.weakTextColor, fontSize: 14)),
           ),
         )
       ];
     }
-    return searchResult
-            ?.map((e) => _searchResultItemBuilder(e, theme))
-            .toList() ??
-        [];
+    return searchResult?.map((e) => _searchResultItemBuilder(e, theme)).toList() ?? [];
   }
 
   Future<V2TimConversation?> getGroupConversation(String groupID) async {
@@ -186,15 +172,12 @@ class _TIMUIKitAddGroupState extends TIMUIKitState<TIMUIKitAddGroup> {
           })) !=
           null) {
         V2TimConversation? conversation;
-        conversation = await _conversationService
-            .getConversationListByConversationId(convID: "group_$groupID");
+        conversation = await _conversationService.getConversationListByConversationId(convID: "group_$groupID");
         if (conversation == null) {
           await friendShipViewModel.loadGroupListData();
-          if (friendShipViewModel.groupList
-                  .indexWhere((element) => element.groupID == groupID) >
-              -1) {
-            final V2TimGroupInfo groupInfo = friendShipViewModel.groupList
-                .firstWhere((element) => element.groupID == groupID);
+          if (friendShipViewModel.groupList.indexWhere((element) => element.groupID == groupID) > -1) {
+            final V2TimGroupInfo groupInfo =
+                friendShipViewModel.groupList.firstWhere((element) => element.groupID == groupID);
             conversation = V2TimConversation(
               conversationID: "group_$groupID",
               type: 2,
@@ -237,10 +220,7 @@ class _TIMUIKitAddGroupState extends TIMUIKitState<TIMUIKitAddGroup> {
     final res = await _groupServices.getGroupsInfo(groupIDList: [params]);
     if (res != null) {
       setState(() {
-        groupResult = res
-            .where((e) => e.resultCode == 0)
-            .map((e) => e.groupInfo!)
-            .toList();
+        groupResult = res.where((e) => e.resultCode == 0).map((e) => e.groupInfo!).toList();
       });
     } else {
       setState(() {

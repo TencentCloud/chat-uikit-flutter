@@ -7,7 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
 import 'package:tencent_cloud_chat_sdk/enum/group_member_role.dart';
 import 'package:tencent_cloud_chat_sdk/enum/group_type.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_full_info.dart';
 import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
@@ -45,7 +46,11 @@ class GroupProfileGroupManageState extends TIMUIKitState<GroupProfileGroupManage
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(color: Colors.white, border: isDesktopScreen ? null : Border(bottom: BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          border: isDesktopScreen
+              ? null
+              : Border(bottom: BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
       child: Column(
         children: [
           InkWell(
@@ -121,7 +126,10 @@ class _GroupProfileGroupManagePageState extends TIMUIKitState<GroupProfileGroupM
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     return MultiProvider(
-        providers: [ChangeNotifierProvider.value(value: widget.model), ChangeNotifierProvider.value(value: serviceLocator<TUIThemeViewModel>())],
+        providers: [
+          ChangeNotifierProvider.value(value: widget.model),
+          ChangeNotifierProvider.value(value: serviceLocator<TUIThemeViewModel>())
+        ],
         builder: (context, w) {
           final memberList = Provider.of<TUIGroupProfileModel>(context).groupMemberList;
           final theme = Provider.of<TUIThemeViewModel>(context).theme;
@@ -133,8 +141,16 @@ class _GroupProfileGroupManagePageState extends TIMUIKitState<GroupProfileGroupM
             return Column(
               children: [
                 Container(
-                  padding: EdgeInsets.only(top: 12, left: isDesktopScreen ? 0 : 16, bottom: isDesktopScreen ? 0 : 12, right: isDesktopScreen ? 0 : 12),
-                  decoration: BoxDecoration(color: Colors.white, border: isDesktopScreen ? null : Border(bottom: BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
+                  padding: EdgeInsets.only(
+                      top: 12,
+                      left: isDesktopScreen ? 0 : 16,
+                      bottom: isDesktopScreen ? 0 : 12,
+                      right: isDesktopScreen ? 0 : 12),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      border: isDesktopScreen
+                          ? null
+                          : Border(bottom: BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
                   child: InkWell(
                     onTap: isDesktopScreen
                         ? null
@@ -156,7 +172,11 @@ class _GroupProfileGroupManagePageState extends TIMUIKitState<GroupProfileGroupM
                           )
                         : Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [Text(TIM_t("设置管理员"), style: TextStyle(fontSize: isDesktopScreen ? 14 : 16, color: theme.darkTextColor)), Icon(Icons.keyboard_arrow_right, color: theme.weakTextColor)],
+                            children: [
+                              Text(TIM_t("设置管理员"),
+                                  style: TextStyle(fontSize: isDesktopScreen ? 14 : 16, color: theme.darkTextColor)),
+                              Icon(Icons.keyboard_arrow_right, color: theme.weakTextColor)
+                            ],
                           ),
                   ),
                 ),
@@ -167,7 +187,10 @@ class _GroupProfileGroupManagePageState extends TIMUIKitState<GroupProfileGroupM
                 if (!isDesktopScreen)
                   Container(
                     padding: const EdgeInsets.only(top: 12, left: 16, bottom: 12, right: 12),
-                    decoration: BoxDecoration(color: Colors.white, border: Border(bottom: BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        border:
+                            Border(bottom: BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -229,7 +252,13 @@ class _GroupProfileGroupManagePageState extends TIMUIKitState<GroupProfileGroupM
                               : const EdgeInsets.only(
                                   bottom: 4,
                                 ),
-                          decoration: isDesktopScreen ? null : BoxDecoration(color: Colors.white, border: Border(bottom: BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
+                          decoration: isDesktopScreen
+                              ? null
+                              : BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border(
+                                      bottom:
+                                          BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
                           child: Row(
                             children: [
                               Icon(
@@ -293,7 +322,9 @@ class _GroupProfileGroupManagePageState extends TIMUIKitState<GroupProfileGroupM
                                     isDarkBackground: false,
                                     borderRadius: const BorderRadius.all(Radius.circular(4)),
                                     context: context,
-                                    offset: Offset(min(details.globalPosition.dx, MediaQuery.of(context).size.width - 80), details.globalPosition.dy),
+                                    offset: Offset(
+                                        min(details.globalPosition.dx, MediaQuery.of(context).size.width - 80),
+                                        details.globalPosition.dy),
                                     child: (onClose) => TUIKitColumnMenu(data: [
                                           ColumnMenuItem(
                                               label: TIM_t("删除"),
@@ -408,7 +439,10 @@ Widget _buildListItem(BuildContext context, V2TimGroupMemberFullInfo memberInfo,
     );
   }
 
-  return TUIKitScreenUtils.getDeviceWidget(context: context, desktopWidget: nameItem(), defaultWidget: SingleChildScrollView(child: Slidable(endActionPane: endActionPane, child: nameItem())));
+  return TUIKitScreenUtils.getDeviceWidget(
+      context: context,
+      desktopWidget: nameItem(),
+      defaultWidget: SingleChildScrollView(child: Slidable(endActionPane: endActionPane, child: nameItem())));
 }
 
 /// 选择管理员
@@ -509,7 +543,12 @@ class _GroupProfileSetManagerPageState extends TIMUIKitState<GroupProfileSetMana
                       padding: const EdgeInsets.symmetric(
                         vertical: 12,
                       ),
-                      decoration: isDesktopScreen ? null : BoxDecoration(color: Colors.white, border: Border(bottom: BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
+                      decoration: isDesktopScreen
+                          ? null
+                          : BoxDecoration(
+                              color: Colors.white,
+                              border: Border(
+                                  bottom: BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
                       child: Row(
                         children: [
                           Icon(
@@ -537,7 +576,10 @@ class _GroupProfileSetManagerPageState extends TIMUIKitState<GroupProfileSetMana
                         },
                         child: (onClose) => GroupProfileAddAdmin(
                               key: groupProfileAddAdminKey,
-                              memberList: memberList.where((element) => element?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_MEMBER).toList(),
+                              memberList: memberList
+                                  .where(
+                                      (element) => element?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_MEMBER)
+                                  .toList(),
                               appbarTitle: TIM_t("设置管理员"),
                               selectCompletedHandler: (context, selectedMember) async {
                                 if (selectedMember.isNotEmpty) {
@@ -554,7 +596,10 @@ class _GroupProfileSetManagerPageState extends TIMUIKitState<GroupProfileSetMana
                         MaterialPageRoute(
                             builder: (context) => GroupProfileAddAdmin(
                                   key: groupProfileAddAdminKey,
-                                  memberList: memberList.where((element) => element?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_MEMBER).toList(),
+                                  memberList: memberList
+                                      .where((element) =>
+                                          element?.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_MEMBER)
+                                      .toList(),
                                   appbarTitle: TIM_t("设置管理员"),
                                   selectCompletedHandler: (context, selectedMember) async {
                                     if (selectedMember.isNotEmpty) {
@@ -576,7 +621,8 @@ class _GroupProfileSetManagerPageState extends TIMUIKitState<GroupProfileSetMana
                               isDarkBackground: false,
                               borderRadius: const BorderRadius.all(Radius.circular(4)),
                               context: context,
-                              offset: Offset(min(details.globalPosition.dx, MediaQuery.of(context).size.width - 80), details.globalPosition.dy),
+                              offset: Offset(min(details.globalPosition.dx, MediaQuery.of(context).size.width - 80),
+                                  details.globalPosition.dy),
                               child: (onClose) => TUIKitColumnMenu(data: [
                                     ColumnMenuItem(
                                         label: TIM_t("删除"),
@@ -638,7 +684,9 @@ class GroupProfileAddAdmin extends StatefulWidget {
   final String appbarTitle;
   final void Function(BuildContext context, List<V2TimGroupMemberFullInfo?> selectedMemberList)? selectCompletedHandler;
 
-  const GroupProfileAddAdmin({Key? key, required this.memberList, this.selectCompletedHandler, required this.appbarTitle}) : super(key: key);
+  const GroupProfileAddAdmin(
+      {Key? key, required this.memberList, this.selectCompletedHandler, required this.appbarTitle})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _GroupProfileAddAdminState();
@@ -672,7 +720,10 @@ class _GroupProfileAddAdminState extends TIMUIKitState<GroupProfileAddAdmin> {
           ),
           ...widget.memberList
               .map((e) => Container(
-                    decoration: BoxDecoration(color: Colors.white, border: Border(bottom: BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
+                    decoration: BoxDecoration(
+                        color: Colors.white,
+                        border:
+                            Border(bottom: BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                     child: InkWell(
                       onTap: () {

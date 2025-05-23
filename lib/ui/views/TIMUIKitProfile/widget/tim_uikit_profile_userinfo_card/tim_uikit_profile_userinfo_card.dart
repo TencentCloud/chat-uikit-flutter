@@ -1,7 +1,8 @@
 // ignore_for_file: deprecated_member_use_from_same_package
 
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_user_full_info.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitProfile/widget/tim_uikit_profile_userinfo_card/tim_uikit_profile_userinfo_card_narrow.dart';
@@ -19,8 +20,9 @@ class TIMUIKitProfileUserInfoCard extends StatelessWidget {
   const TIMUIKitProfileUserInfoCard(
       {Key? key,
       this.userInfo,
-      @Deprecated("This info card can no longer navigate to default personal profile page automatically, please deal with it manually.")
-          this.isJumpToPersonalProfile = false,
+      @Deprecated(
+          "This info card can no longer navigate to default personal profile page automatically, please deal with it manually.")
+      this.isJumpToPersonalProfile = false,
       this.showArrowRightIcon = false,
       this.onClickAvatar})
       : super(key: key);

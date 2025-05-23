@@ -2,8 +2,10 @@ import 'package:azlistview_all_platforms/azlistview_all_platforms.dart';
 import 'package:flutter/material.dart';
 import 'package:lpinyin/lpinyin.dart';
 import 'package:provider/provider.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_info.dart';
 import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
@@ -16,24 +18,17 @@ import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/theme/color.dart';
 import 'package:tencent_cloud_chat_uikit/theme/tui_theme_view_model.dart';
 
-typedef GroupItemBuilder = Widget Function(
-    BuildContext context, V2TimGroupInfo groupInfo);
+typedef GroupItemBuilder = Widget Function(BuildContext context, V2TimGroupInfo groupInfo);
 
 class TIMUIKitGroup extends StatefulWidget {
-  final void Function(V2TimGroupInfo groupInfo, V2TimConversation conversation)?
-      onTapItem;
+  final void Function(V2TimGroupInfo groupInfo, V2TimConversation conversation)? onTapItem;
   final Widget Function(BuildContext context)? emptyBuilder;
   final GroupItemBuilder? itemBuilder;
 
   /// the filter for group conversation
   final bool Function(V2TimGroupInfo? groupInfo)? groupCollector;
 
-  const TIMUIKitGroup(
-      {Key? key,
-      this.onTapItem,
-      this.emptyBuilder,
-      this.itemBuilder,
-      this.groupCollector})
+  const TIMUIKitGroup({Key? key, this.onTapItem, this.emptyBuilder, this.itemBuilder, this.groupCollector})
       : super(key: key);
 
   @override
@@ -41,15 +36,11 @@ class TIMUIKitGroup extends StatefulWidget {
 }
 
 class _TIMUIKitGroupState extends TIMUIKitState<TIMUIKitGroup> {
-  final TUIFriendShipViewModel _friendshipViewModel =
-      serviceLocator<TUIFriendShipViewModel>();
-  final TUIGroupListenerModel _groupListenerModel =
-      serviceLocator<TUIGroupListenerModel>();
+  final TUIFriendShipViewModel _friendshipViewModel = serviceLocator<TUIFriendShipViewModel>();
+  final TUIGroupListenerModel _groupListenerModel = serviceLocator<TUIGroupListenerModel>();
 
-  List<ISuspensionBeanImpl<V2TimGroupInfo>> _getShowList(
-      List<V2TimGroupInfo> groupList) {
-    final List<ISuspensionBeanImpl<V2TimGroupInfo>> showList =
-        List.empty(growable: true);
+  List<ISuspensionBeanImpl<V2TimGroupInfo>> _getShowList(List<V2TimGroupInfo> groupList) {
+    final List<ISuspensionBeanImpl<V2TimGroupInfo>> showList = List.empty(growable: true);
     for (var i = 0; i < groupList.length; i++) {
       final item = groupList[i];
 
@@ -72,14 +63,10 @@ class _TIMUIKitGroupState extends TIMUIKitState<TIMUIKitGroup> {
     final theme = Provider.of<TUIThemeViewModel>(context).theme;
     final showName = groupInfo.groupName ?? groupInfo.groupID;
     final faceUrl = groupInfo.faceUrl ?? "";
-    final isDesktopScreen =
-        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     return Container(
       decoration: BoxDecoration(
-          border: Border(
-              bottom: BorderSide(
-                  color:
-                      theme.weakDividerColor ?? CommonColor.weakDividerColor))),
+          border: Border(bottom: BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
       child: Material(
         color: isDesktopScreen ? theme.wideBackgroundColor : null,
         child: InkWell(
@@ -93,10 +80,9 @@ class _TIMUIKitGroupState extends TIMUIKitState<TIMUIKitGroup> {
                 groupType: groupInfo.groupType,
                 faceUrl: groupInfo.faceUrl,
               );
-              final res = await TencentImSDKPlugin
-                  .v2TIMManager.getConversationManager()
-                  .getConversation(
-                      conversationID: "group_${groupInfo.groupID}");
+              final res = await TencentImSDKPlugin.v2TIMManager
+                  .getConversationManager()
+                  .getConversation(conversationID: "group_${groupInfo.groupID}");
               if (res.code == 0 && res.data != null) {
                 conversation = res.data!;
               }
@@ -126,8 +112,7 @@ class _TIMUIKitGroupState extends TIMUIKitState<TIMUIKitGroup> {
                   padding: const EdgeInsets.only(top: 10, bottom: 20),
                   child: Text(
                     showName,
-                    style: TextStyle(
-                        color: Colors.black, fontSize: isDesktopScreen ? 14 : 18),
+                    style: TextStyle(color: Colors.black, fontSize: isDesktopScreen ? 14 : 18),
                   ),
                 ))
               ],
@@ -154,12 +139,10 @@ class _TIMUIKitGroupState extends TIMUIKitState<TIMUIKitGroup> {
       providers: [
         ChangeNotifierProvider.value(value: _friendshipViewModel),
         ChangeNotifierProvider.value(value: _groupListenerModel),
-        ChangeNotifierProvider.value(
-            value: serviceLocator<TUIThemeViewModel>()),
+        ChangeNotifierProvider.value(value: serviceLocator<TUIThemeViewModel>()),
       ],
       builder: (BuildContext context, Widget? w) {
-        final NeedUpdate? needUpdate =
-            Provider.of<TUIGroupListenerModel>(context).needUpdate;
+        final NeedUpdate? needUpdate = Provider.of<TUIGroupListenerModel>(context).needUpdate;
         if (needUpdate != null) {
           _groupListenerModel.needUpdate = null;
           switch (needUpdate.updateType) {
@@ -173,8 +156,7 @@ class _TIMUIKitGroupState extends TIMUIKitState<TIMUIKitGroup> {
               break;
           }
         }
-        List<V2TimGroupInfo> groupList =
-            Provider.of<TUIFriendShipViewModel>(context).groupList;
+        List<V2TimGroupInfo> groupList = Provider.of<TUIFriendShipViewModel>(context).groupList;
         if (widget.groupCollector != null) {
           groupList = groupList.where(widget.groupCollector!).toList();
         }

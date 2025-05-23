@@ -4,7 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_info.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_group_profile_model.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
@@ -19,11 +20,7 @@ class GroupProfileDetailCard extends TIMUIKitStatelessWidget {
   final TextEditingController controller = TextEditingController();
   final bool isHavePermission;
 
-  GroupProfileDetailCard(
-      {Key? key,
-      required this.groupInfo,
-      this.isHavePermission = false,
-      this.updateGroupName})
+  GroupProfileDetailCard({Key? key, required this.groupInfo, this.isHavePermission = false, this.updateGroupName})
       : super(key: key);
 
   @override
@@ -33,8 +30,7 @@ class GroupProfileDetailCard extends TIMUIKitStatelessWidget {
     final faceUrl = groupInfo.faceUrl ?? "";
     final groupID = groupInfo.groupID;
     final showName = groupInfo.groupName ?? groupID;
-    final isDesktopScreen =
-        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
 
     return InkWell(
       onTapDown: !isHavePermission
@@ -45,11 +41,8 @@ class GroupProfileDetailCard extends TIMUIKitStatelessWidget {
                     context: context,
                     title: TIM_t("修改群名称"),
                     initText: showName,
-                    initOffset: Offset(
-                        min(details.globalPosition.dx,
-                            MediaQuery.of(context).size.width - 350),
-                        min(details.globalPosition.dy + 20,
-                            MediaQuery.of(context).size.height - 470)),
+                    initOffset: Offset(min(details.globalPosition.dx, MediaQuery.of(context).size.width - 350),
+                        min(details.globalPosition.dy + 20, MediaQuery.of(context).size.height - 470)),
                     onSubmitted: (String newText) async {
                       final text = newText.trim();
                       if (updateGroupName != null) {
@@ -88,31 +81,25 @@ class GroupProfileDetailCard extends TIMUIKitStatelessWidget {
                                       decoration: const BoxDecoration(
                                           color: Colors.white,
                                           borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(10.0),
-                                              topRight: Radius.circular(10.0))),
+                                              topLeft: Radius.circular(10.0), topRight: Radius.circular(10.0))),
                                       child: Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Container(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 20),
+                                            padding: const EdgeInsets.symmetric(vertical: 20),
                                             child: Text(TIM_t("修改群名称")),
                                           ),
-                                          Divider(
-                                              height: 2,
-                                              color: theme.weakDividerColor),
+                                          Divider(height: 2, color: theme.weakDividerColor),
                                           Padding(
                                             padding: const EdgeInsets.all(20),
                                             child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
                                                 TextField(
                                                   controller: controller,
                                                   decoration: InputDecoration(
                                                       border: InputBorder.none,
-                                                      fillColor: theme
-                                                          .weakBackgroundColor,
+                                                      fillColor: theme.weakBackgroundColor,
                                                       filled: true,
                                                       isDense: true,
                                                       hintText: ''),
@@ -122,10 +109,7 @@ class GroupProfileDetailCard extends TIMUIKitStatelessWidget {
                                                 ),
                                                 Text(
                                                   TIM_t("修改群名称"),
-                                                  style: TextStyle(
-                                                      fontSize: 13,
-                                                      color:
-                                                          theme.weakTextColor),
+                                                  style: TextStyle(fontSize: 13, color: theme.weakTextColor),
                                                   textAlign: TextAlign.left,
                                                 ),
                                                 const SizedBox(
@@ -135,16 +119,11 @@ class GroupProfileDetailCard extends TIMUIKitStatelessWidget {
                                                     width: double.infinity,
                                                     child: ElevatedButton(
                                                       onPressed: () {
-                                                        final text = controller
-                                                            .text
-                                                            .trim();
-                                                        if (updateGroupName !=
-                                                            null) {
-                                                          updateGroupName!(
-                                                              text);
+                                                        final text = controller.text.trim();
+                                                        if (updateGroupName != null) {
+                                                          updateGroupName!(text);
                                                         } else {
-                                                          model.setGroupName(
-                                                              text);
+                                                          model.setGroupName(text);
                                                         }
                                                         Navigator.pop(context);
                                                         Navigator.pop(context);
@@ -155,11 +134,8 @@ class GroupProfileDetailCard extends TIMUIKitStatelessWidget {
                                                   height: 20,
                                                 ),
                                                 Padding(
-                                                  padding: EdgeInsets.only(
-                                                      bottom:
-                                                          MediaQuery.of(context)
-                                                              .viewInsets
-                                                              .bottom),
+                                                  padding:
+                                                      EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
                                                 )
                                               ],
                                             ),
@@ -209,17 +185,13 @@ class GroupProfileDetailCard extends TIMUIKitStatelessWidget {
                   children: [
                     SelectableText(
                       showName,
-                      style: TextStyle(
-                          fontSize: isDesktopScreen ? 15 : 18,
-                          fontWeight: FontWeight.w600),
+                      style: TextStyle(fontSize: isDesktopScreen ? 15 : 18, fontWeight: FontWeight.w600),
                     ),
                     SizedBox(
                       height: isDesktopScreen ? 4 : 8,
                     ),
                     SelectableText("ID: $groupID",
-                        style: TextStyle(
-                            fontSize: isDesktopScreen ? 13 : 13,
-                            color: theme.weakTextColor))
+                        style: TextStyle(fontSize: isDesktopScreen ? 13 : 13, color: theme.weakTextColor))
                   ],
                 ),
               ),

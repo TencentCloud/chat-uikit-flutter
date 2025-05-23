@@ -35,10 +35,8 @@ abstract class TIMState<T extends StatefulWidget> extends State<T> {
   
   @override
   Widget build(BuildContext context) {
-    final onFlutterError = FlutterError.onError;
     FlutterError.onError = (FlutterErrorDetails details) {
       FlutterError.presentError(details);
-      // onFlutterError?.call(details);
       onTIMCallback(TIMCallback(
           type: TIMCallbackType.FLUTTER_ERROR,
           stackTrace: details.stack,

@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
 import 'package:tencent_cloud_chat_sdk/enum/group_member_filter_enum.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_search_param.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_search_result.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_search_param.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_search_param.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_search_result.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_search_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_value_callback.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
@@ -56,16 +60,13 @@ class _SelectCallInviterState extends TIMUIKitState<SelectCallInviter> {
     return searchText != null && searchText != "";
   }
 
-  Future<void> _loadGroupMemberList(
-      {required String groupID, int count = 100, String? seq}) async {
+  Future<void> _loadGroupMemberList({required String groupID, int count = 100, String? seq}) async {
     if (seq == null || seq == "" || seq == "0") {
       _groupMemberList = [];
     }
-    final String? nextSeq = await _loadGroupMemberListFunction(
-        groupID: groupID, seq: seq, count: count);
+    final String? nextSeq = await _loadGroupMemberListFunction(groupID: groupID, seq: seq, count: count);
     if (nextSeq != null && nextSeq != "0" && nextSeq != "") {
-      return await _loadGroupMemberList(
-          groupID: groupID, count: count, seq: nextSeq);
+      return await _loadGroupMemberList(groupID: groupID, count: count, seq: nextSeq);
     } else {
       setState(() {
         _groupMemberList = _groupMemberList;
@@ -75,8 +76,7 @@ class _SelectCallInviterState extends TIMUIKitState<SelectCallInviter> {
     }
   }
 
-  Future<String?> _loadGroupMemberListFunction(
-      {required String groupID, int count = 100, String? seq}) async {
+  Future<String?> _loadGroupMemberListFunction({required String groupID, int count = 100, String? seq}) async {
     if (seq == "0") {
       _groupMemberList?.clear();
     }
@@ -96,8 +96,7 @@ class _SelectCallInviterState extends TIMUIKitState<SelectCallInviter> {
 
   Future<V2TimValueCallback<V2GroupMemberInfoSearchResult>> searchGroupMember(
       V2TimGroupMemberSearchParam searchParam) async {
-    final res =
-        await _groupServices.searchGroupMembers(searchParam: searchParam);
+    final res = await _groupServices.searchGroupMembers(searchParam: searchParam);
 
     if (res.code == 0) {}
     return res;
@@ -131,8 +130,7 @@ class _SelectCallInviterState extends TIMUIKitState<SelectCallInviter> {
     }
     setState(() {
       loading = false;
-      searchMemberList =
-          isSearchTextExist(searchText) ? currentGroupMember : _groupMemberList;
+      searchMemberList = isSearchTextExist(searchText) ? currentGroupMember : _groupMemberList;
     });
   }
 
@@ -146,8 +144,7 @@ class _SelectCallInviterState extends TIMUIKitState<SelectCallInviter> {
           iconTheme: IconThemeData(
             color: theme.appbarTextColor,
           ),
-          backgroundColor: theme.appbarBgColor ??
-              theme.primaryColor,
+          backgroundColor: theme.appbarBgColor ?? theme.primaryColor,
           leading: TextButton(
             onPressed: () {
               Navigator.pop(context);
@@ -191,12 +188,10 @@ class _SelectCallInviterState extends TIMUIKitState<SelectCallInviter> {
                 customTopArea: PlatformUtils().isWeb
                     ? null
                     : GroupMemberSearchTextField(
-                        onTextChange: (text) =>
-                            handleSearchGroupMembers(text, context),
+                        onTextChange: (text) => handleSearchGroupMembers(text, context),
                       ),
                 memberList: (searchMemberList ?? [])
-                    .where((element) =>
-                        element?.userID != _coreServicesImpl.loginInfo.userID)
+                    .where((element) => element?.userID != _coreServicesImpl.loginInfo.userID)
                     .toList(),
                 canSlideDelete: false,
                 canSelectMember: true,

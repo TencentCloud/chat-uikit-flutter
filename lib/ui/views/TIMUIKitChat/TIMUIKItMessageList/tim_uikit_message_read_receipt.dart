@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_receipt.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_receipt.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message_receipt.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
@@ -17,9 +19,7 @@ class TIMUIKitMessageReadReceipt extends TIMUIKitStatelessWidget {
   final V2TimMessage messageItem;
   final void Function(String, TapDownDetails tapDetails)? onTapAvatar;
 
-  TIMUIKitMessageReadReceipt(
-      {Key? key, this.onTapAvatar, required this.messageItem})
-      : super(key: key);
+  TIMUIKitMessageReadReceipt({Key? key, this.onTapAvatar, required this.messageItem}) : super(key: key);
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
@@ -47,7 +47,7 @@ class TIMUIKitMessageReadReceipt extends TIMUIKitStatelessWidget {
             behavior: HitTestBehavior.opaque,
             onTap: () {
               if ((value?.readCount ?? 0) > 0) {
-                if(isDesktopScreen){
+                if (isDesktopScreen) {
                   TUIKitWidePopup.showPopupWindow(
                       operationKey: TUIKitWideModalOperationKey.messageReadDetails,
                       context: context,
@@ -59,8 +59,7 @@ class TIMUIKitMessageReadReceipt extends TIMUIKitStatelessWidget {
                           onTapAvatar: onTapAvatar,
                           messageItem: messageItem,
                           unreadCount: value?.unreadCount ?? 0,
-                          readCount: value?.readCount ?? 0)
-                  );
+                          readCount: value?.readCount ?? 0));
                 } else {
                   if (value?.unreadCount == 0) {
                     return;
@@ -78,8 +77,7 @@ class TIMUIKitMessageReadReceipt extends TIMUIKitStatelessWidget {
               }
             },
             child: Container(
-              padding: EdgeInsets.only(
-                  bottom: 3, right: 6, left: 6, top: isDesktopScreen ? 2 : 6),
+              padding: EdgeInsets.only(bottom: 3, right: 6, left: 6, top: isDesktopScreen ? 2 : 6),
               child: ((value?.unreadCount ?? 0) == 0 && (value?.readCount ?? 0) > 0)
                   ? Icon(
                       Icons.check_circle_outline,
@@ -94,15 +92,12 @@ class TIMUIKitMessageReadReceipt extends TIMUIKitStatelessWidget {
                           shape: BoxShape.circle,
                           border: Border.all(
                               width: 1.3,
-                              color: (value?.readCount ?? 0) > 0
-                                  ? theme.primaryColor!
-                                  : theme.weakTextColor!)),
+                              color: (value?.readCount ?? 0) > 0 ? theme.primaryColor! : theme.weakTextColor!)),
                       child: (value?.readCount ?? 0) > 0
                           ? Text(
                               '${value?.readCount ?? 0}',
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  fontSize: 8, color: theme.primaryColor),
+                              style: TextStyle(fontSize: 8, color: theme.primaryColor),
                             )
                           : null,
                     ),

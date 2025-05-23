@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_full_info.dart';
 
-enum ActionType {
-  hideAllPanel,
-  longPressToAt,
-  setTextField,
-  requestFocus,
-  handleAtMember
-}
+enum ActionType { hideAllPanel, longPressToAt, setTextField, requestFocus, handleAtMember }
 
 class TIMUIKitInputTextFieldController extends ChangeNotifier {
   TextEditingController? textEditingController = TextEditingController();

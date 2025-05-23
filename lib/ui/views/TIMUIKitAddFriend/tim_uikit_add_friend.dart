@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
 import 'package:tencent_cloud_chat_sdk/enum/friend_type_enum.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_user_full_info.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_wide_modal_operation_key.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/wide_popup.dart';
@@ -44,32 +45,24 @@ class TIMUIKitAddFriend extends StatefulWidget {
 class _TIMUIKitAddFriendState extends TIMUIKitState<TIMUIKitAddFriend> {
   final TextEditingController _controller = TextEditingController();
   final CoreServicesImpl _coreServicesImpl = serviceLocator<CoreServicesImpl>();
-  final FriendshipServices _friendshipServices =
-      serviceLocator<FriendshipServices>();
-  final TUISelfInfoViewModel _selfInfoViewModel =
-      serviceLocator<TUISelfInfoViewModel>();
+  final FriendshipServices _friendshipServices = serviceLocator<FriendshipServices>();
+  final TUISelfInfoViewModel _selfInfoViewModel = serviceLocator<TUISelfInfoViewModel>();
   final FocusNode _focusNode = FocusNode();
   bool isFocused = false;
   bool showResult = false;
   List<V2TimUserFullInfo>? searchResult;
 
-  Widget _searchResultItemBuilder(
-      V2TimUserFullInfo friendInfo, TUITheme theme) {
-    final isDesktopScreen =
-        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+  Widget _searchResultItemBuilder(V2TimUserFullInfo friendInfo, TUITheme theme) {
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
 
     final faceUrl = friendInfo.faceUrl ?? "";
     final userID = friendInfo.userID ?? "";
     final String showName =
-        ((friendInfo.nickName != null && friendInfo.nickName!.isNotEmpty)
-                ? friendInfo.nickName
-                : userID) ??
-            "";
+        ((friendInfo.nickName != null && friendInfo.nickName!.isNotEmpty) ? friendInfo.nickName : userID) ?? "";
     return InkWell(
       onTap: () async {
-        final checkFriend = await _friendshipServices.checkFriend(
-            userIDList: [userID],
-            checkType: FriendTypeEnum.V2TIM_FRIEND_TYPE_SINGLE);
+        final checkFriend = await _friendshipServices
+            .checkFriend(userIDList: [userID], checkType: FriendTypeEnum.V2TIM_FRIEND_TYPE_SINGLE);
         if (checkFriend != null) {
           final res = checkFriend.first;
           if (res.resultCode == 0 && res.resultType != 0) {
@@ -126,9 +119,7 @@ class _TIMUIKitAddFriendState extends TIMUIKitState<TIMUIKitAddFriend> {
               children: [
                 Text(
                   showName,
-                  style: TextStyle(
-                      color: theme.darkTextColor,
-                      fontSize: isDesktopScreen ? 16 : 18),
+                  style: TextStyle(color: theme.darkTextColor, fontSize: isDesktopScreen ? 16 : 18),
                 ),
                 const SizedBox(
                   height: 4,
@@ -145,16 +136,14 @@ class _TIMUIKitAddFriendState extends TIMUIKitState<TIMUIKitAddFriend> {
     );
   }
 
-  List<Widget> _searchResultBuilder(
-      List<V2TimUserFullInfo>? searchResult, TUITheme theme) {
+  List<Widget> _searchResultBuilder(List<V2TimUserFullInfo>? searchResult, TUITheme theme) {
     final noResult = searchResult == null || searchResult.isEmpty;
     if (noResult) {
       return [
         Container(
           margin: const EdgeInsets.only(top: 20),
           child: Center(
-            child: Text(TIM_t("该用户不存在"),
-                style: TextStyle(color: theme.weakTextColor, fontSize: 14)),
+            child: Text(TIM_t("该用户不存在"), style: TextStyle(color: theme.weakTextColor, fontSize: 14)),
           ),
         )
       ];

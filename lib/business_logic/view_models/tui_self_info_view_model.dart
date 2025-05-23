@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_user_full_info.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/tim_uikit_config.dart';
 
 class TUISelfInfoViewModel extends ChangeNotifier {

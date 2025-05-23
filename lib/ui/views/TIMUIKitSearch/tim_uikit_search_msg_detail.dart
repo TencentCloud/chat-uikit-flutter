@@ -4,8 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
 import 'package:tencent_cloud_chat_sdk/enum/message_elem_type.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/platform.dart';
@@ -48,8 +50,7 @@ class TIMUIKitSearchMsgDetail extends StatefulWidget {
   State<StatefulWidget> createState() => TIMUIKitSearchMsgDetailState();
 }
 
-class TIMUIKitSearchMsgDetailState
-    extends TIMUIKitState<TIMUIKitSearchMsgDetail> {
+class TIMUIKitSearchMsgDetailState extends TIMUIKitState<TIMUIKitSearchMsgDetail> {
   final model = serviceLocator<TUISearchViewModel>();
   String keywordState = "";
   int currentPage = 0;
@@ -89,11 +90,8 @@ class TIMUIKitSearchMsgDetailState
     final isAdminRevoke = revokeStatus.$2;
     if (isRevokedMessage) {
       final isSelf = message.isSelf ?? true;
-      final option2 = isAdminRevoke
-          ? TIM_t("管理员")
-          : (isSelf ? TIM_t("您") : message.nickName ?? message.sender);
-      return TIM_t_para("{{option2}}撤回了一条消息", "$option2撤回了一条消息")(
-          option2: option2);
+      final option2 = isAdminRevoke ? TIM_t("管理员") : (isSelf ? TIM_t("您") : message.nickName ?? message.sender);
+      return TIM_t_para("{{option2}}撤回了一条消息", "$option2撤回了一条消息")(option2: option2);
     }
     switch (msgType) {
       case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
@@ -106,8 +104,7 @@ class TIMUIKitSearchMsgDetailState
         return TIM_t("[表情]");
       case MessageElemType.V2TIM_ELEM_TYPE_FILE:
         final option1 = message.fileElem!.fileName;
-        return TIM_t_para("[文件] {{option1}}", "[文件] $option1")(
-            option1: option1);
+        return TIM_t_para("[文件] {{option1}}", "[文件] $option1")(option1: option1);
       case MessageElemType.V2TIM_ELEM_TYPE_IMAGE:
         return TIM_t("[图片]");
       case MessageElemType.V2TIM_ELEM_TYPE_VIDEO:
@@ -121,8 +118,7 @@ class TIMUIKitSearchMsgDetailState
     }
   }
 
-  List<Widget> _renderListMessage(
-      List<V2TimMessage> msgList, BuildContext context, bool isDesktopScreen) {
+  List<Widget> _renderListMessage(List<V2TimMessage> msgList, BuildContext context, bool isDesktopScreen) {
     List<Widget> listWidget = [];
 
     listWidget = msgList.map((message) {
@@ -138,9 +134,8 @@ class TIMUIKitSearchMsgDetailState
               TencentUtils.checkString(message.userID) ??
               message.sender ??
               "",
-          lineOneRight: (isDesktopScreen && message.timestamp != null)
-              ? TimeAgo().getTimeForMessage(message.timestamp!)
-              : null,
+          lineOneRight:
+              (isDesktopScreen && message.timestamp != null) ? TimeAgo().getTimeForMessage(message.timestamp!) : null,
           lineTwo: _getMsgElem(message),
           onClick: () {
             focusNode.unfocus();
@@ -159,8 +154,7 @@ class TIMUIKitSearchMsgDetailState
         keywordState = keyword!;
       });
     }
-    model.getMsgForConversation(keyword ?? keywordState,
-        widget.currentConversation.conversationID, currentPage);
+    model.getMsgForConversation(keyword ?? keywordState, widget.currentConversation.conversationID, currentPage);
     setState(() {
       currentPage = currentPage + 1;
     });
@@ -188,17 +182,12 @@ class TIMUIKitSearchMsgDetailState
       return TIMUIKitSearchNotSupport();
     }
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(
-            value: serviceLocator<TUISearchViewModel>())
-      ],
+      providers: [ChangeNotifierProvider.value(value: serviceLocator<TUISearchViewModel>())],
       builder: (context, w) {
-        final isDesktopScreen =
-            TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+        final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
 
         List<V2TimMessage> currentMsgListForConversation =
-            Provider.of<TUISearchViewModel>(context)
-                .currentMsgListForConversation;
+            Provider.of<TUISearchViewModel>(context).currentMsgListForConversation;
         final currentText = _controller.text;
         if (currentMsgListForConversation.isEmpty &&
             widget.initMessageList != null &&
@@ -207,9 +196,7 @@ class TIMUIKitSearchMsgDetailState
           currentMsgListForConversation = widget.initMessageList!;
         }
 
-        final int totalMsgInConversationCount =
-            Provider.of<TUISearchViewModel>(context)
-                .totalMsgInConversationCount;
+        final int totalMsgInConversationCount = Provider.of<TUISearchViewModel>(context).totalMsgInConversationCount;
         return GestureDetector(
           onTap: () {
             FocusScopeNode currentFocus = FocusScope.of(context);
@@ -226,17 +213,13 @@ class TIMUIKitSearchMsgDetailState
                   child: Row(
                     children: [
                       SizedBox(
-                        child: Avatar(
-                            faceUrl: widget.currentConversation.faceUrl ?? "",
-                            showName: ""),
+                        child: Avatar(faceUrl: widget.currentConversation.faceUrl ?? "", showName: ""),
                         width: 30,
                         height: 30,
                       ),
                       const SizedBox(width: 16),
                       Text(
-                        widget.currentConversation.showName ??
-                            widget.currentConversation.userID ??
-                            "",
+                        widget.currentConversation.showName ?? widget.currentConversation.userID ?? "",
                         style: TextStyle(
                           fontSize: 16,
                           color: theme.darkTextColor,
@@ -267,11 +250,9 @@ class TIMUIKitSearchMsgDetailState
                 child: ListView(
                   controller: _scrollController,
                   children: [
-                    ..._renderListMessage(currentMsgListForConversation,
-                        context, isDesktopScreen),
-                    _renderShowALl(keywordState.isNotEmpty &&
-                        totalMsgInConversationCount >
-                            currentMsgListForConversation.length)
+                    ..._renderListMessage(currentMsgListForConversation, context, isDesktopScreen),
+                    _renderShowALl(
+                        keywordState.isNotEmpty && totalMsgInConversationCount > currentMsgListForConversation.length)
                   ],
                 ),
               )),

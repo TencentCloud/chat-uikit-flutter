@@ -3,8 +3,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_search_param.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_search_param.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_search_param.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
@@ -29,8 +31,7 @@ class GroupProfileMemberListPage extends StatefulWidget {
   State<StatefulWidget> createState() => GroupProfileMemberListPageState();
 }
 
-class GroupProfileMemberListPageState
-    extends TIMUIKitState<GroupProfileMemberListPage> {
+class GroupProfileMemberListPageState extends TIMUIKitState<GroupProfileMemberListPage> {
   List<V2TimGroupMemberFullInfo?>? searchMemberList;
   String? searchText;
 
@@ -45,8 +46,7 @@ class GroupProfileMemberListPageState
   handleSearchGroupMembers(String searchText, context) async {
     searchText = searchText;
     List<V2TimGroupMemberFullInfo?> currentGroupMember =
-        Provider.of<TUIGroupProfileModel>(context, listen: false)
-            .groupMemberList;
+        Provider.of<TUIGroupProfileModel>(context, listen: false).groupMemberList;
 
     if (!isSearchTextExist(searchText)) {
       setState(() {
@@ -55,8 +55,7 @@ class GroupProfileMemberListPageState
       return;
     }
 
-    final res =
-        await widget.model.searchGroupMember(V2TimGroupMemberSearchParam(
+    final res = await widget.model.searchGroupMember(V2TimGroupMemberSearchParam(
       keywordList: [searchText],
       groupIDList: [widget.model.groupInfo!.groupID],
     ));
@@ -84,25 +83,21 @@ class GroupProfileMemberListPageState
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final TUITheme theme = value.theme;
-    final isDesktopScreen =
-        TUIKitScreenUtils.getFormFactor() == DeviceType.Desktop;
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor() == DeviceType.Desktop;
     return MultiProvider(
       providers: [
         ChangeNotifierProvider.value(value: widget.model),
       ],
       builder: (BuildContext context, Widget? w) {
-        final TUIGroupProfileModel groupProfileModel =
-            Provider.of<TUIGroupProfileModel>(context);
-        String option1 = groupProfileModel.groupInfo?.memberCount.toString() ??
-            widget.memberList.length.toString();
-        if(isDesktopScreen){
-          return  GroupProfileMemberList(
+        final TUIGroupProfileModel groupProfileModel = Provider.of<TUIGroupProfileModel>(context);
+        String option1 = groupProfileModel.groupInfo?.memberCount.toString() ?? widget.memberList.length.toString();
+        if (isDesktopScreen) {
+          return GroupProfileMemberList(
             customTopArea: PlatformUtils().isWeb
                 ? null
                 : GroupMemberSearchTextField(
-              onTextChange: (text) =>
-                  handleSearchGroupMembers(text, context),
-            ),
+                    onTextChange: (text) => handleSearchGroupMembers(text, context),
+                  ),
             memberList: searchMemberList ?? groupProfileModel.groupMemberList,
             removeMember: _kickedOffMember,
             touchBottomCallBack: () {},
@@ -116,13 +111,11 @@ class GroupProfileMemberListPageState
         return Scaffold(
             appBar: AppBar(
                 title: Text(
-                  TIM_t_para("群成员({{option1}}人)", "群成员($option1人)")(
-                      option1: option1),
+                  TIM_t_para("群成员({{option1}}人)", "群成员($option1人)")(option1: option1),
                   style: TextStyle(color: theme.appbarTextColor, fontSize: 17),
                 ),
                 shadowColor: theme.weakBackgroundColor,
-                backgroundColor: theme.appbarBgColor ??
-                    theme.primaryColor,
+                backgroundColor: theme.appbarBgColor ?? theme.primaryColor,
                 iconTheme: IconThemeData(
                   color: theme.appbarTextColor,
                 )),
@@ -130,8 +123,7 @@ class GroupProfileMemberListPageState
               customTopArea: PlatformUtils().isWeb
                   ? null
                   : GroupMemberSearchTextField(
-                      onTextChange: (text) =>
-                          handleSearchGroupMembers(text, context),
+                      onTextChange: (text) => handleSearchGroupMembers(text, context),
                     ),
               memberList: searchMemberList ?? groupProfileModel.groupMemberList,
               removeMember: _kickedOffMember,
@@ -141,8 +133,7 @@ class GroupProfileMemberListPageState
                   widget.model.onClickUser!(memberInfo, details);
                 }
               },
-            )
-        );
+            ));
       },
     );
   }

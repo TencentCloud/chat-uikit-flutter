@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info_result.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_search_result_item.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info_result.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_friend_info_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_search_result_item.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message_search_result_item.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_search_view_model.dart';
@@ -29,12 +34,10 @@ class TIMUIKitSearch extends StatefulWidget {
 
   /// [Deprecated] : You are supposed to use [onEnterSearchInConversation],
   /// though the effects are the same.
-  final Function(V2TimConversation conversation, String initKeyword)?
-      onEnterConversation;
+  final Function(V2TimConversation conversation, String initKeyword)? onEnterConversation;
 
   /// On click each conversation from 'Chat history' and searching for historical message in it.
-  final Function(V2TimConversation conversation, String initKeyword)?
-      onEnterSearchInConversation;
+  final Function(V2TimConversation conversation, String initKeyword)? onEnterSearchInConversation;
 
   final VoidCallback? onBack;
 
@@ -43,10 +46,11 @@ class TIMUIKitSearch extends StatefulWidget {
   const TIMUIKitSearch(
       {required this.onTapConversation,
       Key? key,
-      @Deprecated("You are supposed to use [TIMUIKitSearchMsgDetail], if you tend to search inside a specific conversation, includes c2c and group")
-          this.conversation,
+      @Deprecated(
+          "You are supposed to use [TIMUIKitSearchMsgDetail], if you tend to search inside a specific conversation, includes c2c and group")
+      this.conversation,
       @Deprecated("You are supposed to use [onEnterSearchInConversation], though the effects are the same.")
-          this.onEnterConversation,
+      this.onEnterConversation,
       this.isAutoFocus = true,
       this.onEnterSearchInConversation,
       this.onBack})
@@ -61,11 +65,7 @@ class TIMUIKitSearchState extends TIMUIKitState<TIMUIKitSearch> {
   final model = serviceLocator<TUISearchViewModel>();
   final FocusNode focusNode = FocusNode();
   GlobalKey<dynamic> inputTextField = GlobalKey();
-  List<SearchType> searchTypes = [
-    SearchType.group,
-    SearchType.contact,
-    SearchType.history
-  ];
+  List<SearchType> searchTypes = [SearchType.group, SearchType.contact, SearchType.history];
 
   @override
   void initState() {
@@ -80,19 +80,12 @@ class TIMUIKitSearchState extends TIMUIKitState<TIMUIKitSearch> {
       return TIMUIKitSearchNotSupport();
     }
     return MultiProvider(
-      providers: [
-        ChangeNotifierProvider.value(
-            value: serviceLocator<TUISearchViewModel>())
-      ],
+      providers: [ChangeNotifierProvider.value(value: serviceLocator<TUISearchViewModel>())],
       builder: (context, w) {
-        List<V2TimFriendInfoResult> friendResultList =
-            Provider.of<TUISearchViewModel>(context).friendList ?? [];
-        List<V2TimMessageSearchResultItem> msgList =
-            Provider.of<TUISearchViewModel>(context).msgList ?? [];
-        List<V2TimGroupInfo> groupList =
-            Provider.of<TUISearchViewModel>(context).groupList ?? [];
-        int totalMsgCount =
-            Provider.of<TUISearchViewModel>(context).totalMsgCount;
+        List<V2TimFriendInfoResult> friendResultList = Provider.of<TUISearchViewModel>(context).friendList ?? [];
+        List<V2TimMessageSearchResultItem> msgList = Provider.of<TUISearchViewModel>(context).msgList ?? [];
+        List<V2TimGroupInfo> groupList = Provider.of<TUISearchViewModel>(context).groupList ?? [];
+        int totalMsgCount = Provider.of<TUISearchViewModel>(context).totalMsgCount;
         return GestureDetector(
           onTap: () {
             FocusScopeNode currentFocus = FocusScope.of(context);
@@ -123,14 +116,9 @@ class TIMUIKitSearchState extends TIMUIKitState<TIMUIKitSearch> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        if ((friendResultList.isEmpty ||
-                            !(searchTypes.contains(SearchType.contact))) &&
-                                (groupList.isEmpty ||
-                                    !(searchTypes
-                                        .contains(SearchType.group))) &&
-                                (totalMsgCount == 0 ||
-                                    !(searchTypes
-                                        .contains(SearchType.history))))
+                        if ((friendResultList.isEmpty || !(searchTypes.contains(SearchType.contact))) &&
+                            (groupList.isEmpty || !(searchTypes.contains(SearchType.group))) &&
+                            (totalMsgCount == 0 || !(searchTypes.contains(SearchType.history))))
                           TIMUIKitSearchIndicator(
                             typeList: searchTypes,
                             onChange: (list) {
@@ -143,10 +131,8 @@ class TIMUIKitSearchState extends TIMUIKitState<TIMUIKitSearch> {
                           TIMUIKitSearchFriend(
                               onTapConversation: (conversation, message) {
                                 focusNode.unfocus();
-                                Future.delayed(
-                                    const Duration(milliseconds: 100), () {
-                                  widget.onTapConversation(
-                                      conversation, message);
+                                Future.delayed(const Duration(milliseconds: 100), () {
+                                  widget.onTapConversation(conversation, message);
                                 });
                               },
                               friendResultList: friendResultList),
@@ -155,8 +141,7 @@ class TIMUIKitSearchState extends TIMUIKitState<TIMUIKitSearch> {
                             groupList: groupList,
                             onTapConversation: (conversation, message) {
                               focusNode.unfocus();
-                              Future.delayed(const Duration(milliseconds: 100),
-                                  () {
+                              Future.delayed(const Duration(milliseconds: 100), () {
                                 widget.onTapConversation(conversation, message);
                               });
                             },
@@ -167,15 +152,11 @@ class TIMUIKitSearchState extends TIMUIKitState<TIMUIKitSearch> {
                             keyword: textEditingController.text,
                             totalMsgCount: totalMsgCount,
                             msgList: msgList,
-                            onEnterConversation:
-                                (V2TimConversation conversation,
-                                    String keyword) {
+                            onEnterConversation: (V2TimConversation conversation, String keyword) {
                               if (widget.onEnterSearchInConversation != null) {
-                                widget.onEnterSearchInConversation!(
-                                    conversation, keyword);
+                                widget.onEnterSearchInConversation!(conversation, keyword);
                               } else if (widget.onEnterConversation != null) {
-                                widget.onEnterConversation!(
-                                    conversation, keyword);
+                                widget.onEnterConversation!(conversation, keyword);
                               }
                             },
                           ),

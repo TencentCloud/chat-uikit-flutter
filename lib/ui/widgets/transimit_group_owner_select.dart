@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_search_param.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_search_param.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_search_param.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_group_profile_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
@@ -37,7 +39,6 @@ class _SelectNewGroupOwner extends TIMUIKitState<SelectNewGroupOwner> {
   List<V2TimGroupMemberFullInfo?>? searchMemberList;
   String? searchText;
 
-
   @override
   void dispose() {
     super.dispose();
@@ -49,13 +50,9 @@ class _SelectNewGroupOwner extends TIMUIKitState<SelectNewGroupOwner> {
 
   handleSearchGroupMembers(String searchText, context) async {
     searchText = searchText;
-    List<V2TimGroupMemberFullInfo?> currentGroupMember = widget
-        .model.groupMemberList
-        .where(
-            (element) => element?.userID != _coreServicesImpl.loginInfo.userID)
-        .toList();
-    final res =
-        await widget.model.searchGroupMember(V2TimGroupMemberSearchParam(
+    List<V2TimGroupMemberFullInfo?> currentGroupMember =
+        widget.model.groupMemberList.where((element) => element?.userID != _coreServicesImpl.loginInfo.userID).toList();
+    final res = await widget.model.searchGroupMember(V2TimGroupMemberSearchParam(
       keywordList: [searchText],
       groupIDList: [widget.model.groupInfo!.groupID],
       isSearchMemberNameCard: true,
@@ -80,8 +77,7 @@ class _SelectNewGroupOwner extends TIMUIKitState<SelectNewGroupOwner> {
       currentGroupMember = [];
     }
     setState(() {
-      searchMemberList =
-          isSearchTextExist(searchText) ? currentGroupMember : null;
+      searchMemberList = isSearchTextExist(searchText) ? currentGroupMember : null;
     });
   }
 
@@ -103,8 +99,7 @@ class _SelectNewGroupOwner extends TIMUIKitState<SelectNewGroupOwner> {
                 onTextChange: (text) => handleSearchGroupMembers(text, context),
               ),
         memberList: (searchMemberList ?? widget.model.groupMemberList)
-            .where((element) =>
-                element?.userID != _coreServicesImpl.loginInfo.userID)
+            .where((element) => element?.userID != _coreServicesImpl.loginInfo.userID)
             .toList(),
         canSlideDelete: false,
         canSelectMember: true,
@@ -125,8 +120,7 @@ class _SelectNewGroupOwner extends TIMUIKitState<SelectNewGroupOwner> {
               iconTheme: IconThemeData(
                 color: theme.appbarTextColor,
               ),
-              backgroundColor: theme.appbarBgColor ??
-                  theme.primaryColor,
+              backgroundColor: theme.appbarBgColor ?? theme.primaryColor,
               leading: TextButton(
                 onPressed: () {
                   Navigator.pop(context);

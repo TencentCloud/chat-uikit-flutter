@@ -2,16 +2,26 @@ import 'package:tencent_cloud_chat_sdk/enum/V2TimFriendshipListener.dart';
 import 'package:tencent_cloud_chat_sdk/enum/friend_application_type_enum.dart';
 import 'package:tencent_cloud_chat_sdk/enum/friend_response_type_enum.dart';
 import 'package:tencent_cloud_chat_sdk/enum/friend_type_enum.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_callback.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_application_result.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_check_result.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info_result.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_operation_result.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_search_param.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_status.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_callback.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_application_result.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_friend_application_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_check_result.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_friend_check_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_friend_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info_result.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_friend_info_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_operation_result.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_friend_operation_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_search_param.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_friend_search_param.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_user_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_status.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_user_status.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_value_callback.dart';
 
 abstract class FriendshipServices {
   Future<List<V2TimFriendInfoResult>?> getFriendsInfo({
@@ -67,9 +77,7 @@ abstract class FriendshipServices {
   Future<V2TimFriendApplicationResult?> getFriendApplicationList();
 
   Future<V2TimFriendOperationResult?> acceptFriendApplication(
-      {required FriendResponseTypeEnum responseType,
-      required FriendApplicationTypeEnum type,
-      required String userID});
+      {required FriendResponseTypeEnum responseType, required FriendApplicationTypeEnum type, required String userID});
 
   Future<V2TimFriendOperationResult?> refuseFriendApplication(
       {required FriendApplicationTypeEnum type, required String userID});

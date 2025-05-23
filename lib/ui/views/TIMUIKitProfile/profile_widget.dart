@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_friend_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_user_full_info.dart';
 
 enum ProfileWidgetEnum {
   /// THe card shows the user info of a specific user.
@@ -85,13 +88,11 @@ class ProfileWidgetBuilder {
 
   /// The switch of if add another user to block list.
   /// This will not shows when friendship relation not exist as default.
-  Widget Function(bool isAsBlocked, Function(bool value)? onChange)?
-      addToBlockListBar;
+  Widget Function(bool isAsBlocked, Function(bool value)? onChange)? addToBlockListBar;
 
   /// The switch of if pin the one-to-one conversation to the top of the conversation list.
   /// This will not shows when friendship relation not exist as default.
-  Widget Function(bool isPinned, Function(bool value)? onChange)?
-      pinConversationBar;
+  Widget Function(bool isPinned, Function(bool value)? onChange)? pinConversationBar;
 
   /// The switch of if mute the message notification from a specific user.
   /// This will not shows when friendship relation not exist as default.
@@ -136,28 +137,23 @@ class ProfileWidgetBuilder {
   /// The area shows the buttons,
   /// contains "Send message", "Voice/Video Call", "Delete friend" when has the friend relationship,
   /// while contains "Add friend" when no relationship exists, as default.
-  Widget Function(V2TimFriendInfo friendInfo, V2TimConversation conversation,
-      int friendType, bool isDisturb)? addAndDeleteArea;
+  Widget Function(V2TimFriendInfo friendInfo, V2TimConversation conversation, int friendType, bool isDisturb)?
+      addAndDeleteArea;
 
   /// Custom area, you may define send message, make calling, search or anything you want here.
-  Widget Function(bool isFriend, V2TimFriendInfo friendInfo,
-      V2TimConversation conversation)? customBuilderOne;
+  Widget Function(bool isFriend, V2TimFriendInfo friendInfo, V2TimConversation conversation)? customBuilderOne;
 
   /// Custom area, you may define send message, make calling, search or anything you want here.
-  Widget Function(bool isFriend, V2TimFriendInfo friendInfo,
-      V2TimConversation conversation)? customBuilderTwo;
+  Widget Function(bool isFriend, V2TimFriendInfo friendInfo, V2TimConversation conversation)? customBuilderTwo;
 
   /// Custom area, you may define send message, make calling, search or anything you want here.
-  Widget Function(bool isFriend, V2TimFriendInfo friendInfo,
-      V2TimConversation conversation)? customBuilderThree;
+  Widget Function(bool isFriend, V2TimFriendInfo friendInfo, V2TimConversation conversation)? customBuilderThree;
 
   /// Custom area, you may define send message, make calling, search or anything you want here.
-  Widget Function(bool isFriend, V2TimFriendInfo friendInfo,
-      V2TimConversation conversation)? customBuilderFour;
+  Widget Function(bool isFriend, V2TimFriendInfo friendInfo, V2TimConversation conversation)? customBuilderFour;
 
   /// Custom area, you may define send message, make calling, search or anything you want here.
-  Widget Function(bool isFriend, V2TimFriendInfo friendInfo,
-      V2TimConversation conversation)? customBuilderFive;
+  Widget Function(bool isFriend, V2TimFriendInfo friendInfo, V2TimConversation conversation)? customBuilderFive;
 
   ProfileWidgetBuilder(
       {this.operationDivider,

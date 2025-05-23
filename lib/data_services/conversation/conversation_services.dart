@@ -1,7 +1,10 @@
 import 'package:tencent_cloud_chat_sdk/enum/V2TimConversationListener.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_callback.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_callback.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation_result.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation_result.dart';
 
 abstract class ConversationService {
   Future<V2TimConversationResult?> getConversationList({
@@ -26,14 +29,11 @@ abstract class ConversationService {
     required V2TimConversationListener listener,
   });
 
-  Future<V2TimCallback> setConversationDraft(
-      {required String conversationID, String? draftText});
+  Future<V2TimCallback> setConversationDraft({required String conversationID, String? draftText});
 
-  Future<void> removeConversationListener(
-      {V2TimConversationListener? listener});
+  Future<void> removeConversationListener({V2TimConversationListener? listener});
 
   Future<int> getTotalUnreadCount();
 
-  Future<V2TimConversation?> getConversationListByConversationId(
-      {required String convID});
+  Future<V2TimConversation?> getConversationListByConversationId({required String convID});
 }

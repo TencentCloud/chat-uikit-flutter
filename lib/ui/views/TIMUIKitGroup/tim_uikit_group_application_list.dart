@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
 import 'package:tencent_cloud_chat_sdk/enum/group_application_type_enum.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_application.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_application.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_application.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
@@ -14,7 +15,8 @@ import 'package:tencent_cloud_chat_uikit/theme/color.dart';
 import 'package:tencent_cloud_chat_uikit/theme/tui_theme.dart';
 import 'package:tencent_cloud_chat_uikit/theme/tui_theme_view_model.dart';
 
-typedef GroupApplicationItemBuilder = Widget Function(BuildContext context, V2TimGroupApplication applicationInfo, int index);
+typedef GroupApplicationItemBuilder = Widget Function(
+    BuildContext context, V2TimGroupApplication applicationInfo, int index);
 
 enum ApplicationStatus {
   none,
@@ -57,7 +59,9 @@ class TIMUIKitGroupApplicationListState extends TIMUIKitState<TIMUIKitGroupAppli
     final ApplicationStatus currentStatus = applicationStatusList[index];
 
     String _getUserName() {
-      if (applicationInfo.fromUserNickName != null && applicationInfo.fromUserNickName!.isNotEmpty && applicationInfo.fromUserNickName != applicationInfo.fromUser) {
+      if (applicationInfo.fromUserNickName != null &&
+          applicationInfo.fromUserNickName!.isNotEmpty &&
+          applicationInfo.fromUserNickName != applicationInfo.fromUser) {
         return "${applicationInfo.fromUserNickName} (${applicationInfo.fromUser})";
       } else {
         return "${applicationInfo.fromUser}";
@@ -83,7 +87,9 @@ class TIMUIKitGroupApplicationListState extends TIMUIKitState<TIMUIKitGroupAppli
             child: SizedBox(
               height: 40,
               width: 40,
-              child: Avatar(faceUrl: applicationInfo.fromUserFaceUrl ?? "", showName: applicationInfo.fromUserNickName ?? applicationInfo.fromUser ?? ""),
+              child: Avatar(
+                  faceUrl: applicationInfo.fromUserFaceUrl ?? "",
+                  showName: applicationInfo.fromUserNickName ?? applicationInfo.fromUser ?? ""),
             ),
           ),
           Expanded(
@@ -106,7 +112,10 @@ class TIMUIKitGroupApplicationListState extends TIMUIKitState<TIMUIKitGroupAppli
               child: InkWell(
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), color: theme.primaryColor, border: Border.all(width: 1, color: theme.weakTextColor ?? CommonColor.weakTextColor)),
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(4),
+                        color: theme.primaryColor,
+                        border: Border.all(width: 1, color: theme.weakTextColor ?? CommonColor.weakTextColor)),
                     child: Text(
                       TIM_t("同意"), // agree
                       style: const TextStyle(
@@ -135,7 +144,10 @@ class TIMUIKitGroupApplicationListState extends TIMUIKitState<TIMUIKitGroupAppli
           if (currentStatus == ApplicationStatus.none && applicationInfo.handleStatus == 0)
             InkWell(
               child: Container(
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(4), color: Colors.white, border: Border.all(width: 1, color: theme.weakTextColor ?? CommonColor.weakTextColor)),
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(4),
+                    color: Colors.white,
+                    border: Border.all(width: 1, color: theme.weakTextColor ?? CommonColor.weakTextColor)),
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 child: Text(
                   TIM_t("拒绝"), // reject
@@ -146,7 +158,11 @@ class TIMUIKitGroupApplicationListState extends TIMUIKitState<TIMUIKitGroupAppli
               ),
               onTap: () async {
                 final res = await _groupServices.refuseGroupApplication(
-                    addTime: applicationInfo.addTime!, groupID: applicationInfo.groupID, fromUser: applicationInfo.fromUser!, toUser: applicationInfo.toUser!, type: GroupApplicationTypeEnum.values[applicationInfo.type]);
+                    addTime: applicationInfo.addTime!,
+                    groupID: applicationInfo.groupID,
+                    fromUser: applicationInfo.fromUser!,
+                    toUser: applicationInfo.toUser!,
+                    type: GroupApplicationTypeEnum.values[applicationInfo.type]);
                 if (res.code == 0) {
                   setState(() {
                     applicationStatusList[index] = ApplicationStatus.reject;

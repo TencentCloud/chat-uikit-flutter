@@ -4,12 +4,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:tencent_cloud_chat_sdk/enum/V2TimFriendshipListener.dart';
 import 'package:tencent_cloud_chat_sdk/enum/friend_application_type_enum.dart';
 import 'package:tencent_cloud_chat_sdk/enum/friend_response_type_enum.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_application.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_operation_result.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_status.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_application.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_friend_application.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_friend_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_operation_result.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_friend_operation_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_status.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_user_status.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/block_list_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/friend_list_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/new_contact_life_cycle.dart';
@@ -19,11 +25,9 @@ import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 
 class TUIFriendShipViewModel extends ChangeNotifier {
-  final FriendshipServices _friendshipServices =
-      serviceLocator<FriendshipServices>();
+  final FriendshipServices _friendshipServices = serviceLocator<FriendshipServices>();
   final GroupServices _groupServices = serviceLocator<GroupServices>();
-  final TUISelfInfoViewModel selfInfoViewModel =
-      serviceLocator<TUISelfInfoViewModel>();
+  final TUISelfInfoViewModel selfInfoViewModel = serviceLocator<TUISelfInfoViewModel>();
   late V2TimFriendshipListener friendShipListener;
   List<V2TimFriendApplication?>? _friendApplicationList;
   List<V2TimFriendInfo>? _friendList;
@@ -68,8 +72,7 @@ class TUIFriendShipViewModel extends ChangeNotifier {
 
   int get friendApplicationAmount => _friendApplicationAmount;
 
-  List<V2TimFriendApplication?>? get friendApplicationList =>
-      _friendApplicationList;
+  List<V2TimFriendApplication?>? get friendApplicationList => _friendApplicationList;
 
   TUIFriendShipViewModel() {
     friendShipListener = V2TimFriendshipListener(
@@ -125,21 +128,17 @@ class TUIFriendShipViewModel extends ChangeNotifier {
   }
 
   loadUserStatus() async {
-    if (selfInfoViewModel.globalConfig?.isShowOnlineStatus == false ||
-        friendList == null ||
-        friendList!.isEmpty) {
+    if (selfInfoViewModel.globalConfig?.isShowOnlineStatus == false || friendList == null || friendList!.isEmpty) {
       return;
     }
 
     final List<List<String>> userIDSet = [];
     final int needHowManyRequest = ((friendList!.length) / 500).ceil();
-    final int amountEachRequest =
-        ((friendList!.length) / needHowManyRequest).ceil();
+    final int amountEachRequest = ((friendList!.length) / needHowManyRequest).ceil();
 
     for (int i = 0; i < needHowManyRequest; i++) {
       userIDSet.add(friendList!
-          .getRange(i * amountEachRequest,
-              min(friendList!.length, (i + 1) * amountEachRequest))
+          .getRange(i * amountEachRequest, min(friendList!.length, (i + 1) * amountEachRequest))
           .map((e) => e.userID)
           .toList());
     }
@@ -161,19 +160,15 @@ class TUIFriendShipViewModel extends ChangeNotifier {
     final newContactRes = await _friendshipServices.getFriendApplicationList();
     // Only Received Application
     _friendApplicationList = newContactRes?.friendApplicationList
-        ?.where((item) =>
-            item!.type ==
-            FriendApplicationTypeEnum.V2TIM_FRIEND_APPLICATION_COME_IN.index)
+        ?.where((item) => item!.type == FriendApplicationTypeEnum.V2TIM_FRIEND_APPLICATION_COME_IN.index)
         .toList();
     _friendApplicationAmount = _friendApplicationList?.length ?? 0;
     notifyListeners();
   }
 
   Future<void> loadContactListData() async {
-    final List<V2TimFriendInfo> res =
-        await _friendshipServices.getFriendList() ?? [];
-    final memberList =
-        await _contactListLifeCycle?.friendListWillMount(res) ?? res;
+    final List<V2TimFriendInfo> res = await _friendshipServices.getFriendList() ?? [];
+    final memberList = await _contactListLifeCycle?.friendListWillMount(res) ?? res;
     _friendList = memberList;
     notifyListeners();
     return;
@@ -206,15 +201,12 @@ class TUIFriendShipViewModel extends ChangeNotifier {
     return;
   }
 
-  Future<List<V2TimFriendOperationResult>?> deleteFromBlockList(
-      List<String> userIDList) async {
+  Future<List<V2TimFriendOperationResult>?> deleteFromBlockList(List<String> userIDList) async {
     if (_blockListLifeCycle?.shouldDeleteFromBlockList != null &&
-        await _blockListLifeCycle!.shouldDeleteFromBlockList(userIDList) ==
-            false) {
+        await _blockListLifeCycle!.shouldDeleteFromBlockList(userIDList) == false) {
       return null;
     }
-    final res =
-        await _friendshipServices.deleteFromBlackList(userIDList: userIDList);
+    final res = await _friendshipServices.deleteFromBlackList(userIDList: userIDList);
     if (res != null) {
       return res;
     }
@@ -226,8 +218,7 @@ class TUIFriendShipViewModel extends ChangeNotifier {
     int type,
   ) async {
     if (_newContactLifeCycle?.shouldAcceptContactApplication != null &&
-        await _newContactLifeCycle!.shouldAcceptContactApplication(userID) ==
-            false) {
+        await _newContactLifeCycle!.shouldAcceptContactApplication(userID) == false) {
       return null;
     }
     final res = await _friendshipServices.acceptFriendApplication(
@@ -246,8 +237,7 @@ class TUIFriendShipViewModel extends ChangeNotifier {
     int type,
   ) async {
     if (_newContactLifeCycle?.shouldRefuseContactApplication != null &&
-        await _newContactLifeCycle!.shouldRefuseContactApplication(userID) ==
-            false) {
+        await _newContactLifeCycle!.shouldRefuseContactApplication(userID) == false) {
       return null;
     }
     final res = await _friendshipServices.refuseFriendApplication(
@@ -262,8 +252,7 @@ class TUIFriendShipViewModel extends ChangeNotifier {
 
   Future<List<V2TimGroupMemberFullInfo?>> getGroupMembersInfo(
       {required String groupID, required List<String> memberList}) async {
-    final res = await _groupServices.getGroupMembersInfo(
-        groupID: groupID, memberList: memberList);
+    final res = await _groupServices.getGroupMembersInfo(groupID: groupID, memberList: memberList);
     return res.data ?? [];
   }
 

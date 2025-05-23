@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_at_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_at_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_at_info.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
@@ -60,11 +62,18 @@ class _TIMUIKitHistoryMessageListTongueContainerState extends TIMUIKitState<TIMU
     if (offset <= 0.0 && conversationUnreadCount != 0) {
       widget.model.showLatestUnread();
     }
-    if (widget.scrollController.offset <= widget.scrollController.position.minScrollExtent && !widget.scrollController.position.outOfRange && !widget.model.haveMoreLatestData) {
+    if (widget.scrollController.offset <= widget.scrollController.position.minScrollExtent &&
+        !widget.scrollController.position.outOfRange &&
+        !widget.model.haveMoreLatestData) {
       changePositionState(HistoryMessagePosition.bottom);
-    } else if (widget.scrollController.offset <= screenHeight * 1.6 && widget.scrollController.offset > 0 && !widget.scrollController.position.outOfRange && !widget.model.haveMoreLatestData) {
+    } else if (widget.scrollController.offset <= screenHeight * 1.6 &&
+        widget.scrollController.offset > 0 &&
+        !widget.scrollController.position.outOfRange &&
+        !widget.model.haveMoreLatestData) {
       changePositionState(HistoryMessagePosition.inTwoScreen);
-    } else if (widget.scrollController.offset > screenHeight * 1.6 && !widget.scrollController.position.outOfRange && !widget.model.haveMoreLatestData) {
+    } else if (widget.scrollController.offset > screenHeight * 1.6 &&
+        !widget.scrollController.position.outOfRange &&
+        !widget.model.haveMoreLatestData) {
       changePositionState(HistoryMessagePosition.awayTwoScreen);
     }
   }
@@ -134,7 +143,8 @@ class _TIMUIKitHistoryMessageListTongueContainerState extends TIMUIKitState<TIMU
                 try {
                   isClickShowPrevious = true;
                   final String? lastSeqString = widget.conversation.lastMessage?.seq;
-                  final int? lastSeq = TencentUtils.checkString(lastSeqString) != null ? int.parse(lastSeqString!) : null;
+                  final int? lastSeq =
+                      TencentUtils.checkString(lastSeqString) != null ? int.parse(lastSeqString!) : null;
                   final int? previousCount = widget.conversation.unreadCount;
                   if (lastSeq != null && previousCount != null) {
                     final targetSeq = lastSeq - previousCount;

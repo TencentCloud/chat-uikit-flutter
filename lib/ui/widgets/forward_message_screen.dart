@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
@@ -22,11 +23,7 @@ class ForwardMessageScreen extends StatefulWidget {
   final VoidCallback? onClose;
 
   const ForwardMessageScreen(
-      {Key? key,
-      this.isMergerForward = false,
-      required this.conversationType,
-      required this.model,
-      this.onClose})
+      {Key? key, this.isMergerForward = false, required this.conversationType, required this.model, this.onClose})
       : super(key: key);
 
   @override
@@ -35,17 +32,16 @@ class ForwardMessageScreen extends StatefulWidget {
 
 class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
   final TUIChatGlobalModel model = serviceLocator<TUIChatGlobalModel>();
-  final TUISelfInfoViewModel _selfInfoViewModel =
-      serviceLocator<TUISelfInfoViewModel>();
+  final TUISelfInfoViewModel _selfInfoViewModel = serviceLocator<TUISelfInfoViewModel>();
   List<V2TimConversation> _conversationList = [];
   bool isMultiSelect = false;
 
   String _getMergerMessageTitle() {
     if (widget.conversationType == ConvType.c2c) {
-      final option1 = (_selfInfoViewModel.loginInfo?.nickName != null &&
-              _selfInfoViewModel.loginInfo!.nickName!.isNotEmpty)
-          ? _selfInfoViewModel.loginInfo?.nickName
-          : _selfInfoViewModel.loginInfo?.userID;
+      final option1 =
+          (_selfInfoViewModel.loginInfo?.nickName != null && _selfInfoViewModel.loginInfo!.nickName!.isNotEmpty)
+              ? _selfInfoViewModel.loginInfo?.nickName
+              : _selfInfoViewModel.loginInfo?.userID;
       // Chat History for xx
       return TIM_t_para("{{option1}}的聊天记录", "$option1的聊天记录")(option1: option1);
     } else {
@@ -55,9 +51,7 @@ class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
 
   List<String> _getAbstractList() {
     return widget.model.getSelectedMessageList().map((e) {
-      final sender = (e.nickName != null && e.nickName!.isNotEmpty)
-          ? e.nickName
-          : e.sender;
+      final sender = (e.nickName != null && e.nickName!.isNotEmpty) ? e.nickName : e.sender;
       return "$sender: ${model.abstractMessageBuilder != null ? model.abstractMessageBuilder!(e) : MessageUtils.getAbstractMessageAsync(e, [])}";
     }).toList();
   }
@@ -76,8 +70,7 @@ class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
         context: context,
       );
     } else {
-      await widget.model
-          .sendForwardMessage(conversationList: _conversationList);
+      await widget.model.sendForwardMessage(conversationList: _conversationList);
     }
     widget.model.updateMultiSelectStatus(false);
 
@@ -123,8 +116,7 @@ class _ForwardMessageScreenState extends TIMUIKitState<ForwardMessageScreen> {
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
-    final isDesktopScreen =
-        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
     final TUITheme theme = value.theme;
     if (isDesktopScreen) {
       isMultiSelect = true;

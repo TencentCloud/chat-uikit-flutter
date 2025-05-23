@@ -3,9 +3,12 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_friend_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_user_full_info.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_class.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/utils/screen_utils.dart';
@@ -14,11 +17,9 @@ import 'package:tencent_cloud_chat_uikit/theme/color.dart';
 import 'package:tencent_cloud_chat_uikit/theme/tui_theme.dart';
 
 class TIMUIKitProfileWidget extends TIMUIKitClass {
-  static final bool isDesktopScreen =
-      TUIKitScreenUtils.getFormFactor() == DeviceType.Desktop;
+  static final bool isDesktopScreen = TUIKitScreenUtils.getFormFactor() == DeviceType.Desktop;
 
-  static Widget operationDivider(
-      {Color? color, double? height, EdgeInsetsGeometry? margin}) {
+  static Widget operationDivider({Color? color, double? height, EdgeInsetsGeometry? margin}) {
     return Container(
       color: color,
       margin: margin,
@@ -27,21 +28,15 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
   }
 
   /// Remarks
-  static Widget remarkBar(
-      BuildContext context,
-      String remark,
-      Function({Offset? offset, String? initText})? handleTap,
+  static Widget remarkBar(BuildContext context, String remark, Function({Offset? offset, String? initText})? handleTap,
       bool smallCardMode) {
     final GlobalKey key = GlobalKey();
     return InkWell(
       onTapDown: (details) {
         if (handleTap != null) {
           handleTap(
-              offset: Offset(
-                  min(details.globalPosition.dx,
-                      MediaQuery.of(context).size.width - 400),
-                  min(details.globalPosition.dy,
-                      MediaQuery.of(context).size.height - 100)),
+              offset: Offset(min(details.globalPosition.dx, MediaQuery.of(context).size.width - 400),
+                  min(details.globalPosition.dy, MediaQuery.of(context).size.height - 100)),
               initText: remark);
         }
       },
@@ -51,15 +46,14 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
         isEmpty: remark.isEmpty,
         wideEditText: TIM_t("设置备注名"),
         operationName: TIM_t("备注名"),
-        operationRightWidget:
-            Text(remark, textAlign: isDesktopScreen ? null : TextAlign.end),
+        operationRightWidget: Text(remark, textAlign: isDesktopScreen ? null : TextAlign.end),
       ),
     );
   }
 
   /// add to block list
-  static Widget addToBlackListBar(bool value, BuildContext context,
-      Function(bool value)? onChanged, bool smallCardMode) {
+  static Widget addToBlackListBar(
+      bool value, BuildContext context, Function(bool value)? onChanged, bool smallCardMode) {
     return TIMUIKitOperationItem(
       smallCardMode: smallCardMode,
       isEmpty: false,
@@ -75,8 +69,8 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
   }
 
   /// pin the conversation to the top
-  static Widget pinConversationBar(bool value, BuildContext context,
-      Function(bool value)? onChanged, bool smallCardMode) {
+  static Widget pinConversationBar(
+      bool value, BuildContext context, Function(bool value)? onChanged, bool smallCardMode) {
     return TIMUIKitOperationItem(
       smallCardMode: smallCardMode,
       isEmpty: false,
@@ -92,8 +86,8 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
   }
 
   /// message disturb
-  static Widget messageDisturb(BuildContext context, bool isDisturb,
-      Function(bool value)? onChanged, bool smallCardMode) {
+  static Widget messageDisturb(
+      BuildContext context, bool isDisturb, Function(bool value)? onChanged, bool smallCardMode) {
     return TIMUIKitOperationItem(
       smallCardMode: smallCardMode,
       isEmpty: false,
@@ -121,8 +115,7 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
       isEmpty: isEmpty,
       operationName: operationName,
       type: type,
-      operationRightWidget: Text(operationText ?? "",
-          textAlign: isDesktopScreen ? null : TextAlign.end),
+      operationRightWidget: Text(operationText ?? "", textAlign: isDesktopScreen ? null : TextAlign.end),
       operationValue: operationValue,
       onSwitchChange: onSwitchChange,
     );
@@ -163,8 +156,7 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
   }
 
   /// defaultPortraitWidget
-  static Widget defaultPortraitWidget(
-      V2TimUserFullInfo? userInfo, bool smallCardMode) {
+  static Widget defaultPortraitWidget(V2TimUserFullInfo? userInfo, bool smallCardMode) {
     return SizedBox(
       width: 48,
       height: 48,
@@ -189,8 +181,7 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
         isEmpty: nickName.isEmpty,
         showAllowEditStatus: false,
         operationName: TIM_t("昵称"),
-        operationRightWidget:
-            Text(nickName, textAlign: isDesktopScreen ? null : TextAlign.end),
+        operationRightWidget: Text(nickName, textAlign: isDesktopScreen ? null : TextAlign.end),
       ),
     );
   }
@@ -203,8 +194,7 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
         isEmpty: false,
         showAllowEditStatus: false,
         operationName: TIM_t("账号"),
-        operationRightWidget: SelectableText(userNum,
-            textAlign: isDesktopScreen ? null : TextAlign.end),
+        operationRightWidget: SelectableText(userNum, textAlign: isDesktopScreen ? null : TextAlign.end),
       ),
     );
   }
@@ -217,8 +207,7 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
         isEmpty: false,
         showAllowEditStatus: false,
         operationName: TIM_t("个性签名"),
-        operationRightWidget:
-            Text(signature, textAlign: isDesktopScreen ? null : TextAlign.end),
+        operationRightWidget: Text(signature, textAlign: isDesktopScreen ? null : TextAlign.end),
       ),
     );
   }
@@ -236,8 +225,7 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
         isEmpty: false,
         showAllowEditStatus: false,
         operationName: TIM_t("性别"),
-        operationRightWidget: Text(genderMap[gender],
-            textAlign: isDesktopScreen ? null : TextAlign.end),
+        operationRightWidget: Text(genderMap[gender], textAlign: isDesktopScreen ? null : TextAlign.end),
       ),
     );
   }
@@ -254,8 +242,7 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
         smallCardMode: smallCardMode,
         isEmpty: false,
         operationName: TIM_t("性别"),
-        operationRightWidget: Text(genderMap[gender],
-            textAlign: isDesktopScreen ? null : TextAlign.end),
+        operationRightWidget: Text(genderMap[gender], textAlign: isDesktopScreen ? null : TextAlign.end),
       ),
     );
   }
@@ -269,16 +256,14 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
         smallCardMode: smallCardMode,
         isEmpty: false,
         operationName: TIM_t("生日"),
-        operationRightWidget: Text(formatter.format(date),
-            textAlign: isDesktopScreen ? null : TextAlign.end),
+        operationRightWidget: Text(formatter.format(date), textAlign: isDesktopScreen ? null : TextAlign.end),
       );
     } catch (e) {
       return TIMUIKitOperationItem(
         smallCardMode: smallCardMode,
         isEmpty: false,
         operationName: TIM_t("生日"),
-        operationRightWidget:
-            Text(TIM_t("未填写"), textAlign: isDesktopScreen ? null : TextAlign.end),
+        operationRightWidget: Text(TIM_t("未填写"), textAlign: isDesktopScreen ? null : TextAlign.end),
       );
     }
   }
@@ -302,10 +287,8 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
         child: Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.symmetric(vertical: 15),
-          decoration: BoxDecoration(
-              color: Colors.white,
-              border:
-                  Border(bottom: BorderSide(color: theme.weakDividerColor))),
+          decoration:
+              BoxDecoration(color: Colors.white, border: Border(bottom: BorderSide(color: theme.weakDividerColor))),
           child: Text(
             TIM_t("删除好友"),
             style: TextStyle(color: theme.cautionColor, fontSize: 17),
@@ -320,15 +303,11 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
         // padding: const EdgeInsets.symmetric(vertical: 15),
         decoration: BoxDecoration(
             color: Colors.white,
-            border: Border(
-                bottom: BorderSide(
-                    color: theme.weakDividerColor ??
-                        CommonColor.weakDividerColor))),
+            border: Border(bottom: BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
         child: Row(children: [
           Expanded(
             child: TextButton(
-                child: Text(TIM_t("加为好友"),
-                    style: TextStyle(color: theme.primaryColor, fontSize: 17)),
+                child: Text(TIM_t("加为好友"), style: TextStyle(color: theme.primaryColor, fontSize: 17)),
                 onPressed: () {
                   handleAddFriend();
                 }),
@@ -362,15 +341,13 @@ class TIMUIKitProfileWidget extends TIMUIKitClass {
                 style: TextStyle(color: color),
               ),
               style: ButtonStyle(
-                minimumSize:
-                    MaterialStateProperty.all<Size>(const Size(160, 40)),
+                minimumSize: MaterialStateProperty.all<Size>(const Size(160, 40)),
               ))
           : ElevatedButton(
               onPressed: onPressed,
               child: Text(text),
               style: ButtonStyle(
-                  minimumSize:
-                      MaterialStateProperty.all<Size>(const Size(180, 46)),
+                  minimumSize: MaterialStateProperty.all<Size>(const Size(180, 46)),
                   backgroundColor: MaterialStateProperty.all<Color>(color)),
             ),
     );

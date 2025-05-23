@@ -5,17 +5,28 @@ import 'package:tencent_cloud_chat_sdk/enum/history_msg_get_type_enum.dart';
 import 'package:tencent_cloud_chat_sdk/enum/message_priority_enum.dart';
 import 'package:tencent_cloud_chat_sdk/enum/offlinePushInfo.dart';
 import 'package:tencent_cloud_chat_sdk/enum/receive_message_opt_enum.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_callback.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_message_read_member_list.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_change_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_list_result.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_online_url.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_receipt.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_search_param.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_search_result.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_msg_create_info_result.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_callback.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_message_read_member_list.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_message_read_member_list.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_change_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message_change_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_list_result.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message_list_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_online_url.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message_online_url.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_receipt.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message_receipt.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_search_param.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message_search_param.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_search_result.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message_search_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_msg_create_info_result.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_msg_create_info_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_value_callback.dart';
 
 class MessageListResponse {
   final bool haveMoreData;
@@ -26,8 +37,7 @@ class MessageListResponse {
 
 abstract class MessageService {
   Future<List<V2TimMessage>> getHistoryMessageList({
-    HistoryMsgGetTypeEnum getType =
-        HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
+    HistoryMsgGetTypeEnum getType = HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
     String? userID,
     String? groupID,
     int lastMsgSeq,
@@ -37,8 +47,7 @@ abstract class MessageService {
   });
 
   Future<V2TimMessageListResult?> getHistoryMessageListWithComplete({
-    HistoryMsgGetTypeEnum getType =
-        HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
+    HistoryMsgGetTypeEnum getType = HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
     String? userID,
     String? groupID,
     int lastMsgSeq,
@@ -48,8 +57,7 @@ abstract class MessageService {
   });
 
   Future<MessageListResponse> getHistoryMessageListV2({
-    HistoryMsgGetTypeEnum getType =
-        HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
+    HistoryMsgGetTypeEnum getType = HistoryMsgGetTypeEnum.V2TIM_GET_LOCAL_OLDER_MSG,
     String? userID,
     String? groupID,
     int lastMsgSeq,
@@ -70,13 +78,11 @@ abstract class MessageService {
 
   Future<V2TimMsgCreateInfoResult?> createTextMessage({required String text});
 
-  Future<V2TimMsgCreateInfoResult?> createFaceMessage(
-      {required int index, required String data});
+  Future<V2TimMsgCreateInfoResult?> createFaceMessage({required int index, required String data});
 
   Future<V2TimMsgCreateInfoResult?> createCustomMessage({required String data});
 
-  Future<V2TimMsgCreateInfoResult?> createTextAtMessage(
-      {required String text, required List<String> atUserList});
+  Future<V2TimMsgCreateInfoResult?> createTextAtMessage({required String text, required List<String> atUserList});
 
   Future<V2TimValueCallback<V2TimMessage>> sendMessage(
       {required String id, // 自己创建的ID
@@ -100,30 +106,20 @@ abstract class MessageService {
     required V2TimMessage replyMessage, // 被回复的消息
   });
 
-  Future<V2TimValueCallback<V2TimMessage>> reSendMessage(
-      {required String msgID,
-      bool onlineUserOnly});
+  Future<V2TimValueCallback<V2TimMessage>> reSendMessage({required String msgID, bool onlineUserOnly});
 
-  Future<V2TimValueCallback<V2TimMessageChangeInfo>> modifyMessage(
-      {required V2TimMessage message});
+  Future<V2TimValueCallback<V2TimMessageChangeInfo>> modifyMessage({required V2TimMessage message});
 
-  Future<V2TimMsgCreateInfoResult?> createImageMessage(
-      {String? imageName, String? imagePath, dynamic inputElement});
+  Future<V2TimMsgCreateInfoResult?> createImageMessage({String? imageName, String? imagePath, dynamic inputElement});
 
   Future<V2TimMsgCreateInfoResult?> createVideoMessage(
-      {String? videoPath = "",
-      String? type = "",
-      int? duration = 0,
-      String? snapshotPath = "",
-      dynamic inputElement});
+      {String? videoPath = "", String? type = "", int? duration = 0, String? snapshotPath = "", dynamic inputElement});
 
   Future<V2TimMsgCreateInfoResult?> createFileMessage(
       {String? filePath, required String fileName, dynamic inputElement});
 
   Future<V2TimMsgCreateInfoResult?> createLocationMessage(
-      {required String desc,
-      required double longitude,
-      required double latitude});
+      {required String desc, required double longitude, required double latitude});
 
   Future<V2TimMsgCreateInfoResult?> createSoundMessage({
     required String soundPath,
@@ -146,8 +142,7 @@ abstract class MessageService {
     Object? webMessageInstance,
   });
 
-  Future<V2TimCallback> revokeMessage(
-      {required String msgID, Object? webMessageInstance});
+  Future<V2TimCallback> revokeMessage({required String msgID, Object? webMessageInstance});
 
   Future<V2TimCallback> clearC2CHistoryMessage({
     required String userID,
@@ -171,8 +166,7 @@ abstract class MessageService {
     required String msgID,
   });
 
-  Future<V2TimCallback> deleteMessages(
-      {required List<String> msgIDs, List<dynamic>? webMessageInstanceList});
+  Future<V2TimCallback> deleteMessages({required List<String> msgIDs, List<dynamic>? webMessageInstanceList});
 
   Future<List<V2TimMessage>?> findMessages({
     required List<String> messageIDList,
@@ -182,11 +176,9 @@ abstract class MessageService {
     required V2TimMessageSearchParam searchParam,
   });
 
-  Future<V2TimCallback> setLocalCustomInt(
-      {required String msgID, required int localCustomInt});
+  Future<V2TimCallback> setLocalCustomInt({required String msgID, required int localCustomInt});
 
-  Future<V2TimCallback> setLocalCustomData(
-      {required String msgID, required String localCustomData});
+  Future<V2TimCallback> setLocalCustomData({required String msgID, required String localCustomData});
 
   Future<V2TimCallback> setC2CReceiveMessageOpt({
     required List<String> userIDList,
@@ -198,8 +190,7 @@ abstract class MessageService {
     required ReceiveMsgOptEnum opt,
   });
 
-  Future<V2TimValueCallback<V2TimGroupMessageReadMemberList>>
-      getGroupMessageReadMemberList({
+  Future<V2TimValueCallback<V2TimGroupMessageReadMemberList>> getGroupMessageReadMemberList({
     required String messageID,
     required GetGroupMessageReadMemberListFilter filter,
     int nextSeq = 0,

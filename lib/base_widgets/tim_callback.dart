@@ -1,5 +1,3 @@
-import 'package:flutter/cupertino.dart';
-
 enum TIMCallbackType { API_ERROR, FLUTTER_ERROR, INFO }
 
 class TIMCallback {

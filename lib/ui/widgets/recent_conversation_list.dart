@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_conversation_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
@@ -27,14 +28,11 @@ class RecentForwardList extends StatefulWidget {
 }
 
 class _RecentForwardListState extends TIMUIKitState<RecentForwardList> {
-  final TUIConversationViewModel _conversationViewModel =
-      serviceLocator<TUIConversationViewModel>();
+  final TUIConversationViewModel _conversationViewModel = serviceLocator<TUIConversationViewModel>();
   final List<V2TimConversation> _selectedConversation = [];
 
-  List<ISuspensionBeanImpl<V2TimConversation?>> _buildMemberList(
-      List<V2TimConversation?> conversationList) {
-    final List<ISuspensionBeanImpl<V2TimConversation?>> showList =
-        List.empty(growable: true);
+  List<ISuspensionBeanImpl<V2TimConversation?>> _buildMemberList(List<V2TimConversation?> conversationList) {
+    final List<ISuspensionBeanImpl<V2TimConversation?>> showList = List.empty(growable: true);
     for (var i = 0; i < conversationList.length; i++) {
       final item = conversationList[i];
       showList.add(ISuspensionBeanImpl(memberInfo: item, tagIndex: "#"));
@@ -43,8 +41,7 @@ class _RecentForwardListState extends TIMUIKitState<RecentForwardList> {
   }
 
   Widget _buildItem(V2TimConversation conversation) {
-    final isDesktopScreen =
-        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
 
     final faceUrl = conversation.faceUrl ?? "";
     final showName = conversation.showName ?? "";
@@ -108,14 +105,13 @@ class _RecentForwardListState extends TIMUIKitState<RecentForwardList> {
                     child: Container(
                   alignment: Alignment.centerLeft,
                   padding: EdgeInsets.only(top: 10, bottom: isDesktopScreen ? 12 : 19),
-                  decoration: isDesktopScreen ? null : const BoxDecoration(
-                      border:
-                          Border(bottom: BorderSide(color: Color(0xFFDBDBDB)))),
+                  decoration: isDesktopScreen
+                      ? null
+                      : const BoxDecoration(border: Border(bottom: BorderSide(color: Color(0xFFDBDBDB)))),
                   child: Text(
                     showName,
                     // textAlign: TextAlign.center,
-                    style:
-                    TextStyle(color: const Color(0xFF111111), fontSize: isDesktopScreen ? 16 : 18),
+                    style: TextStyle(color: const Color(0xFF111111), fontSize: isDesktopScreen ? 16 : 18),
                   ),
                 ))
               ],
@@ -125,7 +121,6 @@ class _RecentForwardListState extends TIMUIKitState<RecentForwardList> {
       ],
     );
   }
-
 
   @override
   void dispose() {
@@ -144,31 +139,31 @@ class _RecentForwardListState extends TIMUIKitState<RecentForwardList> {
         ChangeNotifierProvider.value(value: _conversationViewModel),
       ],
       builder: (context, w) {
-        final recentConvList =
-            serviceLocator<TUIConversationViewModel>().conversationList;
+        final recentConvList = serviceLocator<TUIConversationViewModel>().conversationList;
         final showList = _buildMemberList(recentConvList);
-        final isDesktopScreen =
-            TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+        final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
 
         return AZListViewContainer(
           memberList: showList,
           isShowIndexBar: false,
           susItemBuilder: (context, index) {
-            return isDesktopScreen ? Container() : Container(
-              height: 40,
-              width: MediaQuery.of(context).size.width,
-              padding: const EdgeInsets.only(left: 16.0),
-              color: theme.weakDividerColor,
-              alignment: Alignment.centerLeft,
-              child: Text(
-                TIM_t("最近联系人"),
-                softWrap: true,
-                style: TextStyle(
-                  fontSize: 14.0,
-                  color: theme.weakTextColor,
-                ),
-              ),
-            );
+            return isDesktopScreen
+                ? Container()
+                : Container(
+                    height: 40,
+                    width: MediaQuery.of(context).size.width,
+                    padding: const EdgeInsets.only(left: 16.0),
+                    color: theme.weakDividerColor,
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      TIM_t("最近联系人"),
+                      softWrap: true,
+                      style: TextStyle(
+                        fontSize: 14.0,
+                        color: theme.weakTextColor,
+                      ),
+                    ),
+                  );
           },
           itemBuilder: (context, index) {
             final conversation = showList[index].memberInfo;

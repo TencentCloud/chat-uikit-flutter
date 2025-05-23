@@ -5,10 +5,14 @@ import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:tencent_cloud_chat_sdk/enum/history_msg_get_type_enum.dart';
 import 'package:tencent_cloud_chat_sdk/enum/message_priority_enum.dart';
 import 'package:tencent_cloud_chat_sdk/enum/offlinePushInfo.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_value_callback.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
@@ -18,8 +22,7 @@ class TIMUIKitChatController {
   late TUIChatSeparateViewModel? model;
   late TIMUIKitInputTextFieldController? textFieldController;
   late AutoScrollController? scrollController;
-  final TUIChatGlobalModel globalChatModel =
-      serviceLocator<TUIChatGlobalModel>();
+  final TUIChatGlobalModel globalChatModel = serviceLocator<TUIChatGlobalModel>();
 
   TIMUIKitChatController({TUIChatSeparateViewModel? viewModel}) {
     if (viewModel != null) {
@@ -28,8 +31,7 @@ class TIMUIKitChatController {
   }
 
   Future<bool> loadHistoryMessageList(
-      {HistoryMsgGetTypeEnum getType =
-          HistoryMsgGetTypeEnum.V2TIM_GET_CLOUD_OLDER_MSG,
+      {HistoryMsgGetTypeEnum getType = HistoryMsgGetTypeEnum.V2TIM_GET_CLOUD_OLDER_MSG,
       String? userID,
       String? groupID,
       int lastMsgSeq = -1,
@@ -59,16 +61,15 @@ class TIMUIKitChatController {
   }
 
   /// Refresh the history message list manually;
-  Future<bool> refreshCurrentHistoryList(
-      [String? convID, ConvType? convType]) async {
-    if(model != null){
-      try{
+  Future<bool> refreshCurrentHistoryList([String? convID, ConvType? convType]) async {
+    if (model != null) {
+      try {
         scrollController?.animateTo(
           scrollController!.position.minScrollExtent,
           duration: const Duration(milliseconds: 200),
           curve: Curves.ease,
         );
-      }catch(e){}
+      } catch (e) {}
       return model!.loadDataFromController();
     } else {
       return false;
@@ -150,13 +151,13 @@ class TIMUIKitChatController {
       assert(groupID != null || convType != ConvType.group);
       assert(userID != null || convType != ConvType.c2c);
       if (isNavigateToMessageListBottom && scrollController != null) {
-        try{
+        try {
           scrollController?.animateTo(
             scrollController!.position.minScrollExtent,
             duration: const Duration(milliseconds: 200),
             curve: Curves.ease,
           );
-        }catch(e){}
+        } catch (e) {}
       }
       return globalChatModel.sendMessageFromController(
           priority: priority,
@@ -173,13 +174,13 @@ class TIMUIKitChatController {
     } else if (model != null) {
       /// Sends a message to the current conversation specified on `TIMUIKitChat`. 发送到 `TIMUIKitChat` 中指定的当前对话。
       if (isNavigateToMessageListBottom && scrollController != null) {
-        try{
+        try {
           scrollController?.animateTo(
             scrollController!.position.minScrollExtent,
             duration: const Duration(milliseconds: 200),
             curve: Curves.ease,
           );
-        }catch(e){}
+        } catch (e) {}
       }
       return model!.sendMessageFromController(
           priority: priority,
@@ -245,13 +246,13 @@ class TIMUIKitChatController {
       assert(groupID != null || convType != ConvType.group);
       assert(userID != null || convType != ConvType.c2c);
       if (isNavigateToMessageListBottom && scrollController != null) {
-        try{
+        try {
           scrollController?.animateTo(
             scrollController!.position.minScrollExtent,
             duration: const Duration(milliseconds: 200),
             curve: Curves.ease,
           );
-        }catch(e){}
+        } catch (e) {}
       }
       return globalChatModel.sendReplyMessageFromController(
           text: messageText,
@@ -307,34 +308,27 @@ class TIMUIKitChatController {
     required BuildContext context,
   }) async {
     return model?.sendMergerMessage(
-        conversationList: conversationList,
-        title: title,
-        abstractList: abstractList,
-        context: context);
+        conversationList: conversationList, title: title, abstractList: abstractList, context: context);
   }
 
   /// Set local custom data; returns the bool shows if succeed.
   /// Please provide `convID`, if you use `TIMUIKitChatController` without specifying to a `TIMUIKitChat`.
-  Future<bool> setLocalCustomData(String msgID, String localCustomData,
-      [String? convID]) async {
+  Future<bool> setLocalCustomData(String msgID, String localCustomData, [String? convID]) async {
     final String? conversationID = convID ?? model?.conversationID;
     if (conversationID == null) {
       return false;
     }
-    return globalChatModel.setLocalCustomData(
-        msgID, localCustomData, conversationID);
+    return globalChatModel.setLocalCustomData(msgID, localCustomData, conversationID);
   }
 
   /// Set local custom int; returns the bool shows if succeed.
   /// Please provide `convID`, if you use `TIMUIKitChatController` without specifying to a `TIMUIKitChat`.
-  Future<bool> setLocalCustomInt(String msgID, int localCustomInt,
-      [String? convID]) async {
+  Future<bool> setLocalCustomInt(String msgID, int localCustomInt, [String? convID]) async {
     final String? conversationID = convID ?? model?.conversationID;
     if (conversationID == null) {
       return false;
     }
-    return globalChatModel.setLocalCustomInt(
-        msgID, localCustomInt, conversationID);
+    return globalChatModel.setLocalCustomInt(msgID, localCustomInt, conversationID);
   }
 
   /// Get current conversation, returns UserID or GroupID if in the chat page, returns "" if not.
@@ -350,8 +344,7 @@ class TIMUIKitChatController {
 
   /// Mention or @ other members in a group manually.
   /// This function solely works when `TIMUIKitChatController` is specified for use within a `TIMUIKitChat`.
-  void mentionOtherMemberInGroup(
-      {required String showNameInMessage, required String userID}) {
+  void mentionOtherMemberInGroup({required String showNameInMessage, required String userID}) {
     textFieldController?.longPressToAt(showNameInMessage, userID);
   }
 
@@ -371,9 +364,7 @@ class TIMUIKitChatController {
   /// This function solely works when `TIMUIKitChatController` is specified for use within a `TIMUIKitChat`.
   List<V2TimGroupMemberFullInfo> getGroupMemberList({String? keyword}) {
     final List<V2TimGroupMemberFullInfo> memberList =
-        (model?.groupMemberList ?? [])
-            .whereType<V2TimGroupMemberFullInfo>()
-            .toList();
+        (model?.groupMemberList ?? []).whereType<V2TimGroupMemberFullInfo>().toList();
 
     return TencentUtils.checkString(keyword) == null
         ? memberList
@@ -381,9 +372,7 @@ class TIMUIKitChatController {
             final userID = e.userID;
             final nickName = e.nickName ?? "";
             final friendRemark = e.friendRemark ?? "";
-            return userID.contains(keyword!) ||
-                nickName.contains(keyword) ||
-                friendRemark.contains(keyword);
+            return userID.contains(keyword!) || nickName.contains(keyword) || friendRemark.contains(keyword);
           }).toList();
   }
 }

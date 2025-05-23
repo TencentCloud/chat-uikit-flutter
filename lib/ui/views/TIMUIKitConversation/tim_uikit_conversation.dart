@@ -6,8 +6,10 @@ import 'package:flutter_slidable_plus_plus/flutter_slidable_plus_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_status.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_status.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_user_status.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
@@ -32,7 +34,8 @@ typedef ConversationItemBuilder = Widget Function(V2TimConversation conversation
 
 typedef ConversationItemSlideBuilder = List<ConversationItemSlidePanel> Function(V2TimConversation conversationItem);
 
-typedef ConversationItemSecondaryMenuBuilder = Widget Function(V2TimConversation conversationItem, VoidCallback onClose);
+typedef ConversationItemSecondaryMenuBuilder = Widget Function(
+    V2TimConversation conversationItem, VoidCallback onClose);
 
 class TIMUIKitConversation extends StatefulWidget {
   /// the callback after clicking conversation item
@@ -178,7 +181,8 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
   }
 
   _pinConversation(V2TimConversation conversation) {
-    _timuiKitConversationController.pinConversation(conversationID: conversation.conversationID, isPinned: !conversation.isPinned!);
+    _timuiKitConversationController.pinConversation(
+        conversationID: conversation.conversationID, isPinned: !conversation.isPinned!);
   }
 
   _deleteConversation(V2TimConversation conversation) {
@@ -186,7 +190,8 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
   }
 
   List<V2TimConversation?> getFilteredConversation() {
-    List<V2TimConversation?> filteredConversationList = model.conversationList.where((element) => (element?.groupID != null || element?.userID != null)).toList();
+    List<V2TimConversation?> filteredConversationList =
+        model.conversationList.where((element) => (element?.groupID != null || element?.userID != null)).toList();
     if (widget.conversationCollector != null) {
       filteredConversationList = filteredConversationList.where(widget.conversationCollector!).toList();
     }
@@ -300,7 +305,8 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
         providers: [
           ChangeNotifierProvider.value(value: model),
           ChangeNotifierProvider.value(value: friendShipViewModel),
-          ChangeNotifierProvider.value(value: groupListenerModel)],
+          ChangeNotifierProvider.value(value: groupListenerModel)
+        ],
         builder: (BuildContext context, Widget? w) {
           final _model = Provider.of<TUIConversationViewModel>(context);
           bool haveMoreData = _model.haveMoreData;
@@ -346,7 +352,9 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
 
                       final conversationItem = filteredConversationList[index];
 
-                      final V2TimUserStatus? onlineStatus = _friendShipViewModel.userStatusList.firstWhere((item) => item.userID == conversationItem?.userID, orElse: () => V2TimUserStatus(statusType: 0));
+                      final V2TimUserStatus? onlineStatus = _friendShipViewModel.userStatusList.firstWhere(
+                          (item) => item.userID == conversationItem?.userID,
+                          orElse: () => V2TimUserStatus(statusType: 0));
 
                       if (widget.itemBuilder != null) {
                         return widget.itemBuilder!(conversationItem!, onlineStatus);
@@ -371,14 +379,18 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
                                 lastMessageBuilder: widget.lastMessageBuilder,
                                 faceUrl: conversationItem.faceUrl ?? "",
                                 nickName: conversationItem.showName ?? "",
-                                isDisturb: (conversationItem.groupType == "Meeting" ? false : conversationItem
-                                    .recvOpt != 0),
+                                isDisturb:
+                                    (conversationItem.groupType == "Meeting" ? false : conversationItem.recvOpt != 0),
                                 lastMsg: conversationItem.lastMessage,
                                 isPined: isPined,
                                 groupAtInfoList: conversationItem.groupAtInfoList ?? [],
                                 unreadCount: conversationItem.unreadCount ?? 0,
                                 draftText: conversationItem.draftText,
-                                onlineStatus: (widget.isShowOnlineStatus && conversationItem.userID != null && conversationItem.userID!.isNotEmpty) ? onlineStatus : null,
+                                onlineStatus: (widget.isShowOnlineStatus &&
+                                        conversationItem.userID != null &&
+                                        conversationItem.userID!.isNotEmpty)
+                                    ? onlineStatus
+                                    : null,
                                 draftTimestamp: conversationItem.draftTimestamp,
                                 convType: conversationItem.type),
                             onTap: () => onTapConvItem(conversationItem),
@@ -399,7 +411,9 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
                                     isDarkBackground: false,
                                     borderRadius: const BorderRadius.all(Radius.circular(4)),
                                     context: context,
-                                    offset: Offset(min(details.globalPosition.dx, MediaQuery.of(context).size.width - 80), min(details.globalPosition.dy, MediaQuery.of(context).size.height - 130)),
+                                    offset: Offset(
+                                        min(details.globalPosition.dx, MediaQuery.of(context).size.width - 80),
+                                        min(details.globalPosition.dy, MediaQuery.of(context).size.height - 130)),
                                     child: (onClose) => _getSecondaryMenu(conversationItem, onClose));
                               },
                               child: conversationLineItem(),
@@ -409,7 +423,13 @@ class _TIMUIKitConversationState extends TIMUIKitState<TIMUIKitConversation> {
                             key: ValueKey(conversationItem.conversationID),
                             controller: _autoScrollController,
                             index: index,
-                            child: Slidable(groupTag: 'conversation-list', child: conversationLineItem(), endActionPane: ActionPane(extentRatio: slideChildren.length > 2 ? 0.77 : 0.5, motion: const DrawerMotion(), children: slideChildren)),
+                            child: Slidable(
+                                groupTag: 'conversation-list',
+                                child: conversationLineItem(),
+                                endActionPane: ActionPane(
+                                    extentRatio: slideChildren.length > 2 ? 0.77 : 0.5,
+                                    motion: const DrawerMotion(),
+                                    children: slideChildren)),
                           ));
                     })
                 : (widget.emptyBuilder != null ? widget.emptyBuilder!() : Container());

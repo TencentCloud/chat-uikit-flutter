@@ -2,8 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_custom_elem.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_custom_elem.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_custom_elem.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 
@@ -43,9 +45,7 @@ class TIMUIKitCustomElem extends TIMUIKitStatelessWidget {
             topRight: Radius.circular(10),
             bottomLeft: Radius.circular(10),
             bottomRight: Radius.circular(10));
-    final backgroundColor = isFromSelf
-        ? theme.lightPrimaryMaterialColor.shade50
-        : theme.weakBackgroundColor;
+    final backgroundColor = isFromSelf ? theme.lightPrimaryMaterialColor.shade50 : theme.weakBackgroundColor;
     return Container(
         padding: textPadding ?? const EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -54,9 +54,7 @@ class TIMUIKitCustomElem extends TIMUIKitStatelessWidget {
         ),
         constraints: const BoxConstraints(maxWidth: 240),
         child: Column(
-          children: [
-            Text(TIM_t("自定义消息"))
-          ],
+          children: [Text(TIM_t("自定义消息"))],
         ));
   }
 }

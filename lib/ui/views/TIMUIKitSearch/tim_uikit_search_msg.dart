@@ -3,9 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_search_result_item.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_search_result_item.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message_search_result_item.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/conversation/conversation_services.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_search_view_model.dart';
@@ -45,19 +48,17 @@ class TIMUIKitSearchMsg extends TIMUIKitStatelessWidget {
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
-    List<V2TimConversation?> _conversationList =
-        Provider.of<TUISearchViewModel>(context).conversationList;
+    List<V2TimConversation?> _conversationList = Provider.of<TUISearchViewModel>(context).conversationList;
 
     if (msgList.isNotEmpty) {
       return TIMUIKitSearchFolder(folderName: TIM_t("聊天记录"), children: [
         ...msgList.map((conv) {
           V2TimConversation? conversation;
-          final index = _conversationList.indexWhere(
-                  (item) => item!.conversationID == conv?.conversationID);
-          if(index > -1){
+          final index = _conversationList.indexWhere((item) => item!.conversationID == conv?.conversationID);
+          if (index > -1) {
             conversation = _conversationList[index]!;
           }
-          if(conversation == null){
+          if (conversation == null) {
             return Container();
           }
           final option1 = conv?.messageCount;
@@ -68,8 +69,7 @@ class TIMUIKitSearchMsg extends TIMUIKitStatelessWidget {
             faceUrl: conversation.faceUrl ?? "",
             showName: conversation.showName ?? "",
             lineOne: conversation.showName ?? "",
-            lineTwo: TIM_t_para("{{option1}}条相关聊天记录", "$option1条相关聊天记录")(
-                option1: option1),
+            lineTwo: TIM_t_para("{{option1}}条相关聊天记录", "$option1条相关聊天记录")(option1: option1),
           );
         }).toList(),
         _renderShowALl(totalMsgCount > msgList.length)

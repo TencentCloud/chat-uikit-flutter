@@ -4,7 +4,8 @@ import 'dart:io';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
 import 'package:tencent_cloud_chat_sdk/enum/message_elem_type.dart';
 import 'package:tencent_cloud_chat_sdk/enum/offlinePushInfo.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/tim_uikit_cloud_custom_data.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_chat_global_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/core/core_services_implements.dart';
@@ -14,15 +15,13 @@ class TUIChatModelTools {
   final TUIChatGlobalModel globalModel = serviceLocator<TUIChatGlobalModel>();
   final CoreServicesImpl _coreServices = serviceLocator<CoreServicesImpl>();
 
-  OfflinePushInfo buildMessagePushInfo(
-      V2TimMessage message, String convID, ConvType convType) {
+  OfflinePushInfo buildMessagePushInfo(V2TimMessage message, String convID, ConvType convType) {
     String createJSON(String convID) {
       return "{\"conversationID\": \"$convID\"}";
     }
 
     if (globalModel.chatConfig.offlinePushInfo != null) {
-      final customData =
-          globalModel.chatConfig.offlinePushInfo!(message, convID, convType);
+      final customData = globalModel.chatConfig.offlinePushInfo!(message, convID, convType);
       if (customData != null) {
         return customData;
       }
@@ -33,12 +32,8 @@ class TUIChatModelTools {
     // If user provides null, use default ext.
     String ext = globalModel.chatConfig.notificationExt != null
         ? globalModel.chatConfig.notificationExt!(message, convID, convType) ??
-            (convType == ConvType.c2c
-                ? createJSON("c2c_${message.sender}")
-                : createJSON("group_$convID"))
-        : (convType == ConvType.c2c
-            ? createJSON("c2c_${message.sender}")
-            : createJSON("group_$convID"));
+            (convType == ConvType.c2c ? createJSON("c2c_${message.sender}") : createJSON("group_$convID"))
+        : (convType == ConvType.c2c ? createJSON("c2c_${message.sender}") : createJSON("group_$convID"));
 
     String desc = message.userID ?? message.groupID ?? "";
     String messageSummary = "";
@@ -76,23 +71,22 @@ class TUIChatModelTools {
     }
 
     if (globalModel.chatConfig.notificationBody != null) {
-      desc =
-          globalModel.chatConfig.notificationBody!(message, convID, convType) ??
-              messageSummary;
+      desc = globalModel.chatConfig.notificationBody!(message, convID, convType) ?? messageSummary;
     } else {
       desc = messageSummary;
     }
 
-    return OfflinePushInfo.fromJson({
-      "title": title,
-      "desc": desc,
-      "disablePush": false,
-      "ext": ext,
-      "iOSSound": globalModel.chatConfig.notificationIOSSound,
-      "androidSound": globalModel.chatConfig.notificationAndroidSound,
-      "ignoreIOSBadge": false,
-      "androidOPPOChannelID": globalModel.chatConfig.notificationOPPOChannelID,
-    });
+    return OfflinePushInfo(
+      title: title,
+      desc: desc,
+      disablePush: false,
+      ext: ext,
+      iOSSound: globalModel.chatConfig.notificationIOSSound,
+      androidSound: globalModel.chatConfig.notificationAndroidSound,
+      ignoreIOSBadge: false,
+      androidOPPOChannelID: globalModel.chatConfig.notificationOPPOChannelID,
+      androidVIVOClassification: 1,
+    );
   }
 
   V2TimMessage setUserInfoForMessage(V2TimMessage messageInfo, String? id) {
@@ -102,18 +96,15 @@ class TUIChatModelTools {
       messageInfo.nickName = loginUserInfo.nickName;
       messageInfo.sender = loginUserInfo.userID;
     }
-    messageInfo.timestamp =
-        (DateTime.now().millisecondsSinceEpoch / 1000).ceil();
+    messageInfo.timestamp = (DateTime.now().millisecondsSinceEpoch / 1000).ceil();
     messageInfo.isSelf = true;
     messageInfo.id = id;
 
     return messageInfo;
   }
 
-  String getMessageSummary(V2TimMessage message,
-      String? Function(V2TimMessage message)? abstractMessageBuilder) {
-    final String? customAbstractMessage =
-        abstractMessageBuilder != null ? abstractMessageBuilder(message) : null;
+  String getMessageSummary(V2TimMessage message, String? Function(V2TimMessage message)? abstractMessageBuilder) {
+    final String? customAbstractMessage = abstractMessageBuilder != null ? abstractMessageBuilder(message) : null;
     if (customAbstractMessage != null) {
       return customAbstractMessage;
     }
@@ -147,8 +138,7 @@ class TUIChatModelTools {
     }
   }
 
-  String getMessageAbstract(V2TimMessage message,
-      String? Function(V2TimMessage message)? abstractMessageBuilder) {
+  String getMessageAbstract(V2TimMessage message, String? Function(V2TimMessage message)? abstractMessageBuilder) {
     final messageAbstract = RepliedMessageAbstract(
         summary: TIM_t(getMessageSummary(message, abstractMessageBuilder)),
         elemType: message.elemType,
@@ -159,18 +149,13 @@ class TUIChatModelTools {
   }
 
   Future<V2TimMessage?> getExistingMessageByID(
-      {required String msgID,
-      required String conversationID,
-      required ConvType conversationType}) async {
-    final currentHistoryMsgList =
-        globalModel.messageListMap[conversationID] ?? [];
+      {required String msgID, required String conversationID, required ConvType conversationType}) async {
+    final currentHistoryMsgList = globalModel.messageListMap[conversationID] ?? [];
     final int? targetIndex = currentHistoryMsgList.indexWhere((item) {
       return item.msgID == msgID;
     });
 
-    if (targetIndex != null &&
-        targetIndex > -1 &&
-        currentHistoryMsgList.isNotEmpty) {
+    if (targetIndex != null && targetIndex > -1 && currentHistoryMsgList.isNotEmpty) {
       return currentHistoryMsgList[targetIndex];
     } else {
       return null;

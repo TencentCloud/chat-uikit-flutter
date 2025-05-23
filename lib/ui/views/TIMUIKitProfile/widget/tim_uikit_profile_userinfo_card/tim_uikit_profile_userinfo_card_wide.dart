@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_user_full_info.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_cloud_chat_uikit/ui/widgets/avatar.dart';
@@ -19,8 +20,9 @@ class TIMUIKitProfileUserInfoCardWide extends TIMUIKitStatelessWidget {
       {Key? key,
       this.userInfo,
       this.onClickAvatar,
-      @Deprecated("This info card can no longer navigate to default personal profile page automatically, please deal with it manually.")
-          this.isJumpToPersonalProfile = false,
+      @Deprecated(
+          "This info card can no longer navigate to default personal profile page automatically, please deal with it manually.")
+      this.isJumpToPersonalProfile = false,
       this.showArrowRightIcon = false})
       : super(key: key);
 
@@ -55,22 +57,19 @@ class TIMUIKitProfileUserInfoCardWide extends TIMUIKitStatelessWidget {
                   children: [
                     Text(
                       "ID:  ",
-                      style:
-                          TextStyle(fontSize: 12, color: theme.weakTextColor),
+                      style: TextStyle(fontSize: 12, color: theme.weakTextColor),
                     ),
-                    Expanded(child: SelectableText(
+                    Expanded(
+                        child: SelectableText(
                       userInfo?.userID ?? "",
-                      style:
-                      TextStyle(fontSize: 12, color: theme.weakTextColor),
+                      style: TextStyle(fontSize: 12, color: theme.weakTextColor),
                     )),
                   ],
                 ),
                 if (signature != null)
                   Container(
                     margin: const EdgeInsets.only(top: 18),
-                    child: SelectableText(signature,
-                        style: TextStyle(
-                            fontSize: 14, color: hexToColor("7f7f7f"))),
+                    child: SelectableText(signature, style: TextStyle(fontSize: 14, color: hexToColor("7f7f7f"))),
                   )
               ],
             ),
@@ -93,9 +92,7 @@ class TIMUIKitProfileUserInfoCardWide extends TIMUIKitStatelessWidget {
                   ),
                 ),
               ),
-              showArrowRightIcon
-                  ? const Icon(Icons.keyboard_arrow_right)
-                  : Container()
+              showArrowRightIcon ? const Icon(Icons.keyboard_arrow_right) : Container()
             ],
           )
         ],

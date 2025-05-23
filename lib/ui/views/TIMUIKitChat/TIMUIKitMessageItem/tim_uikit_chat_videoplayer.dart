@@ -4,9 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:better_player_plus/better_player_plus.dart';
 import 'package:tencent_cloud_chat_sdk/enum/message_elem_type.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_online_url.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_online_url.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message_online_url.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_value_callback.dart';
 import 'package:tencent_cloud_chat_sdk/tencent_im_sdk_plugin.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
@@ -83,9 +86,9 @@ class TIMUIKitVideoPlayerState extends State<TIMUIKitVideoPlayer> {
             enableProgressBar: true,
             enableProgressText: true,
             showControlsOnInitialize: false,
-            enableMute:false,
-            enableOverflowMenu:false,
-            enableSkips:false,
+            enableMute: false,
+            enableOverflowMenu: false,
+            enableSkips: false,
           ),
         );
 
@@ -95,8 +98,7 @@ class TIMUIKitVideoPlayerState extends State<TIMUIKitVideoPlayer> {
         );
 
         if (mounted) {
-          setState(() {
-          });
+          setState(() {});
         }
       }
     } catch (e) {
@@ -134,13 +136,15 @@ class TIMUIKitVideoPlayerState extends State<TIMUIKitVideoPlayer> {
         // 先查本地发送的视频地址
         if (File(widget.message.videoElem!.videoPath!).existsSync()) {
           console("video: local video path exists");
-          return CurrentVideoInfo(path: widget.message.videoElem!.videoPath!, type: CurrentVideoType.local, aspectRatio: aspectRatio);
+          return CurrentVideoInfo(
+              path: widget.message.videoElem!.videoPath!, type: CurrentVideoType.local, aspectRatio: aspectRatio);
         }
       } else if (TencentUtils.checkString(widget.message.videoElem!.localVideoUrl) != null) {
         // 再查本地下载的视频地址
         if (File(widget.message.videoElem!.localVideoUrl!).existsSync()) {
           console("video: local url exists");
-          return CurrentVideoInfo(path: widget.message.videoElem!.localVideoUrl!, type: CurrentVideoType.local, aspectRatio: aspectRatio);
+          return CurrentVideoInfo(
+              path: widget.message.videoElem!.localVideoUrl!, type: CurrentVideoType.local, aspectRatio: aspectRatio);
         }
       } else {
         // 最后再查在线地址(todo 使用 getMessageOnlineUrl 查询)
@@ -155,12 +159,15 @@ class TIMUIKitVideoPlayerState extends State<TIMUIKitVideoPlayer> {
           }
         }
         if (!kIsWeb) {
-          V2TimValueCallback<V2TimMessageOnlineUrl> urlres = await TencentImSDKPlugin.v2TIMManager.getMessageManager().getMessageOnlineUrl(msgID: widget.message.msgID ?? "");
+          V2TimValueCallback<V2TimMessageOnlineUrl> urlres = await TencentImSDKPlugin.v2TIMManager
+              .getMessageManager()
+              .getMessageOnlineUrl(msgID: widget.message.msgID ?? "");
           if (urlres.data != null) {
             if (urlres.data?.videoElem != null) {
               if (TencentUtils.checkString(urlres.data?.videoElem?.videoUrl) != null) {
                 console("view video online url ${urlres.data?.videoElem?.videoUrl}");
-                return CurrentVideoInfo(path: urlres.data!.videoElem!.videoUrl!, type: CurrentVideoType.online, aspectRatio: aspectRatio);
+                return CurrentVideoInfo(
+                    path: urlres.data!.videoElem!.videoUrl!, type: CurrentVideoType.online, aspectRatio: aspectRatio);
               }
             }
           }

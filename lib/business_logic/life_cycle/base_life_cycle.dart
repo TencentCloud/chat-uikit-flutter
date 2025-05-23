@@ -1,9 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_friend_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_value_callback.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_class.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_callback.dart';
 
@@ -63,7 +67,8 @@ abstract class DefaultLifeCycle {
 
   static defaultNullCallbackSolution(dynamic) {}
 
-  static Future<bool> defaultAddFriend(String userID, String? remark, String? friendGroup, String? addWording, [BuildContext? context]) async {
+  static Future<bool> defaultAddFriend(String userID, String? remark, String? friendGroup, String? addWording,
+      [BuildContext? context]) async {
     return true;
   }
 
@@ -77,7 +82,8 @@ abstract class DefaultLifeCycle {
 
   static Future<void> defaultPopBackRemind() async {
     // You have to implement the exact life cycle hook in this case.
-    TIMUIKitClass.onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("请传入离开群组生命周期函数，提供返回首页或其他页面的导航方法。"), infoCode: 6661402));
+    TIMUIKitClass.onTIMCallback(TIMCallback(
+        type: TIMCallbackType.INFO, infoRecommendText: TIM_t("请传入离开群组生命周期函数，提供返回首页或其他页面的导航方法。"), infoCode: 6661402));
     return;
   }
 }

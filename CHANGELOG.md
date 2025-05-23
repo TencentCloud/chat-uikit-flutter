@@ -1,3 +1,10 @@
+# 4.0.8
+* Use the OfflinePushInfo constructor, not the fromJson function.
+
+# 4.0.7
+* Fixed the issue that modifying your own adding friend permissions does not take effect.
+* Fixed the setGroupInfo exception problem.
+
 # 4.0.6
 * Solve the updateSelfInfo exception problem.
 * The success of calling the initSDK interface is determined by the code of the return value. Avoid inaccurate judgment when calling the interface multiple times.

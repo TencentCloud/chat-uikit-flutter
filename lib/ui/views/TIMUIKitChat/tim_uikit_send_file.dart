@@ -2,7 +2,8 @@ import 'dart:io';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_statelesswidget.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/separate_models/tui_chat_separate_view_model.dart';
@@ -18,10 +19,7 @@ import 'package:tencent_cloud_chat_uikit/theme/tui_theme.dart';
 import 'TIMUIKitMessageItem/tim_uikit_chat_file_icon.dart';
 
 String _getConvID(V2TimConversation conversation) {
-  return (conversation.type == 1
-          ? conversation.userID
-          : conversation.groupID) ??
-      "";
+  return (conversation.type == 1 ? conversation.userID : conversation.groupID) ?? "";
 }
 
 sendFileWithConfirmation(
@@ -65,8 +63,7 @@ sendFileWithConfirmation(
     return;
   }
 
-  final option1 = conversation.showName ??
-      (conversationType == ConvType.group ? TIM_t("群聊") : TIM_t("对方"));
+  final option1 = conversation.showName ?? (conversationType == ConvType.group ? TIM_t("群聊") : TIM_t("对方"));
   TUIKitWidePopup.showPopupWindow(
       operationKey: TUIKitWideModalOperationKey.beforeSendScreenShot,
       context: context,
@@ -85,9 +82,7 @@ sendFileWithConfirmation(
                     child: ListView.separated(
                       itemBuilder: (BuildContext context, int index) {
                         final file = files[index];
-                        final fileName = PlatformUtils().isWeb
-                            ? file.name
-                            : path.basename(file.path);
+                        final fileName = PlatformUtils().isWeb ? file.name : path.basename(file.path);
                         return Material(
                           color: theme.wideBackgroundColor,
                           child: InkWell(
@@ -95,22 +90,18 @@ sendFileWithConfirmation(
                               launchUrl(Uri.file(file.path));
                             },
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 6, horizontal: 20),
+                              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 20),
                               child: Row(
                                 children: [
                                   TIMUIKitFileIcon(
                                     size: 44,
-                                    fileFormat: fileName.split(
-                                        ".")[fileName.split(".").length - 1],
+                                    fileFormat: fileName.split(".")[fileName.split(".").length - 1],
                                   ),
                                   const SizedBox(width: 16),
                                   Expanded(
                                     child: Text(
                                       fileName,
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: theme.darkTextColor),
+                                      style: TextStyle(fontSize: 16, color: theme.darkTextColor),
                                     ),
                                   ),
                                 ],
@@ -146,8 +137,7 @@ sendFileWithConfirmation(
                       ),
                       ElevatedButton(
                           onPressed: () {
-                            sendFiles(files, model, conversation,
-                                conversationType, context);
+                            sendFiles(files, model, conversation, conversationType, context);
                             closeFunc();
                           },
                           child: Text(TIM_t("发送")))
@@ -159,21 +149,14 @@ sendFileWithConfirmation(
           ));
 }
 
-Future<void> sendFiles(
-    List<XFile> files,
-    TUIChatSeparateViewModel model,
-    V2TimConversation conversation,
-    ConvType conversationType,
-    BuildContext context) async {
+Future<void> sendFiles(List<XFile> files, TUIChatSeparateViewModel model, V2TimConversation conversation,
+    ConvType conversationType, BuildContext context) async {
   for (final file in files) {
     final fileName = file.name;
     final filePath = file.path;
     await MessageUtils.handleMessageError(
         model.sendFileMessage(
-            fileName: fileName,
-            filePath: filePath,
-            convID: _getConvID(conversation),
-            convType: conversationType),
+            fileName: fileName, filePath: filePath, convID: _getConvID(conversation), convType: conversationType),
         context);
     await Future.delayed(const Duration(microseconds: 300));
   }
@@ -188,8 +171,7 @@ class TIMUIKitSendFile extends TIMUIKitStatelessWidget {
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {
     final theme = value.theme;
     final conversationType = conversation.type;
-    final option1 = conversation.showName ??
-        (conversationType == 2 ? TIM_t("群聊") : TIM_t("会话"));
+    final option1 = conversation.showName ?? (conversationType == 2 ? TIM_t("群聊") : TIM_t("会话"));
 
     return Row(
       mainAxisSize: MainAxisSize.max,
@@ -222,12 +204,8 @@ class TIMUIKitSendFile extends TIMUIKitStatelessWidget {
                         height: 40,
                       ),
                       Text(
-                        TIM_t_para("发送给{{option1}}", "发送给$option1")(
-                            option1: option1),
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: theme.darkTextColor),
+                        TIM_t_para("发送给{{option1}}", "发送给$option1")(option1: option1),
+                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: theme.darkTextColor),
                       )
                     ],
                   ))

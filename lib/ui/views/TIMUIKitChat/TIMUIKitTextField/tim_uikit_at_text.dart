@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_search_param.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_search_result.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_search_param.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_search_param.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_search_result.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_search_result.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_user_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_value_callback.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_self_info_view_model.dart';
 import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart';
@@ -78,8 +84,7 @@ class _AtTextState extends TIMUIKitState<AtText> {
 
   Future<V2TimValueCallback<V2GroupMemberInfoSearchResult>> searchGroupMember(
       V2TimGroupMemberSearchParam searchParam) async {
-    final res =
-        await _groupServices.searchGroupMembers(searchParam: searchParam);
+    final res = await _groupServices.searchGroupMembers(searchParam: searchParam);
 
     if (res.code == 0) {}
     return res;
@@ -105,8 +110,7 @@ class _AtTextState extends TIMUIKitState<AtText> {
     }
 
     setState(() {
-      searchMemberList =
-          isSearchTextExist(searchText) ? searchMemberList : groupMemberList;
+      searchMemberList = isSearchTextExist(searchText) ? searchMemberList : groupMemberList;
     });
   }
 
@@ -148,8 +152,7 @@ class _AtTextState extends TIMUIKitState<AtText> {
           customTopArea: PlatformUtils().isWeb
               ? null
               : GroupMemberSearchTextField(
-                  onTextChange: (text) =>
-                      handleSearchGroupMembers(text, context),
+                  onTextChange: (text) => handleSearchGroupMembers(text, context),
                 ));
     }
 
@@ -196,7 +199,7 @@ class _AtTextState extends TIMUIKitState<AtText> {
                     _submitAtMemberList();
                   },
                   child: Text(
-                   TIM_t("确定"),
+                    TIM_t("确定"),
                     style: TextStyle(
                       color: theme.appbarTextColor,
                       fontSize: 14,

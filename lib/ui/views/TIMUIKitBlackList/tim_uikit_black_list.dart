@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable_plus_plus/flutter_slidable_plus_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_friend_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_friend_info.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_state.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/life_cycle/block_list_life_cycle.dart';
 import 'package:tencent_cloud_chat_uikit/business_logic/view_models/tui_friendship_view_model.dart';
@@ -13,8 +14,7 @@ import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
 import 'package:tencent_cloud_chat_uikit/theme/color.dart';
 import 'package:tencent_cloud_chat_uikit/theme/tui_theme_view_model.dart';
 
-typedef BlackListItemBuilder = Widget Function(
-    BuildContext context, V2TimFriendInfo friendInfo);
+typedef BlackListItemBuilder = Widget Function(BuildContext context, V2TimFriendInfo friendInfo);
 
 class TIMUIKitBlackList extends StatefulWidget {
   final void Function(V2TimFriendInfo friendInfo)? onTapItem;
@@ -24,12 +24,7 @@ class TIMUIKitBlackList extends StatefulWidget {
   /// The life cycle hooks for block list business logic
   final BlockListLifeCycle? lifeCycle;
 
-  const TIMUIKitBlackList(
-      {Key? key,
-      this.onTapItem,
-      this.emptyBuilder,
-      this.itemBuilder,
-      this.lifeCycle})
+  const TIMUIKitBlackList({Key? key, this.onTapItem, this.emptyBuilder, this.itemBuilder, this.lifeCycle})
       : super(key: key);
 
   @override
@@ -37,8 +32,7 @@ class TIMUIKitBlackList extends StatefulWidget {
 }
 
 class _TIMUIKitBlackListState extends TIMUIKitState<TIMUIKitBlackList> {
-  final TUIFriendShipViewModel _friendshipViewModel =
-      serviceLocator<TUIFriendShipViewModel>();
+  final TUIFriendShipViewModel _friendshipViewModel = serviceLocator<TUIFriendShipViewModel>();
 
   _getShowName(V2TimFriendInfo item) {
     final friendRemark = item.friendRemark ?? "";
@@ -52,8 +46,7 @@ class _TIMUIKitBlackListState extends TIMUIKitState<TIMUIKitBlackList> {
     final theme = Provider.of<TUIThemeViewModel>(context).theme;
     final showName = _getShowName(friendInfo);
     final faceUrl = friendInfo.userProfile?.faceUrl ?? "";
-    final isDesktopScreen =
-        TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
+    final isDesktopScreen = TUIKitScreenUtils.getFormFactor(context) == DeviceType.Desktop;
 
     Widget itemWidget() {
       return Material(
@@ -67,10 +60,7 @@ class _TIMUIKitBlackListState extends TIMUIKitState<TIMUIKitBlackList> {
           child: Container(
             padding: const EdgeInsets.only(top: 10, left: 16, right: 16),
             decoration: BoxDecoration(
-                border: Border(
-                    bottom: BorderSide(
-                        color: theme.weakDividerColor ??
-                            CommonColor.weakDividerColor))),
+                border: Border(bottom: BorderSide(color: theme.weakDividerColor ?? CommonColor.weakDividerColor))),
             child: Row(
               children: [
                 Container(
@@ -88,15 +78,13 @@ class _TIMUIKitBlackListState extends TIMUIKitState<TIMUIKitBlackList> {
                   padding: const EdgeInsets.only(top: 10, bottom: 20),
                   child: Text(
                     showName,
-                    style: TextStyle(
-                        color: theme.black, fontSize: isDesktopScreen ? 14 : 18),
+                    style: TextStyle(color: theme.black, fontSize: isDesktopScreen ? 14 : 18),
                   ),
                 )),
                 if (isDesktopScreen)
                   OutlinedButton(
                       onPressed: () {
-                        _friendshipViewModel
-                            .deleteFromBlockList([friendInfo.userID]);
+                        _friendshipViewModel.deleteFromBlockList([friendInfo.userID]);
                       },
                       child: Text(
                         TIM_t("移出黑名单"),
@@ -116,8 +104,7 @@ class _TIMUIKitBlackListState extends TIMUIKitState<TIMUIKitBlackList> {
           endActionPane: ActionPane(motion: const DrawerMotion(), children: [
             SlidableAction(
               onPressed: (context) async {
-                await _friendshipViewModel
-                    .deleteFromBlockList([friendInfo.userID]);
+                await _friendshipViewModel.deleteFromBlockList([friendInfo.userID]);
               },
               backgroundColor: theme.cautionColor ?? CommonColor.cautionColor,
               foregroundColor: theme.white,
@@ -132,7 +119,6 @@ class _TIMUIKitBlackListState extends TIMUIKitState<TIMUIKitBlackList> {
   BlackListItemBuilder _getItemBuilder() {
     return widget.itemBuilder ?? _itemBuilder;
   }
-
 
   @override
   Widget tuiBuild(BuildContext context, TUIKitBuildValue value) {

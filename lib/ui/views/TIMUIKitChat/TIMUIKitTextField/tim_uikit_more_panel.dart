@@ -12,7 +12,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
-import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_full_info.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 import 'package:tencent_cloud_chat_uikit/ui/views/TIMUIKitChat/TIMUIKitTextField/tim_uikit_call_invite_list.dart';
 import 'package:video_player/video_player.dart';
@@ -475,14 +476,12 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
       final size = await originFile!.length();
       if (!isVideo) {
         if (size >= MorePanelConfig.IMAGE_MAX_SIZE) {
-          onTIMCallback(
-              TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("文件大小超出了限制")));
+          onTIMCallback(TIMCallback(type: TIMCallbackType.INFO, infoRecommendText: TIM_t("文件大小超出了限制")));
           return;
         }
 
         MessageUtils.handleMessageError(
-            model.sendImageMessage(imagePath: originFile.path, convID: convID, convType: convType),
-            context);
+            model.sendImageMessage(imagePath: originFile.path, convID: convID, convType: convType), context);
       } else {
         // 监听视频准备完成事件
         _betterPlayerController.addEventsListener((event) {
