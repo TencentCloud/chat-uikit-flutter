@@ -6,8 +6,6 @@ import 'package:intl/intl.dart' as intl;
 
 import 'tencent_cloud_chat_localizations.dart';
 
-// ignore_for_file: type=lint
-
 /// The translations for Chinese (`zh`).
 class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
   TencentCloudChatLocalizationsZh([String locale = 'zh']) : super(locale);
@@ -328,7 +326,10 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
   String get groupType => '群类型';
 
   @override
-  String get addGroupWay => '添加群方式';
+  String get addGroupWay => '主动加群方式';
+
+  @override
+  String get inviteGroupType => '邀请进群方式';
 
   @override
   String get myAliasInGroup => '我的群昵称';
@@ -351,7 +352,7 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
   String get info => '信息';
 
   @override
-  String get setAsAdmin => '设为管理员';
+  String get setAsAdmin => '设置为管理员';
 
   @override
   String get announcement => '群公告';
@@ -873,57 +874,67 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
 
   @override
   String memberJoinedGroup(Object members) {
-    return '$members 已加入群组';
+    return '$members已加入群组';
   }
 
   @override
   String opInvitedToGroup(Object members, Object opMember) {
-    return '$opMember 邀请 $members 加入群组';
+    return '$opMember邀请$members加入群组';
   }
 
   @override
   String memberLeftGroup(Object members) {
-    return '$members 退出群组';
+    return '$members退出群组';
   }
 
   @override
   String opRemovedFromGroup(Object members, Object opMember) {
-    return '$opMember 将 $members 从群组中移除';
+    return '$opMember将$members从群组中移除';
   }
 
   @override
   String opPromotedToAdmin(Object members, Object opMember) {
-    return '$opMember 将 $members 提升为管理员';
+    return '$opMember将$members提升为管理员';
   }
 
   @override
   String opRevokedAdmin(Object members, Object opMember) {
-    return '$opMember 取消了 $members 的管理员身份';
+    return '$opMember取消了$members的管理员身份';
+  }
+
+  @override
+  String setToAdmin(Object members) {
+    return '$members被设置管理员';
+  }
+
+  @override
+  String revokedAdmin(Object members) {
+    return '$members被取消管理员';
   }
 
   @override
   String opChangedGroupInfo(Object groupInfo, Object opMember) {
-    return '$opMember 更改了 $groupInfo';
+    return '$opMember更改了$groupInfo';
   }
 
   @override
   String opChangedMemberInfo(Object memberInfo, Object opMember) {
-    return '$opMember 更改了 $memberInfo';
+    return '$opMember更改了$memberInfo';
   }
 
   @override
   String changedGroupNameTo(Object name) {
-    return '更改群组名称为 $name';
+    return '更改群组名称为$name';
   }
 
   @override
   String changedGroupDescriptionTo(Object description) {
-    return '更改群组描述为 $description';
+    return '更改群组描述为$description';
   }
 
   @override
   String changedGroupAnnouncementTo(Object announcement) {
-    return '更改群组公告为 $announcement';
+    return '更改群组公告为$announcement';
   }
 
   @override
@@ -931,7 +942,7 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
 
   @override
   String transferredGroupOwnershipTo(Object owner) {
-    return '将群组所有权转让给 $owner';
+    return '将群组所有权转让给$owner';
   }
 
   @override
@@ -950,12 +961,12 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
 
   @override
   String changedApplyToJoinGroupTo(Object setting) {
-    return '更改加入群组申请设置为：$setting';
+    return '修改加群方式为：$setting';
   }
 
   @override
   String changedInviteToJoinGroupTo(Object setting) {
-    return '更改邀请加入群组设置为：$setting';
+    return '修改邀请进群方式为：$setting';
   }
 
   @override
@@ -981,22 +992,22 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
   String get receiveMessagesWhenOnlineOnly => '仅在线时接收消息';
 
   @override
-  String get disallowJoinGroup => '不允许申请加入群组';
+  String get disallowJoinGroup => '禁止加群';
 
   @override
-  String get joinGroupNeedApproval => '申请加入群组需管理员审批';
+  String get joinGroupNeedApproval => '管理员审批';
 
   @override
-  String get joinGroupDirectly => '申请后直接加入群组';
+  String get joinGroupDirectly => '自动审批';
 
   @override
-  String get disallowInviting => '不允许邀请加入群组';
+  String get disallowInviting => '禁止邀请';
 
   @override
-  String get requireApprovalForInviting => '邀请加入群组需管理员审批';
+  String get requireApprovalForInviting => '管理员审批';
 
   @override
-  String get joinDirectlyBeenInvited => '被邀请后直接加入群组';
+  String get joinDirectlyBeenInvited => '自动审批';
 
   @override
   String get unmuted => '取消禁言';
@@ -1091,13 +1102,13 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
   String get setGroupName => '设置群组名称';
 
   @override
-  String get groupAddAny => '任何';
+  String get groupAddAny => '自动审批';
 
   @override
-  String get groupAddAuth => '需要批准';
+  String get groupAddAuth => '管理员审批';
 
   @override
-  String get groupAddForbid => '禁止';
+  String get groupAddForbid => '禁止加群';
 
   @override
   String get groupOwner => '群主';
@@ -1106,7 +1117,7 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
   String get groupMember => '成员';
 
   @override
-  String get dismissAdmin => '撤销管理员';
+  String get dismissAdmin => '取消管理员';
 
   @override
   String get welcomeToTencentCloudChat => '欢迎来到腾讯云 IM';
@@ -1688,6 +1699,109 @@ class TencentCloudChatLocalizationsZh extends TencentCloudChatLocalizations {
 
   @override
   String get tuiEmojiLike => '[赞]';
+
+  @override
+  String get startConversation => '发起会话';
+
+  @override
+  String get createGroupChat => '创建群聊';
+
+  @override
+  String get createGroupTips => '创建群组';
+
+  @override
+  String get createCommunity => '创建社群';
+
+  @override
+  String get communityIDEditFormatTips => '社群 ID 前缀必须为 @TGS#_ !';
+
+  @override
+  String get groupIDEditFormatTips => '群组 ID 前缀不能为 @TGS# !';
+
+  @override
+  String get groupIDEditExceedTips => '群组 ID 最长 48 字节!';
+
+  @override
+  String get groupTypeContentButton => '查看产品文档';
+
+  @override
+  String get create => '创建';
+
+  @override
+  String get groupName => '群名称';
+
+  @override
+  String get groupIDOption => '群ID（选填）';
+
+  @override
+  String get groupFaceUrl => '群头像';
+
+  @override
+  String get groupMemberSelected => '已选择的群成员';
+
+  @override
+  String get groupWorkType => '好友工作群(Work)';
+
+  @override
+  String get groupPublicType => '陌生人社交群(Public)';
+
+  @override
+  String get groupMeetingType => '临时会议群(Meeting)';
+
+  @override
+  String get groupCommunityType => '社群(Community)';
+
+  @override
+  String get groupWorkDesc => '好友工作群(Work）：类似普通微信群，创建后仅支持已在群内的好友邀请加群，且无需被邀请方同意或群主审批。';
+
+  @override
+  String get groupPublicDesc => '陌生人社交群(Public）：类似 QQ 群，创建后群主可以指定群管理员，用户搜索群 ID 发起加群申请后，需要群主或管理员审批通过才能入群。';
+
+  @override
+  String get groupMeetingDesc => '临时会议群(Meeting）：创建后可以随意进出，且支持查看入群前消息；适用于音视频会议场景、在线教育场景等与实时音视频产品结合的场景。';
+
+  @override
+  String get groupCommunityDesc => '社群(Community)：创建后可以随意进出，最多支持100000人，支持历史消息存储，用户搜索群 ID 发起加群申请后，无需管理员审批即可进群。';
+
+  @override
+  String get groupDetail => '群聊详情';
+
+  @override
+  String get transferGroupOwner => '转让群主';
+
+  @override
+  String get privateGroup => '讨论组';
+
+  @override
+  String get publicGroup => '公开群';
+
+  @override
+  String get chatRoom => '聊天室';
+
+  @override
+  String get communityGroup => '社群';
+
+  @override
+  String get serverGroupInvalidReq => '请求非法';
+
+  @override
+  String get serverGroupReqAlreadyBeenProcessed => '此邀请或者申请请求已经被处理。';
+
+  @override
+  String inviteToGroupFrom(Object inviter) {
+    return '来自$inviter的邀请';
+  }
+
+  @override
+  String get applyToJoin => '申请加入:';
+
+  @override
+  String get requestWait => '邀请成功，等待处理';
+
+  @override
+  String dismissGroupTips(Object groupName) {
+    return '您所在的群 $groupName 已解散';
+  }
 }
 
 /// The translations for Chinese, using the Han script (`zh_Hans`).
@@ -2017,7 +2131,10 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
   String get groupType => '群組類型';
 
   @override
-  String get addGroupWay => '加群方式';
+  String get addGroupWay => '主動加群方式';
+
+  @override
+  String get inviteGroupType => '邀請進群方式';
 
   @override
   String get myAliasInGroup => '我在群裡嘅別名';
@@ -2040,7 +2157,7 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
   String get info => '詳情';
 
   @override
-  String get setAsAdmin => '設為管理員';
+  String get setAsAdmin => '設置為管理員';
 
   @override
   String get announcement => '群通知';
@@ -2562,57 +2679,67 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
 
   @override
   String memberJoinedGroup(Object members) {
-    return '$members 已加入群組';
+    return '$members已加入群組';
   }
 
   @override
   String opInvitedToGroup(Object members, Object opMember) {
-    return '$opMember 邀請 $members 加入群組';
+    return '$opMember邀請$members加入群組';
   }
 
   @override
   String memberLeftGroup(Object members) {
-    return '$members 離開了群組';
+    return '$members離開了群組';
   }
 
   @override
   String opRemovedFromGroup(Object members, Object opMember) {
-    return '$opMember 將 $members 從群組中移除';
+    return '$opMember將$members從群組中移除';
   }
 
   @override
   String opPromotedToAdmin(Object members, Object opMember) {
-    return '$opMember 將 $members 提升為管理員';
+    return '$opMember將$members提升為管理員';
   }
 
   @override
   String opRevokedAdmin(Object members, Object opMember) {
-    return '$opMember 撤銷了 $members 的管理員角色';
+    return '$opMember撤銷了$members的管理員角色';
+  }
+
+  @override
+  String setToAdmin(Object members) {
+    return '$members被設置管理員';
+  }
+
+  @override
+  String revokedAdmin(Object members) {
+    return '$members被取消管理員';
   }
 
   @override
   String opChangedGroupInfo(Object groupInfo, Object opMember) {
-    return '$opMember 更改了 $groupInfo';
+    return '$opMember更改了$groupInfo';
   }
 
   @override
   String opChangedMemberInfo(Object memberInfo, Object opMember) {
-    return '$opMember 更改了 $memberInfo';
+    return '$opMember更改了$memberInfo';
   }
 
   @override
   String changedGroupNameTo(Object name) {
-    return '將群組名更改為 $name';
+    return '將群組名更改為$name';
   }
 
   @override
   String changedGroupDescriptionTo(Object description) {
-    return '將群組描述更改為 $description';
+    return '將群組描述更改為$description';
   }
 
   @override
   String changedGroupAnnouncementTo(Object announcement) {
-    return '將群組公告更改為 $announcement';
+    return '將群組公告更改為$announcement';
   }
 
   @override
@@ -2620,7 +2747,7 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
 
   @override
   String transferredGroupOwnershipTo(Object owner) {
-    return '將群組所有權轉讓給 $owner';
+    return '將群組所有權轉讓給$owner';
   }
 
   @override
@@ -2639,12 +2766,12 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
 
   @override
   String changedApplyToJoinGroupTo(Object setting) {
-    return '將申請加入群組設置更改為：$setting';
+    return '修改加群方式為：$setting';
   }
 
   @override
   String changedInviteToJoinGroupTo(Object setting) {
-    return '將邀請加入群組設置更改為：$setting';
+    return '修改邀請進群方式為：$setting';
   }
 
   @override
@@ -2670,22 +2797,22 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
   String get receiveMessagesWhenOnlineOnly => '僅在線時接收消息';
 
   @override
-  String get disallowJoinGroup => '不允許申請加入群組';
+  String get disallowJoinGroup => '禁止加群';
 
   @override
-  String get joinGroupNeedApproval => '加入群組需要管理員批准';
+  String get joinGroupNeedApproval => '管理員審批';
 
   @override
-  String get joinGroupDirectly => '申請後直接加入群組';
+  String get joinGroupDirectly => '自動審批';
 
   @override
-  String get disallowInviting => '不允許邀請加入群組';
+  String get disallowInviting => '禁止邀請';
 
   @override
-  String get requireApprovalForInviting => '邀請加入群組需要管理員批准';
+  String get requireApprovalForInviting => '管理員審批';
 
   @override
-  String get joinDirectlyBeenInvited => '被邀請後直接加入群組';
+  String get joinDirectlyBeenInvited => '自動審批';
 
   @override
   String get unmuted => '取消靜音';
@@ -2777,13 +2904,13 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
   String get setGroupName => '設置群組名稱';
 
   @override
-  String get groupAddAny => '任何';
+  String get groupAddAny => '自動審批';
 
   @override
-  String get groupAddAuth => '需要批准';
+  String get groupAddAuth => '管理員審批';
 
   @override
-  String get groupAddForbid => '禁止';
+  String get groupAddForbid => '禁止加群';
 
   @override
   String get groupOwner => '群主';
@@ -2792,7 +2919,7 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
   String get groupMember => '成員';
 
   @override
-  String get dismissAdmin => '撤銷管理員';
+  String get dismissAdmin => '取消管理員';
 
   @override
   String get welcomeToTencentCloudChat => '歡迎來到騰訊雲 IM';
@@ -3371,4 +3498,107 @@ class TencentCloudChatLocalizationsZhHant extends TencentCloudChatLocalizationsZ
 
   @override
   String get tuiEmojiLike => '[讚]';
+
+  @override
+  String get startConversation => '發起會話';
+
+  @override
+  String get createGroupChat => '創建群聊';
+
+  @override
+  String get createGroupTips => '創建群組';
+
+  @override
+  String get createCommunity => '創建社群';
+
+  @override
+  String get communityIDEditFormatTips => '社群 ID 前綴必須為 @TGS#_ !';
+
+  @override
+  String get groupIDEditFormatTips => '群組 ID 前綴不能為 @TGS# !';
+
+  @override
+  String get groupIDEditExceedTips => '群組 ID 最長 48 字節!';
+
+  @override
+  String get groupTypeContentButton => '查看產品文檔';
+
+  @override
+  String get create => '創建';
+
+  @override
+  String get groupName => '群名稱';
+
+  @override
+  String get groupIDOption => '群ID (選填)';
+
+  @override
+  String get groupFaceUrl => '群頭像';
+
+  @override
+  String get groupMemberSelected => '已選擇的群成員';
+
+  @override
+  String get groupWorkType => '好友工作群(Work)';
+
+  @override
+  String get groupPublicType => '陌生人社交群(Public)';
+
+  @override
+  String get groupMeetingType => '臨時會議群(Meeting)';
+
+  @override
+  String get groupCommunityType => '社群(Community)';
+
+  @override
+  String get groupWorkDesc => '好友工作群(Work）：類似普通微信群，創建後僅支持已在群內的好友邀請加群，且無需被邀請方同意或群主審批。';
+
+  @override
+  String get groupPublicDesc => '陌生人社交群(Public）：類似 QQ 群，創建後群主可以指定群管理員，用戶搜索群 ID 發起加群申請後，需要群主或管理員審批通過才能入群。';
+
+  @override
+  String get groupMeetingDesc => '臨時會議群(Meeting）：創建後可以隨意進出，且支持查看入群前消息；適用於音視頻會議場景、在線教育場景等與實時音視頻產品結合的場景。';
+
+  @override
+  String get groupCommunityDesc => '社群(Community)：創建後可以隨意進出，最多支持100000人，支持歷史消息存儲，用戶搜索群 ID 發起加群申請後，無需管理員審批即可進群。';
+
+  @override
+  String get groupDetail => '群聊詳情';
+
+  @override
+  String get transferGroupOwner => '轉讓群主';
+
+  @override
+  String get privateGroup => '討論組';
+
+  @override
+  String get publicGroup => '公開群';
+
+  @override
+  String get chatRoom => '聊天室';
+
+  @override
+  String get communityGroup => '社群';
+
+  @override
+  String get serverGroupInvalidReq => '請求非法';
+
+  @override
+  String get serverGroupReqAlreadyBeenProcessed => '此邀請或者申請請求已經被處理。';
+
+  @override
+  String inviteToGroupFrom(Object inviter) {
+    return '來自$inviter的邀請';
+  }
+
+  @override
+  String get applyToJoin => '申請加入:';
+
+  @override
+  String get requestWait => '邀請成功，等待處理';
+
+  @override
+  String dismissGroupTips(Object groupName) {
+    return '您所在的群組 $groupName 已解散';
+  }
 }

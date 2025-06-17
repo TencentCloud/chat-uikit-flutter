@@ -14,8 +14,6 @@ import 'tencent_cloud_chat_localizations_ja.dart';
 import 'tencent_cloud_chat_localizations_ko.dart';
 import 'tencent_cloud_chat_localizations_zh.dart';
 
-// ignore_for_file: type=lint
-
 /// Callers can lookup localized strings with an instance of TencentCloudChatLocalizations
 /// returned by `TencentCloudChatLocalizations.of(context)`.
 ///
@@ -685,8 +683,14 @@ abstract class TencentCloudChatLocalizations {
   /// No description provided for @addGroupWay.
   ///
   /// In en, this message translates to:
-  /// **'Add Group Way'**
+  /// **'Group Joining Method'**
   String get addGroupWay;
+
+  /// No description provided for @inviteGroupType.
+  ///
+  /// In en, this message translates to:
+  /// **'Group Inviting Method'**
+  String get inviteGroupType;
 
   /// No description provided for @myAliasInGroup.
   ///
@@ -727,7 +731,7 @@ abstract class TencentCloudChatLocalizations {
   /// No description provided for @setAsAdmin.
   ///
   /// In en, this message translates to:
-  /// **'Set as Admin'**
+  /// **'Set Administrator'**
   String get setAsAdmin;
 
   /// No description provided for @announcement.
@@ -1690,6 +1694,18 @@ abstract class TencentCloudChatLocalizations {
   /// **'{opMember} revoked admin role from {members}'**
   String opRevokedAdmin(Object members, Object opMember);
 
+  /// No description provided for @setToAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'{members} was promoted to group manager'**
+  String setToAdmin(Object members);
+
+  /// No description provided for @revokedAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'{members} was demoted from group manager'**
+  String revokedAdmin(Object members);
+
   /// No description provided for @opChangedGroupInfo.
   ///
   /// In en, this message translates to:
@@ -1753,19 +1769,19 @@ abstract class TencentCloudChatLocalizations {
   /// No description provided for @changedGroupMessageReceptionTo.
   ///
   /// In en, this message translates to:
-  /// **'Changed group message reception setting to: {setting}'**
+  /// **' changed group message reception setting to: {setting}'**
   String changedGroupMessageReceptionTo(Object setting);
 
   /// No description provided for @changedApplyToJoinGroupTo.
   ///
   /// In en, this message translates to:
-  /// **'Changed apply to join group setting to: {setting}'**
+  /// **' changed the group join setting to to: {setting}'**
   String changedApplyToJoinGroupTo(Object setting);
 
   /// No description provided for @changedInviteToJoinGroupTo.
   ///
   /// In en, this message translates to:
-  /// **'Changed invite to join group setting to: {setting}'**
+  /// **' changed the group invitation setting to: {setting}'**
   String changedInviteToJoinGroupTo(Object setting);
 
   /// No description provided for @opUnmuted.
@@ -1999,19 +2015,19 @@ abstract class TencentCloudChatLocalizations {
   /// No description provided for @groupAddAny.
   ///
   /// In en, this message translates to:
-  /// **'Any'**
+  /// **'Auto Approval'**
   String get groupAddAny;
 
   /// No description provided for @groupAddAuth.
   ///
   /// In en, this message translates to:
-  /// **'Need Approve'**
+  /// **'Admin Approval'**
   String get groupAddAuth;
 
   /// No description provided for @groupAddForbid.
   ///
   /// In en, this message translates to:
-  /// **'Forbidden'**
+  /// **'Prohibited from Joining'**
   String get groupAddForbid;
 
   /// No description provided for @groupOwner.
@@ -2029,7 +2045,7 @@ abstract class TencentCloudChatLocalizations {
   /// No description provided for @dismissAdmin.
   ///
   /// In en, this message translates to:
-  /// **'Dismiss Admin'**
+  /// **'Cancel Admin'**
   String get dismissAdmin;
 
   /// No description provided for @welcomeToTencentCloudChat.
@@ -3153,6 +3169,204 @@ abstract class TencentCloudChatLocalizations {
   /// In en, this message translates to:
   /// **'[Like]'**
   String get tuiEmojiLike;
+
+  /// No description provided for @startConversation.
+  ///
+  /// In en, this message translates to:
+  /// **'New Chat'**
+  String get startConversation;
+
+  /// No description provided for @createGroupChat.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Group Chat'**
+  String get createGroupChat;
+
+  /// No description provided for @createGroupTips.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Group'**
+  String get createGroupTips;
+
+  /// No description provided for @createCommunity.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Community'**
+  String get createCommunity;
+
+  /// No description provided for @communityIDEditFormatTips.
+  ///
+  /// In en, this message translates to:
+  /// **'Community ID prefix must be @TGS#_ !'**
+  String get communityIDEditFormatTips;
+
+  /// No description provided for @groupIDEditFormatTips.
+  ///
+  /// In en, this message translates to:
+  /// **'Group ID prefix cannot be @TGS# !'**
+  String get groupIDEditFormatTips;
+
+  /// No description provided for @groupIDEditExceedTips.
+  ///
+  /// In en, this message translates to:
+  /// **'Group ID up to 48 bytes!'**
+  String get groupIDEditExceedTips;
+
+  /// No description provided for @groupTypeContentButton.
+  ///
+  /// In en, this message translates to:
+  /// **'View product documentation'**
+  String get groupTypeContentButton;
+
+  /// No description provided for @create.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get create;
+
+  /// No description provided for @groupName.
+  ///
+  /// In en, this message translates to:
+  /// **'Group Name'**
+  String get groupName;
+
+  /// No description provided for @groupIDOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Group ID (optional)'**
+  String get groupIDOption;
+
+  /// No description provided for @groupFaceUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Group Avatar'**
+  String get groupFaceUrl;
+
+  /// No description provided for @groupMemberSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Participants'**
+  String get groupMemberSelected;
+
+  /// No description provided for @groupWorkType.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends Working group(Work)'**
+  String get groupWorkType;
+
+  /// No description provided for @groupPublicType.
+  ///
+  /// In en, this message translates to:
+  /// **'Stranger Social group(Public）'**
+  String get groupPublicType;
+
+  /// No description provided for @groupMeetingType.
+  ///
+  /// In en, this message translates to:
+  /// **'Temporary Meeting group(Meeting）'**
+  String get groupMeetingType;
+
+  /// No description provided for @groupCommunityType.
+  ///
+  /// In en, this message translates to:
+  /// **'Community(Community)'**
+  String get groupCommunityType;
+
+  /// No description provided for @groupWorkDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Friends work group (Work): Similar to ordinary WeChat groups, after creation, only friends who are already in the group can be invited to join the group, and there is no need for the approval of the invitee or the approval of the group owner.'**
+  String get groupWorkDesc;
+
+  /// No description provided for @groupPublicDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Stranger social group (Public): Similar to QQ group, the group owner can designate the group administrator after creation. After the user searches for the group ID and initiates a group application, the group owner or administrator must approve it before joining the group.'**
+  String get groupPublicDesc;
+
+  /// No description provided for @groupMeetingDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Temporary meeting group (Meeting): After creation, you can enter and leave at will, and support viewing of messages before joining the group; it is suitable for audio and video conference scenarios, online education scenarios, and other scenarios that are combined with real-time audio and video products.'**
+  String get groupMeetingDesc;
+
+  /// No description provided for @groupCommunityDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Community(Community)：After creation, you can enter and leave at will, support up to 100,000 people, support historical message storage, and after users search for group ID and initiate a group application, they can join the group without administrator approval.'**
+  String get groupCommunityDesc;
+
+  /// No description provided for @groupDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Group Chat Details'**
+  String get groupDetail;
+
+  /// No description provided for @transferGroupOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer Group Owner'**
+  String get transferGroupOwner;
+
+  /// No description provided for @privateGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Discussion Group'**
+  String get privateGroup;
+
+  /// No description provided for @publicGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Public Group'**
+  String get publicGroup;
+
+  /// No description provided for @chatRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Chatroom'**
+  String get chatRoom;
+
+  /// No description provided for @communityGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Community'**
+  String get communityGroup;
+
+  /// No description provided for @serverGroupInvalidReq.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid request'**
+  String get serverGroupInvalidReq;
+
+  /// No description provided for @serverGroupReqAlreadyBeenProcessed.
+  ///
+  /// In en, this message translates to:
+  /// **'This invitation or request has been processed.'**
+  String get serverGroupReqAlreadyBeenProcessed;
+
+  /// No description provided for @inviteToGroupFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation from {inviter}'**
+  String inviteToGroupFrom(Object inviter);
+
+  /// No description provided for @applyToJoin.
+  ///
+  /// In en, this message translates to:
+  /// **'Apply to join:'**
+  String get applyToJoin;
+
+  /// No description provided for @requestWait.
+  ///
+  /// In en, this message translates to:
+  /// **'Invitation sent. Waiting for response.'**
+  String get requestWait;
+
+  /// No description provided for @dismissGroupTips.
+  ///
+  /// In en, this message translates to:
+  /// **'The group you were in {groupName} has been disbanded'**
+  String dismissGroupTips(Object groupName);
 }
 
 class _TencentCloudChatLocalizationsDelegate extends LocalizationsDelegate<TencentCloudChatLocalizations> {

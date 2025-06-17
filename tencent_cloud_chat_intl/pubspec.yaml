@@ -1,6 +1,6 @@
 name: tencent_cloud_chat_intl
 description: A lightweight internationalization tool for TencentCloudChat and other applications, based on Flutter's official `intl` solution.
-version: 2.1.0
+version: 2.1.3
 repository: https://github.com/RoleWong/tencent_chat_intl_tool
 homepage: https://trtc.io/products/chat?utm_source=flutter_pub
 environment:

@@ -6,8 +6,6 @@ import 'package:intl/intl.dart' as intl;
 
 import 'tencent_cloud_chat_localizations.dart';
 
-// ignore_for_file: type=lint
-
 /// The translations for Japanese (`ja`).
 class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   TencentCloudChatLocalizationsJa([String locale = 'ja']) : super(locale);
@@ -328,7 +326,10 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   String get groupType => 'グループタイプ';
 
   @override
-  String get addGroupWay => 'グループ追加方法';
+  String get addGroupWay => 'グループに参加するための積極的な方法';
+
+  @override
+  String get inviteGroupType => 'グループに招待する方法';
 
   @override
   String get myAliasInGroup => 'グループ内の私のエイリアス';
@@ -902,6 +903,16 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   }
 
   @override
+  String setToAdmin(Object members) {
+    return '$members管理者として設定';
+  }
+
+  @override
+  String revokedAdmin(Object members) {
+    return '$membersキャンセルされた管理者';
+  }
+
+  @override
   String opChangedGroupInfo(Object groupInfo, Object opMember) {
     return '$opMemberが$groupInfoを変更しました';
   }
@@ -950,12 +961,12 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
 
   @override
   String changedApplyToJoinGroupTo(Object setting) {
-    return 'グループへの参加申請設定を$settingに変更しました';
+    return '그룹 가입 방법을 다음으로 수정하세요: $setting';
   }
 
   @override
   String changedInviteToJoinGroupTo(Object setting) {
-    return 'グループへの招待設定を$settingに変更しました';
+    return 'グループに参加するための招待方法を変更します: $setting';
   }
 
   @override
@@ -981,7 +992,7 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   String get receiveMessagesWhenOnlineOnly => 'オンライン時のみメッセージを受信する';
 
   @override
-  String get disallowJoinGroup => 'グループへの参加申請を禁止する';
+  String get disallowJoinGroup => 'グループへの参加は禁止です';
 
   @override
   String get joinGroupNeedApproval => 'グループへの参加申請に管理者の承認が必要です';
@@ -990,7 +1001,7 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   String get joinGroupDirectly => '申請後に直接グループに参加する';
 
   @override
-  String get disallowInviting => 'グループへの招待を禁止する';
+  String get disallowInviting => '招待を無効にする';
 
   @override
   String get requireApprovalForInviting => 'グループへの招待に管理者の承認が必要です';
@@ -1091,13 +1102,13 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
   String get setGroupName => 'グループ名の設定';
 
   @override
-  String get groupAddAny => '任意';
+  String get groupAddAny => '自動承認';
 
   @override
-  String get groupAddAuth => '承認が必要';
+  String get groupAddAuth => '管理者の承認';
 
   @override
-  String get groupAddForbid => '禁止';
+  String get groupAddForbid => 'グループへの参加は禁止です';
 
   @override
   String get groupOwner => 'グループのオーナー';
@@ -1688,4 +1699,107 @@ class TencentCloudChatLocalizationsJa extends TencentCloudChatLocalizations {
 
   @override
   String get tuiEmojiLike => '[いいね]';
+
+  @override
+  String get startConversation => 'セッションを開始する';
+
+  @override
+  String get createGroupChat => 'グループチャットを作成する';
+
+  @override
+  String get createGroupTips => 'グループの作成';
+
+  @override
+  String get createCommunity => 'コミュニティを作成する';
+
+  @override
+  String get communityIDEditFormatTips => 'コミュニティ ID には接頭辞として @TGS#_ を付ける必要があります。';
+
+  @override
+  String get groupIDEditFormatTips => 'グループ ID プレフィックスを @TGS# にすることはできません。';
+
+  @override
+  String get groupIDEditExceedTips => 'グループ ID は最大 48 バイトです。';
+
+  @override
+  String get groupTypeContentButton => '製品ドキュメントを表示する';
+
+  @override
+  String get create => '作成する';
+
+  @override
+  String get groupName => 'グループ名';
+
+  @override
+  String get groupIDOption => 'グループID (オプション)';
+
+  @override
+  String get groupFaceUrl => 'グループアバター';
+
+  @override
+  String get groupMemberSelected => '選択されたグループメンバー';
+
+  @override
+  String get groupWorkType => 'お疲れ様グループ（仕事）';
+
+  @override
+  String get groupPublicType => 'ストレンジャー ソーシャル グループ (パブリック)';
+
+  @override
+  String get groupMeetingType => '臨時会議グループ（会議）';
+
+  @override
+  String get groupCommunityType => 'コミュニティ';
+
+  @override
+  String get groupWorkDesc => '友達ワークグループ（Work）：通常のWeChatグループと同様に、作成後はすでにグループに参加している友達のみをグループに招待でき、招待された側の同意やグループの承認は必要ありません。所有者。';
+
+  @override
+  String get groupPublicDesc => '見知らぬソーシャル グループ (パブリック): QQ グループと同様に、グループ所有者は作成後にグループ管理者を指定できます。ユーザーがグループ ID を検索してグループへの参加申請を開始した後、グループに参加する前にグループ所有者または管理者の承認が必要です。 。';
+
+  @override
+  String get groupMeetingDesc => '一時的な会議グループ (会議): 作成後は自由に出入りでき、グループに参加する前にメッセージの表示をサポートするため、音声会議やビデオ会議のシナリオ、オンライン教育のシナリオ、およびリアルタイム音声と組み合わせたその他のシナリオに適しています。そしてビデオ製品。';
+
+  @override
+  String get groupCommunityDesc => 'コミュニティ: 作成後は自由に参加および退出でき、最大 100,000 人のユーザーがグループ ID を検索してグループ アプリケーションを開始すると、管理者の承認なしでグループに参加できます。';
+
+  @override
+  String get groupDetail => 'グループチャットの詳細';
+
+  @override
+  String get transferGroupOwner => 'グループ所有者を転送する';
+
+  @override
+  String get privateGroup => 'ディスカッショングループ';
+
+  @override
+  String get publicGroup => 'パブリックグループ';
+
+  @override
+  String get chatRoom => 'チャットルーム';
+
+  @override
+  String get communityGroup => 'コミュニティ';
+
+  @override
+  String get serverGroupInvalidReq => '不正なリクエスト';
+
+  @override
+  String get serverGroupReqAlreadyBeenProcessed => 'この招待または申請リクエストはすでに処理されています。';
+
+  @override
+  String inviteToGroupFrom(Object inviter) {
+    return '$inviter からの招待';
+  }
+
+  @override
+  String get applyToJoin => '参加を申し込む:';
+
+  @override
+  String get requestWait => '招待は成功しました。処理を待っています';
+
+  @override
+  String dismissGroupTips(Object groupName) {
+    return 'あなたが所属していたグループ $groupName は解散しました';
+  }
 }

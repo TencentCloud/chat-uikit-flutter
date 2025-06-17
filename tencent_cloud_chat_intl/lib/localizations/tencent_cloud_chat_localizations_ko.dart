@@ -6,8 +6,6 @@ import 'package:intl/intl.dart' as intl;
 
 import 'tencent_cloud_chat_localizations.dart';
 
-// ignore_for_file: type=lint
-
 /// The translations for Korean (`ko`).
 class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   TencentCloudChatLocalizationsKo([String locale = 'ko']) : super(locale);
@@ -328,7 +326,10 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   String get groupType => '그룹 유형';
 
   @override
-  String get addGroupWay => '그룹 추가 방법';
+  String get addGroupWay => '그룹에 참여하는 적극적인 방법';
+
+  @override
+  String get inviteGroupType => '그룹에 초대하는 방법';
 
   @override
   String get myAliasInGroup => '그룹에서의 별칭';
@@ -902,6 +903,16 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   }
 
   @override
+  String setToAdmin(Object members) {
+    return '$members관리자로 설정';
+  }
+
+  @override
+  String revokedAdmin(Object members) {
+    return '$members취소된 관리자';
+  }
+
+  @override
   String opChangedGroupInfo(Object groupInfo, Object opMember) {
     return '$opMember님이 $groupInfo를 변경했습니다';
   }
@@ -950,12 +961,12 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
 
   @override
   String changedApplyToJoinGroupTo(Object setting) {
-    return '그룹 가입 신청 설정을 다음으로 변경했습니다: $setting';
+    return '그룹 가입 방법을 다음과 같이 수정합니다.: $setting';
   }
 
   @override
   String changedInviteToJoinGroupTo(Object setting) {
-    return '그룹 초대 가입 설정을 다음으로변경했습니다: $setting';
+    return '그룹에 가입하기 위한 초대 방법 수정: $setting';
   }
 
   @override
@@ -981,22 +992,22 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   String get receiveMessagesWhenOnlineOnly => '온라인 상태일 때만 메시지 받기';
 
   @override
-  String get disallowJoinGroup => '그룹 가입 신청 거부';
+  String get disallowJoinGroup => '그룹 가입이 금지되어 있습니다.';
 
   @override
-  String get joinGroupNeedApproval => '그룹 가입 신청에 관리자 승인 필요';
+  String get joinGroupNeedApproval => '관리자 승인';
 
   @override
-  String get joinGroupDirectly => '신청 후 바로 그룹에 가입';
+  String get joinGroupDirectly => '자동 승인';
 
   @override
-  String get disallowInviting => '그룹 초대 거부';
+  String get disallowInviting => '초대 비활성화';
 
   @override
-  String get requireApprovalForInviting => '초대 가입에 관리자 승인 필요';
+  String get requireApprovalForInviting => '관리자 승인';
 
   @override
-  String get joinDirectlyBeenInvited => '초대 후 바로 그룹에 가입';
+  String get joinDirectlyBeenInvited => '자동 승인';
 
   @override
   String get unmuted => '음소거 해제';
@@ -1091,13 +1102,13 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
   String get setGroupName => '그룹 이름 설정';
 
   @override
-  String get groupAddAny => '어떤';
+  String get groupAddAny => '자동 승인';
 
   @override
-  String get groupAddAuth => '승인 필요';
+  String get groupAddAuth => '관리자 승인';
 
   @override
-  String get groupAddForbid => '금지';
+  String get groupAddForbid => '그룹 가입이 금지되어 있습니다.';
 
   @override
   String get groupOwner => '그룹 소유자';
@@ -1688,4 +1699,107 @@ class TencentCloudChatLocalizationsKo extends TencentCloudChatLocalizations {
 
   @override
   String get tuiEmojiLike => '[좋아요]';
+
+  @override
+  String get startConversation => '세션 시작';
+
+  @override
+  String get createGroupChat => '그룹 채팅 만들기';
+
+  @override
+  String get createGroupTips => '그룹 만들기';
+
+  @override
+  String get createCommunity => '커뮤니티 만들기';
+
+  @override
+  String get communityIDEditFormatTips => '커뮤니티 ID 앞에는 @TGS#_가 붙어야 합니다!';
+
+  @override
+  String get groupIDEditFormatTips => '그룹 ID 접두사는 @TGS#일 수 없습니다!';
+
+  @override
+  String get groupIDEditExceedTips => '그룹 ID는 최대 48바이트까지 가능합니다!';
+
+  @override
+  String get groupTypeContentButton => '제품 설명서 보기';
+
+  @override
+  String get create => '만들다';
+
+  @override
+  String get groupName => '그룹 이름';
+
+  @override
+  String get groupIDOption => '그룹 ID(선택사항)';
+
+  @override
+  String get groupFaceUrl => '그룹 아바타';
+
+  @override
+  String get groupMemberSelected => '선택된 그룹 구성원';
+
+  @override
+  String get groupWorkType => '좋은 직업 그룹 (일)';
+
+  @override
+  String get groupPublicType => '낯선 소셜 그룹(공개)';
+
+  @override
+  String get groupMeetingType => '임시 회의 그룹 (회의)';
+
+  @override
+  String get groupCommunityType => '지역 사회';
+
+  @override
+  String get groupWorkDesc => '친구 작업 그룹(Work) : 일반 위챗 그룹과 유사하게 생성 후, 이미 그룹에 속한 친구만 그룹에 초대할 수 있으며, 초대한 당사자의 동의나 그룹의 승인이 필요하지 않습니다. 소유자.';
+
+  @override
+  String get groupPublicDesc => '낯선 소셜 그룹(공개): QQ 그룹과 마찬가지로 그룹 생성 후 그룹 소유자가 그룹 관리자를 지정할 수 있습니다. 사용자가 그룹 ID를 검색하고 그룹 가입 신청을 시작한 후 그룹에 가입하기 전에 그룹 소유자 또는 관리자의 승인이 필요합니다. .';
+
+  @override
+  String get groupMeetingDesc => '임시 회의 그룹(Meeting): 생성 후 마음대로 입장 및 퇴장할 수 있으며, 그룹에 참여하기 전 메시지 보기를 지원합니다. 음성 및 영상 회의 시나리오, 온라인 교육 시나리오 및 실시간 오디오와 결합된 기타 시나리오에 적합합니다. 그리고 비디오 제품.';
+
+  @override
+  String get groupCommunityDesc => '커뮤니티: 생성 후 자유롭게 입장 및 탈퇴가 가능하며, 기록 메시지 저장을 지원하며, 사용자가 그룹 ID를 검색하고 그룹 신청을 한 후 관리자 승인 없이 그룹에 가입할 수 있습니다.';
+
+  @override
+  String get groupDetail => '그룹 채팅 세부정보';
+
+  @override
+  String get transferGroupOwner => '그룹 소유자 이전';
+
+  @override
+  String get privateGroup => '토론 그룹';
+
+  @override
+  String get publicGroup => '공개 그룹';
+
+  @override
+  String get chatRoom => '대화방';
+
+  @override
+  String get communityGroup => '지역 사회';
+
+  @override
+  String get serverGroupInvalidReq => '불법적인 요청';
+
+  @override
+  String get serverGroupReqAlreadyBeenProcessed => '이 초대 또는 신청 요청은 이미 처리되었습니다.';
+
+  @override
+  String inviteToGroupFrom(Object inviter) {
+    return '$inviter의 초대';
+  }
+
+  @override
+  String get applyToJoin => '가입 신청:';
+
+  @override
+  String get requestWait => '초대가 성공했습니다. 처리를 기다리고 있습니다.';
+
+  @override
+  String dismissGroupTips(Object groupName) {
+    return '귀하가 속해 있던 $groupName 그룹이 해체되었습니다.';
+  }
 }

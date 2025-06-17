@@ -6,8 +6,6 @@ import 'package:intl/intl.dart' as intl;
 
 import 'tencent_cloud_chat_localizations.dart';
 
-// ignore_for_file: type=lint
-
 /// The translations for English (`en`).
 class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   TencentCloudChatLocalizationsEn([String locale = 'en']) : super(locale);
@@ -328,7 +326,10 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get groupType => 'Group Type';
 
   @override
-  String get addGroupWay => 'Add Group Way';
+  String get addGroupWay => 'Group Joining Method';
+
+  @override
+  String get inviteGroupType => 'Group Inviting Method';
 
   @override
   String get myAliasInGroup => 'My Alias in Group';
@@ -351,7 +352,7 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get info => 'Info';
 
   @override
-  String get setAsAdmin => 'Set as Admin';
+  String get setAsAdmin => 'Set Administrator';
 
   @override
   String get announcement => 'Group Notice';
@@ -902,6 +903,16 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   }
 
   @override
+  String setToAdmin(Object members) {
+    return '$members was promoted to group manager';
+  }
+
+  @override
+  String revokedAdmin(Object members) {
+    return '$members was demoted from group manager';
+  }
+
+  @override
   String opChangedGroupInfo(Object groupInfo, Object opMember) {
     return '$opMember changed $groupInfo';
   }
@@ -945,17 +956,17 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
 
   @override
   String changedGroupMessageReceptionTo(Object setting) {
-    return 'Changed group message reception setting to: $setting';
+    return ' changed group message reception setting to: $setting';
   }
 
   @override
   String changedApplyToJoinGroupTo(Object setting) {
-    return 'Changed apply to join group setting to: $setting';
+    return ' changed the group join setting to to: $setting';
   }
 
   @override
   String changedInviteToJoinGroupTo(Object setting) {
-    return 'Changed invite to join group setting to: $setting';
+    return ' changed the group invitation setting to: $setting';
   }
 
   @override
@@ -1091,13 +1102,13 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get setGroupName => 'set Group Name';
 
   @override
-  String get groupAddAny => 'Any';
+  String get groupAddAny => 'Auto Approval';
 
   @override
-  String get groupAddAuth => 'Need Approve';
+  String get groupAddAuth => 'Admin Approval';
 
   @override
-  String get groupAddForbid => 'Forbidden';
+  String get groupAddForbid => 'Prohibited from Joining';
 
   @override
   String get groupOwner => 'Owner';
@@ -1106,7 +1117,7 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
   String get groupMember => 'Member';
 
   @override
-  String get dismissAdmin => 'Dismiss Admin';
+  String get dismissAdmin => 'Cancel Admin';
 
   @override
   String get welcomeToTencentCloudChat => 'Welcome to Tencent Cloud Chat';
@@ -1694,4 +1705,107 @@ class TencentCloudChatLocalizationsEn extends TencentCloudChatLocalizations {
 
   @override
   String get tuiEmojiLike => '[Like]';
+
+  @override
+  String get startConversation => 'New Chat';
+
+  @override
+  String get createGroupChat => 'Create Group Chat';
+
+  @override
+  String get createGroupTips => 'Create Group';
+
+  @override
+  String get createCommunity => 'Create Community';
+
+  @override
+  String get communityIDEditFormatTips => 'Community ID prefix must be @TGS#_ !';
+
+  @override
+  String get groupIDEditFormatTips => 'Group ID prefix cannot be @TGS# !';
+
+  @override
+  String get groupIDEditExceedTips => 'Group ID up to 48 bytes!';
+
+  @override
+  String get groupTypeContentButton => 'View product documentation';
+
+  @override
+  String get create => 'Create';
+
+  @override
+  String get groupName => 'Group Name';
+
+  @override
+  String get groupIDOption => 'Group ID (optional)';
+
+  @override
+  String get groupFaceUrl => 'Group Avatar';
+
+  @override
+  String get groupMemberSelected => 'Participants';
+
+  @override
+  String get groupWorkType => 'Friends Working group(Work)';
+
+  @override
+  String get groupPublicType => 'Stranger Social group(Public）';
+
+  @override
+  String get groupMeetingType => 'Temporary Meeting group(Meeting）';
+
+  @override
+  String get groupCommunityType => 'Community(Community)';
+
+  @override
+  String get groupWorkDesc => 'Friends work group (Work): Similar to ordinary WeChat groups, after creation, only friends who are already in the group can be invited to join the group, and there is no need for the approval of the invitee or the approval of the group owner.';
+
+  @override
+  String get groupPublicDesc => 'Stranger social group (Public): Similar to QQ group, the group owner can designate the group administrator after creation. After the user searches for the group ID and initiates a group application, the group owner or administrator must approve it before joining the group.';
+
+  @override
+  String get groupMeetingDesc => 'Temporary meeting group (Meeting): After creation, you can enter and leave at will, and support viewing of messages before joining the group; it is suitable for audio and video conference scenarios, online education scenarios, and other scenarios that are combined with real-time audio and video products.';
+
+  @override
+  String get groupCommunityDesc => 'Community(Community)：After creation, you can enter and leave at will, support up to 100,000 people, support historical message storage, and after users search for group ID and initiate a group application, they can join the group without administrator approval.';
+
+  @override
+  String get groupDetail => 'Group Chat Details';
+
+  @override
+  String get transferGroupOwner => 'Transfer Group Owner';
+
+  @override
+  String get privateGroup => 'Discussion Group';
+
+  @override
+  String get publicGroup => 'Public Group';
+
+  @override
+  String get chatRoom => 'Chatroom';
+
+  @override
+  String get communityGroup => 'Community';
+
+  @override
+  String get serverGroupInvalidReq => 'Invalid request';
+
+  @override
+  String get serverGroupReqAlreadyBeenProcessed => 'This invitation or request has been processed.';
+
+  @override
+  String inviteToGroupFrom(Object inviter) {
+    return 'Invitation from $inviter';
+  }
+
+  @override
+  String get applyToJoin => 'Apply to join:';
+
+  @override
+  String get requestWait => 'Invitation sent. Waiting for response.';
+
+  @override
+  String dismissGroupTips(Object groupName) {
+    return 'The group you were in $groupName has been disbanded';
+  }
 }

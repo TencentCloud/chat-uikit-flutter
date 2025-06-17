@@ -6,8 +6,6 @@ import 'package:intl/intl.dart' as intl;
 
 import 'tencent_cloud_chat_localizations.dart';
 
-// ignore_for_file: type=lint
-
 /// The translations for Arabic (`ar`).
 class TencentCloudChatLocalizationsAr extends TencentCloudChatLocalizations {
   TencentCloudChatLocalizationsAr([String locale = 'ar']) : super(locale);
@@ -328,7 +326,10 @@ class TencentCloudChatLocalizationsAr extends TencentCloudChatLocalizations {
   String get groupType => 'نوع المجموعة';
 
   @override
-  String get addGroupWay => 'إضافة طريقة المجموعة';
+  String get addGroupWay => 'طريقة الانضمام النشطة';
+
+  @override
+  String get inviteGroupType => 'طريقة الدعوة للانضمام';
 
   @override
   String get myAliasInGroup => 'لقبي في المجموعة';
@@ -902,6 +903,16 @@ class TencentCloudChatLocalizationsAr extends TencentCloudChatLocalizations {
   }
 
   @override
+  String setToAdmin(Object members) {
+    return '$members تم تعيينه مديرًا للمجموعة';
+  }
+
+  @override
+  String revokedAdmin(Object members) {
+    return '$members تم إزالة صلاحياته كمدير للمجموعة';
+  }
+
+  @override
   String opChangedGroupInfo(Object groupInfo, Object opMember) {
     return 'غير $opMember $groupInfo';
   }
@@ -950,12 +961,12 @@ class TencentCloudChatLocalizationsAr extends TencentCloudChatLocalizations {
 
   @override
   String changedApplyToJoinGroupTo(Object setting) {
-    return 'تغيير إعداد التقدم للانضمام إلى المجموعة إلى: $setting';
+    return 'قام بتغيير طريقة الانضمام إلى المجموعة إلى: $setting';
   }
 
   @override
   String changedInviteToJoinGroupTo(Object setting) {
-    return 'تغيير إعداد الدعوة للانضمام إلى المجموعة إلى: $setting';
+    return 'قام بتغيير طريقة الدعوة إلى المجموعة إلى: $setting';
   }
 
   @override
@@ -1091,13 +1102,13 @@ class TencentCloudChatLocalizationsAr extends TencentCloudChatLocalizations {
   String get setGroupName => 'تعيين اسم المجموعة';
 
   @override
-  String get groupAddAny => 'أي';
+  String get groupAddAny => 'موافقة تلقائية';
 
   @override
-  String get groupAddAuth => 'يحتاج إلى الموافقة';
+  String get groupAddAuth => 'موافقة المدير';
 
   @override
-  String get groupAddForbid => 'ممنوع';
+  String get groupAddForbid => 'منع الانضمام';
 
   @override
   String get groupOwner => 'مالك المجموعة';
@@ -1688,4 +1699,107 @@ class TencentCloudChatLocalizationsAr extends TencentCloudChatLocalizations {
 
   @override
   String get tuiEmojiLike => '[أعجبني]';
+
+  @override
+  String get startConversation => 'ابدأ جلسة';
+
+  @override
+  String get createGroupChat => 'إنشاء دردشة جماعية';
+
+  @override
+  String get createGroupTips => 'إنشاء مجموعة';
+
+  @override
+  String get createCommunity => 'إنشاء مجتمع';
+
+  @override
+  String get communityIDEditFormatTips => 'يجب أن يكون معرف المجتمع مسبوقًا بـ @TGS#_!';
+
+  @override
+  String get groupIDEditFormatTips => 'ا يمكن أن يكون بادئة معرف المجموعة @TGS# !';
+
+  @override
+  String get groupIDEditExceedTips => 'يجب أن يكون معرف المجموعة أقل من 48 بايت!';
+
+  @override
+  String get groupTypeContentButton => 'عرض دليل المنتج';
+
+  @override
+  String get create => 'إنشاء';
+
+  @override
+  String get groupName => 'اسم المجموعة';
+
+  @override
+  String get groupIDOption => 'معرف المجموعة (اختياري)';
+
+  @override
+  String get groupFaceUrl => 'صورة رمزية للمجموعة';
+
+  @override
+  String get groupMemberSelected => 'الأعضاء المحددين في المجموعة';
+
+  @override
+  String get groupWorkType => 'مجموعة عمل الأصدقاء (Work)';
+
+  @override
+  String get groupPublicType => 'مجموعة تواصل الغرباء (Public)';
+
+  @override
+  String get groupMeetingType => 'مجموعة اجتماعات مؤقتة (Meeting)';
+
+  @override
+  String get groupCommunityType => 'مجتمع (Community)';
+
+  @override
+  String get groupWorkDesc => 'مجموعة عمل الأصدقاء (Work): تشبه محادثات WeChat العادية، بعد الإنشاء، يمكن للأصدقاء الموجودين في المجموعة دعوة أصدقائهم للانضمام دون الحاجة إلى موافقة المضافين أو الموافقة من قبل مالك المجموعة.';
+
+  @override
+  String get groupPublicDesc => 'مجموعة تواصل الغرباء (Public): تشبه مجموعات QQ، بعد الإنشاء، يمكن لمالك المجموعة تعيين مشرفين للمجموعة، عندما يبحث المستخدمون عن معرف المجموعة ويطلبون الانضمام، يجب عليهم الحصول على موافقة من مالك المجموعة أو المشرفين قبل الانضمام إلى المجموعة.';
+
+  @override
+  String get groupMeetingDesc => 'مجموعة اجتماعات مؤقتة (Meeting): بعد الإنشاء، يمكن للمستخدمين الانضمام والخروج من المجموعة بحرية، ويمكنهم عرض الرسائل قبل الانضمام إلى المجموعة. تستخدم هذه المجموعات في سيناريوهات الاجتماعات الصوتية والمرئية والتعليم عبر الإنترنت وغيرها من السيناريوهات التي تتطلب منتجات الصوت والفيديو الفورية.';
+
+  @override
+  String get groupCommunityDesc => ' المجتمع (Community): بعد الإنشاء يمكن الدخول والخروج بحرية، يدعم حتى 100000 شخص، يدعم تخزين الرسائل السابقة، بعد البحث عن معرف المجموعة وإرسال طلب الانضمام، يمكن الانضمام إلى المجموعة دون حاجة لموافقة المشرف.';
+
+  @override
+  String get groupDetail => 'تفاصيل المحادثة الجماعية';
+
+  @override
+  String get transferGroupOwner => 'نقل ملكية المجموعة';
+
+  @override
+  String get privateGroup => 'محادثة فردية';
+
+  @override
+  String get publicGroup => 'مجموعة عامة';
+
+  @override
+  String get chatRoom => 'غرفة الدردشة';
+
+  @override
+  String get communityGroup => 'مجموعة المجتمع';
+
+  @override
+  String get serverGroupInvalidReq => 'الطلب غير صالح.';
+
+  @override
+  String get serverGroupReqAlreadyBeenProcessed => 'تم معالجة هذا الطلب أو الدعوة بالفعل';
+
+  @override
+  String inviteToGroupFrom(Object inviter) {
+    return 'دعوة من $inviter';
+  }
+
+  @override
+  String get applyToJoin => 'تقديم طلب الانضمام:';
+
+  @override
+  String get requestWait => 'تمت الدعوة بنجاح، في انتظار المعالجة';
+
+  @override
+  String dismissGroupTips(Object groupName) {
+    return 'لقد تم حل المجموعة التي كنت فيها $groupName';
+  }
 }
