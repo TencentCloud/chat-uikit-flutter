@@ -1,6 +1,6 @@
 name: tencent_cloud_chat_uikit
 description: A powerful chat UI component library and business logic for Tencent Cloud Chat, creating seamless in-app chat modules for delightful user experiences.
-version: 4.0.8
+version: 5.0.0
 homepage: https://trtc.io/products/chat?utm_source=gfs&utm_medium=link&utm_campaign=%E6%B8%A0%E9%81%93&_channel_track_key=k6WgfCKn
 repository: https://github.com/TencentCloud/chat-uikit-flutter
 documentation: https://comm.qq.com/im/doc/flutter/en/TUIKit/readme.html
@@ -19,7 +19,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  tencent_cloud_chat_sdk: ^8.5.6864+6
+  tencent_cloud_chat_sdk: ^8.6.7019+2
   tim_ui_kit_sticker_plugin: ^4.0.2
   tencent_chat_i18n_tool: ^2.3.8
   adaptive_action_sheet: ^2.0.1
@@ -29,17 +29,17 @@ dependencies:
   dotted_border: ^2.0.0+2
   flutter_svg: ^2.0.6
   image_picker: ^0.8.9
-  file_picker: ^5.3.0
+  file_picker: ^9.0.2
   tencent_super_tooltip: ^0.0.1
   better_player_plus: '>=1.0.4 <=1.0.5'
   video_player: ^2.9.2
   chewie: '>=1.8.4 <=1.8.5'
   flutter_slidable_plus_plus: ^0.1.0
-  flutter_plugin_record_plus: ^0.0.19
+  flutter_plugin_record_plus: ^0.0.21
   azlistview_all_platforms: ^2.1.2
   lpinyin: ^2.0.3
   transparent_image: ^2.0.0
-  image_gallery_saver_plus: ^3.0.5
+  image_gallery_saver_plus: ^4.0.0
   path_provider: ^2.0.8
   cached_network_image: ^3.3.0
   shared_preferences: ^2.0.13
@@ -48,10 +48,10 @@ dependencies:
   flutter_easyrefresh: ^2.2.1
   extended_image: ^9.0.0
   extended_text_field: ^16.0.0
-  extended_text: ^14.0.0
+  extended_text: ^15.0.0
   package_info_plus: ^8.0.0
   loading_animation_widget: ^1.1.0+3
-  permission_handler: ^10.2.0
+  permission_handler: ^11.4.0
   tuple: ^2.0.0
   flutter_markdown: ^0.6.15
   url_launcher: ^6.1.4

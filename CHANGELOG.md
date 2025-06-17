@@ -1,3 +1,6 @@
+# 5.0.0
+* Migrate to Flutter 3.29.0.
+
 # 4.0.8
 * Use the OfflinePushInfo constructor, not the fromJson function.
 
