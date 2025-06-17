@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat_common.dart';
 import 'package:tencent_cloud_chat_common/utils/sdk_const.dart';

@@ -1,9 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
-import 'package:tencent_cloud_chat/data/basic/tencent_cloud_chat_basic_data.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/components/tencent_cloud_chat_components_utils.dart';
+import 'package:tencent_cloud_chat_common/data/basic/tencent_cloud_chat_basic_data.dart';
+import 'package:tencent_cloud_chat_common/router/tencent_cloud_chat_navigator.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 
@@ -101,9 +102,13 @@ class TencentCloudChatConversationAppBarName extends StatefulWidget {
 
 class TencentCloudChatConversationAppBarNameState
     extends TencentCloudChatState<TencentCloudChatConversationAppBarName> {
-  addContacts() {}
+  startC2CChat() {
+    navigateToStartC2CChat(context: context);
+  }
 
-  newMessage() {}
+  startGroupChat() {
+    navigateToStartGroupChat(context: context);
+  }
 
   @override
   Widget defaultBuilder(BuildContext context) {
@@ -123,6 +128,53 @@ class TencentCloudChatConversationAppBarNameState
                   onPressed: () {
                     TencentCloudChat.instance.chatController.toggleBrightnessMode();
                   },
+                ),
+                PopupMenuButton<String>(
+                  icon: Icon(Icons.create_outlined, color: colorTheme.appBarIconColor),
+                  offset: const Offset(0, 40),
+                  color: colorTheme.backgroundColor,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                    maxWidth: 120,
+                  ),
+                  onSelected: (String result) {
+                    switch (result) {
+                      case 'startC2CChat':
+                        startC2CChat();
+                        break;
+                      case 'startGroupChat':
+                        startGroupChat();
+                        break;
+                    }
+                  },
+                  itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                    PopupMenuItem<String>(
+                      value: 'startC2CChat',
+                      child: Container(
+                        alignment: Alignment.center,
+                        child: Row(
+                          children: [
+                            const Icon(Icons.chat_outlined),
+                            const SizedBox(width: 8),
+                            Text(tL10n.startConversation),
+                          ],
+                        ),
+                      ),
+                    ),
+                    PopupMenuItem<String>(
+                      value: 'startGroupChat',
+                      child: Container(
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          children: [
+                            const Icon(Icons.group_add_outlined),
+                            const SizedBox(width: 8),
+                            Text(tL10n.createGroupChat),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ));

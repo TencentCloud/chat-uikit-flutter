@@ -3,8 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:better_player_plus/better_player_plus.dart';
 
 class TencentCloudChatMessageVideoPlayer extends StatefulWidget {

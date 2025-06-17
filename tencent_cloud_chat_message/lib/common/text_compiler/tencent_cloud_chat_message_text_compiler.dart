@@ -1,8 +1,8 @@
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 
 class TencentCloudChatSpecialTextSpanBuilder extends SpecialTextSpanBuilder {
   final TencentCloudChatPlugin? stickerPluginInstance;

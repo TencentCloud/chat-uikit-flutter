@@ -27,12 +27,12 @@ class _TencentCloudChatOperationBarState<T>
     extends TencentCloudChatState<TencentCloudChatOperationBar<T>> {
   @override
   Widget defaultBuilder(BuildContext context) {
-    MaterialStateProperty<Color?> getTrackColor(colorTheme) {
-      final MaterialStateProperty<Color?> trackColor =
-          MaterialStateProperty.resolveWith<Color?>(
-        (Set<MaterialState> states) {
+    WidgetStateProperty<Color?> getTrackColor(colorTheme) {
+      final WidgetStateProperty<Color?> trackColor =
+          WidgetStateProperty.resolveWith<Color?>(
+        (Set<WidgetState> states) {
           // Track color when the switch is selected.
-          if (states.contains(MaterialState.selected)) {
+          if (states.contains(WidgetState.selected)) {
             return colorTheme.contactAddContactFriendInfoStateButtonActiveColor;
           }
           // Otherwise return null to set default track color
@@ -47,12 +47,7 @@ class _TencentCloudChatOperationBarState<T>
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Container(
               padding: EdgeInsets.symmetric(horizontal: getWidth(16)),
-              decoration: BoxDecoration(
-                border: Border(
-                    bottom: BorderSide(
-                        color: colorTheme.backgroundColor, width: 1)),
-                color: colorTheme.inputAreaBackground,
-              ),
+          color: colorTheme.groupProfileTabBackground,
               child: Row(
                 children: [
                   Expanded(
@@ -74,9 +69,9 @@ class _TencentCloudChatOperationBarState<T>
                       onChanged: (bool newValue) =>
                           widget.onChange?.call(newValue as T),
                       trackColor: getTrackColor(colorTheme),
-                      thumbColor: MaterialStatePropertyAll<Color>(
+                      thumbColor: WidgetStatePropertyAll<Color>(
                           colorTheme.backgroundColor),
-                      trackOutlineColor: MaterialStatePropertyAll<Color>(colorTheme
+                      trackOutlineColor: WidgetStatePropertyAll<Color>(colorTheme
                           .contactAddContactFriendInfoStateButtonBackgroundColor),
                       inactiveThumbColor: colorTheme.backgroundColor,
                     )

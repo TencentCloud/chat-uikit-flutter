@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
-import 'package:tencent_cloud_chat/data/theme/tencent_cloud_chat_theme.dart';
-import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/data/theme/color/color_base.dart';
+import 'package:tencent_cloud_chat_common/data/theme/tencent_cloud_chat_theme.dart';
+import 'package:tencent_cloud_chat_common/data/theme/text_style/text_style.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
 
 class TencentCloudChatThemeWidget extends StatefulWidget {
   final Widget Function(BuildContext, TencentCloudChatThemeColors colorTheme, TencentCloudChatTextStyle textStyle) build;

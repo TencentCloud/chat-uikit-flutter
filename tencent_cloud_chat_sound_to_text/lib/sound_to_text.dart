@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_code_info.dart';
-import 'package:tencent_cloud_chat_intl/tencent_cloud_chat_intl.dart';
+import 'package:tencent_cloud_chat_common/components/tencent_cloud_chat_components_utils.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_code_info.dart';
 
 class TencentCloudChatTranslate extends StatefulWidget {
   final String msgID;

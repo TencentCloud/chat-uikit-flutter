@@ -1,9 +1,9 @@
-import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_config.dart';
-import 'package:tencent_cloud_chat/components/component_event_handlers/tencent_cloud_chat_message_event_handlers.dart';
-import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_base_controller.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
-import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_data_tools.dart';
+import 'package:tencent_cloud_chat_common/components/component_config/tencent_cloud_chat_message_config.dart';
+import 'package:tencent_cloud_chat_common/components/component_event_handlers/tencent_cloud_chat_message_event_handlers.dart';
+import 'package:tencent_cloud_chat_common/components/components_definition/tencent_cloud_chat_component_base_controller.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
+import 'package:tencent_cloud_chat_message/model/tencent_cloud_chat_message_data_tools.dart';
 
 enum EventName {
   scrollToBottom,

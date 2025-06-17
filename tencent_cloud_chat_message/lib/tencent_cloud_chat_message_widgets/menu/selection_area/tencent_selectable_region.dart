@@ -1699,6 +1699,16 @@ class _SelectableRegionContainerDelegate extends MultiSelectableSelectionContain
     _hasReceivedStartEvent.removeWhere((Selectable selectable) => !selectableSet.contains(selectable));
     super.didChangeSelectables();
   }
+
+  @override
+  // TODO: implement contentLength
+  int get contentLength => throw UnimplementedError();
+
+  @override
+  SelectedContentRange? getSelection() {
+    // TODO: implement getSelection
+    throw UnimplementedError();
+  }
 }
 
 /// An abstract base class for updating multiple selectable children.

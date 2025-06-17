@@ -4,11 +4,11 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
-import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_download_utils.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
+import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
+import 'package:tencent_cloud_chat_common/data/message/tencent_cloud_chat_message_data.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_download_utils.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_viewer/tencent_cloud_chat_message_viewer.dart';
@@ -120,18 +120,16 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
   }
 
   addDownloadMessageToQueue({
-    bool? isClick,
-    bool? isSnap,
+    required bool isOrigin,
   }) {
     if (isSendingMessage()) {
-      console("message is sending. download break .");
+      console("message is sending. download break.");
       return;
     }
-    bool hasThumbLocal = hasLocalImage();
-    bool hasOriginLocal = hasLocalImage(isOrigin: true);
 
-    if (hasThumbLocal && hasOriginLocal) {
-      console("message has both local url. download break.");
+    bool hasLocalImagePath = hasLocalImage(isOrigin: isOrigin);
+    if (hasLocalImagePath) {
+      console("message has local url. isOrigin:${isOrigin}.");
       return;
     }
 
@@ -142,14 +140,14 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
         console("add to download queue error. key is empty.");
         return;
       }
+
       int type = ImageType.thumb.index;
-      if (!hasOriginLocal && hasThumbLocal) {
+      if (isOrigin) {
         type = ImageType.origin.index;
-        console("thumb has been download. download origin local.");
       }
+
       TencentCloudChatDownloadUtils.addDownloadMessageToQueue(
         data: generateDownloadData(type: type, conversationType: conversationType, key: key),
-        isClick: isClick,
       );
     }
   }
@@ -198,10 +196,7 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
         res = true;
       }
     }
-    if (currentdownload?.path != null && currentdownload?.downloadFinish == true) {
-      console("no local url. but has downloaded path in memory.");
-      res = true;
-    }
+
     return res;
   }
 
@@ -495,12 +490,7 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
     );
   }
 
-  DownloadMessageQueueData? currentdownload;
-
-
-  
-
-   
+  DownloadMessageQueueData? currentDownloadData;
 
   handleDownloadEvent(TencentCloudChatMessageData data) {
     if (data.currentUpdatedFields == TencentCloudChatMessageDataKeys.downloadMessage) {
@@ -515,13 +505,13 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
       int type = ImageType.thumb.index;
       if (!hasOriginLocal && hasThumbLocal) {
         type = ImageType.origin.index;
-        console("thumb has been download . download origin local");
       }
+
       int idx = data.currentDownloadMessage.indexWhere((ele) => ele.getUniqueueKey() == generateDownloadData(type: type, conversationType: conversationType, key: key).getUniqueueKey());
 
       if (idx > -1) {
         safeSetState(() {
-          currentdownload = data.currentDownloadMessage[idx];
+          currentDownloadData = data.currentDownloadMessage[idx];
         });
       }
     } else if (data.currentUpdatedFields == TencentCloudChatMessageDataKeys.networkConnectSuccess) {
@@ -633,7 +623,7 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
 
     Widget needDownload = GestureDetector(
       onTap: () {
-        addDownloadMessageToQueue(isClick: true);
+        addDownloadMessageToQueue(isOrigin: true);
         setState(() {
           renderRandom = Random().nextInt(100000);
         });
@@ -647,12 +637,12 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
 
     late Widget finalRenderDownloadStatusWidget;
 
-    if (hasLocalImage() || currentdownload?.downloadFinish == true || isErrorMessage || isSendingMessage() || TencentCloudChatUtils.checkString(widget.data.message.id) != null) {
+    if ((hasLocalImage() && hasLocalImage(isOrigin: true)) || isErrorMessage || isSendingMessage() || TencentCloudChatUtils.checkString(widget.data.message.id) != null) {
       return Container();
     } else {
       if (isDownloading()) {
         finalRenderDownloadStatusWidget = getDownloadingWidget(
-          progress: currentdownload == null ? 0 : (currentdownload!.downloadFinish ? 1 : (currentdownload!.currentDownloadSize / (currentdownload!.totalSize == 0 ? 1 : currentdownload!.totalSize))),
+          progress: currentDownloadData == null ? 0 : (currentDownloadData!.downloadFinish ? 1 : (currentDownloadData!.currentDownloadSize / (currentDownloadData!.totalSize == 0 ? 1 : currentDownloadData!.totalSize))),
         );
       } else if (isInDownloadQueue()) {
         finalRenderDownloadStatusWidget = getDownloadingWidget(progress: 0);
@@ -667,7 +657,7 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
         borderRadius: BorderRadius.all(
           Radius.circular(getSquareSize(15)),
         ),
-        color: Colors.black.withOpacity((hasLocalImage() || currentdownload?.downloadFinish == true) ? 0 : 0.2),
+        color: Colors.black.withOpacity((hasLocalImage() || currentDownloadData?.downloadFinish == true) ? 0 : 0.2),
       ),
       child: finalRenderDownloadStatusWidget,
     );
@@ -682,7 +672,7 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
     _getImageUrl();
     if (!TencentCloudChatPlatformAdapter().isWeb) {
       addDownloadListener();
-      addDownloadMessageToQueue();
+      addDownloadMessageToQueue(isOrigin: false);
     }
   }
 

@@ -5,24 +5,24 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_common_defines.dart';
-import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
-import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
-import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
-import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
-import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/tuicore/tencent_cloud_chat_core.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_code_info.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
+import 'package:tencent_cloud_chat_common/components/component_config/tencent_cloud_chat_message_common_defines.dart';
+import 'package:tencent_cloud_chat_common/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
+import 'package:tencent_cloud_chat_common/components/tencent_cloud_chat_components_utils.dart';
+import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
+import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
+import 'package:tencent_cloud_chat_common/models/tencent_cloud_chat_models.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/tuicore/tencent_cloud_chat_core.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_code_info.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_permission_handlers.dart';
 import 'package:tencent_cloud_chat_common/widgets/desktop_popup/operation_key.dart';
 import 'package:tencent_cloud_chat_common/widgets/desktop_popup/tencent_cloud_chat_desktop_popup.dart';
 import 'package:tencent_cloud_chat_common/widgets/group_member_selector/tencent_cloud_chat_group_member_selector.dart';
 import 'package:tencent_cloud_chat_common/widgets/modal/bottom_modal.dart';
-import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data.dart';
-import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data_notifier.dart';
+import 'package:tencent_cloud_chat_message/model/tencent_cloud_chat_message_separate_data.dart';
+import 'package:tencent_cloud_chat_message/model/tencent_cloud_chat_message_separate_data_notifier.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_controller.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/mobile/tencent_cloud_chat_at_group_member_list.dart';
 import 'package:universal_html/html.dart' as html;
@@ -616,7 +616,7 @@ class _TencentCloudChatMessageInputContainerState extends TencentCloudChatState<
     List<V2TimGroupMemberFullInfo> memberList = await Navigator.push(context,
         MaterialPageRoute(
             builder: (context) => TencentCloudChatAtGroupMemberList(
-              groupInfo: _dataProvider.groupInfo!,
+              groupInfo: _dataProvider.groupInfo,
               memberInfoList: _dataProvider.groupMemberList.where((element) => element != null).map((e) => e!).toList(),
             )));
     return memberList;

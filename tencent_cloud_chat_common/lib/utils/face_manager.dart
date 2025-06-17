@@ -1,4 +1,4 @@
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
 import 'dart:core';
 
 class FaceManager {

@@ -1,12 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
-import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
-import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
-import 'package:tencent_cloud_chat/data/theme/tencent_cloud_chat_theme.dart';
-import 'package:tencent_cloud_chat/eventbus/tencent_cloud_chat_eventbus.dart';
-import 'package:tencent_cloud_chat/log/tencent_cloud_chat_log.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
+import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
+import 'package:tencent_cloud_chat_common/data/theme/tencent_cloud_chat_theme.dart';
+import 'package:tencent_cloud_chat_common/eventbus/tencent_cloud_chat_eventbus.dart';
+import 'package:tencent_cloud_chat_common/log/tencent_cloud_chat_log.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
 
 /// An abstract base class for the state of StatefulWidget in TencentCloudChat.instance.
 ///

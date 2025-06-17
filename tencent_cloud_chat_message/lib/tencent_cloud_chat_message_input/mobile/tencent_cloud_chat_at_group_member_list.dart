@@ -3,8 +3,7 @@ import 'package:azlistview_all_platforms/azlistview_all_platforms.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lpinyin/lpinyin.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat_common.dart';
 import 'package:tencent_cloud_chat_common/utils/sdk_const.dart';
@@ -106,6 +105,7 @@ class TencentCloudChatAtGroupMemberListState extends TencentCloudChatState<Tence
                   ),
                 )
               ],
+              scrolledUnderElevation: 0.0,
             ),
             body: Container(
                 color: colorTheme.backgroundColor,
@@ -258,6 +258,7 @@ class TencentCloudChatGroupProfileMemberListItemState
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50),
                           ),
+                          side: BorderSide(width: 1, color: colorTheme.primaryTextColor),
                           onChanged: (bool? value) {
                             isSelected = value ?? false;
                             widget.onSelectGroupMember(isSelected);
@@ -270,7 +271,7 @@ class TencentCloudChatGroupProfileMemberListItemState
                               imageList: [TencentCloudChatUtils.checkString(widget.memberFullInfo.faceUrl)],
                               width: getSquareSize(40),
                               height: getSquareSize(40),
-                              borderRadius: getSquareSize(48),
+                              borderRadius: getSquareSize(20),
                               scene: TencentCloudChatAvatarScene.groupProfile,
                             )),
                         Expanded(

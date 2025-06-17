@@ -5,17 +5,17 @@ import 'dart:math';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_download_utils.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_download_utils.dart';
 import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_permission_handlers.dart';
 import 'package:universal_html/html.dart' as html;
 import 'package:http/http.dart' as http;
 import 'package:open_file/open_file.dart';
-import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
-import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
-import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
-import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
+import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
+import 'package:tencent_cloud_chat_common/data/message/tencent_cloud_chat_message_data.dart';
+import 'package:tencent_cloud_chat_common/data/theme/color/color_base.dart';
+import 'package:tencent_cloud_chat_common/data/theme/text_style/text_style.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/widgets/file_icon/tencent_cloud_chat_file_icon.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/tencent_cloud_chat_message_item.dart';
@@ -99,9 +99,7 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
     );
   }
 
-  addDownloadMessageToQueue({
-    bool? isClick,
-  }) {
+  addDownloadMessageToQueue() {
     if (hasLocalFile()) {
       console("has local url. download break");
       return;
@@ -119,7 +117,6 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
       }
       TencentCloudChatDownloadUtils.addDownloadMessageToQueue(
         data: generateDownloadData(type: 0, conversationType: conversationType, key: key),
-        isClick: isClick,
       );
     }
   }
@@ -550,7 +547,7 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
 
     Widget needDownload = GestureDetector(
       onTap: () {
-        addDownloadMessageToQueue(isClick: true);
+        addDownloadMessageToQueue();
         setState(() {
           renderRandom = Random().nextInt(100000);
         });
@@ -617,7 +614,6 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
     getFileUrl();
     if (!TencentCloudChatPlatformAdapter().isWeb) {
       addDownloadListener();
-      addDownloadMessageToQueue();
     }
   }
 

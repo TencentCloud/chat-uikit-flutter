@@ -3,23 +3,24 @@ library tencent_cloud_chat_message;
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_config.dart';
-import 'package:tencent_cloud_chat/components/component_options/tencent_cloud_chat_message_options.dart';
-import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
-import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
-import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
-import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
-import 'package:tencent_cloud_chat/router/tencent_cloud_chat_route_names.dart';
-import 'package:tencent_cloud_chat/router/tencent_cloud_chat_router.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
+import 'package:tencent_cloud_chat_common/components/component_config/tencent_cloud_chat_message_config.dart';
+import 'package:tencent_cloud_chat_common/components/component_options/tencent_cloud_chat_message_options.dart';
+import 'package:tencent_cloud_chat_common/components/tencent_cloud_chat_components_utils.dart';
+import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
+import 'package:tencent_cloud_chat_common/data/message/tencent_cloud_chat_message_data.dart';
+import 'package:tencent_cloud_chat_common/models/tencent_cloud_chat_models.dart';
+import 'package:tencent_cloud_chat_common/router/tencent_cloud_chat_route_names.dart';
+import 'package:tencent_cloud_chat_common/router/tencent_cloud_chat_router.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_component_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
-import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data.dart';
-import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data_notifier.dart';
+import 'package:tencent_cloud_chat_message/model/tencent_cloud_chat_message_separate_data.dart';
+import 'package:tencent_cloud_chat_message/model/tencent_cloud_chat_message_separate_data_notifier.dart';
+import 'package:tencent_cloud_chat_message/tencent_cloud_chat_group_profile.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_builders.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_controller.dart';
-import 'package:tencent_cloud_chat/components/component_event_handlers/tencent_cloud_chat_message_event_handlers.dart';
+import 'package:tencent_cloud_chat_common/components/component_event_handlers/tencent_cloud_chat_message_event_handlers.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_header/tencent_cloud_chat_message_header_container.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_info/tencent_cloud_chat_message_info.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_info/tencent_cloud_chat_message_info_options.dart';
@@ -144,30 +145,48 @@ class _TencentCloudChatMessageState extends TencentCloudChatState<TencentCloudCh
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    final hasChat = (widget.options?.userID == null) != (widget.options?.groupID == null);
+    bool hasChat = true;
+    String? userID = widget.options!.userID;
+    String? groupID = widget.options!.groupID;
+    if (widget.options != null) {
+      bool hasC2CChat = true;
+      bool hasGroupChat = true;
+      if (widget.options!.userID == null || widget.options!.userID!.isEmpty) {
+        hasC2CChat = false;
+        userID = null;
+      }
+      if (widget.options!.groupID == null || widget.options!.groupID!.isEmpty) {
+        hasGroupChat = false;
+        groupID = null;
+      }
+
+      if (hasC2CChat == hasGroupChat) {
+        hasChat = false;
+      }
+    }
     final isDesktop = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop;
     return hasChat
         ? TencentCloudChatMessageDataProviderInherited(
             dataProvider: _messageSeparateDataProvider,
             child: TencentCloudChatMessageLayoutContainer(
-              userID: widget.options!.userID,
-              groupID: widget.options!.groupID,
+              userID: userID,
+              groupID: groupID,
               topicID: widget.options!.topicID,
               header: TencentCloudChatMessageHeaderContainer(
                 toolbarHeight: getHeight(isDesktop ? 64 : 60),
-                userID: widget.options!.userID,
-                groupID: widget.options!.groupID,
+                userID: userID,
+                groupID: groupID,
                 topicID: widget.options!.topicID,
               ),
               messageListView: TencentCloudChatMessageListViewContainer(
-                userID: widget.options!.userID,
-                groupID: widget.options!.groupID,
+                userID: userID,
+                groupID: groupID,
                 topicID: widget.options!.topicID,
                 targetMessage: widget.options?.targetMessage,
               ),
               messageInput: TencentCloudChatMessageInputContainer(
-                userID: widget.options!.userID,
-                groupID: widget.options!.groupID,
+                userID: userID,
+                groupID: groupID,
                 topicID: widget.options!.topicID,
                 draftText: widget.options!.draftText,
               ),
@@ -238,6 +257,8 @@ class TencentCloudChatMessageManager {
     TencentCloudChat.instance.dataInstance.messageData.messageBuilder ??= TencentCloudChatMessageBuilders();
 
     TencentCloudChat.instance.dataInstance.messageData.messageController ??= TencentCloudChatMessageControllerGenerator.getInstance();
+
+    TencentCloudChatGroupProfileManager.register();
 
     return (
       componentEnum: TencentCloudChatComponentsEnum.message,

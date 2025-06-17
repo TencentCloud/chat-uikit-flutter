@@ -1,4 +1,4 @@
-import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_base_controller.dart';
+import 'package:tencent_cloud_chat_common/components/components_definition/tencent_cloud_chat_component_base_controller.dart';
 
 class TencentCloudChatContactControllerGenerator {
   static TencentCloudChatContactController getInstance() {
@@ -6,6 +6,6 @@ class TencentCloudChatContactControllerGenerator {
   }
 }
 
-class TencentCloudChatContactController extends TencentCloudChatComponentBaseController{
+class TencentCloudChatContactController extends TencentCloudChatComponentBaseController {
   TencentCloudChatContactController._();
 }

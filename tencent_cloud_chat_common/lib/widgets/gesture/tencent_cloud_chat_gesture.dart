@@ -1,6 +1,5 @@
-
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
+import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 
 class TencentCloudChatGestureColors {
   Color? focusColor;

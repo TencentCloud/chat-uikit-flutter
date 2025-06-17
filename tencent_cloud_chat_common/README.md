@@ -8,6 +8,22 @@ To streamline the development process and maintain UI consistency throughout you
 
 By leveraging these pre-built widgets, you can significantly reduce development time and effort while maintaining a professional and cohesive appearance in your applications.
 
+The required plugins for integration are:
+- [tencent_cloud_chat_common](https://pub.dev/packages/tencent_cloud_chat_common)
+- [tencent_cloud_chat_conversation](https://pub.dev/packages/tencent_cloud_chat_conversation)
+- [tencent_cloud_chat_message](https://pub.dev/packages/tencent_cloud_chat_message)
+- [tencent_cloud_chat_contact](https://pub.dev/packages/tencent_cloud_chat_contact)
+- [tencent_cloud_chat_sticker](https://pub.dev/packages/tencent_cloud_chat_sticker)
+- [tencent_cloud_chat_message_reaction](https://pub.dev/packages/tencent_cloud_chat_message_reaction)
+- [tencent_cloud_chat_text_translate](https://pub.dev/packages/tencent_cloud_chat_text_translate)
+- [tencent_cloud_chat_sound_to_text](https://pub.dev/packages/tencent_cloud_chat_sound_to_text)
+- [tencent_cloud_chat_push](https://pub.dev/packages/tencent_cloud_chat_push)
+- [tencent_calls_uikit](https://pub.dev/packages/tencent_calls_uikit)
+
+For the integration method, please refer to [github demo](https://github.com/TencentCloud/chat-demo-flutter/tree/v2).
+
+To integrate the old version of **WeChat style** UI, please integrate [tencent_cloud_chat_uikit](https://pub.dev/packages/tencent_cloud_chat_uikit), you can refer to [github demo](https://github.com/TencentCloud/chat-demo-flutter/tree/main).
+
 ## Usage Examples
 
 Here are a few examples of how you can utilize these common widgets in your application:

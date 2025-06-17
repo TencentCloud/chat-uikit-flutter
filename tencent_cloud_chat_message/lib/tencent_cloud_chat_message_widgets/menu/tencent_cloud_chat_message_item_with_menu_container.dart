@@ -2,20 +2,20 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_common_defines.dart';
-import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_config.dart';
-import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
-import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
-import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
-import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
+import 'package:tencent_cloud_chat_common/components/component_config/tencent_cloud_chat_message_common_defines.dart';
+import 'package:tencent_cloud_chat_common/components/component_config/tencent_cloud_chat_message_config.dart';
+import 'package:tencent_cloud_chat_common/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
+import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
+import 'package:tencent_cloud_chat_common/data/message/tencent_cloud_chat_message_data.dart';
+import 'package:tencent_cloud_chat_common/models/tencent_cloud_chat_models.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/widgets/desktop_popup/operation_key.dart';
 import 'package:tencent_cloud_chat_common/widgets/desktop_popup/tencent_cloud_chat_desktop_popup.dart';
 import 'package:tencent_cloud_chat_common/widgets/dialog/tencent_cloud_chat_dialog.dart';
-import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data.dart';
-import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data_notifier.dart';
+import 'package:tencent_cloud_chat_message/model/tencent_cloud_chat_message_separate_data.dart';
+import 'package:tencent_cloud_chat_message/model/tencent_cloud_chat_message_separate_data_notifier.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/forward/tencent_cloud_chat_message_forward_container.dart';
 
 class TencentCloudChatMessageItemWithMenuContainer extends StatefulWidget {
@@ -45,7 +45,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState
     extends TencentCloudChatState<TencentCloudChatMessageItemWithMenuContainer> {
   late TencentCloudChatMessageSeparateDataProvider dataProvider;
   final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream =
-      TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatMessageData>("TencentCloudChatMessageData");
+  TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatMessageData>("TencentCloudChatMessageData");
   late StreamSubscription<TencentCloudChatMessageData<dynamic>>? _messageDataSubscription;
 
   List<TencentCloudChatMessageGeneralOptionItem> _menuOptions = [];
@@ -85,12 +85,13 @@ class _TencentCloudChatMessageItemWithMenuContainerState
         break;
       case TencentCloudChatMessageDataKeys.sendMessageProgress:
         if (messageData.messageProgressData.containsKey(msgID)) {
-            var data = messageData.messageProgressData[msgID];
-            if (data != null) {
-              _message = data.message;
-              _generateMenuOptions();
-            }
-        } else if (TencentCloudChatUtils.checkString(_message.id) != null && _message.id != msgID && messageData.messageProgressData.containsKey(_message.id)) {
+          var data = messageData.messageProgressData[msgID];
+          if (data != null) {
+            _message = data.message;
+            _generateMenuOptions();
+          }
+        } else if (TencentCloudChatUtils.checkString(_message.id) != null && _message.id != msgID &&
+            messageData.messageProgressData.containsKey(_message.id)) {
           var data = messageData.messageProgressData[_message.id];
           if (data != null) {
             _message = data.message;
@@ -102,7 +103,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState
         break;
       case TencentCloudChatMessageDataKeys.messageNeedUpdate:
         final messageNeedUpdate = TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate;
-        if (messageNeedUpdate != null &&(
+        if (messageNeedUpdate != null && (
             (TencentCloudChatUtils.checkString(msgID) != null && msgID == messageNeedUpdate.msgID) ||
                 (TencentCloudChatUtils.checkString(_message.id) != null && _message.id == messageNeedUpdate.id)
         )) {
@@ -172,7 +173,9 @@ class _TencentCloudChatMessageItemWithMenuContainerState
       topicID: dataProvider.topicID,
     );
 
-    final timeDiff = (DateTime.now().millisecondsSinceEpoch / 1000).ceil() - (_message.timestamp ?? 0);
+    final timeDiff = (DateTime
+        .now()
+        .millisecondsSinceEpoch / 1000).ceil() - (_message.timestamp ?? 0);
     final enableRecall = (timeDiff < recallTimeLimit) &&
         (_message.isSelf ?? true) &&
         _message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC;
@@ -206,19 +209,19 @@ class _TencentCloudChatMessageItemWithMenuContainerState
         TencentCloudChatUtils.checkString(dataProvider.groupID) != null &&
         dataProvider.config
             .enabledGroupTypesForMessageReadReceipt(
-              userID: dataProvider.userID,
-              groupID: dataProvider.groupID,
-              topicID: dataProvider.topicID,
-            )
+          userID: dataProvider.userID,
+          groupID: dataProvider.groupID,
+          topicID: dataProvider.topicID,
+        )
             .contains(dataProvider.groupInfo?.groupType);
     final showReadReceipt = useReadReceipt && (_message.isSelf ?? true) && (_message.needReadReceipt ?? false);
     final receipt = showReadReceipt
         ? (messageReceipt ?? _messageReceipt) ??
-            TencentCloudChat.instance.dataInstance.messageData.getMessageReadReceipt(
-              msgID: _message.msgID ?? "",
-              userID: _message.userID ?? "",
-              timestamp: _message.timestamp ?? 0,
-            )
+        TencentCloudChat.instance.dataInstance.messageData.getMessageReadReceipt(
+          msgID: _message.msgID ?? "",
+          userID: _message.userID ?? "",
+          timestamp: _message.timestamp ?? 0,
+        )
         : null;
     final int? readCount = showReadReceipt ? receipt?.readCount : null;
     final int? unreadCount = showReadReceipt ? receipt?.unreadCount : null;
@@ -258,7 +261,7 @@ class _TencentCloudChatMessageItemWithMenuContainerState
           onTap: ({Offset? offset}) {
             Future.delayed(
               const Duration(milliseconds: 150),
-              () {
+                  () {
                 dataProvider.inSelectMode = true;
                 dataProvider.selectedMessages = [_message];
               },
@@ -273,19 +276,27 @@ class _TencentCloudChatMessageItemWithMenuContainerState
             onTap: ({Offset? offset}) {
               if (isDesktopScreen) {
                 TencentCloudChatDesktopPopup.showPopupWindow(
-                  width: MediaQuery.of(context).size.width * 0.6,
-                  height: MediaQuery.of(context).size.height * 0.6,
+                  width: MediaQuery
+                      .of(context)
+                      .size
+                      .width * 0.6,
+                  height: MediaQuery
+                      .of(context)
+                      .size
+                      .height * 0.6,
                   operationKey: TencentCloudChatPopupOperationKey.forward,
                   context: context,
-                  child: (closeFunc) => TencentCloudChatMessageForwardContainer(
-                    type: TencentCloudChatForwardType.individually,
-                    onCloseModal: closeFunc,
-                    context: context,
-                    messages: [_message],
-                    messageForwardBuilder: TencentCloudChatMessageDataProviderInherited.of(context)
-                        .messageBuilders
-                        ?.getMessageForwardBuilder,
-                  ),
+                  child: (closeFunc) =>
+                      TencentCloudChatMessageForwardContainer(
+                        type: TencentCloudChatForwardType.individually,
+                        onCloseModal: closeFunc,
+                        context: context,
+                        messages: [_message],
+                        messageForwardBuilder: TencentCloudChatMessageDataProviderInherited
+                            .of(context)
+                            .messageBuilders
+                            ?.getMessageForwardBuilder,
+                      ),
                 );
               } else {
                 showModalBottomSheet<void>(
@@ -297,7 +308,8 @@ class _TencentCloudChatMessageItemWithMenuContainerState
                   builder: (BuildContext _) {
                     return TencentCloudChatMessageForwardContainer(
                       type: TencentCloudChatForwardType.individually,
-                      messageForwardBuilder: TencentCloudChatMessageDataProviderInherited.of(context)
+                      messageForwardBuilder: TencentCloudChatMessageDataProviderInherited
+                          .of(context)
                           .messageBuilders
                           ?.getMessageForwardBuilder,
                       context: context,
@@ -323,17 +335,17 @@ class _TencentCloudChatMessageItemWithMenuContainerState
                   height: 200,
                   actions: [
                     (
-                      onTap: () {},
-                      label: tL10n.cancel,
-                      type: TencentCloudChatDesktopPopupActionButtonType.secondary,
+                    onTap: () {},
+                    label: tL10n.cancel,
+                    type: TencentCloudChatDesktopPopupActionButtonType.secondary,
                     ),
                     if (enableMessageDeleteForSelf)
                       (
-                        onTap: () {
-                          dataProvider.deleteMessagesForMe(messages: [_message]);
-                        },
-                        label: tL10n.confirm,
-                        type: TencentCloudChatDesktopPopupActionButtonType.primary,
+                      onTap: () {
+                        dataProvider.deleteMessagesForMe(messages: [_message]);
+                      },
+                      label: tL10n.confirm,
+                      type: TencentCloudChatDesktopPopupActionButtonType.primary,
                       ),
                   ],
                 );
@@ -411,22 +423,22 @@ class _TencentCloudChatMessageItemWithMenuContainerState
       if (widget.isTextTranslatePluginEnabled && _message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC &&
           !_hasTranslate)
         TencentCloudChatMessageGeneralOptionItem(
-            icon: Icons.translate_outlined,
-            label: tL10n.translate,
-            id: "_uikit_translate",
-            onTap: ({offset})  {
-              dataProvider.translatedMessages = [_message];
-            },
+          icon: Icons.translate_outlined,
+          label: tL10n.translate,
+          id: "_uikit_translate",
+          onTap: ({offset}) {
+            dataProvider.translatedMessages = [_message];
+          },
         ),
       if (widget.isSoundToTextPluginEnabled && _message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC &&
           !_hasConvertToText)
         TencentCloudChatMessageGeneralOptionItem(
-            icon: Icons.translate_outlined,
-            label: tL10n.convertToText,
-            id: "_uikit_convert_to_text",
-            onTap: ({offset})  {
-              dataProvider.soundToTextMessages = [_message];
-            },
+          icon: Icons.translate_outlined,
+          label: tL10n.convertToText,
+          id: "_uikit_convert_to_text",
+          onTap: ({offset}) {
+            dataProvider.soundToTextMessages = [_message];
+          },
         )
     ];
 
@@ -452,22 +464,35 @@ class _TencentCloudChatMessageItemWithMenuContainerState
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    return TencentCloudChatMessageDataProviderInherited.of(context).messageBuilders?.getMessageItemMenuBuilder(
-              data: MessageItemMenuBuilderData(
-                message: _message,
-                isMergeMessage: widget.isMergeMessage,
-                inSelectMode: dataProvider.inSelectMode,
-                useMessageReaction: widget.useMessageReaction,
-                messageReactionPluginInstance: dataProvider.messageReactionPluginInstance,
-              ),
-              methods: MessageItemMenuBuilderMethods(
-                onSelectMessage: () => dataProvider.triggerSelectedMessage(message: _message),
-                getMessageItemWidget: widget.getMessageItemWidget,
-                getMenuOptions: ({String? selectedText}) => TencentCloudChatUtils.checkString(selectedText) == null
-                    ? _menuOptions
-                    : _generateMenuOptions(selectedText: selectedText),
-              ),
-            ) ??
+    return TencentCloudChatMessageDataProviderInherited
+        .of(context)
+        .messageBuilders
+        ?.getMessageItemMenuBuilder(
+      data: MessageItemMenuBuilderData(
+        message: _message,
+        isMergeMessage: widget.isMergeMessage,
+        inSelectMode: dataProvider.inSelectMode,
+        useMessageReaction: widget.useMessageReaction,
+        messageReactionPluginInstance: dataProvider.messageReactionPluginInstance,
+      ),
+      methods: MessageItemMenuBuilderMethods(
+        onSelectMessage: () => dataProvider.triggerSelectedMessage(message: _message),
+        getMessageItemWidget: widget.getMessageItemWidget,
+        getMenuOptions: ({String? selectedText}) {
+          if (TencentCloudChatUtils.checkString(selectedText) == null) {
+            if (_menuOptions.any((element) => element.id == "_uikit_revoke_message")) {
+              if (_showRecallButton() == false) {
+                _menuOptions.removeWhere((element) => element.id == "_uikit_revoke_message");
+              }
+            }
+
+            return _menuOptions;
+          } else {
+            return _generateMenuOptions(selectedText: selectedText);
+          }
+        },
+      ),
+    ) ??
         Container();
   }
 }

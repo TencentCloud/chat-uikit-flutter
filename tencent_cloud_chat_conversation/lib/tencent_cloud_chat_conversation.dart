@@ -3,16 +3,16 @@ library tencent_cloud_chat_conversation;
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_conversation_config.dart';
-import 'package:tencent_cloud_chat/components/component_event_handlers/tencent_cloud_chat_conversation_event_handlers.dart';
-import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
-import 'package:tencent_cloud_chat/data/basic/tencent_cloud_chat_basic_data.dart';
-import 'package:tencent_cloud_chat/data/conversation/tencent_cloud_chat_conversation_data.dart';
-import 'package:tencent_cloud_chat/models/tencent_cloud_chat_models.dart';
-import 'package:tencent_cloud_chat/router/tencent_cloud_chat_route_names.dart';
-import 'package:tencent_cloud_chat/router/tencent_cloud_chat_router.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
+import 'package:tencent_cloud_chat_common/components/component_config/tencent_cloud_chat_conversation_config.dart';
+import 'package:tencent_cloud_chat_common/components/component_event_handlers/tencent_cloud_chat_conversation_event_handlers.dart';
+import 'package:tencent_cloud_chat_common/components/tencent_cloud_chat_components_utils.dart';
+import 'package:tencent_cloud_chat_common/data/basic/tencent_cloud_chat_basic_data.dart';
+import 'package:tencent_cloud_chat_common/data/conversation/tencent_cloud_chat_conversation_data.dart';
+import 'package:tencent_cloud_chat_common/models/tencent_cloud_chat_models.dart';
+import 'package:tencent_cloud_chat_common/router/tencent_cloud_chat_route_names.dart';
+import 'package:tencent_cloud_chat_common/router/tencent_cloud_chat_router.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_component_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
@@ -71,10 +71,10 @@ class TencentCloudChatConversationState extends TencentCloudChatState<TencentClo
         componentName: 'TencentCloudChatConversation',
         logs: "add _conversationDataStream start ${_conversationDataStream != null}");
 
+    _textEditingController = TextEditingController();
     _addBasicEventListener();
     _globalSearchWidget =
         TencentCloudChat.instance.dataInstance.basic.componentsMap[TencentCloudChatComponentsEnum.search];
-    _textEditingController = TextEditingController();
     if (_globalSearchWidget != null) {
       _textEditingController.addListener(_searchTextListenerHandler);
     }
@@ -120,6 +120,7 @@ class TencentCloudChatConversationState extends TencentCloudChatState<TencentClo
   @override
   void dispose() {
     _conversationDataSubscription?.cancel();
+    _basicDataSubscription?.cancel();
     _textEditingController.removeListener(_searchTextListenerHandler);
     _textEditingController.dispose();
     super.dispose();

@@ -1,11 +1,12 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
-import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
-import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data.dart';
-import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data_notifier.dart';
+import 'package:tencent_cloud_chat_common/data/message/tencent_cloud_chat_message_data.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_message_calling_message.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
+import 'package:tencent_cloud_chat_message/model/tencent_cloud_chat_message_separate_data.dart';
+import 'package:tencent_cloud_chat_message/model/tencent_cloud_chat_message_separate_data_notifier.dart';
 
 // MessageContainer is a StatefulWidget that is used for listening to
 // TencentCloudChatMessageData and combining it with a pure message widget.
@@ -162,7 +163,14 @@ class TencentCloudChatMessageItemContainerState extends State<TencentCloudChatMe
           break;
         case MessageElemType.V2TIM_ELEM_TYPE_CUSTOM:
           if (widget.message.customElem != null) {
-            messageText = TencentCloudChatUtils.buildCallingText(widget.message);
+            if (TencentCloudChatUtils.isCreateGroupCustomMessage(widget.message)) {
+              messageText = TencentCloudChatUtils.getCreateGroupCustomText(widget.message);
+            } else {
+              final callingMessage = CallingMessage.getCallMessage(widget.message);
+              if (callingMessage != null && callingMessage.isCallingSignal) {
+                messageText = TencentCloudChatUtils.buildCallingText(widget.message);
+              }
+            }
           }
           break;
         default:

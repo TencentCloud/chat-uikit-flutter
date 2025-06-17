@@ -6,12 +6,12 @@ import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:tencent_cloud_chat/data/message/tencent_cloud_chat_message_data.dart';
-import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
-import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_download_utils.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
+import 'package:tencent_cloud_chat_common/data/message/tencent_cloud_chat_message_data.dart';
+import 'package:tencent_cloud_chat_common/data/theme/color/color_base.dart';
+import 'package:tencent_cloud_chat_common/data/theme/text_style/text_style.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_download_utils.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/widgets/cacheImage/tencent_cloud_chat_cache_image.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_viewer/tencent_cloud_chat_message_viewer.dart';
@@ -189,9 +189,7 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
     );
   }
 
-  addDownloadMessageToQueue({
-    bool? isClick,
-  }) {
+  addDownloadMessageToQueue() {
     if (kIsWeb) {
       return;
     }
@@ -227,7 +225,6 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
           key: key,
           isSnapshot: isSnapshot,
         ),
-        isClick: isClick,
       );
     }
   }
@@ -342,7 +339,7 @@ class _TencentCloudChatMessageVideoState extends TencentCloudChatMessageState<Te
       bool hasClientPath = hasSelfClientPath();
       if (hasLocalSnap) {
         String localSnapUrl = getLocalSnapUrl();
-        console("rendern local url");
+        console("render local url");
         safeSetState(() {
           currentRenderVideoInfo = TimVideoCurrentRenderInfo(height: localDefaultHeight, path: localSnapUrl, width: localDefaultWidth, type: TimVideoCurrentRenderType.local);
         });

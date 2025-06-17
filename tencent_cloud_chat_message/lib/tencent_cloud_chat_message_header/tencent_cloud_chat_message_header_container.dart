@@ -1,14 +1,18 @@
 // ignore_for_file: depend_on_referenced_packages
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/tuicore/tencent_cloud_chat_core.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
+import 'package:tencent_cloud_chat_common/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
+import 'package:tencent_cloud_chat_common/data/conversation/tencent_cloud_chat_conversation_data.dart';
+import 'package:tencent_cloud_chat_common/eventbus/tencent_cloud_chat_eventbus.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/tuicore/tencent_cloud_chat_core.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/widgets/group_member_selector/tencent_cloud_chat_group_member_selector.dart';
-import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data.dart';
-import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data_notifier.dart';
+import 'package:tencent_cloud_chat_message/model/tencent_cloud_chat_message_separate_data.dart';
+import 'package:tencent_cloud_chat_message/model/tencent_cloud_chat_message_separate_data_notifier.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_header/tencent_cloud_chat_message_header_actions.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_header/tencent_cloud_chat_message_header_info.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_header/tencent_cloud_chat_message_header_profile_image.dart';
@@ -65,11 +69,16 @@ class TencentCloudChatMessageHeaderContainer extends StatefulWidget implements P
 class _TencentCloudChatMessageHeaderContainerState
     extends TencentCloudChatState<TencentCloudChatMessageHeaderContainer> {
   late TencentCloudChatMessageSeparateDataProvider dataProvider;
+  V2TimConversation? _conversation;
   bool _inSelectMode = false;
   int _selectAmount = 0;
 
   List<V2TimGroupMemberFullInfo?> _groupMemberInfo = [];
-  V2TimTopicInfo? _topicInfo;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   void didChangeDependencies() {
@@ -101,19 +110,17 @@ class _TencentCloudChatMessageHeaderContainerState
       });
     }
 
-    /// _topicInfo
-    final topicInfo = dataProvider.topicInfo;
-    if (_topicInfo != topicInfo) {
-      setState(() {
-        _topicInfo = topicInfo;
-      });
-    }
-
     final groupMemberList = dataProvider.groupMemberList;
     if (!TencentCloudChatUtils.deepEqual(_groupMemberInfo, groupMemberList)) {
       setState(() {
         _groupMemberInfo = groupMemberList;
       });
+    }
+
+    if (_conversation?.conversationID == dataProvider.conversation?.conversationID &&
+        (_conversation?.faceUrl != dataProvider.conversation?.faceUrl ||
+            _conversation?.showName != dataProvider.conversation?.showName)) {
+      setState(() {});
     }
   }
 
@@ -179,6 +186,7 @@ class _TencentCloudChatMessageHeaderContainerState
 
   Future<V2TimConversation> _loadConversation() async {
     final conversation = dataProvider.conversation ?? await dataProvider.loadConversation();
+    _conversation = conversation;
     return conversation;
   }
 
@@ -224,10 +232,7 @@ class _TencentCloudChatMessageHeaderContainerState
                     conversation: conversation,
                     userID: widget.userID,
                     groupID: widget.groupID,
-                    showName: _topicInfo?.topicName ??
-                        TencentCloudChatUtils.checkString(conversation?.showName) ??
-                        widget.userID ??
-                        tL10n.chat,
+                    showName: TencentCloudChatUtils.checkString(conversation?.showName) ?? widget.userID ?? tL10n.chat,
                     showUserOnlineStatus:
                         TencentCloudChat.instance.dataInstance.basic.userConfig.useUserOnlineStatus ?? true,
                     getUserOnlineStatus: ({required String userID}) {

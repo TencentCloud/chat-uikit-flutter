@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
-import 'package:tencent_cloud_chat/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_message_calling_message/tencent_cloud_chat_message_calling_message.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
+import 'package:tencent_cloud_chat_common/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/utils/message_custom.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_message_calling_message.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_custom.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_custom_c2c_call.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_file.dart';
@@ -271,6 +274,7 @@ class TencentCloudChatMessageItemBuilders {
   static bool isShowTipsMessage(V2TimMessage message) {
     bool isGroupTipsItem = message.elemType == 101 || message.elemType == MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS;
     bool isRecalledMessage = message.status == MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED;
+    bool isCreateGroupTips = false;
     bool isGroupCallMessage = false;
     if (message.elemType == MessageElemType.V2TIM_ELEM_TYPE_CUSTOM) {
       final callingMessage = CallingMessage.getCallMessage(message);
@@ -279,12 +283,18 @@ class TencentCloudChatMessageItemBuilders {
           callingMessage.participantType == CallParticipantType.group) {
         isGroupCallMessage = true;
       }
+
+      if (!isGroupCallMessage) {
+        isCreateGroupTips = TencentCloudChatUtils.isCreateGroupCustomMessage(message);
+      }
     }
 
-    if (isGroupTipsItem || isRecalledMessage || isGroupCallMessage) {
+    if (isGroupTipsItem || isRecalledMessage || isGroupCallMessage || isCreateGroupTips) {
       return true;
     } else {
       return false;
     }
   }
 }
+
+

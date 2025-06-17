@@ -1,4 +1,4 @@
-import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_common_defines.dart';
+import 'package:tencent_cloud_chat_common/components/component_config/tencent_cloud_chat_message_common_defines.dart';
 
 class TencentCloudChatMessageStickerData {
   // A Map instance variable to store the emojis and their paths

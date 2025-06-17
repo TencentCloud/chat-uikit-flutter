@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
-import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data.dart';
-import 'package:tencent_cloud_chat_message/data/tencent_cloud_chat_message_separate_data_notifier.dart';
+import 'package:tencent_cloud_chat_message/model/tencent_cloud_chat_message_separate_data.dart';
+import 'package:tencent_cloud_chat_message/model/tencent_cloud_chat_message_separate_data_notifier.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_list_view/message_row/tencent_cloud_chat_message_row_container.dart';
 
 class TencentCloudChatMessageMergeDetail extends StatefulWidget {
@@ -84,16 +84,19 @@ class TencentCloudChatMessageMergeDetailState
       dataProvider: _messageSeparateDataProvider,
       child: Scaffold(
         appBar: AppBar(title: Text(getMergeMessageTitle())),
-        body: LayoutBuilder(
-          builder: (context, constraints) => ListView.builder(
-            itemBuilder: (BuildContext context, int index) {
-              return TencentCloudChatMessageRowContainer(
-                messageRowWidth: constraints.maxWidth,
-                message: messages[index],
-                inMergerMessagePreviewMode: true,
-              );
-            },
-            itemCount: messages.length,
+        body: Padding(
+          padding: const EdgeInsets.only(top: 5.0),
+          child: LayoutBuilder(
+            builder: (context, constraints) => ListView.builder(
+              itemBuilder: (BuildContext context, int index) {
+                return TencentCloudChatMessageRowContainer(
+                  messageRowWidth: constraints.maxWidth,
+                  message: messages[index],
+                  inMergerMessagePreviewMode: true,
+                );
+              },
+              itemCount: messages.length,
+            ),
           ),
         ),
       ),

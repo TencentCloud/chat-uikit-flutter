@@ -3,15 +3,15 @@ import 'dart:math';
 import 'package:adaptive_action_sheet/adaptive_action_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_swipe_action_cell/core/cell.dart';
-import 'package:tencent_cloud_chat/components/component_config/tencent_cloud_chat_message_common_defines.dart';
-import 'package:tencent_cloud_chat/components/component_options/tencent_cloud_chat_message_options.dart';
-import 'package:tencent_cloud_chat/components/tencent_cloud_chat_components_utils.dart';
-import 'package:tencent_cloud_chat/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
-import 'package:tencent_cloud_chat/data/theme/color/color_base.dart';
-import 'package:tencent_cloud_chat/data/theme/text_style/text_style.dart';
-import 'package:tencent_cloud_chat/router/tencent_cloud_chat_navigator.dart';
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
-import 'package:tencent_cloud_chat/utils/tencent_cloud_chat_utils.dart';
+import 'package:tencent_cloud_chat_common/components/component_config/tencent_cloud_chat_message_common_defines.dart';
+import 'package:tencent_cloud_chat_common/components/component_options/tencent_cloud_chat_message_options.dart';
+import 'package:tencent_cloud_chat_common/components/tencent_cloud_chat_components_utils.dart';
+import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
+import 'package:tencent_cloud_chat_common/data/theme/color/color_base.dart';
+import 'package:tencent_cloud_chat_common/data/theme/text_style/text_style.dart';
+import 'package:tencent_cloud_chat_common/router/tencent_cloud_chat_navigator.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/builders/tencent_cloud_chat_common_builders.dart';
@@ -138,39 +138,44 @@ class TencentCloudChatConversationItemState extends TencentCloudChatState<Tencen
       fontWeight: FontWeight.w600,
       color: colors.conversationItemMoreActionItemNormalTextColor,
     );
+    final actions = <BottomSheetAction>[
+      BottomSheetAction(
+          title: Text(
+            tL10n.hide,
+            style: style,
+          ),
+          onPressed: (context) async {
+            await _hideConversation();
+            hideMoreItemAction();
+          }),
+      BottomSheetAction(
+          title: Text(
+            tL10n.delete,
+            style: deleteStyle,
+          ),
+          onPressed: (context) async {
+            await _deleteConversation();
+            hideMoreItemAction();
+          }),
+    ];
+
+    if (widget.conversation.unreadCount! > 0) {
+      actions.insert(0, BottomSheetAction(
+          title: Text(
+            tL10n.markAsRead,
+            style: style,
+          ),
+          onPressed: (context) {
+            _markAsRead();
+            hideMoreItemAction();
+          }));
+    }
+
     await showAdaptiveActionSheet(
       context: context,
       title: Text(tL10n.more),
       androidBorderRadius: 30,
-      actions: <BottomSheetAction>[
-        BottomSheetAction(
-            title: Text(
-              tL10n.markAsRead,
-              style: style,
-            ),
-            onPressed: (context) {
-              _markAsRead();
-              hideMoreItemAction();
-            }),
-        BottomSheetAction(
-            title: Text(
-              tL10n.hide,
-              style: style,
-            ),
-            onPressed: (context) async {
-              await _hideConversation();
-              hideMoreItemAction();
-            }),
-        BottomSheetAction(
-            title: Text(
-              tL10n.delete,
-              style: deleteStyle,
-            ),
-            onPressed: (context) async {
-              await _deleteConversation();
-              hideMoreItemAction();
-            }),
-      ],
+      actions: actions,
       cancelAction: CancelAction(
         title: Text(
           tL10n.cancel,
@@ -328,30 +333,8 @@ class TencentCloudChatConversationItemAvatar extends StatefulWidget {
 
 class TencentCloudChatConversationItemAvatarState
     extends TencentCloudChatState<TencentCloudChatConversationItemAvatar> {
-  List<String?> getAvatar() {
-    var conversation = widget.conversation;
-
-    if (conversation.type == ConversationType.V2TIM_C2C) {
-      return [conversation.faceUrl];
-    } else {
-      if (TencentCloudChatUtils.checkString(conversation.faceUrl) != null) {
-        return [conversation.faceUrl!];
-      }
-      if (TencentCloudChatUtils.checkString(conversation.groupID) == null) {
-        return [""];
-      }
-      List<V2TimGroupMemberFullInfo?> groupMemberList =
-          TencentCloudChat.instance.dataInstance.groupProfile.getGroupMemberList(conversation.groupID!);
-      var list =
-          groupMemberList.takeWhile((value) => TencentCloudChatUtils.checkString(value?.faceUrl) != null).toList();
-      if (list.isNotEmpty) {
-        if (list.length > 9) {
-          list = list.sublist(0, 9);
-        }
-        return list.map((e) => e?.faceUrl!).toList();
-      }
-      return [""];
-    }
+  List<String> getAvatar() {
+    return [widget.conversation.faceUrl ?? ''];
   }
 
   @override

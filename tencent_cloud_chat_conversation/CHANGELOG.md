@@ -1,51 +1,64 @@
-## 2.1.0
+# 4.1.0
+## General
+* Migrate to Flutter 3.29.0.
 
-### General
+# 3.2.0
+## General
+### Breaking changes
+* Starting from version 3.2.0, tencent_cloud_chat, tencent_cloud_chat_group_profile, tencent_cloud_chat_user_profile are no longer maintained or depended on.
+* Merge the logic in tencent_cloud_chat into tencent_cloud_chat_common, and merge the logic in tencent_cloud_chat_group_profile and tencent_cloud_chat_user_profile into tencent_cloud_chat_contact.
+
+## New features and bug fixes
+* Added "start a conversation" and "create a group chat" entrances.
+
+# 2.1.0
+
+## General
 * Optimize multiple issues.
 
-## 1.6.2
+# 1.6.2
 
-### General
+## General
 
 * Support draft capability.
 
-## 1.6.0
+# 1.6.0
 
-### General
+## General
 
 * Added support to Customer Service Plug-in.
 
-## 1.5.0
+# 1.5.0
 
-### General
+## General
 
 * Upgraded the underlying Flutter Chat SDK, as well as the iOS and Android Chat SDKs, to version 8.0.
 * Migrated group data storage to a global LRU-optimized cache, improving the integration between TencentCloudChatMessage
   and TencentCloudChatGroupProfile components.
 
-## 1.4.1
+# 1.4.1
 
-### General
+## General
 * Enhanced performance on the Web.
 
-## 1.4.0
+# 1.4.0
 
-### General
+## General
 
 * **[Breakthrough]**: Added comprehensive support for **Web**, including both Mobile and Desktop browsers.
 * Added support to return the login status for the `initUIKit` method.
 * Added `addGlobalCallback` and `removeGlobalCallback` to `TencentCloudChatCoreController`, enabling the integration and management of custom `TencentCloudChatCallbacks` throughout your codebase.
 * Improved device screen recognition logic.
 
-## 1.3.1
+# 1.3.1
 
-### General
+## General
 
 - Added support to Flutter 3.22.
 
-## 1.3.0
+# 1.3.0
 
-### General
+## General
 
 - Enhanced the `initUIKit` function with several improvements, streamlining the configuration process and increasing overall usability. Key updates include:
     - A new `components` parameter that consolidates component-related configurations, including the required `usedComponentsRegister` for manually declaring utilized components. It also allows for optional global configurations, builders, controllers, and event handlers for each component, affecting all instances of each component.
@@ -62,16 +75,16 @@
 - Migrated the `register` from the `Instance` of each component to the `Manager`, as described in the previous point.
 - Refined the core data storage structure and performance, paving the way for future feature enhancements.
 
-## 1.2.1
+# 1.2.1
 
-### Conversation (TencentCloudChatConversation)
+## Conversation (TencentCloudChatConversation)
 
 - Fixed an issue where the main widget was being disposed on desktop after switching login accounts.
 - Changed the button `Mark as Unread` to `Mark as Read` and its functionality has been implemented.
 
-## 1.2.0
+# 1.2.0
 
-### General
+## General
 
 - Added support for tablet devices, including adaptive UI for iPad and various Android tablets. Now you can deploy to all platforms (mobile, pad, desktop, web) with a single codebase and code once.
 - Introduced callback functionality, allowing handling of SDK API errors and specific UIKit events that require user attention with `eventCode` and `text` by default, on a global scale. Developers can initialize UIKit with `TencentCloudChatCoreController.initUIKit()` and set up the callbacks accordingly.
@@ -81,34 +94,34 @@
   Replaced the original `logout` method with the `resetUIKit({bool shouldLogout = false})` method in `TencentCloudChatCoreController` to ensure no data residue in UIKit after logging out and avoid logout twice after been kicked off. For specific usage, refer to the comment.
 - Added SVG support for avatars.
 
-### Conversation (TencentCloudChatConversation)
+## Conversation (TencentCloudChatConversation)
 
 - Optimized time display in conversation items for better readability.
 - Fixed the issue where the conversation unread count could not be updated dynamically.
 
-## 1.1.2
+# 1.1.2
 
-### General
+## General
 
 - Further enhanced the integration process.
 
 - Optimized screen type recognition for better adaptation to different screen types.
 
-### Conversation *(TencentCloudChatConversation)*
+## Conversation *(TencentCloudChatConversation)*
 
 - Added a new `onTap` event, `onTapConversationItem`, to `TencentCloudChatConversationUIEventHandlers` of `TencentCloudChatConversationEventHandlers` on the `eventHandlers`.This allows for custom event handling when a conversation item is clicked. If it returns false, the default navigation will be executed, to the corresponding `TencentCloudChatMessage` widget.
 
 - Introduced a new builder, `conversationHeaderBuilder`, for customizing the header bar.
 
-## 1.1.1
+# 1.1.1
 
 * Enhanced the integration process by reducing the number of steps, increasing the success rate of one-time integration, and lowering the barrier to entry.
 
-## 1.1.0+1
+# 1.1.0+1
 
 * Open-sourced on [GitHub repo](https://github.com/TencentCloud/chat-uikit-flutter/tree/v2/tencent_cloud_chat_conversation).
 
-## 1.1.0
+# 1.1.0
 
 Introducing the first release of the brand new Tencent Cloud Chat UIKit.
 

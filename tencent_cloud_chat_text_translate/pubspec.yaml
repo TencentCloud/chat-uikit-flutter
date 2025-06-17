@@ -1,6 +1,6 @@
 name: tencent_cloud_chat_text_translate
 description: Message Translation Plugin for Tencent Cloud Chat.
-version: 2.1.0
+version: 4.1.0
 repository: https://github.com/TencentCloud/chat-uikit-flutter/tree/v2/tencent_cloud_chat_message_reaction
 homepage: https://trtc.io/products/chat?utm_source=flutter_pub
 
@@ -11,11 +11,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  tencent_cloud_chat_common: ^2.1.0
-  tencent_cloud_chat_intl: ^2.1.0
-  tencent_cloud_chat_message: ^2.1.0
-  tencent_cloud_chat_sdk: ^8.3.6498
-  extended_text: ^14.0.0
+  tencent_cloud_chat_common: ^4.1.0
+  tencent_cloud_chat_intl: ^2.1.2
+  tencent_cloud_chat_message: ^4.1.0
+  tencent_cloud_chat_sdk: ^8.6.7019+2
+  extended_text: ^15.0.0
 
 dev_dependencies:
   flutter_test:
@@ -23,14 +23,12 @@ dev_dependencies:
   flutter_lints: ^3.0.0
 
 dependency_overrides:
-#  tencent_cloud_chat:
-#    path: ../tencent_cloud_chat
 #  tencent_cloud_chat_common:
-#    path: ../tencent_cloud_chat_common
+#    path: ../TIMCommon
 #  tencent_cloud_chat_intl:
-#    path: ../tencent_cloud_chat_intl
+#    path: ../TUIInternational
 #  tencent_cloud_chat_message:
-#    path: ../tencent_cloud_chat_message
+#    path: ../TUIMessage
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

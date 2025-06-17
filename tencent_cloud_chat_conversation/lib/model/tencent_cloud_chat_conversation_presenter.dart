@@ -1,7 +1,7 @@
-import 'package:tencent_cloud_chat/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
 
 class TencentCloudChatConversationPresenter {
-  static const String _tag = "TencentCloudChatConversationController";
+  static const String _tag = "TencentCloudChatConversationPresenter";
 
   Future<void> getConversationList({
     String? seq,
