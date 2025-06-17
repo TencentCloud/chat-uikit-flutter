@@ -32,7 +32,7 @@ The packages included in this repository are organized as follows:
 
 The architecture of our UIKit is shown below:
 
-![](https://comm.qq.com/im/static-files/uikit_structure.png)
+<img width="1373" alt="flutter-structure" src="https://github.com/user-attachments/assets/c178c853-e52f-40e9-b76b-b667c7bb39ba" />
 
 To use the new version of the UIKit, customers need to first import the `tencent_cloud_chat` package and then manually import the six modular UI component packages as needed.
 
