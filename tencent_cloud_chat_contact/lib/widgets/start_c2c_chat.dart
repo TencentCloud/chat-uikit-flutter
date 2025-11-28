@@ -140,6 +140,7 @@ class _StartC2CChatState extends TencentCloudChatState<StartC2CChat> {
               backgroundColor: colorTheme.backgroundColor,
               appBar: AppBar(
                 backgroundColor: colorTheme.contactBackgroundColor,
+                leadingWidth: 80,
                 leading: TextButton(
                   onPressed: () => Navigator.of(context).pop(),
                   child: Text(
