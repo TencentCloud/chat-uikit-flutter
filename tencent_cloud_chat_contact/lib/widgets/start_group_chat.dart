@@ -248,6 +248,7 @@ class _StartGroupChatState extends TencentCloudChatState<StartGroupChat> {
               backgroundColor: colorTheme.backgroundColor,
               appBar: AppBar(
                 backgroundColor: colorTheme.contactBackgroundColor,
+                leadingWidth: 80,
                 leading: TextButton(
                   onPressed: () => Navigator.of(context).pop(),
                   child: Text(
