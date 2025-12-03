@@ -15,6 +15,8 @@ import 'package:tencent_cloud_chat_sdk/models/v2_tim_message.dart'
     if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message.dart';
 import 'package:tencent_cloud_chat_sdk/models/v2_tim_message_change_info.dart'
     if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_message_change_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_user_full_info.dart'
+  if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_user_full_info.dart';
 import 'package:tencent_cloud_chat_sdk/models/v2_tim_value_callback.dart'
     if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_value_callback.dart';
 import 'package:tencent_cloud_chat_uikit/base_widgets/tim_ui_kit_base.dart';
@@ -81,6 +83,18 @@ typedef MessageItemContent = Widget? Function(
   VoidCallback clearJump,
 );
 
+class RenderingDirectionResult {
+  final bool? isSelf;
+  final V2TimUserFullInfo? userInfo;
+
+  const RenderingDirectionResult({
+    this.isSelf,
+    this.userInfo,
+  });
+}
+
+typedef RenderingDirectionCallback = RenderingDirectionResult? Function(V2TimMessage message);
+
 class MessageHoverControlItem {
   String name;
   Widget icon;
@@ -131,6 +145,8 @@ class MessageItemBuilder {
   /// message nick name builder
   final MessageNickNameBuilder? messageNickNameBuilder;
 
+  final RenderingDirectionCallback? renderingDirectionCallback;
+
   MessageItemBuilder({
     this.locationMessageItemBuilder,
     this.textMessageItemBuilder,
@@ -145,6 +161,7 @@ class MessageItemBuilder {
     this.mergerMessageItemBuilder,
     this.messageRowBuilder,
     this.messageNickNameBuilder,
+    this.renderingDirectionCallback,
   });
 }
 
@@ -283,7 +300,9 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
   /// If provided, the default message action functionality will appear in the right-click context menu instead.
   final Widget? Function(V2TimMessage message)? customMessageHoverBarOnDesktop;
 
-  const TIMUIKitHistoryMessageListItem(
+  final RenderingDirectionCallback? renderingDirectionCallback;
+
+  TIMUIKitHistoryMessageListItem(
       {Key? key,
       required this.message,
       @Deprecated(
@@ -312,7 +331,8 @@ class TIMUIKitHistoryMessageListItem extends StatefulWidget {
       this.textFieldController,
       this.onSecondaryTapForOthersPortrait,
       this.groupMemberInfo,
-      this.customMessageHoverBarOnDesktop})
+      this.customMessageHoverBarOnDesktop,
+      this.renderingDirectionCallback,})
       : super(key: key);
 
   @override
@@ -366,6 +386,7 @@ class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistory
   final GlobalKey _key = GlobalKey();
   bool isShowWideToolTip = false;
   TapDownDetails? _tapDetails;
+  final CoreServicesImpl _coreServicesImpl = serviceLocator<CoreServicesImpl>();
 
   @override
   void initState() {
@@ -415,7 +436,19 @@ class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistory
     final msgType = messageItem.elemType;
     final isShowJump = (model.jumpMsgID == messageItem.msgID) && (messageItem.msgID?.isNotEmpty ?? false);
     final MessageItemBuilder? messageItemBuilder = widget.messageItemBuilder;
-    final isFromSelf = messageItem.isSelf ?? true;
+    
+    RenderingDirectionResult? overrideIsSelfResult;
+    if (widget.renderingDirectionCallback != null) {
+      overrideIsSelfResult = widget.renderingDirectionCallback!(messageItem);
+    }
+
+    bool isFromSelf = true;
+    if (overrideIsSelfResult != null && overrideIsSelfResult.isSelf != null) {
+      isFromSelf = overrideIsSelfResult.isSelf!;
+    } else {
+      isFromSelf = messageItem.isSelf ?? true;
+    }
+
     void clearJump() {
       Future.delayed(const Duration(milliseconds: 100), () {
         model.jumpMsgID = "";
@@ -456,7 +489,7 @@ class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistory
               message: messageItem,
               soundElem: messageItem.soundElem!,
               msgID: messageItem.msgID ?? "",
-              isFromSelf: messageItem.isSelf ?? true,
+              isFromSelf: isFromSelf,
               clearJump: clearJump,
               isShowJump: isShowJump,
               localCustomInt: messageItem.localCustomInt,
@@ -501,7 +534,7 @@ class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistory
             TIMUIKitTextElem(
               chatModel: model,
               message: messageItem,
-              isFromSelf: messageItem.isSelf ?? true,
+              isFromSelf: isFromSelf,
               clearJump: clearJump,
               isShowJump: isShowJump,
               borderRadius: widget.themeData?.messageBorderRadius,
@@ -542,7 +575,7 @@ class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistory
               message: messageItem,
               messageID: messageItem.msgID,
               fileElem: messageItem.fileElem,
-              isSelf: messageItem.isSelf ?? true,
+              isSelf: isFromSelf,
               clearJump: clearJump,
               isShowJump: isShowJump,
               isShowMessageReaction: widget.isUseMessageReaction,
@@ -1149,7 +1182,21 @@ class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistory
     final TUITheme theme = value.theme;
     final message = widget.message;
     final msgType = message.elemType;
-    final isSelf = message.isSelf ?? true;
+
+    RenderingDirectionResult? renderingDirectionResult;
+    if (widget.renderingDirectionCallback != null) {
+      renderingDirectionResult = widget.renderingDirectionCallback!(message);
+    }
+
+    bool isSelf = true;
+    String? faceUrl = message.faceUrl;
+    if (renderingDirectionResult != null && renderingDirectionResult.isSelf != null) {
+      isSelf = renderingDirectionResult.isSelf!;
+      faceUrl = renderingDirectionResult.userInfo?.faceUrl;
+    } else {
+      isSelf = message.isSelf ?? true;
+    }
+
     final isGroupTipsMsg = msgType == MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS;
 
     final revokeStatus = isRevokeMessage(message, model);
@@ -1323,7 +1370,8 @@ class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistory
                                       width: 40,
                                       height: 40,
                                       child: Avatar(
-                                        faceUrl: message.faceUrl ?? "",
+                                        borderRadius: widget.themeData?.avatarBorderRadius,
+                                        faceUrl: faceUrl ?? "",
                                         showName: MessageUtils.getDisplayName(message),
                                       ),
                                     ),
@@ -1414,7 +1462,7 @@ class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistory
                               TIMUIKitTextTranslationElem(
                                   message: message,
                                   customEmojiStickerList: widget.customEmojiStickerList,
-                                  isFromSelf: message.isSelf ?? true,
+                                  isFromSelf: isSelf,
                                   isShowJump: false,
                                   clearJump: () {},
                                   chatModel: model),
@@ -1443,7 +1491,9 @@ class _TIMUIKItHistoryMessageListItemState extends TIMUIKitState<TIMUIKitHistory
                                       }
                                     },
                                     child: Avatar(
-                                        faceUrl: message.faceUrl ?? "", showName: MessageUtils.getDisplayName(message)),
+                                      borderRadius: widget.themeData?.avatarBorderRadius,
+                                      faceUrl: faceUrl ?? "",
+                                      showName: MessageUtils.getDisplayName(message)),
                                   ),
                                 ),
                       ],

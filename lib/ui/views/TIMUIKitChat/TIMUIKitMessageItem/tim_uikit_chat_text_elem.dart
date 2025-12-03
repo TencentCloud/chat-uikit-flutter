@@ -193,7 +193,7 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitTextElem> {
         : (theme.chatMessageItemFromOthersBgColor);
 
     final backgroundColor =
-        isShowJumpState ? const Color.fromRGBO(245, 166, 35, 1) : (defaultStyle ?? widget.backgroundColor);
+        isShowJumpState ? const Color.fromRGBO(245, 166, 35, 1) : (widget.backgroundColor ?? defaultStyle);
 
     return Container(
       padding: widget.textPadding ?? EdgeInsets.all(isDesktopScreen ? 12 : 10),

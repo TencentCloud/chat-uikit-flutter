@@ -472,27 +472,35 @@ class _TIMUIKitTextFieldLayoutWideState extends TIMUIKitState<TIMUIKitTextFieldL
     try {
       final convID = widget.conversationID;
       final convType = widget.conversationType;
-      FilePickerResult? result = await FilePicker.platform.pickFiles();
-      _removeOverlay();
-      if (result != null && result.files.isNotEmpty) {
-        if (PlatformUtils().isWeb) {
-          html.Node? inputElem;
-          inputElem = html.document.getElementById("__file_picker_web-file-input")?.querySelector("input");
-          fileName = result.files.single.name;
-
-          MessageUtils.handleMessageError(
-              model.sendFileMessage(inputElement: inputElem, fileName: fileName, convID: convID, convType: convType),
-              context);
-        } else {
+      if (PlatformUtils().isWeb) {
+        final html.FileUploadInputElement uploadInput = html.FileUploadInputElement();
+        uploadInput.accept = '*/*';
+        uploadInput.click();
+        _removeOverlay();
+        uploadInput.onChange.listen((event) {
+          final file = uploadInput.files?.first;
+          if (file != null) {
+            final fileName = file.name;
+            MessageUtils.handleMessageError(
+                model.sendFileMessage(inputElement: uploadInput, fileName: fileName, convID: convID, convType: convType),
+                context);
+          } else {
+            throw TypeError();
+          }
+        });
+      } else {
+        FilePickerResult? result = await FilePicker.platform.pickFiles();
+        _removeOverlay();
+        if (result != null && result.files.isNotEmpty) {
           File file = File(result.files.single.path!);
           final int size = file.lengthSync();
           final String savePath = file.path;
 
           MessageUtils.handleMessageError(
               model.sendFileMessage(filePath: savePath, size: size, convID: convID, convType: convType), context);
+        } else {
+          throw TypeError();
         }
-      } else {
-        throw TypeError();
       }
     } catch (e) {
       // ignore: avoid_print

@@ -321,6 +321,7 @@ class MessageServiceImpl extends MessageService {
           localCustomData: localCustomData,
           cloudCustomData: cloudCustomData,
           isExcludedFromContentModeration: isExcludedFromContentModeration,
+          isExcludedFromUnreadCount: isExcludedFromUnreadCount,
         );
     if (result.code != 0) {
       String recommendText = ErrorMessageConverter.getErrorMessage(result.code);

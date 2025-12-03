@@ -1,3 +1,23 @@
+# 5.0.1+3
+* Optimize UI refresh timing when joining a call midway.
+
+# 5.0.1+2
+* Optimize the dependency of the internationalization plugin intl.
+
+# 5.0.1+1
+* Fixed the issue of sending files on the web platform.
+* Fixed the issue where the custom background color of text messages did not take effect.
+
+# 5.0.1
+* Optimize the display direction of C2C audio and video call prompt messages.
+
+# 5.0.0+2
+* Fixed the issue that the chat page avatar rounded corner configuration did not take effect.
+* Fixed the issue where clicking multiple voice messages in succession would display the playback animation at the same time.
+
+# 5.0.0+1
+* Add the isExcludedFromUnreadCount field setting to the sendMessage method of MessageServiceImpl
+
 # 5.0.0
 * Migrate to Flutter 3.29.0.
 

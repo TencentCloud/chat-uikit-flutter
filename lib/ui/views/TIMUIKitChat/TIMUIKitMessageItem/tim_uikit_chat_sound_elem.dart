@@ -77,11 +77,11 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
     } else {
       SoundPlayer.play(url: stateElement.url!);
       widget.chatModel.currentPlayedMsgId = widget.msgID;
-
-      setState(() {
-        isPlaying = widget.chatModel.currentPlayedMsgId != '' && widget.chatModel.currentPlayedMsgId == widget.msgID;
-      });
     }
+
+    setState(() {
+      isPlaying = widget.chatModel.currentPlayedMsgId != '' && widget.chatModel.currentPlayedMsgId == widget.msgID;
+    });
   }
 
   downloadMessageDetailAndSave() async {
@@ -201,6 +201,9 @@ class _TIMUIKitSoundElemState extends TIMUIKitState<TIMUIKitSoundElem> {
         }
       }
     }
+
+    isPlaying = widget.chatModel.currentPlayedMsgId != '' && widget.chatModel.currentPlayedMsgId == widget.msgID;
+
     return GestureDetector(
       onTap: () => _playSound(),
       child: Container(

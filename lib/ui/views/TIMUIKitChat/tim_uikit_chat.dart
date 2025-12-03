@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:scroll_to_index/scroll_to_index.dart';
 import 'package:tencent_chat_i18n_tool/tencent_chat_i18n_tool.dart';
+import 'package:tencent_cloud_chat_sdk/enum/V2TimGroupListener.dart';
 import 'package:tencent_cloud_chat_sdk/models/v2_tim_conversation.dart'
     if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_conversation.dart';
 import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_application.dart'
@@ -234,6 +235,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
   bool isInit = false;
   final TUIChatGlobalModel chatGlobalModel = serviceLocator<TUIChatGlobalModel>();
   bool _dragging = false;
+  V2TimGroupListener? _groupListener;
 
   final GlobalKey alignKey = GlobalKey();
   final GlobalKey listContainerKey = GlobalKey();
@@ -256,6 +258,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
     if (kProfileMode) {
       Frame.init();
     }
+    _addGroupListener();
     model.abstractMessageBuilder = widget.abstractMessageBuilder;
     model.onTapAvatar = widget.onTapAvatar;
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -274,6 +277,7 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
     if (kProfileMode) {
       Frame.destroy();
     }
+    _removeGroupListener();
     model.dispose();
   }
 
@@ -305,6 +309,26 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
     }
     if (oldWidget.groupMemberList != widget.groupMemberList) {
       model.groupMemberList = widget.groupMemberList;
+    }
+  }
+
+  void _addGroupListener() {
+    _groupListener = V2TimGroupListener(
+        onGroupAttributeChanged: (
+            String groupID,
+            Map<String, String> groupAttributeMap,) {
+          if (groupID == widget.conversationID) {
+            _updateJoinInGroupCallWidget();
+          }
+        }
+    );
+    TencentImSDKPlugin.v2TIMManager.addGroupListener(listener: _groupListener!);
+  }
+
+  void _removeGroupListener() {
+    if (_groupListener != null) {
+      TencentImSDKPlugin.v2TIMManager.removeGroupListener(listener: _groupListener!);
+      _groupListener = null;
     }
   }
 

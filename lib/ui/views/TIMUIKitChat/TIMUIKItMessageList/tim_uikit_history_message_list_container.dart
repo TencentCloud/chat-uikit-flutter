@@ -188,7 +188,8 @@ class _TIMUIKitHistoryMessageListContainerState extends TIMUIKitState<TIMUIKitHi
                 allowAtUserWhenReply: chatConfig.isAtWhenReply,
                 allowAvatarTap: chatConfig.isAllowClickAvatar,
                 allowLongPress: chatConfig.isAllowLongPressMessage,
-                isUseMessageReaction: chatConfig.isUseMessageReaction);
+                isUseMessageReaction: chatConfig.isUseMessageReaction,
+                renderingDirectionCallback: widget.messageItemBuilder?.renderingDirectionCallback,);
           },
           tongueItemBuilder: widget.tongueItemBuilder,
           initFindingMsg: widget.initFindingMsg,
