@@ -166,8 +166,12 @@ class _TIMUIKitGroupProfileState extends TIMUIKitState<TIMUIKitGroupProfile> {
 
                 model.loadGroupInfo(widget.groupID);
                 break;
-              case UpdateType.memberList:
-                model.loadGroupMemberList(groupID: widget.groupID);
+              case UpdateType.memberEnter:
+                model.processGroupMemberListEnter(groupID: widget.groupID, memberList: needUpdate.extraData);
+                model.loadGroupInfo(widget.groupID);
+                break;
+              case UpdateType.memberLeave:
+                model.processGroupMemberListLeave(groupID: widget.groupID, memberList: needUpdate.extraData);
                 model.loadGroupInfo(widget.groupID);
                 break;
               default:

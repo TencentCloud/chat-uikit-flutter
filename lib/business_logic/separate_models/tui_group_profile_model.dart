@@ -16,6 +16,8 @@ import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_info.dart'
     if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_info.dart';
 import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_full_info.dart'
     if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_full_info.dart';
+import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_info.dart'
+    if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_info.dart';
 import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_operation_result.dart'
     if (dart.library.html) 'package:tencent_cloud_chat_sdk/web/compatible_models/v2_tim_group_member_operation_result.dart';
 import 'package:tencent_cloud_chat_sdk/models/v2_tim_group_member_search_param.dart'
@@ -132,6 +134,34 @@ class TUIGroupProfileModel extends ChangeNotifier {
       _groupMemberListSeq = groupMemberListRes.nextSeq ?? "0";
     }
     return groupMemberListRes?.nextSeq;
+  }
+
+  Future<void> processGroupMemberListEnter({required String groupID, required List<V2TimGroupMemberInfo> memberList}) async {
+    final List<V2TimGroupMemberFullInfo> fullInfoList = memberList
+        .where((member) => member.userID != null)
+        .map((member) {
+      return V2TimGroupMemberFullInfo(
+        userID: member.userID!,
+        nickName: member.nickName,
+        nameCard: member.nameCard,
+        friendRemark: member.friendRemark,
+        faceUrl: member.faceUrl,
+        onlineDevices: member.onlineDevices,
+      );
+    }).toList();
+
+    for (final fullInfo in fullInfoList) {
+      final exists = _groupMemberList?.any((e) => e?.userID == fullInfo.userID) ?? false;
+      if (!exists) {
+        _groupMemberList = [...?_groupMemberList, fullInfo];
+      }
+    }
+  }
+
+  Future<void> processGroupMemberListLeave({required String groupID, required List<V2TimGroupMemberInfo> memberList}) async {
+    final Set<String?> userIDsToRemove = memberList.map((member) => member.userID).toSet();
+
+    _groupMemberList?.removeWhere((member) => userIDsToRemove.contains(member?.userID));
   }
 
   _loadConversation() async {

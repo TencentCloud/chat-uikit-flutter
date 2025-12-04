@@ -449,11 +449,11 @@ class _TUIChatState extends TIMUIKitState<TIMUIKitChat> {
               case UpdateType.groupInfo:
                 model.loadGroupInfo(_getConvID());
                 break;
-              case UpdateType.memberList:
-                if (widget.groupMemberList == null) {
-                  model.loadGroupMemberList(groupID: _getConvID());
-                }
-                model.loadGroupInfo(_getConvID());
+              case UpdateType.memberEnter:
+                model.processGroupMemberListEnter(groupID: _getConvID(), memberList: needUpdate.extraData);
+                break;
+              case UpdateType.memberLeave:
+                model.processGroupMemberListLeave(groupID: _getConvID(), memberList: needUpdate.extraData);
                 break;
               default:
                 break;

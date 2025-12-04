@@ -1,3 +1,6 @@
+# 5.0.1+4
+* Optimize the logic for retrieving the group member list when monitoring group members entering and leaving.
+
 # 5.0.1+3
 * Optimize UI refresh timing when joining a call midway.
 

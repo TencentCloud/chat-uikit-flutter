@@ -149,7 +149,8 @@ class _TIMUIKitGroupState extends TIMUIKitState<TIMUIKitGroup> {
             case UpdateType.groupInfo:
               Provider.of<TUIFriendShipViewModel>(context).loadGroupListData();
               break;
-            case UpdateType.memberList:
+            case UpdateType.memberEnter:
+            case UpdateType.memberLeave:
               Provider.of<TUIFriendShipViewModel>(context).loadGroupListData();
               break;
             default:

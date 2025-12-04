@@ -25,12 +25,12 @@ import 'package:tencent_cloud_chat_uikit/data_services/group/group_services.dart
 import 'package:tencent_cloud_chat_uikit/data_services/services_locatar.dart';
 import 'package:tencent_cloud_chat_uikit/tencent_cloud_chat_uikit.dart';
 
-enum UpdateType { groupInfo, memberList, joinApplicationList, groupDismissed, kickedFromGroup }
+enum UpdateType { groupInfo, memberEnter, memberLeave, joinApplicationList, groupDismissed, kickedFromGroup }
 
 class NeedUpdate {
   final String groupID;
   final UpdateType updateType;
-  final String extraData;
+  final dynamic extraData;
   int? groupInfoSubType;
   String? ownerID;
 
@@ -55,7 +55,7 @@ class TUIGroupListenerModel extends ChangeNotifier {
 
   TUIGroupListenerModel() {
     _groupListener = V2TimGroupListener(onMemberInvited: (groupID, opUser, memberList) {
-      _needUpdate = NeedUpdate(groupID, UpdateType.memberList, "");
+      _needUpdate = NeedUpdate(groupID, UpdateType.memberEnter, memberList);
       notifyListeners();
     }, onMemberKicked: (groupID, opUser, memberList) async {
       if (_isLoginUserKickedFromGroup(groupID, memberList)) {
@@ -66,10 +66,10 @@ class TUIGroupListenerModel extends ChangeNotifier {
         notifyListeners();
       }
     }, onMemberEnter: (String groupID, List<V2TimGroupMemberInfo> memberList) {
-      _needUpdate = NeedUpdate(groupID, UpdateType.memberList, "");
+      _needUpdate = NeedUpdate(groupID, UpdateType.memberEnter, memberList);
       notifyListeners();
     }, onMemberLeave: (String groupID, V2TimGroupMemberInfo member) {
-      _needUpdate = NeedUpdate(groupID, UpdateType.memberList, "");
+      _needUpdate = NeedUpdate(groupID, UpdateType.memberLeave, [member]);
       notifyListeners();
     }, onGroupInfoChanged: (groupID, changeInfos) {
       _needUpdate = NeedUpdate(groupID, UpdateType.groupInfo, "");
