@@ -47,7 +47,9 @@ dependencies:
   wechat_assets_picker: ^9.3.3
   flutter_easyrefresh: ^2.2.1
   extended_image: ^9.0.0
-  extended_text_field: ^16.0.0
+  extended_text_field:
+    git:
+      url: 'https://github.com/bg-1998/extended_text_field'
   extended_text: ^15.0.0
   package_info_plus: ^8.0.0
   loading_animation_widget: ^1.1.0+3
