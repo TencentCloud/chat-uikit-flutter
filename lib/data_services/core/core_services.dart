@@ -69,7 +69,16 @@ abstract class CoreServices {
     required String userSig,
   });
 
+  // 悟空 IM SDK 登录
+  Future wkLogin({
+    required String uid,
+    required String token,
+  });
+
   Future logout();
+
+  // 悟空 IM SDK 登出
+  Future wkLogout();
 
   Future logoutWithoutClearData();
 

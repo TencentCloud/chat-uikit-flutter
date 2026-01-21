@@ -48,6 +48,10 @@ dependencies:
 #   tencent_im_sdk_plugin_web:
 #     path: /Users/wangrunlin/Documents/GitHub/im-flutter-plugin/tencent_im_sdk_plugin_web
 
+dependency_overrides:
+  # 解决依赖冲突问题
+  uuid: ^4.3.3
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

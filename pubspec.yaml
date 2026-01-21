@@ -47,6 +47,7 @@ dependencies:
   wechat_assets_picker: ^9.3.3
   flutter_easyrefresh: ^2.2.1
   extended_image: ^9.0.0
+  # 解决ohos报错
   extended_text_field:
     git:
       url: 'https://github.com/bg-1998/extended_text_field'
@@ -80,12 +81,17 @@ dependencies:
   logger: ^2.0.1
   visibility_detector: ^0.4.0+2
 
+  # Wukong SDK 依赖
+  wukongimfluttersdk: ^1.6.7
+
 dev_dependencies:
   flutter_lints: ^1.0.0
   build_runner: any
   lints: ^1.0.1
 
 dependency_overrides:
+  # 解决依赖冲突问题
+  uuid: ^4.3.3
 #   tencent_chat_i18n_tool:
 #     path: ../../../tencent_chat_i18n_tool
 
