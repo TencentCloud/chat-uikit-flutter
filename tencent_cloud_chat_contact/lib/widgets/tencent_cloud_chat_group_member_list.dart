@@ -26,11 +26,13 @@ class ISuspensionBeanImpl<T> extends ISuspensionBean {
 class TencentCloudChatGroupMemberList extends StatefulWidget {
   final V2TimGroupInfo groupInfo;
   final List<V2TimGroupMemberFullInfo> memberInfoList;
+  final Map<String, int>? lastMessageTimeMap;
 
   const TencentCloudChatGroupMemberList({
     Key? key,
     required this.groupInfo,
     required this.memberInfoList,
+    this.lastMessageTimeMap,
   }) : super(key: key);
 
   @override
@@ -76,14 +78,24 @@ class TencentCloudChatGroupMemberListState extends TencentCloudChatState<Tencent
   Widget? desktopBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) =>
-            Container(
-                color: colorTheme.backgroundColor,
-                child: Center(
-                  child: TencentCloudChatGroupMemberListAzList(
-                    groupInfo: widget.groupInfo,
-                    memberInfoList: widget.memberInfoList,
+            Scaffold(
+                appBar: AppBar(
+                  leading: IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.arrow_back_ios_rounded),
+                    color: colorTheme.primaryColor,
                   ),
-                )));
+                  scrolledUnderElevation: 0.0,
+                ),
+                body: Container(
+                    color: colorTheme.backgroundColor,
+                    child: Center(
+                      child: TencentCloudChatGroupMemberListAzList(
+                        groupInfo: widget.groupInfo,
+                        memberInfoList: widget.memberInfoList,
+                        lastMessageTimeMap: widget.lastMessageTimeMap,
+                      ),
+                    ))));
   }
 
   @override
@@ -105,6 +117,7 @@ class TencentCloudChatGroupMemberListState extends TencentCloudChatState<Tencent
                       child: TencentCloudChatGroupMemberListAzList(
                         groupInfo: widget.groupInfo,
                         memberInfoList: widget.memberInfoList,
+                        lastMessageTimeMap: widget.lastMessageTimeMap,
                       ),
                     ))));
   }
@@ -119,11 +132,13 @@ class TencentCloudChatGroupMemberListState extends TencentCloudChatState<Tencent
 class TencentCloudChatGroupMemberListAzList extends StatefulWidget {
   final V2TimGroupInfo groupInfo;
   final List<V2TimGroupMemberFullInfo> memberInfoList;
+  final Map<String, int>? lastMessageTimeMap;
 
   const TencentCloudChatGroupMemberListAzList({
     Key? key,
     required this.groupInfo,
     required this.memberInfoList,
+    this.lastMessageTimeMap,
   }) : super(key: key);
 
   @override
@@ -142,9 +157,14 @@ class TencentCloudChatGroupMemberListAzListState extends TencentCloudChatState<T
     tagCount = {};
     list = _getListTag();
     final loginID = TencentCloudChat.instance.dataInstance.basic.currentUser!.userID;
-    myRole = widget.memberInfoList
-        .firstWhere((element) => element.userID == loginID)
-        .role ?? 0;
+    try {
+      myRole = widget.memberInfoList
+          .firstWhere((element) => element.userID == loginID)
+          .role ?? 0;
+    } catch (e) {
+      // If current user not found in member list, default to member role
+      myRole = 0; // V2TIM_GROUP_MEMBER_ROLE_MEMBER
+    }
   }
 
   List<ISuspensionBeanImpl> _getListTag() {
@@ -199,6 +219,7 @@ class TencentCloudChatGroupMemberListAzListState extends TencentCloudChatState<T
               memberFullInfo: item,
               myRole: myRole,
               groupInfo: widget.groupInfo,
+              lastMessageTime: widget.lastMessageTimeMap?[item.userID],
             );
           },
           indexBarData: SuspensionUtil.getTagIndexList(list).where((element) => element != "@").toList(),
@@ -220,12 +241,14 @@ class TencentCloudChatGroupMemberListItem extends StatefulWidget {
   final V2TimGroupMemberFullInfo memberFullInfo;
   final int myRole;
   final Function() onDeleteGroupMember;
+  final int? lastMessageTime;
 
   const TencentCloudChatGroupMemberListItem({super.key,
     required this.memberFullInfo,
     required this.myRole,
     required this.groupInfo,
-    required this.onDeleteGroupMember});
+    required this.onDeleteGroupMember,
+    this.lastMessageTime});
 
   @override
   State<StatefulWidget> createState() => TencentCloudChatGroupMemberListItemState();
@@ -233,6 +256,25 @@ class TencentCloudChatGroupMemberListItem extends StatefulWidget {
 
 class TencentCloudChatGroupMemberListItemState extends TencentCloudChatState<TencentCloudChatGroupMemberListItem> {
   ContactPresenter contactPresenter = ContactPresenter();
+
+  String _getRoleText() {
+    switch (widget.memberFullInfo.role) {
+      case GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER:
+        return tL10n.groupOwner;
+      case GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN:
+        return tL10n.admin;
+      default:
+        return tL10n.groupMember;
+    }
+  }
+
+  String _getLastMessageTimeText() {
+    if (widget.lastMessageTime != null && widget.lastMessageTime! > 0) {
+      final dateTime = DateTime.fromMillisecondsSinceEpoch(widget.lastMessageTime! * 1000);
+      return TencentCloudChatIntl.getFormattedTimeString(dateTime: dateTime);
+    }
+    return '无';
+  }
 
   bool canSetAdmin() {
     if (widget.groupInfo.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER) {
@@ -346,6 +388,8 @@ class TencentCloudChatGroupMemberListItemState extends TencentCloudChatState<Ten
 
   @override
   Widget defaultBuilder(BuildContext context) {
+    final lastMessageTimeText = _getLastMessageTimeText();
+    final roleText = _getRoleText();
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) =>
             Container(
@@ -354,7 +398,7 @@ class TencentCloudChatGroupMemberListItemState extends TencentCloudChatState<Ten
                   onTap: onManageMember,
                   child: Padding(
                     padding: EdgeInsets.symmetric(
-                      vertical: getHeight(8),
+                      vertical: getHeight(10),
                       horizontal: getWidth(16),
                     ),
                     child: Row(
@@ -369,49 +413,87 @@ class TencentCloudChatGroupMemberListItemState extends TencentCloudChatState<Ten
                               scene: TencentCloudChatAvatarScene.groupProfile,
                             )),
                         Expanded(
-                            child: Row(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
-                                Text(
-                                  TencentCloudChatUtils.checkString(widget.memberFullInfo.nameCard) ??
-                                      TencentCloudChatUtils.checkString(widget.memberFullInfo.nickName) ??
-                                      widget.memberFullInfo.userID,
-                                  style:
-                                  TextStyle(color: colorTheme.groupProfileTextColor, fontSize: textStyle.fontsize_14),
+                                Row(
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        TencentCloudChatUtils.checkString(widget.memberFullInfo.nameCard) ??
+                                            TencentCloudChatUtils.checkString(widget.memberFullInfo.nickName) ??
+                                            widget.memberFullInfo.userID,
+                                        style:
+                                        TextStyle(color: colorTheme.groupProfileTextColor, fontSize: textStyle.fontsize_14),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    if (widget.memberFullInfo.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER)
+                                      Container(
+                                        margin: const EdgeInsets.only(left: 8),
+                                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                                        decoration: BoxDecoration(
+                                          color: colorTheme.primaryColor.withAlpha(30),
+                                          border: Border.all(color: colorTheme.primaryColor),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: Text(
+                                          tL10n.groupOwner,
+                                          style: TextStyle(
+                                            color: colorTheme.primaryColor,
+                                            fontSize: textStyle.fontsize_10,
+                                          ),
+                                        ),
+                                      ),
+                                    if (widget.memberFullInfo.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN)
+                                      Container(
+                                        margin: const EdgeInsets.only(left: 8),
+                                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                                        decoration: BoxDecoration(
+                                          color: colorTheme.primaryColor.withAlpha(30),
+                                          border: Border.all(color: colorTheme.primaryColor),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: Text(
+                                          tL10n.admin,
+                                          style: TextStyle(
+                                            color: colorTheme.primaryColor,
+                                            fontSize: textStyle.fontsize_10,
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
-                                if (widget.memberFullInfo.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_OWNER)
-                                  Container(
-                                    margin: const EdgeInsets.only(left: 8),
-                                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                                    decoration: BoxDecoration(
-                                      color: colorTheme.primaryColor.withAlpha(30),
-                                      border: Border.all(color: colorTheme.primaryColor),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      tL10n.groupOwner,
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Text(
+                                      roleText,
                                       style: TextStyle(
-                                        color: colorTheme.primaryColor,
-                                        fontSize: textStyle.fontsize_10,
+                                        color: colorTheme.groupProfileTabTextColor,
+                                        fontSize: textStyle.fontsize_12,
                                       ),
                                     ),
-                                  ),
-                                if (widget.memberFullInfo.role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_ADMIN)
-                                  Container(
-                                    margin: const EdgeInsets.only(left: 8),
-                                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                                    decoration: BoxDecoration(
-                                      color: colorTheme.primaryColor.withAlpha(30),
-                                      border: Border.all(color: colorTheme.primaryColor),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Text(
-                                      tL10n.admin,
-                                      style: TextStyle(
-                                        color: colorTheme.primaryColor,
-                                        fontSize: textStyle.fontsize_10,
+                                    Text(
+                                        '  ·  ',
+                                        style: TextStyle(
+                                          color: colorTheme.groupProfileTabTextColor,
+                                          fontSize: textStyle.fontsize_12,
+                                        ),
                                       ),
-                                    ),
-                                  ),
+                                      Flexible(
+                                        child: Text(
+                                          lastMessageTimeText,
+                                          style: TextStyle(
+                                            color: colorTheme.groupProfileTabTextColor,
+                                            fontSize: textStyle.fontsize_12,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                  ],
+                                ),
                               ],
                             )),
                         if (!isSelf()) Icon(Icons.arrow_forward_ios_rounded, color: colorTheme.groupProfileTabTextColor)

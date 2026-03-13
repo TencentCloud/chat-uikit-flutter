@@ -16,6 +16,7 @@ abstract class TencentCloudChatComponentBuilder {
 
   getConversationHeaderBuilder({
     TextEditingController? textEditingController,
+    FocusNode? focusNode,
   }) {}
 
   getConversationItemInfoBuilder(V2TimConversation conversation) {}

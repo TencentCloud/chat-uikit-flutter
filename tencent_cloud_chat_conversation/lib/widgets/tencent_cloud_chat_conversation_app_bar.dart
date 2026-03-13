@@ -10,10 +10,12 @@ import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.d
 
 class TencentCloudChatConversationAppBar extends StatefulWidget {
   final TextEditingController? textEditingController;
+  final FocusNode? focusNode;
 
   const TencentCloudChatConversationAppBar({
     super.key,
     this.textEditingController,
+    this.focusNode,
   });
 
   @override
@@ -79,6 +81,7 @@ class TencentCloudChatConversationAppBarState extends TencentCloudChatState<Tenc
         child: (widget.textEditingController != null && includeSearch)
             ? TencentCloudChatAppBarSearchItem(
                 textEditingController: widget.textEditingController!,
+                focusNode: widget.focusNode,
               )
             : Text(
                 tL10n.chats,
@@ -183,38 +186,47 @@ class TencentCloudChatConversationAppBarNameState
 
 class TencentCloudChatAppBarSearchItem extends StatefulWidget {
   final TextEditingController textEditingController;
+  final FocusNode? focusNode;
 
-  const TencentCloudChatAppBarSearchItem({Key? key, required this.textEditingController}) : super(key: key);
+  const TencentCloudChatAppBarSearchItem({
+    Key? key,
+    required this.textEditingController,
+    this.focusNode,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => TencentCloudChatAppBarSearchItemState();
 }
 
 class TencentCloudChatAppBarSearchItemState extends State<TencentCloudChatAppBarSearchItem> {
-  final FocusNode _focusNode = FocusNode();
+  late final FocusNode _focusNode;
 
   @override
   void initState() {
     super.initState();
+    _focusNode = widget.focusNode ?? FocusNode();
     widget.textEditingController.addListener(_textEditingControllerListener);
   }
 
   void _textEditingControllerListener() {
-    if (widget.textEditingController.text.isEmpty) {
-      _focusNode.unfocus();
-    }
+    // Do not unfocus when text becomes empty (e.g. user backspaces to clear).
+    // Unfocus only when user taps the clear button (handled there).
+    setState(() {});
   }
 
   @override
   void dispose() {
-    super.dispose();
     widget.textEditingController.removeListener(_textEditingControllerListener);
+    if (widget.focusNode == null) _focusNode.dispose();
+    super.dispose();
   }
+
+  FocusNode get _effectiveFocusNode => widget.focusNode ?? _focusNode;
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      focusNode: _focusNode,
+      focusNode: _effectiveFocusNode,
       maxLines: 1,
       controller: widget.textEditingController,
       style: const TextStyle(fontSize: 14),
@@ -229,7 +241,7 @@ class TencentCloudChatAppBarSearchItemState extends State<TencentCloudChatAppBar
                 icon: const Icon(Icons.clear),
                 onPressed: () {
                   widget.textEditingController.clear();
-                  _focusNode.unfocus();
+                  _effectiveFocusNode.unfocus();
                 },
               )
             : null,

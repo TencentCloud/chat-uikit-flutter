@@ -110,6 +110,7 @@ class TencentCloudChatConversationListState extends TencentCloudChatState<Tencen
             var conversation = conv[index];
             var isOnline = getIsOnline(conversation);
             return TencentCloudChatConversationItem(
+              key: ValueKey(conversation.conversationID),
               conversation: conversation,
               isOnline: isOnline,
               isSelected: widget.currentConversation?.conversationID == conversation.conversationID && TencentCloudChatUtils.checkString(widget.currentConversation?.conversationID) != null,

@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'dart:async';
 
 import 'package:tencent_cloud_chat_common/components/component_config/tencent_cloud_chat_group_profile_config.dart';
 import 'package:tencent_cloud_chat_common/components/component_event_handlers/tencent_cloud_chat_group_profile_event_handlers.dart';
@@ -48,20 +49,31 @@ class TencentCloudChatGroupProfileData<T> extends TencentCloudChatDataAB<T> {
 
   TencentLRUCache<String, List<V2TimGroupMemberFullInfo?>> groupMemberListCache = TencentLRUCache<String, List<V2TimGroupMemberFullInfo?>>(capacity: 5);
 
+  // Track loading state per groupID to prevent duplicate calls
+  final Map<String, bool> _loadingGroups = {};
+  // Track last load time per groupID to prevent rapid successive calls
+  final Map<String, DateTime> _lastLoadTime = {};
+  // Track pending futures to reuse them
+  final Map<String, Future<List<V2TimGroupMemberFullInfo?>>> _pendingLoads = {};
+  // Minimum time between loads for the same group (2 seconds to prevent rapid loops)
+  static const Duration _minLoadInterval = Duration(seconds: 2);
+
   updateGroupMemberInfo(String groupID, List<V2TimGroupMemberChangeInfo> groupMemberList) async {
     final targetList = getGroupMemberList(groupID);
     if(targetList.isNotEmpty) {
       final memberIDs = groupMemberList.map((e) => e.userID).whereType<String>().toList();
       final fullMemberInfo = await _getGroupMemberFullInfo(memberIDs, groupID);
       if(fullMemberInfo.isNotEmpty) {
+        // Re-read from cache after async call to get the latest state
+        final currentList = getGroupMemberList(groupID);
         for (var memberInfo in fullMemberInfo) {
-          final targetIndex = targetList.indexWhere((e) => e?.userID == memberInfo.userID);
+          final targetIndex = currentList.indexWhere((e) => e?.userID == memberInfo.userID);
           if(targetIndex > -1) {
-            targetList[targetIndex] = memberInfo;
+            currentList[targetIndex] = memberInfo;
           }
         }
         updateGroupID = groupID;
-        groupMemberListCache.set(groupID, targetList);
+        groupMemberListCache.set(groupID, currentList);
         notifyListener(TencentCloudChatGroupProfileDataKeys.membersChange as T);
       }
     }
@@ -89,11 +101,21 @@ class TencentCloudChatGroupProfileData<T> extends TencentCloudChatDataAB<T> {
     final targetList = getGroupMemberList(groupID);
     if(targetList.isNotEmpty) {
       final memberList = groupMemberList.map((e) => e.userID).whereType<String>().toList();
-      final membersFullInfo = await _getGroupMemberFullInfo(memberList, groupID);
+      // Deduplicate: only fetch info for members not already in the list
+      final existingUserIDs = targetList.map((e) => e?.userID).whereType<String>().toSet();
+      final newMemberIDs = memberList.where((id) => !existingUserIDs.contains(id)).toList();
+      if (newMemberIDs.isEmpty) return;
+      final membersFullInfo = await _getGroupMemberFullInfo(newMemberIDs, groupID);
       if(membersFullInfo.isNotEmpty) {
-         targetList.addAll(membersFullInfo);
+         // Re-read from cache after async call to get the latest state
+         // (cache may have been replaced by loadGroupMemberList during the await)
+         final currentList = getGroupMemberList(groupID);
+         final currentUserIDs = currentList.map((e) => e?.userID).whereType<String>().toSet();
+         final trulyNewMembers = membersFullInfo.where((m) => !currentUserIDs.contains(m.userID)).toList();
+         if (trulyNewMembers.isEmpty) return;
+         currentList.addAll(trulyNewMembers);
          updateGroupID = groupID;
-         groupMemberListCache.set(groupID, targetList);
+         groupMemberListCache.set(groupID, currentList);
          notifyListener(TencentCloudChatGroupProfileDataKeys.membersChange as T);
       }
     }
@@ -115,6 +137,38 @@ class TencentCloudChatGroupProfileData<T> extends TencentCloudChatDataAB<T> {
     if (TencentCloudChatUtils.checkString(groupID) == null) {
       return [];
     }
+    
+    // Only apply debouncing for initial load (nextSeq == "0")
+    if (nextSeq == "0") {
+      // Check if already loading for this group
+      if (_loadingGroups[groupID!] == true) {
+        // Return pending future if exists
+        if (_pendingLoads.containsKey(groupID)) {
+          return _pendingLoads[groupID]!;
+        }
+      }
+
+      // Check if we recently loaded this group
+      final lastLoadTime = _lastLoadTime[groupID];
+      if (lastLoadTime != null) {
+        final timeSinceLastLoad = DateTime.now().difference(lastLoadTime);
+        if (timeSinceLastLoad < _minLoadInterval) {
+          // Too soon, return cached data if available
+          final cachedList = getGroupMemberList(groupID);
+          if (cachedList.isNotEmpty) {
+            // Return cached data to prevent duplicate calls
+            return cachedList;
+          }
+          // If no cache, wait a bit and try again
+          await Future.delayed(_minLoadInterval - timeSinceLastLoad);
+        }
+      }
+
+      // Mark as loading
+      _loadingGroups[groupID] = true;
+      _lastLoadTime[groupID] = DateTime.now();
+    }
+    
     final res = await TencentCloudChat.instance.chatSDKInstance.groupSDK.getGroupMemberList(
       groupID: groupID!,
       filter: loadGroupAdminAndOwnerOnly
@@ -145,9 +199,29 @@ class TencentCloudChatGroupProfileData<T> extends TencentCloudChatDataAB<T> {
         );
         list.insertAll(0, res?.data?.memberInfoList ?? []);
       }
-      groupMemberListCache.set(groupID, list);
+      // Deduplicate by userID before caching (defense in depth against any source of duplicates)
+      final seen = <String>{};
+      final dedupedList = <V2TimGroupMemberFullInfo?>[];
+      for (final member in list) {
+        if (member != null && seen.add(member.userID)) {
+          dedupedList.add(member);
+        }
+      }
+      groupMemberListCache.set(groupID, dedupedList);
       updateGroupID = groupID;
+      
+      // Create and store the future before notifying
+      final completedFuture = Future.value(dedupedList);
+      _pendingLoads[groupID] = completedFuture;
+      
       notifyListener(TencentCloudChatGroupProfileDataKeys.membersChange as T);
+      
+      // Clear loading state after a delay to prevent rapid successive calls
+      Future.delayed(_minLoadInterval, () {
+        _loadingGroups[groupID] = false;
+        _pendingLoads.remove(groupID);
+      });
+      return dedupedList;
     }
     return list;
   }
@@ -162,7 +236,9 @@ class TencentCloudChatGroupProfileData<T> extends TencentCloudChatDataAB<T> {
   }
 
   List<V2TimGroupMemberFullInfo?> getGroupMemberList(String? groupID) {
-    return (TencentCloudChatUtils.checkString(groupID) != null ? groupMemberListCache.get(groupID!) : []) ?? [];
+    final cached = TencentCloudChatUtils.checkString(groupID) != null ? groupMemberListCache.get(groupID!) : null;
+    // Return a defensive copy to prevent external mutation of the cached list
+    return cached != null ? List<V2TimGroupMemberFullInfo?>.from(cached) : [];
   }
 
   @override
@@ -170,6 +246,7 @@ class TencentCloudChatGroupProfileData<T> extends TencentCloudChatDataAB<T> {
     currentUpdatedFields = key;
     var event = TencentCloudChatGroupProfileData<T>(key);
     event.updateGroupID = updateGroupID;
+    event.updateGroupInfo = updateGroupInfo;
     event.updateMemberList = updateMemberList;
     event.updateMemberRole = updateMemberRole;
     event._groupProfileConfig = _groupProfileConfig;

@@ -171,6 +171,7 @@ class TencentCloudChatConversationState extends TencentCloudChatState<TencentClo
     final header =
         TencentCloudChat.instance.dataInstance.conversation.conversationBuilder?.getConversationHeaderBuilder(
       textEditingController: _textEditingController,
+      focusNode: null,
     );
     if (header?.$2 ?? false) {
       return TencentCloudChatThemeWidget(
@@ -220,6 +221,10 @@ class TencentCloudChatConversationState extends TencentCloudChatState<TencentClo
                       child: _globalSearchWidget!(
                         options: {
                           "keyWord": _searchText,
+                          "closeFunc": () {
+                            _textEditingController.clear();
+                            setState(() {});
+                          },
                         },
                       ),
                     )

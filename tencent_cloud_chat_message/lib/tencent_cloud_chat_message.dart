@@ -3,6 +3,8 @@ library tencent_cloud_chat_message;
 import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:tencent_cloud_chat_common/components/component_config/tencent_cloud_chat_message_config.dart';
 import 'package:tencent_cloud_chat_common/components/component_options/tencent_cloud_chat_message_options.dart';
 import 'package:tencent_cloud_chat_common/components/tencent_cloud_chat_components_utils.dart';
@@ -52,11 +54,15 @@ class _TencentCloudChatMessageState extends TencentCloudChatState<TencentCloudCh
   StreamSubscription<TencentCloudChatMessageData<dynamic>>? _messageDataSubscription;
 
   final TencentCloudChatMessageSeparateDataProvider _messageSeparateDataProvider = TencentCloudChatMessageSeparateDataProvider();
+  
+  // CRITICAL: Track if init is in progress to prevent concurrent init calls
+  bool _initInProgress = false;
 
   @override
   void initState() {
     super.initState();
     _addMessageDataListener();
+    _initInProgress = true;
     _messageSeparateDataProvider.init(
       userID: widget.options?.userID,
       groupID: widget.options?.groupID,
@@ -66,6 +72,14 @@ class _TencentCloudChatMessageState extends TencentCloudChatState<TencentCloudCh
       controller: null,
       builders: widget.builders,
     );
+    _initInProgress = false;
+    if (mounted) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          setState(() {});
+        }
+      });
+    }
   }
 
   @override
@@ -74,7 +88,11 @@ class _TencentCloudChatMessageState extends TencentCloudChatState<TencentCloudCh
     if ((widget.options?.userID != oldWidget.options?.userID && !(TencentCloudChatUtils.checkString(widget.options?.userID) == null && TencentCloudChatUtils.checkString(oldWidget.options?.userID) == null)) ||
         (widget.options?.groupID != oldWidget.options?.groupID && !(TencentCloudChatUtils.checkString(widget.options?.groupID) == null && TencentCloudChatUtils.checkString(oldWidget.options?.groupID) == null)) ||
         (widget.options?.topicID != oldWidget.options?.topicID && !(TencentCloudChatUtils.checkString(widget.options?.topicID) == null && TencentCloudChatUtils.checkString(oldWidget.options?.topicID) == null))) {
+      if (_initInProgress) {
+        return;
+      }
       _messageSeparateDataProvider.unInit();
+      _initInProgress = true;
       _messageSeparateDataProvider.init(
         userID: widget.options?.userID,
         groupID: widget.options?.groupID,
@@ -84,6 +102,7 @@ class _TencentCloudChatMessageState extends TencentCloudChatState<TencentCloudCh
         controller: null,
         builders: widget.builders,
       );
+      _initInProgress = false;
     }
     _updateGlobalData(oldWidget);
   }
@@ -167,6 +186,7 @@ class _TencentCloudChatMessageState extends TencentCloudChatState<TencentCloudCh
     final isDesktop = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop;
     return hasChat
         ? TencentCloudChatMessageDataProviderInherited(
+            key: ValueKey('dataProvider-${widget.options?.userID ?? ""}-${widget.options?.groupID ?? ""}'),
             dataProvider: _messageSeparateDataProvider,
             child: TencentCloudChatMessageLayoutContainer(
               userID: userID,

@@ -131,6 +131,23 @@ class TencentCloudChatMessageDataTools {
                 .contains(groupInfo.groupType));
 
     if (messageInfo != null) {
+      // Ensure currentUser.faceUrl is set before building optimistic message so C2C sent message doesn't flicker (default→correct)
+      final basic = TencentCloudChat.instance.dataInstance.basic;
+      final cur = basic.currentUser;
+      final selfId = cur?.userID;
+      if (cur != null &&
+          selfId != null &&
+          selfId.isNotEmpty &&
+          (cur.faceUrl == null || cur.faceUrl!.isEmpty)) {
+        final res = await TencentCloudChat.instance.chatSDKInstance.manager
+            .getUsersInfo(userIDList: [selfId]);
+        if (res.data != null &&
+            res.data!.isNotEmpty &&
+            res.data!.first.faceUrl != null &&
+            res.data!.first.faceUrl!.isNotEmpty) {
+          basic.updateCurrentUserInfo(userFullInfo: res.data!.first);
+        }
+      }
       V2TimMessage? messageInfoWithAdditionalInfo = TencentCloudChatMessageDataTools.setAdditionalInfoForMessage(
         messageInfo: messageInfo,
         id: createdMessage.id,
@@ -214,13 +231,42 @@ class TencentCloudChatMessageDataTools {
         cloudCustomData: cloudCustomData,)
       : await TencentCloudChat.instance.chatSDKInstance.messageSDK.reSendMessage(msgID: messageInfo?.msgID ?? "");
 
-    if (sendMsgRes.data != null && isCurrentConversation) {
+    // CRITICAL: For binary replacement scheme, don't update message here
+    // The FFI stream will handle the actual message state (success or failure)
+    // This prevents duplicate messages: one from sendMessageFinalPhase and one from FFI stream
+    // The FFI layer generates different msgID than UIKit, so updating here would break matching
+    // Only update message status to SEND_FAIL if sendMessage failed, but don't replace the message
+    // The FFI stream will send the actual message with correct msgID later
+    if (sendMsgRes.code == 0 && sendMsgRes.data != null && isCurrentConversation) {
+      // For binary replacement scheme, don't update message here
+      // Just trigger onSendMessageProgress to update UI, but don't replace the message
+      // The FFI stream will send the actual message with correct msgID later
+      TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate = sendMsgRes.data!;
+
+      TencentCloudChat.instance.dataInstance.messageData.onSendMessageProgress(
+        message: sendMsgRes.data!,
+        progress: 100,
+        isSendComplete: true,
+        id: id,
+      );
+    } else if (sendMsgRes.code != 0 && sendMsgRes.data != null && isCurrentConversation) {
+      // If sendMessage failed, update message status to SEND_FAIL
+      // But don't rely on this - FFI stream will handle the actual state
       List<V2TimMessage> currentHistoryMsgList = TencentCloudChat.instance.dataInstance.messageData
           .getMessageList(key: TencentCloudChatUtils.checkString(groupID) ?? userID ?? "");
 
-      // Update the message in the currentHistoryMsgList with the same id.
+      // Update the message status to SEND_FAIL
       currentHistoryMsgList = currentHistoryMsgList.map((message) {
-        if (message.id == id || message.msgID == sendMsgRes.data!.msgID) {
+        // Check if id matches
+        if (message.id == id) {
+          return sendMsgRes.data!;
+        }
+        // Check if msgID matches
+        if (sendMsgRes.data!.msgID != null && message.msgID == sendMsgRes.data!.msgID) {
+          return sendMsgRes.data!;
+        }
+        // Check if message.id matches sendMsgRes.data!.msgID
+        if (sendMsgRes.data!.msgID != null && message.id == sendMsgRes.data!.msgID) {
           return sendMsgRes.data!;
         }
         return message;
@@ -231,15 +277,6 @@ class TencentCloudChatMessageDataTools {
         userID: userID,
         groupID: groupID,
         disableNotify: true,
-      );
-
-      TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate = sendMsgRes.data!;
-
-      TencentCloudChat.instance.dataInstance.messageData.onSendMessageProgress(
-        message: sendMsgRes.data!,
-        progress: 100,
-        isSendComplete: true,
-        id: id,
       );
     }
     return sendMsgRes;

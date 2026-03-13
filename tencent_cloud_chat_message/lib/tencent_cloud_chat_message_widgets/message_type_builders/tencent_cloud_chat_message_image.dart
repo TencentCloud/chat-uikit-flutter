@@ -71,6 +71,47 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
         _getImageUrl();
       }
     }
+    // CRITICAL: Check if imageElem.path or imageList.localUrl has changed (for received images)
+    // This handles the case where file_done event updates the message path from /tmp/receiving_ to /avatars/
+    if (widget.data.message.imageElem != null && oldWidget.data.message.imageElem != null) {
+      final oldPath = oldWidget.data.message.imageElem!.path;
+      final newPath = widget.data.message.imageElem!.path;
+      // Check if path changed (e.g., from /tmp/receiving_ to /avatars/)
+      if (oldPath != newPath && newPath != null && (newPath.contains('/avatars/') || newPath.contains('/file_recv/'))) {
+        final file = File(newPath);
+        if (file.existsSync()) {
+          _getImageUrl();
+          return;
+        }
+      }
+      // Check if imageList.localUrl changed
+      final oldImageList = oldWidget.data.message.imageElem!.imageList;
+      final newImageList = widget.data.message.imageElem!.imageList;
+      if (oldImageList != newImageList) {
+        String? oldLocalUrl;
+        String? newLocalUrl;
+        if (oldImageList != null) {
+          for (final img in oldImageList) {
+            if (img != null && img.localUrl != null && img.localUrl!.isNotEmpty) {
+              oldLocalUrl = img.localUrl;
+              break;
+            }
+          }
+        }
+        if (newImageList != null) {
+          for (final img in newImageList) {
+            if (img != null && img.localUrl != null && img.localUrl!.isNotEmpty) {
+              newLocalUrl = img.localUrl;
+              break;
+            }
+          }
+        }
+        // If localUrl changed from null/empty to a valid path, refresh the image
+        if ((oldLocalUrl == null || oldLocalUrl.isEmpty) && newLocalUrl != null && newLocalUrl.isNotEmpty) {
+          _getImageUrl();
+        }
+      }
+    }
   }
 
   final Stream<TencentCloudChatMessageData<dynamic>>? _messageDataStream = TencentCloudChat.instance.eventBusInstance.on<TencentCloudChatMessageData<dynamic>>("TencentCloudChatMessageData");
@@ -162,7 +203,9 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
   Future<bool> hasSelfClientPath() async {
     if (widget.data.message.imageElem != null && !TencentCloudChatPlatformAdapter().isWeb) {
       if (TencentCloudChatUtils.checkString(widget.data.message.imageElem!.path) != null) {
-        if (File(widget.data.message.imageElem!.path!).existsSync()) {
+        final path = widget.data.message.imageElem!.path!;
+        // CRITICAL: Don't use /tmp/receiving_ paths as client path - they are temporary
+        if (!path.startsWith('/tmp/receiving_') && File(path).existsSync()) {
           return true;
         }
       }
@@ -231,7 +274,10 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
         if (img.type == ImageType.thumb.index) {}
         if (img.url != null) {
           if (img.url!.isNotEmpty) {
-            res = img.url!;
+            // CRITICAL: Don't use /tmp/receiving_ paths as URL - they are temporary and will fail when used as online URLs
+            if (!img.url!.startsWith('/tmp/receiving_')) {
+              res = img.url!;
+            }
           }
         }
       }
@@ -263,13 +309,18 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
         console("message has localUrl. render by local.");
       } else if (widget.data.message.imageElem != null) {
         var thumbUrl = getOnlineThumbUrl();
-        if (thumbUrl.isNotEmpty) {
+        // CRITICAL: Don't use /tmp/receiving_ paths as online URL - they are temporary and will fail
+        if (thumbUrl.isNotEmpty && !thumbUrl.startsWith('/tmp/receiving_')) {
           var imageInfo = ImageCurrentRenderInfo(path: thumbUrl, type: ImageCurrentRenderType.online);
           safeSetState(() {
             currentRenderImageInfo = imageInfo;
           });
 
           console("message render by online url.");
+        } else if (thumbUrl.startsWith('/tmp/receiving_')) {
+          // If URL is a temporary path, don't try to render it as online URL
+          // The image will be updated when file_done event updates the path
+          console("message has temporary receiving path, waiting for file_done event. url: $thumbUrl");
         }
       } else {
         safeSetState(() {
@@ -370,8 +421,37 @@ class _TencentCloudChatMessageImageState extends TencentCloudChatMessageState<Te
     );
   }
 
+  bool _isLocalFilePath(String url) {
+    if (url.isEmpty) return false;
+    if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('//')) return false;
+    if (url.startsWith('/')) return true;
+    // Windows absolute path (e.g. C:\Users\...)
+    if (url.length > 2 && url[1] == ':') return true;
+    return false;
+  }
+
   Widget renderOnlineImage(String url) {
     console("render online image. url: $url");
+    if (_isLocalFilePath(url)) {
+      return ClipRRect(
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(getSquareSize(16)),
+          topRight: Radius.circular(getSquareSize(16)),
+          bottomLeft: Radius.circular(getSquareSize(sentFromSelf ? 16 : 0)),
+          bottomRight: Radius.circular(getSquareSize(sentFromSelf ? 0 : 16)),
+        ),
+        child: Image.file(
+          File(url),
+          key: ValueKey(onlineRenderKey),
+          fit: BoxFit.cover,
+          width: min(widget.data.messageRowWidth * 0.7, 198),
+          errorBuilder: (context, error, stackTrace) {
+            console("local image render failed. path: $url");
+            return getErrorWidget();
+          },
+        ),
+      );
+    }
     return ClipRRect(
       borderRadius: BorderRadius.only(
         topLeft: Radius.circular(getSquareSize(16)),

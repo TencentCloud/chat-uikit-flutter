@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:tencent_cloud_chat_common/log/tencent_cloud_chat_log_test_environment.dart'
+    if (dart.library.io) 'package:tencent_cloud_chat_common/log/tencent_cloud_chat_log_test_environment_io.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
 
 /// Enum to represent different log levels
@@ -33,7 +35,7 @@ class TencentCloudChatLog {
   Timer? _timer;
 
   TencentCloudChatLog._() {
-    if (_timer == null) {
+    if (_timer == null && !isTencentCloudChatFlutterTestEnvironment) {
       // Start a timer to periodically write logs
       _timer = Timer.periodic(const Duration(seconds: 10), (Timer timer) {
         _writeLog();
@@ -63,7 +65,8 @@ class TencentCloudChatLog {
 
     logLevel ??= TencentCloudChatLogLevel.debug;
 
-    var cacheLogs = "TCCF:$currentTime:$componentName:${logLevel.name}:{ $logs }";
+    var cacheLogs =
+        "TCCF:$currentTime:$componentName:${logLevel.name}:{ $logs }";
 
     if (kDebugMode) {
       // Print the log message to the console if the app is running in debug mode
@@ -90,7 +93,8 @@ class TencentCloudChatLog {
       return;
     }
 
-    TencentCloudChat.instance.chatSDKInstance.uikitTrace(trace: _cachedLogList.join("\n"));
+    TencentCloudChat.instance.chatSDKInstance
+        .uikitTrace(trace: _cachedLogList.join("\n"));
 
     /// Log a message indicating that the timer executed and the number of logs written
 

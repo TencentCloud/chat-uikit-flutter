@@ -20,6 +20,22 @@ import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.d
 import 'package:tencent_cloud_chat_common/widgets/file_icon/tencent_cloud_chat_file_icon.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/tencent_cloud_chat_message_item.dart';
 
+/// Archive file extensions that should not be "opened" on desktop (would trigger extract/mount).
+/// On desktop we reveal in folder instead so the user can choose how to open.
+const _archiveExtensions = {
+  'zip', 'tar', 'gz', 'tgz', 'bz2', 'xz', 'zst', 'rar', '7z', 'dmg',
+  'iso', 'tar.gz', 'tar.bz2', 'tar.xz',
+};
+
+bool _isArchiveFile(String path) {
+  if (path.isEmpty) return false;
+  final lower = path.toLowerCase();
+  for (final ext in _archiveExtensions) {
+    if (lower.endsWith('.$ext')) return true;
+  }
+  return false;
+}
+
 enum TimFileCurrentRenderType {
   online,
   local,
@@ -362,6 +378,23 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
     });
   }
 
+  /// On desktop, opening archive files (zip, dmg, etc.) with the default app often
+  /// extracts or mounts them. Reveal in folder instead so the user can choose.
+  Future<void> _revealFileInFolder(String filePath) async {
+    try {
+      if (Platform.isMacOS) {
+        await Process.run('open', ['-R', filePath]);
+      } else if (Platform.isWindows) {
+        await Process.run('explorer', ['/select,', filePath]);
+      } else if (Platform.isLinux) {
+        final directory = File(filePath).parent.path;
+        await Process.run('xdg-open', [directory]);
+      }
+    } catch (e) {
+      console("_revealFileInFolder failed for $filePath: $e");
+    }
+  }
+
   _openFile() async {
     if (TencentCloudChatPlatformAdapter().isWeb) {
       if (!_webDownloading) {
@@ -380,21 +413,34 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
       }
     }
 
+    String? pathToOpen;
     if (widget.data.message.status == 1) {
-      if (TencentCloudChatUtils.checkString(widget.data.message.fileElem!.path) != null) {
-        if (File(widget.data.message.fileElem!.path!).existsSync()) {
-          return await OpenFile.open(widget.data.message.fileElem!.path!);
+      final elemPath = widget.data.message.fileElem?.path;
+      if (TencentCloudChatUtils.checkString(elemPath) != null) {
+        if (File(elemPath!).existsSync()) {
+          pathToOpen = elemPath;
         }
       }
     }
-
-    if (TencentCloudChatUtils.checkString(getLocalPath()) != null) {
-      return await OpenFile.open(getLocalPath());
-    } else if (hasLocalFile()) {
-      return await OpenFile.open(getLocalUrl());
-    } else {
-      console("message has not local path . download first");
+    if (pathToOpen == null && TencentCloudChatUtils.checkString(widget.data.message.fileElem?.path) != null) {
+      pathToOpen = getLocalPath();
     }
+    if (pathToOpen == null && hasLocalFile()) {
+      pathToOpen = getLocalUrl();
+    }
+
+    if (pathToOpen == null) {
+      console("message has not local path . download first");
+      return;
+    }
+
+    final isDesktop = TencentCloudChatPlatformAdapter().isDesktop;
+    if (isDesktop && _isArchiveFile(pathToOpen)) {
+      await _revealFileInFolder(pathToOpen);
+      return;
+    }
+
+    await OpenFile.open(pathToOpen);
   }
 
   Widget messageInfo() {
@@ -439,6 +485,21 @@ class _TencentCloudChatMessageFileState extends TencentCloudChatMessageState<Ten
       if (idx > -1) {
         safeSetState(() {
           currentdownload = data.currentDownloadMessage[idx];
+        });
+      }
+    } else if (data.currentUpdatedFields == TencentCloudChatMessageDataKeys.messageNeedUpdate) {
+      // Handle messageNeedUpdate event to refresh UI when file is received
+      // This ensures that when localUrl is set after file reception, the widget updates correctly
+      final messageNeedUpdate = TencentCloudChat.instance.dataInstance.messageData.messageNeedUpdate;
+      if (messageNeedUpdate != null && messageNeedUpdate.msgID == widget.data.message.msgID) {
+        // Message was updated (e.g., localUrl was set after file reception)
+        // CRITICAL FIX: Update the message's fileElem so that hasLocalFile() can detect localUrl
+        // Without this, rebuild reads the old message reference which still has localUrl = null
+        safeSetState(() {
+          if (messageNeedUpdate.fileElem != null) {
+            widget.data.message.fileElem = messageNeedUpdate.fileElem;
+          }
+          renderRandom = Random().nextInt(100000);
         });
       }
     }

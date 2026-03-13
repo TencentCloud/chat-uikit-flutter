@@ -2,7 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
+
 
 import 'package:fc_native_video_thumbnail/fc_native_video_thumbnail.dart';
 import 'package:flutter/scheduler.dart';
@@ -25,6 +25,8 @@ import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_builders.d
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_controller.dart';
 
 class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
+  bool _disposed = false;
+
   final AutoScrollController desktopInputMemberSelectionPanelScroll = AutoScrollController(
     axis: Axis.vertical,
   );
@@ -491,9 +493,36 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
       return;
     }
 
+    // Synchronously pre-populate conversation from global conversation list to avoid
+    // header flash (default avatar/ID shown briefly before async load completes).
+    // The global list already contains correct faceUrl and showName from the conversation list page.
+    final convID = TencentCloudChatUtils.checkString(_groupID) != null ? "group_$_groupID" : "c2c_$_userID";
+    final globalConvList = TencentCloudChat.instance.dataInstance.conversation.conversationList;
+    final cachedConv = globalConvList.cast<V2TimConversation?>().firstWhere(
+      (c) => c?.conversationID == convID,
+      orElse: () => null,
+    );
+    if (cachedConv != null) {
+      _conversation = cachedConv;
+      notifyListeners();
+    }
+
     final conversation = await loadConversation(shouldUpdateState: true);
     if (_groupID != null) {
       _loadMentionedMessages(conversation: conversation);
+    }
+
+    // If conversation has no faceUrl (e.g. avatar saved after list was built), schedule a delayed
+    // refresh so session list/header pick up the latest from Prefs when avatar is available.
+    final hasEmptyFaceUrl = conversation.faceUrl == null || conversation.faceUrl!.isEmpty;
+    if (hasEmptyFaceUrl && TencentCloudChatUtils.checkString(_userID) != null) {
+      Future.delayed(const Duration(milliseconds: 800), () async {
+        if (_userID == null) return;
+        final refreshed = await loadConversation(shouldUpdateState: true);
+        if (refreshed.faceUrl != null && refreshed.faceUrl!.isNotEmpty) {
+          this.conversation = refreshed;
+        }
+      });
     }
 
     if (config != null) {
@@ -557,10 +586,18 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
 
   @override
   void dispose() {
-    super.dispose();
+    if (_disposed) return;
+    _disposed = true;
     removeUIKitListener();
     _cleanGroupData();
     _conversationDataSubscription?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void notifyListeners() {
+    if (_disposed) return;
+    super.notifyListeners();
   }
 
   void unInit() {
@@ -636,7 +673,9 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
       _sendMessageReadReceipt(messageListPointer);
     }
 
-    List<V2TimMessage> messageList = [...messageListPointer.reversed];
+    // OPTIMIZED: messageListPointer is already in newest-first order (internal storage format),
+    // so we don't need to reverse it. We'll work directly with newest-first order.
+    List<V2TimMessage> messageList = [...messageListPointer];
 
     final timeDividerConfig = _config.timeDividerConfig(userID: _userID, groupID: _groupID, topicID: _topicID);
     final List<V2TimMessage> listWithTimestamp = [];
@@ -690,43 +729,112 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
         ) ??
         messageList;
 
+    // OPTIMIZED: Sort messages by timestamp to ensure correct order before creating date separators
+    // Since we're working with newest-first order, we sort descending (newest first)
+    // This ensures messages are properly ordered and date separators are inserted correctly
+    messageList.sort((a, b) {
+      final timestampA = a.timestamp ?? 0;
+      final timestampB = b.timestamp ?? 0;
+      // If timestamps are equal, use msgID as tiebreaker to ensure stable sort
+      if (timestampA == timestampB) {
+        final msgIDA = a.msgID ?? a.id ?? '';
+        final msgIDB = b.msgID ?? b.id ?? '';
+        return msgIDB.compareTo(msgIDA); // Descending for newest-first
+      }
+      return timestampB.compareTo(timestampA); // Descending: newest first
+    });
+
+    // Process messages in newest-first order and insert date separators.
+    // With FlutterListView reverse:true, index 0 is at the BOTTOM of the screen.
+    // So in the list: lower index = newer = visually at bottom, higher index = older = visually at top.
+    //
+    // Desired UI (top to bottom):
+    //   [divider: Yesterday]    ← top (highest index)
+    //   [msg_yesterday]
+    //   [divider: Today]
+    //   [msg_today]             ← bottom (index 0, newest)
+    //
+    // Corresponding list (newest-first): [msg_today, divider_today, msg_yesterday, divider_yesterday]
+    //
+    // Algorithm: For each message, add the message first, then check if a separator
+    // is needed AFTER it (between this message and the next older one, or after the oldest message).
+    // The separator uses the CURRENT message's timestamp so it labels the messages below it.
+    DateTime? lastMessageDate;
+
     if (interval != null) {
-      for (var item in messageList) {
-        if (listWithTimestamp.isEmpty ||
-            (listWithTimestamp.last.timestamp != null &&
-                item.timestamp != null &&
-                (item.timestamp! - listWithTimestamp.last.timestamp! > interval))) {
+      // Use time interval for separators
+      for (int i = 0; i < messageList.length; i++) {
+        final item = messageList[i];
+        listWithTimestamp.add(item);
+
+        // Check if we need a separator AFTER this message (visually above it)
+        bool needsSeparator = false;
+        if (i == messageList.length - 1) {
+          // Last (oldest) message always needs a separator above it
+          needsSeparator = true;
+        } else {
+          final nextItem = messageList[i + 1];
+          if (item.timestamp != null && nextItem.timestamp != null &&
+              (item.timestamp! - nextItem.timestamp!).abs() > interval) {
+            needsSeparator = true;
+          }
+        }
+
+        if (needsSeparator) {
           listWithTimestamp.add(V2TimMessage(
             userID: '',
             isSelf: false,
             elemType: 101,
-            msgID: 'time-divider-${item.timestamp}-${Random().nextInt(100000)}',
+            msgID: 'time-divider-${item.timestamp}-${item.msgID ?? i}',
             timestamp: item.timestamp,
           ));
         }
-        listWithTimestamp.add(item);
       }
     } else {
-      DateTime? lastDate;
+      // Use date-based separators
+      for (int i = 0; i < messageList.length; i++) {
+        final item = messageList[i];
+        DateTime currentItemDate = DateTime.fromMillisecondsSinceEpoch((item.timestamp ?? 0) * 1000);
 
-      for (var item in messageList) {
-        DateTime currentItemDate = DateTime.fromMillisecondsSinceEpoch(item.timestamp! * 1000);
-        if (lastDate == null || currentItemDate.day != lastDate.day) {
+        listWithTimestamp.add(item);
+
+        // Check if we need a separator AFTER this message (visually above it)
+        bool needsSeparator = false;
+        if (i == messageList.length - 1) {
+          // Last (oldest) message always needs a separator above it
+          needsSeparator = true;
+        } else {
+          final nextItem = messageList[i + 1];
+          DateTime nextItemDate = DateTime.fromMillisecondsSinceEpoch((nextItem.timestamp ?? 0) * 1000);
+          if (currentItemDate.year != nextItemDate.year ||
+              currentItemDate.month != nextItemDate.month ||
+              currentItemDate.day != nextItemDate.day) {
+            needsSeparator = true;
+          }
+        }
+
+        if (needsSeparator) {
           listWithTimestamp.add(V2TimMessage(
             userID: '',
             isSelf: false,
             elemType: 101,
-            msgID: 'time-divider-${item.timestamp}-${Random().nextInt(100000)}',
+            msgID: 'time-divider-${item.timestamp}-${item.msgID ?? i}',
             timestamp: item.timestamp,
           ));
         }
 
-        listWithTimestamp.add(item);
-        lastDate = currentItemDate;
+        lastMessageDate = currentItemDate;
       }
     }
-
-    return listWithTimestamp.reversed.toList();
+    
+    // listWithTimestamp is in newest-first order with separators correctly positioned:
+    // [msg_today, divider_today, msg_yesterday, divider_yesterday]
+    // With reverse:true ListView, this renders as:
+    //   divider_yesterday (top)
+    //   msg_yesterday
+    //   divider_today
+    //   msg_today (bottom, newest)
+    return listWithTimestamp;
   }
 
   _sendMessageReadReceipt(List<V2TimMessage> messageList) async {

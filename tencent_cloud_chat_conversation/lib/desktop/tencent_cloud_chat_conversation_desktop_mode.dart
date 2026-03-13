@@ -37,12 +37,14 @@ class _TencentCloudChatConversationDesktopModeState
   TencentCloudChatWidgetBuilder? _messageWidget;
   TencentCloudChatWidgetBuilder? _globalSearchWidget;
   String _searchText = "";
+  late final FocusNode _searchFocusNode;
 
   @override
   void dispose() {
     _conversationDataSubscription?.cancel();
     _basicDataSubscription?.cancel();
     _textEditingController.removeListener(_searchTextListenerHandler);
+    _searchFocusNode.dispose();
     super.dispose();
   }
 
@@ -51,6 +53,7 @@ class _TencentCloudChatConversationDesktopModeState
     if (data.currentTargetMessage != _currentTargetMessage && data.currentTargetMessage != null) {
       _currentTargetMessage = data.currentTargetMessage;
       data.currentTargetMessage = null;
+      TencentCloudChat.instance.dataInstance.conversation.currentTargetMessage = null;
       _searchText = "";
       _textEditingController.clear();
       needUpdate = true;
@@ -103,6 +106,7 @@ class _TencentCloudChatConversationDesktopModeState
   @override
   void initState() {
     super.initState();
+    _searchFocusNode = FocusNode();
     _addBasicEventListener();
     _addConversationDataListener();
     _messageWidget = TencentCloudChat.instance.dataInstance.basic.componentsMap[TencentCloudChatComponentsEnum.message];
@@ -118,6 +122,12 @@ class _TencentCloudChatConversationDesktopModeState
     final text = _textEditingController.text;
     safeSetState(() {
       _searchText = text;
+    });
+    // Keep focus on search bar after rebuild so it does not jump to message input (e.g. when one chat is open).
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && _searchFocusNode.context != null) {
+        _searchFocusNode.requestFocus();
+      }
     });
   }
 
@@ -141,6 +151,7 @@ class _TencentCloudChatConversationDesktopModeState
                       child: TencentCloudChat.instance.dataInstance.conversation.conversationBuilder
                               ?.getConversationHeaderBuilder(
                                 textEditingController: _textEditingController,
+                                focusNode: _searchFocusNode,
                               )
                               .$1 ??
                           Container(),
@@ -153,6 +164,10 @@ class _TencentCloudChatConversationDesktopModeState
                       ? _globalSearchWidget!(
                           options: {
                             "keyWord": _searchText,
+                            "closeFunc": () {
+                              _textEditingController.clear();
+                              setState(() {});
+                            },
                           },
                         )
                       : TencentCloudChatConversationList(

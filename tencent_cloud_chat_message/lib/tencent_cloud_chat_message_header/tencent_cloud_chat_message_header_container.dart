@@ -8,6 +8,7 @@ import 'package:tencent_cloud_chat_common/data/conversation/tencent_cloud_chat_c
 import 'package:tencent_cloud_chat_common/eventbus/tencent_cloud_chat_eventbus.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/tuicore/tencent_cloud_chat_core.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_call_action_availability.dart';
 import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/widgets/group_member_selector/tencent_cloud_chat_group_member_selector.dart';
@@ -20,13 +21,15 @@ import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_header/ten
 
 class _PreferredAppBarSize extends Size {
   _PreferredAppBarSize(this.toolbarHeight, this.bottomHeight)
-      : super.fromHeight((toolbarHeight ?? kToolbarHeight) + (bottomHeight ?? 0));
+      : super.fromHeight(
+            (toolbarHeight ?? kToolbarHeight) + (bottomHeight ?? 0));
 
   final double? toolbarHeight;
   final double? bottomHeight;
 }
 
-class TencentCloudChatMessageHeaderContainer extends StatefulWidget implements PreferredSizeWidget {
+class TencentCloudChatMessageHeaderContainer extends StatefulWidget
+    implements PreferredSizeWidget {
   final String? userID;
   final String? groupID;
   final String? topicID;
@@ -38,10 +41,12 @@ class TencentCloudChatMessageHeaderContainer extends StatefulWidget implements P
     this.toolbarHeight,
     this.bottom,
     this.topicID,
-  }) : preferredSize = _PreferredAppBarSize(toolbarHeight, bottom?.preferredSize.height);
+  }) : preferredSize =
+            _PreferredAppBarSize(toolbarHeight, bottom?.preferredSize.height);
 
   @override
-  State<TencentCloudChatMessageHeaderContainer> createState() => _TencentCloudChatMessageHeaderContainerState();
+  State<TencentCloudChatMessageHeaderContainer> createState() =>
+      _TencentCloudChatMessageHeaderContainerState();
 
   @override
   final Size preferredSize;
@@ -117,9 +122,15 @@ class _TencentCloudChatMessageHeaderContainerState
       });
     }
 
-    if (_conversation?.conversationID == dataProvider.conversation?.conversationID &&
+    // Handle initial load: when _conversation is null but dataProvider has loaded conversation
+    if (_conversation == null && dataProvider.conversation != null) {
+      _conversation = dataProvider.conversation;
+      setState(() {});
+    } else if (_conversation?.conversationID ==
+            dataProvider.conversation?.conversationID &&
         (_conversation?.faceUrl != dataProvider.conversation?.faceUrl ||
             _conversation?.showName != dataProvider.conversation?.showName)) {
+      _conversation = dataProvider.conversation;
       setState(() {});
     }
   }
@@ -139,8 +150,12 @@ class _TencentCloudChatMessageHeaderContainerState
     final useCallKit = TencentCloudChat.instance.dataInstance.basic.useCallKit;
     if (useCallKit) {
       if (TencentCloudChatUtils.checkString(widget.groupID) != null) {
-        final List<V2TimGroupMemberFullInfo> memberInfoList = await showGroupMemberSelector(
-          groupMemberList: dataProvider.groupMemberList.where((element) => element != null).map((e) => e!).toList(),
+        final List<V2TimGroupMemberFullInfo> memberInfoList =
+            await showGroupMemberSelector(
+          groupMemberList: dataProvider.groupMemberList
+              .where((element) => element != null)
+              .map((e) => e!)
+              .toList(),
           context: context,
           onSelectLabel: tL10n.startCall,
         );
@@ -164,8 +179,12 @@ class _TencentCloudChatMessageHeaderContainerState
     final useCallKit = TencentCloudChat.instance.dataInstance.basic.useCallKit;
     if (useCallKit) {
       if (TencentCloudChatUtils.checkString(widget.groupID) != null) {
-        final List<V2TimGroupMemberFullInfo> memberInfoList = await showGroupMemberSelector(
-          groupMemberList: dataProvider.groupMemberList.where((element) => element != null).map((e) => e!).toList(),
+        final List<V2TimGroupMemberFullInfo> memberInfoList =
+            await showGroupMemberSelector(
+          groupMemberList: dataProvider.groupMemberList
+              .where((element) => element != null)
+              .map((e) => e!)
+              .toList(),
           context: context,
           onSelectLabel: tL10n.startCall,
         );
@@ -185,9 +204,14 @@ class _TencentCloudChatMessageHeaderContainerState
   }
 
   Future<V2TimConversation> _loadConversation() async {
-    final conversation = dataProvider.conversation ?? await dataProvider.loadConversation();
+    final conversation =
+        dataProvider.conversation ?? await dataProvider.loadConversation();
     _conversation = conversation;
     return conversation;
+  }
+
+  bool _isCallSupportedForGroup(V2TimConversation? conversation) {
+    return widget.groupID == null || widget.groupID!.isEmpty;
   }
 
   @override
@@ -197,8 +221,19 @@ class _TencentCloudChatMessageHeaderContainerState
     return FutureBuilder(
         future: _loadConversation(),
         initialData: dataProvider.conversation,
-        builder: (BuildContext context, AsyncSnapshot<V2TimConversation> snapshot) {
+        builder:
+            (BuildContext context, AsyncSnapshot<V2TimConversation> snapshot) {
           final conversation = snapshot.data ?? dataProvider.conversation;
+          final effectiveUseCallKit =
+              useCallKit && _isCallSupportedForGroup(conversation);
+          final callActionsEnabled = shouldEnableDirectCallActions(
+            userID: widget.userID,
+            groupID: widget.groupID,
+            getUserOnlineStatus: ({required String userID}) {
+              return TencentCloudChat.instance.dataInstance.contact
+                  .getOnlineStatusByUserId(userID: userID);
+            },
+          );
           return dataProvider.messageBuilders?.getMessageHeader(
                 data: MessageHeaderBuilderData(
                   selectAmount: _selectAmount,
@@ -207,12 +242,14 @@ class _TencentCloudChatMessageHeaderContainerState
                   topicID: widget.topicID,
                   groupID: widget.groupID,
                   conversation: conversation,
-                  showUserOnlineStatus:
-                      TencentCloudChat.instance.dataInstance.basic.userConfig.useUserOnlineStatus ?? true,
+                  showUserOnlineStatus: TencentCloudChat.instance.dataInstance
+                          .basic.userConfig.useUserOnlineStatus ??
+                      true,
                 ),
                 methods: MessageHeaderBuilderMethods(
                   getUserOnlineStatus: ({required String userID}) {
-                    return TencentCloudChat.instance.dataInstance.contact.getOnlineStatusByUserId(userID: userID);
+                    return TencentCloudChat.instance.dataInstance.contact
+                        .getOnlineStatusByUserId(userID: userID);
                   },
                   getGroupMembersInfo: _getGroupMembersInfo,
                   controller: dataProvider.messageController,
@@ -222,7 +259,8 @@ class _TencentCloudChatMessageHeaderContainerState
                   startVoiceCall: _startVoiceCall,
                 ),
                 widgets: MessageHeaderBuilderWidgets(
-                  messageHeaderProfileImage: TencentCloudChatMessageHeaderProfileImage(
+                  messageHeaderProfileImage:
+                      TencentCloudChatMessageHeaderProfileImage(
                     getGroupMembersInfo: _getGroupMembersInfo,
                     conversation: conversation,
                     startVideoCall: _startVideoCall,
@@ -232,20 +270,27 @@ class _TencentCloudChatMessageHeaderContainerState
                     conversation: conversation,
                     userID: widget.userID,
                     groupID: widget.groupID,
-                    showName: TencentCloudChatUtils.checkString(conversation?.showName) ?? widget.userID ?? tL10n.chat,
-                    showUserOnlineStatus:
-                        TencentCloudChat.instance.dataInstance.basic.userConfig.useUserOnlineStatus ?? true,
+                    showName: TencentCloudChatUtils.checkString(
+                            conversation?.showName) ??
+                        widget.userID ??
+                        tL10n.chat,
+                    showUserOnlineStatus: TencentCloudChat.instance.dataInstance
+                            .basic.userConfig.useUserOnlineStatus ??
+                        true,
                     getUserOnlineStatus: ({required String userID}) {
-                      return TencentCloudChat.instance.dataInstance.contact.getOnlineStatusByUserId(userID: userID);
+                      return TencentCloudChat.instance.dataInstance.contact
+                          .getOnlineStatusByUserId(userID: userID);
                     },
                     getGroupMembersInfo: _getGroupMembersInfo,
                   ),
                   messageHeaderActions: TencentCloudChatMessageHeaderActions(
                     startVoiceCall: _startVoiceCall,
                     startVideoCall: _startVideoCall,
-                    useCallKit: useCallKit,
+                    useCallKit: effectiveUseCallKit,
+                    callActionsEnabled: callActionsEnabled,
                   ),
-                  messageHeaderMessagesSelectMode: TencentCloudChatMessageHeaderSelectMode(
+                  messageHeaderMessagesSelectMode:
+                      TencentCloudChatMessageHeaderSelectMode(
                     key: ValueKey<bool>(_inSelectMode),
                     selectAmount: _selectAmount,
                     onCancelSelect: () => dataProvider.inSelectMode = false,

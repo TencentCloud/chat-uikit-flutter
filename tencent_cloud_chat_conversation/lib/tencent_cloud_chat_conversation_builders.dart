@@ -19,6 +19,7 @@ typedef ConversationItemInfoBuilder = Widget? Function(
 
 typedef ConversationHeaderBuilder = Widget? Function({
   TextEditingController? textEditingController,
+  FocusNode? focusNode,
 });
 
 class TencentCloudChatConversationBuilders
@@ -56,16 +57,19 @@ class TencentCloudChatConversationBuilders
   @override
   (Widget, bool) getConversationHeaderBuilder({
     TextEditingController? textEditingController,
-}) {
+    FocusNode? focusNode,
+  }) {
     Widget? widget;
 
     if (_conversationHeaderBuilder != null) {
       widget = _conversationHeaderBuilder!(
-        textEditingController: textEditingController,);
+        textEditingController: textEditingController,
+        focusNode: focusNode,
+      );
     }
 
     return (
-      widget ?? TencentCloudChatConversationAppBar(textEditingController: textEditingController,),
+      widget ?? TencentCloudChatConversationAppBar(textEditingController: textEditingController, focusNode: focusNode),
       widget != null
     );
   }

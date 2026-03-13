@@ -1,45 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 
-class TencentCloudChatMessageHeaderActions extends StatefulWidget {
+class TencentCloudChatMessageHeaderActions extends StatelessWidget {
   final VoidCallback? startVoiceCall;
   final VoidCallback? startVideoCall;
   final bool useCallKit;
+  final bool callActionsEnabled;
 
   const TencentCloudChatMessageHeaderActions(
       {super.key,
       this.startVoiceCall,
       this.startVideoCall,
-      required this.useCallKit});
+      required this.useCallKit,
+      this.callActionsEnabled = true});
 
   @override
-  State<TencentCloudChatMessageHeaderActions> createState() =>
-      _TencentCloudChatMessageHeaderActionsState();
-}
+  Widget build(BuildContext context) {
+    final voiceCallHandler = callActionsEnabled ? startVoiceCall : null;
+    final videoCallHandler = callActionsEnabled ? startVideoCall : null;
 
-class _TencentCloudChatMessageHeaderActionsState
-    extends TencentCloudChatState<TencentCloudChatMessageHeaderActions> {
-  @override
-  Widget defaultBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Row(
               children: [
-                if (widget.startVoiceCall != null && widget.useCallKit)
+                if (startVoiceCall != null && useCallKit)
                   IconButton(
-                    onPressed: widget.startVoiceCall,
+                    onPressed: voiceCallHandler,
                     icon: Icon(
                       Icons.call,
-                      color: colorTheme.primaryColor,
+                      color: callActionsEnabled
+                          ? colorTheme.primaryColor
+                          : colorTheme.primaryTextColor.withValues(alpha: 0.35),
                       size: textStyle.inputAreaIcon,
                     ),
                   ),
-                if (widget.startVideoCall != null && widget.useCallKit)
+                if (startVideoCall != null && useCallKit)
                   IconButton(
-                    onPressed: widget.startVideoCall,
+                    onPressed: videoCallHandler,
                     icon: Icon(
                       Icons.videocam,
-                      color: colorTheme.primaryColor,
+                      color: callActionsEnabled
+                          ? colorTheme.primaryColor
+                          : colorTheme.primaryTextColor.withValues(alpha: 0.35),
                       size: textStyle.inputAreaIcon,
                     ),
                   ),

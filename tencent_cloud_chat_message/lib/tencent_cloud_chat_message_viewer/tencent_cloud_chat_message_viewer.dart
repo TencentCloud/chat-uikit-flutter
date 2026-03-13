@@ -19,6 +19,14 @@ import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_viewer/ten
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_widgets/message_type_builders/tencent_cloud_chat_message_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+bool _isLocalFilePath(String url) {
+  if (url.isEmpty) return false;
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('//')) return false;
+  if (url.startsWith('/')) return true;
+  if (url.length > 2 && url[1] == ':') return true;
+  return false;
+}
+
 class TencentCloudChatMessageViewer extends StatefulWidget {
   final String convKey;
   final V2TimMessage message;
@@ -88,6 +96,7 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
       }
     }
 
+    if (!mounted) return;
     setState(() {
       isLoading = false;
       if (msgs.isNotEmpty) {
@@ -136,7 +145,11 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
 
   getImageOnlineOriginUrl(V2TimImageElem imageElem) {
     List<V2TimImage?> imageList = imageElem.imageList ?? [];
-    return imageList.firstWhere((element) => element?.type == ImageType.origin.index)?.url;
+    V2TimImage? originImage = imageList.cast<V2TimImage?>().firstWhere(
+      (element) => element?.type == ImageType.origin.index,
+      orElse: () => null,
+    );
+    return originImage?.url;
   }
 
   console(String log) {
@@ -195,7 +208,10 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
     if (message.elemType == MessageElemType.V2TIM_ELEM_TYPE_IMAGE) {
       if (message.imageElem != null) {
         var imageList = message.imageElem!.imageList ?? [];
-        var image = imageList.firstWhere((element) => element?.type == ImageType.origin.index, orElse: () => null);
+        V2TimImage? image = imageList.cast<V2TimImage?>().firstWhere(
+          (element) => element?.type == ImageType.origin.index,
+          orElse: () => null,
+        );
         if (image != null) {
           if (TencentCloudChatUtils.checkString(image.localUrl) != null) {
             res = true;
@@ -472,6 +488,7 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
                                       ),
                                     );
                                   } else if (TencentCloudChatUtils.checkString(originUrl) != null) {
+                                    final isLocalPath = _isLocalFilePath(originUrl);
                                     return GestureDetector(
                                       onSecondaryTapDown: (details) {
                                         TencentCloudChatDesktopPopup.showColumnMenu(
@@ -501,9 +518,17 @@ class TencentCloudChatMessageViewerState extends State<TencentCloudChatMessageVi
                                           ],
                                         );
                                       },
-                                      child: Image.network(
-                                        originUrl,
-                                      ),
+                                      child: isLocalPath
+                                          ? Image.file(
+                                              File(originUrl),
+                                              errorBuilder: (context, error, stackTrace) =>
+                                                  const Center(child: Icon(Icons.broken_image, size: 48, color: Colors.grey)),
+                                            )
+                                          : Image.network(
+                                              originUrl,
+                                              errorBuilder: (context, error, stackTrace) =>
+                                                  const Center(child: Icon(Icons.broken_image, size: 48, color: Colors.grey)),
+                                            ),
                                     );
                                   }
                                 }

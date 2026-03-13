@@ -791,6 +791,14 @@ class TencentCloudChatUtils {
       lineOne = callingMessage.getContent();
       return (lineOne, lineTwo);
     }
+    // Fallback: av_call/rtc_call custom data that failed to parse as CallingMessage
+    // (e.g. session list lastMessage built from raw JSON) — show readable summary like [image]
+    if (lineOne == "[${tL10n.custom}]" && customElem?.data != null) {
+      final data = customElem!.data!;
+      if (data.contains('av_call') || data.contains('rtc_call')) {
+        lineOne = '[${tL10n.call}]';
+      }
+    }
     if (lineOne == "[${tL10n.custom}]") {
       debugPrint(message.customElem!.toJson().toString());
     }

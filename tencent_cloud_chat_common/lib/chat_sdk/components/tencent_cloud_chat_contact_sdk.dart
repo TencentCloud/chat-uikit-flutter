@@ -122,7 +122,13 @@ class TencentCloudChatContactSDK {
         TencentCloudChat.instance.dataInstance.contact.setApplicationCode(res.data?.resultCode ?? res.code, userID);
       }
     }
-    return res.data ?? V2TimFriendOperationResult(userID: userID);
+    // Ensure resultCode is never null so UI does not show "好友申请失效" when native actually succeeded
+    final resultCode = res.data?.resultCode ?? (res.code == 0 ? 0 : -1);
+    final data = res.data ?? V2TimFriendOperationResult(userID: userID, resultCode: resultCode);
+    if (data.resultCode == null) {
+      return V2TimFriendOperationResult(userID: data.userID ?? userID, resultCode: resultCode);
+    }
+    return data;
   }
 
   Future<V2TimFriendOperationResult> refuseFriendApplication(String userID, FriendApplicationTypeEnum? type) async {
@@ -135,7 +141,12 @@ class TencentCloudChatContactSDK {
         TencentCloudChat.instance.dataInstance.contact.setApplicationCode(res.data?.resultCode ?? res.code, userID);
       }
     }
-    return res.data ?? V2TimFriendOperationResult(userID: userID);
+    final resultCode = res.data?.resultCode ?? (res.code == 0 ? 0 : -1);
+    final data = res.data ?? V2TimFriendOperationResult(userID: userID, resultCode: resultCode);
+    if (data.resultCode == null) {
+      return V2TimFriendOperationResult(userID: data.userID ?? userID, resultCode: resultCode);
+    }
+    return data;
   }
 
   Future<void> getBlockList() async {

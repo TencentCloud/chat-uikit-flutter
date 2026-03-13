@@ -165,17 +165,26 @@ class _TencentCloudChatMessageListViewState extends TencentCloudChatState<Tencen
                     : widget.data.c2cReadTimestamp,
                 itemBuilder: (BuildContext context, int index) {
                   V2TimMessage message = widget.data.messageList[index];
+                  // CRITICAL: Use a unique key per row. When msgID/id are missing or when timestamp
+                  // is in seconds (same second + same sender = same fallback), include index so
+                  // multiple messages in the same second from the same sender still render as separate rows.
+                  final messageKey = message.msgID ??
+                      message.id ??
+                      '${message.timestamp}_${message.sender ?? 'unknown'}_$index';
                   return TencentCloudChatMessageRowContainer(
-                    key: ValueKey(message.msgID),
+                    key: ValueKey(messageKey),
                     messageRowWidth: _maxWidth!,
                     message: message,
                     inMergerMessagePreviewMode: false,
                   );
                 },
-                onMsgKey: (int index) =>
-                widget.data.messageList[index].msgID ??
-                    widget.data.messageList[index].id ??
-                    widget.data.messageList[index].timestamp.toString(),
+                onMsgKey: (int index) {
+                  final message = widget.data.messageList[index];
+                  final key = message.msgID ??
+                      message.id ??
+                      '${message.timestamp}_${message.sender ?? 'unknown'}_$index';
+                  return key;
+                },
                 onLoadToLatestReadMessage: () async {
                   try {
                     await widget.methods.loadToSpecificMessage(

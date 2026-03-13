@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:tencent_cloud_chat_common/log/tencent_cloud_chat_log.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
+import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_sdk/enum/V2TimUIKitListener.dart';
 
 class TencentCloudChatMessageSDKGenerator {
@@ -41,9 +42,23 @@ class TencentCloudChatMessageSDK {
         onRecvNewMessage?.call(msg);
 
         // private 群创建后没有通知，需要发一条消息来激活，因此判断缓存中【已加入的群】是否有该群来决定是否重新获取
-        List<V2TimGroupInfo> joinedGroupList = TencentCloudChat.instance.dataInstance.contact.groupList;
-        if (joinedGroupList.indexWhere((element) => element.groupID == msg.groupID) < 0) {
-          TencentCloudChat.instance.chatSDKInstance.contactSDK.getGroupList();
+        // Only check for group messages, not C2C messages
+        final groupID = TencentCloudChatUtils.checkString(msg.groupID);
+        if (groupID != null && groupID.isNotEmpty) {
+          try {
+            List<V2TimGroupInfo> joinedGroupList = TencentCloudChat.instance.dataInstance.contact.groupList;
+            if (joinedGroupList.indexWhere((element) => element.groupID == groupID) < 0) {
+              TencentCloudChat.instance.chatSDKInstance.contactSDK.getGroupList();
+            }
+          } catch (e) {
+            // Ignore errors when getting group list (e.g., SDK not initialized)
+            // This shouldn't block message reception
+            TencentCloudChat.instance.logInstance.console(
+              componentName: _tag,
+              logs: "Error getting group list in onRecvNewMessage: $e",
+              logLevel: TencentCloudChatLogLevel.debug,
+            );
+          }
         }
 
         TencentCloudChat.instance.dataInstance.conversation.unhideConversation(userID: msg.userID, groupID: msg.groupID);

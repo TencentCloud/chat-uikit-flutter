@@ -13,6 +13,7 @@ import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_component_widg
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_contact/tencent_cloud_chat_contact_builders.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_user_profile_body.dart';
+import 'package:tencent_cloud_chat_intl/tencent_cloud_chat_intl.dart';
 
 class TencentCloudChatUserProfile extends TencentCloudChatComponent<TencentCloudChatUserProfileOptions,
     TencentCloudChatContactConfig, TencentCloudChatContactBuilders, TencentCloudChatContactEventHandlers> {
@@ -105,25 +106,30 @@ class _TencentCloudChatUserProfileState extends TencentCloudChatState<TencentClo
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(_getShowName()),
-      ),
-      body: FutureBuilder(
-        initialData: widget.options?.userFullInfo,
-        future: _loadUserFullInfo(),
-        builder: (BuildContext context, AsyncSnapshot<V2TimUserFullInfo> snapshot) {
-          final userFullInfo = widget.options?.userFullInfo ?? snapshot.data;
-          return userFullInfo != null
-              ? TencentCloudChatUserProfileBody(
-                  userFullInfo: userFullInfo,
-                  startVideoCall: widget.options!.startVideoCall,
-                  startVoiceCall: widget.options!.startVoiceCall,
-                  isNavigatedFromChat: widget.options!.isNavigatedFromChat ?? true,
-                )
-              : Container();
-        },
-      ),
+    return ListenableBuilder(
+      listenable: TencentCloudChatIntl(),
+      builder: (context, _) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(_getShowName()),
+          ),
+          body: FutureBuilder(
+            initialData: widget.options?.userFullInfo,
+            future: _loadUserFullInfo(),
+            builder: (BuildContext context, AsyncSnapshot<V2TimUserFullInfo> snapshot) {
+              final userFullInfo = widget.options?.userFullInfo ?? snapshot.data;
+              return userFullInfo != null
+                  ? TencentCloudChatUserProfileBody(
+                      userFullInfo: userFullInfo,
+                      startVideoCall: widget.options!.startVideoCall,
+                      startVoiceCall: widget.options!.startVoiceCall,
+                      isNavigatedFromChat: widget.options!.isNavigatedFromChat ?? true,
+                    )
+                  : Container();
+            },
+          ),
+        );
+      },
     );
   }
 }

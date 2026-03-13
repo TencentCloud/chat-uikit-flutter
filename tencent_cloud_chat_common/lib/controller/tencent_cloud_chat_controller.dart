@@ -71,7 +71,7 @@ class TencentCloudChatCoreController {
         if (res.code == 0) {
           TencentCloudChatControllerUtils.clearData();
           TencentCloudChat.instance.dataInstance.basic.updateLoginStatus(status: true);
-          TencentCloudChatControllerUtils.cacheEnvData(options.userID);
+          await TencentCloudChatControllerUtils.cacheEnvData(options.userID);
           TencentCloudChatControllerUtils.initCallService();
           TencentCloudChatControllerUtils.initPreloadData();
           TencentCloudChatControllerUtils.initPlugins(plugins);
@@ -89,7 +89,7 @@ class TencentCloudChatCoreController {
             onSuccess: () async {
               TencentCloudChatControllerUtils.clearData();
               TencentCloudChat.instance.dataInstance.basic.updateLoginStatus(status: true);
-              TencentCloudChatControllerUtils.cacheEnvData(options.userID);
+              await TencentCloudChatControllerUtils.cacheEnvData(options.userID);
               TencentCloudChatControllerUtils.initCallService();
               TencentCloudChatControllerUtils.initPreloadData();
               TencentCloudChatControllerUtils.initPlugins(plugins);

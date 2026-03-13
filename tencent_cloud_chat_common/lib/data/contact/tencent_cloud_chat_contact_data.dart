@@ -94,11 +94,14 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
         _applicationList.removeAt(index);
       }
     }
+    // Keep unread count in sync so badge clears when applications are removed (e.g. auto-accept)
+    _applicationUnreadCount = _applicationList.where((e) => e.type == 1).length;
     console(
       logs:
-          "$action buildApplicationList ${applicationList.length} changed. total application length is ${_applicationList.length}",
+          "$action deleteApplicationList ${applicationList.length} changed. total application length is ${_applicationList.length}",
     );
     notifyListener(TencentCloudChatContactDataKeys.applicationList as T);
+    notifyListener(TencentCloudChatContactDataKeys.applicationCount as T);
   }
 
   /// === friend response type ===
@@ -127,9 +130,13 @@ class TencentCloudChatContactData<T> extends TencentCloudChatDataAB<T> {
   }
 
   void addGroupInfoToJoinedGroupList(V2TimGroupInfo groupInfo) {
+    if (groupInfo.groupID.isEmpty) return; // Guard: never add entries with empty groupID
     int index = _groupList.indexWhere((element) => element.groupID == groupInfo.groupID);
     if (index < 0) {
       _groupList.add(groupInfo);
+    } else {
+      // Update existing group info to ensure we have the latest data
+      _groupList[index] = groupInfo;
     }
 
     var groupProfileEvent = TencentCloudChatGroupProfileData(TencentCloudChatGroupProfileDataKeys.joinGroup);

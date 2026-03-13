@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_common/components/component_options/tencent_cloud_chat_message_options.dart';
 import 'package:tencent_cloud_chat_common/components/tencent_cloud_chat_components_utils.dart';
 import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
+import 'package:tencent_cloud_chat_common/data/contact/tencent_cloud_chat_contact_data.dart';
 import 'package:tencent_cloud_chat_common/data/group_profile/tencent_cloud_chat_group_profile_data.dart';
 import 'package:tencent_cloud_chat_common/eventbus/tencent_cloud_chat_eventbus.dart';
 import 'package:tencent_cloud_chat_common/router/tencent_cloud_chat_navigator.dart';
@@ -33,20 +34,38 @@ class TencentCloudChatContactGroupListState extends TencentCloudChatState<Tencen
       .instance.eventBusInstance
       .on<TencentCloudChatGroupProfileData<dynamic>>(TencentCloudChatEventBus.eventNameGroup);
   StreamSubscription<TencentCloudChatGroupProfileData<dynamic>>? _groupProfileDataSubscription;
+  
+  final Stream<TencentCloudChatContactData<dynamic>>? _contactDataStream = TencentCloudChat.instance.eventBusInstance
+      .on<TencentCloudChatContactData<dynamic>>(TencentCloudChatEventBus.eventNameContact);
+  StreamSubscription<TencentCloudChatContactData<dynamic>>? _contactDataSubscription;
 
   @override
   void initState() {
     super.initState();
     _addGroupDataListener();
+    _addContactDataListener();
   }
 
   _addGroupDataListener() {
     _groupProfileDataSubscription = _groupProfileDataStream?.listen(_groupProfileDataHandler);
   }
 
+  _addContactDataListener() {
+    _contactDataSubscription = _contactDataStream?.listen(_contactDataHandler);
+  }
+
+  _contactDataHandler(TencentCloudChatContactData data) {
+    if (data.currentUpdatedFields == TencentCloudChatContactDataKeys.groupList) {
+      setState(() {
+        // Force rebuild when group list is updated
+      });
+    }
+  }
+
   _groupProfileDataHandler(TencentCloudChatGroupProfileData data) {
     if (data.currentUpdatedFields == TencentCloudChatGroupProfileDataKeys.joinGroup) {
       setState(() {
+        // Update both widget.groupList and data instance
         int index = widget.groupList.indexWhere((element) => element.groupID == data.updateGroupInfo.groupID);
         if (index < 0) {
           widget.groupList.add(data.updateGroupInfo);
@@ -64,6 +83,17 @@ class TencentCloudChatContactGroupListState extends TencentCloudChatState<Tencen
         }
       });
     }
+  }
+
+  // Get the latest group list from TencentCloudChatContactData
+  List<V2TimGroupInfo> get _currentGroupList {
+    // Always get from data instance to ensure we have the latest data
+    final dataGroupList = TencentCloudChat.instance.dataInstance.contact.groupList;
+    if (dataGroupList.isNotEmpty) {
+      return dataGroupList;
+    }
+    // Fall back to widget.groupList if data instance is empty
+    return widget.groupList;
   }
 
   @override
@@ -88,7 +118,7 @@ class TencentCloudChatContactGroupListState extends TencentCloudChatState<Tencen
                 body: Container(
                   color: colorTheme.contactApplicationBackgroundColor,
                   child: Center(
-                    child: TencentCloudChatContactGroupAzList(groupList: widget.groupList),
+                    child: TencentCloudChatContactGroupAzList(groupList: _currentGroupList),
                   ),
                 )));
   }
@@ -96,20 +126,22 @@ class TencentCloudChatContactGroupListState extends TencentCloudChatState<Tencen
   @override
   Widget desktopBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(
-        build: (context, colorTheme, textStyle) =>
-            Scaffold(
-                body: Container(
-                  color: colorTheme.contactApplicationBackgroundColor,
-                  child: Center(
-                    child: TencentCloudChatContactGroupAzList(groupList: widget.groupList),
-                  ),
-                )));
+      build: (context, colorTheme, textStyle) =>
+          Scaffold(
+              body: Container(
+                color: colorTheme.contactApplicationBackgroundColor,
+                child: Center(
+                  child: TencentCloudChatContactGroupAzList(groupList: _currentGroupList),
+                ),
+              )),
+    );
   }
 
   @override
   void dispose() {
     super.dispose();
     _groupProfileDataSubscription?.cancel();
+    _contactDataSubscription?.cancel();
   }
 }
 
@@ -131,6 +163,11 @@ class TencentCloudChatContactGroupAzListState extends TencentCloudChatState<Tenc
     for (var i = 0; i < widget.groupList.length; i++) {
       final item = widget.groupList[i];
       final name = widget.groupList[i].groupName ?? widget.groupList[i].groupID;
+      // Check if name is empty to avoid RangeError
+      if (name.isEmpty) {
+        showList.add(ISuspensionBeanImpl(friendInfo: item, tagIndex: "#"));
+        continue;
+      }
       String tag = name.substring(0, 1).toUpperCase();
       if (RegExp("[A-Z]").hasMatch(tag)) {
         showList.add(ISuspensionBeanImpl(friendInfo: item, tagIndex: tag));
@@ -153,7 +190,7 @@ class TencentCloudChatContactGroupAzListState extends TencentCloudChatState<Tenc
   @override
   Widget defaultBuilder(BuildContext context) {
     final showList = _getGroupList();
-    if (widget.groupList.isEmpty) {
+    if (showList.isEmpty) {
       return TencentCloudChatThemeWidget(
           build: (context, colors, fontSize) =>
               Center(

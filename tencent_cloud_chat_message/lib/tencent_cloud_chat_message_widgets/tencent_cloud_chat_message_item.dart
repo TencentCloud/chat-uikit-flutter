@@ -173,15 +173,23 @@ abstract class TencentCloudChatMessageState<T extends TencentCloudChatMessageIte
   }) {
     return widget.data.showMessageTimeIndicator
         ? TencentCloudChatThemeWidget(
-            build: (context, colorTheme, textStyle) => Text(
-              TencentCloudChatIntl.formatTimestampToTime(widget.data.message.timestamp ?? 0),
-              style: TextStyle(
-                color: textColor ?? colorTheme.secondaryTextColor.withOpacity(0.6),
-                fontSize: fontSize ?? textStyle.standardSmallText,
-                fontWeight: FontWeight.w400,
-                shadows: shadow,
-              ),
-            ),
+            build: (context, colorTheme, textStyle) {
+              final isSelf = widget.data.message.isSelf ?? false;
+              // Self: timestamp lighter than body (same hue, lower opacity). Others: secondary gray.
+              final timeColor = textColor ??
+                  (isSelf
+                      ? colorTheme.selfMessageTextColor.withOpacity(0.25)
+                      : colorTheme.secondaryTextColor.withOpacity(0.5));
+              return Text(
+                TencentCloudChatIntl.formatTimestampToTime(widget.data.message.timestamp ?? 0),
+                style: TextStyle(
+                  color: timeColor,
+                  fontSize: fontSize ?? textStyle.standardSmallText,
+                  fontWeight: FontWeight.w400,
+                  shadows: shadow,
+                ),
+              );
+            },
           )
         : Container();
   }

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tencent_cloud_chat_common/components/component_options/tencent_cloud_chat_user_profile_options.dart';
+import 'package:tencent_cloud_chat_common/router/tencent_cloud_chat_navigator.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
@@ -83,9 +85,10 @@ class TencentCloudChatGroupMemberInfoBodyState extends TencentCloudChatState<Ten
   }
 
   String _getJoinTime() {
-    DateTime dateTime = DateTime.fromMillisecondsSinceEpoch((widget.memberFullInfo.joinTime ?? 0) * 1000);
-    String formattedDate = TencentCloudChatIntl.getFormattedTimeString(dateTime: dateTime);
-    return formattedDate;
+    final joinTime = widget.memberFullInfo.joinTime ?? 0;
+    if (joinTime <= 0) return '无';
+    final dateTime = DateTime.fromMillisecondsSinceEpoch(joinTime * 1000);
+    return TencentCloudChatIntl.getFormattedTimeString(dateTime: dateTime);
   }
 
   @override
@@ -164,6 +167,36 @@ class TencentCloudChatGroupMemberInfoBodyState extends TencentCloudChatState<Ten
                                 style:
                                     TextStyle(color: colorTheme.groupProfileTextColor, fontSize: textStyle.fontsize_16))
                           ],
+                        ),
+                      )
+                    ],
+                  ),
+                  Column(
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          navigateToUserProfile(
+                            context: context,
+                            options: TencentCloudChatUserProfileOptions(
+                              userID: widget.memberFullInfo.userID,
+                              isNavigatedFromChat: false,
+                            ),
+                          );
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: getWidth(16), vertical: getHeight(12)),
+                          width: MediaQuery.of(context).size.width,
+                          color: colorTheme.groupProfileTabBackground,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Text(tL10n.profile,
+                                    style: TextStyle(
+                                        color: colorTheme.groupProfileTabTextColor, fontSize: textStyle.fontsize_16)),
+                              ),
+                              Icon(Icons.chevron_right, color: colorTheme.groupProfileTextColor, size: getSquareSize(20))
+                            ],
+                          ),
                         ),
                       )
                     ],

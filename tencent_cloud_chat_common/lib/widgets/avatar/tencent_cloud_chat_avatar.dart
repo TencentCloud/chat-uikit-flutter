@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:cached_network_image/cached_network_image.dart';
@@ -146,13 +147,55 @@ class _TencentCloudChatAvatarState extends TencentCloudChatState<TencentCloudCha
         },
       );
     } else {
-      return Image.asset(
-        imagePath,
-        package: 'tencent_cloud_chat_common',
-        width: width,
-        height: height,
-        fit: BoxFit.cover,
-      );
+      // Check if it's a local file path (absolute path starting with / or file://)
+      // or a path that contains directory separators indicating a file system path
+      final isLocalFile = imagePath.startsWith('/') || 
+                          imagePath.startsWith('file://') ||
+                          (imagePath.contains('/') && !imagePath.startsWith('images/'));
+      
+      if (isLocalFile) {
+        // Use Image.file for local file system paths
+        try {
+          // Remove file:// prefix if present
+          final filePath = imagePath.startsWith('file://') 
+              ? imagePath.substring(7) 
+              : imagePath;
+          return Image.file(
+            File(filePath),
+            width: width,
+            height: height,
+            fit: BoxFit.cover,
+            errorBuilder: (context, error, stackTrace) {
+              // Fallback to default avatar if file doesn't exist
+              return Image.asset(
+                "images/default_user_icon.png",
+                package: 'tencent_cloud_chat_common',
+                width: width,
+                height: height,
+                fit: BoxFit.cover,
+              );
+            },
+          );
+        } catch (e) {
+          // Fallback to default avatar on error
+          return Image.asset(
+            "images/default_user_icon.png",
+            package: 'tencent_cloud_chat_common',
+            width: width,
+            height: height,
+            fit: BoxFit.cover,
+          );
+        }
+      } else {
+        // Use Image.asset for asset paths
+        return Image.asset(
+          imagePath,
+          package: 'tencent_cloud_chat_common',
+          width: width,
+          height: height,
+          fit: BoxFit.cover,
+        );
+      }
     }
   }
 

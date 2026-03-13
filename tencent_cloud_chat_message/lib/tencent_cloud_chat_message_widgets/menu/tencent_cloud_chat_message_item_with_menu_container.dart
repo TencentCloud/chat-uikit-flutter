@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -13,6 +14,7 @@ import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/widgets/desktop_popup/operation_key.dart';
 import 'package:tencent_cloud_chat_common/widgets/desktop_popup/tencent_cloud_chat_desktop_popup.dart';
+import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat_common/widgets/dialog/tencent_cloud_chat_dialog.dart';
 import 'package:tencent_cloud_chat_message/model/tencent_cloud_chat_message_separate_data.dart';
 import 'package:tencent_cloud_chat_message/model/tencent_cloud_chat_message_separate_data_notifier.dart';
@@ -181,6 +183,112 @@ class _TencentCloudChatMessageItemWithMenuContainerState
         _message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC;
 
     return enableRecall;
+  }
+
+  /// Reveal file in folder (open file location in file manager)
+  Future<void> _revealFileInFolder() async {
+    if (TencentCloudChatPlatformAdapter().isWeb) {
+      // Web platform doesn't support revealing files in folder
+      return;
+    }
+
+    String? filePath;
+
+    // Handle file messages
+    if (_message.fileElem != null) {
+      // Try to get local path first (for sending messages, status == 1 means sending)
+      if (_message.status == 1) {
+        if (TencentCloudChatUtils.checkString(_message.fileElem!.path) != null) {
+          filePath = _message.fileElem!.path;
+        }
+      }
+      
+      // Try to get local URL (for received messages)
+      if (filePath == null && TencentCloudChatUtils.checkString(_message.fileElem!.localUrl) != null) {
+        filePath = _message.fileElem!.localUrl;
+      }
+      
+      // Fallback to path if available
+      if (filePath == null && TencentCloudChatUtils.checkString(_message.fileElem!.path) != null) {
+        filePath = _message.fileElem!.path;
+      }
+    }
+    // Handle video messages
+    else if (_message.videoElem != null) {
+      // Try to get local path first (for sending messages)
+      if (_message.status == 1) {
+        if (TencentCloudChatUtils.checkString(_message.videoElem!.videoPath) != null) {
+          filePath = _message.videoElem!.videoPath;
+        }
+      }
+      
+      // Try to get local URL (for received messages)
+      if (filePath == null && TencentCloudChatUtils.checkString(_message.videoElem!.localVideoUrl) != null) {
+        filePath = _message.videoElem!.localVideoUrl;
+      }
+      
+      // Fallback to videoPath if available
+      if (filePath == null && TencentCloudChatUtils.checkString(_message.videoElem!.videoPath) != null) {
+        filePath = _message.videoElem!.videoPath;
+      }
+    }
+    // Handle sound/audio messages
+    else if (_message.soundElem != null) {
+      // Try to get local path first (for sending messages)
+      if (_message.status == 1) {
+        if (TencentCloudChatUtils.checkString(_message.soundElem!.path) != null) {
+          filePath = _message.soundElem!.path;
+        }
+      }
+      
+      // Try to get local URL (for received messages)
+      if (filePath == null && TencentCloudChatUtils.checkString(_message.soundElem!.localUrl) != null) {
+        filePath = _message.soundElem!.localUrl;
+      }
+      
+      // Fallback to path if available
+      if (filePath == null && TencentCloudChatUtils.checkString(_message.soundElem!.path) != null) {
+        filePath = _message.soundElem!.path;
+      }
+    }
+    // Handle image messages
+    else if (_message.imageElem != null) {
+      // Try path (sending or local)
+      if (TencentCloudChatUtils.checkString(_message.imageElem!.path) != null) {
+        filePath = _message.imageElem!.path;
+      }
+      // Try localUrl from origin snapshot (received, downloaded)
+      if (filePath == null && _message.imageElem!.imageList != null) {
+        for (final snapshot in _message.imageElem!.imageList!) {
+          final url = snapshot?.localUrl;
+          if (TencentCloudChatUtils.checkString(url) != null) {
+            filePath = url;
+            break;
+          }
+        }
+      }
+    }
+
+    if (filePath == null || !File(filePath).existsSync()) {
+      return;
+    }
+
+    try {
+      if (Platform.isMacOS) {
+        // macOS: use 'open -R' to reveal file in Finder
+        await Process.run('open', ['-R', filePath]);
+      } else if (Platform.isWindows) {
+        // Windows: use 'explorer /select,' to select file in Explorer
+        await Process.run('explorer', ['/select,', filePath]);
+      } else if (Platform.isLinux) {
+        // Linux: try xdg-open with parent directory
+        final file = File(filePath);
+        final directory = file.parent.path;
+        await Process.run('xdg-open', [directory]);
+      }
+    } catch (e) {
+      // Silently fail if the operation is not supported
+    }
   }
 
   List<TencentCloudChatMessageGeneralOptionItem> _generateMenuOptions(
@@ -439,6 +547,20 @@ class _TencentCloudChatMessageItemWithMenuContainerState
           onTap: ({offset}) {
             dataProvider.soundToTextMessages = [_message];
           },
+        ),
+      // Add "Location" menu item for file, video, sound, and image messages (unified media menu)
+      if ((_message.elemType == MessageElemType.V2TIM_ELEM_TYPE_FILE ||
+           _message.elemType == MessageElemType.V2TIM_ELEM_TYPE_VIDEO ||
+           _message.elemType == MessageElemType.V2TIM_ELEM_TYPE_SOUND ||
+           _message.elemType == MessageElemType.V2TIM_ELEM_TYPE_IMAGE) &&
+          !TencentCloudChatPlatformAdapter().isWeb)
+        TencentCloudChatMessageGeneralOptionItem(
+          icon: Icons.folder_open,
+          label: tL10n.location,
+          id: "_uikit_reveal_file_location",
+          onTap: ({Offset? offset}) async {
+            await _revealFileInFolder();
+          },
         )
     ];
 
@@ -454,6 +576,26 @@ class _TencentCloudChatMessageItemWithMenuContainerState
 
     if (!(_message.isSelf ?? false)) {
       mergedList.removeWhere((element) => element.id == "_uikit_revoke_message");
+    }
+
+    // Remove quote/reply and multi-select for file, image, video, and sound messages (unified media menu)
+    if (_message.elemType == MessageElemType.V2TIM_ELEM_TYPE_FILE ||
+        _message.elemType == MessageElemType.V2TIM_ELEM_TYPE_IMAGE ||
+        _message.elemType == MessageElemType.V2TIM_ELEM_TYPE_VIDEO ||
+        _message.elemType == MessageElemType.V2TIM_ELEM_TYPE_SOUND) {
+      mergedList.removeWhere((element) =>
+        element.id == "_uikit_quote_message" ||
+        element.id == "_uikit_multi_message"
+      );
+    }
+
+    // Remove quote/reply, multi-select, and translate for text messages
+    if (_message.elemType == MessageElemType.V2TIM_ELEM_TYPE_TEXT) {
+      mergedList.removeWhere((element) => 
+        element.id == "_uikit_quote_message" || 
+        element.id == "_uikit_multi_message" ||
+        element.id == "_uikit_translate"
+      );
     }
 
     if (TencentCloudChatUtils.checkString(selectedText) == null) {

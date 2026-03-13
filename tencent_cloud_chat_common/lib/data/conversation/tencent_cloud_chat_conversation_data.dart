@@ -103,11 +103,48 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
 
   bool get isGetDataEnd => _isGetDataEnd;
 
+  /// Merges [incoming] into [existing] for an already-known conversation.
+  /// Preserves display fields (showName, faceUrl, lastMessage) from existing when
+  /// incoming has null/empty values to avoid brief disappearance of avatar/text.
+  static V2TimConversation _mergeConversation(
+    V2TimConversation existing,
+    V2TimConversation incoming,
+  ) {
+    final keepShowName = incoming.showName == null || incoming.showName!.isEmpty;
+    final keepFaceUrl = incoming.faceUrl == null || incoming.faceUrl!.isEmpty;
+    final keepLastMessage = incoming.lastMessage == null;
+    return V2TimConversation(
+      conversationID: incoming.conversationID,
+      type: incoming.type ?? existing.type,
+      userID: incoming.userID ?? existing.userID,
+      groupID: incoming.groupID ?? existing.groupID,
+      showName: keepShowName ? existing.showName : incoming.showName,
+      faceUrl: keepFaceUrl ? existing.faceUrl : incoming.faceUrl,
+      groupType: incoming.groupType ?? existing.groupType,
+      // Prefer incoming unread so conversation list shows new unread (e.g. from external_stream)
+      unreadCount: incoming.unreadCount ?? existing.unreadCount,
+      lastMessage: keepLastMessage ? existing.lastMessage : incoming.lastMessage,
+      draftText: incoming.draftText ?? existing.draftText,
+      draftTimestamp: incoming.draftTimestamp ?? existing.draftTimestamp,
+      isPinned: incoming.isPinned ?? existing.isPinned,
+      recvOpt: incoming.recvOpt ?? existing.recvOpt,
+      orderkey: (existing.orderkey != null && existing.orderkey! > 0 && (incoming.orderkey == null || incoming.orderkey == 0))
+          ? existing.orderkey
+          : (incoming.orderkey ?? existing.orderkey),
+      markList: incoming.markList ?? existing.markList,
+      customData: incoming.customData ?? existing.customData,
+      conversationGroupList: incoming.conversationGroupList ?? existing.conversationGroupList,
+      c2cReadTimestamp: incoming.c2cReadTimestamp ?? existing.c2cReadTimestamp,
+      groupReadSequence: incoming.groupReadSequence ?? existing.groupReadSequence,
+      groupAtInfoList: incoming.groupAtInfoList ?? existing.groupAtInfoList,
+    );
+  }
+
   void buildConversationList(List<V2TimConversation> convList, String action) {
     for (var element in convList) {
       var index = _conversationList.indexWhere((ele) => element.conversationID == ele.conversationID);
       if (index > -1) {
-        _conversationList[index] = element;
+        _conversationList[index] = _mergeConversation(_conversationList[index], element);
       } else {
         _conversationList.add(element);
       }
@@ -116,7 +153,18 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
     if (TencentCloudChatPlatformAdapter().isWeb) {
       try {
         _conversationList.sort((a, b) {
-          return b.lastMessage!.timestamp!.compareTo(a.lastMessage!.timestamp!);
+          // Primary sort: by timestamp (descending - newer first)
+          final aTime = a.lastMessage?.timestamp ?? 0;
+          final bTime = b.lastMessage?.timestamp ?? 0;
+          final timeCompare = bTime.compareTo(aTime);
+          if (timeCompare != 0) {
+            return timeCompare;
+          }
+          // Stable sort: when timestamps are equal, use conversationID as tiebreaker
+          // This ensures consistent ordering even when timestamps are the same
+          final aID = a.conversationID;
+          final bID = b.conversationID;
+          return aID.compareTo(bID);
         });
 
         final pinnedConversation = _conversationList.where((element) => element.isPinned == true).toList();
@@ -129,7 +177,16 @@ class TencentCloudChatConversationData<T> extends TencentCloudChatDataAB<T> {
         (a, b) {
           int aR = a.orderkey ?? 0;
           int bR = b.orderkey ?? 0;
-          return bR.compareTo(aR);
+          // Primary sort: by orderkey (descending - higher value first)
+          final orderkeyCompare = bR.compareTo(aR);
+          if (orderkeyCompare != 0) {
+            return orderkeyCompare;
+          }
+          // Stable sort: when orderkey is equal, use conversationID as tiebreaker
+          // This ensures consistent ordering even when orderkeys are the same
+          final aID = a.conversationID;
+          final bID = b.conversationID;
+          return aID.compareTo(bID);
         },
       );
     }

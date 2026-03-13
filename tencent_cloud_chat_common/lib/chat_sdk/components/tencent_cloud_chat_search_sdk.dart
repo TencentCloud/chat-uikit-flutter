@@ -67,28 +67,39 @@ class TencentCloudChatSearchSDK {
     if (TencentCloudChatPlatformAdapter().isWeb) {
       return [];
     }
-    final res = await TencentCloudChat.instance.chatSDKInstance.manager.v2TIMFriendshipManager.searchFriends(
-      searchParam: V2TimFriendSearchParam(
-        keywordList: [
-          keyword,
-        ],
-      ),
-    );
-    return res.data ?? [];
+    try {
+      final res = await TencentCloudChat.instance.chatSDKInstance.manager.v2TIMFriendshipManager.searchFriends(
+        searchParam: V2TimFriendSearchParam(
+          keywordList: [
+            keyword,
+          ],
+        ),
+      );
+      return res.data ?? [];
+    } catch (_) {
+      // searchFriends may fail on some platforms; degrade to empty results.
+      return [];
+    }
   }
 
   Future<List<V2TimGroupInfo>> searchGroups(String keyword) async {
     if (TencentCloudChatPlatformAdapter().isWeb) {
       return [];
     }
-    final res = await TencentCloudChat.instance.chatSDKInstance.manager.v2TIMGroupManager.searchGroups(
-      searchParam: V2TimGroupSearchParam(
-        keywordList: [
-          keyword,
-        ],
-      ),
-    );
-    return res.data ?? [];
+    try {
+      final res = await TencentCloudChat.instance.chatSDKInstance.manager.v2TIMGroupManager.searchGroups(
+        searchParam: V2TimGroupSearchParam(
+          keywordList: [
+            keyword,
+          ],
+        ),
+      );
+      return res.data ?? [];
+    } catch (_) {
+      // searchGroups may not be available on all platforms (e.g. missing FFI symbol).
+      // Gracefully degrade to empty results.
+      return [];
+    }
   }
 
   Future<(int?, String?, List<TencentCloudChatSearchResultItemData>, String?)> searchMessages(
@@ -106,30 +117,37 @@ class TencentCloudChatSearchSDK {
             ),
           );
 
-    final cloudRes = await TencentCloudChat.instance.chatSDKInstance.manager.v2TIMMessageManager.searchCloudMessages(
-      searchParam: V2TimMessageSearchParam(
-        searchCount: 100,
-        type: KeywordListMatchType.V2TIM_KEYWORD_LIST_MATCH_TYPE_OR.index,
-        conversationID: conversationID,
-        messageTypeList: (messageTypeList ?? []).isNotEmpty ? messageTypeList! : null,
-        searchCursor: cursor,
-        keywordList: [
-          keyword,
-        ],
-      ),
-    );
+    // Cloud search may not be supported on all platforms (e.g. tim2tox returns ERR_SDK_NOT_SUPPORTED).
+    // Gracefully degrade to local-only results when cloud search fails.
+    V2TimValueCallback<V2TimMessageSearchResult>? cloudRes;
+    try {
+      cloudRes = await TencentCloudChat.instance.chatSDKInstance.manager.v2TIMMessageManager.searchCloudMessages(
+        searchParam: V2TimMessageSearchParam(
+          searchCount: 100,
+          type: KeywordListMatchType.V2TIM_KEYWORD_LIST_MATCH_TYPE_OR.index,
+          conversationID: conversationID,
+          messageTypeList: (messageTypeList ?? []).isNotEmpty ? messageTypeList! : null,
+          searchCursor: cursor,
+          keywordList: [
+            keyword,
+          ],
+        ),
+      );
+    } catch (_) {
+      // Cloud search unavailable; proceed with local results only.
+    }
 
     final resList = localRes?.data?.messageSearchResultItems ?? [];
-    if ((cloudRes.data?.messageSearchResultItems ?? []).isNotEmpty) {
-      for (final cloudResultItem in cloudRes.data!.messageSearchResultItems!) {
+    if ((cloudRes?.data?.messageSearchResultItems ?? []).isNotEmpty) {
+      for (final cloudResultItem in cloudRes!.data!.messageSearchResultItems!) {
         final target = resList.indexWhere((e) => e.conversationID == cloudResultItem.conversationID);
         if (target > -1) {
           final cloudList = cloudResultItem.messageList ?? [];
-          cloudList.map((cloudMessageItem) {
+          for (final cloudMessageItem in cloudList) {
             if (!((resList[target].messageList ?? []).any((e) => e.msgID == cloudMessageItem.msgID))) {
               resList[target].messageList?.add(cloudMessageItem);
             }
-          });
+          }
           resList[target].messageCount =
               max((cloudResultItem.messageCount ?? 0), (resList[target].messageList?.length ?? 0));
         } else {
@@ -140,7 +158,7 @@ class TencentCloudChatSearchSDK {
 
     final conversationList = TencentCloudChat.instance.dataInstance.conversation.conversationList;
     final List<TencentCloudChatSearchResultItemData> searchResultConversationList = [];
-    resList.forEach((element) async {
+    for (final element in resList) {
       if ((element.messageCount ?? 0) > 0 && TencentCloudChatUtils.checkString(element.conversationID) != null) {
         final conversationID = element.conversationID ?? "";
         V2TimConversation? targetConversation = conversationList.firstWhereOrNull((conversation) =>
@@ -160,12 +178,12 @@ class TencentCloudChatSearchSDK {
           ),
         );
       }
-    });
+    }
     return (
       localRes?.data?.totalCount,
       localRes?.data?.searchCursor,
       searchResultConversationList,
-      cloudRes.data?.searchCursor
+      cloudRes?.data?.searchCursor
     );
   }
 }

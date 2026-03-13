@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:tencent_cloud_chat_common/components/tencent_cloud_chat_components_utils.dart';
-import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat_common/data/basic/tencent_cloud_chat_basic_data.dart';
 import 'package:tencent_cloud_chat_common/models/tencent_cloud_chat_callbacks.dart';
 import 'package:tencent_cloud_chat_common/models/tencent_cloud_chat_models.dart';
@@ -167,11 +166,9 @@ class TencentCloudChatControllerUtils {
   }
 
   static initCallService() {
-    if (TencentCloudChatPlatformAdapter().isMobile) {
-      TUICore.instance.getService(TUICALLKIT_SERVICE_NAME).then((value) {
-        TencentCloudChat.instance.dataInstance.basic.useCallKit = value;
-      });
-    }
+    TUICore.instance.getService(TUICALLKIT_SERVICE_NAME).then((value) {
+      TencentCloudChat.instance.dataInstance.basic.useCallKit = value;
+    });
   }
 
   static cacheEnvData(String userID) async {

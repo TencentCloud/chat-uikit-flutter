@@ -12,6 +12,7 @@ import 'package:tencent_cloud_chat_common/components/components_definition/tence
 import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat_common/data/tencent_cloud_chat_data_abstract.dart';
 import 'package:tencent_cloud_chat_common/models/tencent_cloud_chat_models.dart';
+import 'package:tencent_cloud_chat_common/log/tencent_cloud_chat_log.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_download_utils.dart';
 import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
@@ -555,8 +556,6 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
         player!.seek(Duration.zero);
         _audioPlayInfo = null;
         _currentPlayAudioInfo = null;
-      } else {
-        console(logs: "current state is ${player?.state.name}, no need to stop");
       }
     } catch (e) {
       if (kDebugMode) {
@@ -635,11 +634,19 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
   }
 
   /// ==== Message List ====
-  int maxMessageCount = 50;
+  /// Maximum messages kept in memory per conversation.
+  /// Original SDK default was 50, but this causes a "sliding window" effect:
+  /// constant trimming during scroll creates jumpy scrollbar behavior.
+  /// 500 is large enough for most conversations while keeping memory reasonable.
+  int maxMessageCount = 500;
 
   Map<String, List<V2TimMessage>> _messageListMap = {};
 
   Map<String, MessageListStatus> _messageListStatusMap = {};
+
+  /// === Set to track messages currently being processed to prevent recursion ===
+  /// This prevents infinite loops when onRecvNewMessage triggers onReceiveNewMessage
+  Set<String> _processingMessageIds = {};
 
   Map<String, List<V2TimMessage>> get messageListMap => _messageListMap;
 
@@ -713,7 +720,24 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
     final userID0 = TencentCloudChatUtils.checkString(userID);
     final groupID0 = TencentCloudChatUtils.checkString(groupID);
     final topicID0 = TencentCloudChatUtils.checkString(topicID);
-    _messageListMap[topicID0 ?? groupID0 ?? userID0 ?? ""] = messageList;
+    final conversationID = topicID0 ?? groupID0 ?? userID0 ?? "";
+    
+    // OPTIMIZED: Ensure message list is always sorted in newest-first order (descending by timestamp)
+    // This guarantees consistent ordering throughout the system and eliminates need for redundant sorting
+    final sortedMessageList = List<V2TimMessage>.from(messageList);
+    sortedMessageList.sort((a, b) {
+      final timestampA = a.timestamp ?? 0;
+      final timestampB = b.timestamp ?? 0;
+      // If timestamps are equal, use msgID as tiebreaker to ensure stable sort
+      if (timestampA == timestampB) {
+        final msgIDA = a.msgID ?? a.id ?? '';
+        final msgIDB = b.msgID ?? b.id ?? '';
+        return msgIDB.compareTo(msgIDA); // Descending for newest-first
+      }
+      return timestampB.compareTo(timestampA); // Descending: newest first
+    });
+    
+    _messageListMap[conversationID] = sortedMessageList;
 
     if (!disableNotify) {
       notifyListener(
@@ -798,25 +822,269 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
   /// function(V2TimMessage)
   void onReceiveNewMessage(V2TimMessage newMessage) {
     String conversationID = TencentCloudChatUtils.checkString(newMessage.groupID) ?? TencentCloudChatUtils.checkString(newMessage.userID) ?? "";
+    
+    // Validate conversationID - if empty, log error and skip
+    if (conversationID.isEmpty) {
+      TencentCloudChat.instance.logInstance.console(
+        componentName: "TencentCloudChatMessageData",
+        logs: "onReceiveNewMessage: ERROR - conversationID is empty! userID=${newMessage.userID}, groupID=${newMessage.groupID}, msgID=${newMessage.msgID}",
+        logLevel: TencentCloudChatLogLevel.error,
+      );
+      return;
+    }
+    
     List<V2TimMessage> messageList = getMessageList(key: conversationID);
 
     // Check if the message list already contains the new message.
-    bool messageExists = messageList.any((message) => message.msgID == newMessage.msgID);
+    // Check by msgID first, then fall back to content-based matching (text/file + sender + timestamp).
+    // Content-based matching is needed because the same message can arrive through two paths:
+    // 1. Native FFI callback (HandleFriendMessage) with m-prefix msgID
+    // 2. Dart stream (_setupMessageListener) with real msgID
+    bool messageExists = messageList.any((message) {
+      if (message.msgID == newMessage.msgID) return true;
+      // Only treat as duplicate by content when newMessage has no ID or temp ID (same message from two paths).
+      // When newMessage has a real msgID, distinct messages with same content must not be merged.
+      if (newMessage.msgID != null && !newMessage.msgID!.startsWith('m')) return false;
+      // Content-based matching for messages with different IDs
+      if (message.sender == newMessage.sender) {
+        final timeDiff = ((message.timestamp ?? 0) - (newMessage.timestamp ?? 0)).abs();
+        if (timeDiff <= 10) {
+          final msgText = message.textElem?.text ?? '';
+          final newText = newMessage.textElem?.text ?? '';
+          if (msgText.isNotEmpty && msgText == newText) {
+            // Update the existing message's msgID if the new one looks like a real ID (not m-prefix)
+            if (newMessage.msgID != null && !(newMessage.msgID!.startsWith('m'))) {
+              message.msgID = newMessage.msgID;
+              message.id = newMessage.msgID;
+            }
+            return true;
+          }
+          if (message.fileElem != null && newMessage.fileElem != null) {
+            final msgFileName = message.fileElem?.fileName ?? '';
+            final newFileName = newMessage.fileElem?.fileName ?? '';
+            if (msgFileName.isNotEmpty && msgFileName == newFileName) {
+              if (newMessage.msgID != null && !(newMessage.msgID!.startsWith('m'))) {
+                message.msgID = newMessage.msgID;
+                message.id = newMessage.msgID;
+              }
+              return true;
+            }
+          }
+          if (message.imageElem != null && newMessage.imageElem != null) {
+            final msgPath = message.imageElem?.path ?? '';
+            final newPath = newMessage.imageElem?.path ?? '';
+            if (msgPath.isNotEmpty && msgPath == newPath) {
+              if (newMessage.msgID != null && !(newMessage.msgID!.startsWith('m'))) {
+                message.msgID = newMessage.msgID;
+                message.id = newMessage.msgID;
+              }
+              return true;
+            }
+          }
+        }
+      }
+      return false;
+    });
 
+    if (messageExists) {
+      TencentCloudChat.instance.logInstance.console(
+        componentName: "TencentCloudChatMessageData",
+        logs: "onReceiveNewMessage: duplicate detected, skipping msgID=${newMessage.msgID}",
+      );
+    }
     if (!messageExists) {
-      // If the new message is consecutive, add it to the list.
-      if (!getMessageListStatus(userID: newMessage.userID, groupID: newMessage.groupID).haveMoreLatestData) {
-        messageList.insert(0, newMessage);
+      // Always add new messages to the list, regardless of haveMoreLatestData
+      // haveMoreLatestData indicates there are more messages on the server, not that we should skip new messages
+      // New messages should always be displayed, even if user is viewing older messages
+      messageList.insert(0, newMessage);
 
-        // Ensure the message list doesn't exceed the maximum message count.
-        if (messageList.length > maxMessageCount) {
-          messageList = messageList.take(maxMessageCount).toList();
-          final key = TencentCloudChatUtils.checkString(newMessage.groupID) ?? TencentCloudChatUtils.checkString(newMessage.userID) ?? "";
-          _messageListStatusMap[key]!.haveMorePreviousData = true;
+      // Ensure the message list doesn't exceed the maximum message count.
+      if (messageList.length > maxMessageCount) {
+        messageList = messageList.take(maxMessageCount).toList();
+        final key = TencentCloudChatUtils.checkString(newMessage.groupID) ?? TencentCloudChatUtils.checkString(newMessage.userID) ?? "";
+        _messageListStatusMap[key]!.haveMorePreviousData = true;
+      }
+
+      // Update the message list in the data store.
+      updateMessageList(userID: newMessage.userID, groupID: newMessage.groupID, messageList: messageList);
+    } else {
+      // When duplicate exists (e.g. optimistic send + SDK callback), copy faceUrl/nickName from
+      // newMessage to the existing message so the row shows correct avatar (e.g. self avatar from prefs).
+      final contentMatchIndex = messageList.indexWhere((message) {
+        if (message.msgID == newMessage.msgID) return true;
+        if (message.sender != newMessage.sender) return false;
+        final timeDiff = ((message.timestamp ?? 0) - (newMessage.timestamp ?? 0)).abs();
+        if (timeDiff > 10) return false;
+        final msgText = message.textElem?.text ?? '';
+        final newText = newMessage.textElem?.text ?? '';
+        if (msgText.isNotEmpty && msgText == newText) return true;
+        if (message.fileElem != null && newMessage.fileElem != null) {
+          if ((message.fileElem?.fileName ?? '') == (newMessage.fileElem?.fileName ?? '')) return true;
+        }
+        if (message.imageElem != null && newMessage.imageElem != null) {
+          if ((message.imageElem?.path ?? '') == (newMessage.imageElem?.path ?? '')) return true;
+        }
+        return false;
+      });
+      if (contentMatchIndex > -1) {
+        final existingMsg = messageList[contentMatchIndex];
+        if (TencentCloudChatUtils.checkString(newMessage.faceUrl) != null) {
+          existingMsg.faceUrl = newMessage.faceUrl;
+        }
+        if (TencentCloudChatUtils.checkString(newMessage.nickName) != null) {
+          existingMsg.nickName = newMessage.nickName;
+        }
+        if (newMessage.msgID != null && !(newMessage.msgID!.startsWith('m'))) {
+          existingMsg.msgID = newMessage.msgID;
+          existingMsg.id = newMessage.msgID;
+        }
+        updateMessageList(userID: newMessage.userID, groupID: newMessage.groupID, messageList: messageList);
+      }
+
+      // CRITICAL: When a message already exists, check if the incoming message has updated
+      // file/image/video/audio data (e.g., localUrl changed from /tmp/receiving_ to final path).
+      // This happens when a file_done event arrives for a received file message —
+      // the SDK dispatches it as onRecvNewMessage (not onRecvMessageModified) for non-self messages.
+      // Without this update, the old message with temp localUrl persists, causing the UI to show
+      // a spinner or download icon even after the file has been fully received.
+      int existingIndex = messageList.indexWhere((message) => message.msgID == newMessage.msgID);
+      if (existingIndex > -1) {
+        final existingMsg = messageList[existingIndex];
+        bool needsUpdate = false;
+
+        // Check if fileElem localUrl changed (file received)
+        if (newMessage.fileElem != null && existingMsg.fileElem != null) {
+          final newLocalUrl = newMessage.fileElem!.localUrl ?? '';
+          final oldLocalUrl = existingMsg.fileElem!.localUrl ?? '';
+          if (newLocalUrl.isNotEmpty && newLocalUrl != oldLocalUrl &&
+              !newLocalUrl.startsWith('/tmp/receiving_')) {
+            needsUpdate = true;
+          }
+        }
+        // Check if imageElem localUrl changed (image received)
+        if (newMessage.imageElem != null && existingMsg.imageElem != null) {
+          final newImageList = newMessage.imageElem!.imageList;
+          final oldImageList = existingMsg.imageElem!.imageList;
+          if (newImageList != null && newImageList.isNotEmpty) {
+            final newLocalUrl = newImageList.first?.localUrl ?? '';
+            final oldLocalUrl = (oldImageList != null && oldImageList.isNotEmpty)
+                ? (oldImageList.first?.localUrl ?? '') : '';
+            if (newLocalUrl.isNotEmpty && newLocalUrl != oldLocalUrl &&
+                !newLocalUrl.startsWith('/tmp/receiving_')) {
+              needsUpdate = true;
+            }
+          }
+        }
+        // Check if videoElem localVideoUrl changed (video received)
+        if (newMessage.videoElem != null && existingMsg.videoElem != null) {
+          final newLocalUrl = newMessage.videoElem!.localVideoUrl ?? '';
+          final oldLocalUrl = existingMsg.videoElem!.localVideoUrl ?? '';
+          if (newLocalUrl.isNotEmpty && newLocalUrl != oldLocalUrl &&
+              !newLocalUrl.startsWith('/tmp/receiving_')) {
+            needsUpdate = true;
+          }
+        }
+        // Check if soundElem localUrl changed (audio received)
+        if (newMessage.soundElem != null && existingMsg.soundElem != null) {
+          final newLocalUrl = newMessage.soundElem!.localUrl ?? '';
+          final oldLocalUrl = existingMsg.soundElem!.localUrl ?? '';
+          if (newLocalUrl.isNotEmpty && newLocalUrl != oldLocalUrl &&
+              !newLocalUrl.startsWith('/tmp/receiving_')) {
+            needsUpdate = true;
+          }
         }
 
-        // Update the message list in the data store.
-        updateMessageList(userID: newMessage.userID, groupID: newMessage.groupID, messageList: messageList);
+        if (needsUpdate) {
+          messageList.replaceRange(existingIndex, existingIndex + 1, [newMessage]);
+          // Setting messageNeedUpdate triggers notifyListener for messageNeedUpdate key
+          // via the setter, which notifies all file/image widgets listening for updates
+          messageNeedUpdate = newMessage;
+          updateMessageList(
+            userID: newMessage.userID,
+            groupID: newMessage.groupID,
+            messageList: messageList,
+            disableNotify: true,
+          );
+          return; // Message updated, no need to trigger SDK callback below
+        }
+      }
+
+      // Even if message already exists, we still need to update conversation lastMessage
+      // This ensures that when a message status changes (e.g., from sending to failed),
+      // the conversation list's second line is updated to show the latest message.
+      // We trigger the SDK's onRecvNewMessage callback to update conversation.
+      // This is safe because the SDK will check if the message is newer and update conversation accordingly.
+      
+      // Prevent recursion: if this message is already being processed, skip the callback
+      // Use both msgID and id to ensure we catch all cases
+      final messageId = newMessage.msgID ?? newMessage.id ?? '';
+      final messageIdAlt = newMessage.id ?? newMessage.msgID ?? '';
+      
+      // Check if either ID is already being processed
+      if (messageId.isNotEmpty && _processingMessageIds.contains(messageId)) {
+        TencentCloudChat.instance.logInstance.console(
+          componentName: "TencentCloudChatMessageData",
+          logs: "onReceiveNewMessage: Skipping recursive callback for message $messageId",
+          logLevel: TencentCloudChatLogLevel.debug,
+        );
+        return;
+      }
+      if (messageIdAlt.isNotEmpty && messageIdAlt != messageId && _processingMessageIds.contains(messageIdAlt)) {
+        TencentCloudChat.instance.logInstance.console(
+          componentName: "TencentCloudChatMessageData",
+          logs: "onReceiveNewMessage: Skipping recursive callback for message $messageIdAlt",
+          logLevel: TencentCloudChatLogLevel.debug,
+        );
+        return;
+      }
+      
+      // If messageId is empty, we cannot safely prevent recursion, so skip the callback
+      if (messageId.isEmpty && messageIdAlt.isEmpty) {
+        TencentCloudChat.instance.logInstance.console(
+          componentName: "TencentCloudChatMessageData",
+          logs: "onReceiveNewMessage: Skipping callback for existing message with no ID (cannot prevent recursion)",
+          logLevel: TencentCloudChatLogLevel.debug,
+        );
+        return;
+      }
+      
+      try {
+        // Mark message as being processed to prevent recursion (mark both IDs if different)
+        if (messageId.isNotEmpty) {
+          _processingMessageIds.add(messageId);
+        }
+        if (messageIdAlt.isNotEmpty && messageIdAlt != messageId) {
+          _processingMessageIds.add(messageIdAlt);
+        }
+        
+        // Get the SDK's advanced message listener and trigger onRecvNewMessage
+        // This will update the conversation's lastMessage even if the message already exists in our list
+        // This is important for updating the conversation list's second line
+        final sdk = TencentCloudChat.instance.chatSDKInstance.messageSDK;
+        final listener = sdk.advancedMsgListener;
+        if (listener != null) {
+          listener.onRecvNewMessage(newMessage);
+        }
+        
+        // CRITICAL: Do NOT call updateMessageList here when message already exists
+        // This would cause duplicate messages in the UI
+        // The UI should already be showing the message since it exists in the list
+        // If UI is not showing it, the problem is elsewhere (e.g., conversation not current)
+      } catch (e) {
+        // If SDK callback fails, log but don't block
+        TencentCloudChat.instance.logInstance.console(
+          componentName: "TencentCloudChatMessageData",
+          logs: "onReceiveNewMessage: Error triggering SDK callback for existing message: $e",
+          logLevel: TencentCloudChatLogLevel.debug,
+        );
+      } finally {
+        // Always remove the message ID from processing set, even if an error occurred
+        if (messageId.isNotEmpty) {
+          _processingMessageIds.remove(messageId);
+        }
+        if (messageIdAlt.isNotEmpty && messageIdAlt != messageId) {
+          _processingMessageIds.remove(messageIdAlt);
+        }
       }
     }
   }
@@ -1028,6 +1296,43 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
     }
   }
 
+  /// Normalize sender/user ID for comparison to avoid duplicate messages when
+  /// the same logical user appears with different formats (e.g. 64-char Tox key vs prefixed).
+  static String _normalizeSenderForMatch(String? s) {
+    if (s == null || s.isEmpty) return s ?? '';
+    String t = s.trim();
+    if (t.startsWith('c2c_')) t = t.substring(4).trim();
+    if (t.startsWith('group_')) t = t.substring(6).trim();
+    if (t.length > 64) t = t.substring(0, 64);
+    return t;
+  }
+
+  /// Returns true if [loadedMsg] is already represented in [existingList] (by msgID or content).
+  static bool _loadedMessageExistsInList(V2TimMessage loadedMsg, List<V2TimMessage> existingList) {
+    final existingIds = existingList.map((m) => m.msgID).whereType<String>().toSet();
+    if (loadedMsg.msgID != null && existingIds.contains(loadedMsg.msgID)) return true;
+    final loadedSender = _normalizeSenderForMatch(loadedMsg.sender);
+    for (final msg in existingList) {
+      if (_normalizeSenderForMatch(msg.sender) != loadedSender) continue;
+      final timeDiff = ((msg.timestamp ?? 0) - (loadedMsg.timestamp ?? 0)).abs();
+      if (timeDiff > 10) continue;
+      final msgText = msg.textElem?.text ?? '';
+      final loadedText = loadedMsg.textElem?.text ?? '';
+      if (msgText.isNotEmpty && msgText == loadedText) return true;
+      if (msg.fileElem != null && loadedMsg.fileElem != null) {
+        final n = msg.fileElem?.fileName ?? '';
+        final l = loadedMsg.fileElem?.fileName ?? '';
+        if (n.isNotEmpty && n == l) return true;
+      }
+      if (msg.imageElem != null && loadedMsg.imageElem != null) {
+        final p = msg.imageElem?.path ?? '';
+        final q = loadedMsg.imageElem?.path ?? '';
+        if (p.isNotEmpty && p == q) return true;
+      }
+    }
+    return false;
+  }
+
   /// function to load message list
   /// [userID] (optional) string
   /// [groupID] (optional) string
@@ -1063,17 +1368,108 @@ class TencentCloudChatMessageData<T> extends TencentCloudChatDataAB<T> {
     }
 
     // Update the message list in the data store.
-    List<V2TimMessage> messageList = getMessageList(key: (TencentCloudChatUtils.checkString(topicID) ?? TencentCloudChatUtils.checkString(groupID) ?? TencentCloudChatUtils.checkString(userID)) ?? "");
+    final conversationID = (TencentCloudChatUtils.checkString(topicID) ?? TencentCloudChatUtils.checkString(groupID) ?? TencentCloudChatUtils.checkString(userID)) ?? "";
+    List<V2TimMessage> messageList = getMessageList(key: conversationID);
 
     if (TencentCloudChatUtils.checkString(lastMsgID) == null) {
+      // When loading initial messages (lastMsgID == null), we should preserve any new messages
+      // that were added via onReceiveNewMessage before history loading started
+      // Check if there are any messages in the list that might be new messages
+      // New messages typically have timestamps close to current time
+      final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+      final recentMessages = messageList.where((msg) {
+        final msgTime = msg.timestamp ?? 0;
+        // Consider messages from last 5 minutes as potentially new
+        return (now - msgTime) < 300;
+      }).toList();
+      
+      // Clear the list to start fresh with history
       messageList.clear();
       clearMessageListStatus(userID: userID, groupID: TencentCloudChatUtils.checkString(topicID) ?? groupID);
-    }
-
-    if (direction == TencentCloudChatMessageLoadDirection.previous) {
-      messageList.addAll(loadedMessages);
+      
+      // Load history messages
+      // CRITICAL: loadedMessages from getHistoryMessageListV2 are newest-first (descending order)
+      // Internal storage (messageList) is also newest-first
+      // For previous direction (loading older messages), we need to add older messages to the end
+      // Since loadedMessages is newest-first, we need to reverse it to get oldest-first, then add to end
+      if (direction == TencentCloudChatMessageLoadDirection.previous) {
+        // Reverse to get oldest-first, then add to end (oldest messages go to end of newest-first list)
+        messageList.addAll(loadedMessages.reversed);
+      } else {
+        // For latest direction, insert newest messages at the beginning
+        messageList.insertAll(0, loadedMessages);
+      }
+      
+      // Merge back recent messages that weren't in the loaded history
+      if (recentMessages.isNotEmpty) {
+        TencentCloudChat.instance.logInstance.console(
+          componentName: 'GetHistoryMessageListMessageData',
+          logs: "Merging ${recentMessages.length} recent messages with history, conversationID=$conversationID",
+          logLevel: TencentCloudChatLogLevel.info,
+        );
+        // Add recent messages that don't exist in loaded history
+        // CRITICAL: Match by both msgID and content (text/file + sender + timestamp).
+        // Use normalized sender so C2C IDs (e.g. 64-char Tox key vs prefixed) match.
+        // The native FFI callback creates messages with m-prefix IDs while the Dart
+        // stream path creates messages with real IDs — same logical message, different msgIDs.
+        int skippedAsExisting = 0;
+        for (final recentMsg in recentMessages) {
+          if (recentMsg.msgID == null) continue;
+          final existsInHistory = loadedMessages.any((msg) {
+            if (msg.msgID == recentMsg.msgID) return true;
+            if (_normalizeSenderForMatch(msg.sender) != _normalizeSenderForMatch(recentMsg.sender)) return false;
+            final timeDiff = ((msg.timestamp ?? 0) - (recentMsg.timestamp ?? 0)).abs();
+            if (timeDiff > 10) return false;
+            final msgText = msg.textElem?.text ?? '';
+            final recentText = recentMsg.textElem?.text ?? '';
+            if (msgText.isNotEmpty && msgText == recentText) return true;
+            if (msg.fileElem != null && recentMsg.fileElem != null) {
+              final msgFileName = msg.fileElem?.fileName ?? '';
+              final recentFileName = recentMsg.fileElem?.fileName ?? '';
+              if (msgFileName.isNotEmpty && msgFileName == recentFileName) return true;
+            }
+            if (msg.imageElem != null && recentMsg.imageElem != null) {
+              final msgPath = msg.imageElem?.path ?? '';
+              final recentPath = recentMsg.imageElem?.path ?? '';
+              if (msgPath.isNotEmpty && msgPath == recentPath) return true;
+            }
+            return false;
+          });
+          if (existsInHistory) {
+            skippedAsExisting++;
+          } else {
+            messageList.insert(0, recentMsg);
+          }
+        }
+        if (skippedAsExisting > 0) {
+          TencentCloudChat.instance.logInstance.console(
+            componentName: 'GetHistoryMessageListMessageData',
+            logs: "Merging recent: skipped $skippedAsExisting as existsInHistory, conversationID=$conversationID",
+            logLevel: TencentCloudChatLogLevel.debug,
+          );
+        }
+      }
     } else {
-      messageList.insertAll(0, loadedMessages.reversed);
+      // Loading more messages (pagination), merge with existing
+      // Deduplicate: only add loaded messages that are not already in the list (by msgID or content)
+      final toAdd = loadedMessages.where((msg) => !_loadedMessageExistsInList(msg, messageList)).toList();
+      final filteredCount = loadedMessages.length - toAdd.length;
+      if (filteredCount > 0) {
+        TencentCloudChat.instance.logInstance.console(
+          componentName: 'GetHistoryMessageListMessageData',
+          logs: "Pagination: filtered $filteredCount duplicate(s) before merge, conversationID=$conversationID",
+          logLevel: TencentCloudChatLogLevel.debug,
+        );
+      }
+      // CRITICAL: loadedMessages from getHistoryMessageListV2 are newest-first (descending order)
+      // Internal storage (messageList) is also newest-first
+      if (direction == TencentCloudChatMessageLoadDirection.previous) {
+        // Reverse to get oldest-first, then add to end (oldest messages go to end of newest-first list)
+        messageList.addAll(toAdd.reversed);
+      } else {
+        // For latest direction, insert newest messages at the beginning
+        messageList.insertAll(0, toAdd);
+      }
     }
 
     // Ensure the message list doesn't exceed the maximum message count.

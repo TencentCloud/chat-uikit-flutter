@@ -45,48 +45,50 @@ class _TencentCloudChatOperationBarState<T>
     }
 
     return TencentCloudChatThemeWidget(
-        build: (context, colorTheme, textStyle) => Container(
-              padding: EdgeInsets.symmetric(horizontal: getWidth(16)),
-          color: colorTheme.groupProfileTabBackground,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      widget.label,
-                      style: TextStyle(
-                          color: colorTheme.secondaryTextColor, fontSize: 16),
+        build: (context, colorTheme, textStyle) => Material(
+              color: colorTheme.groupProfileTabBackground,
+              child: Container(
+                padding: EdgeInsets.symmetric(horizontal: getWidth(16)),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        widget.label,
+                        style: TextStyle(
+                            color: colorTheme.secondaryTextColor, fontSize: 16),
+                      ),
                     ),
-                  ),
-                  if (widget.operationBarType == OperationBarType.labelButton)
-                    TextButton(
-                      onPressed: () => widget.onChange?.call(widget.value),
-                      child: Text(widget.label),
-                    )
-                  else if (widget.operationBarType ==
-                      OperationBarType.switchControl)
-                    Switch(
-                      value: widget.value as bool,
-                      onChanged: (bool newValue) =>
-                          widget.onChange?.call(newValue as T),
-                      trackColor: getTrackColor(colorTheme),
-                      thumbColor: WidgetStatePropertyAll<Color>(
-                          colorTheme.backgroundColor),
-                      trackOutlineColor: WidgetStatePropertyAll<Color>(colorTheme
-                          .contactAddContactFriendInfoStateButtonBackgroundColor),
-                      inactiveThumbColor: colorTheme.backgroundColor,
-                    )
-                  else if (widget.operationBarType ==
-                      OperationBarType.stringValue)
-                    Row(
-                      children: [
-                        Text(widget.value.toString()),
-                        IconButton(
-                          icon: const Icon(Icons.edit),
-                          onPressed: () => widget.onChange?.call(widget.value),
-                        ),
-                      ],
-                    ),
-                ],
+                    if (widget.operationBarType == OperationBarType.labelButton)
+                      TextButton(
+                        onPressed: () => widget.onChange?.call(widget.value),
+                        child: Text(widget.label),
+                      )
+                    else if (widget.operationBarType ==
+                        OperationBarType.switchControl)
+                      Switch(
+                        value: widget.value as bool,
+                        onChanged: (bool newValue) =>
+                            widget.onChange?.call(newValue as T),
+                        trackColor: getTrackColor(colorTheme),
+                        thumbColor: WidgetStatePropertyAll<Color>(
+                            colorTheme.backgroundColor),
+                        trackOutlineColor: WidgetStatePropertyAll<Color>(colorTheme
+                            .contactAddContactFriendInfoStateButtonBackgroundColor),
+                        inactiveThumbColor: colorTheme.backgroundColor,
+                      )
+                    else if (widget.operationBarType ==
+                        OperationBarType.stringValue)
+                      Row(
+                        children: [
+                          Text(widget.value.toString()),
+                          IconButton(
+                            icon: const Icon(Icons.edit),
+                            onPressed: () => widget.onChange?.call(widget.value),
+                          ),
+                        ],
+                      ),
+                  ],
+                ),
               ),
             ));
   }
