@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:flutter/widgets.dart';
 import 'package:tencent_cloud_chat_common/components/components_definition/tencent_cloud_chat_component_base_controller.dart';
 import 'package:tencent_cloud_chat_common/data/basic/tencent_cloud_chat_basic_data.dart';
 import 'package:tencent_cloud_chat_common/data/group_profile/tencent_cloud_chat_group_profile_data.dart';
@@ -27,6 +28,29 @@ class TencentCloudChatConversationController extends TencentCloudChatComponentBa
 
   Stream<TencentCloudChatGroupProfileData<dynamic>>? _groupProfileDataStream;
   StreamSubscription<TencentCloudChatGroupProfileData<dynamic>>? _groupProfileDataSubscription;
+
+  /// Scroll controller attached by [TencentCloudChatConversationList].
+  /// Exposed so the parent app can call [scrollToTop] programmatically.
+  /// Lazily created on first access so callers can pre-register it before
+  /// the list mounts.
+  ScrollController? _scrollController;
+
+  ScrollController get scrollController =>
+      _scrollController ??= ScrollController();
+
+  /// Animates the conversation list back to the top. Safe to call when no
+  /// list is currently mounted — becomes a no-op if the controller has no
+  /// attached scroll position.
+  Future<void> scrollToTop({
+    Duration duration = const Duration(milliseconds: 220),
+    Curve curve = Curves.easeOut,
+  }) async {
+    final controller = _scrollController;
+    if (controller == null || !controller.hasClients) {
+      return;
+    }
+    await controller.animateTo(0, duration: duration, curve: curve);
+  }
 
   void init() {
     _initListener();

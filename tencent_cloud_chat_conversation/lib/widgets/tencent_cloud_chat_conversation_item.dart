@@ -39,7 +39,8 @@ class TencentCloudChatConversationItem extends StatefulWidget {
 
 class TencentCloudChatConversationItemState extends TencentCloudChatState<TencentCloudChatConversationItem> {
   final bool useDesktopMode = (TencentCloudChat.instance.dataInstance.conversation.conversationConfig.useDesktopMode) &&
-      (TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop);
+      (TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop ||
+          TencentCloudChat.instance.dataInstance.conversation.conversationConfig.forceDesktopLayout);
   TencentCloudChatConversationPresenter conversationPresenter = TencentCloudChatConversationPresenter();
 
   _navigateToMessage() async {
@@ -79,6 +80,22 @@ class TencentCloudChatConversationItemState extends TencentCloudChatState<Tencen
 
   isPin() {
     return widget.conversation.isPinned ?? false;
+  }
+
+  Future<void> _handleSecondaryTap(TapDownDetails details, bool isDesktopScreen) async {
+    final handler = TencentCloudChat.instance.dataInstance.conversation.conversationEventHandlers?.uiEventHandlers
+        .onSecondaryTapConversationItem;
+    final handled = await handler?.call(
+          conversation: widget.conversation,
+          position: details.globalPosition,
+        ) ??
+        false;
+    if (handled) {
+      return;
+    }
+    if (isDesktopScreen) {
+      _showDesktopMenu(details);
+    }
   }
 
   _showDesktopMenu(TapDownDetails details) {
@@ -203,7 +220,7 @@ class TencentCloudChatConversationItemState extends TencentCloudChatState<Tencen
       ),
       child: TencentCloudChatGesture(
         onTap: _navigateToMessage,
-        onSecondaryTapDown: isDesktopScreen ? (_) => _showDesktopMenu(_) : null,
+        onSecondaryTapDown: (details) => _handleSecondaryTap(details, isDesktopScreen),
         child: Padding(
           padding: EdgeInsets.symmetric(
             vertical: getHeight(12),

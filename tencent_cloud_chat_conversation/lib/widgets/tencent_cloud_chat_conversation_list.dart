@@ -8,6 +8,7 @@ import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_theme_widget.dart';
 import 'package:tencent_cloud_chat_common/widgets/shimmer/tencent_cloud_chat_list_shimmer.dart';
+import 'package:tencent_cloud_chat_conversation/tencent_cloud_chat_conversation_controller.dart';
 import 'package:tencent_cloud_chat_conversation/widgets/tencent_cloud_chat_conversation_item.dart';
 
 class TencentCloudChatConversationList extends StatefulWidget {
@@ -105,6 +106,7 @@ class TencentCloudChatConversationListState extends TencentCloudChatState<Tencen
         removeTop: true,
         removeBottom: true,
         child: ListView.builder(
+          controller: TencentCloudChatConversationController.instance.scrollController,
           itemCount: conv.length,
           itemBuilder: (context, index) {
             var conversation = conv[index];

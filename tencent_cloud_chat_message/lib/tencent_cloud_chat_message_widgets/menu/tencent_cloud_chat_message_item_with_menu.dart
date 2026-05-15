@@ -566,6 +566,23 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
     FocusScope.of(context).requestFocus(FocusNode());
   }
 
+  /// Mirror of [_onLongPressMessageOnMobile] for desktop secondary-tap (right-click).
+  /// Routes through the same action-sheet path so right-click on a message bubble
+  /// in non-desktop screen modes opens the standard message menu.
+  void _onSecondaryTapMessageOnMobile(TapUpDetails details) {
+    if (widget.data.isMergeMessage) {
+      return;
+    }
+    if (widget.data.inSelectMode) {
+      widget.methods.onSelectMessage();
+      return;
+    }
+
+    _listMessageScaleAnimationController.forward();
+    _showMobileMessageActions();
+    FocusScope.of(context).requestFocus(FocusNode());
+  }
+
   @override
   Widget defaultBuilder(BuildContext context) {
     return Column(
@@ -576,6 +593,7 @@ class _TencentCloudChatMessageItemWithMenuState extends TencentCloudChatState<Te
           child: GestureDetector(
             key: _messageGestureKey,
             onLongPress: _onLongPressMessageOnMobile,
+            onSecondaryTapUp: _onSecondaryTapMessageOnMobile,
             child: ScaleTransition(
               scale: _listMessageScaleAnimation,
               child: widget.methods.getMessageItemWidget(

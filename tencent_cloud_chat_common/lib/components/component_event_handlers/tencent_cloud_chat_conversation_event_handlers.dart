@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:tencent_cloud_chat_common/components/component_options/tencent_cloud_chat_message_options.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
 
@@ -5,6 +6,14 @@ typedef OnTapConversationItem = Future<bool> Function({
   required TencentCloudChatMessageOptions messageOptions,
   required V2TimConversation conversation,
   required bool inDesktopMode,
+});
+
+/// Fired when the user secondary-taps (right-clicks) a conversation item.
+/// Return true to indicate the event was handled and to prevent UIKit's
+/// default desktop context menu from appearing.
+typedef OnSecondaryTapConversationItem = Future<bool> Function({
+  required V2TimConversation conversation,
+  required Offset position,
 });
 
 class TencentCloudChatConversationEventHandlers {
@@ -33,14 +42,28 @@ class TencentCloudChatConversationUIEventHandlers {
 
   OnTapConversationItem? get onTapConversationItem => _onTapConversationItem;
 
+  /// This function is triggered when the user secondary-taps (right-clicks) a conversation item.
+  /// Provides the conversation and the global cursor position so the parent app can anchor a
+  /// custom context menu (e.g. via `showMenu`).
+  /// Return value:
+  /// - true: handled — UIKit will skip its default desktop column menu.
+  /// - false: keep default UIKit behavior.
+  OnSecondaryTapConversationItem? _onSecondaryTapConversationItem;
+
+  OnSecondaryTapConversationItem? get onSecondaryTapConversationItem => _onSecondaryTapConversationItem;
+
   TencentCloudChatConversationUIEventHandlers({
     OnTapConversationItem? onTapConversationItem,
-  }) : _onTapConversationItem = onTapConversationItem;
+    OnSecondaryTapConversationItem? onSecondaryTapConversationItem,
+  })  : _onTapConversationItem = onTapConversationItem,
+        _onSecondaryTapConversationItem = onSecondaryTapConversationItem;
 
   void setEventHandlers({
     OnTapConversationItem? onTapConversationItem,
+    OnSecondaryTapConversationItem? onSecondaryTapConversationItem,
   }) {
     _onTapConversationItem = onTapConversationItem ?? _onTapConversationItem;
+    _onSecondaryTapConversationItem = onSecondaryTapConversationItem ?? _onSecondaryTapConversationItem;
   }
 }
 
