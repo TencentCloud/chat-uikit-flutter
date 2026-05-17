@@ -165,12 +165,12 @@ class _TencentCloudChatMessageTextState extends TencentCloudChatMessageState<Ten
                   sentFromSelf ? colorTheme.selfMessageBubbleBorderColor : colorTheme.othersMessageBubbleBorderColor,
             ),
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(getSquareSize(!sentFromSelf && widget.data.showMessageSenderName ? 0 : 16)),
-              topRight: Radius.circular(getSquareSize(sentFromSelf && widget.data.showMessageSenderName ? 0 : 16)),
+              topLeft: Radius.circular(getSquareSize(!sentFromSelf && widget.data.showMessageSenderName ? 4 : 16)),
+              topRight: Radius.circular(getSquareSize(sentFromSelf && widget.data.showMessageSenderName ? 4 : 16)),
               bottomLeft:
-                  Radius.circular(getSquareSize(!sentFromSelf && !widget.data.showMessageSenderName ? 0 : 16)),
+                  Radius.circular(getSquareSize(!sentFromSelf && !widget.data.showMessageSenderName ? 4 : 16)),
               bottomRight:
-                  Radius.circular(getSquareSize(sentFromSelf && !widget.data.showMessageSenderName ? 0 : 16)),
+                  Radius.circular(getSquareSize(sentFromSelf && !widget.data.showMessageSenderName ? 4 : 16)),
             )),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -227,12 +227,12 @@ class _TencentCloudChatMessageTextState extends TencentCloudChatMessageState<Ten
                     sentFromSelf ? colorTheme.selfMessageBubbleBorderColor : colorTheme.othersMessageBubbleBorderColor,
               ),
               borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(getSquareSize(!sentFromSelf && widget.data.showMessageSenderName ? 0 : 16)),
-                topRight: Radius.circular(getSquareSize(sentFromSelf && widget.data.showMessageSenderName ? 0 : 16)),
+                topLeft: Radius.circular(getSquareSize(!sentFromSelf && widget.data.showMessageSenderName ? 4 : 16)),
+                topRight: Radius.circular(getSquareSize(sentFromSelf && widget.data.showMessageSenderName ? 4 : 16)),
                 bottomLeft:
-                    Radius.circular(getSquareSize(!sentFromSelf && !widget.data.showMessageSenderName ? 0 : 16)),
+                    Radius.circular(getSquareSize(!sentFromSelf && !widget.data.showMessageSenderName ? 4 : 16)),
                 bottomRight:
-                    Radius.circular(getSquareSize(sentFromSelf && !widget.data.showMessageSenderName ? 0 : 16)),
+                    Radius.circular(getSquareSize(sentFromSelf && !widget.data.showMessageSenderName ? 4 : 16)),
               )),
           child: Column(
             mainAxisSize: MainAxisSize.min,

@@ -62,10 +62,14 @@ class _TencentCloudChatMessageRowState
     final tipsItem = widget.data.message.elemType == 101 || widget.data.message.elemType == MessageElemType.V2TIM_ELEM_TYPE_GROUP_TIPS;
     final isRecalled = widget.data.message.status == MessageStatus.V2TIM_MSG_STATUS_LOCAL_REVOKED;
     final isDesktopScreen = TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.desktop;
+    // Grouped spacing: tight gap (4px) for continuation messages from the
+    // same sender, larger gap (12px) when starting a new group / different
+    // sender (i.e. when the sender name is shown again).
+    final double bottomGap = widget.data.showMessageSenderName ? 12.0 : 4.0;
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => Container(
         margin: EdgeInsets.only(
-          bottom: getSquareSize(16),
+          bottom: getSquareSize(bottomGap),
         ),
         padding: EdgeInsets.only(right: isDesktopScreen ? getSquareSize(8) : 0, left: isDesktopScreen ? getSquareSize(8) : 0),
         color: (widget.data.isSelected && widget.data.inSelectMode) ? colorTheme.messageBeenChosenBackgroundColor : Colors.transparent,
@@ -201,10 +205,12 @@ class _TencentCloudChatMessageRowState
       child: widget.widgets.messageRowAvatar,
     );
 
+    // Grouped spacing for desktop builder (matches mobile logic).
+    final double desktopBottomGap = widget.data.showMessageSenderName ? 12.0 : 4.0;
     return TencentCloudChatThemeWidget(
       build: (context, colorTheme, textStyle) => Container(
         margin: EdgeInsets.only(
-          bottom: getSquareSize(16),
+          bottom: getSquareSize(desktopBottomGap),
         ),
         padding: EdgeInsets.only(right: getSquareSize(6), left: getSquareSize(6)),
         child: (isUseTipsBuilder)

@@ -518,9 +518,9 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
                                         child: Container(
                                           decoration: BoxDecoration(
                                               color: colorTheme.primaryColor, borderRadius: BorderRadius.circular(25)),
-                                          padding: EdgeInsets.all(getSquareSize(4)),
+                                          padding: EdgeInsets.all(getSquareSize(8)),
                                           child: Icon(
-                                            Icons.arrow_downward,
+                                            Icons.arrow_upward_rounded,
                                             size: textStyle.inputAreaIcon,
                                             color: colorTheme.backgroundColor,
                                           ),

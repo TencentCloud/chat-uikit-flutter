@@ -576,6 +576,8 @@ class TencentCloudChatConversationItemContentState
 
   @override
   Widget desktopBuilder(BuildContext context) {
+    final hasUnread = (widget.conversation.unreadCount ?? 0) > 0;
+    final titleWeight = hasUnread ? FontWeight.w600 : FontWeight.w500;
     return Expanded(
       child: TencentCloudChatThemeWidget(build: (context, colorTheme, textStyle) {
         Widget status = getLastMessageStatus(colorTheme);
@@ -590,7 +592,7 @@ class TencentCloudChatConversationItemContentState
               widget.conversation.showName ?? widget.conversation.conversationID,
               style: TextStyle(
                 fontSize: textStyle.fontsize_13,
-                fontWeight: FontWeight.w600,
+                fontWeight: titleWeight,
                 color: colorTheme.conversationItemShowNameTextColor,
               ),
               maxLines: 1,
@@ -616,6 +618,8 @@ class TencentCloudChatConversationItemContentState
 
   @override
   Widget defaultBuilder(BuildContext context) {
+    final hasUnread = (widget.conversation.unreadCount ?? 0) > 0;
+    final titleWeight = hasUnread ? FontWeight.w600 : FontWeight.w500;
     return Expanded(
       child: TencentCloudChatThemeWidget(build: (context, colorTheme, textStyle) {
         Widget status = getLastMessageStatus(colorTheme);
@@ -630,7 +634,7 @@ class TencentCloudChatConversationItemContentState
               widget.conversation.showName ?? widget.conversation.conversationID,
               style: TextStyle(
                 fontSize: textStyle.fontsize_14,
-                fontWeight: FontWeight.w600,
+                fontWeight: titleWeight,
                 color: colorTheme.conversationItemShowNameTextColor,
               ),
               maxLines: 1,
