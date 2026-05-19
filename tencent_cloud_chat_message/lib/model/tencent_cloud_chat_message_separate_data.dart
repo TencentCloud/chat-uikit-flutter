@@ -446,8 +446,11 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
   // M10: high-watermark for read-receipt reporting — avoid firing
   // cleanConversationUnreadMessageCount / sendMessageReadReceipts on every
   // render when the newest visible message hasn't advanced.
+  // msgID-only watermark. Tox timestamps are second-granular, so any
+  // timestamp-based gate (the original M10 design) silently drops every
+  // same-second message and stops marking-as-read forever. msgID is the only
+  // identifier guaranteed unique per message — use it for both group and C2C.
   String? _lastReportedReadMsgID;
-  int _lastReportedReadTimestamp = 0;
 
   Future<void> loadMessageList({
     String? userID,
@@ -649,6 +652,15 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
     _inSelectMode = false;
     _selectedMessages.clear();
     _quotedMessage = null;
+    // Reset per-conversation pagination + read-receipt watermark state so the
+    // next conversation can't inherit the previous one's flags. Without these,
+    // (1) a stale `_lastReportedReadTimestamp` from a busy chat can permanently
+    // suppress auto-mark-as-read on a chat with older newest messages, and
+    // (2) an in-flight load from the previous chat can transiently block the
+    // new chat's first `loadMessageList`.
+    _isLoadingPrevious = false;
+    _isLoadingLatest = false;
+    _lastReportedReadMsgID = null;
     removeUIKitListener();
     notifyListeners();
   }
@@ -891,22 +903,14 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
       element.isRead = true;
     }
 
-    // M10: bail out if the newest message hasn't advanced past the previously
-    // reported watermark. messageList is in newest-first order (see
-    // getMessageListForRender), so messageList[0] is the newest. For groups we
-    // gate by timestamp; for C2C we gate by msgID identity.
-    final isGroup = TencentCloudChatUtils.checkString(_groupID) != null;
-    final newest = messageList.first;
-    final newestTimestamp = newest.timestamp ?? 0;
-    final newestMsgID = TencentCloudChatUtils.checkString(newest.msgID);
-    if (isGroup) {
-      if (newestTimestamp <= _lastReportedReadTimestamp) {
-        return;
-      }
-    } else {
-      if (newestMsgID != null && newestMsgID == _lastReportedReadMsgID) {
-        return;
-      }
+    // M10: bail out if the newest message hasn't advanced. messageList is
+    // newest-first (see getMessageListForRender), so messageList[0] is the
+    // newest. Use msgID identity for both group and C2C — Tox timestamps are
+    // second-granular and the old per-branch timestamp gate dropped every
+    // same-second message permanently.
+    final newestMsgID = TencentCloudChatUtils.checkString(messageList.first.msgID);
+    if (newestMsgID != null && newestMsgID == _lastReportedReadMsgID) {
+      return;
     }
 
     if (TencentCloudChatUtils.checkString(_groupID) != null && useReadReceipt) {
@@ -933,11 +937,7 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
 
     // Advance watermark only after we've gone through the report path so a
     // failure mid-flight doesn't get permanently suppressed by the watermark.
-    if (isGroup) {
-      if (newestTimestamp > _lastReportedReadTimestamp) {
-        _lastReportedReadTimestamp = newestTimestamp;
-      }
-    } else if (newestMsgID != null) {
+    if (newestMsgID != null) {
       _lastReportedReadMsgID = newestMsgID;
     }
   }
