@@ -78,6 +78,12 @@ class TencentCloudChatSoundToText extends TencentCloudChatPlugin {
       Function()? onTranslateFailed,
       Function()? onTranslateSuccess,
       bool? hasFailed = false,}) {
+    // toxee: sound-to-text disabled — tim2tox has no STT backend.
+    // We short-circuit so the inline "convert to text" widget never renders
+    // and never fires a backend call that would fail. The implementation is
+    // preserved below for when we wire a real STT provider.
+    return const SizedBox.shrink();
+    // ignore: dead_code
     final {
       "msgID": msgID,
       "language": language,

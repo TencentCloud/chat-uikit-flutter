@@ -82,23 +82,17 @@ class TencentCloudChatTextTranslate extends TencentCloudChatPlugin {
 
     if (methodName ==
         TencentCloudChatTranslateMethodName.checkTranslateEnable) {
-      final {
-        "groupID": groupID,
-        "topicID": topicID,
-        "userID": userID,
-        "message": textMessage,
-      } = methodValue ?? {};
-      if (_enableTranslate != null) {
-        return {
-          "enable": _enableTranslate!(groupID, userID, topicID, textMessage),
-        };
-      }
+      // toxee: translate disabled — tim2tox has no translation backend.
+      // Always answer false regardless of the host's _enableTranslate hook.
+      return {"enable": false};
     }
 
     return {
       "sourceLanguage": _sourceLanguage,
       "targetLanguage": _targetLanguate,
-      "enable": true,
+      // toxee: translate disabled — tim2tox has no translation backend.
+      // Surface enable=false so UIKit hides the translate menu/action entirely.
+      "enable": false,
     };
   }
 
@@ -122,6 +116,12 @@ class TencentCloudChatTextTranslate extends TencentCloudChatPlugin {
       Map<String, TencentCloudChatPluginTapFn>? fns,
       Function(String)? onTranslateSuccess,
       Function()? onTranslateFailed,}) {
+    // toxee: translate disabled — tim2tox has no translation backend.
+    // We deliberately short-circuit instead of removing the plugin so
+    // host code keeps compiling and we can re-enable by deleting this
+    // early return once we wire a translation provider.
+    return const SizedBox.shrink();
+    // ignore: dead_code
     final {
       "text": text,
       "targetLanguage": targetLanguage,

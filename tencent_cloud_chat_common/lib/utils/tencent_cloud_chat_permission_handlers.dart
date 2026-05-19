@@ -13,15 +13,13 @@ class TencentCloudChatPermissionHandler {
       case 'microphone':
         return Permission.microphone;
       case 'storage':
-        if (TencentCloudChatPlatformAdapter().isAndroid) {
-          final androidInfo = await DeviceInfoPlugin().androidInfo;
-          if (androidInfo.version.sdkInt <= 32) {
-            return Permission.storage;
-          } else {
-            return Permission.manageExternalStorage;
-          }
-        }
+      case 'photo':
       case 'photos':
+        // toxee(P0): never request MANAGE_EXTERNAL_STORAGE on Android 13+ —
+        // Play Store rejects apps that request the all-files-access permission
+        // for media use-cases. Route 'storage'/'photo'/'photos' to the
+        // scoped READ_MEDIA_IMAGES permission (Permission.photos on Android 13+).
+        // Pre-Android-13 still uses legacy READ_EXTERNAL_STORAGE.
         if (TencentCloudChatPlatformAdapter().isAndroid) {
           final androidInfo = await DeviceInfoPlugin().androidInfo;
           if (androidInfo.version.sdkInt <= 32) {
@@ -31,6 +29,28 @@ class TencentCloudChatPermissionHandler {
           }
         }
         return Permission.photos;
+      case 'video':
+      case 'videos':
+        if (TencentCloudChatPlatformAdapter().isAndroid) {
+          final androidInfo = await DeviceInfoPlugin().androidInfo;
+          if (androidInfo.version.sdkInt <= 32) {
+            return Permission.storage;
+          } else {
+            return Permission.videos;
+          }
+        }
+        return Permission.videos;
+      case 'audio':
+      case 'audios':
+        if (TencentCloudChatPlatformAdapter().isAndroid) {
+          final androidInfo = await DeviceInfoPlugin().androidInfo;
+          if (androidInfo.version.sdkInt <= 32) {
+            return Permission.storage;
+          } else {
+            return Permission.audio;
+          }
+        }
+        return Permission.audio;
       default:
         return null;
     }

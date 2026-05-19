@@ -443,8 +443,11 @@ class _TencentCloudChatMessageInputDesktopState extends TencentCloudChatState<Te
         String pkgName = packageInfo.packageName;
         directory = Pertypath().join(documentsDirectoryPath, "Documents", ".TencentCloudChat", pkgName, "screenshots");
       } else {
+        // toxee(P2): keep pasted-image scratch files in a dedicated
+        // sub-directory so we don't pollute the appSupport root, and
+        // can later wipe just the paste cache.
         final dic = await getApplicationSupportDirectory();
-        directory = dic.path;
+        directory = Pertypath().join(dic.path, 'paste_images');
       }
       var uuid = DateTime.now().microsecondsSinceEpoch;
       final fileName = 'paste_image_$uuid.png';

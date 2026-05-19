@@ -34,7 +34,13 @@ class _TencentCloudChatMessageInputSelectModeContainerState
               data: MessageInputSelectBuilderData(
                 enableMessageForwardIndividually:
                     defaultMessageSelectionOperationsConfig.enableMessageForwardIndividually,
-                enableMessageForwardCombined: defaultMessageSelectionOperationsConfig.enableMessageForwardCombined,
+                // toxee(P1-13): hidden until protocol design lands.
+                // Merge/combined forward requires a Tox-side "merger" elem
+                // (V2TIM_ELEM_TYPE_MERGER) representation we have not designed
+                // yet; tapping the button would crash or silently fail.
+                // Keep the underlying code paths intact so we can re-enable
+                // by flipping this flag once the protocol is in place.
+                enableMessageForwardCombined: false,
                 enableMessageDeleteForSelf: defaultMessageSelectionOperationsConfig.enableMessageDeleteForSelf,
                 messages: dataProvider.getSelectedMessages(),
               ),

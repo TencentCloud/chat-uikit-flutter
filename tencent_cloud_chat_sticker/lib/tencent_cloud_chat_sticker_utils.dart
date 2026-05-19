@@ -13,7 +13,14 @@ class TencentCloudChatStickerUtils {
     if (kDebugMode) {
       print(text);
     }
-    return TencentImSDKPlugin.v2TIMManager.uikitTrace(trace: text);
+    // toxee(P1): tim2tox does not implement uikitTrace — calling it raises a
+    // MissingPluginException / UnimplementedError on every sticker log. Swallow
+    // so sticker UI keeps working; visible logs already went through `print`.
+    try {
+      await TencentImSDKPlugin.v2TIMManager.uikitTrace(trace: text);
+    } catch (_) {
+      // tim2tox does not implement uikitTrace; swallow.
+    }
   }
 
   static StickerDeviceScreenType getDeviceType(BuildContext context) {

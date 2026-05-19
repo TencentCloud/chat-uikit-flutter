@@ -10,6 +10,20 @@ import 'package:tencent_cloud_chat_common/widgets/desktop_popup/tencent_cloud_ch
 import 'package:tencent_cloud_chat_common/widgets/file_icon/tencent_cloud_chat_file_icon.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+// toxee(P2-10): extensions that should never auto-launch — these are
+// arbitrary code execution vectors when received over P2P chat. For now we
+// log a warning and proceed (matches upstream behavior); TODO swap in a
+// proper confirm dialog using existing TencentCloudChatDialog helpers.
+const Set<String> _dangerousExecutableExts = {
+  '.exe', '.dmg', '.app', '.apk', '.bat', '.cmd', '.com', '.scr', '.msi',
+  '.pkg', '.deb', '.rpm', '.sh', '.ps1', '.vbs', '.jar', '.appimage',
+};
+
+bool _isDangerousFile(String filePath) {
+  final ext = Pertypath().extension(filePath).toLowerCase();
+  return _dangerousExecutableExts.contains(ext);
+}
+
 class TencentCloudChatDesktopFileTools {
   static sendFileWithConfirmation({
     required List<String> filesPath,
@@ -74,6 +88,18 @@ class TencentCloudChatDesktopFileTools {
                         color: colorTheme.backgroundColor,
                         child: InkWell(
                           onTap: () {
+                            if (_isDangerousFile(filePath)) {
+                              // TODO(P2-10): show confirm dialog before
+                              // launching executable extensions. For now we
+                              // log a warning so the path is auditable, but
+                              // proceed to preserve current UX. Callers must
+                              // still scrutinize file_tools usage.
+                              debugPrint(
+                                '[toxee] WARN: launching potentially '
+                                'dangerous file via desktop drop preview: '
+                                '$filePath',
+                              );
+                            }
                             launchUrl(Uri.file(filePath));
                           },
                           child: Padding(
@@ -156,7 +182,10 @@ class TencentCloudChatDesktopFileTools {
   }) async {
     for (final filePath in filesPath) {
       await sendFileMessage(filePath: filePath);
-      await Future.delayed(const Duration(microseconds: 300));
+      // toxee(P1): upstream wrote `microseconds: 300` (~ 0 delay).
+      // Need real spacing between consecutive sends so the SDK can
+      // serialize message IDs and avoid out-of-order writes.
+      await Future.delayed(const Duration(milliseconds: 300));
     }
   }
 }

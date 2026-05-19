@@ -1017,6 +1017,7 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
   sendVideoMessage({
     String? videoPath,
     dynamic inputElement,
+    int? videoDuration,
   }) async {
     if (!TencentCloudChatPlatformAdapter().isWeb && (videoPath?.isEmpty ?? true)) {
       return null;
@@ -1041,7 +1042,12 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
       snapshotPath: snapshotPath,
       inputElement: inputElement,
       type: fileExtension,
-      duration: 150,
+      // toxee(P1): upstream hard-coded `duration: 150` for every video,
+      // which lies to the receiver and our own metadata mappers. Real
+      // duration should come from the caller (gallery picker / recorder);
+      // if unavailable, surface 0 and let downstream backfill from the
+      // file metadata instead of a fabricated value.
+      duration: videoDuration ?? 0,
     );
 
     return _sendMessage(messageInfoResult: messageInfo);
