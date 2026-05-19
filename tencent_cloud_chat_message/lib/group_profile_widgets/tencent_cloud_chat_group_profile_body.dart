@@ -7,7 +7,6 @@ import 'package:tencent_cloud_chat_common/components/component_options/tencent_c
 import 'package:tencent_cloud_chat_common/components/component_options/tencent_cloud_chat_group_member_list_options.dart';
 import 'package:tencent_cloud_chat_common/components/component_options/tencent_cloud_chat_group_transfer_owner_options.dart';
 import 'package:tencent_cloud_chat_common/components/tencent_cloud_chat_components_utils.dart';
-import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
 import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat_common/router/tencent_cloud_chat_navigator.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
@@ -329,14 +328,14 @@ class TencentCloudChatGroupProfileContentState
   }
 
   changeGroupName() {
-    String mid = "";
+    String mid = groupName;
     TextEditingController controller = TextEditingController(text: groupName);
-    showCupertinoDialog(
+    showDialog(
         context: context,
         builder: (context) {
-          return CupertinoAlertDialog(
+          return AlertDialog(
             title: Text(tL10n.setGroupName),
-            content: CupertinoTextField(
+            content: TextField(
               maxLines: null,
               autofocus: true,
               controller: controller,
@@ -345,14 +344,16 @@ class TencentCloudChatGroupProfileContentState
               },
             ),
             actions: <Widget>[
-              CupertinoDialogAction(
+              TextButton(
                 onPressed: () {
-                  _onChangeGroupName(mid);
+                  if (mid.trim().isNotEmpty) {
+                    _onChangeGroupName(mid.trim());
+                  }
                   Navigator.pop(context);
                 },
                 child: Text(tL10n.confirm),
               ),
-              CupertinoDialogAction(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -397,17 +398,20 @@ class TencentCloudChatGroupProfileContentState
                     ),
                   ),
                   SizedBox(height: getHeight(8)),
-                  Text(
-                    chatId != null && chatId!.isNotEmpty
-                        ? "Group ID: $chatId"
-                        : "Group ID: $displayGroupID",
-                    style: TextStyle(
-                      fontSize: textStyle.fontsize_12,
-                      color: chatId != null && chatId!.isNotEmpty
-                          ? colorTheme.groupProfileTextColor
-                          : colorTheme.groupProfileTextColor?.withOpacity(0.5),
+                  Directionality(
+                    textDirection: TextDirection.ltr,
+                    child: SelectableText(
+                      chatId != null && chatId!.isNotEmpty
+                          ? "Group ID: $chatId"
+                          : "Group ID: $displayGroupID",
+                      style: TextStyle(
+                        fontSize: textStyle.fontsize_12,
+                        color: chatId != null && chatId!.isNotEmpty
+                            ? colorTheme.groupProfileTextColor
+                            : colorTheme.groupProfileTextColor?.withOpacity(0.5),
+                      ),
+                      textAlign: TextAlign.center,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ],
               ),
@@ -433,10 +437,8 @@ class TencentCloudChatGroupProfileChatButton extends StatefulWidget {
 
 class TencentCloudChatGroupProfileChatButtonState
     extends TencentCloudChatState<TencentCloudChatGroupProfileChatButton> {
-  final isMobile =
-      TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.mobile;
-
   _navigateToChat() async {
+    final isMobile = MediaQuery.sizeOf(context).width < 600;
     final tryUseOnNavigateToChat = await TencentCloudChat.instance.dataInstance
             .contact.contactEventHandlers?.uiEventHandlers.onNavigateToChat
             ?.call(userID: null, groupID: widget.groupInfo.groupID) ??

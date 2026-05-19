@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_common/components/component_options/tencent_cloud_chat_message_options.dart';
 import 'package:tencent_cloud_chat_common/components/tencent_cloud_chat_components_utils.dart';
-import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
 import 'package:tencent_cloud_chat_common/router/tencent_cloud_chat_navigator.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/tuicore/tencent_cloud_chat_core.dart';
@@ -15,6 +13,12 @@ import 'package:tencent_cloud_chat_common/builders/tencent_cloud_chat_common_bui
 import 'package:tencent_cloud_chat_common/widgets/avatar/tencent_cloud_chat_avatar.dart';
 import 'package:tencent_cloud_chat_common/widgets/dialog/tencent_cloud_chat_dialog.dart';
 import 'package:tencent_cloud_chat_common/widgets/operation_bar/tencent_cloud_chat_operation_bar.dart';
+
+String _normalizeId(String? id) {
+  if (id == null) return '';
+  final t = id.trim();
+  return t.length > 64 ? t.substring(0, 64) : t;
+}
 
 class TencentCloudChatUserProfileBody extends StatefulWidget {
   final V2TimUserFullInfo userFullInfo;
@@ -39,34 +43,37 @@ class TencentCloudChatUserProfileBodyState
   Widget defaultBuilder(BuildContext context) {
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Center(
-              child: ListView(
-                children: [
-                  SizedBox(
-                    height: getHeight(40),
-                  ),
-                  TencentCloudChat.instance.dataInstance.contact.contactBuilder
-                      ?.getUserProfileAvatarBuilder(
-                    userFullInfo: widget.userFullInfo,
-                  ),
-                  TencentCloudChat.instance.dataInstance.contact.contactBuilder
-                      ?.getUserProfileContentBuilder(
-                    userFullInfo: widget.userFullInfo,
-                  ),
-                  TencentCloudChat.instance.dataInstance.contact.contactBuilder
-                      ?.getUserProfileChatButtonBuilder(
-                    userFullInfo: widget.userFullInfo,
-                    startVideoCall: widget.startVideoCall,
-                    startVoiceCall: widget.startVoiceCall,
-                    isNavigatedFromChat: widget.isNavigatedFromChat,
-                  ),
-                  TencentCloudChat.instance.dataInstance.contact.contactBuilder
-                      ?.getUserProfileStateButtonBuilder(
-                          userFullInfo: widget.userFullInfo),
-                  TencentCloudChat.instance.dataInstance.contact.contactBuilder
-                      ?.getUserProfileDeleteButtonBuilder(
-                    userFullInfo: widget.userFullInfo,
-                  )
-                ],
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 720),
+                child: ListView(
+                  children: [
+                    SizedBox(
+                      height: getHeight(40),
+                    ),
+                    TencentCloudChat.instance.dataInstance.contact.contactBuilder
+                        ?.getUserProfileAvatarBuilder(
+                      userFullInfo: widget.userFullInfo,
+                    ),
+                    TencentCloudChat.instance.dataInstance.contact.contactBuilder
+                        ?.getUserProfileContentBuilder(
+                      userFullInfo: widget.userFullInfo,
+                    ),
+                    TencentCloudChat.instance.dataInstance.contact.contactBuilder
+                        ?.getUserProfileChatButtonBuilder(
+                      userFullInfo: widget.userFullInfo,
+                      startVideoCall: widget.startVideoCall,
+                      startVoiceCall: widget.startVoiceCall,
+                      isNavigatedFromChat: widget.isNavigatedFromChat,
+                    ),
+                    TencentCloudChat.instance.dataInstance.contact.contactBuilder
+                        ?.getUserProfileStateButtonBuilder(
+                            userFullInfo: widget.userFullInfo),
+                    TencentCloudChat.instance.dataInstance.contact.contactBuilder
+                        ?.getUserProfileDeleteButtonBuilder(
+                      userFullInfo: widget.userFullInfo,
+                    )
+                  ],
+                ),
               ),
             ));
   }
@@ -153,25 +160,26 @@ class TencentCloudChatUserProfileContentState
   changeFriendRemark() {
     String remark = "";
 
-    showCupertinoDialog(
+    showDialog(
         context: context,
         builder: (context) {
-          return CupertinoAlertDialog(
+          return AlertDialog(
             title: Text(tL10n.modifyRemark),
-            content: CupertinoTextField(
+            content: TextField(
+              autofocus: true,
               maxLines: null,
               onChanged: (value) {
                 remark = value;
               },
             ),
             actions: <Widget>[
-              CupertinoDialogAction(
+              TextButton(
                 onPressed: () {
                   Navigator.pop(context);
                 },
                 child: Text(tL10n.cancel),
               ),
-              CupertinoDialogAction(
+              TextButton(
                 onPressed: () {
                   _onChangeFriendRemark(remark);
                   Navigator.pop(context);
@@ -185,9 +193,9 @@ class TencentCloudChatUserProfileContentState
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    Set<String?> friendIDList = TencentCloudChat
+    final Set<String> friendIDList = TencentCloudChat
         .instance.dataInstance.contact.contactList
-        .map((e) => e.userID)
+        .map((e) => _normalizeId(e.userID))
         .toSet();
     friendRemark = friendRemark.isNotEmpty
         ? friendRemark
@@ -207,7 +215,7 @@ class TencentCloudChatUserProfileContentState
                             fontSize: textStyle.fontsize_24,
                             fontWeight: FontWeight.w600),
                       ),
-                      if (friendIDList.contains(widget.userFullInfo.userID))
+                      if (friendIDList.contains(_normalizeId(widget.userFullInfo.userID)))
                         FloatingActionButton.small(
                             onPressed: changeFriendRemark,
                             elevation: 0,
@@ -249,9 +257,6 @@ class TencentCloudChatUserProfileChatButton extends StatefulWidget {
 
 class TencentCloudChatUserProfileChatButtonState
     extends TencentCloudChatState<TencentCloudChatUserProfileChatButton> {
-  final isMobile =
-      TencentCloudChatScreenAdapter.deviceScreenType == DeviceScreenType.mobile;
-
   Widget _buildClickableItem({
     required IconData icon,
     required String label,
@@ -309,6 +314,7 @@ class TencentCloudChatUserProfileChatButtonState
   }
 
   _navigateToChat() async {
+    final isMobile = MediaQuery.sizeOf(context).width < 600;
     final tryUseOnNavigateToChat = await TencentCloudChat.instance.dataInstance
             .contact.contactEventHandlers?.uiEventHandlers.onNavigateToChat
             ?.call(userID: widget.userFullInfo.userID, groupID: null) ??
@@ -636,21 +642,21 @@ class TencentCloudChatUserProfileDeleteButtonState
           ));
 
       if (errorCode == 0) {
-        Navigator.popUntil(context, (route) => route.isFirst);
+        Navigator.of(context).pop();
       }
     }
   }
 
   @override
   Widget defaultBuilder(BuildContext context) {
-    Set<String?> friendIDList = TencentCloudChat
+    final Set<String> friendIDList = TencentCloudChat
         .instance.dataInstance.contact.contactList
-        .map((e) => e.userID)
+        .map((e) => _normalizeId(e.userID))
         .toSet();
     return TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) => Column(children: [
               Container(
-                  width: MediaQuery.of(context).size.width,
+                  width: double.infinity,
                   decoration: BoxDecoration(
                       border: Border(
                           bottom: BorderSide(
@@ -670,11 +676,11 @@ class TencentCloudChatUserProfileDeleteButtonState
                             fontSize: textStyle.fontsize_16,
                             fontWeight: FontWeight.w400),
                       ))),
-              if (friendIDList.contains(widget.userFullInfo.userID))
+              if (friendIDList.contains(_normalizeId(widget.userFullInfo.userID)))
                 Container(
                     color: colorTheme
                         .contactAddContactFriendInfoStateButtonBackgroundColor,
-                    width: MediaQuery.of(context).size.width,
+                    width: double.infinity,
                     padding: EdgeInsets.symmetric(
                         vertical: getHeight(10), horizontal: getWidth(16)),
                     child: GestureDetector(

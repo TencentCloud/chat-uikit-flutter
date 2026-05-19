@@ -148,9 +148,12 @@ class _TencentCloudChatAvatarState extends TencentCloudChatState<TencentCloudCha
       );
     } else {
       // Check if it's a local file path (absolute path starting with / or file://)
-      // or a path that contains directory separators indicating a file system path
-      final isLocalFile = imagePath.startsWith('/') || 
+      // or a path that contains directory separators indicating a file system path.
+      // Also detect Windows-style paths (backslash separator or drive-letter prefix).
+      final isLocalFile = imagePath.startsWith('/') ||
                           imagePath.startsWith('file://') ||
+                          imagePath.contains('\\') ||
+                          RegExp(r'^[a-zA-Z]:[\\/]').hasMatch(imagePath) ||
                           (imagePath.contains('/') && !imagePath.startsWith('images/'));
       
       if (isLocalFile) {
