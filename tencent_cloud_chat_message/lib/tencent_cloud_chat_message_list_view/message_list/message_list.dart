@@ -18,6 +18,7 @@ class TencentCloudChatScrollBehavior extends MaterialScrollBehavior {
   @override
   Set<PointerDeviceKind> get dragDevices => {
         PointerDeviceKind.touch,
+        PointerDeviceKind.mouse,
         PointerDeviceKind.trackpad,
         PointerDeviceKind.stylus,
         PointerDeviceKind.unknown,
@@ -518,6 +519,9 @@ class MessageListState extends State<MessageList> {
       behavior: ScrollConfiguration.of(context).copyWith(dragDevices: {
         PointerDeviceKind.touch,
         PointerDeviceKind.mouse,
+        PointerDeviceKind.trackpad,
+        PointerDeviceKind.stylus,
+        PointerDeviceKind.unknown,
       }),
       child: Scrollbar(
         controller: listViewController,

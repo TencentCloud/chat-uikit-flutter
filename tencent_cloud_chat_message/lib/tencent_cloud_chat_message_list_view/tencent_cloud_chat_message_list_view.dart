@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter/widgets.dart';
 import 'package:tencent_cloud_chat_common/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
 import 'package:tencent_cloud_chat_common/data/message/tencent_cloud_chat_message_data.dart';
@@ -32,6 +33,7 @@ class _TencentCloudChatMessageListViewState extends TencentCloudChatState<Tencen
   late TencentCloudChatMessageController? controller;
   List<V2TimMessage> _messagesMentionedMe = [];
   double? _maxWidth;
+  bool _widthUpdateScheduled = false;
 
   @override
   void initState() {
@@ -108,10 +110,14 @@ class _TencentCloudChatMessageListViewState extends TencentCloudChatState<Tencen
       child: Column(
         children: [
           LayoutBuilder(builder: (context, constraints) {
-            if (_maxWidth != constraints.maxWidth) {
-              Future.delayed(const Duration(milliseconds: 10), () {
+            if (_maxWidth != constraints.maxWidth && !_widthUpdateScheduled) {
+              _widthUpdateScheduled = true;
+              final pendingWidth = constraints.maxWidth;
+              SchedulerBinding.instance.addPostFrameCallback((_) {
+                _widthUpdateScheduled = false;
+                if (!mounted) return;
                 setState(() {
-                  _maxWidth = constraints.maxWidth;
+                  _maxWidth = pendingWidth;
                 });
               });
             }

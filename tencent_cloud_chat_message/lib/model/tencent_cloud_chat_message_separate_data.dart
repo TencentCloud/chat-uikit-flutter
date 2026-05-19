@@ -401,18 +401,23 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
       messageListStatus.haveMoreLatestData = res.haveMoreLatestData;
       messageListStatus.haveMorePreviousData = res.haveMorePreviousData;
 
-      Future.delayed(const Duration(milliseconds: 100), () {
+      // M11: single post-frame scroll instead of two racing Future.delayed
+      // hops. Capture the conversation identifier at issue time and bail if
+      // the user has navigated to a different conversation (or this provider
+      // has been disposed) before the frame settles.
+      final scrollTargetUserID = _userID;
+      final scrollTargetGroupID = _groupID;
+      final scrollTargetTopicID = _topicID;
+      final scrollMsgID = TencentCloudChatUtils.checkString(res.targetMessage?.msgID) ?? message?.msgID;
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (_disposed) return;
+        if (_userID != scrollTargetUserID ||
+            _groupID != scrollTargetGroupID ||
+            _topicID != scrollTargetTopicID) {
+          return;
+        }
         _messageController?.scrollToSpecificMessage(
-          msgID: TencentCloudChatUtils.checkString(res.targetMessage?.msgID) ?? message?.msgID,
-          userID: _userID,
-          topicID: _topicID,
-          groupID: TencentCloudChatUtils.checkString(_topicID) ?? _groupID,
-        );
-      });
-
-      Future.delayed(const Duration(milliseconds: 150), () {
-        _messageController?.scrollToSpecificMessage(
-          msgID: TencentCloudChatUtils.checkString(res.targetMessage?.msgID) ?? message?.msgID,
+          msgID: scrollMsgID,
           userID: _userID,
           topicID: _topicID,
           groupID: TencentCloudChatUtils.checkString(_topicID) ?? _groupID,
@@ -435,6 +440,15 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
     }
   }
 
+  bool _isLoadingPrevious = false;
+  bool _isLoadingLatest = false;
+
+  // M10: high-watermark for read-receipt reporting — avoid firing
+  // cleanConversationUnreadMessageCount / sendMessageReadReceipts on every
+  // render when the newest visible message hasn't advanced.
+  String? _lastReportedReadMsgID;
+  int _lastReportedReadTimestamp = 0;
+
   Future<void> loadMessageList({
     String? userID,
     String? groupID,
@@ -447,24 +461,46 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
     final messageListStatus = _messageGlobalData.getMessageListStatus(
         userID: userID, groupID: TencentCloudChatUtils.checkString(topicID) ?? groupID);
 
+    // H6: parenthesize the early-exit guard so lastMsgID gates BOTH directions
+    // (the previous form parsed as `(lastMsgID != null && prev) || latest`,
+    // letting the latest-path clause fire regardless of lastMsgID).
     if (lastMsgID != null &&
-            (direction == TencentCloudChatMessageLoadDirection.previous && !messageListStatus.haveMorePreviousData) ||
-        (direction == TencentCloudChatMessageLoadDirection.latest && !messageListStatus.haveMoreLatestData)) {
+        ((direction == TencentCloudChatMessageLoadDirection.previous && !messageListStatus.haveMorePreviousData) ||
+            (direction == TencentCloudChatMessageLoadDirection.latest && !messageListStatus.haveMoreLatestData))) {
       return;
     }
-    final isFinished = await _messageGlobalData.loadMessageList(
-      direction: direction,
-      userID: userID,
-      groupID: groupID,
-      topicID: topicID,
-      count: count,
-      lastMsgID: lastMsgID,
-      lastMsgSeq: lastMsgSeq,
-    );
-    if (direction == TencentCloudChatMessageLoadDirection.latest) {
-      messageListStatus.haveMoreLatestData = !isFinished;
+
+    // H5: per-direction in-flight guard — drop overlapping callers
+    // for the same direction so we don't fan out duplicate fetches.
+    final isPrevDir = direction == TencentCloudChatMessageLoadDirection.previous;
+    if (isPrevDir && _isLoadingPrevious) return;
+    if (!isPrevDir && _isLoadingLatest) return;
+    if (isPrevDir) {
+      _isLoadingPrevious = true;
     } else {
-      messageListStatus.haveMorePreviousData = !isFinished;
+      _isLoadingLatest = true;
+    }
+    try {
+      final isFinished = await _messageGlobalData.loadMessageList(
+        direction: direction,
+        userID: userID,
+        groupID: groupID,
+        topicID: topicID,
+        count: count,
+        lastMsgID: lastMsgID,
+        lastMsgSeq: lastMsgSeq,
+      );
+      if (direction == TencentCloudChatMessageLoadDirection.latest) {
+        messageListStatus.haveMoreLatestData = !isFinished;
+      } else {
+        messageListStatus.haveMorePreviousData = !isFinished;
+      }
+    } finally {
+      if (isPrevDir) {
+        _isLoadingPrevious = false;
+      } else {
+        _isLoadingLatest = false;
+      }
     }
     return;
   }
@@ -855,6 +891,24 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
       element.isRead = true;
     }
 
+    // M10: bail out if the newest message hasn't advanced past the previously
+    // reported watermark. messageList is in newest-first order (see
+    // getMessageListForRender), so messageList[0] is the newest. For groups we
+    // gate by timestamp; for C2C we gate by msgID identity.
+    final isGroup = TencentCloudChatUtils.checkString(_groupID) != null;
+    final newest = messageList.first;
+    final newestTimestamp = newest.timestamp ?? 0;
+    final newestMsgID = TencentCloudChatUtils.checkString(newest.msgID);
+    if (isGroup) {
+      if (newestTimestamp <= _lastReportedReadTimestamp) {
+        return;
+      }
+    } else {
+      if (newestMsgID != null && newestMsgID == _lastReportedReadMsgID) {
+        return;
+      }
+    }
+
     if (TencentCloudChatUtils.checkString(_groupID) != null && useReadReceipt) {
       final List<V2TimMessage> needReceiptMessageList = filteredMessageList
           .where(
@@ -875,6 +929,16 @@ class TencentCloudChatMessageSeparateDataProvider extends ChangeNotifier {
             cleanTimestamp: 0,
             cleanSequence: 0,
           );
+    }
+
+    // Advance watermark only after we've gone through the report path so a
+    // failure mid-flight doesn't get permanently suppressed by the watermark.
+    if (isGroup) {
+      if (newestTimestamp > _lastReportedReadTimestamp) {
+        _lastReportedReadTimestamp = newestTimestamp;
+      }
+    } else if (newestMsgID != null) {
+      _lastReportedReadMsgID = newestMsgID;
     }
   }
 
