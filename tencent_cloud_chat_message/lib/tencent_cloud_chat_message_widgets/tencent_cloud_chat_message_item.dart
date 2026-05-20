@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:tencent_cloud_chat_common/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
 import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
 import 'package:tencent_cloud_chat_common/data/theme/color/color_base.dart';
+import 'package:tencent_cloud_chat_common/data/theme/text_style/text_style.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
 import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
 import 'package:tencent_cloud_chat_common/base/tencent_cloud_chat_state_widget.dart';
@@ -119,9 +120,58 @@ abstract class TencentCloudChatMessageState<T extends TencentCloudChatMessageIte
     );
   }
 
+  // Toxee: For SEND_FAIL bubbles, render a tappable refresh affordance
+  // alongside the existing red error glyph. Tap retries immediately; long-press
+  // surfaces the original confirm dialog as a safety net for accidental taps.
+  // The whole row is one tap target so the GestureDetector wrapping
+  // messageStatusIndicator() can't also fire (double-retry).
+  Widget _renderFailedStatus(TencentCloudChatThemeColors colorTheme,
+      TencentCloudChatTextStyle textStyle) {
+    final iconSize = textStyle.standardText;
+    // Hardcoded English semantics label — no matching key in tL10n / app i18n;
+    // when toxee adds a "retry" string we can swap this in. Visible UI shows
+    // only the refresh glyph, so this string is for screen readers.
+    const retrySemantics = 'Retry';
+    return Semantics(
+      button: true,
+      label: retrySemantics,
+      child: Container(
+        margin: const EdgeInsets.only(right: 4),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: Icon(
+                Icons.refresh,
+                color: colorTheme.error,
+                size: iconSize,
+              ),
+            ),
+            Icon(
+              Icons.error,
+              color: colorTheme.error,
+              size: iconSize,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget messageStatusIndicator() {
     return GestureDetector(
+      // One-tap retry on SEND_FAIL; long-press still surfaces the confirm
+      // dialog as a safety net for accidental taps. Both paths route to the
+      // same onResendMessage callback (see _resendMessage in the row
+      // container), which Tim2Tox handles via reSendMessage() with media
+      // path recovery for image/file/sound/video messages.
       onTap: () {
+        if (widget.data.message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_FAIL) {
+          widget.methods.onResendMessage?.call();
+        }
+      },
+      onLongPress: () {
         if (widget.data.message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_FAIL) {
           _showResendDialog();
         }
@@ -137,11 +187,11 @@ abstract class TencentCloudChatMessageState<T extends TencentCloudChatMessageIte
                 return _renderSendingStatus(colorTheme);
               }
 
+              if (widget.data.message.status == MessageStatus.V2TIM_MSG_STATUS_SEND_FAIL) {
+                return _renderFailedStatus(colorTheme, textStyle);
+              }
+
               switch (widget.data.message.status) {
-                case MessageStatus.V2TIM_MSG_STATUS_SEND_FAIL:
-                  iconData = Icons.error;
-                  iconColor = colorTheme.error;
-                  break;
                 case MessageStatus.V2TIM_MSG_STATUS_SEND_SUCC:
                   iconData = showReadByOthersStatus ? Icons.done_all : Icons.done;
                   break;

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:ui' as ui;
@@ -5,6 +6,7 @@ import 'package:tencent_cloud_chat_common/utils/sdk_const.dart';
 import 'package:universal_html/html.dart' as html;
 
 import 'package:extended_text_field/extended_text_field.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -25,8 +27,14 @@ import 'package:tencent_cloud_chat_message/common/for_desktop/file_tools.dart';
 import 'package:tencent_cloud_chat_message/common/for_desktop/image_tools.dart';
 import 'package:tencent_cloud_chat_message/common/text_compiler/tencent_cloud_chat_message_text_compiler.dart';
 import 'package:tencent_cloud_chat_message/model/tencent_cloud_chat_message_separate_data_notifier.dart';
+import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/desktop/tencent_cloud_chat_message_input_recording_desktop.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/message_reply/tencent_cloud_chat_message_input_reply_container.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/select_mode/tencent_cloud_chat_message_input_select_mode_container.dart';
+
+// Tox protocol max payload for tox_friend_send_message() is 1372 UTF-8 bytes;
+// the warning threshold (~80%) gives the user breathing room before the cap.
+const int _kToxMaxMessageBytes = 1372;
+const int _kToxByteCounterThreshold = 1097;
 
 class TencentCloudChatMessageInputDesktop extends StatefulWidget {
   final MessageInputBuilderData inputData;
@@ -55,6 +63,7 @@ class _TencentCloudChatMessageInputDesktopState extends TencentCloudChatState<Te
   int _atTagIndex = -1;
   double _inputWidth = 900;
   int _maxLines = 6;
+  int _byteCount = 0;
   String listenerUUID = "";
 
   @override
@@ -300,6 +309,13 @@ class _TencentCloudChatMessageInputDesktopState extends TencentCloudChatState<Te
 
     /// End
     _inputText = _textEditingController.text;
+
+    final nextByteCount = utf8.encode(_inputText).length;
+    if (nextByteCount != _byteCount) {
+      safeSetState(() {
+        _byteCount = nextByteCount;
+      });
+    }
   }
 
   final GlobalKey desktopInputKey = GlobalKey();
@@ -365,6 +381,42 @@ class _TencentCloudChatMessageInputDesktopState extends TencentCloudChatState<Te
 
   List<Widget> _generateControlBar(TencentCloudChatThemeColors theme) {
     return _generateBarIcons(theme);
+  }
+
+  /// toxee 5.3 — Whether the current platform supports desktop voice
+  /// recording via `package:record`. Linux is gated off because it depends
+  /// on PulseAudio / PipeWire which we can't reliably probe at runtime.
+  bool get _desktopVoiceSupported {
+    if (kIsWeb) return false;
+    return Platform.isMacOS || Platform.isWindows;
+  }
+
+  Widget _buildDesktopMicButton(TencentCloudChatThemeColors theme) {
+    return Tooltip(
+      preferBelow: false,
+      message: tL10n.audio,
+      child: InkWell(
+        onTap: () async {
+          final result = await showDesktopVoiceRecorder(context);
+          if (result != null) {
+            widget.inputMethods.sendVoiceMessage(
+              voicePath: result.path,
+              duration: result.duration,
+            );
+          }
+        },
+        child: Container(
+          margin: const EdgeInsets.only(right: 10),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(2)),
+          padding: const EdgeInsets.all(4),
+          child: Icon(
+            Icons.mic,
+            color: theme.inputAreaIconColor.withOpacity(0.6),
+            size: 20,
+          ),
+        ),
+      ),
+    );
   }
 
   String _getShowName(V2TimGroupMemberFullInfo? item) {
@@ -504,6 +556,10 @@ class _TencentCloudChatMessageInputDesktopState extends TencentCloudChatState<Te
       } else if (isPressEnter) {
         if (!_isComposingText) {
           if (!_isEditingAtSearchWords || showMemberList.isEmpty) {
+            if (utf8.encode(_textEditingController.text).length >
+                _kToxMaxMessageBytes) {
+              return KeyEventResult.handled;
+            }
             widget.inputMethods.sendTextMessage(
               text: _textEditingController.text,
               mentionedUsers: _mentionedUsers
@@ -515,6 +571,9 @@ class _TencentCloudChatMessageInputDesktopState extends TencentCloudChatState<Te
             _inputText = "";
             _mentionedUsers.clear();
             _textEditingController.clear();
+            safeSetState(() {
+              _byteCount = 0;
+            });
             _cancelEditingMemberMentionStatus();
           } else {
             final V2TimGroupMemberFullInfo? memberInfo = showMemberList[activeIndex];
@@ -586,7 +645,11 @@ class _TencentCloudChatMessageInputDesktopState extends TencentCloudChatState<Te
                           padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.start,
-                            children: _generateControlBar(colorTheme),
+                            children: [
+                              ..._generateControlBar(colorTheme),
+                              if (_desktopVoiceSupported)
+                                _buildDesktopMicButton(colorTheme),
+                            ],
                           ),
                         ),
                       Container(
@@ -612,7 +675,10 @@ class _TencentCloudChatMessageInputDesktopState extends TencentCloudChatState<Te
                               )),
                             if (TencentCloudChatUtils.checkString(widget.statusText) == null)
                               Expanded(
-                                child: ExtendedTextField(
+                                child: Stack(
+                                  alignment: Alignment.bottomRight,
+                                  children: [
+                                    ExtendedTextField(
                                   key: desktopInputKey,
                                   scrollController: _scrollController,
                                   autofocus: true,
@@ -644,6 +710,21 @@ class _TencentCloudChatMessageInputDesktopState extends TencentCloudChatState<Te
                                   onTap: () {
                                     widget.inputMethods.closeSticker();
                                   },
+                                ),
+                                    if (_byteCount >= _kToxByteCounterThreshold)
+                                      Padding(
+                                        padding: const EdgeInsets.only(right: 6, bottom: 2),
+                                        child: Text(
+                                          '$_byteCount / $_kToxMaxMessageBytes',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: _byteCount > _kToxMaxMessageBytes
+                                                ? colorTheme.error
+                                                : const Color(0xFFE8A317),
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
                           ],

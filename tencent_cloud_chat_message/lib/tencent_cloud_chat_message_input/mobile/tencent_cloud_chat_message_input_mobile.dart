@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:math';
 
 import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:tencent_cloud_chat_common/components/components_definition/tencent_cloud_chat_component_builder_definitions.dart';
 import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat_common/tencent_cloud_chat.dart';
@@ -18,6 +20,11 @@ import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/mobi
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/mobile/tencent_cloud_chat_message_camera.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/mobile/tencent_cloud_chat_message_input_recording.dart';
 import 'package:tencent_cloud_chat_message/tencent_cloud_chat_message_input/select_mode/tencent_cloud_chat_message_input_select_mode_container.dart';
+
+// Tox protocol max payload for tox_friend_send_message() is 1372 UTF-8 bytes;
+// the warning threshold (~80%) gives the user breathing room before the cap.
+const int _kToxMaxMessageBytes = 1372;
+const int _kToxByteCounterThreshold = 1097;
 
 class TencentCloudChatMessageInputMobile extends StatefulWidget {
   final MessageInputBuilderData inputData;
@@ -56,6 +63,7 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
   Timer? _recordingStarter;
   double? _bottomPadding;
   String _inputText = "";
+  int _byteCount = 0;
   String listenerUUID = "";
 
   @override
@@ -196,6 +204,44 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
                 ),
               ),
             ));
+  }
+
+  /// toxee 5.4 — Explicit "paste from clipboard" affordance.
+  ///
+  /// The OS keyboard already exposes plain-text paste on long-press of the
+  /// input field, so we don't *need* a dedicated button. We add one anyway as
+  /// a discoverability win for users who don't realise text paste is a
+  /// keyboard feature (esp. on Android where the paste bubble can be slow to
+  /// appear). It only handles plain text — images need a new dependency
+  /// (`super_clipboard` or platform channels) which is out of scope for this
+  /// pass.
+  // TODO(toxee): support pasting images from the clipboard on mobile. Needs
+  // `super_clipboard` or platform-channel work — tracked under polish-pass 5.4.
+  Future<void> _pasteTextFromClipboard() async {
+    try {
+      final data = await Clipboard.getData(Clipboard.kTextPlain);
+      final pasted = data?.text;
+      if (pasted == null || pasted.isEmpty) return;
+      final selection = _textEditingController.selection;
+      final current = _textEditingController.text;
+      final insertAt = selection.isValid ? selection.start : current.length;
+      final updated =
+          current.substring(0, insertAt) + pasted + current.substring(insertAt);
+      _textEditingController.text = updated;
+      _textEditingController.selection =
+          TextSelection.collapsed(offset: insertAt + pasted.length);
+      _inputText = updated;
+      // Trigger byte-count re-evaluation through the existing listener path.
+      final nextByteCount = utf8.encode(updated).length;
+      if (nextByteCount != _byteCount) {
+        safeSetState(() {
+          _byteCount = nextByteCount;
+        });
+      }
+      _textEditingFocusNode.requestFocus();
+    } catch (e) {
+      debugPrint('Clipboard paste failed: $e');
+    }
   }
 
   void _onStartRecording(PointerDownEvent event) async {
@@ -353,6 +399,13 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
     /// End
     _inputText = _textEditingController.text;
 
+    final nextByteCount = utf8.encode(_inputText).length;
+    if (nextByteCount != _byteCount) {
+      safeSetState(() {
+        _byteCount = nextByteCount;
+      });
+    }
+
     /// Update draft
     _updateDraft(_inputText);
   }
@@ -467,6 +520,23 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
                         Expanded(
                           child: _buildInputTextField(),
                         ),
+                        // toxee 5.4: explicit clipboard-paste affordance —
+                        // pastes plain text from the system clipboard into the
+                        // input. Image paste is intentionally not handled here
+                        // (see `_pasteTextFromClipboard` TODO).
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: _pasteTextFromClipboard,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: getSquareSize(4)),
+                            child: Icon(
+                              Icons.content_paste_rounded,
+                              size: textStyle.inputAreaIcon,
+                              color: colorTheme.inputAreaIconColor,
+                            ),
+                          ),
+                        ),
                         if (widget.inputData.hasStickerPlugin)
                           GestureDetector(
                             onTap: () {
@@ -502,22 +572,30 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
                                 angle: _animationController!.value * pi,
                                 child: _showSendButton
                                     ? InkWell(
-                                        onTap: () {
-                                          widget.inputMethods.sendTextMessage(
-                                            text: _textEditingController.text,
-                                            mentionedUsers: _mentionedUsers
-                                                .map(
-                                                  (e) => e.userID,
-                                                )
-                                                .toList(),
-                                          );
-                                          _inputText = "";
-                                          _mentionedUsers.clear();
-                                          _textEditingController.clear();
-                                        },
+                                        onTap: _byteCount > _kToxMaxMessageBytes
+                                            ? null
+                                            : () {
+                                                widget.inputMethods.sendTextMessage(
+                                                  text: _textEditingController.text,
+                                                  mentionedUsers: _mentionedUsers
+                                                      .map(
+                                                        (e) => e.userID,
+                                                      )
+                                                      .toList(),
+                                                );
+                                                _inputText = "";
+                                                _mentionedUsers.clear();
+                                                _textEditingController.clear();
+                                                safeSetState(() {
+                                                  _byteCount = 0;
+                                                });
+                                              },
                                         child: Container(
                                           decoration: BoxDecoration(
-                                              color: colorTheme.primaryColor, borderRadius: BorderRadius.circular(25)),
+                                              color: _byteCount > _kToxMaxMessageBytes
+                                                  ? colorTheme.primaryColor.withOpacity(0.4)
+                                                  : colorTheme.primaryColor,
+                                              borderRadius: BorderRadius.circular(25)),
                                           padding: EdgeInsets.all(getSquareSize(8)),
                                           child: Icon(
                                             Icons.arrow_upward_rounded,
@@ -560,22 +638,28 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
     if (_showStickerPanel) {
       return getHeight(280);
     }
-    // if (_showKeyboard) {
-    //   final currentKeyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-    //   double originHeight = TencentCloudChat.instance.dataInstance.basic.keyboardHeight ?? getHeight(280);
-    //   if (currentKeyboardHeight > -1) {
-    //     if (currentKeyboardHeight >= originHeight) {
-    //       originHeight = currentKeyboardHeight;
-    //     }
-    //     TencentCloudChatUtils.debounce("setCurrentKeyboardHeight", () {
-    //       TencentCloudChat.instance.dataInstance.basic.keyboardHeight = currentKeyboardHeight;
-    //     }, duration: const Duration(seconds: 1));
-    //   }
-    //   final height = originHeight != 0 ? originHeight : currentKeyboardHeight;
-    //   final actualHeight = height + (_bottomPadding! > 8 ? getSquareSize(16) : getSquareSize(0));
-    //
-    //   return actualHeight;
-    // }
+    // toxee 5.1: track the soft keyboard height via viewInsets so the sticker
+    // panel can size to match the previously-seen keyboard height the first
+    // time it opens. The previous behaviour (commented out below) tried to
+    // pad the panel area with the live `viewInsets.bottom`, which conflicted
+    // with `Scaffold.resizeToAvoidBottomInset` and produced double-padding.
+    // Instead we only OBSERVE the keyboard height here (debounced cache) and
+    // let the outer `Padding` (see `defaultBuilder`) push the bar above the
+    // keyboard. Sticker-panel sizing falls back to the cached height.
+    if (_showKeyboard) {
+      final currentKeyboardHeight =
+          MediaQuery.viewInsetsOf(context).bottom;
+      if (currentKeyboardHeight > 0) {
+        TencentCloudChatUtils.debounce(
+          'setCurrentKeyboardHeight',
+          () {
+            TencentCloudChat.instance.dataInstance.basic.keyboardHeight =
+                currentKeyboardHeight;
+          },
+          duration: const Duration(seconds: 1),
+        );
+      }
+    }
     return _bottomPadding ?? 0.0;
   }
 
@@ -596,10 +680,19 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
   Widget defaultBuilder(BuildContext context) {
     _bottomPadding ??= MediaQuery.of(context).padding.bottom;
     var panelHeight = _getBottomContainerHeight();
+    // toxee 5.1: pad the input container above the OS soft keyboard. We use
+    // `MediaQuery.viewInsetsOf(context).bottom` (tear-off form, lower rebuild
+    // cost than `MediaQuery.of(context).viewInsets.bottom`). When the sticker
+    // panel is shown we suppress the inset because the panel itself takes
+    // the keyboard's place.
+    final double keyboardInset =
+        _showStickerPanel ? 0.0 : MediaQuery.viewInsetsOf(context).bottom;
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) => TencentCloudChatThemeWidget(
         build: (context, colorTheme, textStyle) {
-          return Container(
+          return Padding(
+            padding: EdgeInsets.only(bottom: keyboardInset),
+            child: Container(
             color: colorTheme.inputAreaBackground,
             padding: EdgeInsets.only(
               bottom: _showStickerPanel ? 0 : (_bottomPadding! > 8 ? getSquareSize(0) : getSquareSize(16)),
@@ -608,10 +701,24 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
               top: widget.inputData.repliedMessage != null ? getSquareSize(8) : getSquareSize(16),
             ),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 if (widget.inputData.repliedMessage != null)
                   TencentCloudChatMessageInputReplyContainer(
                     repliedMessage: widget.inputData.repliedMessage,
+                  ),
+                if (_byteCount >= _kToxByteCounterThreshold)
+                  Padding(
+                    padding: EdgeInsets.only(bottom: getSquareSize(4), right: getSquareSize(4)),
+                    child: Text(
+                      '$_byteCount / $_kToxMaxMessageBytes',
+                      style: TextStyle(
+                        fontSize: getFontSize(11),
+                        color: _byteCount > _kToxMaxMessageBytes
+                            ? colorTheme.error
+                            : const Color(0xFFE8A317),
+                      ),
+                    ),
                   ),
                 IndexedStack(
                   index: _isRecording ? 1 : 0,
@@ -658,6 +765,7 @@ class _TencentCloudChatMessageInputMobileState extends TencentCloudChatState<Ten
                       : Container(),
                 )
               ],
+            ),
             ),
           );
         },
