@@ -1,6 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:tencent_cloud_chat_common/components/component_options/tencent_cloud_chat_message_options.dart';
 import 'package:tencent_cloud_chat_common/components/tencent_cloud_chat_components_utils.dart';
+import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_screen_adapter.dart';
 import 'package:tencent_cloud_chat_common/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat_common/router/tencent_cloud_chat_navigator.dart';
@@ -45,14 +48,101 @@ class TencentCloudChatContactItemState extends TencentCloudChatState<TencentClou
     }
   }
 
+  Future<void> _copyToxId() async {
+    await Clipboard.setData(ClipboardData(text: widget.friend.userID));
+    if (!mounted) return;
+    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+      const SnackBar(
+        content: Text('Tox ID copied'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  Future<void> _showDesktopContextMenu(Offset globalPosition) async {
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox?;
+    final selected = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        globalPosition.dx,
+        globalPosition.dy,
+        overlay == null ? globalPosition.dx : overlay.size.width - globalPosition.dx,
+        overlay == null ? globalPosition.dy : overlay.size.height - globalPosition.dy,
+      ),
+      items: const <PopupMenuEntry<String>>[
+        PopupMenuItem<String>(
+          value: 'open',
+          child: ListTile(
+            leading: Icon(Icons.chat_bubble_outline),
+            title: Text('Open chat'),
+            dense: true,
+            contentPadding: EdgeInsets.zero,
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'copy',
+          child: ListTile(
+            leading: Icon(Icons.copy),
+            title: Text('Copy Tox ID'),
+            dense: true,
+            contentPadding: EdgeInsets.zero,
+          ),
+        ),
+      ],
+    );
+    if (selected == null) return;
+    switch (selected) {
+      case 'open':
+        await navigateToChat();
+        break;
+      case 'copy':
+        await _copyToxId();
+        break;
+    }
+  }
+
+  Future<void> _showMobileContextMenu() async {
+    await showCupertinoModalPopup<void>(
+      context: context,
+      builder: (BuildContext sheetContext) => CupertinoActionSheet(
+        actions: <CupertinoActionSheetAction>[
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(sheetContext);
+              navigateToChat();
+            },
+            child: const Text('Open chat'),
+          ),
+          CupertinoActionSheetAction(
+            onPressed: () {
+              Navigator.pop(sheetContext);
+              _copyToxId();
+            },
+            child: const Text('Copy Tox ID'),
+          ),
+        ],
+        cancelButton: CupertinoActionSheetAction(
+          onPressed: () => Navigator.pop(sheetContext),
+          child: const Text('Cancel'),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget defaultBuilder(BuildContext context) {
+    final platformIsDesktop = TencentCloudChatPlatformAdapter().isDesktop;
     return TencentCloudChatThemeWidget(
       build: (context, color, textStyle) => Material(
         color: color.backgroundColor,
         child: InkWell(
           onTap: navigateToChat,
+          onLongPress: platformIsDesktop ? null : _showMobileContextMenu,
+          onSecondaryTapDown: platformIsDesktop
+              ? (TapDownDetails details) {
+                  _showDesktopContextMenu(details.globalPosition);
+                }
+              : null,
           child: Container(
             width: MediaQuery.of(context).size.width,
             padding: EdgeInsets.symmetric(

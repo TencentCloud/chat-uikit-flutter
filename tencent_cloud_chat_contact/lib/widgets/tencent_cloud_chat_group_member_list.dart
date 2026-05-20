@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:azlistview_all_platforms/azlistview_all_platforms.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat_common/data/group_profile/tencent_cloud_chat_group_profile_data.dart';
 import 'package:tencent_cloud_chat_common/utils/tencent_cloud_chat_utils.dart';
@@ -12,6 +13,26 @@ import 'package:tencent_cloud_chat_common/tencent_cloud_chat_common.dart';
 import 'package:tencent_cloud_chat_common/widgets/dialog/tencent_cloud_chat_dialog.dart';
 import 'package:tencent_cloud_chat_contact/model/contact_presenter.dart';
 import 'package:tencent_cloud_chat_contact/widgets/tencent_cloud_chat_group_member_info.dart';
+
+// toxee: keep these in sync with lib/util/responsive_layout.dart —
+// `masterDetailBreakpoint` (800) and the desktop max content width (1200).
+// The UIKit fork can't import from the toxee app, so the constants live
+// here; they move at most once per release.
+const double _kToxeeMasterDetailBreakpoint = 800.0;
+const double _kToxeeMasterDetailMaxWidth = 1200.0;
+
+/// Wraps the AZ list in a max-width container when the viewport is wide
+/// enough that an unconstrained list looks like a "postage stamp on 4K".
+/// Below the master-detail breakpoint we pass the child through untouched
+/// so phone/tablet layouts behave exactly as before.
+Widget _toxeeConstrainWide(BuildContext context, Widget child) {
+  final width = MediaQuery.sizeOf(context).width;
+  if (width < _kToxeeMasterDetailBreakpoint) return child;
+  return ConstrainedBox(
+    constraints: const BoxConstraints(maxWidth: _kToxeeMasterDetailMaxWidth),
+    child: child,
+  );
+}
 
 class ISuspensionBeanImpl<T> extends ISuspensionBean {
   String tagIndex;
@@ -90,10 +111,13 @@ class TencentCloudChatGroupMemberListState extends TencentCloudChatState<Tencent
                 body: Container(
                     color: colorTheme.backgroundColor,
                     child: Center(
-                      child: TencentCloudChatGroupMemberListAzList(
-                        groupInfo: widget.groupInfo,
-                        memberInfoList: widget.memberInfoList,
-                        lastMessageTimeMap: widget.lastMessageTimeMap,
+                      child: _toxeeConstrainWide(
+                        context,
+                        TencentCloudChatGroupMemberListAzList(
+                          groupInfo: widget.groupInfo,
+                          memberInfoList: widget.memberInfoList,
+                          lastMessageTimeMap: widget.lastMessageTimeMap,
+                        ),
                       ),
                     ))));
   }
@@ -114,10 +138,13 @@ class TencentCloudChatGroupMemberListState extends TencentCloudChatState<Tencent
                 body: Container(
                     color: colorTheme.backgroundColor,
                     child: Center(
-                      child: TencentCloudChatGroupMemberListAzList(
-                        groupInfo: widget.groupInfo,
-                        memberInfoList: widget.memberInfoList,
-                        lastMessageTimeMap: widget.lastMessageTimeMap,
+                      child: _toxeeConstrainWide(
+                        context,
+                        TencentCloudChatGroupMemberListAzList(
+                          groupInfo: widget.groupInfo,
+                          memberInfoList: widget.memberInfoList,
+                          lastMessageTimeMap: widget.lastMessageTimeMap,
+                        ),
                       ),
                     ))));
   }
@@ -314,6 +341,121 @@ class TencentCloudChatGroupMemberListItemState extends TencentCloudChatState<Ten
     return widget.memberFullInfo.userID == TencentCloudChat.instance.dataInstance.basic.currentUser!.userID;
   }
 
+  Future<void> _copyMemberId() async {
+    await Clipboard.setData(ClipboardData(text: widget.memberFullInfo.userID));
+    if (!mounted) return;
+    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+      const SnackBar(
+        content: Text('Tox ID copied'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  Future<void> _showDesktopContextMenu(Offset globalPosition) async {
+    if (isSelf()) {
+      return;
+    }
+    final int role = widget.memberFullInfo.role ?? 0;
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox?;
+
+    final List<PopupMenuEntry<String>> items = <PopupMenuEntry<String>>[
+      const PopupMenuItem<String>(
+        value: 'info',
+        child: ListTile(
+          leading: Icon(Icons.person_outline),
+          title: Text('Info'),
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+        ),
+      ),
+      const PopupMenuItem<String>(
+        value: 'copy',
+        child: ListTile(
+          leading: Icon(Icons.copy),
+          title: Text('Copy Tox ID'),
+          dense: true,
+          contentPadding: EdgeInsets.zero,
+        ),
+      ),
+    ];
+    if (canSetAdmin()) {
+      items.add(
+        PopupMenuItem<String>(
+          value: 'admin',
+          child: ListTile(
+            leading: const Icon(Icons.shield_outlined),
+            title: Text(role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_MEMBER
+                ? tL10n.setAsAdmin
+                : tL10n.dismissAdmin),
+            dense: true,
+            contentPadding: EdgeInsets.zero,
+          ),
+        ),
+      );
+    }
+    if (canDeleteMember()) {
+      items.add(
+        PopupMenuItem<String>(
+          value: 'remove',
+          child: ListTile(
+            leading: const Icon(Icons.person_remove_outlined, color: Colors.red),
+            title: Text(tL10n.delete, style: const TextStyle(color: Colors.red)),
+            dense: true,
+            contentPadding: EdgeInsets.zero,
+          ),
+        ),
+      );
+    }
+
+    final selected = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        globalPosition.dx,
+        globalPosition.dy,
+        overlay == null ? globalPosition.dx : overlay.size.width - globalPosition.dx,
+        overlay == null ? globalPosition.dy : overlay.size.height - globalPosition.dy,
+      ),
+      items: items,
+    );
+    if (selected == null || !mounted) return;
+    switch (selected) {
+      case 'info':
+        final isDesktop = TencentCloudChatPlatformAdapter().isDesktop;
+        if (isDesktop) {
+          TencentCloudChatDialog.showCustomDialog(
+            context: context,
+            builder: (c) => TencentCloudChatGroupMemberInfo(
+              memberFullInfo: widget.memberFullInfo,
+            ),
+          );
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TencentCloudChatGroupMemberInfo(
+                memberFullInfo: widget.memberFullInfo,
+              ),
+            ),
+          );
+        }
+        break;
+      case 'copy':
+        await _copyMemberId();
+        break;
+      case 'admin':
+        if (role == GroupMemberRoleType.V2TIM_GROUP_MEMBER_ROLE_MEMBER) {
+          await _onSetMemberRole(GroupMemberRoleTypeEnum.V2TIM_GROUP_MEMBER_ROLE_ADMIN);
+        } else {
+          await _onSetMemberRole(GroupMemberRoleTypeEnum.V2TIM_GROUP_MEMBER_ROLE_MEMBER);
+        }
+        break;
+      case 'remove':
+        widget.onDeleteGroupMember();
+        break;
+    }
+  }
+
   onManageMember() {
     if (isSelf()) {
       return;
@@ -396,6 +538,11 @@ class TencentCloudChatGroupMemberListItemState extends TencentCloudChatState<Ten
               color: colorTheme.backgroundColor,
               child: GestureDetector(
                   onTap: onManageMember,
+                  onSecondaryTapDown: TencentCloudChatPlatformAdapter().isDesktop
+                      ? (TapDownDetails details) {
+                          _showDesktopContextMenu(details.globalPosition);
+                        }
+                      : null,
                   child: Padding(
                     padding: EdgeInsets.symmetric(
                       vertical: getHeight(10),

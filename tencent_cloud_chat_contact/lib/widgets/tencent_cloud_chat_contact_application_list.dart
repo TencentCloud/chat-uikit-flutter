@@ -1,7 +1,9 @@
 // ignore_for_file: public_member_api_docs, sort_constructors_first, unused_import
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:tencent_cloud_chat_common/chat_sdk/components/tencent_cloud_chat_contact_sdk.dart';
 import 'package:tencent_cloud_chat_common/components/tencent_cloud_chat_components_utils.dart';
+import 'package:tencent_cloud_chat_common/cross_platforms_adapter/tencent_cloud_chat_platform_adapter.dart';
 import 'package:tencent_cloud_chat_common/data/theme/color/color_base.dart';
 import 'package:tencent_cloud_chat_common/data/theme/text_style/text_style.dart';
 import 'package:tencent_cloud_chat_common/models/tencent_cloud_chat_models.dart';
@@ -81,10 +83,136 @@ class TencentCloudChatContactApplicationItemState
     });
   }
 
+  Future<void> _acceptFromMenu() async {
+    final res = await TencentCloudChat.instance.chatSDKInstance.contactSDK.acceptFriendApplication(
+      widget.application.userID,
+      FriendResponseTypeEnum.V2TIM_FRIEND_ACCEPT_AGREE_AND_ADD,
+      FriendApplicationTypeEnum.values[widget.application.type],
+    );
+    final id = res.userID ?? '';
+    final code = res.resultCode ?? -1;
+    if (id == widget.application.userID && code == 0) {
+      safeSetState(() {
+        applicationResult = ContactApplicationResult(
+          result: tL10n.accepted,
+          userID: widget.application.userID,
+        );
+      });
+    } else {
+      TencentCloudChat.instance.callbacks.onUserNotificationEvent(
+        TencentCloudChatComponentsEnum.contact,
+        TencentCloudChatUserNotificationEvent(
+          eventCode: code,
+          text: tL10n.invalidApplication,
+        ),
+      );
+    }
+    TencentCloudChat.instance.dataInstance.contact
+        .deleteApplicationList([widget.application.userID], 'onFriendApplicationListDeleted');
+  }
+
+  Future<void> _refuseFromMenu() async {
+    final res = await TencentCloudChat.instance.chatSDKInstance.contactSDK.refuseFriendApplication(
+      widget.application.userID,
+      FriendApplicationTypeEnum.values[widget.application.type],
+    );
+    final id = res.userID ?? '';
+    final code = res.resultCode ?? -1;
+    if (id == widget.application.userID && code == 0) {
+      safeSetState(() {
+        applicationResult = ContactApplicationResult(
+          result: tL10n.declined,
+          userID: widget.application.userID,
+        );
+      });
+    } else {
+      TencentCloudChat.instance.callbacks.onUserNotificationEvent(
+        TencentCloudChatComponentsEnum.contact,
+        TencentCloudChatUserNotificationEvent(
+          eventCode: code,
+          text: tL10n.invalidApplication,
+        ),
+      );
+    }
+    TencentCloudChat.instance.dataInstance.contact
+        .deleteApplicationList([widget.application.userID], 'onFriendApplicationListDeleted');
+  }
+
+  Future<void> _copyApplicantId() async {
+    await Clipboard.setData(ClipboardData(text: widget.application.userID));
+    if (!mounted) return;
+    ScaffoldMessenger.maybeOf(context)?.showSnackBar(
+      const SnackBar(
+        content: Text('Tox ID copied'),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  Future<void> _showDesktopContextMenu(Offset globalPosition) async {
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox?;
+    final selected = await showMenu<String>(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        globalPosition.dx,
+        globalPosition.dy,
+        overlay == null ? globalPosition.dx : overlay.size.width - globalPosition.dx,
+        overlay == null ? globalPosition.dy : overlay.size.height - globalPosition.dy,
+      ),
+      items: const <PopupMenuEntry<String>>[
+        PopupMenuItem<String>(
+          value: 'accept',
+          child: ListTile(
+            leading: Icon(Icons.check, color: Colors.green),
+            title: Text('Accept'),
+            dense: true,
+            contentPadding: EdgeInsets.zero,
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'reject',
+          child: ListTile(
+            leading: Icon(Icons.close, color: Colors.red),
+            title: Text('Reject'),
+            dense: true,
+            contentPadding: EdgeInsets.zero,
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'copy',
+          child: ListTile(
+            leading: Icon(Icons.copy),
+            title: Text('View Tox ID'),
+            dense: true,
+            contentPadding: EdgeInsets.zero,
+          ),
+        ),
+      ],
+    );
+    if (selected == null || !mounted) return;
+    switch (selected) {
+      case 'accept':
+        await _acceptFromMenu();
+        break;
+      case 'reject':
+        await _refuseFromMenu();
+        break;
+      case 'copy':
+        await _copyApplicantId();
+        break;
+    }
+  }
+
   @override
   Widget defaultBuilder(BuildContext context) {
+    final platformIsDesktop = TencentCloudChatPlatformAdapter().isDesktop;
     return GestureDetector(
         onTap: gotoApplicationInfoPage,
+        onSecondaryTapDown: platformIsDesktop
+            ? (TapDownDetails details) {
+                _showDesktopContextMenu(details.globalPosition);
+              }
+            : null,
         child: TencentCloudChatThemeWidget(
             build: (context, colorTheme, textStyle) => Container(
                   color: colorTheme.backgroundColor,
