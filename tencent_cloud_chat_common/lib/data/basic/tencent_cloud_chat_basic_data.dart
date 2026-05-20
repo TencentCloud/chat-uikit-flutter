@@ -26,6 +26,7 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> with Widget
   void clear() {
     _hasLoggedIn = false;
     _currentUser = null;
+    plugins.clear();
   }
 
   /// === AppLifecycleState ===
@@ -82,7 +83,12 @@ class TencentCloudChatBasicData<T> extends TencentCloudChatDataAB<T> with Widget
   TencentCloudChatUserConfig get userConfig => _userConfig;
 
   addPlugin(TencentCloudChatPluginItem plugin) {
-    plugins.add(plugin);
+    final existing = plugins.indexWhere((e) => e.name == plugin.name);
+    if (existing > -1) {
+      plugins[existing] = plugin;
+    } else {
+      plugins.add(plugin);
+    }
   }
 
   hasPlugins(String name) {
