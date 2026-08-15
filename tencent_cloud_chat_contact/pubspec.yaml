@@ -18,7 +18,7 @@ platforms:
 dependencies:
   flutter:
     sdk: flutter
-  tencent_cloud_chat_common: ^4.1.0y
+  tencent_cloud_chat_common: ^4.1.0
   azlistview_all_platforms: ^2.1.2
   url_launcher: ^6.2.6
 
